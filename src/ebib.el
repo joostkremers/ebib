@@ -98,7 +98,7 @@ documentation of that function for details."
   "*Standard field to store urls in.
 
 In the index buffer, the command ebib-browse-url can be used to
-send a url to a browser. This options sets the field from which
+send a url to a browser. This option sets the field from which
 this command extracts the url."
   :group 'ebib
   :type 'symbol)
