@@ -79,6 +79,10 @@ of entries, so it is not compatible with setting the Sort Order option."
   :group 'ebib
   :type 'boolean)
 
+(defface ebib-crossref-face '((t (:foreground "red")))
+  "*Face used to indicate values inherited from crossreferenced entries."
+  :group 'ebib)
+
 (defcustom ebib-use-timestamp nil
   "*If true, new entries will get a time stamp.
 The time stamp will be stored in a field \"timestamp\" that can
@@ -802,6 +806,10 @@ The keys of HASHTABLE must be either symbols or strings."
 	     hashtable)
     result))
 
+(defmacro ebib-retrieve-entry (entry-key db)
+  "Returns the hash table of the fields stored in DB under ENTRY-KEY."
+  `(gethash ,entry-key (edb-database ,db)))
+
 (defun ebib-get-field-highlighted (field current-entry &optional match-str)
   ;; note: we need to work on a copy of the string, otherwise the highlights
   ;; are made to the string as stored in the database. hence copy-sequence.
@@ -816,7 +824,12 @@ The keys of HASHTABLE must be either symbols or strings."
     ;; - properly adjust the string if it's multiline
     ;; but all this is not necessary if there was no string
     (if (null string)
-	(setq string "")
+	(let ((xref (to-raw (gethash 'crossref current-entry))))
+	  (when xref
+	    (setq string (gethash field (ebib-retrieve-entry xref ebib-cur-db)))
+	    (if string
+		(setq string (propertize (to-raw string) 'face 'ebib-crossref-face 'fontified t))
+	      (setq string ""))))
       (if (raw-p string)
 	  (setq raw "*")
 	(setq string (to-raw string))) ; we have to make the string look nice
@@ -981,10 +994,6 @@ added."
 	(if sort
 	    (sort (cons abbr (edb-strings-list db)) 'string<)
 	  (cons abbr (edb-strings-list db)))))
-
-(defmacro ebib-retrieve-entry (entry-key db)
-  "Returns the hash table of the fields stored in DB under ENTRY-KEY."
-  `(gethash ,entry-key (edb-database ,db)))
 
 (defmacro ebib-cur-entry-key ()
   "Returns the key of the current entry in EBIB-CUR-DB."
@@ -2609,7 +2618,9 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 		(puthash 'crossref (from-raw key) ebib-cur-entry-hash)
 		(ebib-set-modified t)))))
     (other-window 1)
-    (ebib-redisplay-current-field)))
+    ;; we now redisplay the entire entry buffer, so that the crossref'ed
+    ;; fields show up. this also puts the cursor back on the type field.
+    (ebib-fill-entry-buffer)))
 
 ;; we should modify ebib-edit-field, so that it calls the appropriate
 ;; helper function, which asks the user for the new value and just returns

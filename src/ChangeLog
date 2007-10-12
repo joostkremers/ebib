@@ -1,3 +1,11 @@
+2007-10-11  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-get-field-highlighted): modified so as to show
+	field values inherited from a cross-referenced entry.
+	(ebib-crossref-face): new.
+	(ebib-edit-crossref): modified to redisplay the entire entry
+	buffer, not just the current field.
+
 2007-07-29  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-store-multiline-text): added a check to make sure
