@@ -1,0 +1,61 @@
+body {
+    font-family: Verdana, "Bitstream Vera Sans", sans-serif;
+    background-color: #c9c9c9;
+    color: #33333A;
+}
+
+a {
+    text-decoration: none;
+    color: #533333;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #cf1212;
+}
+
+h1 {
+    text-align: center
+}
+
+img {
+    border: 0;
+}
+
+#main {
+    position: absolute;
+/*     margin-right: 20%; */
+    margin-left: 50px;
+    top: 0px;
+    text-align: justify;
+    width: 600px;
+}
+
+#menu {
+    position: absolute;
+/*     margin-left: 78%; */
+    margin-left: 750px;
+    top: 20px;
+    width: 180px;
+    text-align: center;
+    background-color: #c00000;
+    height: 600px;
+    color: #c9c9c9;
+}
+
+#menu a {
+    text-decoration: none;
+    color: #ffa71d;
+}
+
+#menu a:hover {
+    text-decoration: none;
+    color: #ffdf20;
+}
+
+.bottom-dweller {
+    width: 100%;
+    position: absolute;
+    bottom: 0%;
+}
