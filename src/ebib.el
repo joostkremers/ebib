@@ -56,7 +56,8 @@
   :group 'ebib
   :type 'integer)
 
-(defcustom ebib-insertion-strings '((1 . "\\cite{%s}"))
+(defcustom ebib-insertion-strings '((0 . "%s")
+				    (1 . "\\cite{%s}"))
   "*The string to insert when calling EBIB-INSERT-BIBTEX-KEY.
 
 The directive \"%s\" is replaced with the entry key."
@@ -256,6 +257,7 @@ Each string is added to the preamble on a separate line."
 (defvar ebib-minibuf-hist nil "Holds the minibuffer history for Ebib")
 (defvar ebib-saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib-export-filename nil "Filename to export entries to.")
+(defvar ebib-push-buffer nil "Buffer to push entries to.")
 (defvar ebib-search-string nil "Stores the last search string.")
 (defvar ebib-editing nil "Indicates what the user is editing.
 Its value can be 'strings, 'fields, or 'preamble.")
@@ -1154,7 +1156,8 @@ killed and the database has been modified."
 				    ebib-latex-entries
 				    ebib-mark-entry
 				    ebib-print-entries
-				    ebib-export-entry)))
+				    ebib-export-entry
+				    ebib-push-entry-key)))
 
 ;; macro to redefine key bindings.
 
@@ -1224,10 +1227,11 @@ killed and the database has been modified."
 (ebib-key index [(control n)] ebib-next-entry)
 (ebib-key index [(meta n)] ebib-index-scroll-up)
 (ebib-key index "o" ebib-load-bibtex-file)
-(ebib-key index "p" ebib-edit-preamble)
+(ebib-key index "p" ebib-push-entry-key)
 (ebib-key index [(control p)] ebib-prev-entry)
 (ebib-key index [(meta p)] ebib-index-scroll-down)
 (ebib-key index "P" ebib-print-entries)
+(ebib-key index "r" ebib-edit-preamble)
 (ebib-key index "q" ebib-quit)
 (ebib-key index "s" ebib-save-current-database)
 (ebib-key index "S" ebib-save-all-databases)
@@ -2441,6 +2445,32 @@ modified."
   (interactive)
   (other-window 1)
   (ebib-display-help ebib-index-buffer))
+
+(defun ebib-push-entry-key (prefix)
+  "Pushes the current entry to a LaTeX buffer.
+
+The user is prompted for the buffer to push the entry into."
+  (interactive "p")
+  (let ((called-with-prefix (ebib-called-with-prefix)))
+    (ebib-execute-when
+      ((entries)
+       (let ((buffer (read-buffer "Push entry(ies) to buffer: " ebib-push-buffer t)))
+	 (when buffer
+	   (setq ebib-push-buffer buffer)
+	   (let ((latex-cmd (or (cdr (assoc prefix ebib-insertion-strings))
+				"{%s}"))
+		 (latex-arg (if called-with-prefix
+				(when (edb-marked-entries ebib-cur-db)
+				  (mapconcat #'(lambda (x) x)
+					     (edb-marked-entries ebib-cur-db)
+					     ","))
+			      (car (edb-cur-entry ebib-cur-db)))))
+	     (save-excursion
+	       (set-buffer buffer)
+	       (insert (format latex-cmd latex-arg)))
+	     (message "Pushed entries to buffer %s" buffer)))))
+      ((default)
+       (beep)))))
 
 ;;;;;;;;;;;;;;;;
 ;; entry-mode ;;

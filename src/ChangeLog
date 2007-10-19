@@ -1,3 +1,16 @@
+2007-10-19  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-push-entry-key): new. pushes the current entry
+	key, or the marked entry keys, to a buffer, using
+	ebib-insertion-strings.
+	(ebib-key "p"): changed to ebib-push-entry-key.
+	(ebib-key "r"): new. assigned to ebib-edit-preamble.
+	(ebib-prefixed-functions): ebib-push-entry-key added.
+	(ebib-push-buffer): new. holds the name of the last buffer to
+	which an entry was pushed, to present it as default in the next
+	push operation.
+	(ebib-insertion-strings): modified default value: 0 added.
+
 2007-10-11  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-get-field-highlighted): modified so as to show

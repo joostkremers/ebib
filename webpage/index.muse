@@ -79,8 +79,10 @@ quite a few extra features that make managing your BibTeX files easier.
 
 *** LaTeX integration
 
-  - automatic insertion of a BibTeX key into a LaTeX document, where you
-    can use TAB-completion to select a key from the database.
+  - automatic selection and insertion of a BibTeX key into a LaTeX
+    document, where you can use TAB-completion to select a key from the
+    database.
+  - pushing entries from Ebib to a LaTeX buffer.
   - quick summary of entries into a =*Help*= buffer.
 
 

@@ -105,7 +105,6 @@ background. The =.bib= files that you have opened remain loaded, and you can
 return to them by typing =M-x ebib= again.
 
 
-
 *** Opening a =.bib= file
 
 Loading a =.bib= file into Ebib is done with the command =o=. Ebib reads the
@@ -370,57 +369,66 @@ databases*. These are described later. (See [[#virtual-databases][Virtual Databa
 
 ** LaTeX Integration
 
-Leaving Ebib with the command =z= has an additional advantage, apart from the
-fact that you do not have to reload your database(s) when you invoke Ebib
-again. When you are in a non-Ebib buffer, two commands are available that
-allow you to query Ebib's database. First, there is
-=ebib-insert-bibtex-key=. When you invoke this command, Emacs prompts you for
-a key from the database associated with the current buffer. You can type
-the key, using tab-completion, and after hitting =RET=, Emacs puts a BibTeX
-citation at the cursor position in the current buffer with the key you
-selected.
+Having a BibTeX database manager running inside Emacs has an additional
+advantage: it makes it trivially easy to insert BibTeX keys in your LaTeX
+documents.
 
-The citation command that Emacs inserts is =\cite{<key>}=. The string that
-=ebib-insert-bibtex-key= inserts can be customised. It is in fact possible to
-define multiple insertion strings, so that you can have Ebib insert not
-only the key, but the entire citation command. The different strings can
-then be obtained by calling =ebib-insert-bibtex-key= with a prefix
+Ebib provides two functions for this. First, if you're in a LaTeX buffer,
+you can call the function =ebib-insert-bibtex-key=. When you invoke this
+command, Emacs prompts you for a key from the database(s) associated with
+the current buffer. You can type the key, using TAB-completion, and after
+hitting =RET=, Emacs puts a BibTeX citation at the cursor position in the
+current buffer with the key you selected.
+
+It is also possible to push entries from Ebib to a LaTeX buffer. To do
+this, hit the key =p= in the index buffer. Ebib will ask you for a buffer to
+push the entry to, and will then insert the string =\cite{<key>}= at the
+current cursor position in the buffer you've supplied.
+
+By default, both =ebib-insert-bibtex-key= and the command key =p= in the index
+buffer insert the key into the LaTeX buffer with command =\cite=. It is
+possible to change this, however. In fact, it is possible to define
+multiple insertion strings, so that you can have Ebib insert a variety of
+citation commands with the key. The different strings can then be obtained
+by calling =ebib-insert-bibtex-key= or by hitting =p= with a prefix
 argument. So if you have defined e.g. four insertion strings, =M-2 M-x
-ebib-insert-bibtex-key= inserts the second one. If you have defined more
-than one insertion string, calling =ebib-insert-bibtex-key= without prefix
-argument will insert the first string. For details on defining custom
-insertion strings, see [[#insertion-strings][Insertion Strings]].
+ebib-insert-bibtex-key= or =M-2 p= both use the second one. If you have
+defined more than one insertion string, calling =ebib-insert-bibtex-key= or
+hitting =p= without prefix argument will insert the first string. For details
+on defining custom insertion strings, see [[#insertion-strings][Insertion Strings]].
 
-The second function that is available outside Ebib is
+There is another function that is available outside Ebib:
 =ebib-entry-summary=. This command reads the key under the cursor in the
 current buffer and displays the field values associated with that key in a
 =*Help*= buffer. This allows you to quickly check a reference in a text.
 
-Ebib can have multiple databases open, but the two commands discussed here
-operate on only one of these. In order to determine which database
-=ebib-insert-bibtex-key= and =ebib-entry-summary= must consult, Ebib tries to
-associate a (LaTeX) buffer with a particular BibTeX database.  Ebib does
-this by checking if there is a <verb>\bibliography</verb> command in the
-current file. If there is, it reads the filename from that command and
-tries to find a corresponding database. If there is no database with that
-name, Ebib will give an error. (This usually means that the relevant
-database is not loaded.)  If there is no <verb>\bibliography</verb> command
-in the current file, Ebib will consult the current database, i.e., the
-database that was active when Ebib was lowered.
+Ebib can have multiple databases open, but both =ebib-insert-bibtex-key= and
+=ebib-entry-summary= operate on only one of these. In order to determine
+which database these commands must consult, Ebib tries to associate a
+(LaTeX) buffer with one or more BibTeX databases currently loaded.  Ebib
+does this by checking if there is a <verb>\bibliography</verb> command in
+the current file. If there is, it reads the filename(s) from that command
+and tries to find a corresponding database. If there are no databases with
+that name, Ebib will give an error. (This usually means that the relevant
+database is not loaded. Note that Ebib does not automatically load a
+database that is mentioned in a <verb>\bibliography</verb> command.) If
+there is no <verb>\bibliography</verb> command in the current file, Ebib
+consults the current database, i.e., the database that was active when Ebib
+was lowered.
 
 If you have split up your LaTeX document into more than one file, you may
 of course be editing a file that does not have a <verb>\bibliography</verb>
-command of its own. If you use AUCTeX, Ebib will check if the variable
+command of its own. If you use AUCTeX, Ebib checks if the variable
 =TeX-master= happens to be set to a filename. If it is, Ebib will look for a
 <verb>\bibliography</verb> command in that file instead of in the current
 buffer.  If you don't use AUCTeX, just make sure that the relevant database
 is active in Ebib: if Ebib does not find a <verb>\bibliography</verb>
-command in the current buffer, and does not find =TeX-master=, it will use
+command in the current buffer, and does not find =TeX-master=, it uses
 the current database as a default.
 
-A final note: probably the easiest way to use both of these functions is to
-bind them to a key sequence. For example, you could put the following in
-your =~/.emacs=:
+A final note: probably the easiest way to use both =ebib-insert-bibtex-key=
+and =ebib-entry-summary= is to bind them to a key sequence. For example, you
+could put the following in your =~/.emacs=:
 
 <example>
 (add-hook 'LaTeX-mode-hook #'(lambda ()
@@ -538,14 +546,14 @@ discussed in the chapter on customisation, see [[#customisation-buffer][The Cust
 ** Marking Entries
 
 Commands in the index buffer generally operate on one single entry, or on
-all entries. For some, however, it would be useful if you could perform
-them on more than one entry, but not necessarily all of them. You can mark
-the entries you want to perform a command on with the key =m=. This marks (or
-unmarks) the current entry. Marked entries are displayed in inverse
-video.[9]
+all entries. For some, however, it may sometimes be useful to perform them
+on more than one entry, but not necessarily all of them. This can be
+achieved by marking entries. You can mark the entries you want to perform a
+command on with the key =m=. This marks (or unmarks) the current
+entry. Marked entries are displayed in inverse video.[9]
 
-Of the commands discussed so far, three can be used on marked entries: =d=, =L=
-and =P=. Note, however, that it is not enough to mark the entries you want
+Of the commands discussed so far, four can be used on marked entries: =d=, =p=,
+=L= and =P=. Note, however, that it is not enough to mark the entries you want
 and then type any of these commands. If you do so, they will behave as if
 no entries were marked. To get these commands to work on the marked
 entries, you have to type a semicolon before them. That is, =; d= deletes all
@@ -553,6 +561,10 @@ marked entries, and =; L= and =; P= create a LaTeX file of only the marked
 entries. The command =m= itself can also be used with the =;= prefix. If there
 are any marked entries, =; m= unmarks them all. Otherwise, =; m= marks all
 entries.
+
+=; p= pushes all marked entries to a LaTeX buffer. It does so by putting them
+all in a single =\cite= command, separated by commas, not by putting them in
+separate =\cite= commands.
 
 
 ** Calling a Browser
@@ -606,7 +618,7 @@ Chances are that you will be doing most of your work with one or a few =.bib=
 files, and you may find yourself opening the same file or files every time
 you start Ebib. If so, you can tell Ebib to always load specific =.bib= files
 on startup. To do this, specify the files in Ebib's customisation buffer,
-under the option =Preload Bib Files=.
+under the option [[#preload-bib-files][Preload Bib Files]].
 
 
 ** =@Preamble= Definition
@@ -636,7 +648,7 @@ file:
          # "\newcommand{\singleletter}[1]{#1} " }
 </example>
 
-Creating or editing a =@preamble= definition in Ebib is done by hitting =p= in
+Creating or editing a =@preamble= definition in Ebib is done by hitting =r= in
 the index buffer. Ebib uses the multiline edit buffer for editing the text
 of the =@preamble= definition, which means that as discussed above, =C-x b=
 stores the =@preamble= text and returns focus to the index buffer, while =C-x
@@ -1204,10 +1216,11 @@ of references formatted by BibTeX. =(ebib-latex-database)=
   =M-n= :: equivalent to =PgDn=.
   
   =o= :: open a =.bib= file. =(ebib-load-bibtex-file)=
- 
-  =p= :: show and edit the =@preamble= definition in the
-database. =(ebib-edit-preamble)=
 
+  =p= :: push an entry to a LaTeX buffer =(ebib-push-entry-key)=
+
+  =; p= :: push the marked entries to a LaTeX buffer.
+ 
   =C-p= :: equivalent to =Up=.
 
   =M-p= :: equivalent to =PgUp=.
@@ -1216,6 +1229,9 @@ database. =(ebib-edit-preamble)=
 contents of each entry. =(ebib-print-database)=
 
   =; P= :: create a LaTeX file with the marked entries.
+
+  =r= :: show and edit the =@preamble= definition in the
+database. =(ebib-edit-preamble)=
 
   =q= :: quit Ebib. This sets all variables to nil, unloads the database(s)
 and quits Ebib. =(ebib-quit)=
@@ -1403,6 +1419,7 @@ type, which can be customised through this option. The standard value is
 
 
 *** Preload Bib Files
+#preload-bib-files
 
 This option allows you to specify which file(s) Ebib is to load when it
 starts up. Specify one file per line, press the =INS= button to add more
@@ -1430,16 +1447,16 @@ Ebib screen. The default value is 10.
 *** Insertion Strings
 #insertion-strings
 
-With the command =ebib-insert-bibtex-key=, you can insert a BibTeX key into a
-LaTeX buffer. This options allows you to customise the string that Ebib
-inserts in the buffer.
+With the command =ebib-insert-bibtex-key= or with the command key =p= in the
+index buffer, you can insert a BibTeX key into a LaTeX buffer. This option
+allows you to customise the string that Ebib inserts in the buffer.
 
 In fact, it is possible to define multiple strings. Each string must be
 numbered: this number provides a way to identify the string that you want
 to use. You can select the desired string by calling =ebib-insert-bibtex-key=
-with a numeric prefix argument corresponding to the string.
+or by hitting =p= with a numeric prefix argument corresponding to the string.
 
-Each string must contain a =%s= directive, which is replaced with the BibTeX
+Each string *must* contain a =%s= directive, which is replaced with the BibTeX
 key. For example, it is possible to define the following:
 
 <example>
@@ -1449,16 +1466,23 @@ key. For example, it is possible to define the following:
 </example>
 
 With this, typing =M-2 M-x ebib-insert-bibtex-key=, followed by a BibTeX key
-will insert the command <verb>\nocite{<key>}</verb> into the current
-buffer. The prefix argument also works when you have bound
-=ebib-insert-bibtex-key= to a key sequence. That is, if you have bound it to
-say =C-c b=, typing =M-2 C-c b= inserts the second string.
+inserts the command <verb>\nocite{<key>}</verb> into the current
+buffer. Similarly, typing =M-2 p= in the index buffer inserts the current key
+into the buffer you choose. (Note that the prefix argument also works when
+you have bound =ebib-insert-bibtex-key= to a key sequence. That is, if you
+have bound it to say =C-c b=, typing =M-2 C-c b= inserts the second string.)
 
-You can still use =ebib-insert-bibtex-key= without prefix argument if you
-have specified multiple strings. Ebib will then insert string number
-1. Note that if you define only one custom string, it still needs to be
-numbered. Give it number 1, so that you can enter it without prefix
-argument.
+Even if you have specified multiple strings, you can still use
+=ebib-insert-bibtex-key= or hit =p= without prefix argument. In that case, ebib
+just inserts string number 1. Note that if you define only one custom
+string, it still needs to be numbered. Give it number 1, so that you can
+enter it without prefix argument.
+
+The default value of this option is =((0 . "%s") (1 . "\cite{%s}"))=. With
+this setting, both =ebib-insert-bibtex-key= and =p= insert the key with the
+LaTeX command <verb>\cite</verb> by default, and they can furthemore be
+used with a prefix argument =0= (i.e. =M-0 ebib-insert-bibtex-key= or =M-0 p=) to
+insert just the bare key, without a <verb>\cite</verb> command.
 
 
 *** Sort Order
