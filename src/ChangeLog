@@ -4,6 +4,9 @@
 	the entire entry buffer is the current field is crossref. (cutting
 	the value from the crossref field would leave the inherited field
 	values visible.)
+	(ebib-import): modified to use insert-buffer-substring, rather
+	than buffer-string and insert. this way, there is no need to
+	temporarily store the buffer contents in a variable.
 
 2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
 

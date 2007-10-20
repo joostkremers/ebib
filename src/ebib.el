@@ -3235,9 +3235,9 @@ if it is active."
 	  (if (region-active)
 	      (narrow-to-region (region-beginning)
 				(region-end)))
-	  (let ((text (buffer-string)))
+	  (let ((buffer (current-buffer)))
 	    (with-temp-buffer
-	      (insert text)
+	      (insert-buffer-substring buffer)
 	      (let ((n (ebib-find-bibtex-entries t)))
 		(setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
 		(setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
