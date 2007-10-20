@@ -44,19 +44,19 @@ echo
 # )
 
 (cd $BASE/manual
-    if [ -f html/ebib-manual.html ] ; do
-	cp html/ebib-manual.html ebib-manual.ccs ../"$full_name"/doc/html/
+    if [ -f html/ebib-manual.html ] ; then
+	cp html/ebib-manual.html ebib-manual.css ../"$full_name"/doc/html/
 	echo "Copied html manual to $full_name/doc/html/"
     else
 	echo Warning: ebib-manual.html not found!
     fi
-    if [ -f pdf/ebib-manual.pdf ] ; do
+    if [ -f pdf/ebib-manual.pdf ] ; then
 	cp html/ebib-manual.pdf ../"$full_name"/doc/
 	echo "Copied pdf manual to $full_name/doc/"
     else
 	echo Warning: ebib-manual.pdf not found!
     fi
-    if [ -f html/ebib-manual.info ] ; do
+    if [ -f html/ebib-manual.info ] ; then
 	cp html/ebib-manual.info ../"$full_name"/info
 	echo "Copied info manual to $full_name/info"
     else
