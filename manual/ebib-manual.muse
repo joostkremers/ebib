@@ -607,15 +607,15 @@ can be customised. (See [[#url-regexp][Url Regexp]].)
 There exists an Emacs function =browse-url=, which provides a nifty interface
 to calling an external browser. In principle, Ebib uses this
 function. However, if this function is not present on your
-installation,[10] you can set the option =Browser Command= to call the
-browser. (See [[#browser-command][Browser Command]].)
+installation,[10] you can set the option [[#browser-command][Browser Command]] to call the
+browser.
 
 As just explained, if you press =u= in the index buffer, Ebib searches the
 =url= field of the current entry for URLs. If you have the habit of putting
 your URLs in another field, however, you may change the customisation
-option =Standard Url Field= and tell Ebib to use another field for searching
-the URLs. (See [[#standard-url-field][Standard Url Field]].) (Keep in mind, though, that in the
-entry buffer, you can load a URL from any field.)
+option [[#standard-url-field][Standard Url Field]] and tell Ebib to use another field for searching
+the URLs. (Keep in mind, though, that in the entry buffer, you can load a
+URL from any field.)
 
 
 * Advanced Features
@@ -926,8 +926,8 @@ BibTeX in that they put multiple =keywords= fields in the BibTeX entries that
 they produce. If you were to import such an entry into Ebib, you would lose
 all your keywords except the last one. To remedy this, you can tell Ebib
 that it should allow multiple occurrences of a single field in a BibTeX
-entry. You can do this by setting the customisation option =Allow Identical
-Fields=. (See [[#allow-identical-fields][Allow Identical Fields]].)
+entry. You can do this by setting the customisation option
+[[#allow-identical-fields][Allow Identical Fields]].
 
 With this option set, Ebib collapses the multiple occurrences into a single
 occurrence. All the values of the different occurrences are collected and
@@ -940,7 +940,7 @@ values.[15] So suppose you have an entry that contains the following
 @book{jones1998,
     author = {Jones, Joan},
     year = {1998},
-    dots{}
+    ...
     keywords = {sleep},
     keywords = {winter},
     keywords = {hybernation}
@@ -954,7 +954,7 @@ set, you will get the following:
 @book{jones1998,
     author = {Jones, Joan},
     year = {1998},
-    dots{}
+    ...
     keywords = {sleep; winter; hybernation}
 }
 </example>
