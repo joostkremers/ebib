@@ -10,6 +10,7 @@
 	(ebib-get-field-highlighted): modified so that it doesn't produce
 	an error if an entry contains a crossref to an entry that does not
 	exist.
+	(ebib-get-local-databases): variable bibfiles removed from the let.
 
 2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
 

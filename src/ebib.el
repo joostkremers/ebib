@@ -2049,7 +2049,6 @@ a filename is asked to which the entry is appended."
     ((default)
      (beep))))
      
-
 (defun ebib-search ()
   "Search the current Ebib database.
 
@@ -3027,7 +3026,7 @@ which the string is appended."
   (let ((num (ebib-prefix prefix)))
     (if num
 	(ebib-export-to-db num (format "@STRING definition `%s' copied to database %%d" ebib-current-string)
-			   3'(lambda (db)
+			   #'(lambda (db)
 			       (let ((abbr ebib-current-string)
 				     (string (gethash ebib-current-string (edb-strings ebib-cur-db))))
 				 (if (member abbr (edb-strings-list db))
@@ -3273,8 +3272,7 @@ master file for a \\bibliography command and returns the file(s)
 given in its argument. If no \\bibliography command is found,
 returns the symbol NONE."
   (let ((texfile-buffer (current-buffer))
-	texfile
-	bibfiles)
+	texfile)
     ;; if AucTeX's TeX-master is used and set to a string, we must
     ;; search that file for a \bibliography command, as it's more
     ;; likely to be in there than in the file we're in.
