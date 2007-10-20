@@ -1,5 +1,12 @@
 2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-redisplay-current-field): modified. now redisplays
+	the entire entry buffer is the current field is crossref. (cutting
+	the value from the crossref field would leave the inherited field
+	values visible.)
+
+2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
+
 	* ebib.el (ebib-local-bibtex-filenames): renamed from
 	ebib-local-bibtex-filname. this is now a list of strings, rather
 	than a string. thanks to Sinisa Pajevic for pointing out that a

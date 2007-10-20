@@ -746,14 +746,16 @@ display the actual filename."
 (defun ebib-redisplay-current-field ()
   "Redisplays the contents of the current field in the entry buffer."
   (set-buffer ebib-entry-buffer)
-  (with-buffer-writable
-    (goto-char (ebib-highlight-start ebib-fields-highlight))
-    (let ((beg (point)))
-      (end-of-line)
-      (delete-region beg (point)))
-    (insert (format "%-17s " (symbol-name ebib-current-field))
-	    (ebib-get-field-highlighted ebib-current-field ebib-cur-entry-hash))
-    (ebib-set-fields-highlight)))
+  (if (eq ebib-current-field 'crossref)
+      (ebib-fill-entry-buffer)
+    (with-buffer-writable
+      (goto-char (ebib-highlight-start ebib-fields-highlight))
+      (let ((beg (point)))
+	(end-of-line)
+	(delete-region beg (point)))
+      (insert (format "%-17s " (symbol-name ebib-current-field))
+	      (ebib-get-field-highlighted ebib-current-field ebib-cur-entry-hash))
+      (ebib-set-fields-highlight))))
 
 (defun ebib-redisplay-current-string ()
   "Redisplays the current string definition in the strings buffer."
