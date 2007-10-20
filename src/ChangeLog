@@ -1,8 +1,24 @@
+2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-local-bibtex-filenames): renamed from
+	ebib-local-bibtex-filname. this is now a list of strings, rather
+	than a string. thanks to Sinisa Pajevic for pointing out that a
+	\bibliography command can contain more than one .bib file.
+	(ebib-extract-bibfiles): removed.
+	(ebib-get-local-databases): modified to return a list of database
+	filenames. also now uses insert-buffer-substring, rather than a
+	combination of buffer-string and insert.
+	(ebib-insert-bibtex-key): modified so that it can handle multiple
+	bibtex files. this reflects the change to
+	ebib-local-bibtex-filenames.
+	(ebib-entry-summary): same.
+
 2007-10-19  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-push-entry-key): new. pushes the current entry
 	key, or the marked entry keys, to a buffer, using
-	ebib-insertion-strings.
+	ebib-insertion-strings. thanks to Sinisa Pajevic for suggesting
+	this feature.
 	(ebib-key "p"): changed to ebib-push-entry-key.
 	(ebib-key "r"): new. assigned to ebib-edit-preamble.
 	(ebib-prefixed-functions): ebib-push-entry-key added.

@@ -263,8 +263,8 @@ Each string is added to the preamble on a separate line."
 Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-multiline-raw nil "Indicates whether the multiline text being edited is raw.")
 (defvar ebib-before-help nil "Stores the buffer the user was in when he displayed the help message.")
-(defvar ebib-local-bibtex-filename nil "A buffer-local variable holding the name of that buffer's .bib file")
-(make-variable-buffer-local 'ebib-local-bibtex-filename)
+(defvar ebib-local-bibtex-filenames nil "A buffer-local variable holding a list of the name(s) of that buffer's .bib file")
+(make-variable-buffer-local 'ebib-local-bibtex-filenames)
 
 ;; the databases
 
@@ -3252,75 +3252,81 @@ if it is active."
 				     "a"
 				   "no")))))))))))
 
-(defun ebib-extract-bibfile ()
-  (save-excursion
-    (goto-char (point-min))
-    (when (re-search-forward "\\\\bibliography{\\(.*?\\)}" nil t)
-      (ensure-extension 
-       (buffer-substring-no-properties (match-beginning 1) (match-end 1))
-       "bib"))))
-
 (defun ebib-get-db-from-filename (filename)
   "Returns the database struct associated with FILENAME."
   (catch 'found
-    (mapc '(lambda (db)
+    (mapc #'(lambda (db)
 	     (if (string= (file-name-nondirectory (edb-filename db)) filename)
 		 (throw 'found db)))
 	  ebib-databases)
     nil))
 
-(defun ebib-get-local-database ()
-  "Returns the database associated with the LaTeX file in the current buffer.
+(defun ebib-get-local-databases ()
+  "Returns a list of .bib files associated with the file in the current LaTeX buffer.
 
-If there is no \\bibliography command, return the current database."
-  (unless ebib-local-bibtex-filename
-    ;; if we don't know the .bib file yet, try to find it.
-    (if (and (boundp 'TeX-master)
-	     (stringp TeX-master))
-	;; if AucTeX's TeX-master is used and set to a string, we must
-	;; search that file for a \bibliography command, as it's more
-	;; likely to be in there than in the file we're in.
-	(let ((texfile (ensure-extension TeX-master "tex")))
-	  (if (file-readable-p texfile)
-	      (let ((bibfile nil))
-		(with-temp-buffer
-		  (insert-file-contents texfile)
-		  ;; we can only set ebib-local-bibtex-filename after the
-		  ;; temp buffer is killed. so we store it temporarily.
-		  (setq bibfile (ebib-extract-bibfile)))
-		(setq ebib-local-bibtex-filename bibfile))))
-      ;; and otherwise just search the current file.
-      (setq ebib-local-bibtex-filename (ebib-extract-bibfile))))
-  (if (null ebib-local-bibtex-filename)	; if we still don't have a bibtex filename...
-      (progn
-	(message "No \\bibliography command found. Using current database.")
-	ebib-cur-db)
-    (ebib-get-db-from-filename ebib-local-bibtex-filename)))
+Each .bib file is a string holding the name of the .bib
+file. This function simply searches the current LaTeX file or its
+master file for a \\bibliography command and returns the file(s)
+given in its argument. If no \\bibliography command is found,
+returns the symbol NONE."
+  (let ((texfile-buffer (current-buffer))
+	texfile
+	bibfiles)
+    ;; if AucTeX's TeX-master is used and set to a string, we must
+    ;; search that file for a \bibliography command, as it's more
+    ;; likely to be in there than in the file we're in.
+    (and (boundp 'TeX-master)
+	 (stringp TeX-master)
+	 (setq texfile (ensure-extension TeX-master "tex")))
+    (with-temp-buffer
+      (if (and texfile (file-readable-p texfile))
+	  (insert-file-contents texfile)
+	(insert-buffer-substring texfile-buffer))
+      (save-excursion
+	(goto-char (point-min))
+	(if (re-search-forward "\\\\bibliography{\\(.*?\\)}" nil t)
+	    (mapcar #'(lambda (file)
+			(ensure-extension file "bib"))
+		    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*"))
+	  'none)))))
 
 (defun ebib-insert-bibtex-key (prefix)
-  "Inserts a BibTeX key at POINT, surrounded by braces.
+  "Inserts a BibTeX key at POINT.
 
-The user is prompted for a BibTeX key and has to choose one from the
-database of the current LaTeX file, or from the current database if there
-is no \\bibliography command. Tab completion works."
+The user is prompted for a BibTeX key and has to choose one from
+the database(s) associated with the current LaTeX file, or from
+the current database if there is no \\bibliography command. Tab
+completion works."
   (interactive "p")
-  (if (null ebib-databases)
-      (error "No database loaded")
-    (let ((db (ebib-get-local-database)))
-      (cond
-       ((null db)
-        (error "Database %s not loaded." ebib-local-bibtex-filename))
-       ((= (hash-table-count (edb-database db)) 0)
-        (error "No entries in database %s" ebib-local-bibtex-filename))
-       (t
-        (let* ((latex-cmd (or (cdr (assoc prefix ebib-insertion-strings))
-                              "{%s}"))
-               (collection (ebib-create-collection (edb-database db)))
-               (key (completing-read (format "Insert \"%s\" with key: " latex-cmd)
-                                     collection nil t nil ebib-minibuf-hist)))
-          (when key
-            (insert (format (or (cdr (assoc prefix ebib-insertion-strings))
-                                "{%s}") key)))))))))
+  (ebib-execute-when
+    ((database)
+     (or ebib-local-bibtex-filenames
+	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+     (let (collection)
+       (if (eq ebib-local-bibtex-filenames 'none)
+	   (if (null (edb-cur-entry ebib-cur-db))
+	       (error "No entries found in current database")
+	     (setq collection (ebib-create-collection (edb-database ebib-cur-db))))
+	 (mapc #'(lambda (file)
+		   (let ((db (ebib-get-db-from-filename file)))
+		     (cond
+		      ((null db)
+		       (message "Database %s not loaded" file))
+		      ((null (edb-cur-entry db))
+		       (message "No entries in database %s" file))
+		      (t (setq collection (append (ebib-create-collection (edb-database db))
+						  collection))))))
+	       ebib-local-bibtex-filenames))
+       (if collection
+	   (let* ((latex-cmd (or (cdr (assoc prefix ebib-insertion-strings))
+				 "{%s}"))
+		  (key (completing-read (format "Insert \"%s\" with key: " latex-cmd)
+					collection nil t nil ebib-minibuf-hist)))
+	     (when key
+	       (insert (format (or (cdr (assoc prefix ebib-insertion-strings))
+				   "{%s}") key)))))))
+    ((default)
+     (error "No database loaded"))))
 
 (defun ebib-entry-summary ()
   "Shows the fields of the key at POINT.
@@ -3328,19 +3334,32 @@ is no \\bibliography command. Tab completion works."
 The key is searched in the database associated with the LaTeX file, or in
 the current database if no \\bibliography command can be found."
   (interactive)
-  (if (null ebib-databases)
-      (error "No database loaded")
-    (let ((db (ebib-get-local-database))
-	  (key (read-string-at-point "\"#%'(),={} \n\t\f")))
-      (cond
-       ((null db)
-	(error "Database %s not loaded" ebib-local-bibtex-filename))
-       ((not (member key (edb-keys-list db)))
-	(error "`%s' is not in database `%s'" key ebib-local-bibtex-filename))
-       (t
-	(with-output-to-temp-buffer "*Help*"
-	  (let* ((entry (gethash key (edb-database db))))
-	    (ebib-format-fields entry 'princ))))))))
+  (ebib-execute-when
+    ((database)
+     (or ebib-local-bibtex-filenames
+	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+     (let ((key (read-string-at-point "\"#%'(),={} \n\t\f"))
+	   entry)
+       (if (eq ebib-local-bibtex-filenames 'none)
+	   (if (not (member key (edb-keys-list ebib-cur-db)))
+	       (error "`%s' is not in the current database" key)
+	     (setq entry (gethash key (edb-database ebib-cur-db))))
+	 (setq entry
+	       (catch 'found
+		 (mapc #'(lambda (file)
+			   (let ((db (ebib-get-db-from-filename file)))
+			     (if (null db)
+				 (message "Database %s not loaded" file)
+			       (if (member key (edb-keys-list db))
+				   (throw 'found (gethash key (edb-database db)))))))
+		       ebib-local-bibtex-filenames)
+		 nil)))
+       (if (null entry)
+	   (error "Entry `%s' not found" key)
+	 (with-output-to-temp-buffer "*Help*"
+	   (ebib-format-fields entry 'princ)))))
+    ((default)
+     (error "No database(s) loaded"))))
 
 (provide 'ebib)
 
@@ -3369,7 +3388,7 @@ a:                        add a new entry
 d:                        delete the current entry
 ;-d:                      deletes all marked entries
 t:                        edit the @STRING definitions
-p:                        edit the @PREAMBLE definition
+r:                        edit the @PREAMBLE definition
 m:                        (un)mark the current entry
 ;-m:                      unmarks all marked entries
 
@@ -3411,6 +3430,8 @@ P:                        print the database
 
 general:
 u:                        extract URL from the `url' field and send it to a browser
+p:                        push the current entry to a LaTeX buffer
+;-p:                      push marked entries to a LaTeX buffer
 C:                        customise Ebib
 z:                        put Ebib in the background
 q:                        quit Ebib
