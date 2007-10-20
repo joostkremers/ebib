@@ -7,6 +7,9 @@
 	(ebib-import): modified to use insert-buffer-substring, rather
 	than buffer-string and insert. this way, there is no need to
 	temporarily store the buffer contents in a variable.
+	(ebib-get-field-highlighted): modified so that it doesn't produce
+	an error if an entry contains a crossref to an entry that does not
+	exist.
 
 2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
 

@@ -828,9 +828,10 @@ The keys of HASHTABLE must be either symbols or strings."
     ;; - properly adjust the string if it's multiline
     ;; but all this is not necessary if there was no string
     (if (null string)
-	(let ((xref (to-raw (gethash 'crossref current-entry))))
-	  (when xref
-	    (setq string (gethash field (ebib-retrieve-entry xref ebib-cur-db)))
+	(let* ((xref (to-raw (gethash 'crossref current-entry)))
+	       (xref-entry (ebib-retrieve-entry xref ebib-cur-db)))
+	  (when xref-entry
+	    (setq string (gethash field xref-entry))
 	    (if string
 		(setq string (propertize (to-raw string) 'face 'ebib-crossref-face 'fontified t))
 	      (setq string ""))))
