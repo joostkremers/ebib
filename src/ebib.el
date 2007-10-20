@@ -166,14 +166,14 @@ Each string is added to the preamble on a separate line."
   (set-default var value)
   (clrhash ebib-entry-types-hash)
   (setq ebib-unique-field-list nil)
-  (mapc '(lambda (entry)
-	   (puthash (car entry) (cdr entry) ebib-entry-types-hash)
-	   (mapc '(lambda (field)
-		    (add-to-listq ebib-unique-field-list field t 'eq))
-		 (cadr entry))
-	   (mapc '(lambda (field)
-		    (add-to-listq ebib-unique-field-list field t 'eq))
-		 (caddr entry)))
+  (mapc #'(lambda (entry)
+	    (puthash (car entry) (cdr entry) ebib-entry-types-hash)
+	    (mapc #'(lambda (field)
+		      (add-to-listq ebib-unique-field-list field t 'eq))
+		  (cadr entry))
+	    (mapc #'(lambda (field)
+		      (add-to-listq ebib-unique-field-list field t 'eq))
+		  (caddr entry)))
 	value))
 
 (defcustom ebib-entry-types 
@@ -607,13 +607,13 @@ condition, BODY is executed if they all match (i.e., the
 conditions are AND'ed.)"
   (declare (indent defun))
   `(cond
-    ,@(mapcar '(lambda (form)
-		 (cons (if (= 1 (length (car form)))
-			   (ebib-execute-helper (caar form))
-			 `(and ,@(mapcar '(lambda (env)
-					    (ebib-execute-helper env))
-					 (car form))))
-		       (cdr form)))
+    ,@(mapcar #'(lambda (form)
+		  (cons (if (= 1 (length (car form)))
+			    (ebib-execute-helper (caar form))
+			  `(and ,@(mapcar #'(lambda (env)
+					      (ebib-execute-helper env))
+					  (car form))))
+			(cdr form)))
 	      forms)))
 
 ;; the numeric prefix argument is 1 if the user gave no prefix argument at
@@ -803,10 +803,10 @@ overlay is not moved.  FIELD must be a symbol."
 
 The keys of HASHTABLE must be either symbols or strings."
   (let ((result nil))
-    (maphash '(lambda (x y)
-		(setq result (cons (cons (symbol-or-string x)
-					 0)
-				   result)))
+    (maphash #'(lambda (x y)
+		 (setq result (cons (cons (symbol-or-string x)
+					  0)
+				    result)))
 	     hashtable)
     result))
 
@@ -858,17 +858,17 @@ The keys of HASHTABLE must be either symbols or strings."
 	 (obl-fields (ebib-get-obl-fields entry-type))
 	 (opt-fields (ebib-get-opt-fields entry-type)))
     (funcall fn (format "%-19s %s\n" "type" entry-type))
-    (mapc '(lambda (fields)
-	     (funcall fn "\n")
-	     (mapcar '(lambda (field)
-			(unless (and (get field 'ebib-hidden)
-				     ebib-hide-hidden-fields)
-			  (funcall fn (format "%-17s " field))
-			  (funcall fn (or
-				       (ebib-get-field-highlighted field entry match-str)
-				       ""))
-			  (funcall fn "\n")))
-		     fields))
+    (mapc #'(lambda (fields)
+	      (funcall fn "\n")
+	      (mapcar #'(lambda (field)
+			  (unless (and (get field 'ebib-hidden)
+				       ebib-hide-hidden-fields)
+			    (funcall fn (format "%-17s " field))
+			    (funcall fn (or
+					 (ebib-get-field-highlighted field entry match-str)
+					 ""))
+			    (funcall fn "\n")))
+		      fields))
 	  (list obl-fields opt-fields ebib-additional-fields))))
 
 (defun ebib-fill-entry-buffer (&optional match-str)
@@ -1058,8 +1058,8 @@ is a list of fields that are considered in order for the sort value."
     (unless ebib-initialized
       (ebib-init)
       (if ebib-preload-bib-files
-	  (mapc '(lambda (file)
-		   (ebib-load-bibtex-file file))
+	  (mapc #'(lambda (file)
+		    (ebib-load-bibtex-file file))
 		ebib-preload-bib-files)))
     ;; we save the current window configuration.
     (setq ebib-saved-window-config (current-window-configuration))
@@ -1278,14 +1278,14 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	  ;; we may call this function when there are no entries in the
 	  ;; database. if so, we don't need to do this:
 	  (when (edb-cur-entry ebib-cur-db)
-	    (mapcar '(lambda (entry)
-		       (insert entry)
-		       (when (member entry (edb-marked-entries ebib-cur-db))
-			 (let ((beg (save-excursion
-				      (beginning-of-line)
-				      (point))))
-			   (add-text-properties beg (point) `(face ,ebib-marked-face))))
-		       (insert "\n"))
+	    (mapcar #'(lambda (entry)
+			(insert entry)
+			(when (member entry (edb-marked-entries ebib-cur-db))
+			  (let ((beg (save-excursion
+				       (beginning-of-line)
+				       (point))))
+			    (add-text-properties beg (point) `(face ,ebib-marked-face))))
+			(insert "\n"))
 		    (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
 	    (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
@@ -1293,7 +1293,7 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	    (ebib-set-index-highlight))
 	  (set-buffer-modified-p (edb-modified ebib-cur-db))
 	  (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-						      (length (member ebib-cur-db ebib-databases)))))
+						       (length (member ebib-cur-db ebib-databases)))))
 				 (edb-name ebib-cur-db))))
       (rename-buffer " none"))))
 
@@ -1773,10 +1773,10 @@ If TIMESTAMP is T, a timestamp is added to the entry if EBIB-USE-TIMESTAMP is T.
   (let ((entry (ebib-retrieve-entry key db)))
     (when entry
       (insert (format "@%s{%s,\n" (gethash 'type* entry) key))
-      (maphash '(lambda (key value)
-		  (unless (or (eq key 'type*)
-			      (and (eq key 'timestamp) timestamp ebib-use-timestamp))
-		    (insert (format "\t%s = %s,\n" key value))))
+      (maphash #'(lambda (key value)
+		   (unless (or (eq key 'type*)
+			       (and (eq key 'timestamp) timestamp ebib-use-timestamp))
+		     (insert (format "\t%s = %s,\n" key value))))
 	       entry)
       (if (and timestamp ebib-use-timestamp)
 	  (insert (format "\ttimestamp = {%s}" (format-time-string ebib-timestamp-format)))
@@ -1785,8 +1785,8 @@ If TIMESTAMP is T, a timestamp is added to the entry if EBIB-USE-TIMESTAMP is T.
 
 (defun ebib-format-strings (db)
   "Format the @STRING commands in database DB."
-  (maphash '(lambda (key value)
-	      (insert (format "@STRING{%s = %s}\n" key value)))
+  (maphash #'(lambda (key value)
+	       (insert (format "@STRING{%s = %s}\n" key value)))
 	   (edb-strings db))
   (insert "\n"))
 
@@ -1804,7 +1804,7 @@ If TIMESTAMP is T, a timestamp is added to the entry if EBIB-USE-TIMESTAMP is T.
       (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
      (ebib-sort-order
       (setq sorted-list (sort sorted-list 'ebib-entry<))))
-    (mapc '(lambda (key) (ebib-format-entry key db nil)) sorted-list)))
+    (mapc #'(lambda (key) (ebib-format-entry key db nil)) sorted-list)))
 
 (defun ebib-save-database (db)
   "Saves the database DB."
@@ -1846,10 +1846,10 @@ Can also be used to change a virtual database into a real one."
 	      (setf (edb-virtual ebib-cur-db) nil)
 	      (setf (edb-database ebib-cur-db)
 		    (let ((new-db (make-hash-table :test 'equal)))
-		      (mapc '(lambda (key)
-			       (let ((entry (gethash key (edb-database ebib-cur-db))))
-				 (when entry
-				   (puthash key (copy-hash-table entry) new-db))))
+		      (mapc #'(lambda (key)
+				(let ((entry (gethash key (edb-database ebib-cur-db))))
+				  (when entry
+				    (puthash key (copy-hash-table entry) new-db))))
 			    (edb-keys-list ebib-cur-db))
 		      new-db))))
 	   (ebib-set-modified nil))))
@@ -1906,8 +1906,8 @@ Can also be used to change a virtual database into a real one."
       (ebib-execute-when
 	((real-db marked-entries)
 	 (when (y-or-n-p "Delete all marked entries? ")
-	   (mapc '(lambda (entry)
-		    (ebib-remove-entry-from-db entry ebib-cur-db (not (string= entry (ebib-cur-entry-key)))))
+	   (mapc #'(lambda (entry)
+		     (ebib-remove-entry-from-db entry ebib-cur-db (not (string= entry (ebib-cur-entry-key)))))
 		 (edb-marked-entries ebib-cur-db))
 	   (message "Marked entries deleted.")
 	   (ebib-set-modified t)
@@ -1996,24 +1996,24 @@ a filename is asked to which the entry is appended."
     ((real-db entries)
      (if num
 	 (ebib-export-to-db num (format "Entry `%s' copied to database %%d." (ebib-cur-entry-key))
-			    '(lambda (db)
-			       (let ((entry-key (ebib-cur-entry-key)))
-				 (if (member entry-key (edb-keys-list db))
-				     (error "Entry key `%s' already exists in database %d" entry-key num)
-				   (ebib-insert-entry entry-key
-						      (copy-hash-table (ebib-retrieve-entry entry-key
-											    ebib-cur-db))
-						      db t t)
-				   ;; if this is the first entry in the target DB,
-				   ;; its CUR-ENTRY must be set!
-				   (when (null (edb-cur-entry db))
-				     (setf (edb-cur-entry db) (edb-keys-list db)))
-				   t)))) ; we must return T, WHEN does not always do this.
+			    #'(lambda (db)
+				(let ((entry-key (ebib-cur-entry-key)))
+				  (if (member entry-key (edb-keys-list db))
+				      (error "Entry key `%s' already exists in database %d" entry-key num)
+				    (ebib-insert-entry entry-key
+						       (copy-hash-table (ebib-retrieve-entry entry-key
+											     ebib-cur-db))
+						       db t t)
+				    ;; if this is the first entry in the target DB,
+				    ;; its CUR-ENTRY must be set!
+				    (when (null (edb-cur-entry db))
+				      (setf (edb-cur-entry db) (edb-keys-list db)))
+				    t)))) ; we must return T, WHEN does not always do this.
        (ebib-export-to-file (format "Export `%s' to file: " (ebib-cur-entry-key))
 			    (format "Entry `%s' exported to %%s." (ebib-cur-entry-key))
-			    '(lambda ()
-			       (insert "\n")
-			       (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db t)))))
+			    #'(lambda ()
+				(insert "\n")
+				(ebib-format-entry (ebib-cur-entry-key) ebib-cur-db t)))))
     ((default)
      (beep))))
 
@@ -2027,25 +2027,25 @@ a filename is asked to which the entry is appended."
      (if num
 	 (ebib-export-to-db
 	  num "Entries copied to database %d."
-	  '(lambda (db)
-	     (mapc '(lambda (entry-key)
-		      (if (member entry-key (edb-keys-list db))
-			  (error "Entry key `%s' already exists in database %d" entry-key num)
-			(ebib-insert-entry entry-key
-					   (copy-hash-table (ebib-retrieve-entry entry-key
-										 ebib-cur-db))
-					   db t t)))
-		   (edb-marked-entries ebib-cur-db))
-	     ;; if the target DB was empty before, its CUR-ENTRY must be set!
-	     (when (null (edb-cur-entry db))
-	       (setf (edb-cur-entry db) (edb-keys-list db)))
-	     t)) ; we must return T, WHEN does not always do this.
+	  #'(lambda (db)
+	      (mapc #'(lambda (entry-key)
+			(if (member entry-key (edb-keys-list db))
+			    (error "Entry key `%s' already exists in database %d" entry-key num)
+			  (ebib-insert-entry entry-key
+					     (copy-hash-table (ebib-retrieve-entry entry-key
+										   ebib-cur-db))
+					     db t t)))
+		    (edb-marked-entries ebib-cur-db))
+	      ;; if the target DB was empty before, its CUR-ENTRY must be set!
+	      (when (null (edb-cur-entry db))
+		(setf (edb-cur-entry db) (edb-keys-list db)))
+	      t))	  ; we must return T, WHEN does not always do this.
        (ebib-export-to-file "Export to file: " "Entries exported to %s."
-			    '(lambda ()
-			       (mapc '(lambda (entry-key)
-					(insert "\n")
-					(ebib-format-entry entry-key ebib-cur-db t))
-				     (edb-marked-entries ebib-cur-db))))))
+			    #'(lambda ()
+				(mapc #'(lambda (entry-key)
+					  (insert "\n")
+					  (ebib-format-entry entry-key ebib-cur-db t))
+				      (edb-marked-entries ebib-cur-db))))))
     ((default)
      (beep))))
      
@@ -2111,10 +2111,10 @@ field is searched."
 	  (when (and (stringp value) ; the type* field has a symbol as value
 		     (string-match search-str value))
 	    (setq result (list field))))
-      (maphash '(lambda (field value)
-		  (when (and (stringp value) ; the type* field has a symbol as value
-			     (string-match search-str value))
-		    (setq result (cons field result))))
+      (maphash #'(lambda (field value)
+		   (when (and (stringp value) ; the type* field has a symbol as value
+			      (string-match search-str value))
+		     (setq result (cons field result))))
 	       entry))
     result))
 
@@ -2156,15 +2156,15 @@ the preamble is appended."
        (let ((num (ebib-prefix prefix)))
 	 (if num
 	     (ebib-export-to-db num "@PREAMBLE copied to database %d"
-				'(lambda (db)
-				   (let ((text (edb-preamble ebib-cur-db)))
-				     (if (edb-preamble db)
-					 (setf (edb-preamble db) (concat (edb-preamble db) "\n# " text))
-				       (setf (edb-preamble db) text)))))
+				#'(lambda (db)
+				    (let ((text (edb-preamble ebib-cur-db)))
+				      (if (edb-preamble db)
+					  (setf (edb-preamble db) (concat (edb-preamble db) "\n# " text))
+					(setf (edb-preamble db) text)))))
 	   (ebib-export-to-file "Export @PREAMBLE to file: "
 				"@PREAMBLE exported to %s"
-				'(lambda ()
-				   (insert (format "\n@preamble{%s}\n\n" (edb-preamble ebib-cur-db)))))))))
+				#'(lambda ()
+				    (insert (format "\n@preamble{%s}\n\n" (edb-preamble ebib-cur-db)))))))))
     ((default)
      (beep))))
 
@@ -2185,25 +2185,25 @@ Either prints the entire database, or the marked entries."
 	     (with-temp-buffer
 	       (insert "\\documentclass{article}\n\n")
 	       (when ebib-print-preamble
-		 (mapc '(lambda (string)
-			  (insert (format "%s\n" string)))
+		 (mapc #'(lambda (string)
+			   (insert (format "%s\n" string)))
 		       ebib-print-preamble))
 	       (insert "\n\\begin{document}\n\n")
-	       (mapc '(lambda (entry-key)
-			(insert "\\begin{tabular}{p{0.2\\textwidth}p{0.8\\textwidth}}\n")
-			(let ((entry (ebib-retrieve-entry entry-key ebib-cur-db)))
-			  (insert (format "\\multicolumn{2}{l}{\\texttt{%s (%s)}}\\\\\n"
-					  entry-key (symbol-name (gethash 'type* entry))))
-			  (insert "\\hline\n")
-			  (mapc '(lambda (field)
-				   (if-str (value (gethash field entry))
-				       (when (or (not (multiline-p value))
-						 ebib-print-multiline)
-					 (insert (format "%s: & %s\\\\\n"
-							 field (to-raw value))))))
-				(cdr (ebib-get-all-fields (gethash 'type* entry)))))
-			(insert "\\end{tabular}\n\n")
-			(insert "\\bigskip\n\n"))
+	       (mapc #'(lambda (entry-key)
+			 (insert "\\begin{tabular}{p{0.2\\textwidth}p{0.8\\textwidth}}\n")
+			 (let ((entry (ebib-retrieve-entry entry-key ebib-cur-db)))
+			   (insert (format "\\multicolumn{2}{l}{\\texttt{%s (%s)}}\\\\\n"
+					   entry-key (symbol-name (gethash 'type* entry))))
+			   (insert "\\hline\n")
+			   (mapc #'(lambda (field)
+				     (if-str (value (gethash field entry))
+					 (when (or (not (multiline-p value))
+						   ebib-print-multiline)
+					   (insert (format "%s: & %s\\\\\n"
+							   field (to-raw value))))))
+				 (cdr (ebib-get-all-fields (gethash 'type* entry)))))
+			 (insert "\\end{tabular}\n\n")
+			 (insert "\\bigskip\n\n"))
 		     entries)
 	       (insert "\\end{document}\n")
 	       (write-region (point-min) (point-max) tempfile))
@@ -2226,13 +2226,13 @@ Operates either on all entries or on the marked entries."
 	   (with-temp-buffer
 	     (insert "\\documentclass{article}\n\n")
 	     (when ebib-print-preamble
-	       (mapc '(lambda (string)
-			(insert (format "%s\n" string)))
+	       (mapc #'(lambda (string)
+			 (insert (format "%s\n" string)))
 		     ebib-latex-preamble))
 	     (insert "\n\\begin{document}\n\n")
 	     (if (ebib-called-with-prefix)
-		 (mapc '(lambda (entry)
-			  (insert (format "\\nocite{%s}\n" entry)))
+		 (mapc #'(lambda (entry)
+			   (insert (format "\\nocite{%s}\n" entry)))
 		       (edb-marked-entries ebib-cur-db))
 	       (insert "\\nocite{*}\n"))
 	     (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (edb-filename ebib-cur-db))))
@@ -2366,8 +2366,8 @@ a logical `not' is applied to the selection."
 					(if (< not 0) "(not " "")
 					(if (< not 0) ")" ""))
 				(cons '("any" 0)
-				      (mapcar '(lambda (x)
-						 (cons (symbol-name x) 0))
+				      (mapcar #'(lambda (x)
+						  (cons (symbol-name x) 0))
 					      (append ebib-unique-field-list ebib-additional-fields)))
 				nil t)))
     (setq field (intern-soft field))
@@ -2416,10 +2416,10 @@ a logical `not' is applied to the selection."
   "Run FILTER on DB"
   (setf (edb-keys-list db)
 	(sort (let ((result nil))
-		(maphash '(lambda (key value)
-			    (let ((entry value)) ; this is necessary for actually running the filter
-			      (when (eval filter)
-				(setq result (cons key result)))))
+		(maphash #'(lambda (key value)
+			     (let ((entry value)) ; this is necessary for actually running the filter
+			       (when (eval filter)
+				 (setq result (cons key result)))))
 			 (edb-database db))
 		result)
 	      'string<))
@@ -3027,18 +3027,18 @@ which the string is appended."
   (let ((num (ebib-prefix prefix)))
     (if num
 	(ebib-export-to-db num (format "@STRING definition `%s' copied to database %%d" ebib-current-string)
-			   '(lambda (db)
-			      (let ((abbr ebib-current-string)
-				    (string (gethash ebib-current-string (edb-strings ebib-cur-db))))
-				(if (member abbr (edb-strings-list db))
-				    (error "@STRING definition already exists in database %d" num)
-				  (ebib-insert-string abbr string db t)))))
+			   3'(lambda (db)
+			       (let ((abbr ebib-current-string)
+				     (string (gethash ebib-current-string (edb-strings ebib-cur-db))))
+				 (if (member abbr (edb-strings-list db))
+				     (error "@STRING definition already exists in database %d" num)
+				   (ebib-insert-string abbr string db t)))))
       (ebib-export-to-file (format "Export @STRING definition `%s' to file: " ebib-current-string)
 			   (format "@STRING definition `%s' exported to %%s" ebib-current-string)
-			   '(lambda ()
-			      (insert (format "\n@string{%s = %s}\n"
-					      ebib-current-string
-					      (gethash ebib-current-string (edb-strings ebib-cur-db)))))))))
+			   #'(lambda ()
+			       (insert (format "\n@string{%s = %s}\n"
+					       ebib-current-string
+					       (gethash ebib-current-string (edb-strings ebib-cur-db)))))))))
 
 (defun ebib-export-all-strings (prefix)
   "Export all @STRING definitions.
@@ -3052,17 +3052,17 @@ to."
       (if num
 	  (ebib-export-to-db 
 	   num "All @STRING definitions copied to database %d"
-	   '(lambda (db)
-	      (mapc #'(lambda (abbr)
-			(if (member abbr (edb-strings-list db))
-			    (message "@STRING definition `%s' already exists in database %d" abbr num)
-			  (ebib-insert-string abbr (gethash abbr (edb-strings ebib-cur-db)) db t)))
-		    (edb-strings-list ebib-cur-db))))
+	   #'(lambda (db)
+	       (mapc #'(lambda (abbr)
+			 (if (member abbr (edb-strings-list db))
+			     (message "@STRING definition `%s' already exists in database %d" abbr num)
+			   (ebib-insert-string abbr (gethash abbr (edb-strings ebib-cur-db)) db t)))
+		     (edb-strings-list ebib-cur-db))))
 	(ebib-export-to-file "Export all @STRING definitions to file: "
 			     "All @STRING definitions exported to %s"
-			     '(lambda ()
-				(insert (format "\n"))	; to keep things tidy.
-				(ebib-format-strings ebib-cur-db)))))))
+			     #'(lambda ()
+				 (insert (format "\n"))	; to keep things tidy.
+				 (ebib-format-strings ebib-cur-db)))))))
 
 (defun ebib-edit-multiline-string ()
   "Edits the current string in multiline-mode."
