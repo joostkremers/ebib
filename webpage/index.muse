@@ -100,14 +100,14 @@ quite a few extra features that make managing your BibTeX files easier.
 #screenshots
 * Screenshots
 
-Visually, Ebib is not very spectacular. But to get an impression of how it
-looks, you can take a look at the following two screenshots. The first
-shows Ebib's standard lay-out, with the list of entry keys in the top
-window and the fields of the currently highlighted entry in the bottom
-window. The string `Reuland' is highlighted as the result of a text
-search. The second screenshot shows the strings buffer, where you can edit
-the =@string= definitions in the database. (By the way, the color theme here
-is Blue Sea, it has nothing to do with Ebib.)
+Visually, Ebib is not very spectacular. But to get an impression of what it
+looks like, you can view the following two screenshots. The first shows
+Ebib's standard lay-out, with the list of entry keys in the top window and
+the fields of the currently highlighted entry in the bottom window. The
+string `Reuland' is highlighted as the result of a text search. The second
+screenshot shows the strings buffer, where you can edit the =@string=
+definitions in the database. (By the way, the color theme here is Blue Sea,
+it has nothing to do with Ebib.)
 
 ; [[images/ebib-1.png][images/tn_ebib-1.png]]
 
@@ -133,9 +133,13 @@ The complete user manual for Ebib is available in html format [[manual/ebib-manu
 #download
 * Download
 
-Ebib can be downloaded from the [[http://sourceforge.net/projects/ebib][Sourceforge Project Page]]. The tar ball
-contains the source code, and the manual in info, html and pdf
-format. Installation instructions can be found in the manual.
+Tar balls of Ebib releases can be downloaded from the
+[[http://sourceforge.net/projects/ebib][Sourceforge Project Page]]. The tar ball contains the source code, and the
+manual in info, html and pdf format. Installation instructions can be found
+in the manual.
+
+There is also a public [[http://repo.or.cz/w/ebib.git][git repository]] for Ebib. From there, you can get the
+latest sources, provided you have [[http://git.or.cz/][git]] installed.
 
 
 #contact
