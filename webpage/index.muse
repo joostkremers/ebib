@@ -11,9 +11,8 @@ Emacs. If you are used to doing everything LaTeX from within Emacs, you may
 appreciate that you can manage your =.bib= files in Emacs as well. One
 distinct advantage of Ebib is that you do not need to switch to another
 window and copy/paste a BibTeX key into your LaTeX file with the
-mouse. Ebib provides a function with which you can select a key from the
-database using TAB-completion and have it inserted directly into your LaTeX
-text.
+mouse. Ebib provides functions with which you can select a key from the
+database and have it inserted directly into your LaTeX text.
 
 Ebib is fully keyboard-operated. Unlike other BibTeX database managers, you
 do not need the mouse at all. Everything Ebib can do can be accomplished
@@ -79,10 +78,9 @@ quite a few extra features that make managing your BibTeX files easier.
 
 *** LaTeX integration
 
-  - automatic selection and insertion of a BibTeX key into a LaTeX
-    document, where you can use TAB-completion to select a key from the
-    database.
-  - pushing entries from Ebib to a LaTeX buffer.
+  - from within a LaTeX document, it is possible to select (using
+    TAB-completion) and insert a BibTeX key into the document.
+  - inside Ebib, it is possible to push entries to a LaTeX buffer.
   - quick summary of entries into a =*Help*= buffer.
 
 
