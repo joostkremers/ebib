@@ -51,13 +51,13 @@ echo
 	echo Warning: ebib-manual.html not found!
     fi
     if [ -f pdf/ebib-manual.pdf ] ; then
-	cp html/ebib-manual.pdf ../"$full_name"/doc/
+	cp pdf/ebib-manual.pdf ../"$full_name"/doc/
 	echo "Copied pdf manual to $full_name/doc/"
     else
 	echo Warning: ebib-manual.pdf not found!
     fi
-    if [ -f html/ebib-manual.info ] ; then
-	cp html/ebib-manual.info ../"$full_name"/info
+    if [ -f texi/ebib-manual.info ] ; then
+	cp texi/ebib-manual.info ../"$full_name"/info
 	echo "Copied info manual to $full_name/info"
     else
 	echo Warning: ebib-manual.info not found!
