@@ -1055,6 +1055,8 @@ is a list of fields that are considered in order for the sort value."
   (if (or (equal (window-buffer) ebib-index-buffer)
 	  (equal (window-buffer) ebib-entry-buffer))
       (error "Ebib already active")
+    ;; we save the buffer from which ebib is called
+    (setq ebib-push-buffer (current-buffer))
     (unless ebib-initialized
       (ebib-init)
       (if ebib-preload-bib-files

@@ -1,3 +1,9 @@
+2007-10-22  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib): modified to store the buffer from which ebib is
+	called in ebib-push-buffer, so that it becomes the default for
+	pushing entries. Thanks to Sinisa Pajevic for the suggestion.
+
 2007-10-20  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-redisplay-current-field): modified. now redisplays
