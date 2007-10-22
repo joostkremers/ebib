@@ -24,7 +24,7 @@ integration with Emacs' TeX and LaTeX modes becomes possible.  For example,
 one can insert a key from the database into the text one is editing using
 tab completion. Another advantage of Ebib is that it is completely
 controlled by key commands: no stressful mouse movements are required, as
-with most other (usually X-based) BibTeX database managers.[1]
+with most other (usually X-based) BibTeX database managers.
 
 
 * Installation
@@ -32,7 +32,7 @@ with most other (usually X-based) BibTeX database managers.[1]
 To install Ebib, so that it will be loaded automatically when Emacs is
 started, simply copy the file =ebib.el= to somewhere in your load path and
 add the following line to Emacs' init file (=~/.emacs= for GNU/Emacs,
-=~/.xemacs/init.el= for XEmacs):[2]
+=~/.xemacs/init.el= for XEmacs):[1]
 
 <example>
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
@@ -122,7 +122,7 @@ Once you've opened a =.bib= file, the keys of all the entries in the file are
 shown in alphabetical order in the index buffer in the top Ebib window. The
 first entry is highlighted, meaning it is the current entry. The fields it
 holds and their values are shown in the entry buffer in the bottom Ebib
-window. The first field is the type field,[4] which tells you what kind of
+window. The first field is the type field,[3] which tells you what kind of
 entry you're dealing with (i.e. =book, article=, etc.).
 
 Below the type field, Ebib displays (up to) three sets of fields. The first
@@ -147,7 +147,7 @@ To move around in the index buffer, you can use the cursor keys, =C-p= and
 =C-n=, or for those more used to mutt's key bindings, with =k= and
 =j=. Furthermore, =Space= and =PgDn= move a screenful of entries down, while =b=
 and =PgUp= move in the other direction. Lastly, =g= and =Home= move to the first
-entry, while =G= and =End= move to the last one.[5]
+entry, while =G= and =End= move to the last one.[4]
 
 Ebib is not restricted to opening just one =.bib= file at a time. You can
 open more files by just typing =o= again and entering the filename. Ebib
@@ -216,7 +216,7 @@ expected.
 Editing a field value can be done with =e=. For most fields, Ebib will simply
 ask you for a string value in the minibuffer. (Here, =RET= confirms the edit,
 while =C-g= cancels it.) Although BibTeX requires that field values be
-surrounded by braces {},[6] you do not need to type them. Ebib will add
+surrounded by braces {},[5] you do not need to type them. Ebib will add
 them for you when it saves the =.bib= file.
 
 Some fields, however, are handled in a special way. The first of these is
@@ -336,7 +336,7 @@ expected. You can use them to search entry keys. Note that once you've
 found the key you're searching, you must hit =ENTER= to make it active. Ebib
 does not update the entry buffer during incremental search, as this would
 be rather pointless: you're only interested in the entry you're searching
-for, not in the entries you pass along the way.[7]
+for, not in the entries you pass along the way.[6]
 
 Of course, it is also possible to search the database itself. If you type
 =/=, Ebib asks you for a search term. This can be a regural expression, to
@@ -408,7 +408,7 @@ could put the following in your =~/.emacs=:
 </example>
 
 This binds =C-c b= to the command =ebib-insert-bibtex-key= in AUCTeX's LaTeX
-mode.[8]
+mode.[7]
 
 
 *** Consulting databases from within a LaTeX file
@@ -607,7 +607,7 @@ can be customised. (See [[#url-regexp][Url Regexp]].)
 There exists an Emacs function =browse-url=, which provides a nifty interface
 to calling an external browser. In principle, Ebib uses this
 function. However, if this function is not present on your
-installation,[10] you can set the option [[#browser-command][Browser Command]] to call the
+installation,[9] you can set the option [[#browser-command][Browser Command]] to call the
 browser.
 
 As just explained, if you press =u= in the index buffer, Ebib searches the
@@ -704,7 +704,7 @@ direction. The keys =g=, =G=, =Home= and =End= also function as expected.
 To delete a =@string= definition, use =d=. To edit the value of a definition,
 use =e=. There is also a command =c=, which copies the value of the current
 =@string= definition to the kill ring. Unlike in the entry buffer, there are
-no corresponing commands =y= and =x=.[11] Yanking from the kill ring can be
+no corresponing commands =y= and =x=.[10] Yanking from the kill ring can be
 done with =C-y/M-y= in the minibuffer when you edit a =@string='s
 value. Cutting a =@string='s value is pointless, because a =@string=
 definition must have a value.
@@ -767,7 +767,7 @@ By default, the entries in the database are saved to the =.bib= file in
 alphabetical order according to entry key. If you only deal with the =.bib=
 file through Ebib, you may not care in which order the entries are
 saved. However, it may sometimes be desirable to be able to specify the
-sort order of entries in more detail.[12]
+sort order of entries in more detail.[11]
 
 You can specify a sort order in Ebib's customisation buffer. To sort the
 entries, you must set at least one sort level (that is, a field to sort the
@@ -803,7 +803,7 @@ to =author editor=, and the second to =year=. In that way, the entries in the
 author/editor are sorted by year.
 
 Entries that cannot be sorted on some sort level, because the sort fields
-are empty, are sorted on entry key.[13]
+are empty, are sorted on entry key.[12]
 
 Note that if you have set the option =Save Xrefs First= (see the previous
 section), it is pointless to set a sort order. Saving cross-referencing
@@ -916,7 +916,7 @@ Under normal circumstances, a BibTeX entry only contains one occurrence of
 each field. If BibTeX notices that an entry contains more than one
 occurrence of an obligatory or optional field, it will issue a
 warning. Ebib is somewhat less gracious, it simply takes the value of the
-last occurrence without giving any warning.[14] When additional fields
+last occurrence without giving any warning.[13] When additional fields
 appear more than once in an entry, BibTeX does not warn you, since it
 ignores those fields anyway. Here, too, Ebib's standard behaviour is to
 ignore all but the last value.
@@ -933,7 +933,7 @@ With this option set, Ebib collapses the multiple occurrences into a single
 occurrence. All the values of the different occurrences are collected and
 stored in the single occurrence, separated by semicolons. That is, Ebib
 does not retain the multiple occurrences, but it does retain the
-values.[15] So suppose you have an entry that contains the following
+values.[14] So suppose you have an entry that contains the following
 =keywords= fields:
 
 <example>
@@ -1008,7 +1008,7 @@ it was created from. This means that you can refine or extend the selection
 example, you want to include all the entries that have ``Jones'' in the
 =editor= field, you have to perform a logical =or= operation: you want to
 select an entry if it contains ``Jones'' in the =author= field (which you
-already did) *or* if it contains ``Jones'' in the =editor= field.[16]
+already did) *or* if it contains ``Jones'' in the =editor= field.[15]
 
 To perform a logical =or= operation, press the key =|=. Like before, you will
 be asked which field you want to filter on, and which regexp you want to
@@ -1018,7 +1018,7 @@ the original database that match the additional criterion.
 It is also possible to perform a logical =and= on the virtual database. Use
 this if you want to select those entries that contain ``Jones'' in the
 =author= field and e.g. ``symbiotic hybernation'' in the =keyword= field. A
-logical =and= operation is done with the key =&=.[17]
+logical =and= operation is done with the key =&=.[16]
 
 Both the =&= and =|= commands can be used with the negative prefix argument =M--=
 (or =C-u -=, which is identical). In this case, the search criterion is
@@ -1109,7 +1109,7 @@ really want to abandon your changes.
 If you leave the multitiline edit buffer with =C-x b= when the buffer is empty
 (i.e., you deleted all the text, including the final newline), and you were
 editing a field value or the =@preamble= definition, the field value or
-preamble will be deleted.[18]
+preamble will be deleted.[17]
 
 The third command that is redefined in the multiline edit buffer is =C-x
 C-s=. This command can be used to save the database. Because Ebib does not
@@ -1690,61 +1690,58 @@ existing prefix key.
 
 
 Footnotes: 
-[1] Many thanks go to Jesse Alama for converting the original =.tex= version
-of this manual to =.texinfo=.
-
-[2] If you do not know what your load path is set to, go to the =*scratch*=
+[1] If you do not know what your load path is set to, go to the =*scratch*=
 buffer, type =load-path= on an empty line, put the cursor right after it and
 type =C-j=. The value of =load-path= will then appear in the buffer.
 
-[3] This may produce a warning about functions that are ``not known to be
+[2] This may produce a warning about functions that are ``not known to be
 defined''. This can be safely ignored. GNU Emacs and XEmacs have some small
 differences, and the functions reported in this warning are those used by
 the other version. Ebib makes sure that the correct functions are called.
 
-[4] Actually, in the =.bib= file, this is not a field at all, but rather the
+[3] Actually, in the =.bib= file, this is not a field at all, but rather the
 type identifier appearing after the @-sign.
 
-[5] All key bindings in Ebib can be customised through an init file.
+[4] All key bindings in Ebib can be customised through an init file.
 
 ; See [[#modifying-key-bindings][Modifying Key Bindings]].
 
-[6] Or double quotes "", but Ebib does not use those, even though it can of
+[5] Or double quotes "", but Ebib does not use those, even though it can of
 course handle them when they are used in an existing =.bib= file.
 
-[7] Another ---practical--- reason why Ebib does not do this is that the
+[6] Another ---practical--- reason why Ebib does not do this is that the
 incremental search functions are actually Emacs' own functions. Updating
 the entry buffer would require implementing Ebib-specific versions of
 =isearch-forward= and =isearch-backward=.
 
-[8] Commands of the form =C-c <letter>= are reserved for the
+[7] Commands of the form =C-c <letter>= are reserved for the
 user, and should therefore not be set by any package. For this (and other)
 reasons, Ebib does not set this command automatically.
 
-[9] That is, in GNU Emacs. XEmacs doesn't have this option, so that marked
+[8] That is, in GNU Emacs. XEmacs doesn't have this option, so that marked
 entries are simply highlighted.
 
-[10] My installation of XEmacs, for example, does not have it.
+[9] My installation of XEmacs, for example, does not have it.
 
-[11] In fact, =x= does exist, but has another function.
+[10] In fact, =x= does exist, but has another function.
 
-[12] I have been told that the bibliography module of ConTeXt can retain
+[11] I have been told that the bibliography module of ConTeXt can retain
 the order of entries in the =.bib= file, for example.
 
-[13] Note that if the first sort level yields *no value* for a specific
+[12] Note that if the first sort level yields *no value* for a specific
 entry, Ebib does *not* use the second sort level to sort that entry. It uses
 the entry key. The second sort level is only used if the first yields
 *identical* values for two or more entries.
 
-[14] Note, by the way, that BibTeX will use the value of the *first*
+[13] Note, by the way, that BibTeX will use the value of the *first*
 occurrence, not the last.
 
-[15] Given the way Ebib is designed, it would not be easy to add the
+[14] Given the way Ebib is designed, it would not be easy to add the
 ability to store multiple fields of the same type in an entry. And since
 this is not really a common situation for BibTeX entries, it is unlikely
 that this functionality will ever be added.
 
-[16] The first impulse in a case like this might be to use =and= instead of
+[15] The first impulse in a case like this might be to use =and= instead of
 =or=: after all, you want to select all entries that contain ``Jones'' in the
 =author= field *and* all entries that contain ``Jones'' in the =editor=
 field. However, the filter that you build up is used to test each entry
@@ -1754,16 +1751,16 @@ criterion if it contains ``Jones'' in the =author= field *or* if it contains
 this case. If you would use =and=, you would only get those entries that
 contain ``Jones'' in both the =author= *and* =editor= fields.
 
-[17] This is the same key that is used to create a virtual database. In
+[16] This is the same key that is used to create a virtual database. In
 fact, you can also create a virtual database with =|=: when used in a normal
 database, =&= and =|= are equivalent. They are only different in virtual
 databases.
 
-[18] This is in fact the *only* way to delete the =@preamble= definition. Field
+[17] This is in fact the *only* way to delete the =@preamble= definition. Field
 values on the other hand can also be deleted by hitting =x= or =d= on them in
 the entry buffer.
 
-[19] Starting with Ebib 1.0, the initialisation file =~/.ebibrc= is
+[18] Starting with Ebib 1.0, the initialisation file =~/.ebibrc= is
 deprecated for everything except key bindings. Although it is in principle
 possible to customise Ebib by setting the relevant variables in =~/.ebibrc=,
 you are advised not to do so. The customisation macros that used to exist,
