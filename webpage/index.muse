@@ -133,8 +133,8 @@ The complete user manual for Ebib is available in html format [[manual/ebib-manu
 
 Tar balls of Ebib releases can be downloaded from the
 [[http://sourceforge.net/projects/ebib][Sourceforge Project Page]]. The tar ball contains the source code, and the
-manual in info, html and pdf format. Installation instructions can be found
-in the manual.
+manual in info and html format. Installation instructions can be found in
+the manual.
 
 There is also a public [[http://repo.or.cz/w/ebib.git][git repository]] for Ebib. From there, you can get the
 latest sources, provided you have [[http://git.or.cz/][git]] installed.

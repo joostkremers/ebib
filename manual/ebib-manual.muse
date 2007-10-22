@@ -54,7 +54,7 @@ may set them.)
 It is recommended to byte-compile the source, Ebib runs quite a lot faster
 when it is byte-compiled. You can do this either within Emacs with =M-x
 byte-compile-file=, or from your shell by going into the directory where you
-put =ebib.el= and typing:[3]
+put =ebib.el= and typing:[2]
 
 <example>
 emacs -batch -f batch-byte-compile ebib.el
