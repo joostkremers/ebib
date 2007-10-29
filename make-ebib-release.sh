@@ -22,43 +22,22 @@ echo
     echo
 )
 
-# (cd $BASE/manual
-#     mv ebib-manual.texinfo ebib-manual.texinfo.source
-#     sed -e "s/==VERSION==/$version/" -e "s/==DATE==/$(date +'%d %B %Y')/" \
-# 	ebib-manual.texinfo.source > ebib-manual.texinfo
-#     rm ebib-manual.texinfo.source
-#     echo "Creating ebib.info"
-#     makeinfo ebib-manual.texinfo
-#     echo
-#     echo "Creating html manual"
-#     rm -rf ebib/
-#     makeinfo --html ebib-manual.texinfo
-#     echo
-#     echo "Creating pdf manual"
-#     texi2dvi ebib-manual.texinfo
-#     dvips -Ppdf -t a4 ebib-manual.dvi
-#     ps2pdf ebib-manual.ps
-#     cp -a ebib.info ebib-manual.pdf ebib/ ../"$full_name"
-#     echo "Copied manual to $full_name"
-#     echo
-# )
-
 (cd $BASE/manual
     if [ -f html/ebib-manual.html ] ; then
-	cp html/ebib-manual.html ebib-manual.css ../"$full_name"/doc/html/
-	echo "Copied html manual to $full_name/doc/html/"
+	mv html/ebib-manual.html ebib-manual.css ../"$full_name"/doc/html/
+	echo "Moved html manual to $full_name/doc/html/"
     else
 	echo Warning: ebib-manual.html not found!
     fi
     if [ -f pdf/ebib-manual.pdf ] ; then
-	cp pdf/ebib-manual.pdf ../"$full_name"/doc/
-	echo "Copied pdf manual to $full_name/doc/"
+	mv pdf/ebib-manual.pdf ../"$full_name"/doc/
+	echo "Moved pdf manual to $full_name/doc/"
     else
 	echo Warning: ebib-manual.pdf not found!
     fi
     if [ -f texi/ebib-manual.info ] ; then
-	cp texi/ebib-manual.info ../"$full_name"/info
-	echo "Copied info manual to $full_name/info"
+	mv texi/ebib-manual.info ../"$full_name"/info
+	echo "Moved info manual to $full_name/info"
     else
 	echo Warning: ebib-manual.info not found!
     fi
