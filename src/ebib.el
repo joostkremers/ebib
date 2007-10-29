@@ -1049,6 +1049,7 @@ is a list of fields that are considered in order for the sort value."
 ;; main program execution ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;###autoload
 (defun ebib ()
   "Ebib, a BibTeX database manager."
   (interactive)
@@ -1280,15 +1281,15 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	  ;; we may call this function when there are no entries in the
 	  ;; database. if so, we don't need to do this:
 	  (when (edb-cur-entry ebib-cur-db)
-	    (mapcar #'(lambda (entry)
-			(insert entry)
-			(when (member entry (edb-marked-entries ebib-cur-db))
-			  (let ((beg (save-excursion
-				       (beginning-of-line)
-				       (point))))
-			    (add-text-properties beg (point) `(face ,ebib-marked-face))))
-			(insert "\n"))
-		    (edb-keys-list ebib-cur-db))
+	    (mapc #'(lambda (entry)
+		      (insert entry)
+		      (when (member entry (edb-marked-entries ebib-cur-db))
+			(let ((beg (save-excursion
+				     (beginning-of-line)
+				     (point))))
+			  (add-text-properties beg (point) `(face ,ebib-marked-face))))
+		      (insert "\n"))
+		  (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
 	    (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
 	    (beginning-of-line)
@@ -1738,7 +1739,7 @@ the entry. The latter is at position LIMIT."
 		     (delete (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db)))
 	       (remove-text-properties (ebib-highlight-start ebib-index-highlight)
 				       (ebib-highlight-end ebib-index-highlight)
-				       '(face ,ebib-marked-face)))
+				       `(face ,ebib-marked-face)))
 	   (setf (edb-marked-entries ebib-cur-db) (sort (cons (ebib-cur-entry-key)
 							      (edb-marked-entries ebib-cur-db))
 							'string<))

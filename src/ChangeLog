@@ -1,3 +1,13 @@
+2007-10-29  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-fill-index-buffer): changed mapcar to mapc
+	(prevents compiler warning). fix provided by Leo
+	<sdl.web at gmail.com>.
+	(ebib): added autoload cookie. suggested by Leo
+	<sdl.web at gmail.com>.
+	(ebib-mark-entry): fixed typo: '(face ,ebib-marked-face) to `(face
+	,ebib-marked-face). fix provided by Leo <sdl.web at gmail.com>.
+
 2007-10-22  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib): modified to store the buffer from which ebib is
