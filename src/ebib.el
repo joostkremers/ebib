@@ -84,6 +84,12 @@ of entries, so it is not compatible with setting the Sort Order option."
   "*Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib)
 
+(defface ebib-marked-face (if (featurep 'xemacs)
+			      '((t (:foreground "white" :background "red")))
+			    '((t (:inverse-video t))))
+  "*Face to indicate marked entries."
+  :group 'ebib)
+
 (defcustom ebib-use-timestamp nil
   "*If true, new entries will get a time stamp.
 The time stamp will be stored in a field \"timestamp\" that can
@@ -305,11 +311,6 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-index-buffer-help nil "Help for the index buffer.")
 (defvar ebib-entry-buffer-help nil "Help for the entry buffer.")
 (defvar ebib-strings-buffer-help nil "Help for the strings buffer.")
-
-;; for highlighting marked entries
-(if (featurep 'xemacs)
-    (defvar ebib-marked-face 'highlight)
-  (defvar ebib-marked-face '(:inverse-video t)))
 
 ;; the prefix key is stored in a variable so that the user can customise it.
 (defvar ebib-prefix-key ?\;)
@@ -1287,7 +1288,7 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 			(let ((beg (save-excursion
 				     (beginning-of-line)
 				     (point))))
-			  (add-text-properties beg (point) `(face ,ebib-marked-face))))
+			  (add-text-properties beg (point) '(face ebib-marked-face))))
 		      (insert "\n"))
 		  (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
@@ -1739,13 +1740,13 @@ the entry. The latter is at position LIMIT."
 		     (delete (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db)))
 	       (remove-text-properties (ebib-highlight-start ebib-index-highlight)
 				       (ebib-highlight-end ebib-index-highlight)
-				       `(face ,ebib-marked-face)))
+				       '(face ebib-marked-face)))
 	   (setf (edb-marked-entries ebib-cur-db) (sort (cons (ebib-cur-entry-key)
 							      (edb-marked-entries ebib-cur-db))
 							'string<))
 	   (add-text-properties (ebib-highlight-start ebib-index-highlight)
 				(ebib-highlight-end ebib-index-highlight)
-				`(face ,ebib-marked-face)))))
+				'(face ebib-marked-face)))))
       ((default)
        (beep)))))
 

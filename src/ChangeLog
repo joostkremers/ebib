@@ -1,5 +1,12 @@
 2007-10-29  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-marked-face): turned into a customisable option.
+	(ebib-fill-index-buffer): modified to use ebib-marked-face as a
+	face, rather than a variable.
+	(ebib-mark-entry): same.
+
+2007-10-29  Joost Kremers  <joostkremers@yahoo.com>
+
 	* ebib.el (ebib-fill-index-buffer): changed mapcar to mapc
 	(prevents compiler warning). fix provided by Leo
 	<sdl.web at gmail.com>.

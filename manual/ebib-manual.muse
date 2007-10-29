@@ -563,7 +563,9 @@ all entries. For some, however, it may sometimes be useful to perform them
 on more than one entry, but not necessarily all of them. This can be
 achieved by marking entries. You can mark the entries you want to perform a
 command on with the key =m=. This marks (or unmarks) the current
-entry. Marked entries are displayed in inverse video.[9]
+entry. Marked entries are displayed in inverse video.[8] (Note: the face
+properties of marked entries can be customised through the customisation
+option [[#marked-face][Marked Face]].)
 
 Of the commands discussed so far, four can be used on marked entries: =d=, =p=,
 =L= and =P=. Note, however, that it is not enough to mark the entries you want
@@ -1528,6 +1530,16 @@ Field values inherited from a cross-referenced entry are marked with this
 face. By default, the face has red as foreground colour.
 
 
+*** Marked Face
+#marked-face
+
+When entries are marked (with =m=), they are highlighted in this face. By
+default, GNU Emacs uses the text property =highlight=. XEmacs only allows
+this on terminals, therefore it displays marked entries with a red
+background and a white foreground colour. This option allows you to change
+these defaults.
+
+
 *** Use Timestamp
 
 If this option is set, Ebib will add a =timestamp= field to every new entry,
@@ -1719,7 +1731,7 @@ user, and should therefore not be set by any package. For this (and other)
 reasons, Ebib does not set this command automatically.
 
 [8] That is, in GNU Emacs. XEmacs doesn't have this option, so that marked
-entries are simply highlighted.
+entries are white on red.
 
 [9] My installation of XEmacs, for example, does not have it.
 
