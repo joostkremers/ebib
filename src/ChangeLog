@@ -1,3 +1,8 @@
+2007-10-31  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-init): removed test whether ~/.ebibrc exists; use
+	second (optional) argument to load instead.
+
 2007-10-29  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-marked-face): turned into a customisable option.

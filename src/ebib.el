@@ -1084,8 +1084,7 @@ buffers and reads the rc file."
 	ebib-minibuf-hist nil
 	ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
-  (when (file-readable-p "~/.ebibrc")
-    (load "~/.ebibrc"))
+  (load "~/.ebibrc" t)
   (ebib-create-buffers)
   (setq ebib-index-highlight (ebib-make-highlight 1 1 ebib-index-buffer))
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 ebib-entry-buffer))
