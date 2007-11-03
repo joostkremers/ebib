@@ -1,3 +1,11 @@
+2007-11-02  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-syntax-table): new.
+	(ebib-load-bibtex-file): modified to use with-syntax-table.
+	(ebib-merge-bibtex-file): same.
+	(ebib-import): same.
+	(ebib-store-multiline-text): check-parens removed.
+
 2007-10-31  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-init): removed test whether ~/.ebibrc exists; use

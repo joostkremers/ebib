@@ -271,6 +271,12 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-before-help nil "Stores the buffer the user was in when he displayed the help message.")
 (defvar ebib-local-bibtex-filenames nil "A buffer-local variable holding a list of the name(s) of that buffer's .bib file")
 (make-variable-buffer-local 'ebib-local-bibtex-filenames)
+(defvar ebib-syntax-table (make-syntax-table) "Syntax table used for reading .bib files.")
+(modify-syntax-entry ?\[ "w" ebib-syntax-table)
+(modify-syntax-entry ?\] "w" ebib-syntax-table)
+(modify-syntax-entry ?\( "w" ebib-syntax-table)
+(modify-syntax-entry ?\) "w" ebib-syntax-table)
+(modify-syntax-entry ?\" "w" ebib-syntax-table)
 
 ;; the databases
 
@@ -1320,29 +1326,30 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
       ;; if the user entered the name of an existing file, we load it
       ;; by putting it in a buffer and then parsing it.
       (with-temp-buffer
-	(insert-file-contents file)
-	;; if the user makes any changes, we'll want to create a back-up. 
-	(setf (edb-make-backup ebib-cur-db) t)
-	(let ((result (ebib-find-bibtex-entries nil)))
-	  (setf (edb-n-entries ebib-cur-db) (car result))
-	  (when (edb-keys-list ebib-cur-db)
-	    (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<)))
-	  (when (edb-strings-list ebib-cur-db)
-	    (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-	  (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-	  ;; and fill the buffers. note that filling a buffer also makes
-	  ;; that buffer active. therefore we do EBIB-FILL-INDEX-BUFFER
-	  ;; later.
-	  (ebib-set-modified nil)
-	  (ebib-fill-entry-buffer)
-	  ;; and now we tell the user the result
-	  (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-		   (car result)
-		   (cadr result)
-		   (if (caddr result)
-		       "a"
-		     "no"))))
-    ;; if the file does not exist, we need to issue a message.
+	(with-syntax-table ebib-syntax-table
+	  (insert-file-contents file)
+	  ;; if the user makes any changes, we'll want to create a back-up. 
+	  (setf (edb-make-backup ebib-cur-db) t)
+	  (let ((result (ebib-find-bibtex-entries nil)))
+	    (setf (edb-n-entries ebib-cur-db) (car result))
+	    (when (edb-keys-list ebib-cur-db)
+	      (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<)))
+	    (when (edb-strings-list ebib-cur-db)
+	      (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+	    (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+	    ;; and fill the buffers. note that filling a buffer also makes
+	    ;; that buffer active. therefore we do EBIB-FILL-INDEX-BUFFER
+	    ;; later.
+	    (ebib-set-modified nil)
+	    (ebib-fill-entry-buffer)
+	    ;; and now we tell the user the result
+	    (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+		     (car result)
+		     (cadr result)
+		     (if (caddr result)
+			 "a"
+		       "no")))))
+	;; if the file does not exist, we need to issue a message.
     (message "(New file)"))
   ;; what we have to do in *any* case, is fill the index buffer. (this
   ;; even works if there are no keys in the database, e.g. when the
@@ -1357,22 +1364,23 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	(error "No database loaded. Use `o' to open a database")
       (let ((file (read-file-name "File to merge: ")))
 	(with-temp-buffer
-	  (insert-file-contents file)
-	  (let ((n (ebib-find-bibtex-entries t)))
-	    (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-	    (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
-	    (when (edb-strings-list ebib-cur-db)
-	      (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-	    (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-	    (ebib-fill-entry-buffer)
-	    (ebib-fill-index-buffer)
-	    (ebib-set-modified t)
-	    (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-		     (car n)
-		     (cadr n)
-		     (if (caddr n)
-			 "a"
-		       "no"))))))))
+	  (with-syntax-table ebib-syntax-table
+	    (insert-file-contents file)
+	    (let ((n (ebib-find-bibtex-entries t)))
+	      (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
+	      (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
+	      (when (edb-strings-list ebib-cur-db)
+		(setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+	      (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+	      (ebib-fill-entry-buffer)
+	      (ebib-fill-index-buffer)
+	      (ebib-set-modified t)
+	      (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+		       (car n)
+		       (cadr n)
+		       (if (caddr n)
+			   "a"
+			 "no")))))))))
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
@@ -1386,7 +1394,6 @@ whether a @PREAMBLE was found.
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry. Note that a timestamp is only added if EBIB-USE-TIMESTAMP
 is set to T."
-  (modify-syntax-entry ?\" "w")
   (let ((n-entries 0)
 	(n-strings 0)
 	(preamble nil))
@@ -3128,10 +3135,7 @@ STARTTEXT is a string that contains the initial text of the buffer."
 
 (defun ebib-store-multiline-text ()
   "Stores the text being edited in the multiline edit buffer."
-  ;; first make sure the buffer has no unbalanced braces. they would
-  ;; confuse ebib if the file is loaded the next time.
-  (check-parens)
-    (let ((text (buffer-substring-no-properties (point-min) (point-max))))
+  (let ((text (buffer-substring-no-properties (point-min) (point-max))))
       (cond
        ((eq ebib-editing 'preamble)
 	(if (equal text "")
@@ -3233,29 +3237,30 @@ if it is active."
       (error "No database loaded. Use `o' to open a database")
     (if (edb-virtual ebib-cur-db)
 	(error "Cannot import to a virtual database")
-      (save-excursion
-	(save-restriction
-	  (if (region-active)
-	      (narrow-to-region (region-beginning)
-				(region-end)))
-	  (let ((buffer (current-buffer)))
-	    (with-temp-buffer
-	      (insert-buffer-substring buffer)
-	      (let ((n (ebib-find-bibtex-entries t)))
-		(setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-		(setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
-		(when (edb-strings-list ebib-cur-db)
-		  (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-		(setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-		(ebib-fill-entry-buffer)
-		(ebib-fill-index-buffer)
-		(ebib-set-modified t)
-		(message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
-				 (car n)
-				 (cadr n)
-				 (if (caddr n)
-				     "a"
-				   "no")))))))))))
+      (with-syntax-table ebib-syntax-table
+	(save-excursion
+	  (save-restriction
+	    (if (region-active)
+		(narrow-to-region (region-beginning)
+				  (region-end)))
+	    (let ((buffer (current-buffer)))
+	      (with-temp-buffer
+		(insert-buffer-substring buffer)
+		(let ((n (ebib-find-bibtex-entries t)))
+		  (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
+		  (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
+		  (when (edb-strings-list ebib-cur-db)
+		    (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+		  (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+		  (ebib-fill-entry-buffer)
+		  (ebib-fill-index-buffer)
+		  (ebib-set-modified t)
+		  (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
+				   (car n)
+				   (cadr n)
+				   (if (caddr n)
+				       "a"
+				     "no"))))))))))))
 
 (defun ebib-get-db-from-filename (filename)
   "Returns the database struct associated with FILENAME."
