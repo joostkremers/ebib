@@ -255,6 +255,7 @@ Each string is added to the preamble on a separate line."
 (defvar ebib-strings-buffer nil "The strings buffer.")
 (defvar ebib-multiline-buffer nil "Buffer for editing multiline strings.")
 (defvar ebib-help-buffer nil "Buffer showing Ebib help.")
+(defvar ebib-log-buffer nil "Buffer showing warnings and errors during loading of .bib files")
 (defvar ebib-index-highlight nil "Highlight to mark the current entry.")
 (defvar ebib-fields-highlight nil "Highlight to mark the current field.")
 (defvar ebib-strings-highlight nil "Highlight to mark the current string.")
@@ -269,6 +270,7 @@ Each string is added to the preamble on a separate line."
 Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-multiline-raw nil "Indicates whether the multiline text being edited is raw.")
 (defvar ebib-before-help nil "Stores the buffer the user was in when he displayed the help message.")
+(defvar ebib-log-error nil "Indicates whether an error was logged.")
 (defvar ebib-local-bibtex-filenames nil "A buffer-local variable holding a list of the name(s) of that buffer's .bib file")
 (make-variable-buffer-local 'ebib-local-bibtex-filenames)
 (defvar ebib-syntax-table (make-syntax-table) "Syntax table used for reading .bib files.")
@@ -1117,6 +1119,8 @@ buffers and reads the rc file."
   (setq ebib-help-buffer (get-buffer-create " *Ebib-help*"))
   (set-buffer ebib-help-buffer)
   (ebib-help-mode)
+  ;; the log buffer
+  (setq ebib-log-buffer (get-buffer-create " *Ebib-log*"))
   ;; and lastly we create a buffer for the entry keys.
   (setq ebib-index-buffer (get-buffer-create " none"))
   (set-buffer ebib-index-buffer)
@@ -1307,10 +1311,29 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
       (rename-buffer " none"))))
 
 (defun ebib-customize ()
+  "Switches to Ebib's customisation group."
   (interactive)
   (ebib-lower)
   (customize-group 'ebib))
 
+(defun ebib-log (type format-string &rest args)
+  "Writes a message to Ebib's log buffer.
+TYPE (a symbol) is the type of message. It can be LOG, which
+writes the message to the log buffer only; MESSAGE, which writes
+the message to the log buffer and outputs it with the function
+MESSAGE; WARNING, which logs the message and sets the variable
+EBIB-LOG-ERROR to 0; or ERROR, which logs the message and sets
+the variable EBIB-LOG-ERROR to 1. The latter two can be used to
+signal the user to check the log for warnings or errors."
+  (set-buffer ebib-log-buffer)
+  (when (eq type 'warning)
+    (setq ebib-log-error 0))
+  (when (eq type 'error)
+    (setq ebib-log-error 1))
+  (when (eq type 'message)
+    (apply 'message format-string args))
+  (insert (apply 'format  (concat format-string "\n") args)))
+  
 (defun ebib-load-bibtex-file (&optional file)
   "Loads a BibTeX file into ebib."
   (interactive)
@@ -1319,6 +1342,8 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
   (setq ebib-cur-db (ebib-create-new-database))
   (setf (edb-filename ebib-cur-db) (expand-file-name file))
   (setf (edb-name ebib-cur-db) (file-name-nondirectory (edb-filename ebib-cur-db)))
+  (setq ebib-log-error nil) ; we haven't found any errors
+  (ebib-log 'log "%s: Opening file %s" (format-time-string "%d-%b-%Y, %H:%M:%S") (edb-filename ebib-cur-db))
   ;; first, we empty the buffers
   (ebib-erase-buffer ebib-index-buffer)
   (ebib-erase-buffer ebib-entry-buffer)
@@ -1343,18 +1368,21 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	    (ebib-set-modified nil)
 	    (ebib-fill-entry-buffer)
 	    ;; and now we tell the user the result
-	    (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-		     (car result)
-		     (cadr result)
-		     (if (caddr result)
-			 "a"
-		       "no")))))
-	;; if the file does not exist, we need to issue a message.
-    (message "(New file)"))
+	    (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+		      (car result)
+		      (cadr result)
+		      (if (caddr result)
+			  "a"
+			"no")))))
+    ;; if the file does not exist, we need to issue a message.
+    (ebib-log 'message "(New file)"))
   ;; what we have to do in *any* case, is fill the index buffer. (this
   ;; even works if there are no keys in the database, e.g. when the
   ;; user opened a new file or if no BibTeX entries were found.
-  (ebib-fill-index-buffer))
+  (ebib-fill-index-buffer)
+  (when ebib-log-error
+    (message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+  (ebib-log 'log "\n\f\n"))
 
 (defun ebib-merge-bibtex-file ()
   "Merges a BibTeX file into the database."
@@ -1363,6 +1391,8 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
     (if (not ebib-cur-db)
 	(error "No database loaded. Use `o' to open a database")
       (let ((file (read-file-name "File to merge: ")))
+	(setq ebib-log-error nil) ; we haven't found any errors
+	(ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
 	(with-temp-buffer
 	  (with-syntax-table ebib-syntax-table
 	    (insert-file-contents file)
@@ -1375,12 +1405,14 @@ If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
 	      (ebib-fill-entry-buffer)
 	      (ebib-fill-index-buffer)
 	      (ebib-set-modified t)
-	      (message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-		       (car n)
-		       (cadr n)
-		       (if (caddr n)
-			   "a"
-			 "no")))))))))
+	      (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+			(car n)
+			(cadr n)
+			(if (caddr n)
+			    "a"
+			  "no"))
+	        (when ebib-log-error
+		  (message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors")))))))))))
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
@@ -1406,13 +1438,15 @@ is set to T."
 	     ((equal entry-type "string") ; string and preamble must be treated differently
 	      (if (ebib-read-string)
 		  (setq n-strings (1+ n-strings))))
-	     ((equal entry-type "preamble") (ebib-read-preamble)
+	     ((equal entry-type "preamble")
+	      (ebib-read-preamble)
 	      (setq preamble t))
 	     ((equal entry-type "comment") (ebib-match-paren-forward (point-max))) ; ignore comments
 	     ((gethash (intern-soft entry-type) ebib-entry-types-hash) ; if the entry type has been defined
 	      (if (ebib-read-entry entry-type timestamp)
 		  (setq n-entries (1+ n-entries))))
-	     (t (message "Unknown entry type `%s'. Skipping." entry-type) ; we found something we don't know
+	     ;; anything else we report as an unknown entry type.
+	     (t (ebib-log 'warning "%d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
 		(ebib-match-paren-forward (point-max))))))))
     (list n-entries n-strings preamble)))
 
@@ -1441,7 +1475,7 @@ database. Returns the string if one was read, nil otherwise."
 							   nil))
 				 (t nil)))
 		    (if (member abbr (edb-strings-list ebib-cur-db))
-			(message (format "@STRING definition `%s' duplicated" abbr))
+			(ebib-log 'warning (format "%d: @STRING definition `%s' duplicated" (line-number-at-pos) abbr))
 		      (ebib-insert-string abbr string ebib-cur-db))))))))))
 
 (defun ebib-read-preamble ()
@@ -1477,7 +1511,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
 			       1)	; this delimits the entry key
       (let ((entry-key (buffer-substring-no-properties beg (point))))
 	(if (member entry-key (edb-keys-list ebib-cur-db))
-	    (message "Entry `%s' duplicated " entry-key)
+	    (ebib-log 'warning "%d: Entry `%s' duplicated " (line-number-at-pos) entry-key)
 	  (let ((fields (ebib-find-bibtex-fields (intern-soft entry-type) entry-limit)))
 	    (when fields	     ; if fields were found, we store them, and return T.
 	      (ebib-insert-entry entry-key fields ebib-cur-db nil timestamp)

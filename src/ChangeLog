@@ -1,3 +1,19 @@
+2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-log-error): new.
+	(ebib-create-buffers): added creating the log buffer.
+	(ebib-find-bibtex-entries): modified to use ebib-log.
+	(ebib-read-string): same.
+	(ebib-read-entry): same.
+
+2007-11-06  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-customize): added doc string.
+	(ebib-log-buffer): new.
+	(ebib-log): new.
+	(ebib-load-bibtex-file): modified to use ebib-log.
+	(ebib-merge-bibtex-file): same.
+
 2007-11-02  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-syntax-table): new.
