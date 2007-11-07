@@ -1,5 +1,13 @@
 2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-merge-bibtex-file): added final call to ebib-log,
+	to insert "\n\f\n".
+	(ebib-find-bibtex-entries): added "Line" to warning message.
+	(ebib-read-string): same.
+	(ebib-read-entry): same.
+
+2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
+
 	* ebib.el (ebib-log-error): new.
 	(ebib-create-buffers): added creating the log buffer.
 	(ebib-find-bibtex-entries): modified to use ebib-log.

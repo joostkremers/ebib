@@ -1391,7 +1391,7 @@ signal the user to check the log for warnings or errors."
     (if (not ebib-cur-db)
 	(error "No database loaded. Use `o' to open a database")
       (let ((file (read-file-name "File to merge: ")))
-	(setq ebib-log-error nil) ; we haven't found any errors
+	(setq ebib-log-error nil)	; we haven't found any errors
 	(ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
 	(with-temp-buffer
 	  (with-syntax-table ebib-syntax-table
@@ -1411,8 +1411,9 @@ signal the user to check the log for warnings or errors."
 			(if (caddr n)
 			    "a"
 			  "no"))
-	        (when ebib-log-error
-		  (message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors")))))))))))
+	      (when ebib-log-error
+		(message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+	      (ebib-log 'log "\n\f\n"))))))))
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
@@ -1446,7 +1447,7 @@ is set to T."
 	      (if (ebib-read-entry entry-type timestamp)
 		  (setq n-entries (1+ n-entries))))
 	     ;; anything else we report as an unknown entry type.
-	     (t (ebib-log 'warning "%d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
+	     (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
 		(ebib-match-paren-forward (point-max))))))))
     (list n-entries n-strings preamble)))
 
@@ -1475,7 +1476,7 @@ database. Returns the string if one was read, nil otherwise."
 							   nil))
 				 (t nil)))
 		    (if (member abbr (edb-strings-list ebib-cur-db))
-			(ebib-log 'warning (format "%d: @STRING definition `%s' duplicated" (line-number-at-pos) abbr))
+			(ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated" (line-number-at-pos) abbr))
 		      (ebib-insert-string abbr string ebib-cur-db))))))))))
 
 (defun ebib-read-preamble ()
@@ -1511,7 +1512,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
 			       1)	; this delimits the entry key
       (let ((entry-key (buffer-substring-no-properties beg (point))))
 	(if (member entry-key (edb-keys-list ebib-cur-db))
-	    (ebib-log 'warning "%d: Entry `%s' duplicated " (line-number-at-pos) entry-key)
+	    (ebib-log 'warning "Line %d: Entry `%s' duplicated " (line-number-at-pos) entry-key)
 	  (let ((fields (ebib-find-bibtex-fields (intern-soft entry-type) entry-limit)))
 	    (when fields	     ; if fields were found, we store them, and return T.
 	      (ebib-insert-entry entry-key fields ebib-cur-db nil timestamp)
