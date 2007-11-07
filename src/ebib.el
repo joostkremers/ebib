@@ -1325,14 +1325,15 @@ MESSAGE; WARNING, which logs the message and sets the variable
 EBIB-LOG-ERROR to 0; or ERROR, which logs the message and sets
 the variable EBIB-LOG-ERROR to 1. The latter two can be used to
 signal the user to check the log for warnings or errors."
-  (set-buffer ebib-log-buffer)
-  (when (eq type 'warning)
-    (setq ebib-log-error 0))
-  (when (eq type 'error)
-    (setq ebib-log-error 1))
-  (when (eq type 'message)
-    (apply 'message format-string args))
-  (insert (apply 'format  (concat format-string "\n") args)))
+  (save-excursion
+    (set-buffer ebib-log-buffer)
+    (when (eq type 'warning)
+      (setq ebib-log-error 0))
+    (when (eq type 'error)
+      (setq ebib-log-error 1))
+    (when (eq type 'message)
+      (apply 'message format-string args))
+    (insert (apply 'format  (concat format-string "\n") args))))
   
 (defun ebib-load-bibtex-file (&optional file)
   "Loads a BibTeX file into ebib."

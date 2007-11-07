@@ -5,6 +5,8 @@
 	(ebib-find-bibtex-entries): added "Line" to warning message.
 	(ebib-read-string): same.
 	(ebib-read-entry): same.
+	(ebib-log): added save-excursion, so that the ebib log buffer is
+	only current during this function.
 
 2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
 
