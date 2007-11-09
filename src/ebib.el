@@ -932,50 +932,104 @@ If DB is set to a database, the new database is a copy of DB."
     (setq ebib-databases (append ebib-databases (list new-db)))
     new-db))
 
-;; the next two functions are used in loading the database. a database is
-;; loaded by reading the raw file into a temp buffer and then reading all
-;; the entries in it. for this we need to be able to search a matching
-;; parenthesis and a matching double quote.
-
 (defun ebib-match-paren-forward (limit)
   "Moves forward to the closing parenthesis matching the opening parenthesis at POINT.
+This function handles parentheses () and braces {}. Does not
+search/move beyond LIMIT. Returns T if a matching parenthesis was
+found, NIL otherwise. If point was not at an opening parenthesis
+at all, NIL is returned and point is not moved. If point was at
+an opening parenthesis but no matching closing parenthesis was
+found, an error is logged and point is moved one character
+forward to allow parsing to continue."
+  (cond
+   ((eq (char-after) ?\{)
+    (ebib-match-brace-forward limit))
+   ((eq (char-after) ?\()
+    ;; we wrap this in a condition-case because we need to log the error
+    ;; message outside of the save-restriction, otherwise we get the wrong
+    ;; line number.
+    (condition-case nil
+	(save-restriction
+	  (narrow-to-region (point) limit)
+	  ;; this is really a hack. we want to allow unbalanced parentheses in
+	  ;; field values (bibtex does), so we cannot use forward-list
+	  ;; here. for the same reason, looking for the matching paren by hand
+	  ;; is pretty complicated. however, balanced parentheses can only be
+	  ;; used to enclose entire entries (or @STRINGs or @PREAMBLEs) so we
+	  ;; can be pretty sure we'll find it right before the next @ at the
+	  ;; start of a line, or right before the end of the file.
+	  (re-search-forward "^@" nil 0)
+	  (skip-chars-backward "@ \n\t\f")
+	  (forward-char -1)
+	  (if (eq (char-after) ?\))
+	      t
+	    (goto-char (1+ (point-min)))
+	    (error)))
+      (error (ebib-log 'error "Error in line %d: Matching closing parenthesis not found!" (line-number-at-pos))
+	     nil)))
+   (t nil)))
 
-Does not search/move beyond LIMIT. Returns T if a matching parenthesis was
-found, NIL otherwise. If point was not at an opening parenthesis at all,
-NIL is returned and point is not moved. If point was at an opening
-parenthesis but no matching closing parenthesis was found, point is moved
-to LIMIT."
-  (if (nor (eq (char-after) ?\{)
-	   (eq (char-after) ?\"))
-      nil
-    (save-restriction
-      (narrow-to-region (point-min) limit)
-      (condition-case nil
+(defun ebib-match-delim-forward (limit)
+  "Moves forward to the closing delimiter matching the opening delimiter at POINT.
+This function handles braces {} and double quotes \"\". Does not
+search/move beyond LIMIT. Returns T if a matching delimiter was
+found, NIL otherwise. If point was not at an opening delimiter at
+all, NIL is returned and point is not moved. If point was at an
+opening delimiter but no matching closing delimiter was found, an
+error is logged and point is moved one character forward to allow
+parsing to continue."
+  (cond
+   ((eq (char-after) ?\")
+    (ebib-match-quote-forward limit))
+   ((eq (char-after) ?\{)
+    (ebib-match-brace-forward limit))
+   (t nil)))
+
+(defun ebib-match-brace-forward (limit)
+  "Moves forward to the closing brace matching the opening brace at POINT.
+Does not search/move beyond LIMIT. Returns T if a matching brace
+was found, NIL otherwise. If point was not at an opening brace at
+all, NIL is returned and point is not moved. If point was at an
+opening brace but no matching closing brace was found, an error
+is logged and point is moved one character forward to allow
+parsing to continue."
+  (when (eq (char-after) ?\{) ; make sure we're really on a brace, otherwise return nil
+    (condition-case nil
+	(save-restriction
+	  (narrow-to-region (point) limit)
 	  (progn
 	    (forward-list)
 	    ;; all of ebib expects that point moves to the closing
 	    ;; parenthesis, not right after it, so we adjust.
 	    (forward-char -1)
-	    t) ; return t because a matching brace was found
-	(error (progn
-		 (goto-char (point-max)) ; point-max because the narrowing is still in effect
-		 nil))))))
+	    t))		      ; return t because a matching brace was found
+      (error (progn
+	       (ebib-log 'error "Error in line %d: Matching closing brace not found!" (line-number-at-pos))
+	       (forward-char 1)
+	       nil)))))
 
 (defun ebib-match-quote-forward (limit)
   "Moves to the closing double quote matching the quote at POINT.
-
-Does not search/move beyond LIMIT. Returns T if a matching quote was found,
-NIL otherwise. If point was not at a double quote at all, NIL is returned
-and point is not moved. If point was at a quote but no matching closing
-quote was found, point is moved to LIMIT."
-  (when (eq (char-after (point)) ?\") ; make sure we're on a double quote.
-    (while
-	(progn
-	  (forward-char) ; we need to move forward because we're on a double quote.
-	  (skip-chars-forward "^\"" limit) ; find the next double quote.
-	  (and (eq (char-before) ?\\)  ; if it's preceded by a backslash,
-	       (< (point) limit)))) ; and we're still below LIMIT, keep on searching.
-    (eq (char-after (point)) ?\"))) ; return T or NIL based on whether we've found a quote.
+Does not search/move beyond LIMIT. Returns T if a matching quote
+was found, NIL otherwise. If point was not at a double quote at
+all, NIL is returned and point is not moved. If point was at a
+quote but no matching closing quote was found, an error is logged
+and point is moved one character forward to allow parsing to
+continue."
+  (when (eq (char-after (point)) ?\")  ; make sure we're on a double quote.
+    (condition-case nil
+	(save-restriction
+	  (narrow-to-region (point) limit)
+	  (while (progn
+		   (forward-char) ; move forward because we're on a double quote
+		   (skip-chars-forward "^\"") ; search the next double quote
+		   (eq (char-before) ?\\))) ; if it's preceded by a backslash, keep on searching
+	  (or (eq (char-after) ?\")
+	      (progn
+		(goto-char (1+ (point-min)))
+		(error))))
+      (error (ebib-log 'error "Error in line %d: Matching closing quote not found!" (line-number-at-pos))
+	     nil))))
 
 (defun ebib-insert-entry (entry-key fields db &optional sort timestamp)
   "Stores the entry defined by ENTRY-KEY and FIELDS into DB.
@@ -1121,6 +1175,10 @@ buffers and reads the rc file."
   (ebib-help-mode)
   ;; the log buffer
   (setq ebib-log-buffer (get-buffer-create " *Ebib-log*"))
+  (set-buffer ebib-log-buffer)
+  (erase-buffer)
+  (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n\n")
+  (ebib-log-mode)
   ;; and lastly we create a buffer for the entry keys.
   (setq ebib-index-buffer (get-buffer-create " none"))
   (set-buffer ebib-index-buffer)
@@ -1136,7 +1194,10 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
 	  (y-or-n-p "Quit Ebib? "))
     (kill-buffer ebib-entry-buffer)
     (kill-buffer ebib-index-buffer)
+    (kill-buffer ebib-strings-buffer)
     (kill-buffer ebib-multiline-buffer)
+    (kill-buffer ebib-help-buffer)
+    (kill-buffer ebib-log-buffer)
     (setq ebib-databases nil
 	  ebib-index-buffer nil
 	  ebib-entry-buffer nil
@@ -1236,6 +1297,7 @@ killed and the database has been modified."
 (ebib-key index "j" ebib-next-entry)
 (ebib-key index "J" ebib-switch-to-database)
 (ebib-key index "k" ebib-prev-entry)
+(ebib-key index "l" ebib-show-log)
 (ebib-key index "L" ebib-latex-entries)
 (ebib-key index "m" ebib-mark-entry)
 (ebib-key index "M" ebib-merge-bibtex-file)
@@ -1327,12 +1389,14 @@ the variable EBIB-LOG-ERROR to 1. The latter two can be used to
 signal the user to check the log for warnings or errors."
   (save-excursion
     (set-buffer ebib-log-buffer)
-    (when (eq type 'warning)
-      (setq ebib-log-error 0))
-    (when (eq type 'error)
+    (cond
+     ((eq type 'warning)
+      (or ebib-log-error ; if ebib-error-log is already set to 1, we don't want to overwrite it!
+	  (setq ebib-log-error 0)))
+     ((eq type 'error)
       (setq ebib-log-error 1))
-    (when (eq type 'message)
-      (apply 'message format-string args))
+     ((eq type 'message)
+      (apply 'message format-string args)))
     (insert (apply 'format  (concat format-string "\n") args))))
   
 (defun ebib-load-bibtex-file (&optional file)
@@ -1344,7 +1408,7 @@ signal the user to check the log for warnings or errors."
   (setf (edb-filename ebib-cur-db) (expand-file-name file))
   (setf (edb-name ebib-cur-db) (file-name-nondirectory (edb-filename ebib-cur-db)))
   (setq ebib-log-error nil) ; we haven't found any errors
-  (ebib-log 'log "%s: Opening file %s" (format-time-string "%d-%b-%Y, %H:%M:%S") (edb-filename ebib-cur-db))
+  (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") (edb-filename ebib-cur-db))
   ;; first, we empty the buffers
   (ebib-erase-buffer ebib-index-buffer)
   (ebib-erase-buffer ebib-entry-buffer)
@@ -1382,7 +1446,7 @@ signal the user to check the log for warnings or errors."
   ;; user opened a new file or if no BibTeX entries were found.
   (ebib-fill-index-buffer)
   (when ebib-log-error
-    (message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+    (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
   (ebib-log 'log "\n\f\n"))
 
 (defun ebib-merge-bibtex-file ()
@@ -1413,17 +1477,17 @@ signal the user to check the log for warnings or errors."
 			    "a"
 			  "no"))
 	      (when ebib-log-error
-		(message "%s found! Check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+		(message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
 	      (ebib-log 'log "\n\f\n"))))))))
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
-
-The search is started at the beginnig of the buffer. All entries found are
-stored in the hash table DATABASE of EBIB-CUR-DB. Returns a three-element
-list: the first element is the number of entries found, the second the
-number of @STRING definitions, and the third is T or NIL, indicating
-whether a @PREAMBLE was found.
+The search is started at the beginnig of the buffer. All entries
+found are stored in the hash table DATABASE of
+EBIB-CUR-DB. Returns a three-element list: the first element is
+the number of entries found, the second the number of @STRING
+definitions, and the third is T or NIL, indicating whether a
+@PREAMBLE was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry. Note that a timestamp is only added if EBIB-USE-TIMESTAMP
@@ -1441,16 +1505,18 @@ is set to T."
 	      (if (ebib-read-string)
 		  (setq n-strings (1+ n-strings))))
 	     ((equal entry-type "preamble")
-	      (ebib-read-preamble)
-	      (setq preamble t))
-	     ((equal entry-type "comment") (ebib-match-paren-forward (point-max))) ; ignore comments
+	      (when (ebib-read-preamble)
+		(setq preamble t)))
+	     ((equal entry-type "comment") ; ignore comments
+	      (ebib-log 'log "Comment at line %d ignored" (line-number-at-pos))
+	      (ebib-match-paren-forward (point-max)))
 	     ((gethash (intern-soft entry-type) ebib-entry-types-hash) ; if the entry type has been defined
 	      (if (ebib-read-entry entry-type timestamp)
 		  (setq n-entries (1+ n-entries))))
 	     ;; anything else we report as an unknown entry type.
 	     (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
 		(ebib-match-paren-forward (point-max))))))))
-    (list n-entries n-strings preamble)))
+  (list n-entries n-strings preamble)))
 
 (defun ebib-read-string ()
   "Reads the @STRING definition beginning at the line POINT is on.
@@ -1468,14 +1534,9 @@ database. Returns the string if one was read, nil otherwise."
 	    (progn
 	      (skip-chars-forward "^\"{" limit)
 	      (let ((beg (point)))
-		(if-str (string (cond
-				 ((eq (char-after) ?\" ) (if (ebib-match-quote-forward limit)
-							     (buffer-substring-no-properties beg (1+ (point)))
-							   nil))
-				 ((eq (char-after) ?\{ ) (if (ebib-match-paren-forward limit)
-							     (buffer-substring-no-properties beg (1+ (point)))
-							   nil))
-				 (t nil)))
+		(if-str (string  (if (ebib-match-delim-forward limit)
+				    (buffer-substring-no-properties beg (1+ (point)))
+				  nil))
 		    (if (member abbr (edb-strings-list ebib-cur-db))
 			(ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated" (line-number-at-pos) abbr))
 		      (ebib-insert-string abbr string ebib-cur-db))))))))))
@@ -1487,11 +1548,11 @@ If there was already another @PREAMBLE definition, the new one is added to
 the existing one with a hash sign `#' between them."
   (let ((beg (point)))
     (forward-char -1)
-    (ebib-match-paren-forward (point-max))
-    (let ((text (buffer-substring-no-properties beg (point))))
-      (if (edb-preamble ebib-cur-db)
-	  (setf (edb-preamble ebib-cur-db) (concat (edb-preamble ebib-cur-db) "\n# " text))
-	(setf (edb-preamble ebib-cur-db) text)))))
+    (when (ebib-match-paren-forward (point-max))
+      (let ((text (buffer-substring-no-properties beg (point))))
+	(if (edb-preamble ebib-cur-db)
+	    (setf (edb-preamble ebib-cur-db) (concat (edb-preamble ebib-cur-db) "\n# " text))
+	  (setf (edb-preamble ebib-cur-db) text))))))
 
 (defun ebib-read-entry (entry-type &optional timestamp)
   "Reads a BibTeX entry and stores it in DATABASE of EBIB-CUR-DB.
@@ -1567,14 +1628,11 @@ search."
 
 (defun ebib-find-end-of-field (limit)
   "Moves POINT to the end of a field's contents and returns POINT.
-
 The contents of a field is delimited by a comma or by the closing brace of
 the entry. The latter is at position LIMIT."
   (while (and (not (eq (char-after) ?\,))
 	      (< (point) limit))
-    (cond
-     ((eq (char-after) ?\{) (ebib-match-paren-forward limit))
-     ((eq (char-after) ?\") (ebib-match-quote-forward limit)))
+    (ebib-match-delim-forward limit) ; check if we're on a delimiter and if so, jump to the matching closing delimiter
     (forward-char 1))
   (if (= (point) limit)
       (skip-chars-backward " \n\t\f"))
@@ -1587,14 +1645,16 @@ the entry. The latter is at position LIMIT."
 	   (equal (window-buffer) ebib-entry-buffer)
 	   (equal (window-buffer) ebib-strings-buffer)
 	   (equal (window-buffer) ebib-multiline-buffer)
-	   (equal (window-buffer) ebib-help-buffer))
+	   (equal (window-buffer) ebib-help-buffer)
+	   (equal (window-buffer) ebib-log-buffer))
       (error "Ebib is not active ")
     (set-window-configuration ebib-saved-window-config)
     (bury-buffer ebib-entry-buffer)
     (bury-buffer ebib-index-buffer)
     (bury-buffer ebib-multiline-buffer)
     (bury-buffer ebib-strings-buffer)
-    (bury-buffer ebib-help-buffer)))
+    (bury-buffer ebib-help-buffer)
+    (bury-buffer ebib-log-buffer)))
 
 (defun ebib-prev-entry ()
   "Moves to the previous BibTeX entry."
@@ -2494,6 +2554,12 @@ modified."
   (other-window 1)
   (ebib-display-help ebib-index-buffer))
 
+(defun ebib-show-log ()
+  "Display the contents of the log buffer."
+  (interactive)
+  (other-window 1)
+  (switch-to-buffer ebib-log-buffer))
+
 (defun ebib-push-entry-key (prefix)
   "Pushes the current entry to a LaTeX buffer.
 
@@ -3257,6 +3323,31 @@ STARTTEXT is a string that contains the initial text of the buffer."
     (switch-to-buffer ebib-entry-buffer))
    ((eq ebib-before-help ebib-strings-buffer)
     (switch-to-buffer ebib-strings-buffer))))
+
+;;;;;;;;;;;;;;;;;;;
+;; ebib-log-mode ;;
+;;;;;;;;;;;;;;;;;;;
+
+(defvar ebib-log-mode-map
+  (let ((map (make-keymap)))
+    (suppress-keymap map)
+    (define-key map " " 'scroll-up)
+    (define-key map "b" 'scroll-down)
+    (define-key map "q" 'ebib-quit-log-buffer)
+    map)
+  "Keymap for the ebib log buffer.")
+
+(define-derived-mode ebib-log-mode
+  fundamental-mode "Ebib-log"
+  "Major mode for the Ebib log buffer."
+  (local-set-key "\C-xb" 'ebib-quit-log-buffer)
+  (local-set-key "\C-xk" 'ebib-quit-log-buffer))
+
+(defun ebib-quit-log-buffer ()
+  "Exits the log buffer."
+  (interactive)
+  (switch-to-buffer ebib-entry-buffer)
+  (other-window 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functions for non-Ebib buffers ;;

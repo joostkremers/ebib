@@ -118,6 +118,21 @@ file into Ebib. If, however, you have custom entry types, or custom fields
 in your =.bib= files, you should read the chapter on customising Ebib to
 learn how to define them, so that Ebib knows about them. (See [[#entry-types][Entry types]].)
 
+Every time Ebib reads a =.bib= file, it produces a few log messages. These
+are written into a special buffer =*Ebib-log*=. If Ebib encounters entry tyes
+in the =.bib= file that it doesn't know, it will log a warning. If Ebib finds
+something that it believes to be incorrect, an error will be logged. If any
+warnings or errors occur while loading the =.bib= file, Ebib tells you so
+after loading the file. To view the log file, press =l= in the index buffer.
+
+Note that even if it detects warnings or errors, Ebib will try to continue
+parsing the rest of the =.bib= file. That means that normally, only the entry
+in which an error occurs is not read. Entries occurring after the
+problematic one are read.
+
+
+*** Navigating a =.bib= file
+
 Once you've opened a =.bib= file, the keys of all the entries in the file are
 shown in alphabetical order in the index buffer in the top Ebib window. The
 first entry is highlighted, meaning it is the current entry. The fields it

@@ -1,3 +1,25 @@
+2007-11-09  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-match-quote-forward): reworked a bit.
+	(ebib-show-log): new.
+	(ebib-index-mode-map): added "l" key, bound to ebib-show-log.
+	(ebib-log-mode-map): new.
+	(ebib-log-mode): new.
+	(ebib-quit-log-buffer): new.
+	(ebib-match-delim-forward): new.
+	(ebib-read-string): modified to use ebib-match-delim-forward.
+	(ebib-read-preamble): added a test to check for the result of
+	ebib-match-paren-forward.
+	(ebib-find-bibtex-entries): added test to check if
+	ebib-read-preamble returns non-nil.
+	(ebib-find-end-of-field): modified to use ebib-match-delim-forward.
+	(ebib-create-buffers): added initial message to the log buffer.
+
+2007-11-08  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-lower): added bury-buffer command for ebib-log-buffer.
+	(ebib-quit): added kill-buffer commands for ebib-log-buffer and ebib-strings-buffer.
+
 2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-merge-bibtex-file): added final call to ebib-log,
@@ -6,7 +28,16 @@
 	(ebib-read-string): same.
 	(ebib-read-entry): same.
 	(ebib-log): added save-excursion, so that the ebib log buffer is
-	only current during this function.
+	only current during this function. also modified to no longer set
+	ebib-log-error to 0 unconditionally, instead checks if it's still
+	nil. also modified to use cond.
+	(ebib-match-brace-forward): new. this function handles braces {}
+	only.
+	(ebib-match-paren-forward): modified to handle parenthesis () and
+	braces {} differently.
+	(ebib-match-quote-forward): modified: logs an error when no
+	closing quote is found, and moves point to the char after the
+	opening quote.
 
 2007-11-07  Joost Kremers  <joostkremers@yahoo.com>
 
