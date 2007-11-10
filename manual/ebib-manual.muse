@@ -409,7 +409,7 @@ hitting =RET=, Emacs puts a BibTeX citation at the cursor position in the
 current buffer with the key you selected.
 
 You can also do it the other way around: if you're in the index buffer in
-Ebib, you can *push* an entry to a LaTex buffer. To do this, use the key =p=.
+Ebib, you can *push* an entry to a LaTeX buffer. To do this, use the key =p=.
 Ebib will ask you for a buffer to push the entry to, and will then insert
 the string =\cite{<key>}= at the current cursor position in the buffer you've
 supplied.
@@ -713,7 +713,6 @@ exactly as you enter it. So you'd have to type the following in Ebib:
 Note that when Ebib loads a =.bib= file that contains more than one =@preamble=
 definition, it will concatenate all the strings in them in the manner just
 described and save them in one =@preamble= definition.
-
 
 
 ** =@String= Definitions
@@ -1528,7 +1527,7 @@ you have bound =ebib-insert-bibtex-key= to a key sequence. That is, if you
 have bound it to say =C-c b=, typing =M-2 C-c b= inserts the second string.)
 
 Even if you have specified multiple strings, you can still use
-=ebib-insert-bibtex-key= or hit =p= without prefix argument. In that case, ebib
+=ebib-insert-bibtex-key= or hit =p= without prefix argument. In that case, Ebib
 just inserts string number 1. Note that if you define only one custom
 string, it still needs to be numbered. Give it number 1, so that you can
 enter it without prefix argument.
@@ -1609,7 +1608,7 @@ This is the regular expression that Ebib uses to search for URLs in a
 field. The default value is:
 
 <example>
-\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f\l]+
+\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+
 </example>
 
 With this regular expression, Ebib considers everything that is in a LaTeX
