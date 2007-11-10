@@ -347,9 +347,8 @@ Its value can be 'strings, 'fields, or 'preamble.")
 
 (defmacro if-str (bindvar then &rest else)
   "Execute THEN only if STRING is nonempty.
-
-Format: (if-str (var value) then-form [else-forms])
-VAR is bound to VALUE, which is evaluated. If VAR is a nonempty string,
+Format: (if-str (var value) then-form [else-forms]) VAR is bound
+to VALUE, which is evaluated. If VAR is a nonempty string,
 THEN-FORM is executed. If VAR is either \"\" or nil, ELSE-FORM is
 executed. Returns the value of THEN or of ELSE."
   (declare (indent 2))
@@ -379,7 +378,6 @@ executed. Returns the value of THEN or of ELSE."
 
 (defun read-string-at-point (chars)
   "Reads a string at POINT delimited by CHARS and returns it.
-
 CHARS is a string of characters that should not occur in the string."
   (save-excursion
     (skip-chars-backward (concat "^" chars))
@@ -389,7 +387,6 @@ CHARS is a string of characters that should not occur in the string."
 
 (defun remove-from-string (string remove)
   "Returns a copy of STRING with all the occurrences of REMOVE taken out.
-
 REMOVE can be a regex."
   (apply 'concat (split-string string remove)))
 
@@ -404,7 +401,6 @@ REMOVE can be a regex."
 
 (defun ensure-extension (string ext)
   "Makes sure STRING has the extension EXT, by appending it if necessary.
-
 EXT should be an extension without the dot."
   (if (string-match (concat "\\." ext "$") string)
       string
@@ -430,9 +426,8 @@ After BODY is executed, the buffer modified flag is unset."
 
 (defun symbol-or-string (x)
   "Returns the symbol-name of X if X is a symbol, otherwise return X.
-
-Much like SYMBOL-NAME, except it does not throw an error if X is not a
-symbol."
+Much like SYMBOL-NAME, except it does not throw an error if X is
+not a symbol."
   (if (symbolp x)
        (symbol-name x)
      x))
@@ -441,9 +436,9 @@ symbol."
 (if (not (fboundp 'propertize))
     (defun propertize (string &rest properties)
       "Return a copy of STRING with text properties added.
-First argument is the string to copy.
-Remaining arguments form a sequence of PROPERTY VALUE pairs for text
-properties to add to the result."
+First argument is the string to copy.  Remaining arguments form a
+sequence of PROPERTY VALUE pairs for text properties to add to
+the result."
       (let ((new-string (copy-sequence string)))
 	(add-text-properties 0 (length new-string) properties new-string)
 	new-string)))
@@ -551,17 +546,15 @@ properties to add to the result."
 
 (defun match-all (match-str string)
   "Highlights all the matches of MATCH-STR in STRING.
-
-The return value is a list of two elements: the first is the modified
-string, the second either t or nil, indicating whether a match was found at
-all."
+The return value is a list of two elements: the first is the
+modified string, the second either t or nil, indicating whether a
+match was found at all."
   (do ((counter 0 (match-end 0)))
       ((not (string-match match-str string counter)) (values string (not (= counter 0))))
     (add-text-properties (match-beginning 0) (match-end 0) '(face highlight) string)))
 
 (defun looking-at-goto-end (str &optional match)
   "Like LOOKING-AT but moves point to the end of the matching string.
-
 MATCH acts just like the argument to MATCH-END, and defaults to 0."
   (or match (setq match 0))
   (let ((case-fold-search t))
@@ -595,7 +588,6 @@ MATCH acts just like the argument to MATCH-END, and defaults to 0."
 
 (defmacro ebib-execute-when (&rest forms)
   "Macro to facilitate writing Ebib functions.
-
 This functions essentially like a COND clause: the basic format
 is (ebib-execute-when FORMS ...), where each FORM is built up
 as (ENVIRONMENTS BODY). ENVIRONMENTS is a list of symbols (not
@@ -641,7 +633,6 @@ conditions are AND'ed.)"
 
 (defmacro ebib-export-to-db (num message copy-fn)
   "Exports data to another database.
-
 NUM is the number of the database to which the data is to be copied.
 
 MESSAGE is a string displayed in the echo area if the export was
@@ -664,7 +655,6 @@ successful, and NIL otherwise."
 
 (defmacro ebib-export-to-file (prompt-string message insert-fn)
   "Exports data to a file.
-
 PROMPT-STRING is the string that is used to ask for the filename
 to export to. INSERT-FN must insert the data to be exported into
 the current buffer: it is called within a WITH-TEMP-BUFFER, whose
@@ -783,7 +773,6 @@ display the actual filename."
 
 (defun ebib-move-to-field (field direction)
   "Moves the fields overlay to the line containing FIELD.
-
 If DIRECTION is positive, searches forward, if DIRECTION is
 negative, searches backward. If DIRECTION is 1 or -1, searches
 from POINT, if DIRECTION is 2 or -2, searches from beginning or
@@ -809,7 +798,6 @@ overlay is not moved.  FIELD must be a symbol."
 
 (defun ebib-create-collection (hashtable)
   "Creates a list from the keys in HASHTABLE that can be used as COLLECTION in COMPLETING-READ.
-
 The keys of HASHTABLE must be either symbols or strings."
   (let ((result nil))
     (maphash #'(lambda (x y)
@@ -882,7 +870,6 @@ The keys of HASHTABLE must be either symbols or strings."
 
 (defun ebib-fill-entry-buffer (&optional match-str)
   "Fills the entry buffer with the fields of the current entry.
-
 MATCH-STRING is a regexp that will be highlighted when it occurs in the
 field contents."
   (set-buffer ebib-entry-buffer)
@@ -900,9 +887,9 @@ field contents."
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
-
-If DB is nil, it defaults to the current database, and the modified flag of
-the index buffer is also (re)set. MOD must be either T or NIL."
+If DB is nil, it defaults to the current database, and the
+modified flag of the index buffer is also (re)set. MOD must be
+either T or NIL."
   (unless db
     (setq db ebib-cur-db))
   (setf (edb-modified db) mod)
@@ -913,7 +900,6 @@ the index buffer is also (re)set. MOD must be either T or NIL."
 
 (defun ebib-modified-p ()
   "Checks if any of the databases in Ebib were modified.
-
 Returns the first modified database, or NIL if none was modified."
   (let ((db (car ebib-databases)))
     (while (and db
@@ -923,7 +909,6 @@ Returns the first modified database, or NIL if none was modified."
 
 (defun ebib-create-new-database (&optional db)
   "Creates a new database instance and returns it.
-
 If DB is set to a database, the new database is a copy of DB."
   (let ((new-db
 	 (if (edb-p db)
@@ -1033,7 +1018,6 @@ continue."
 
 (defun ebib-insert-entry (entry-key fields db &optional sort timestamp)
   "Stores the entry defined by ENTRY-KEY and FIELDS into DB.
-
 Optional argument SORT indicates whether the KEYS-LIST must be
 sorted after insertion. Default is NIL. Optional argument
 TIMESTAMP indicates whether a timestamp is to be added to the
@@ -1051,7 +1035,6 @@ must also be set to T."
 
 (defun ebib-insert-string (abbr string db &optional sort)
   "Stores the @STRING definition defined by ABBR and STRING into DB.
-
 Optional argument SORT indicates whether the STRINGS-LIST must be sorted
 after insertion. When loading or merging a file, for example, it is more
 economic to sort KEYS-LIST manually after all entries in the file have been
@@ -1081,7 +1064,6 @@ Moves point to the first character of the key and returns point."
 
 (defun ebib-entry< (x y)
   "Returns T if entry X is smaller than entry Y.
-
 The entries are compared based on the fields listed in EBIB-SORT-ORDER. X
 and Y should be keys of entries in the current database."
   (let* ((sort-list ebib-sort-order)
@@ -1098,7 +1080,6 @@ and Y should be keys of entries in the current database."
 
 (defun ebib-get-sortstring (entry-key sortkey-list)
   "Returns the field value on which the entry ENTRY-KEY is to be sorted.
-
 ENTRY-KEY must be the key of an entry in the current database. SORTKEY-LIST
 is a list of fields that are considered in order for the sort value."
   (let ((sort-string nil))
@@ -1138,7 +1119,6 @@ is a list of fields that are considered in order for the sort value."
 
 (defun ebib-init ()
   "Initialises Ebib.
-
 This function sets all variables to their initial values, creates the
 buffers and reads the rc file."
   (setq ebib-cur-entry-hash nil
@@ -1186,7 +1166,6 @@ buffers and reads the rc file."
 
 (defun ebib-quit ()
   "Quits Ebib.
-
 The Ebib buffers are killed, all variables except the keymaps are set to nil."
   (interactive)
   (when (if (ebib-modified-p)
@@ -1343,8 +1322,8 @@ killed and the database has been modified."
 
 (defun ebib-fill-index-buffer ()
   "Fills the index buffer with the list of keys in EBIB-CUR-DB.
-
-If EBIB-CUR-DB is nil, the buffer is just erased and its name set to \"none\"."
+If EBIB-CUR-DB is nil, the buffer is just erased and its name set
+to \"none\"."
   (set-buffer ebib-index-buffer)
   (let ((buffer-read-only nil))
     (erase-buffer)
@@ -1520,7 +1499,6 @@ is set to T."
 
 (defun ebib-read-string ()
   "Reads the @STRING definition beginning at the line POINT is on.
-
 If a proper abbreviation and string are found, they are stored in the
 database. Returns the string if one was read, nil otherwise."
   (let ((limit (save-excursion	     ; we find the matching end parenthesis
@@ -1538,14 +1516,14 @@ database. Returns the string if one was read, nil otherwise."
 				    (buffer-substring-no-properties beg (1+ (point)))
 				  nil))
 		    (if (member abbr (edb-strings-list ebib-cur-db))
-			(ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated" (line-number-at-pos) abbr))
+			(ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
+						   (line-number-at-pos) abbr))
 		      (ebib-insert-string abbr string ebib-cur-db))))))))))
 
 (defun ebib-read-preamble ()
   "Reads the @PREAMBLE definition and stores it in EBIB-PREAMBLE.
-
-If there was already another @PREAMBLE definition, the new one is added to
-the existing one with a hash sign `#' between them."
+If there was already another @PREAMBLE definition, the new one is
+added to the existing one with a hash sign `#' between them."
   (let ((beg (point)))
     (forward-char -1)
     (when (ebib-match-paren-forward (point-max))
@@ -1556,7 +1534,6 @@ the existing one with a hash sign `#' between them."
 
 (defun ebib-read-entry (entry-type &optional timestamp)
   "Reads a BibTeX entry and stores it in DATABASE of EBIB-CUR-DB.
-
 Returns the new EBIB-KEYS-LIST if an entry was found, nil
 otherwise. Optional argument TIMESTAMP indicates whether a
 timestamp is to be added. (Whether a timestamp is actually added,
@@ -1574,7 +1551,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
 			       1)	; this delimits the entry key
       (let ((entry-key (buffer-substring-no-properties beg (point))))
 	(if (member entry-key (edb-keys-list ebib-cur-db))
-	    (ebib-log 'warning "Line %d: Entry `%s' duplicated " (line-number-at-pos) entry-key)
+	    (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)
 	  (let ((fields (ebib-find-bibtex-fields (intern-soft entry-type) entry-limit)))
 	    (when fields	     ; if fields were found, we store them, and return T.
 	      (ebib-insert-entry entry-key fields ebib-cur-db nil timestamp)
@@ -1582,11 +1559,10 @@ also depends on EBIB-USE-TIMESTAMP.)"
 
 (defun ebib-find-bibtex-fields (entry-type limit)
   "Finds the fields of the BibTeX entry that starts on the line POINT is on.
-
-Returns a hash table containing all the fields and values, or NIL if none
-were found. ENTRY-TYPE is the type of the entry, which will be recorded in
-the hash table. Before the search starts, POINT is moved back to the
-beginning of the line."
+Returns a hash table containing all the fields and values, or NIL
+if none were found. ENTRY-TYPE is the type of the entry, which
+will be recorded in the hash table. Before the search starts,
+POINT is moved back to the beginning of the line."
   (beginning-of-line)
   ;; we assign a function to fn in order to avoid putting the test on
   ;; ebib-allow-identical-fields in the while loop, where it would get
@@ -1619,7 +1595,6 @@ beginning of the line."
 
 (defun ebib-get-field-contents (limit)
   "Gets the contents of a BibTeX field.
-
 LIMIT indicates the end of the entry, beyond which the function will not 
 search."
   (skip-chars-forward "#%'(),=} \n\t\f" limit)
@@ -1874,8 +1849,8 @@ the entry. The latter is at position LIMIT."
 
 (defun ebib-format-entry (key db timestamp)
   "Format entry KEY from database DB into the current buffer in BibTeX format.
-
-If TIMESTAMP is T, a timestamp is added to the entry if EBIB-USE-TIMESTAMP is T."
+If TIMESTAMP is T, a timestamp is added to the entry if
+EBIB-USE-TIMESTAMP is T."
   (let ((entry (ebib-retrieve-entry key db)))
     (when entry
       (insert (format "@%s{%s,\n" (gethash 'type* entry) key))
@@ -1927,7 +1902,6 @@ If TIMESTAMP is T, a timestamp is added to the entry if EBIB-USE-TIMESTAMP is T.
 
 (defun ebib-write-database ()
   "Writes the current database to a different file.
-
 Can also be used to change a virtual database into a real one."
   (interactive)
   (ebib-execute-when
@@ -2035,11 +2009,10 @@ Can also be used to change a virtual database into a real one."
 
 (defun ebib-remove-entry-from-db (entry-key db &optional new-cur-entry)
   "Removes ENTRY-KEY from DB.
-
-Optional argument NEW-CUR-ENTRY is the key of the entry that is to become
-the new current entry. It it is NIL, the entry after the deleted one
-becomes the new current entry. If it is T, the current entry is not
-changed."
+Optional argument NEW-CUR-ENTRY is the key of the entry that is
+to become the new current entry. It it is NIL, the entry after
+the deleted one becomes the new current entry. If it is T, the
+current entry is not changed."
   (remhash entry-key (edb-database db))
   (setf (edb-n-entries db) (1- (edb-n-entries db)))
   (cond
@@ -2083,7 +2056,6 @@ changed."
 
 (defun ebib-export-entry (prefix)
   "Copies entries to another database.
-
 The prefix argument indicates which database to copy the entry
 to. If no prefix argument is present, a filename is asked to
 which the entry is appended."
@@ -2095,7 +2067,6 @@ which the entry is appended."
 
 (defun ebib-export-single-entry (num)
   "Copies the current entry to another database.
-
 NUM indicates which database to copy the entry to. If it is NIL,
 a filename is asked to which the entry is appended."
   (ebib-execute-when
@@ -2125,7 +2096,6 @@ a filename is asked to which the entry is appended."
 
 (defun ebib-export-marked-entries (num)
   "Copies the marked entries to another database.
-
 NUM indicates which database to copy the entry to. If it is NIL,
 a filename is asked to which the entry is appended."
   (ebib-execute-when
@@ -2157,9 +2127,8 @@ a filename is asked to which the entry is appended."
      
 (defun ebib-search ()
   "Search the current Ebib database.
-
-The search is conducted with STRING-MATCH and can therefore be a regexp.
-Searching starts with the current entry."
+The search is conducted with STRING-MATCH and can therefore be a
+regexp.  Searching starts with the current entry."
   (interactive)
   (ebib-execute-when
     ((entries)
@@ -2177,9 +2146,9 @@ Searching starts with the current entry."
 
 (defun ebib-search-next ()
   "Search the next occurrence of EBIB-SEARCH-STRING.
-
-Searching starts at the entry following the current entry. If a match is
-found, the matching entry is shown and becomes the new current entry."
+Searching starts at the entry following the current entry. If a
+match is found, the matching entry is shown and becomes the new
+current entry."
   (interactive)
   (ebib-execute-when
     ((entries)
@@ -2205,10 +2174,9 @@ found, the matching entry is shown and becomes the new current entry."
 
 (defun ebib-search-in-entry (search-str entry &optional field)
   "Searches one entry of the ebib database.
-
-Returns a list of fields in ENTRY that match the regexp SEARCH-STR,
-or NIL if no matches were found. If FIELD is given, only that
-field is searched."
+Returns a list of fields in ENTRY that match the regexp
+SEARCH-STR, or NIL if no matches were found. If FIELD is given,
+only that field is searched."
   (let ((case-fold-search t)  ; we want to ensure a case-insensitive search
 	(result nil))
     (if field
@@ -2247,7 +2215,6 @@ field is searched."
 
 (defun ebib-export-preamble (prefix)
   "Export the @PREAMBLE definition.
-
 If a prefix argument is given, it is taken as the database to
 export the preamble to. If the goal database already has a
 preamble, the new preamble will be appended to it. If no prefix
@@ -2275,7 +2242,6 @@ the preamble is appended."
 
 (defun ebib-print-entries ()
   "Creates a LaTeX file listing the entries.
-
 Either prints the entire database, or the marked entries."
   (interactive)
   (ebib-execute-when
@@ -2319,7 +2285,6 @@ Either prints the entire database, or the marked entries."
 
 (defun ebib-latex-entries ()
   "Creates a LaTeX file that \\nocite's entries from the database.
-
 Operates either on all entries or on the marked entries."
   (interactive)
   (ebib-execute-when
@@ -2382,7 +2347,6 @@ Operates either on all entries or on the marked entries."
 
 (defun ebib-browse-url (num)
   "Ask a browser to load the URL in the standard URL field.
-
 The standard URL field may contain more than one URL, if they're
 whitespace-separated. In that case, a numeric prefix argument
 specifies which URL to choose.
@@ -2403,7 +2367,6 @@ is `url'."
 
 (defun ebib-call-browser (urls n)
   "Passes the Nth url in URLS to a browser.
-
 URLs must be a string of whitespace-separated urls."
   (let ((url (nth (1- n)
 		  (let ((start 0)
@@ -2425,7 +2388,6 @@ URLs must be a string of whitespace-separated urls."
 
 (defun ebib-virtual-db-and (not)
   "Filter entries into a virtual database.
-
 If the current database is a virtual database already, perform a
 logical AND on the entries."
   (interactive "p")
@@ -2437,7 +2399,6 @@ logical AND on the entries."
 
 (defun ebib-virtual-db-or (not)
   "Filter entries into a virtual database.
-
 If the current database is a virtual database already, perform a
 logical OR with the entries in the original database."
   (interactive "p")
@@ -2464,7 +2425,6 @@ logical OR with the entries in the original database."
 
 (defun ebib-filter-to-virtual-db (bool not)
   "Filters the current database to a virtual database.
-
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s(contains <field> <regexp>)%s. Enter field: "
@@ -2533,7 +2493,6 @@ a logical `not' is applied to the selection."
 
 (defun ebib-print-filter (num)
   "Display the filter of the current virtual database.
-
 With any prefix argument, reapplies the filter to the
 database. This can be useful when the source database was
 modified."
@@ -2562,7 +2521,6 @@ modified."
 
 (defun ebib-push-entry-key (prefix)
   "Pushes the current entry to a LaTeX buffer.
-
 The user is prompted for the buffer to push the entry into."
   (interactive "p")
   (let ((called-with-prefix (ebib-called-with-prefix)))
@@ -2638,7 +2596,6 @@ The user is prompted for the buffer to push the entry into."
 
 (defun ebib-find-visible-field (field direction)
   "Finds the first visible field before or after FIELD.
-
 If DIRECTION is negative, search the preceding fields, otherwise
 search the succeeding fields. If FIELD is visible itself, return
 that. If there is no preceding/following visible field, return
@@ -2806,7 +2763,6 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 
 (defun ebib-browse-url-in-field (num)
   "Browse the url in the current field.
-
 The field may contain a whitespace-separated set of urls. The
 prefix argument indicates which url is to be sent to the
 browser."
@@ -2839,7 +2795,6 @@ browser."
 
 (defun ebib-yank-field-contents (arg)
   "Inserts the last killed text into the current field.
-
 If the current field already has a contents, nothing is inserted,
 unless the previous command was also ebib-yank-field-contents,
 then the field contents is replaced with the previous yank. That
@@ -2865,8 +2820,8 @@ of C-y/M-y.  Prefix arguments also work the same as with C-y/M-y."
 	(ebib-set-modified t)))))
 
 (defun ebib-delete-field-contents ()
-  "Deletes the contents of the current field. The deleted text is not put
-in the kill ring."
+  "Deletes the contents of the current field.
+The deleted text is not put in the kill ring."
   (interactive)
   (if (eq ebib-current-field 'type*)
       (beep)
@@ -3064,7 +3019,6 @@ in the kill ring."
 
 (defun ebib-edit-string ()
   "Edits the value of an @STRING definition
-
 When the user enters an empty string, the value is not changed."
   (interactive)
   (let ((init-contents (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
@@ -3130,7 +3084,6 @@ When the user enters an empty string, the value is not changed."
 
 (defun ebib-export-string (prefix)
   "Exports the current @STRING.
-
 The prefix argument indicates which database to copy the string
 to. If no prefix argument is present, a filename is asked to
 which the string is appended."
@@ -3153,10 +3106,9 @@ which the string is appended."
 
 (defun ebib-export-all-strings (prefix)
   "Export all @STRING definitions.
-
-If a prefix argument is given, it is taken as the database to copy the
-definitions to. Without prefix argument, asks for a file to append them
-to."
+If a prefix argument is given, it is taken as the database to
+copy the definitions to. Without prefix argument, asks for a file
+to append them to."
   (interactive "P")
   (when ebib-current-string ; there is always a current string, unless there are no strings
     (let ((num (ebib-prefix prefix)))
@@ -3199,7 +3151,6 @@ to."
 
 (defun ebib-multiline-edit (type &optional starttext)
   "Switches to Ebib's multiline edit buffer.
-
 STARTTEXT is a string that contains the initial text of the buffer."
   ;; note: the buffer is put in the currently active window!
   (switch-to-buffer ebib-multiline-buffer)
@@ -3355,10 +3306,9 @@ STARTTEXT is a string that contains the initial text of the buffer."
 
 (defun ebib-import ()
   "Searches for BibTeX entries in the current buffer.
-
-The entries are added to the current database (i.e. the database that was
-active when Ebib was lowered. Works on the whole buffer, or on the region
-if it is active."
+The entries are added to the current database (i.e. the database
+that was active when Ebib was lowered. Works on the whole buffer,
+or on the region if it is active."
   (interactive)
   (if (not ebib-cur-db)
       (error "No database loaded. Use `o' to open a database")
@@ -3400,7 +3350,6 @@ if it is active."
 
 (defun ebib-get-local-databases ()
   "Returns a list of .bib files associated with the file in the current LaTeX buffer.
-
 Each .bib file is a string holding the name of the .bib
 file. This function simply searches the current LaTeX file or its
 master file for a \\bibliography command and returns the file(s)
@@ -3428,7 +3377,6 @@ returns the symbol NONE."
 
 (defun ebib-insert-bibtex-key (prefix)
   "Inserts a BibTeX key at POINT.
-
 The user is prompted for a BibTeX key and has to choose one from
 the database(s) associated with the current LaTeX file, or from
 the current database if there is no \\bibliography command. Tab
@@ -3466,9 +3414,9 @@ completion works."
 
 (defun ebib-entry-summary ()
   "Shows the fields of the key at POINT.
-
-The key is searched in the database associated with the LaTeX file, or in
-the current database if no \\bibliography command can be found."
+The key is searched in the database associated with the LaTeX
+file, or in the current database if no \\bibliography command can
+be found."
   (interactive)
   (ebib-execute-when
     ((database)

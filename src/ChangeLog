@@ -1,3 +1,10 @@
+2007-11-10  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el: removed empty lines after the first line of doc
+	strings. (this is apparently not an Emacs convention...)
+	(ebib-read-entry): changed warning message for duplicate entries.
+	(ebib-read-string): same.
+
 2007-11-09  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-match-quote-forward): reworked a bit.
