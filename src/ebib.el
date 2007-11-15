@@ -59,14 +59,12 @@
 (defcustom ebib-insertion-strings '((0 . "%s")
 				    (1 . "\\cite{%s}"))
   "*The string to insert when calling EBIB-INSERT-BIBTEX-KEY.
-
 The directive \"%s\" is replaced with the entry key."
   :group 'ebib
   :type '(repeat (cons :tag "Insertion string" (integer :tag "Number") (string))))
 
 (defcustom ebib-sort-order nil
   "*The fields on which the BibTeX entries are to be sorted in the .bib file.
-
 Sorting is done on different sort levels, and each sort level contains one
 or more sort keys."
   :group 'ebib
@@ -74,7 +72,6 @@ or more sort keys."
 
 (defcustom ebib-save-xrefs-first nil
   "*If true, entries with a crossref field will be saved first in the .bib-file.
-
 Setting this option has unpredictable results for the sort order
 of entries, so it is not compatible with setting the Sort Order option."
   :group 'ebib
@@ -99,7 +96,6 @@ be made visible with the `H' command in the index buffer."
 
 (defcustom ebib-timestamp-format "%a %b %e %T %Y"
   "*Format of the time string used in the timestamp.
-
 The format is given directly to FORMAT-TIME-STRING, see the
 documentation of that function for details."
   :group 'ebib
@@ -107,7 +103,6 @@ documentation of that function for details."
 
 (defcustom ebib-standard-url-field 'url
   "*Standard field to store urls in.
-
 In the index buffer, the command ebib-browse-url can be used to
 send a url to a browser. This option sets the field from which
 this command extracts the url."
@@ -121,7 +116,6 @@ this command extracts the url."
 
 (defcustom ebib-browser-command ""
   "*Command to call the browser with.
-
 GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
@@ -129,7 +123,6 @@ option is unset."
 
 (defcustom ebib-print-preamble nil
   "*Preamble used for the LaTeX file for printing the database.
-
 Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
@@ -141,7 +134,6 @@ Each string is added to the preamble on a separate line."
 
 (defcustom ebib-latex-preamble '("\\bibliographystyle{plain}")
   "*Preamble used for the LaTeX file for BibTeXing the database.
-
 Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
