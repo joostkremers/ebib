@@ -1,3 +1,8 @@
+2007-11-15  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-syntax-table): modified the syntax classes for ()
+	and [] to punctuation character. Not that it really matters, though.
+
 2007-11-10  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el: removed empty lines after the first line of doc
