@@ -56,6 +56,11 @@
   :group 'ebib
   :type 'integer)
 
+(defcustom ebib-index-display-fields nil
+  "*Holds a list of the fields to display in the index buffer."
+  :group 'ebib
+  :type '(repeat (symbol :tag "Index Field")))
+
 (defcustom ebib-insertion-strings '((0 . "%s")
 				    (1 . "\\cite{%s}"))
   "*The string to insert when calling EBIB-INSERT-BIBTEX-KEY.
@@ -717,7 +722,7 @@ display the actual filename."
   (set-buffer ebib-index-buffer)
   (beginning-of-line)
   (let ((beg (point)))
-    (end-of-line)
+    (skip-chars-forward "^ ")
     (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)))
 
 (defun ebib-set-fields-highlight ()
@@ -1325,16 +1330,26 @@ to \"none\"."
 	  ;; database. if so, we don't need to do this:
 	  (when (edb-cur-entry ebib-cur-db)
 	    (mapc #'(lambda (entry)
-		      (insert entry)
+		      (insert (format "%-30s %s"
+				      entry
+				      (if ebib-index-display-fields
+					  (let ((cur-entry-hash (ebib-retrieve-entry entry ebib-cur-db)))
+					    (mapconcat #'(lambda (field)
+							   (to-raw (gethash field cur-entry-hash)))
+						       ebib-index-display-fields
+						       "; "))
+					"")))
 		      (when (member entry (edb-marked-entries ebib-cur-db))
-			(let ((beg (save-excursion
-				     (beginning-of-line)
-				     (point))))
-			  (add-text-properties beg (point) '(face ebib-marked-face))))
+			(save-excursion
+			  (let ((beg (progn
+				       (beginning-of-line)
+				       (point))))
+			    (skip-chars-forward "^ ")
+			    (add-text-properties beg (point) '(face ebib-marked-face)))))
 		      (insert "\n"))
 		  (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
-	    (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
+	    (re-search-forward (format "^%s " (ebib-cur-entry-key)))
 	    (beginning-of-line)
 	    (ebib-set-index-highlight))
 	  (set-buffer-modified-p (edb-modified ebib-cur-db))
@@ -2036,7 +2051,7 @@ current entry is not changed."
      (beginning-of-line)
      (let ((beg (point)))
        (let* ((key (save-excursion
-		     (end-of-line)
+		     (skip-chars-forward "^ ")
 		     (buffer-substring-no-properties beg (point))))
 	      (new-cur-entry (member key (edb-keys-list ebib-cur-db))))
 	 (when new-cur-entry

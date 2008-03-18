@@ -1,3 +1,12 @@
+2008-03-18  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-index-display-fields): new.
+	(ebib-fill-index-buffer): modified so as to make use of
+	ebib-index-display-fields.
+	(ebib-set-index-highlight): changed end-of-line into
+	skip-chars-forward because of ebib-index-display-fields.
+	(ebib-select-entry): same.
+
 2007-11-15  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-syntax-table): modified the syntax classes for ()

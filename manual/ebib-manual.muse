@@ -130,11 +130,12 @@ you should read the chapter on customising Ebib to learn how to define
 them, so that Ebib knows about them. (See [[#entry-types][Entry types]].)
 
 Every time Ebib reads a =.bib= file, it produces a few log messages. These
-are written into a special buffer =*Ebib-log*=. If Ebib encounters entry tyes
-in the =.bib= file that it doesn't know, it will log a warning. If Ebib finds
-something that it believes to be incorrect, an error will be logged. If any
-warnings or errors occur while loading the =.bib= file, Ebib tells you so
-after loading the file. To view the log file, press =l= in the index buffer.
+are written into a special buffer =*Ebib-log*=. If Ebib encounters entry
+types in the =.bib= file that it doesn't know, it will log a warning. If Ebib
+finds something that it believes to be incorrect, an error will be
+logged. If any warnings or errors occur while loading the =.bib= file, Ebib
+tells you so after loading the file. To view the log file, press =l= in the
+index buffer.
 
 Note that even if it detects warnings or errors, Ebib will try to continue
 parsing the rest of the =.bib= file. That means that normally, only the entry
@@ -145,9 +146,11 @@ problematic one are read.
 *** Navigating a =.bib= file
 
 Once you've opened a =.bib= file, the keys of all the entries in the file are
-shown in alphabetical order in the index buffer in the top Ebib window. The
-first entry is highlighted, meaning it is the current entry. The fields it
-holds and their values are shown in the entry buffer in the bottom Ebib
+shown in alphabetical order in the index buffer in the top Ebib window. (In
+fact, it is possible to show more than just the entry key in this
+buffer. See [[#index-display-fields][Index Display Fields]] on how to accomplish this.) The first
+entry is highlighted, meaning it is the current entry. The fields it holds
+and their values are shown in the entry buffer in the bottom Ebib
 window. The first field is the type field, which tells you what kind of
 entry you're dealing with (i.e. =book, article=, etc.).
 
@@ -1496,6 +1499,15 @@ By default, the following additional fields are defined: =crossref=, =url=,
 
 This option lets you specify the size of the index window at the top of the
 Ebib screen. The default value is 10.
+
+
+*** Index Display Fields
+#index-display-fields
+
+This option allows you to specify fields that should be displayed next to
+the entry key in the index buffer. By default, the index buffer only shows
+the key of each entry, but if this is too little information, you can use
+this option to display e.g. the title of each entry as well.
 
 
 *** Insertion Strings
