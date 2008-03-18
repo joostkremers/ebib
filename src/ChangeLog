@@ -1,8 +1,10 @@
 2008-03-18  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-index-display-fields): new.
+	(ebib-display-entry): new.
 	(ebib-fill-index-buffer): modified so as to make use of
-	ebib-index-display-fields.
+	ebib-display-entry.
+	(ebib-edit-keyname): same.
 	(ebib-set-index-highlight): changed end-of-line into
 	skip-chars-forward because of ebib-index-display-fields.
 	(ebib-select-entry): same.

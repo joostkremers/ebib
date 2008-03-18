@@ -739,6 +739,20 @@ display the actual filename."
     (looking-at-goto-end "[^ \t\n\f]*")
     (ebib-move-highlight ebib-strings-highlight beg (point) ebib-strings-buffer)))
 
+(defun ebib-display-entry (entry-key)
+  "Displays ENTRY-KEY in the index buffer at POINT."
+  (insert (format "%-30s %s\n"
+		  entry-key
+		  (if ebib-index-display-fields
+		      (let ((cur-entry-hash (ebib-retrieve-entry entry-key ebib-cur-db)))
+			(mapconcat #'(lambda (field)
+				       (or
+					(to-raw (gethash field cur-entry-hash))
+					""))
+				   ebib-index-display-fields
+				   "; "))
+		    ""))))
+
 (defun ebib-redisplay-current-field ()
   "Redisplays the contents of the current field in the entry buffer."
   (set-buffer ebib-entry-buffer)
@@ -1330,23 +1344,14 @@ to \"none\"."
 	  ;; database. if so, we don't need to do this:
 	  (when (edb-cur-entry ebib-cur-db)
 	    (mapc #'(lambda (entry)
-		      (insert (format "%-30s %s"
-				      entry
-				      (if ebib-index-display-fields
-					  (let ((cur-entry-hash (ebib-retrieve-entry entry ebib-cur-db)))
-					    (mapconcat #'(lambda (field)
-							   (to-raw (gethash field cur-entry-hash)))
-						       ebib-index-display-fields
-						       "; "))
-					"")))
+		      (ebib-display-entry entry)
 		      (when (member entry (edb-marked-entries ebib-cur-db))
 			(save-excursion
 			  (let ((beg (progn
 				       (beginning-of-line)
 				       (point))))
 			    (skip-chars-forward "^ ")
-			    (add-text-properties beg (point) '(face ebib-marked-face)))))
-		      (insert "\n"))
+			    (add-text-properties beg (point) '(face ebib-marked-face))))))
 		  (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
 	    (re-search-forward (format "^%s " (ebib-cur-entry-key)))
@@ -1793,7 +1798,7 @@ the entry. The latter is at position LIMIT."
 		 (setf (edb-cur-entry ebib-cur-db) (member new-keyname (edb-keys-list ebib-cur-db)))
 		 (sort-in-buffer (edb-n-entries ebib-cur-db) new-keyname)
 		 (with-buffer-writable
-		   (insert (format "%s\n" new-keyname))) ; add the entry in the buffer.
+		   (ebib-display-entry new-keyname))
 		 (forward-line -1) ; move one line up to position the cursor on the new entry.
 		 (ebib-set-index-highlight)
 		 (ebib-set-modified t)
