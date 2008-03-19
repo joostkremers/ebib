@@ -741,6 +741,7 @@ display the actual filename."
 
 (defun ebib-display-entry (entry-key)
   "Displays ENTRY-KEY in the index buffer at POINT."
+  (set-buffer ebib-index-buffer)
   (insert (format "%-30s %s\n"
 		  entry-key
 		  (if ebib-index-display-fields

@@ -1,3 +1,7 @@
+2008-03-19  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-display-entry): added set-buffer.
+
 2008-03-18  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-index-display-fields): new.
