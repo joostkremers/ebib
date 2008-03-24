@@ -21,10 +21,11 @@ Emacs as a working environment, in the same way that for example Gnus is.
 The advantage of having a BibTeX database manager inside Emacs is that X is
 no longer required, as Emacs can run on the console, and also that some
 integration with Emacs' TeX and LaTeX modes becomes possible.  For example,
-one can insert a key from the database into the text one is editing using
-tab completion. Another advantage of Ebib is that it is completely
-controlled by key commands: no stressful mouse movements are required, as
-with most other (usually X-based) BibTeX database managers.
+you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when
+you're in a LaTeX buffer, you can consult your BibTeX database and insert a
+key from it into the document. Another advantage of Ebib is that it is
+completely controlled by key commands: no stressful mouse movements are
+required, as with most other (usually X-based) BibTeX database managers.
 
 
 * Installation
@@ -86,13 +87,13 @@ When Ebib is started, the current windows in Emacs are hidden and the Emacs
 frame is divided into two windows. The top one contains a buffer that is
 called the *index buffer*, while the lower window contains the *entry
 buffer*. When a database is loaded, the index buffer holds a list of all the
-keys in the database. You can navigate through these keys with the cursor
+keys in the database. You can move through these keys with the cursor
 keys. In the entry buffer, the fields of the currently highlighted entry
 are shown, with their values.
 
 In this chapter, all basic functions of Ebib are described, so that you can
-get on your way using it. At times, reference will be made to later
-chapters, where more specific functions are described.
+get startet with it. At times, reference will be made to later chapters,
+where more specific functions are described.
 
 
 
@@ -116,7 +117,7 @@ return to them by typing =M-x ebib= again.
 *** Opening a =.bib= file
 
 Loading a =.bib= file into Ebib is done with the command =o=. Ebib reads the
-file that you specified, and reports how many entries it found, how many
+file that you specify, and reports how many entries it found, how many
 =@string= definitions it found, and whether a =@preamble= was found. Note that
 when Ebib reads a =.bib= file, it only reads entry types (e.g. =book, article,
 phdthesis= etc.) that it knows about. Fields (e.g. =author, title, year= etc.)
@@ -159,7 +160,7 @@ set are the so-called obligatory fields, the fields that BibTeX requires to
 be filled. The second group are the optional fields, which do not have to
 be filled but which BibTeX will normally add to the bibliography if they do
 have a value. The third group are the so-called additional fields. These
-fields are usually ignored by BibTeX (note that BibTeX will normally ignore
+fields are usually ignored by BibTeX (note that BibTeX normally ignores
 *all* fields it does not know), although there are bibliography styles that
 treat some of these fields as optional rather than as additional; (i.e.,
 the =harvard= styles do typeset the =url= field, if present.)
@@ -172,8 +173,8 @@ database. Ebib by default defines the following additional fields:
 sufficient for you, you need to customise Ebib and add your own
 fields. (See [[#additional-fields][Additional Fields]], if you need to find out how to do that.)
 
-To move around in the index buffer, you can use the cursor keys, =C-p= and
-=C-n=, or for those more used to mutt's key bindings, with =k= and
+To move around in the index buffer, you can use the =up= and =down= cursor
+keys, =C-p= and =C-n=, or for those more used to mutt's key bindings, =k= and
 =j=. Furthermore, =Space= and =PgDn= move a screenful of entries down, while =b=
 and =PgUp= move in the other direction. Lastly, =g= and =Home= move to the first
 entry, while =G= and =End= move to the last one.
@@ -242,8 +243,8 @@ and =k=. =Space= and =PgDn= move to the next set of fields, while =PgUp= and =b=
 to the previous set of fields. =g= and =G=, and =Home= and =End= also work as
 expected.
 
-Editing a field value can be done with =e=. For most fields, Ebib will simply
-ask you for a string value in the minibuffer. (Here, =RET= confirms the edit,
+Editing a field value can be done with =e=. For most fields, Ebib simply asks
+you for a string value in the minibuffer. (Here, =RET= confirms the edit,
 while =C-g= cancels it.) Although BibTeX requires that field values be
 surrounded by braces {} (or double quotes "", but Ebib does not use those,
 even though it can of course handle them when they are used in an existing
@@ -252,16 +253,16 @@ even though it can of course handle them when they are used in an existing
 
 Some fields, however, are handled in a special way. The first of these is
 the =type= field: if you edit this field, you must enter one of the
-predefined entry types. Ebib will not allow you to enter anything else. You
+predefined entry types. Ebib won't allow you to enter anything else. You
 can use tab-completion in this case. Similarly, if you edit the =crossref=
 field, Ebib requires that you fill in a key from the database. Here, too,
 you can use tab-completion.
 
-Note that if you're adding a new entry, Ebib will automatically put you in
-the entry buffer after you've typed the entry key: you don't have to type =e=
-to move to the entry buffer. When creating a new entry, it is best to set
-the =type= field first, because the =type= field determines which other fields
-are available for an entry.
+Note that if you're adding a new entry, Ebib automatically puts you in the
+entry buffer after you've typed the entry key: you don't have to type =e= to
+move to the entry buffer. When creating a new entry, it is best to set the
+=type= field first, because the =type= field determines which other fields are
+available for an entry.
 
 Note also that after editing a field, Ebib (usually) puts you on the next
 field. This is convenient if you're creating a new entry and need to fill
@@ -282,11 +283,11 @@ field. Most field values normally consist of a single line of
 text. However, because the =annote= field is meant for creating annotated
 bibliographies, it would not be very useful if you could only write one
 line of text in this field. Therefore, when you edit the =annote= field, Ebib
-will put you in the so-called *multiline edit buffer*. This is essentially a
-text mode buffer that allows you to enter as much text as you like. To
-store the text and leave the multiline edit buffer, type =C-x b=. (This is of
-course the standard Emacs command to switch buffers. It is redefined in
-Ebib's multiline edit buffer.)
+puts you in the so-called *multiline edit buffer*. This is essentially a text
+mode buffer that allows you to enter as much text as you like. To store the
+text and leave the multiline edit buffer, type =C-x b=. (This is of course
+the standard Emacs command to switch buffers. It is redefined in Ebib's
+multiline edit buffer.)
 
 If you want to leave the multiline edit buffer without saving the text you
 have just typed, you can use the command =C-x k=. This too is redefined in
@@ -343,8 +344,8 @@ marked as modified, which is indicated in the mode line for the index
 buffer. A modified database can be saved by typing =s=. This saves the
 database to the file it was loaded from without asking for
 confirmation. (It is similar to =C-x C-s= in Emacs.) If you're saving a file
-for the first time after loading it, Ebib will create a backup file under
-the same name appended with a tilde: =<filename>.bib~=.
+for the first time after loading it, Ebib creates a backup file under the
+same name appended with a tilde: =<filename>.bib~=.
 
 If you have multiple databases open, have made changes in more than one of
 them, and want to save all of them without going through each yourself, you
@@ -486,6 +487,7 @@ i.e. the database that was active when Ebib was lowered with =z=.
 
 
 ** Cross-referencing
+#cross-referencing
 
 BibTeX has a cross-referencing facility. Suppose you have an entry
 =jones1998=, which appeared in a book that is also in your database, say
@@ -563,14 +565,14 @@ alternatively, use LaTeX code in your multiline fields.)
 As mentioned, when you use either =L= or =P=, Ebib creates a LaTeX file. More
 precisely, it creates a temporary buffer and writes the LaTeX code into it,
 and then saves the contents of that buffer to a file. After it has done
-that, Ebib will lower itself and instruct Emacs to open the file in a
-buffer, which will then be properly set up as a LaTeX buffer. From there
-you can run LaTeX and view the result.
+that, Ebib lowers itself and instruct Emacs to open the file in a buffer,
+which will then be properly set up as a LaTeX buffer. From there you can
+run LaTeX and view the result.
 
-Before doing all this, Ebib will ask you which file to write to. Be careful
-with this: since this is supposed to be a temporary file, Ebib will simply
-assume that if you provide a filename of an existing file, it can overwrite
-that file without warning!
+Before doing all this, Ebib asks you which file to write to. Be careful
+with this: since this is supposed to be a temporary file, Ebib simply
+assumes that if you provide a filename of an existing file, it can
+overwrite that file without warning!
 
 A better way to tell Ebib which file to use is to set the option =Print
 Tempfile= in Ebib's customisation buffer to some temporary file. When this
@@ -622,18 +624,17 @@ becomes common to store URLs in a BibTeX database. Sometimes you may want
 to load such a URL in your browser. Ebib provides a convenient way for
 doing so.
 
-If you type =u= in the index buffer, Ebib will take the first URL stored in
-the =url= field of the current entry and pass it to your
-browser. Furthermore, in the entry buffer, you can use =u= on *any* field. If
-you happen to have more than one URL stored in the relevant field, and you
-want to pass the second (or third, etc.) to the browser, you can use a
-prefix argument. So typing =M-2 u= sends the second URL to your browser, =M-3
-u= the third, and so on.
+If you type =u= in the index buffer, Ebib takes the first URL stored in the
+=url= field of the current entry and passes it to your browser. Furthermore,
+in the entry buffer, you can use =u= on *any* field. If you happen to have more
+than one URL stored in the relevant field, and you want to pass the second
+(or third, etc.) to the browser, you can use a prefix argument. So typing
+=M-2 u= sends the second URL to your browser, =M-3 u= the third, and so on.
 
 It is not even necessary that the relevant field contains *only* URLs. It may
 contain other text mixed with the URLs: Ebib simply searches the URLs in
 the field and ignores the rest of the text. Ebib considers every string of
-characters that starts with =http://= or =https://= and does not contain
+characters that starts with =http://= or =https://= and that does not contain
 whitespace or any of the characters =" ' <= or =>= as a URL. Furthermore, Ebib
 regards everything that is enclosed in a LaTeX <verb>\url{...}</verb>
 command as a URL. This behaviour is controlled by a regular expression that
@@ -674,7 +675,7 @@ Apart from database entries, BibTeX allows three more types of elements to
 appear in a =.bib= file. These are =@comment=, =@preamble= and =@string=
 definitions. Ebib provides facilities to handle the latter two. =@comment=
 definitions cannot be added to a =.bib= file through Ebib, and if Ebib finds
-one in a =.bib= file, it will simply ignore it.
+one in a =.bib= file, it is simply ignored.
 
 =@preamble= and =@string= definitions can be handled, however. Ebib allows you
 to add one =@preamble= definition to the database.  In principle, BibTeX
@@ -704,9 +705,10 @@ have made. (For details on using the multiline edit buffer, see
 [[#multiline-edit-buffer][The Multiline Edit Buffer]].)
 
 In order to create a =@preamble= as shown above in Ebib, you only have to
-type the text between the braces.  Ebib will take care of including the
-braces of the =@preamble= command, but otherwise it will save the text
-exactly as you enter it. So you'd have to type the following in Ebib:
+type the text between the braces.  Ebib takes care of including the braces
+of the =@preamble= command, but otherwise it saves the text exactly as you
+enter it. So in order to get the preamble above, you'd have to type the
+following in Ebib:
 
 <example>
 "\newcommand{\noopsort}[1]{} "
@@ -714,8 +716,8 @@ exactly as you enter it. So you'd have to type the following in Ebib:
 </example>
 
 Note that when Ebib loads a =.bib= file that contains more than one =@preamble=
-definition, it will concatenate all the strings in them in the manner just
-described and save them in one =@preamble= definition.
+definition, it concatenates all the strings in them in the manner just
+described and saves them in one =@preamble= definition.
 
 
 ** =@String= Definitions
@@ -785,12 +787,11 @@ exact text including quotes or braces around the strings, and marking the
 relevant field as raw.
 
 An easy way to enter a =@string= abbreviation as a field value is to use the
-key =s= instead of =e=. If you type =s=, Ebib will ask you for a =@string=
-abbreviation to put in the current field, and will automatically mark the
-field as raw. With this command, Ebib will only accept =@string= definitions
-that are in the database, so that by using =s= you can make sure you don't
-make any typos. Note that you can use tab completion to complete a partial
-string.
+key =s= instead of =e=. If you type =s=, Ebib asks you for a =@string= abbreviation
+to put in the current field, and automatically marks the field as raw. With
+this command, Ebib only accepts =@string= definitions that are in the
+database, so that by using =s= you can make sure you don't make any
+typos. Note that you can use tab completion to complete a partial string.
 
 
 ** Sorting the =.bib= file
@@ -842,10 +843,10 @@ level yields *no value* for a specific entry, Ebib does *not* use the second
 sort level to sort that entry. It uses the entry key. The second sort level
 is only used if the first yields *identical* values for two or more entries.)
 
-Note that if you have set the option =Save Xrefs First= (see the previous
-section), it is pointless to set a sort order. Saving cross-referencing
-entries first messes up any sort order, so Ebib simply ignores the sort
-order if =Save Xrefs First= is set.
+Note that if you have set the option =Save Xrefs First= (see
+[[#cross-referencing][Cross-referencing]]), it is pointless to set a sort order. Saving
+cross-referencing entries first messes up any sort order, so Ebib simply
+ignores the sort order if =Save Xrefs First= is set.
 
 
 ** Merging and Importing
@@ -864,12 +865,12 @@ happens.
 
 Another way to add entries to a database is to import them from an Emacs
 buffer. If, for example, you find ready-formatted BibTeX entries in a text
-file or e.g. the internet, you can copy & paste them to any Emacs buffer
+file or e.g. on the internet, you can copy & paste them to any Emacs buffer
 (e.g. the =*scratch*= buffer), and then execute the command =M-x
-ebib-import=. Ebib will then go through the buffer and load all BibTeX
-entries it finds into the current database (i.e. the database that was
-active when you lowered Ebib). If you call =ebib-import= while the region is
-active, Ebib will only read the BibTeX entries in the region.
+ebib-import=. Ebib then goes through the buffer and loads all BibTeX entries
+it finds into the current database (i.e. the database that was active when
+you lowered Ebib). If you call =ebib-import= while the region is active, Ebib
+only reads the BibTeX entries in the region.
 
 
 ** Exporting Entries
@@ -894,7 +895,7 @@ it. The number of the database is given in the modeline of the index
 buffer.
 
 If the database you're copying an entry to already contains an entry with
-the same entry key, Ebib will not copy the entry, and issue an appropriate
+the same entry key, Ebib won't copy the entry, and issues an appropriate
 warning message.
 
 Note that the command =x= can operate on marked entries. So to export several
@@ -920,7 +921,7 @@ in the (additional) field =timestamp=. (By default, this field is not shown,
 but you can make it visible by pressing =H= in the index buffer.)
 
 You can tell Ebib to create timestamps by setting the option =Use Timestamp=
-in Ebib's customisation buffer. With this option set, a timestamp will be
+in Ebib's customisation buffer. With this option set, a timestamp is
 included in entries added to the database with =a=. Ebib will also add a
 timestamp to entries imported from a buffer or merged from a file, and to
 entries exported to another database or to a file. When importing or
@@ -928,17 +929,17 @@ exporting entries, existing timestamps will be overwritten. The logic
 behind this is that the timestamp records the date and time when the entry
 was added to the database, not when it was first created.
 
-Note that if this option is unset, the timestamp of an entry will be
-retained when it's imported or exported. Therefore, if you record
-timestamps and want to im-/export entries without changing their
-timestamps, temporarily unset this option.
+Note that if this option is unset, the timestamp of an entry is retained
+when it's imported or exported. Therefore, if you record timestamps and
+want to im-/export entries without changing their timestamps, temporarily
+unset this option.
 
 Ebib uses the function =format-time-string= to create the timestamp. The
 format string that Ebib uses can be customised in Ebib's customisation
 buffer. The default string is ="%a %b %e %T %Y"=, which produces a timestamp
 of the form ="Mon Mar 12 01:03:26 2007"=. Obviously, this string is not
-suited for sorting, so if you want to be able to sort on timestamps, you
-will need to customise the format string. See the documentation for
+suited for sorting, so if you want to be able to sort on timestamps, you'll
+need to customise the format string. See the documentation for
 =format-time-string= on the options that are available.
 
 
@@ -947,13 +948,13 @@ will need to customise the format string. See the documentation for
 
 Under normal circumstances, a BibTeX entry only contains one occurrence of
 each field. If BibTeX notices that an entry contains more than one
-occurrence of an obligatory or optional field, it will issue a
-warning. Ebib is somewhat less gracious, it simply takes the value of the
-last occurrence without giving any warning. (Note, by the way, that BibTeX
-will use the value of the *first* occurrence, not the last.) When additional
-fields appear more than once in an entry, BibTeX does not warn you, since
-it ignores those fields anyway. Here, too, Ebib's standard behaviour is to
-ignore all but the last value.
+occurrence of an obligatory or optional field, it issues a warning. Ebib is
+somewhat less gracious, it simply takes the value of the last occurrence
+without giving any warning. (Note, by the way, that BibTeX will use the
+value of the *first* occurrence, not the last.) When additional fields appear
+more than once in an entry, BibTeX does not warn you, since it ignores
+those fields anyway. Here, too, Ebib's standard behaviour is to ignore all
+but the last value.
 
 However, some online reference management services ``use'' this feature of
 BibTeX in that they put multiple =keywords= fields in the BibTeX entries that
@@ -1053,8 +1054,8 @@ contains ``Jones'' in the =editor= field. Therefore, =or= is the required
 operator in this case. If you would use =and=, you would only get those
 entries that contain ``Jones'' in both the =author= *and* =editor= fields.
 
-To perform a logical =or= operation, press the key =|=. Like before, you will
-be asked which field you want to filter on, and which regexp you want to
+To perform a logical =or= operation, press the key =|=. As before, you will be
+asked which field you want to filter on, and which regexp you want to
 filter with. Ebib will then update the virtual database with all entries in
 the original database that match the additional criterion.
 
@@ -1147,22 +1148,22 @@ functions assigned to the key sequences =C-x b=, =C-x k= and =C-x C-s=. These ke
 sequences do not have their usual functions, but rather are redefined to
 fit Ebib. Both =C-x b= and =C-x k= can be used to leave the multiline edit
 buffer. =C-x b= will store the text as it is to the database, while =C-x k=
-will leave the multiline edit buffer *without* storing the text, i.e., the
-original value of the field or preamble that you were editing will be
-retained. If the text in the buffer was modified, =C-x k= will ask you if you
+leaves the multiline edit buffer *without* storing the text, i.e., the
+original value of the field or preamble that you were editing is
+retained. If the text in the buffer was modified, =C-x k= asks you if you
 really want to abandon your changes.
 
 If you leave the multitiline edit buffer with =C-x b= when the buffer is
 empty (i.e., you deleted all the text, including the final newline), and
 you were editing a field value or the =@preamble= definition, the field value
-or preamble will be deleted. (This is in fact the *only* way to delete the
+or preambleis deleted. (This is in fact the *only* way to delete the
 =@preamble= definition. Field values on the other hand can also be deleted by
 hitting =x= or =d= on them in the entry buffer.)
 
 The third command that is redefined in the multiline edit buffer is =C-x
 C-s=. This command can be used to save the database. Because Ebib does not
 do an autosave of the current database, it is advisable to save the
-database manually every now and then to prevent data-loss in case of
+database manually every now and then to prevent data loss in case of
 crashes. It would be annoying to have to leave the multiline edit buffer
 every time you want to do this, so =C-x C-s= has been redefined to allow you
 to do this from within the buffer.
@@ -1235,7 +1236,7 @@ database. =(ebib-virtual-db-not)=
   =f= :: display the full filename of the current database in the minibuffer.
 =(ebib-print-file-name)=
 
-  =F= :: follow =crossref=. =(ebib-follow-crossref)=
+  =F= :: follow =crossref= field. =(ebib-follow-crossref)=
 
   =g= :: equivalent to =Home=.
 
@@ -1301,7 +1302,7 @@ and quits Ebib. =(ebib-quit)=
 database. =(ebib-edit-strings)=
 
   =u= :: extract a URL from the =url= field and send it to a browser. With
-numeric prefix argument, extract the *n*th url.
+numeric prefix argument, extract the *n*-th url.
 
   =V= :: Display the filter of the current virtual database in the
 minibuffer. With prefix argument: reapply the filter. =(ebib-print-filter)=
@@ -1380,7 +1381,7 @@ buffer. =(ebib-quit-entry-buffer)=
 database. =(ebib-insert-abbreviation)=
 
   =u= :: extract a URL from the current field and send it to a browser. With
-numeric prefix argument, extract the *n*th url.
+numeric prefix argument, extract the *n*-th url.
 
   =x= :: cut the contents of the current field. Like =c=, =x= puts the contents
 of the current field in the kill ring. =(ebib-cut-field-contents)=
@@ -1461,7 +1462,7 @@ you wish to customise those, you have to use the file =~/.ebibrc=.
 #customisation-buffer
 
 Ebib's customisation group is a subgroup of the =Tex= group. It can be
-invoked by typing =M-x customize-group RET ebib RET=}, or by pressing =C= in
+invoked by typing =M-x customize-group RET ebib RET=, or by pressing =C= in
 the index buffer. This chapter gives a short description of all the options
 available in the customisation buffer.
 
@@ -1533,10 +1534,10 @@ key. For example, it is possible to define the following:
 
 With this, typing =M-2 M-x ebib-insert-bibtex-key=, followed by a BibTeX key
 inserts the command <verb>\nocite{<key>}</verb> into the current
-buffer. Similarly, typing =M-2 p= in the index buffer inserts the current key
-into the buffer you choose. (Note that the prefix argument also works when
-you have bound =ebib-insert-bibtex-key= to a key sequence. That is, if you
-have bound it to say =C-c b=, typing =M-2 C-c b= inserts the second string.)
+buffer. Typing =M-2 p= in the index buffer does the same for the LaTeX buffer
+you choose. (Note that the prefix argument also works when you have bound
+=ebib-insert-bibtex-key= to a key sequence. That is, if you have bound it to
+say =C-c b=, typing =M-2 C-c b= inserts the second string.)
 
 Even if you have specified multiple strings, you can still use
 =ebib-insert-bibtex-key= or hit =p= without prefix argument. In that case, Ebib
@@ -1569,9 +1570,8 @@ save all entries with a =crossref= field first, you must set the option =Save
 Xrefs First= in Ebib's customisation buffer. With this option set, BibTeX's
 crossreferencing options work as intended.
 
-By default, this option is unset, because it slows down saving the =.bib=
-file somewhat. (Actually, i don't think the difference is noticeable,
-unless you explicitly time it, but still.)
+By default, this option is unset, because it (marginally) slows down saving
+the =.bib= file somewhat.
 
 
 *** Crossref Face
