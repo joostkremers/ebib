@@ -1,3 +1,13 @@
+2008-03-25  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-additional-fields): added 'file' to the default
+	value.
+	(ebib-url-regexp): changed doc string.
+	(ebib-standard-file-field): new.
+	(ebib-file-associations): new.
+	(ebib-file-regexp): new.
+	(ebib-file-search-dirs): new.
+
 2008-03-19  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-display-entry): added set-buffer.

@@ -46,7 +46,8 @@
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
-(defcustom ebib-additional-fields '(crossref url annote abstract keywords timestamp)
+(defcustom ebib-additional-fields '(crossref url annote abstract
+					     keywords file timestamp)
   "*Holds a list of the additional fields."
   :group 'ebib
   :type '(repeat (symbol :tag "Field")))
@@ -115,7 +116,7 @@ this command extracts the url."
   :type 'symbol)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
-  "*Regexp to extract urls."
+  "*Regular expression to extract urls."
   :group 'ebib
   :type 'string)
 
@@ -125,6 +126,35 @@ GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
   :type '(string :tag "Browser command"))
+
+(defcustom ebib-standard-file-field 'file
+  "*Standard field to store filenames in.
+In the index buffer, the command ebib-view-file can be used to
+view a file externally. This option sets the field from which
+this command extracts the filename."
+  :group 'ebib
+  :type 'symbol)
+
+(defcustom ebib-file-associations '(("pdf" . "/usr/bin/xpdf")
+				    ("ps" . "/usr/bin/gv"))
+  "*List of file associations.
+Lists file extensions together with external programs to handle
+files with those extensions. If the external program is left
+blank, Ebib tries to handle the file internally in
+Emacs (e.g. with doc-view-mode)."
+  :group 'ebib
+  :type '(repeat (cons :tag "File association"
+		       (string :tag "Extension") (string :tag "Command"))))
+
+(defcustom ebib-file-regexp "[^?\\|:*<>\"\n\t\f]+"
+  "*Regular expression to match filenames."
+  :group 'ebib
+  :type 'string)
+
+(defcustom ebib-file-search-dirs '("~")
+  "*List of directories to search for files."
+  :group 'ebib
+  :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
 (defcustom ebib-print-preamble nil
   "*Preamble used for the LaTeX file for printing the database.

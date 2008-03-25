@@ -169,8 +169,8 @@ The first two groups of fields are different for each entry type, while the
 third group are common to all entry types. You can use the additional
 fields, for example, to add personal comments to the works in your
 database. Ebib by default defines the following additional fields:
-=crossref, url, annote, abstract, keywords= and =timestamp=. If these are not
-sufficient for you, you need to customise Ebib and add your own
+=crossref, url, annote, abstract, keywords, file= and =timestamp=. If these are
+not sufficient for you, you need to customise Ebib and add your own
 fields. (See [[#additional-fields][Additional Fields]], if you need to find out how to do that.)
 
 To move around in the index buffer, you can use the =up= and =down= cursor
@@ -1492,8 +1492,8 @@ types, and which BibTeX generally ignores. This option allows you to
 specify which additional fields you wish to use in your database. Specify
 one field per line, press the =INS= button to add more fields.
 
-By default, the following additional fields are defined: =crossref=, =url=,
-=annote=, =abstract=, =keywords= and =timestamp=.
+By default, the following additional fields are defined: =crossref, url,
+annote, abstract, keywords, file= and =timestamp=.
 
 
 *** Index Window Size
