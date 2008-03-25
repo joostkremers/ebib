@@ -1,3 +1,10 @@
+2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-index-mode): set truncate-lines to t, which works
+	better if ebib-index-dislay-fields is set.
+	(ebib-set-index-highlight): changed so that it highlights the
+	entire line if ebib-index-display-fields is set.
+
 2008-03-19  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-display-entry): added set-buffer.

@@ -722,7 +722,9 @@ display the actual filename."
   (set-buffer ebib-index-buffer)
   (beginning-of-line)
   (let ((beg (point)))
-    (skip-chars-forward "^ ")
+    (if ebib-index-display-fields
+	(end-of-line)
+      (skip-chars-forward "^ "))
     (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)))
 
 (defun ebib-set-fields-highlight ()
@@ -1330,7 +1332,8 @@ killed and the database has been modified."
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
   "Major mode for the Ebib index buffer."
-  (setq buffer-read-only t))
+  (setq buffer-read-only t)
+  (setq truncate-lines t))
 
 (defun ebib-fill-index-buffer ()
   "Fills the index buffer with the list of keys in EBIB-CUR-DB.
