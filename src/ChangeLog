@@ -1,3 +1,16 @@
+2008-03-26  Morgan Veyret  <patzy@appart.kicks-ass.net>
+
+	* ebib.el (ebib): changed to check if ebib is visible
+	already. window setup moved to ebib-setup-windows.
+	(ebib-setup-windows): new.
+	(ebib-delete-windows): new.
+	(): rebound C-xb to ebib-select-other-window.
+	(ebib-select-other-window): new.
+	(ebib-quit-entry-buffer): use get-buffer-window to find the index
+	buffer.
+	(ebib-entry-summary): modified to direct output to *Ebib-entry*
+	buffer.
+
 2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-index-mode): set truncate-lines to t, which works

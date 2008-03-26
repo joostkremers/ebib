@@ -1116,20 +1116,39 @@ is a list of fields that are considered in order for the sort value."
       (error "Ebib already active")
     ;; we save the buffer from which ebib is called
     (setq ebib-push-buffer (current-buffer))
+    ;; initialize ebib if required
     (unless ebib-initialized
       (ebib-init)
       (if ebib-preload-bib-files
 	  (mapc #'(lambda (file)
 		    (ebib-load-bibtex-file file))
 		ebib-preload-bib-files)))
-    ;; we save the current window configuration.
-    (setq ebib-saved-window-config (current-window-configuration))
-    ;; create the window configuration we want for ebib.
-    (delete-other-windows)
-    (switch-to-buffer ebib-index-buffer)
-    (let* ((keys-window (selected-window))
-	   (entry-window (split-window keys-window ebib-index-window-size)))
-      (set-window-buffer entry-window ebib-entry-buffer))))
+    ;; if ebib is visible, we just switch to the index buffer
+    (let ((keys-window (get-buffer-window ebib-index-buffer 'visible)))
+      (if keys-window
+          (select-window keys-window)
+        (ebib-setup-windows)))))
+
+(defun ebib-setup-windows ()
+  "Create the window configuration we want for ebib in the
+current window."
+  ;; we save the current window configuration.
+  (setq ebib-saved-window-config (current-window-configuration))
+  (switch-to-buffer ebib-index-buffer)
+  (let* ((keys-window (selected-window))
+         (entry-window (split-window keys-window ebib-index-window-size)))
+      (set-window-buffer entry-window ebib-entry-buffer)
+      (set-window-dedicated-p keys-window t)
+      (set-window-dedicated-p entry-window t)))
+
+(defun ebib-delete-windows ()
+  "Delete all ebib windows (but not the buffers)."
+  (switch-to-buffer ebib-index-buffer)
+  (let* ((keys-window (get-buffer-window ebib-index-buffer))
+         (entry-window (get-buffer-window ebib-entry-buffer)))
+    (set-window-dedicated-p keys-window nil)
+    (set-window-dedicated-p entry-window nil)
+    (delete-window entry-window)))
 
 (defun ebib-init ()
   "Initialises Ebib.
@@ -1311,7 +1330,7 @@ killed and the database has been modified."
 (ebib-key index "V" ebib-print-filter)
 (ebib-key index "w" ebib-write-database)
 (ebib-key index "x" ebib-export-entry)
-(ebib-key index "\C-xb" ebib-lower)
+(ebib-key index "\C-xb" ebib-select-other-window)
 (ebib-key index "\C-xk" ebib-quit)
 (ebib-key index "X" ebib-export-preamble)
 (ebib-key index "z" ebib-lower)
@@ -1629,8 +1648,8 @@ the entry. The latter is at position LIMIT."
       (skip-chars-backward " \n\t\f"))
   (point))
 
-(defun ebib-lower ()
-  "Hides the Ebib buffers, but does not delete them."
+(defun ebib-select-other-window ()
+  "Leave the current ebib window and get to the next available non-ebib buffer."
   (interactive)
   (if (nor (equal (window-buffer) ebib-index-buffer)
 	   (equal (window-buffer) ebib-entry-buffer)
@@ -1639,6 +1658,25 @@ the entry. The latter is at position LIMIT."
 	   (equal (window-buffer) ebib-help-buffer)
 	   (equal (window-buffer) ebib-log-buffer))
       (error "Ebib is not active ")
+    (bury-buffer ebib-entry-buffer)
+    (bury-buffer ebib-index-buffer)
+    (bury-buffer ebib-multiline-buffer)
+    (bury-buffer ebib-strings-buffer)
+    (bury-buffer ebib-help-buffer)
+    (bury-buffer ebib-log-buffer)
+    (select-window (next-window (get-buffer-window ebib-entry-buffer)))))
+
+(defun ebib-lower ()
+  "Hides the Ebib windows."
+  (interactive)
+  (if (nor (equal (window-buffer) ebib-index-buffer)
+	   (equal (window-buffer) ebib-entry-buffer)
+	   (equal (window-buffer) ebib-strings-buffer)
+	   (equal (window-buffer) ebib-multiline-buffer)
+	   (equal (window-buffer) ebib-help-buffer)
+	   (equal (window-buffer) ebib-log-buffer))
+      (error "Ebib is not active ")
+    (ebib-delete-windows)
     (set-window-configuration ebib-saved-window-config)
     (bury-buffer ebib-entry-buffer)
     (bury-buffer ebib-index-buffer)
@@ -2608,7 +2646,7 @@ The user is prompted for the buffer to push the entry into."
 (defun ebib-quit-entry-buffer ()
   "Quit editing the entry."
   (interactive)
-  (other-window 1))
+  (select-window (get-buffer-window ebib-index-buffer)))
 
 (defun ebib-find-visible-field (field direction)
   "Finds the first visible field before or after FIELD.
@@ -3456,8 +3494,10 @@ be found."
 		 nil)))
        (if (null entry)
 	   (error "Entry `%s' not found" key)
-	 (with-output-to-temp-buffer "*Help*"
-	   (ebib-format-fields entry 'princ)))))
+	 (with-current-buffer " *Ebib-entry*"
+           (with-buffer-writable
+             (erase-buffer)
+             (ebib-format-fields entry 'insert))))))
     ((default)
      (error "No database(s) loaded"))))
 
