@@ -1,11 +1,19 @@
+2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): added a space to the format string
+	that adds the new entry key in the buffer.
+
+2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-layout): new.
+
 2008-03-26  Morgan Veyret  <patzy@appart.kicks-ass.net>
 
 	* ebib.el (ebib): changed to check if ebib is visible
 	already. window setup moved to ebib-setup-windows.
 	(ebib-setup-windows): new.
 	(ebib-delete-windows): new.
-	(): rebound C-xb to ebib-select-other-window.
-	(ebib-select-other-window): new.
+	(ebib-select-other-window): new. Bound to C-xb.
 	(ebib-quit-entry-buffer): use get-buffer-window to find the index
 	buffer.
 	(ebib-entry-summary): modified to direct output to *Ebib-entry*

@@ -51,6 +51,16 @@
   :group 'ebib
   :type '(repeat (symbol :tag "Field")))
 
+(defcustom ebib-layout 'full
+  "*Ebib window layout.
+Full width: Ebib occupies the entire Emacs frame.
+
+Specify width: Ebib occupies the right side of the Emacs frame,
+with the left side free for another window."
+  :group 'ebib
+  :type '(choice (const :tag "Full width" full)
+		 (integer :tag "Specify width")))
+
 (defcustom ebib-index-window-size 10
   "*The number of lines used for the keys buffer window."
   :group 'ebib
@@ -1730,7 +1740,7 @@ the entry. The latter is at position LIMIT."
 	     (set-buffer ebib-index-buffer)
 	     (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
 	     (with-buffer-writable
-	       (insert (format "%s\n" entry-key))) ; add the entry in the buffer.
+	       (insert (format "%s \n" entry-key))) ; add the entry in the buffer.
 	     (forward-line -1) ; move one line up to position the cursor on the new entry.
 	     (ebib-set-index-highlight)
 	     (let ((fields (make-hash-table)))
@@ -3494,12 +3504,45 @@ be found."
 		 nil)))
        (if (null entry)
 	   (error "Entry `%s' not found" key)
-	 (with-current-buffer " *Ebib-entry*"
-           (with-buffer-writable
-             (erase-buffer)
-             (ebib-format-fields entry 'insert))))))
+	 (with-output-to-temp-buffer "*Help*"
+	   (ebib-format-fields entry 'princ)))))
     ((default)
      (error "No database(s) loaded"))))
+
+;; (defun ebib-entry-summary ()
+;;   "Shows the fields of the key at POINT.
+;; The key is searched in the database associated with the LaTeX
+;; file, or in the current database if no \\bibliography command can
+;; be found."
+;;   (interactive)
+;;   (ebib-execute-when
+;;     ((database)
+;;      (or ebib-local-bibtex-filenames
+;; 	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+;;      (let ((key (read-string-at-point "\"#%'(),={} \n\t\f"))
+;; 	   entry)
+;;        (if (eq ebib-local-bibtex-filenames 'none)
+;; 	   (if (not (member key (edb-keys-list ebib-cur-db)))
+;; 	       (error "`%s' is not in the current database" key)
+;; 	     (setq entry (gethash key (edb-database ebib-cur-db))))
+;; 	 (setq entry
+;; 	       (catch 'found
+;; 		 (mapc #'(lambda (file)
+;; 			   (let ((db (ebib-get-db-from-filename file)))
+;; 			     (if (null db)
+;; 				 (message "Database %s not loaded" file)
+;; 			       (if (member key (edb-keys-list db))
+;; 				   (throw 'found (gethash key (edb-database db)))))))
+;; 		       ebib-local-bibtex-filenames)
+;; 		 nil)))
+;;        (if (null entry)
+;; 	   (error "Entry `%s' not found" key)
+;; 	 (with-current-buffer " *Ebib-entry*"
+;;            (with-buffer-writable
+;;              (erase-buffer)
+;;              (ebib-format-fields entry 'insert))))))
+;;     ((default)
+;;      (error "No database(s) loaded"))))
 
 (provide 'ebib)
 
