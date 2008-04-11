@@ -1,5 +1,10 @@
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-add-entry): used ebib-display-entry to insert the
+	new entry in the buffer.
+
+2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
+
 	* ebib.el (ebib-add-entry): inserted a space in the format string
 	that puts the new entry key into the buffer. this way
 	ebib-set-index-highlight doesn't put the end of the highlight at
