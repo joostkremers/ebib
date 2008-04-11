@@ -1,3 +1,22 @@
+2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): used ebib-display-entry to insert the
+	new entry in the buffer.
+
+2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): inserted a space in the format string
+	that puts the new entry key into the buffer. this way
+	ebib-set-index-highlight doesn't put the end of the highlight at
+	the next line.
+
+2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-index-mode): set truncate-lines to t, which works
+	better if ebib-index-dislay-fields is set.
+	(ebib-set-index-highlight): changed so that it highlights the
+	entire line if ebib-index-display-fields is set.
+
 2008-03-25  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-additional-fields): added 'file' to the default
