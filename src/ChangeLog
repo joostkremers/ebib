@@ -1,3 +1,10 @@
+2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): inserted a space in the format string
+	that puts the new entry key into the buffer. this way
+	ebib-set-index-highlight doesn't put the end of the highlight at
+	the next line.
+
 2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-index-mode): set truncate-lines to t, which works
