@@ -1309,7 +1309,7 @@ killed and the database has been modified."
 (ebib-key index "d" ebib-delete-entry)
 (ebib-key index "e" ebib-edit-entry)
 (ebib-key index "E" ebib-edit-keyname)
-(ebib-key index "f" ebib-print-filename)
+(ebib-key index "f" ebib-view-file)
 (ebib-key index "F" ebib-follow-crossref)
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
@@ -2428,6 +2428,47 @@ URLs must be a string of whitespace-separated urls."
       (if (not (string= ebib-browser-command ""))
 	  (start-process "Ebib-browser" nil ebib-browser-command url)
 	(browse-url url)))))
+
+(defun ebib-view-file (num)
+  "View a file in the standard file field.
+The standard file field may contain more than one filename, if
+they're whitespace-separated. In that case, a numeric prefix
+argument specifies which file to choose.
+
+By \"standard file field\" is meant the field defined in the
+customisation variable EBIB-STANDARD-FILE-FIELD. Its default
+value is `file'."
+  (interactive "p")
+  (ebib-execute-when
+    ((entries)
+     (let ((filename (to-raw (gethash ebib-standard-file-field
+				      (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+       (when (not (and file
+		       (ebib-call-file-viewer file num)))
+	 (error "No filename found in field `%s'" ebib-standard-file-field))))
+    ((default)
+     (beep))))
+
+;;; (defun ebib-call-file-viewer (files n)
+;;;   "Passes the Nth file in FILES to a browser.
+;;; URLs must be a string of whitespace-separated urls."
+;;;   (let ((file (nth (1- n)
+;;; 		  (let ((start 0)
+;;; 			(result nil))
+;;; 		    (while (string-match ebib-file-regexp files start)
+;;; 		      (add-to-list 'result (match-string 0 files) t)
+;;; 		      (setq start (match-end 0)))
+;;; 		    result))))
+;;;     (cond
+;;;      ((string-match "\\\\url{\\(.*?\\)}" url)
+;;;       (setq url (match-string 1 url)))
+;;;      ((string-match ebib-url-regexp url)
+;;;       (setq url (match-string 0 url)))
+;;;      (t (setq url nil)))
+;;;     (when url
+;;;       (if (not (string= ebib-browser-command ""))
+;;; 	  (start-process "Ebib-browser" nil ebib-browser-command url)
+;;; 	(browse-url url)))))
 
 (defun ebib-virtual-db-and (not)
   "Filter entries into a virtual database.
