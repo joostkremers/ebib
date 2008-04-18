@@ -1,6 +1,6 @@
 ;; Ebib v==VERSION==
 ;;
-;; Copyright (c) 2003-2007 Joost Kremers
+;; Copyright (c) 2003-2008 Joost Kremers
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -2181,7 +2181,7 @@ current entry."
 	   (setf (edb-cur-entry ebib-cur-db) cur-search-entry)
 	   (set-buffer ebib-index-buffer)
 	   (goto-char (point-min))
-	   (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
+	   (re-search-forward (format "^%s " (ebib-cur-entry-key)))
 	   (beginning-of-line)
 	   (ebib-set-index-highlight)
 	   (ebib-fill-entry-buffer ebib-search-string)))))
