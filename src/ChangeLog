@@ -1,3 +1,7 @@
+2008-04-17  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-view-file): new.
+
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-add-entry): used ebib-display-entry to insert the
