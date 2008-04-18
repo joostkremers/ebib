@@ -19,6 +19,7 @@
 
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-layout): new.
 	* ebib.el (ebib-add-entry): used ebib-display-entry to insert the
 	new entry in the buffer.
 
@@ -28,6 +29,18 @@
 	that puts the new entry key into the buffer. this way
 	ebib-set-index-highlight doesn't put the end of the highlight at
 	the next line.
+
+2008-03-26  Morgan Veyret  <patzy@appart.kicks-ass.net>
+
+	* ebib.el (ebib): changed to check if ebib is visible
+	already. window setup moved to ebib-setup-windows.
+	(ebib-setup-windows): new.
+	(ebib-delete-windows): new.
+	(ebib-select-other-window): new. Bound to C-xb.
+	(ebib-quit-entry-buffer): use get-buffer-window to find the index
+	buffer.
+	(ebib-entry-summary): modified to direct output to *Ebib-entry*
+	buffer.
 
 2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
 
