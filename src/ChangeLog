@@ -3,6 +3,19 @@
 	* ebib.el (ebib-search-next): changed $ in search string to space:
 	with ebib-index-display-fields, index entries now have a space
 	after the entry key.
+	(ebib-call-file-viewer): new.
+	(ebib-file-regexp): added a space to the regexp. (!)
+	(ebib-browse-url-in-field): changed the doc string.
+	(ebib-view-file-in-field): new.
+	(ebib-view-file-in-field): new. bound to 'f' in the entry buffer.
+	(ebib-file-associations): changed default value: paths removed
+	from the programs, as start-process searches the user's PATH.
+
+2008-04-17  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-view-file): new. bound to 'f' in the index
+	buffer. (which means that 'f' is no longer bound to
+	ebib-print-filename.
 
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 
@@ -22,6 +35,16 @@
 	better if ebib-index-dislay-fields is set.
 	(ebib-set-index-highlight): changed so that it highlights the
 	entire line if ebib-index-display-fields is set.
+
+2008-03-25  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-additional-fields): added 'file' to the default
+	value.
+	(ebib-url-regexp): changed doc string.
+	(ebib-standard-file-field): new.
+	(ebib-file-associations): new.
+	(ebib-file-regexp): new.
+	(ebib-file-search-dirs): new.
 
 2008-03-19  Joost Kremers  <joostkremers@yahoo.com>
 

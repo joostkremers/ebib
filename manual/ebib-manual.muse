@@ -169,8 +169,8 @@ The first two groups of fields are different for each entry type, while the
 third group are common to all entry types. You can use the additional
 fields, for example, to add personal comments to the works in your
 database. Ebib by default defines the following additional fields:
-=crossref, url, annote, abstract, keywords= and =timestamp=. If these are not
-sufficient for you, you need to customise Ebib and add your own
+=crossref, url, annote, abstract, keywords, file= and =timestamp=. If these are
+not sufficient for you, you need to customise Ebib and add your own
 fields. (See [[#additional-fields][Additional Fields]], if you need to find out how to do that.)
 
 To move around in the index buffer, you can use the =up= and =down= cursor
@@ -651,6 +651,46 @@ your URLs in another field, however, you may change the customisation
 option [[#standard-url-field][Standard Url Field]] and tell Ebib to use another field for searching
 the URLs. (Keep in mind, though, that in the entry buffer, you can load a
 URL from any field.)
+
+
+** Viewing files
+
+If you have electronic versions of the papers in your database stored on
+your computer, you can use Ebib to call external viewers for these
+files. The interface for this is similar to that for calling a browser: if
+you press =f= in the index buffer, Ebib searches the =file= field for a
+filename and when it finds one, calls an appropriate viewer.
+
+Just as with =u=, you can use =f= in the entry buffer as well, in which case it
+can be used on any field, not just the =file= field. It is also possible to
+have more than one filename in a field: you can select the one you want to
+view with the prefix argument.
+
+Just as in the case of URLs, you can customise several things about the
+file view functionality. The option [[#standard-file-field][Standard File Field]] allows you to
+customise the field that =f= extracts filenames from when pressed in the
+index buffer. Extracting filenames is done with a regular expression, which
+can be customised through the option [[#file-regexp][File Regexp]].
+
+The option [[#file-search-dirs][File Search Dirs]] allows you to tell Ebib which directories it
+needs to search for files. The default value is =~=, which means Ebib just
+looks in your home dir. Since this is probably not where you keep your
+files, you may want to customise this. Note that you can specify more than
+one directory.
+
+Note that Ebib does not search directories recursively. It is possible,
+however, to put subdirectories in the filenames. That is, if you put
+something like =a/abney1987.pdf= in the =file= field, Ebib searches for the
+relevant file in a subdirectory =a/= of the directories listed in the option
+=File Search Dirs=. (Note that if you want to do this under Windows, you may
+want to remove the backslash from the file regexp.)
+
+Ebib can call different external programs depending on the file type of the
+relevant file, but you have to specify which programs to call. The option
+[[#file-associations][File Associations]] allows you to do this. By default, =.pdf= and =.ps= files are
+handled, by =xpdf= and =gv=, respectively. You can specify further file types by
+their extensions (do not include the dot). The program is searched for in
+PATH, but you can of course specify the full path to the program.
 
 
 * Advanced Features
@@ -1233,8 +1273,9 @@ database. =(ebib-virtual-db-not)=
   
   =E= :: edit the key of the current entry. =(ebib-edit-keyname)=
 
-  =f= :: display the full filename of the current database in the minibuffer.
-=(ebib-print-file-name)=
+  =f= :: extract a filename from the =file= field and send it to an
+appropriate viewer. With numeric prefix argument, extract the *n*-th
+filename.
 
   =F= :: follow =crossref= field. =(ebib-follow-crossref)=
 
@@ -1324,6 +1365,7 @@ numeric prefix argument, to another database. =(ebib-export-preamble)=
 
   =z= :: lower Ebib. =(ebib-lower)=
 
+One function is not bound to any key: =ebib-print-filename=.
 
 ** The Entry Buffer
 
@@ -1351,6 +1393,10 @@ be put in the kill ring, and is therefore irretrievably
 lost. =(ebib-delete-field-contents)=
   
   =e= :: edit the current field. =(ebib-edit-fields)=
+
+  =f= :: extract a filename from the current field and send it to an
+appropriate viewer. With numeric prefix argument, extract the *n*-th
+filename.
 
   =g= :: equivalent to =Home=.
   
@@ -1492,8 +1538,8 @@ types, and which BibTeX generally ignores. This option allows you to
 specify which additional fields you wish to use in your database. Specify
 one field per line, press the =INS= button to add more fields.
 
-By default, the following additional fields are defined: =crossref=, =url=,
-=annote=, =abstract=, =keywords= and =timestamp=.
+By default, the following additional fields are defined: =crossref, url,
+annote, abstract, keywords, file= and =timestamp=.
 
 
 *** Index Window Size
@@ -1639,6 +1685,54 @@ this option to =firefox=.
 
 For this to work, the browser that you use must be able to handle a URL on
 the command line.
+
+
+*** Standard File Field
+#standard-file-field
+
+This is the field that Ebib searches for filenames if you press =f= in the
+index buffer. Its default value is =file=.
+
+
+*** File Associations
+#file-associations
+
+The programs used to view files. By default, programs for =.pdf= and =.ps=
+files are specified, which should be available on most linux systems. If
+you prefer other programs or are running on Windows, you'll can specify
+them here. Note that Ebib searches the PATH for the programs, but you can
+also specify full path names. Of course, it is also possible to add new
+associations.
+
+Note that GNU/Emacs 23 (as yet unreleased) comes with =doc-view-mode=, which
+provides a way to view =.pdf= and =.ps= files inside Emacs. (The files are
+converted to =.png= format first.) If you prefer to use this mode, simply
+leave the program field blank for the relevant file type.
+
+
+*** File Regexp
+#file-regexp
+
+In order to find files in an field, Ebib uses a regural expression. The
+default value is:
+
+<example>
+  [^?|\:*<>\" \n\t\f]+
+</example>
+
+This essentially means that every string of characters not containing any
+of the characters <example>? | \ : * < > "</example> or space, newline, tab
+of formfeed. URLs can easily by recognised by the prefix =http:=, but
+recognising files is not so straightforward. It is therefore not advisable
+to put anything but filenames in the =file= field.
+
+
+*** File Search Dirs
+#file-search-dirs
+
+This is the list of directories that Ebib searches for files. Note that
+searching is not recursive: only the files listed here are searched, not
+their subdirectories.
 
 
 *** Print Preamble
