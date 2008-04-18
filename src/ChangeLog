@@ -1,6 +1,18 @@
+2008-04-18  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-call-file-viewer): new.
+	(ebib-file-regexp): added a space to the regexp. (!)
+	(ebib-browse-url-in-field): changed the doc string.
+	(ebib-view-file-in-field): new.
+	(ebib-view-file-in-field): new. bound to 'f' in the entry buffer.
+	(ebib-file-associations): changed default value: paths removed
+	from the programs. start-process searches the user's PATH.
+
 2008-04-17  Joost Kremers  <joostkremers@yahoo.com>
 
-	* ebib.el (ebib-view-file): new.
+	* ebib.el (ebib-view-file): new. bound to 'f' in the index
+	buffer. (which means that 'f' is no longer bound to
+	ebib-print-filename.
 
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 

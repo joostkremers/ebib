@@ -1,6 +1,6 @@
 ;; Ebib v==VERSION==
 ;;
-;; Copyright (c) 2003-2007 Joost Kremers
+;; Copyright (c) 2003-2008 Joost Kremers
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -135,8 +135,8 @@ this command extracts the filename."
   :group 'ebib
   :type 'symbol)
 
-(defcustom ebib-file-associations '(("pdf" . "/usr/bin/xpdf")
-				    ("ps" . "/usr/bin/gv"))
+(defcustom ebib-file-associations '(("pdf" . "xpdf")
+				    ("ps" . "gv"))
   "*List of file associations.
 Lists file extensions together with external programs to handle
 files with those extensions. If the external program is left
@@ -146,7 +146,7 @@ Emacs (e.g. with doc-view-mode)."
   :type '(repeat (cons :tag "File association"
 		       (string :tag "Extension") (string :tag "Command"))))
 
-(defcustom ebib-file-regexp "[^?\\|:*<>\"\n\t\f]+"
+(defcustom ebib-file-regexp "[^?|\\:*<>\" \n\t\f]+"
   "*Regular expression to match filenames."
   :group 'ebib
   :type 'string)
@@ -1388,7 +1388,7 @@ to \"none\"."
 			    (add-text-properties beg (point) '(face ebib-marked-face))))))
 		  (edb-keys-list ebib-cur-db))
 	    (goto-char (point-min))
-	    (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+	    (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
 	    (beginning-of-line)
 	    (ebib-set-index-highlight))
 	  (set-buffer-modified-p (edb-modified ebib-cur-db))
@@ -2211,7 +2211,7 @@ current entry."
 	   (setf (edb-cur-entry ebib-cur-db) cur-search-entry)
 	   (set-buffer ebib-index-buffer)
 	   (goto-char (point-min))
-	   (re-search-forward (format "^%s$" (ebib-cur-entry-key)))
+	   (re-search-forward (format "^%s " (ebib-cur-entry-key)))
 	   (beginning-of-line)
 	   (ebib-set-index-highlight)
 	   (ebib-fill-entry-buffer ebib-search-string)))))
@@ -2446,32 +2446,29 @@ value is `file'."
     ((entries)
      (let ((filename (to-raw (gethash ebib-standard-file-field
 				      (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-       (when (not (and file
-		       (ebib-call-file-viewer file num)))
-	 (error "No filename found in field `%s'" ebib-standard-file-field))))
+       (when (not (and filename
+		       (ebib-call-file-viewer filename num)))
+	 (error "No valid filename found in field `%s'" ebib-standard-file-field))))
     ((default)
      (beep))))
 
-;;; (defun ebib-call-file-viewer (files n)
-;;;   "Passes the Nth file in FILES to a browser.
-;;; URLs must be a string of whitespace-separated urls."
-;;;   (let ((file (nth (1- n)
-;;; 		  (let ((start 0)
-;;; 			(result nil))
-;;; 		    (while (string-match ebib-file-regexp files start)
-;;; 		      (add-to-list 'result (match-string 0 files) t)
-;;; 		      (setq start (match-end 0)))
-;;; 		    result))))
-;;;     (cond
-;;;      ((string-match "\\\\url{\\(.*?\\)}" url)
-;;;       (setq url (match-string 1 url)))
-;;;      ((string-match ebib-url-regexp url)
-;;;       (setq url (match-string 0 url)))
-;;;      (t (setq url nil)))
-;;;     (when url
-;;;       (if (not (string= ebib-browser-command ""))
-;;; 	  (start-process "Ebib-browser" nil ebib-browser-command url)
-;;; 	(browse-url url)))))
+(defun ebib-call-file-viewer (files n)
+  "Passes the Nth file in FILES to an external viewer.
+FILESs must be a string of whitespace-separated filenames."
+  (let* ((file (nth (1- n)
+		    (let ((start 0)
+			  (result nil))
+		      (while (string-match ebib-file-regexp files start)
+			(add-to-list 'result (match-string 0 files) t)
+			(setq start (match-end 0)))
+		      result)))
+	 (ext (last1 (split-string file "\\."))))
+    (let ((file-full-path (locate-file file ebib-file-search-dirs)))
+      (when file-full-path
+	(if-str (viewer (cdr (assoc ext ebib-file-associations)))
+	    (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path)
+	  (ebib-lower)
+	  (find-file file-full-path))))))
 
 (defun ebib-virtual-db-and (not)
   "Filter entries into a virtual database.
@@ -2649,6 +2646,7 @@ The user is prompted for the buffer to push the entry into."
     (define-key map "c" 'ebib-copy-field-contents)
     (define-key map "d" 'ebib-delete-field-contents)
     (define-key map "e" 'ebib-edit-field)
+    (define-key map "f" 'ebib-view-file-in-field)
     (define-key map "g" 'ebib-goto-first-field)
     (define-key map "G" 'ebib-goto-last-field)
     (define-key map "h" 'ebib-entry-help)
@@ -2849,7 +2847,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 	(ebib-set-modified t))))))
 
 (defun ebib-browse-url-in-field (num)
-  "Browse the url in the current field.
+  "Browse a url in the current field.
 The field may contain a whitespace-separated set of urls. The
 prefix argument indicates which url is to be sent to the
 browser."
@@ -2858,6 +2856,17 @@ browser."
     (if (not (and urls
 		  (ebib-call-browser urls num)))
 	(error "No url found in field `%s'" ebib-current-field))))
+
+(defun ebib-view-file-in-field (num)
+  "View a file in the current field.
+The field may contain a whitespace-separated set of
+filenames. The prefix argument indicates which file is to be
+viewed."
+  (interactive "p")
+  (let ((files (to-raw (gethash ebib-current-field ebib-cur-entry-hash))))
+    (if (not (and files
+		  (ebib-call-file-viewer files num)))
+	(error "No valid filename found in field `%s'" ebib-current-field))))
 
 (defun ebib-copy-field-contents ()
   "Copies the contents of the current field to the kill ring."
