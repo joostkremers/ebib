@@ -300,6 +300,7 @@ Each string is added to the preamble on a separate line."
 ;; general bookkeeping
 (defvar ebib-minibuf-hist nil "Holds the minibuffer history for Ebib")
 (defvar ebib-saved-window-config nil "Stores the window configuration when Ebib is called.")
+(defvar ebib-pre-ebib-window nil "The window that was active when Ebib was called.")
 (defvar ebib-export-filename nil "Filename to export entries to.")
 (defvar ebib-push-buffer nil "Buffer to push entries to.")
 (defvar ebib-search-string nil "Stores the last search string.")
@@ -1175,6 +1176,7 @@ current window."
   ;; we save the current window configuration.
   (setq ebib-saved-window-config (current-window-configuration))
   (unless (eq ebib-layout 'full)
+    (setq ebib-pre-ebib-window (selected-window))
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-layout) t)))
       (select-window ebib-window)))
   (let* ((index-window (selected-window))
@@ -1254,7 +1256,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
 	  ebib-index-highlight nil
 	  ebib-fields-highlight nil
 	  ebib-strings-highlight nil
-	  ebib-export-filename nil)
+	  ebib-export-filename nil
+	  ebib-pre-ebib-window nil)
     (set-window-configuration ebib-saved-window-config)
     (message "")))
 
@@ -1705,7 +1708,7 @@ buffer if Ebib is not occupying the entire frame."
     (error "Ebib is not active "))
   (if (and soft
 	   (not (eq ebib-layout 'full)))
-      (select-window (next-window (get-buffer-window ebib-entry-buffer)))
+      (select-window ebib-pre-ebib-window) ;; (next-window (get-buffer-window ebib-entry-buffer)))
     (set-window-configuration ebib-saved-window-config))
   (mapc #'(lambda (buffer)
 	    (bury-buffer buffer))
@@ -2814,15 +2817,14 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 	  (ebib-move-to-field ebib-current-field -1))))))
 
 (defun ebib-edit-entry-type ()
-  "Edits the type of an entry."
-  ;; we want to put the completion buffer in the lower window. for this
-  ;; reason, we need to switch to the other window before calling
-  ;; completing-read. but in order to make sure that we return to the
-  ;; entry buffer and not the index buffer when the user presses C-g, we
-  ;; need to do this in an unwind-protect.
+  ;; we don't want the completion buffer to be shown in the index window,
+  ;; so we need to switch to an appropriate window first. we do this in an
+  ;; unwind-protect to make sure we always get back to the entry buffer.
   (unwind-protect
       (progn
-	(other-window 1)
+	(if (eq ebib-layout 'full)
+	    (other-window 1)
+	  (select-window ebib-pre-ebib-window))
 	(let ((collection (ebib-create-collection ebib-entry-types-hash)))
 	  (if-str (new-type (completing-read "type: " collection nil t))
 	      (progn
@@ -2830,19 +2832,24 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 		(ebib-fill-entry-buffer)
 		(setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
 		(ebib-set-modified t)))))
-    (other-window 1)))
-
+    (select-window (get-buffer-window ebib-entry-buffer))))
+  
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
+  ;; we don't want the completion buffer to be shown in the index window,
+  ;; so we need to switch to an appropriate window first. we do this in an
+  ;; unwind-protect to make sure we always get back to the entry buffer.
   (unwind-protect
       (progn
-	(other-window 1)
+	(if (eq ebib-layout 'full)
+	    (other-window 1)
+	  (select-window ebib-pre-ebib-window))
 	(let ((collection (ebib-create-collection (edb-database ebib-cur-db))))
 	  (if-str (key (completing-read "Key to insert in `crossref': " collection nil t))
 	      (progn
 		(puthash 'crossref (from-raw key) ebib-cur-entry-hash)
 		(ebib-set-modified t)))))
-    (other-window 1)
+    (select-window (get-buffer-window ebib-entry-buffer))
     ;; we now redisplay the entire entry buffer, so that the crossref'ed
     ;; fields show up. this also puts the cursor back on the type field.
     (ebib-fill-entry-buffer)))

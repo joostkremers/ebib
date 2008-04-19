@@ -1,5 +1,14 @@
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-pre-ebib-window): new.
+	(ebib-setup-windows): added ebib-pre-ebib-window.
+	(ebib-quit): added ebib-pre-ebib-window.
+	(ebib-lower): modified to use ebib-pre-ebib-window.
+	(ebib-edit-entry-type): modified to use ebib-layout.
+	(ebib-edit-crossref): same.
+
+2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
+
 	* ebib.el (ebib): added nil as second argument (norecord) to
 	select-window.
 	(ebib-setup-windows): modified. now uses ebib-layout to choose the
