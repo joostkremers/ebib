@@ -1,3 +1,8 @@
+2008-04-20  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-export-to-db): modified to use gensym.
+	(ebib-export-to-file): same.
+
 2008-04-18  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-search-next): changed $ in search string to space:
