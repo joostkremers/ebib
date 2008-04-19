@@ -1,3 +1,17 @@
+2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib): added nil as second argument (norecord) to
+	select-window.
+	(ebib-setup-windows): modified. now uses ebib-layout to choose the
+	desired window layout.
+	(ebib-delete-window): removed. i really don't think we need this.
+	(ebib-lower): removed call to ebib-delete-windows.
+	(ebib-quit): modified: put all the kill-buffers into a mapc.
+	(ebib-select-other-window): removed.
+	(ebib-leave-ebib-windows): new. bound to "z" and "C-xb".
+	(ebib-lower): modified: now simply leaves the ebib buffers if
+	requested. rebound to "Z".
+
 2008-04-18  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-search-next): changed $ in search string to space:
