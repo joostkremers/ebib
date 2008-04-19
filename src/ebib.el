@@ -301,6 +301,7 @@ Each string is added to the preamble on a separate line."
 (defvar ebib-minibuf-hist nil "Holds the minibuffer history for Ebib")
 (defvar ebib-saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib-pre-ebib-window nil "The window that was active when Ebib was called.")
+(defvar ebib-pre-multiline-buffer nil "The buffer in the window before switching to the multiline edit buffer.")
 (defvar ebib-export-filename nil "Filename to export entries to.")
 (defvar ebib-push-buffer nil "Buffer to push entries to.")
 (defvar ebib-search-string nil "Stores the last search string.")
@@ -709,6 +710,12 @@ display the actual filename."
 	   (append-to-file (point-min) (point-max) filename)
 	   (setq ebib-export-filename filename)))))
 
+(defun ebib-temp-window ()
+  ""
+  (if (eq ebib-layout 'full)
+      (get-buffer-window ebib-entry-buffer)
+    ebib-pre-ebib-window))
+
 (defun ebib-get-obl-fields (entry-type)
   "Returns the obligatory fields of ENTRY-TYPE."
   (car (gethash entry-type ebib-entry-types-hash)))
@@ -801,7 +808,11 @@ display the actual filename."
   "Redisplays the contents of the current field in the entry buffer."
   (set-buffer ebib-entry-buffer)
   (if (eq ebib-current-field 'crossref)
-      (ebib-fill-entry-buffer)
+      (progn
+	(ebib-fill-entry-buffer)
+	(setq ebib-current-field 'crossref)
+	(re-search-forward "^crossref")
+	(ebib-set-fields-highlight))
     (with-buffer-writable
       (goto-char (ebib-highlight-start ebib-fields-highlight))
       (let ((beg (point)))
@@ -938,7 +949,8 @@ field contents."
 				   (edb-database ebib-cur-db)) 'insert match-str)
       (setq ebib-current-field 'type*)
       (goto-char (point-min))
-      (ebib-set-fields-highlight))))
+      (ebib-set-fields-highlight)
+      (skip-chars-forward "^ "))))
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
@@ -1165,7 +1177,7 @@ is a list of fields that are considered in order for the sort value."
 		    (ebib-load-bibtex-file file))
 		ebib-preload-bib-files)))
     ;; if ebib is visible, we just switch to the index buffer
-    (let ((index-window (get-buffer-window ebib-index-buffer 'visible)))
+    (let ((index-window (get-buffer-window ebib-index-buffer)))
       (if index-window
           (select-window index-window nil)
         (ebib-setup-windows)))))
@@ -1178,7 +1190,7 @@ current window."
   (unless (eq ebib-layout 'full)
     (setq ebib-pre-ebib-window (selected-window))
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-layout) t)))
-      (select-window ebib-window)))
+      (select-window ebib-window nil)))
   (let* ((index-window (selected-window))
 	 (entry-window (split-window index-window ebib-index-window-size)))
     (switch-to-buffer ebib-index-buffer)
@@ -1708,7 +1720,7 @@ buffer if Ebib is not occupying the entire frame."
     (error "Ebib is not active "))
   (if (and soft
 	   (not (eq ebib-layout 'full)))
-      (select-window ebib-pre-ebib-window) ;; (next-window (get-buffer-window ebib-entry-buffer)))
+      (select-window ebib-pre-ebib-window nil)
     (set-window-configuration ebib-saved-window-config))
   (mapc #'(lambda (buffer)
 	    (bury-buffer buffer))
@@ -1849,8 +1861,8 @@ buffer if Ebib is not occupying the entire frame."
     ((real-db entries)
      (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
      (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
-     (other-window 1)
-     (switch-to-buffer ebib-entry-buffer)
+     (select-window (get-buffer-window ebib-entry-buffer) nil)
+;;     (switch-to-buffer ebib-entry-buffer)
      (goto-char (ebib-highlight-end ebib-fields-highlight)))
     ((default)
      (beep))))
@@ -2285,8 +2297,11 @@ only that field is searched."
   (ebib-execute-when
     ((real-db)
      (ebib-fill-strings-buffer)
-     (other-window 1)
+     (select-window (get-buffer-window ebib-entry-buffer) nil)
+     (set-window-dedicated-p (selected-window) nil)
      (switch-to-buffer ebib-strings-buffer)
+     (unless (eq ebib-layout 'full)
+       (set-window-dedicated-p (selected-window) t))
      (goto-char (point-min)))
     ((default)
      (beep))))
@@ -2296,7 +2311,7 @@ only that field is searched."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (other-window 1) ; we want the multiline edit buffer to appear in the lower window
+     (select-window (ebib-temp-window) nil)
      (ebib-multiline-edit 'preamble (edb-preamble ebib-cur-db)))
     ((default)
      (beep))))
@@ -2719,7 +2734,7 @@ The user is prompted for the buffer to push the entry into."
 (defun ebib-quit-entry-buffer ()
   "Quit editing the entry."
   (interactive)
-  (select-window (get-buffer-window ebib-index-buffer)))
+  (select-window (get-buffer-window ebib-index-buffer) nil))
 
 (defun ebib-find-visible-field (field direction)
   "Finds the first visible field before or after FIELD.
@@ -2824,7 +2839,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
       (progn
 	(if (eq ebib-layout 'full)
 	    (other-window 1)
-	  (select-window ebib-pre-ebib-window))
+	  (select-window ebib-pre-ebib-window) nil)
 	(let ((collection (ebib-create-collection ebib-entry-types-hash)))
 	  (if-str (new-type (completing-read "type: " collection nil t))
 	      (progn
@@ -2832,7 +2847,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 		(ebib-fill-entry-buffer)
 		(setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
 		(ebib-set-modified t)))))
-    (select-window (get-buffer-window ebib-entry-buffer))))
+    (select-window (get-buffer-window ebib-entry-buffer) nil)))
   
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
@@ -2843,16 +2858,19 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
       (progn
 	(if (eq ebib-layout 'full)
 	    (other-window 1)
-	  (select-window ebib-pre-ebib-window))
+	  (select-window ebib-pre-ebib-window) nil)
 	(let ((collection (ebib-create-collection (edb-database ebib-cur-db))))
 	  (if-str (key (completing-read "Key to insert in `crossref': " collection nil t))
 	      (progn
 		(puthash 'crossref (from-raw key) ebib-cur-entry-hash)
 		(ebib-set-modified t)))))
-    (select-window (get-buffer-window ebib-entry-buffer))
+    (select-window (get-buffer-window ebib-entry-buffer) nil)
     ;; we now redisplay the entire entry buffer, so that the crossref'ed
     ;; fields show up. this also puts the cursor back on the type field.
-    (ebib-fill-entry-buffer)))
+    (ebib-fill-entry-buffer)
+    (setq ebib-current-field 'crossref)
+    (re-search-forward "^crossref")
+    (ebib-set-fields-highlight)))
 
 ;; we should modify ebib-edit-field, so that it calls the appropriate
 ;; helper function, which asks the user for the new value and just returns
@@ -3002,6 +3020,7 @@ The deleted text is not put in the kill ring."
 	  (setq ebib-multiline-raw t)
 	(setq text (to-raw text))
 	(setq ebib-multiline-raw nil))
+      (select-window (ebib-temp-window) nil)
       (ebib-multiline-edit 'fields text))))
 
 (defun ebib-insert-abbreviation ()
@@ -3074,8 +3093,11 @@ The deleted text is not put in the kill ring."
 (defun ebib-quit-strings-buffer ()
   "Quit editing the @STRING definitions."
   (interactive)
+  (set-window-dedicated-p (selected-window) nil)
   (switch-to-buffer ebib-entry-buffer)
-  (other-window 1))
+  (unless (eq ebib-layout 'full)
+    (set-window-dedicated-p (selected-window) t))
+  (select-window (get-buffer-window ebib-index-buffer) nil))
 
 (defun ebib-prev-string ()
   "Move to the previous string."
@@ -3272,6 +3294,7 @@ to append them to."
 (defun ebib-edit-multiline-string ()
   "Edits the current string in multiline-mode."
   (interactive)
+  (select-window (ebib-temp-window) nil)
   (ebib-multiline-edit 'string (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
 
 (defun ebib-strings-help ()
@@ -3287,7 +3310,7 @@ to append them to."
   text-mode "Ebib-edit"
   "Major mode for editing multiline strings in Ebib."
   ;; we redefine some basic keys because we need them to leave this buffer.
-  (local-set-key "\C-xb" 'ebib-leave-multiline-edit)
+  (local-set-key "\C-xb" 'ebib-quit-multiline-edit)
   (local-set-key "\C-x\C-s" 'ebib-save-from-multiline-edit)
   (local-set-key "\C-xk" 'ebib-cancel-multiline-edit))
 
@@ -3295,7 +3318,9 @@ to append them to."
   "Switches to Ebib's multiline edit buffer.
 STARTTEXT is a string that contains the initial text of the buffer."
   ;; note: the buffer is put in the currently active window!
+  (setq ebib-pre-multiline-buffer (current-buffer))
   (switch-to-buffer ebib-multiline-buffer)
+  (set-buffer-modified-p nil)
   (erase-buffer)
   (setq ebib-editing type)
   (when starttext
@@ -3303,23 +3328,43 @@ STARTTEXT is a string that contains the initial text of the buffer."
     (goto-char (point-min))
     (set-buffer-modified-p nil)))
 
-(defun ebib-leave-multiline-edit ()
-  "Quits the multiline edit buffer."
+(defun ebib-quit-multiline-edit ()
+  "Quits the multiline edit buffer, saving the text."
   (interactive)
   (ebib-store-multiline-text)
+  (ebib-leave-multiline-edit-buffer)
   (cond
-   ((eq ebib-editing 'preamble)
-    (switch-to-buffer ebib-entry-buffer)
-    (other-window 1)) ; we have to switch back to the index buffer window
    ((eq ebib-editing 'fields)
-    (switch-to-buffer ebib-entry-buffer)
-    (ebib-redisplay-current-field)
     (ebib-next-field))
    ((eq ebib-editing 'strings)
-    (switch-to-buffer ebib-strings-buffer)
-    (ebib-redisplay-current-string)
     (ebib-next-string)))
   (message "Text stored."))
+
+(defun ebib-cancel-multiline-edit ()
+  "Quits the multiline edit buffer and discards the changes."
+  (interactive)
+  (catch 'no-cancel
+    (when (buffer-modified-p)
+      (unless (y-or-n-p "Text has been modified. Abandon changes? ")
+	(throw 'no-cancel nil)))
+    (ebib-leave-multiline-edit-buffer)))
+
+(defun ebib-leave-multiline-edit-buffer ()
+  "Leaves the multiline edit buffer.
+Restores the previous buffer in the window that the multiline
+edit buffer was shown in."
+  (switch-to-buffer ebib-pre-multiline-buffer)
+  (cond
+   ((eq ebib-editing 'preamble)
+    (select-window (get-buffer-window ebib-index-buffer) nil))
+   ((eq ebib-editing 'fields)
+    ;; in full-frame layout, select-window isn't necessary, but it doesn't hurt either.
+    (select-window (get-buffer-window ebib-entry-buffer) nil)
+    (ebib-redisplay-current-field))
+   ((eq ebib-editing 'strings)
+    ;; in full-frame layout, select-window isn't necessary, but it doesn't hurt either.
+    (select-window (get-buffer-window ebib-strings-buffer) nil)
+    (ebib-redisplay-current-string))))
 
 (defun ebib-save-from-multiline-edit ()
   "Stores the text being edited in the multiline edit buffer and then saves the database."
@@ -3352,26 +3397,6 @@ STARTTEXT is a string that contains the initial text of the buffer."
 	  (setq text (from-raw text))  ; strings cannot be raw
 	  (puthash ebib-current-string text (edb-strings ebib-cur-db))))))
     (ebib-set-modified t))
-
-(defun ebib-cancel-multiline-edit ()
-  "Quits the multiline edit buffer and discards the changes."
-  (interactive)
-  (catch 'no-cancel
-    (when (buffer-modified-p)
-      (unless (y-or-n-p "Text has been modified. Abandon changes? ")
-	(throw 'no-cancel nil)))
-    (cond
-     ((eq ebib-editing 'fields)
-      (switch-to-buffer ebib-entry-buffer)
-      (ebib-redisplay-current-field)) ; we have to do this, because the
-				      ; user may have saved with C-x C-s
-				      ; before
-     ((eq ebib-editing 'strings)
-      (switch-to-buffer ebib-strings-buffer)
-      (ebib-redisplay-current-string))
-     ((eq ebib-editing 'preamble)
-      (switch-to-buffer ebib-entry-buffer)
-      (other-window 1)))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ebib-help-mode ;;

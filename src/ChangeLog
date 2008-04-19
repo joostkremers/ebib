@@ -6,6 +6,25 @@
 	(ebib-lower): modified to use ebib-pre-ebib-window.
 	(ebib-edit-entry-type): modified to use ebib-layout.
 	(ebib-edit-crossref): same.
+	(ebib-fill-entry-buffer): added skip-chars-forward: the cursor
+	usually appears directly after the field name.
+	(ebib-edit-crossref): modified to make the crossref field the
+	current field again.
+	(ebib-redisplay-current-field): same.
+	(ebib-temp-window): new.
+	(ebib-leave-multiline-edit): removed.
+	(ebib-leave-multiline-edit-buffer): new.
+	(ebib-quit-multiline-edit): new.
+	(ebib-cancel-multiline-edit): modified to use
+	ebib-leave-multiline-edit-buffer.
+	(ebib-edit-multiline-field): modified to use ebib-temp-window.
+	(ebib-edit-multiline-string): same.
+	(ebib-multiline-edit): modified: sets the buffer's modified flag
+	to nil.
+	(ebib-edit-strings): modified: in split-frame layout the window's
+	dedicated flag must be temporarily unset in order to switch to the
+	strings-buffer.
+	(ebib-quit-strings-buffer): same.
 
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 
