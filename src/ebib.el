@@ -291,7 +291,6 @@ Each string is added to the preamble on a separate line."
 (defvar ebib-entry-buffer nil "The entry buffer.")
 (defvar ebib-strings-buffer nil "The strings buffer.")
 (defvar ebib-multiline-buffer nil "Buffer for editing multiline strings.")
-(defvar ebib-help-buffer nil "Buffer showing Ebib help.")
 (defvar ebib-log-buffer nil "Buffer showing warnings and errors during loading of .bib files")
 (defvar ebib-index-highlight nil "Highlight to mark the current entry.")
 (defvar ebib-fields-highlight nil "Highlight to mark the current field.")
@@ -308,7 +307,6 @@ Each string is added to the preamble on a separate line."
 (defvar ebib-editing nil "Indicates what the user is editing.
 Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-multiline-raw nil "Indicates whether the multiline text being edited is raw.")
-(defvar ebib-before-help nil "Stores the buffer the user was in when he displayed the help message.")
 (defvar ebib-log-error nil "Indicates whether an error was logged.")
 (defvar ebib-local-bibtex-filenames nil "A buffer-local variable holding a list of the name(s) of that buffer's .bib file")
 (make-variable-buffer-local 'ebib-local-bibtex-filenames)
@@ -352,12 +350,6 @@ Its value can be 'strings, 'fields, or 'preamble.")
 ;; and these two are set by EBIB-FILL-ENTRY-BUFFER and EBIB-FILL-STRINGS-BUFFER, respectively
 (defvar ebib-current-field nil "The current field.") 
 (defvar ebib-current-string nil "The current @STRING definition.")
-
-;; we define these variables here, but only give them a value at the end of
-;; the file, because the long strings mess up Emacs' syntax highlighting.
-(defvar ebib-index-buffer-help nil "Help for the index buffer.")
-(defvar ebib-entry-buffer-help nil "Help for the entry buffer.")
-(defvar ebib-strings-buffer-help nil "Help for the strings buffer.")
 
 ;; the prefix key is stored in a variable so that the user can customise it.
 (defvar ebib-prefix-key ?\;)
@@ -1231,10 +1223,6 @@ buffers and reads the rc file."
   (setq ebib-strings-buffer (get-buffer-create " *Ebib-strings*"))
   (set-buffer ebib-strings-buffer)
   (ebib-strings-mode)
-  ;; then we create the help buffer
-  (setq ebib-help-buffer (get-buffer-create " *Ebib-help*"))
-  (set-buffer ebib-help-buffer)
-  (ebib-help-mode)
   ;; the log buffer
   (setq ebib-log-buffer (get-buffer-create " *Ebib-log*"))
   (set-buffer ebib-log-buffer)
@@ -1259,7 +1247,6 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
 		ebib-index-buffer
 		ebib-strings-buffer
 		ebib-multiline-buffer
-		ebib-help-buffer
 		ebib-log-buffer))
     (setq ebib-databases nil
 	  ebib-index-buffer nil
@@ -1356,7 +1343,6 @@ killed and the database has been modified."
 (ebib-key index "F" ebib-follow-crossref)
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
-(ebib-key index "h" ebib-index-help)
 (ebib-key index "H" ebib-toggle-hidden)
 (ebib-key index "j" ebib-next-entry)
 (ebib-key index "J" ebib-switch-to-database)
@@ -1715,7 +1701,6 @@ buffer if Ebib is not occupying the entire frame."
 					ebib-entry-buffer
 					ebib-strings-buffer
 					ebib-multiline-buffer
-					ebib-help-buffer
 					ebib-log-buffer))
     (error "Ebib is not active "))
   (if (and soft
@@ -1728,7 +1713,6 @@ buffer if Ebib is not occupying the entire frame."
 	      ebib-entry-buffer
 	      ebib-strings-buffer
 	      ebib-multiline-buffer
-	      ebib-help-buffer
 	      ebib-log-buffer)))
 
 (defun ebib-prev-entry ()
@@ -2648,17 +2632,14 @@ modified."
     ((default)
      (beep))))
 
-(defun ebib-index-help ()
-  "Displays the help message for the index buffer."
-  (interactive)
-  (other-window 1)
-  (ebib-display-help ebib-index-buffer))
-
 (defun ebib-show-log ()
   "Display the contents of the log buffer."
   (interactive)
-  (other-window 1)
-  (switch-to-buffer ebib-log-buffer))
+  (select-window (get-buffer-window ebib-entry-buffer) nil)
+  (set-window-dedicated-p (selected-window) nil)
+  (switch-to-buffer ebib-log-buffer)
+  (unless (eq ebib-layout 'full)
+    (set-window-dedicated-p (selected-window) t)))
 
 (defun ebib-push-entry-key (prefix)
   "Pushes the current entry to a LaTeX buffer.
@@ -2706,7 +2687,6 @@ The user is prompted for the buffer to push the entry into."
     (define-key map "f" 'ebib-view-file-in-field)
     (define-key map "g" 'ebib-goto-first-field)
     (define-key map "G" 'ebib-goto-last-field)
-    (define-key map "h" 'ebib-entry-help)
     (define-key map "j" 'ebib-next-field)
     (define-key map "k" 'ebib-prev-field)
     (define-key map "l" 'ebib-edit-multiline-field)
@@ -3042,11 +3022,6 @@ The deleted text is not put in the kill ring."
 	(ebib-redisplay-current-field)
 	(ebib-next-field)))))
 
-(defun ebib-entry-help ()
-  "Displays the help message for the entry buffer."
-  (interactive)
-  (ebib-display-help ebib-entry-buffer))
-
 ;;;;;;;;;;;;;;;;;;
 ;; strings-mode ;;
 ;;;;;;;;;;;;;;;;;;
@@ -3068,7 +3043,6 @@ The deleted text is not put in the kill ring."
     (define-key map "e" 'ebib-edit-string)
     (define-key map "g" 'ebib-goto-first-string)
     (define-key map "G" 'ebib-goto-last-string)
-    (define-key map "h" 'ebib-strings-help)
     (define-key map "j" 'ebib-next-string)
     (define-key map "k" 'ebib-prev-string)
     (define-key map "l" 'ebib-edit-multiline-string)
@@ -3297,11 +3271,6 @@ to append them to."
   (select-window (ebib-temp-window) nil)
   (ebib-multiline-edit 'string (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
 
-(defun ebib-strings-help ()
-  "Displays the help message for the strings buffer."
-  (interactive)
-  (ebib-display-help ebib-strings-buffer))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; multiline edit mode ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3398,50 +3367,6 @@ edit buffer was shown in."
 	  (puthash ebib-current-string text (edb-strings ebib-cur-db))))))
     (ebib-set-modified t))
 
-;;;;;;;;;;;;;;;;;;;;
-;; ebib-help-mode ;;
-;;;;;;;;;;;;;;;;;;;;
-
-(defvar ebib-help-mode-map
-  (let ((map (make-keymap)))
-    (suppress-keymap map)
-    (define-key map " " 'scroll-up)
-    (define-key map "b" 'scroll-down)
-    (define-key map "q" 'ebib-quit-help-buffer)
-    map)
-  "Keymap for the ebib help buffer.")
-
-(define-derived-mode ebib-help-mode
-  fundamental-mode "Ebib-help"
-  "Major mode for the Ebib help buffer."
-  (setq buffer-read-only t)
-  (local-set-key "\C-xb" 'ebib-quit-help-buffer)
-  (local-set-key "\C-xk" 'ebib-quit-help-buffer))
-
-(defun ebib-display-help (buffer)
-  "Shows the help message for Ebib-buffer BUFFER."
-  (switch-to-buffer ebib-help-buffer)
-  (setq ebib-before-help buffer)
-  (with-buffer-writable
-    (erase-buffer)
-    (cond
-     ((eq buffer ebib-index-buffer) (insert ebib-index-buffer-help))
-     ((eq buffer ebib-entry-buffer) (insert ebib-entry-buffer-help))
-     ((eq buffer ebib-strings-buffer) (insert ebib-strings-buffer-help)))
-    (goto-char (point-min))))
-
-(defun ebib-quit-help-buffer ()
-  "Exits the help buffer."
-  (interactive)
-  (cond
-   ((eq ebib-before-help ebib-index-buffer)
-    (switch-to-buffer ebib-entry-buffer)
-    (other-window 1))
-   ((eq ebib-before-help ebib-entry-buffer)
-    (switch-to-buffer ebib-entry-buffer))
-   ((eq ebib-before-help ebib-strings-buffer)
-    (switch-to-buffer ebib-strings-buffer))))
-
 ;;;;;;;;;;;;;;;;;;;
 ;; ebib-log-mode ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -3464,8 +3389,11 @@ edit buffer was shown in."
 (defun ebib-quit-log-buffer ()
   "Exits the log buffer."
   (interactive)
+  (set-window-dedicated-p (selected-window) nil)
   (switch-to-buffer ebib-entry-buffer)
-  (other-window 1))
+  (unless (eq ebib-layout 'full)
+    (set-window-dedicated-p (selected-window) t))
+  (select-window (get-buffer-window ebib-index-buffer) nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functions for non-Ebib buffers ;;
@@ -3625,180 +3553,6 @@ be found."
     ((default)
      (error "No database(s) loaded"))))
 
-;; (defun ebib-entry-summary ()
-;;   "Shows the fields of the key at POINT.
-;; The key is searched in the database associated with the LaTeX
-;; file, or in the current database if no \\bibliography command can
-;; be found."
-;;   (interactive)
-;;   (ebib-execute-when
-;;     ((database)
-;;      (or ebib-local-bibtex-filenames
-;; 	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-;;      (let ((key (read-string-at-point "\"#%'(),={} \n\t\f"))
-;; 	   entry)
-;;        (if (eq ebib-local-bibtex-filenames 'none)
-;; 	   (if (not (member key (edb-keys-list ebib-cur-db)))
-;; 	       (error "`%s' is not in the current database" key)
-;; 	     (setq entry (gethash key (edb-database ebib-cur-db))))
-;; 	 (setq entry
-;; 	       (catch 'found
-;; 		 (mapc #'(lambda (file)
-;; 			   (let ((db (ebib-get-db-from-filename file)))
-;; 			     (if (null db)
-;; 				 (message "Database %s not loaded" file)
-;; 			       (if (member key (edb-keys-list db))
-;; 				   (throw 'found (gethash key (edb-database db)))))))
-;; 		       ebib-local-bibtex-filenames)
-;; 		 nil)))
-;;        (if (null entry)
-;; 	   (error "Entry `%s' not found" key)
-;; 	 (with-current-buffer " *Ebib-entry*"
-;;            (with-buffer-writable
-;;              (erase-buffer)
-;;              (ebib-format-fields entry 'insert))))))
-;;     ((default)
-;;      (error "No database(s) loaded"))))
-
 (provide 'ebib)
-
-;; we put these at the end, because they seem to mess up Emacs'
-;; syntax highlighting.
-
-(setq ebib-index-buffer-help
-  "Ebib index buffer -- command key overview
-
-Note: command keys are case-sensitive.
-
-(Press C-v to scroll down, M-v to scroll up, `q' to quit.)
-
-cursor movement:
-[Up], k, C-p:             go to the previous entry
-[Down], j, C-n:           go to the next entry
-[Home], g:                go to the first entry
-[End], G:                 go to the last entry
-[PgUp], b, M-p:           scroll up
-[PgDn], [Space], M-n:     scroll down
-
-editing:
-e:                        edit the current entry
-E:                        edit the current entry's name
-a:                        add a new entry
-d:                        delete the current entry
-;-d:                      deletes all marked entries
-t:                        edit the @STRING definitions
-r:                        edit the @PREAMBLE definition
-m:                        (un)mark the current entry
-;-m:                      unmarks all marked entries
-
-searching:
-/:                        search the database
-n:                        find the next occurrence of the search string
-C-s:                      search for a key (incrementally)
-[return]:                 select the entry under the cursor (use after C-s)
-F:                        follow the crossref field
-&:                        filter the current database with a logical AND
-|:                        filter the current database with a logical OR
-~:                        filter the current database with a logical NOT
-V:                        show the current filter (with prefix argument:
-                               reapply current filter)
-
-file handling:
-o:                        open a database
-c:                        close the database
-s:                        save the database
-S:                        save all databases
-w:                        save the database under a different name
-M:                        merge another database
-x:                        export the current entry to another file
-                               (with prefix argument N: copy to database N)
-;-x:                      export the marked entry to another file
-                               (with prefix argument N: copy to database N)
-X:                        export the @PREAMBLE definition to another file
-                               (with prefix argument N: copy to database N)          
-f:                        print the full filename in the minibuffer
-
-databases:
-1-9:                      switch to database 1-9
-J:                        switch to another database (accepts prefix argument)
-[right], [left]:          switch to previous/next database 
-L:                        LaTeX the database
-;-L:                      LaTeX the marked entries
-P:                        print the database
-;-P:                      print the marked entries
-
-general:
-u:                        extract URL from the `url' field and send it to a browser
-p:                        push the current entry to a LaTeX buffer
-;-p:                      push marked entries to a LaTeX buffer
-C:                        customise Ebib
-z:                        put Ebib in the background
-q:                        quit Ebib
-h:                        show this help page
-")
-
-(setq ebib-entry-buffer-help
-  "Ebib entry buffer -- command key overview
-
-Note: command keys are case-sensitive.
-
-(Press C-v to scroll down, M-v to scroll up, `q' to quit.)
-
-cursor movement:
-[Up], k, C-p:             go to the previous field
-[Down], j, C-n:           go to the next field
-[Home], g:                go to the first field
-[End], G:                 go to the last field
-[PgUp], b, M-p:           go to the previous group of fields
-[PgDn], [Space], M-n:     go to the next group of fields
-
-editing:
-e:                        edit the value of the current field
-c:                        copy the value of the current field (value is put into the kill ring)
-x:                        kill the value of the current field (value is put into the kill ring)
-y:                        yank the most recently copied/cut string
-d:                        delete the value of the current entry
-r:                        toggle the \"rawness\" status of the current field
-l:                        edit the current field as multi-line
-s:                        insert an @STRING abbreviation into the current field
-
-general:
-u:                        extract URL and send it to a browser
-q:                        quit the entry buffer and return to the index buffer
-h:                        show this help page
-")
-
-(setq ebib-strings-buffer-help
-  "Ebib strings buffer -- command key overview
-
-Note: command keys are case-sensitive.
-
-(Press C-v to scroll down, M-v to scroll up, `q' to quit.)
-
-cursor movement:
-[Up], k, C-p:           go to the previous @STRING definition
-[Down], j, C-n:         go to the next @STRING definition
-[Home], g:              go to the first @STRING definition
-[End], G:               go to the last @STRING definition
-[PgUp], b, M-p:         scroll 10 @STRING definitions up
-[PgDn], [Space], M-n:   scroll 10 @STRING definitions down
-
-editing:
-e:                      edit the value of the current @STRING definition
-c:                      copy the value of the current @STRING definition
-d:                      delete the current @STRING definition
-a:                      add an @STRING definition
-l:                      edit the current @STRING as multi-line
-
-exporting:
-x:                      export the current @STRING definition to another file
-                             (with prefix argument N: copy to database N)
-X:                      export all @STRING definitions to another file
-                             (with prefix argument N: copy to database N)
-
-general:
-q:                      quit the strings buffer and return to the index buffer
-h:                      show this help page
-")
 
 ;;; ebib ends here

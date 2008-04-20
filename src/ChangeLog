@@ -3,6 +3,11 @@
 	* ebib.el (ebib-entry-summary): modified: if the ebib buffers are
 	visible, instead of putting the output in a temp buffer, the
 	relevant entry is displayed in the ebib buffers.
+	(ebib) help mode removed.
+	(ebib-show-log): modified: in split-frame layout the window's
+	dedicated flag must be temporarily unset in order to switch to the
+	strings-buffer.
+	(ebib-quit-log-buffer): same.
 
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 
