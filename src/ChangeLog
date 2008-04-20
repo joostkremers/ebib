@@ -1,3 +1,7 @@
+2008-04-21  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el: fixed doc strings.
+
 2008-04-20  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-entry-summary): modified: if the ebib buffers are
