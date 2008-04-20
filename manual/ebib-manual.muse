@@ -1313,8 +1313,6 @@ filename.
 
   =G= :: equivalent to =End=.
 
-  =h= :: show help for the index buffer. =(ebib-index-help)=
-
   =H= :: show/hide hidden fields. =(ebib-toggle-hidden)=
 
   =j= :: equivalent to =Down=.
@@ -1434,8 +1432,6 @@ filename.
   
   =G= :: equivalent to =End=.
 
-  =h= :: show help for the entry buffer. =(ebib-entry-help)=
-
   =j= :: go to the next field. =(ebib-next-field)=
 
   =k= :: go to the previous field. =(ebib-prev-field)=
@@ -1500,8 +1496,6 @@ asked for confirmation. =(ebib-delete-string)=
   =g= :: equivalent to =Home=.
   
   =G= :: equivalent to =End=.
-
-  =h= :: show help for the strings buffer. =(ebib-strings-help)=
 
   =j= :: equivalent to =Down=.
 
@@ -1763,10 +1757,13 @@ default value is:
 </example>
 
 This essentially means that every string of characters not containing any
-of the characters <example>? | \ : * < > "</example> or space, newline, tab
-of formfeed. URLs can easily by recognised by the prefix =http:=, but
-recognising files is not so straightforward. It is therefore not advisable
-to put anything but filenames in the =file= field.
+of the characters
+
+<example>? | \ : * < > "</example>
+
+or space, newline, tab of formfeed. URLs can easily by recognised by the
+prefix =http:=, but recognising files is not so straightforward. It is
+therefore not advisable to put anything but filenames in the =file= field.
 
 
 *** File Search Dirs
