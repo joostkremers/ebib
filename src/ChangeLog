@@ -13,6 +13,10 @@
 	(ebib-set-fields-highlight): same.
 	(ebib-set-strings-highlight): same.
 	(ebib-edit-entry): removed goto-char and switch-to-buffer.
+	(line-number-at-pos): this is called line-number in xemacs, so an
+	alias is defined.
+	(ebib-match-paren-forward): added "" to error, to keep xemacs from complaining.
+	(ebib-match-quote-forward): same.
 
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 

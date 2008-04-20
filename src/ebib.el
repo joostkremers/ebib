@@ -364,6 +364,10 @@ Its value can be 'strings, 'fields, or 'preamble.")
   (if (featurep 'xemacs)
       (defvar mark-active)))
 
+(eval-and-compile
+  (if (featurep 'xemacs)
+      (defalias 'line-number-at-pos 'line-number)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; useful macros and functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1011,7 +1015,7 @@ forward to allow parsing to continue."
 	  (if (eq (char-after) ?\))
 	      t
 	    (goto-char (1+ (point-min)))
-	    (error)))
+	    (error "")))
       (error (ebib-log 'error "Error in line %d: Matching closing parenthesis not found!" (line-number-at-pos))
 	     nil)))
    (t nil)))
@@ -1074,7 +1078,7 @@ continue."
 	  (or (eq (char-after) ?\")
 	      (progn
 		(goto-char (1+ (point-min)))
-		(error))))
+		(error ""))))
       (error (ebib-log 'error "Error in line %d: Matching closing quote not found!" (line-number-at-pos))
 	     nil))))
 
