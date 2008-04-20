@@ -765,21 +765,24 @@ display the actual filename."
     (if ebib-index-display-fields
 	(end-of-line)
       (skip-chars-forward "^ "))
-    (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)))
+    (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)
+    (beginning-of-line)))
 
 (defun ebib-set-fields-highlight ()
   (set-buffer ebib-entry-buffer)
   (beginning-of-line)
   (let ((beg (point)))
     (looking-at-goto-end "[^ \t\n\f]*")
-    (ebib-move-highlight ebib-fields-highlight beg (point) ebib-entry-buffer)))
+    (ebib-move-highlight ebib-fields-highlight beg (point) ebib-entry-buffer)
+    (beginning-of-line)))
 
 (defun ebib-set-strings-highlight ()
   (set-buffer ebib-strings-buffer)
   (beginning-of-line)
   (let ((beg (point)))
     (looking-at-goto-end "[^ \t\n\f]*")
-    (ebib-move-highlight ebib-strings-highlight beg (point) ebib-strings-buffer)))
+    (ebib-move-highlight ebib-strings-highlight beg (point) ebib-strings-buffer)
+    (beginning-of-line)))
 
 (defun ebib-display-entry (entry-key)
   "Displays ENTRY-KEY in the index buffer at POINT."
@@ -941,8 +944,8 @@ field contents."
 				   (edb-database ebib-cur-db)) 'insert match-str)
       (setq ebib-current-field 'type*)
       (goto-char (point-min))
-      (ebib-set-fields-highlight)
-      (skip-chars-forward "^ "))))
+      (ebib-set-fields-highlight))))
+;;      (skip-chars-forward "^ "))))
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
@@ -1845,9 +1848,7 @@ buffer if Ebib is not occupying the entire frame."
     ((real-db entries)
      (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
      (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
-     (select-window (get-buffer-window ebib-entry-buffer) nil)
-;;     (switch-to-buffer ebib-entry-buffer)
-     (goto-char (ebib-highlight-end ebib-fields-highlight)))
+     (select-window (get-buffer-window ebib-entry-buffer) nil))
     ((default)
      (beep))))
 

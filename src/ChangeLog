@@ -8,6 +8,11 @@
 	dedicated flag must be temporarily unset in order to switch to the
 	strings-buffer.
 	(ebib-quit-log-buffer): same.
+	(ebib-set-index-highlight): modified: move cursor to beginning of
+	line after setting the highlight.
+	(ebib-set-fields-highlight): same.
+	(ebib-set-strings-highlight): same.
+	(ebib-edit-entry): removed goto-char and switch-to-buffer.
 
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 
