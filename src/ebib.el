@@ -1186,7 +1186,8 @@ is a list of fields that are considered in order for the sort value."
 current window."
   ;; we save the current window configuration.
   (setq ebib-saved-window-config (current-window-configuration))
-  (unless (eq ebib-layout 'full)
+  (if (eq ebib-layout 'full)
+      (delete-other-windows)
     (setq ebib-pre-ebib-window (selected-window))
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-layout) t)))
       (select-window ebib-window nil)))

@@ -17,6 +17,7 @@
 	alias is defined.
 	(ebib-match-paren-forward): added "" to error, to keep xemacs from complaining.
 	(ebib-match-quote-forward): same.
+	(ebib-setup-windows): added delete-other-windows in full-frame layout.
 
 2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
 
