@@ -711,7 +711,7 @@ display the actual filename."
 	   (setq ebib-export-filename filename)))))
 
 (defun ebib-temp-window ()
-  ""
+  "Returns a window to be used for temporary use."
   (if (eq ebib-layout 'full)
       (get-buffer-window ebib-entry-buffer)
     ebib-pre-ebib-window))
@@ -3590,25 +3590,38 @@ be found."
      (or ebib-local-bibtex-filenames
 	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
      (let ((key (read-string-at-point "\"#%'(),={} \n\t\f"))
-	   entry)
+	   entry
+	   database)
        (if (eq ebib-local-bibtex-filenames 'none)
 	   (if (not (member key (edb-keys-list ebib-cur-db)))
-	       (error "`%s' is not in the current database" key)
-	     (setq entry (gethash key (edb-database ebib-cur-db))))
-	 (setq entry
-	       (catch 'found
-		 (mapc #'(lambda (file)
-			   (let ((db (ebib-get-db-from-filename file)))
-			     (if (null db)
-				 (message "Database %s not loaded" file)
-			       (if (member key (edb-keys-list db))
-				   (throw 'found (gethash key (edb-database db)))))))
-		       ebib-local-bibtex-filenames)
-		 nil)))
+	       (error "Entry `%s' is not in the current database" key)
+	     (setq entry (gethash key (edb-database ebib-cur-db)))
+	     (setq database ebib-cur-db))
+	 (multiple-value-setq (entry database)
+	   (catch 'found
+	     (mapc #'(lambda (file)
+		       (let ((db (ebib-get-db-from-filename file)))
+			 (if (null db)
+			     (message "Database %s not loaded" file)
+			   (if (member key (edb-keys-list db))
+			       (throw 'found (values (gethash key (edb-database db)) db))))))
+		   ebib-local-bibtex-filenames)
+	     (list nil nil))))
        (if (null entry)
 	   (error "Entry `%s' not found" key)
-	 (with-output-to-temp-buffer "*Help*"
-	   (ebib-format-fields entry 'princ)))))
+	 (let ((index-window (get-buffer-window ebib-index-buffer)))
+	   (if (not index-window)
+	       (with-output-to-temp-buffer "*Help*"
+		 (ebib-format-fields entry 'princ))
+	     (with-selected-window index-window
+	       (setq ebib-cur-db database)
+	       (ebib-fill-index-buffer)
+	       (setf (edb-cur-entry ebib-cur-db) (member key (edb-keys-list ebib-cur-db)))
+	       (goto-char (point-min))
+	       (re-search-forward (format "^%s " key))
+	       (beginning-of-line)
+	       (ebib-set-index-highlight))
+	     (ebib-fill-entry-buffer))))))
     ((default)
      (error "No database(s) loaded"))))
 
