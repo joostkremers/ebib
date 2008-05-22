@@ -1,3 +1,8 @@
+2008-05-21  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): bugfix: moved the code that creates
+	the hash table up, so that it appears before ebib-display-entry.
+
 2008-04-21  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el: fixed doc strings.

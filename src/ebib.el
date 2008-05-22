@@ -728,6 +728,10 @@ display the actual filename."
 		       (ebib-get-opt-fields entry-type) 
 		       ebib-additional-fields)))
 
+(defmacro ebib-retrieve-entry (entry-key db)
+  "Returns the hash table of the fields stored in DB under ENTRY-KEY."
+  `(gethash ,entry-key (edb-database ,db)))
+
 (defun ebib-erase-buffer (buffer)
   (set-buffer buffer)
   (with-buffer-writable
@@ -873,10 +877,6 @@ The keys of HASHTABLE must be either symbols or strings."
 				    result)))
 	     hashtable)
     result))
-
-(defmacro ebib-retrieve-entry (entry-key db)
-  "Returns the hash table of the fields stored in DB under ENTRY-KEY."
-  `(gethash ,entry-key (edb-database ,db)))
 
 (defun ebib-get-field-highlighted (field current-entry &optional match-str)
   ;; note: we need to work on a copy of the string, otherwise the highlights
@@ -1769,13 +1769,16 @@ buffer if Ebib is not occupying the entire frame."
 	       (error "Key already exists")
 	     (set-buffer ebib-index-buffer)
 	     (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
+	     ;; we create the hash table *before* the call to
+	     ;; ebib-display-entry, because that function refers to the
+	     ;; hash table if ebib-index-display-fields is set.
+	     (let ((fields (make-hash-table)))
+	       (puthash 'type* ebib-default-type fields)
+	       (ebib-insert-entry entry-key fields ebib-cur-db t t))
 	     (with-buffer-writable
 	       (ebib-display-entry entry-key))
 	     (forward-line -1) ; move one line up to position the cursor on the new entry.
 	     (ebib-set-index-highlight)
-	     (let ((fields (make-hash-table)))
-	       (puthash 'type* ebib-default-type fields)
-	       (ebib-insert-entry entry-key fields ebib-cur-db t t))
 	     (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
 	     (ebib-fill-entry-buffer)
 	     (ebib-edit-entry)
