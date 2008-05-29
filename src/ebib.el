@@ -2514,7 +2514,7 @@ FILES must be a string of whitespace-separated filenames."
 			(add-to-list 'result (match-string 0 files) t)
 			(setq start (match-end 0)))
 		      result)))
-	 (ext (last1 (split-string file "\\."))))
+	 (ext (file-name-extension file)))
     (let ((file-full-path (locate-file file ebib-file-search-dirs)))
       (when file-full-path
 	(if-str (viewer (cdr (assoc ext ebib-file-associations)))
