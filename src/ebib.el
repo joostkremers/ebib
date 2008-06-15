@@ -63,7 +63,7 @@ with the left side free for another window."
 		 (integer :tag "Specify width")))
 
 (defcustom ebib-index-window-size 10
-  "*The number of lines used for the keys buffer window."
+  "*The number of lines used for the index buffer window."
   :group 'ebib
   :type 'integer)
 

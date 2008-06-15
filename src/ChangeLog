@@ -1,3 +1,8 @@
+2008-05-31  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-index-window-size): "key buffer" in the doc string
+	changed to "index buffer".
+
 2008-05-30  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-call-file-viewer): modified to use
