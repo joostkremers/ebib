@@ -1561,8 +1561,9 @@ is set to T."
     (goto-char (point-min))
     (while (re-search-forward "^@" nil t) ; find the next entry
       (let ((beg (point)))
-	(when (looking-at-goto-end (concat ebib-bibtex-identifier "[\(\{]"))
-	  (let ((entry-type (downcase (buffer-substring-no-properties beg (1- (point))))))
+	(when (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
+	  (let ((entry-type (downcase (buffer-substring-no-properties beg (point)))))
+            (looking-at-goto-end "[[:space:]]*[\(\{]")
 	    (cond
 	     ((equal entry-type "string") ; string and preamble must be treated differently
 	      (if (ebib-read-string)

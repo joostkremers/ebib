@@ -1,3 +1,10 @@
+2008-06-15  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-read-string): bug fix: ebib would choke on bibtex
+	entries that have a space after the entry type but before the
+	opening parenthesis/brace. bug reported and fix provided by Rupert
+	Swarbrick.
+
 2008-05-31  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-index-window-size): "key buffer" in the doc string
