@@ -371,7 +371,7 @@ be rather pointless: you're only interested in the entry you're searching
 for, not in the entries you pass along the way.
 
 Of course, it is also possible to search the database itself. If you type
-=/=, Ebib asks you for a search term. This can be a regural expression, to
+=/=, Ebib asks you for a search term. This can be a regular expression, to
 allow for flexibility in searching. After hitting =ENTER=, Ebib will start
 searching the database (starting from the current entry, *not* from the first
 entry!) and will display the entry with the first occurrence of the search
@@ -653,7 +653,7 @@ the URLs. (Keep in mind, though, that in the entry buffer, you can load a
 URL from any field.)
 
 
-** Viewing files
+** Viewing Files
 
 If you have electronic versions of the papers in your database stored on
 your computer, you can use Ebib to call external viewers for these
@@ -690,7 +690,7 @@ relevant file, but you have to specify which programs to call. The option
 [[#file-associations][File Associations]] allows you to do this. By default, =.pdf= and =.ps= files are
 handled, by =xpdf= and =gv=, respectively. You can specify further file types by
 their extensions (do not include the dot). The program is searched for in
-PATH, but you can of course specify the full path to the program.
+=PATH=, but you can of course specify the full path to the program.
 
 
 * Advanced Features
@@ -700,7 +700,37 @@ started using Ebib. However, Ebib has several more advanced features, which
 are described in this chapter.
 
 
-** Preloading =.bib= files
+** Screen Layout
+#screen-layout
+
+By default, Ebib takes over the entire Emacs frame it is started in. If you
+have a wide enough screen, however, it may be more convenient to have Ebib
+take up only part of the frame, so that you can have the LaTeX text you're
+working on and Ebib visible at the same time. The option [[#layout][Layout]] allows you
+to do this, by giving you the ability to choose between a full-frame or a
+split-frame layout.
+
+In the split-frame layout, the Ebib windows are displayed on the right of
+the current frame, with the left part free for your document. In this
+layout, some aspects of Ebib behave somewhat differently. Most importantly,
+the multiline edit buffer is not displayed in the lower Ebib window, but in
+the non-Ebib window on the left. (Obviously, after leaving the multiline
+edit buffer, the original buffer is restored to that window.)
+
+Furthermore, pressing =z= in the index buffer leaves Ebib, but keeps the
+buffers visible. You can get back to Ebib with the command =M-x ebib= (or any
+key bound to it, of course), or simply by manually switching to the index
+buffer. If you want to remove the Ebib buffers from the frame but keep Ebib
+in the background, you can use =Z= (i.e. capital =Z=) in the index
+buffer. (Note that =Z= is also available in the full-frame layout, but there
+it is identical to =z=.)
+
+Lastly, the command =ebib-entry-summary= checks whether the Ebib buffers are
+visible in the frame. If they are, it does not output the entry info in a
+=*Help*= buffer, but rather displays the entry in Ebib itself.
+
+
+** Preloading =.bib= Files
 
 Chances are that you will be doing most of your work with one or a few =.bib=
 files, and you may find yourself opening the same file or files every time
@@ -1283,8 +1313,6 @@ filename.
 
   =G= :: equivalent to =End=.
 
-  =h= :: show help for the index buffer. =(ebib-index-help)=
-
   =H= :: show/hide hidden fields. =(ebib-toggle-hidden)=
 
   =j= :: equivalent to =Down=.
@@ -1363,7 +1391,9 @@ prefix argument, to another database.
   =X= :: export the =@preamble= definition to a file or, when used with a
 numeric prefix argument, to another database. =(ebib-export-preamble)=
 
-  =z= :: lower Ebib. =(ebib-lower)=
+  =z= :: move focus away from the Ebib windows. =(ebib-leave-ebib-windows)=
+
+  =Z= :: put Ebib in the background. =(ebib-lower)=
 
 One function is not bound to any key: =ebib-print-filename=.
 
@@ -1401,8 +1431,6 @@ filename.
   =g= :: equivalent to =Home=.
   
   =G= :: equivalent to =End=.
-
-  =h= :: show help for the entry buffer. =(ebib-entry-help)=
 
   =j= :: go to the next field. =(ebib-next-field)=
 
@@ -1468,8 +1496,6 @@ asked for confirmation. =(ebib-delete-string)=
   =g= :: equivalent to =Home=.
   
   =G= :: equivalent to =End=.
-
-  =h= :: show help for the strings buffer. =(ebib-strings-help)=
 
   =j= :: equivalent to =Down=.
 
@@ -1540,6 +1566,16 @@ one field per line, press the =INS= button to add more fields.
 
 By default, the following additional fields are defined: =crossref, url,
 annote, abstract, keywords, file= and =timestamp=.
+
+
+*** Layout
+#layout
+
+The default value of this option is =full=, which means that Ebib takes over
+the entire frame when it runs. Alternatively, you can select to specify a
+width (in characters) yourself, in which case Ebib takes up the right part
+of the frame, leaving the left part free. See [[#screen-layout][Screen Layout]] for details.
+
 
 
 *** Index Window Size
@@ -1713,7 +1749,7 @@ leave the program field blank for the relevant file type.
 *** File Regexp
 #file-regexp
 
-In order to find files in an field, Ebib uses a regural expression. The
+In order to find files in a field, Ebib uses a regular expression. The
 default value is:
 
 <example>
@@ -1721,10 +1757,13 @@ default value is:
 </example>
 
 This essentially means that every string of characters not containing any
-of the characters <example>? | \ : * < > "</example> or space, newline, tab
-of formfeed. URLs can easily by recognised by the prefix =http:=, but
-recognising files is not so straightforward. It is therefore not advisable
-to put anything but filenames in the =file= field.
+of the characters
+
+<example>? | \ : * < > "</example>
+
+or space, newline, tab of formfeed. URLs can easily by recognised by the
+prefix =http:=, but recognising files is not so straightforward. It is
+therefore not advisable to put anything but filenames in the =file= field.
 
 
 *** File Search Dirs

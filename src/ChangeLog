@@ -1,7 +1,94 @@
+2008-06-15  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-read-string): bug fix: ebib would choke on bibtex
+	entries that have a space after the entry type but before the
+	opening parenthesis/brace. bug reported and fix provided by Rupert
+	Swarbrick.
+
+2008-05-31  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-index-window-size): "key buffer" in the doc string
+	changed to "index buffer".
+
+2008-05-30  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-call-file-viewer): modified to use
+	file-name-extension. is probably a safer bet that what i used
+	before: (last1 (split-string file "\\.")).
+
+2008-05-21  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-add-entry): bugfix: moved the code that creates
+	the hash table up, so that it appears before ebib-display-entry.
+
+2008-04-21  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el: fixed doc strings.
+
 2008-04-20  Joost Kremers  <joostkremers@yahoo.com>
 
-	* ebib.el (ebib-export-to-db): modified to use gensym.
+	* ebib.el (ebib-entry-summary): modified: if the ebib buffers are
+	visible, instead of putting the output in a temp buffer, the
+	relevant entry is displayed in the ebib buffers.
+	(ebib) help mode removed.
+	(ebib-show-log): modified: in split-frame layout the window's
+	dedicated flag must be temporarily unset in order to switch to the
+	strings-buffer.
+	(ebib-quit-log-buffer): same.
+	(ebib-set-index-highlight): modified: move cursor to beginning of
+	line after setting the highlight.
+	(ebib-set-fields-highlight): same.
+	(ebib-set-strings-highlight): same.
+	(ebib-edit-entry): removed goto-char and switch-to-buffer.
+	(line-number-at-pos): this is called line-number in xemacs, so an
+	alias is defined.
+	(ebib-match-paren-forward): added "" to error, to keep xemacs from complaining.
+	(ebib-match-quote-forward): same.
+	(ebib-setup-windows): added delete-other-windows in full-frame layout.
+	(ebib-export-to-db): modified to use gensym.
 	(ebib-export-to-file): same.
+
+2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-pre-ebib-window): new.
+	(ebib-setup-windows): added ebib-pre-ebib-window.
+	(ebib-quit): added ebib-pre-ebib-window.
+	(ebib-lower): modified to use ebib-pre-ebib-window.
+	(ebib-edit-entry-type): modified to use ebib-layout.
+	(ebib-edit-crossref): same.
+	(ebib-fill-entry-buffer): added skip-chars-forward: the cursor
+	usually appears directly after the field name.
+	(ebib-edit-crossref): modified to make the crossref field the
+	current field again.
+	(ebib-redisplay-current-field): same.
+	(ebib-temp-window): new.
+	(ebib-leave-multiline-edit): removed.
+	(ebib-leave-multiline-edit-buffer): new.
+	(ebib-quit-multiline-edit): new.
+	(ebib-cancel-multiline-edit): modified to use
+	ebib-leave-multiline-edit-buffer.
+	(ebib-edit-multiline-field): modified to use ebib-temp-window.
+	(ebib-edit-multiline-string): same.
+	(ebib-multiline-edit): modified: sets the buffer's modified flag
+	to nil.
+	(ebib-edit-strings): modified: in split-frame layout the window's
+	dedicated flag must be temporarily unset in order to switch to the
+	strings-buffer.
+	(ebib-quit-strings-buffer): same.
+
+2008-04-19  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib): added nil as second argument (norecord) to
+	select-window.
+	(ebib-setup-windows): modified. now uses ebib-layout to choose the
+	desired window layout.
+	(ebib-delete-window): removed. i really don't think we need this.
+	(ebib-lower): removed call to ebib-delete-windows.
+	(ebib-quit): modified: put all the kill-buffers into a mapc.
+	(ebib-select-other-window): removed.
+	(ebib-leave-ebib-windows): new. bound to "z" and "C-xb".
+	(ebib-lower): modified: now simply leaves the ebib buffers if
+	requested. rebound to "Z".
 
 2008-04-18  Joost Kremers  <joostkremers@yahoo.com>
 
@@ -24,6 +111,7 @@
 
 2008-04-11  Joost Kremers  <joostkremers@yahoo.com>
 
+	* ebib.el (ebib-layout): new.
 	* ebib.el (ebib-add-entry): used ebib-display-entry to insert the
 	new entry in the buffer.
 
@@ -33,6 +121,18 @@
 	that puts the new entry key into the buffer. this way
 	ebib-set-index-highlight doesn't put the end of the highlight at
 	the next line.
+
+2008-03-26  Morgan Veyret  <patzy@appart.kicks-ass.net>
+
+	* ebib.el (ebib): changed to check if ebib is visible
+	already. window setup moved to ebib-setup-windows.
+	(ebib-setup-windows): new.
+	(ebib-delete-windows): new.
+	(ebib-select-other-window): new. Bound to C-xb.
+	(ebib-quit-entry-buffer): use get-buffer-window to find the index
+	buffer.
+	(ebib-entry-summary): modified to direct output to *Ebib-entry*
+	buffer.
 
 2008-03-26  Joost Kremers  <joostkremers@yahoo.com>
 
