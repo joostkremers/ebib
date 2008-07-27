@@ -1,0 +1,26 @@
+\input texinfo  @c -*-texinfo-*-
+
+@setfilename <lisp>(concat (muse-page-name) ".info")</lisp>
+@settitle <lisp>(muse-publishing-directive "title")</lisp>
+
+@documentencoding iso-8859-1
+
+@iftex
+@finalout
+@end iftex
+
+@titlepage
+@title <lisp>(muse-publishing-directive "title")</lisp>
+@author <lisp>(muse-publishing-directive "author")</lisp>
+@end titlepage
+
+@dircategory Emacs
+@direntry
+     * Ebib: (ebib).           A BibTeX database manager that runs in Emacs and XEmacs
+@end direntry
+
+<lisp>(and muse-publish-generate-contents "@contents")</lisp>
+
+@node Top, Overview, , (dir)
+@top Overview
+@c Page published by Emacs Muse begins here
