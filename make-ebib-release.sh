@@ -24,7 +24,8 @@ echo
 
 (cd $BASE/manual
     if [ -f html/ebib-manual.html ] ; then
-	mv html/ebib-manual.html ebib-manual.css ../"$full_name"/doc/html/
+	mv html/ebib-manual.html ../"$full_name"/doc/html/
+	cp ebib-manual.css ../"$full_name"/doc/html/
 	echo "Moved html manual to $full_name/doc/html/"
     else
 	echo Warning: ebib-manual.html not found!
