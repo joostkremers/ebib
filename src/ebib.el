@@ -193,8 +193,6 @@ Each string is added to the preamble on a separate line."
   :group 'ebib
   :type 'boolean)
 
-(defvar ebib-entry-types-hash (make-hash-table)
-  "Holds the hash table containing the entry type definitions.")
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
 
@@ -204,13 +202,11 @@ Each string is added to the preamble on a separate line."
       `(add-to-list (quote ,listvar) ,element ,append)
     `(add-to-list (quote ,listvar) ,element ,append ,fn)))
 
-(defun ebib-set-entry-types-hash (var value)
-  "Sets EBIB-ENTRY-TYPES-HASH on the basis of EBIB-ENTRY-TYPES"
+(defun ebib-set-unique-field-list (var value)
+  "Sets EBIB-UNIQUE-FIELD-LIST on the basis of EBIB-ENTRY-TYPES"
   (set-default var value)
-  (clrhash ebib-entry-types-hash)
   (setq ebib-unique-field-list nil)
   (mapc #'(lambda (entry)
-	    (puthash (car entry) (cdr entry) ebib-entry-types-hash)
 	    (mapc #'(lambda (field)
 		      (add-to-listq ebib-unique-field-list field t 'eq))
 		  (cadr entry))
@@ -277,7 +273,7 @@ Each string is added to the preamble on a separate line."
   :type '(repeat (list :tag "Entry type" (symbol :tag "Name")
 		       (repeat :tag "Obligatory fields" (symbol :tag "Field"))
 		       (repeat :tag "Optional fields" (symbol :tag "Field"))))
-  :set 'ebib-set-entry-types-hash)
+  :set 'ebib-set-unique-field-list)
 
 ;; generic for all databases
 
@@ -718,11 +714,11 @@ display the actual filename."
 
 (defun ebib-get-obl-fields (entry-type)
   "Returns the obligatory fields of ENTRY-TYPE."
-  (car (gethash entry-type ebib-entry-types-hash)))
+  (nth 1 (assoc entry-type ebib-entry-types)))
 
 (defun ebib-get-opt-fields (entry-type)
   "Returns the optional fields of ENTRY-TYPE."
-  (cadr (gethash entry-type ebib-entry-types-hash)))
+  (nth 2 (assoc entry-type ebib-entry-types)))
 
 (defun ebib-get-all-fields (entry-type)
   "Returns all the fields of ENTRY-TYPE."
@@ -1576,7 +1572,7 @@ is set to T."
 	     ((equal entry-type "comment") ; ignore comments
 	      (ebib-log 'log "Comment at line %d ignored" (line-number-at-pos))
 	      (ebib-match-paren-forward (point-max)))
-	     ((gethash (intern-soft entry-type) ebib-entry-types-hash) ; if the entry type has been defined
+	     ((assoc (intern-soft entry-type) ebib-entry-types) ; if the entry type has been defined
 	      (if (ebib-read-entry entry-type timestamp)
 		  (setq n-entries (1+ n-entries))))
 	     ;; anything else we report as an unknown entry type.
@@ -2835,13 +2831,12 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 	(if (eq ebib-layout 'full)
 	    (other-window 1)
 	  (select-window ebib-pre-ebib-window) nil)
-	(let ((collection (ebib-create-collection ebib-entry-types-hash)))
-	  (if-str (new-type (completing-read "type: " collection nil t))
-	      (progn
-		(puthash 'type* (intern-soft new-type) ebib-cur-entry-hash)
-		(ebib-fill-entry-buffer)
-		(setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
-		(ebib-set-modified t)))))
+	(if-str (new-type (completing-read "type: " ebib-entry-types nil t))
+	    (progn
+	      (puthash 'type* (intern-soft new-type) ebib-cur-entry-hash)
+	      (ebib-fill-entry-buffer)
+	      (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
+	      (ebib-set-modified t))))
     (select-window (get-buffer-window ebib-entry-buffer) nil)))
   
 (defun ebib-edit-crossref ()

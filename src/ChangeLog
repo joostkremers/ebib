@@ -1,3 +1,14 @@
+2008-08-01  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-entry-types-hash): removed.
+	(ebib-set-entry-types-hash): removed.
+	(ebib-set-unique-field-list): new.
+	(ebib-get-obl-fields): modified to use ebib-entry-types directly,
+	rather than the (now defunct) ebib-entry-types-hash.
+	(ebib-get-opt-fields): same.
+	(ebib-find-bibtex-entries): same.
+	(ebib-edit-entry-type): same.
+
 2008-06-15  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-read-string): bug fix: ebib would choke on bibtex
