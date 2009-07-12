@@ -72,12 +72,11 @@ with the left side free for another window."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
-(defcustom ebib-insertion-strings '((0 . "%s")
-				    (1 . "\\cite{%s}"))
-  "*The string to insert when calling EBIB-INSERT-BIBTEX-KEY.
-The directive \"%s\" is replaced with the entry key."
+(defcustom ebib-insertion-commands '(("cite" . 1))
+  "*A list of commands that can be used to insert an entry into a (La)TeX buffer.
+For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
-  :type '(repeat (cons :tag "Insertion string" (integer :tag "Number") (string))))
+  :type '(repeat (cons :tag "Command" (string) (integer :tag "Optional arguments"))))
 
 (defcustom ebib-sort-order nil
   "*The fields on which the BibTeX entries are to be sorted in the .bib file.
@@ -1292,8 +1291,8 @@ killed and the database has been modified."
 				    ebib-latex-entries
 				    ebib-mark-entry
 				    ebib-print-entries
-				    ebib-export-entry
-				    ebib-push-entry-key)))
+				    ebib-push-bibtex-key
+				    ebib-export-entry)))
 
 ;; macro to redefine key bindings.
 
@@ -1363,7 +1362,7 @@ killed and the database has been modified."
 (ebib-key index [(control n)] ebib-next-entry)
 (ebib-key index [(meta n)] ebib-index-scroll-up)
 (ebib-key index "o" ebib-load-bibtex-file)
-(ebib-key index "p" ebib-push-entry-key)
+(ebib-key index "p" ebib-push-bibtex-key)
 (ebib-key index [(control p)] ebib-prev-entry)
 (ebib-key index [(meta p)] ebib-index-scroll-down)
 (ebib-key index "P" ebib-print-entries)
@@ -2651,27 +2650,45 @@ modified."
   (unless (eq ebib-layout 'full)
     (set-window-dedicated-p (selected-window) t)))
 
-(defun ebib-push-entry-key (prefix)
+(defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
 The user is prompted for the buffer to push the entry into."
-  (interactive "p")
+  (interactive)
   (let ((called-with-prefix (ebib-called-with-prefix)))
     (ebib-execute-when
       ((entries)
-       (let ((buffer (read-buffer "Push entry(ies) to buffer: " ebib-push-buffer t)))
+       (let ((buffer (read-buffer (if called-with-prefix
+				      "Push marked entries to buffer: "
+				    "Push entry to buffer: ")
+				  ebib-push-buffer t))
+	     insert-string)
 	 (when buffer
 	   (setq ebib-push-buffer buffer)
-	   (let ((latex-cmd (or (cdr (assoc prefix ebib-insertion-strings))
-				"{%s}"))
-		 (latex-arg (if called-with-prefix
-				(when (edb-marked-entries ebib-cur-db)
-				  (mapconcat #'(lambda (x) x)
-					     (edb-marked-entries ebib-cur-db)
-					     ","))
-			      (car (edb-cur-entry ebib-cur-db)))))
+	   (let ((keys (if called-with-prefix
+			   (when (edb-marked-entries ebib-cur-db)
+			     (mapconcat #'(lambda (x) x)
+					(edb-marked-entries ebib-cur-db)
+					","))
+			 (car (edb-cur-entry ebib-cur-db)))))
+	     (if-str (command (completing-read "Command to use: " ebib-insertion-commands
+					       nil nil nil ebib-insertion-commands))
+		 (let* ((n-opt-args (or
+				     (cdr (assoc command ebib-insertion-commands))
+				     1))
+			(opt-args (loop for i from 1 to n-opt-args
+					collect (read-from-minibuffer (format "Optional argument %d: " i)))))
+		   (while (equal (car opt-args) "")  ; empty args at the beginning of the list don't need
+		     (setq opt-args (cdr opt-args))) ; to be included.
+		   (setq insert-string (format "\\%s%s{%s}" command
+					       (mapconcat #'(lambda (str)
+							      (format "[%s]" str))
+							  opt-args "")
+					       keys)))
+	       (setq insert-string keys)))
+	   (when insert-string
 	     (save-excursion
 	       (set-buffer buffer)
-	       (insert (format latex-cmd latex-arg)))
+	       (insert insert-string))
 	     (message "Pushed entries to buffer %s" buffer)))))
       ((default)
        (beep)))))
@@ -3481,18 +3498,18 @@ returns the symbol NONE."
 		    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*"))
 	  'none)))))
 
-(defun ebib-insert-bibtex-key (prefix)
+(defun ebib-insert-bibtex-key ()
   "Inserts a BibTeX key at POINT.
 The user is prompted for a BibTeX key and has to choose one from
 the database(s) associated with the current LaTeX file, or from
 the current database if there is no \\bibliography command. Tab
 completion works."
-  (interactive "p")
+  (interactive)
   (ebib-execute-when
     ((database)
      (or ebib-local-bibtex-filenames
 	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let (collection)
+     (let (collection insert-string)
        (if (eq ebib-local-bibtex-filenames 'none)
 	   (if (null (edb-cur-entry ebib-cur-db))
 	       (error "No entries found in current database")
@@ -3507,14 +3524,25 @@ completion works."
 		      (t (setq collection (append (ebib-create-collection (edb-database db))
 						  collection))))))
 	       ebib-local-bibtex-filenames))
-       (if collection
-	   (let* ((latex-cmd (or (cdr (assoc prefix ebib-insertion-strings))
-				 "{%s}"))
-		  (key (completing-read (format "Insert \"%s\" with key: " latex-cmd)
-					collection nil t nil ebib-minibuf-hist)))
-	     (when key
-	       (insert (format (or (cdr (assoc prefix ebib-insertion-strings))
-				   "{%s}") key)))))))
+       (when collection
+	 (let ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist)))
+	   (if-str (command (completing-read "Command to use: " ebib-insertion-commands
+					     nil nil nil ebib-insertion-commands))
+	       (let* ((n-opt-args (or
+				   (cdr (assoc command ebib-insertion-commands))
+				   1))
+		      (opt-args (loop for i from 1 to n-opt-args
+				      collect (read-from-minibuffer (format "Optional argument %d: " i)))))
+		 (while (equal (car opt-args) "")  ; empty args at the beginning of the list don't need
+		   (setq opt-args (cdr opt-args))) ; to be included.
+		 (setq insert-string (format "\\%s%s{%s}" command
+					     (mapconcat #'(lambda (str)
+							    (format "[%s]" str))
+							opt-args "")
+					     key)))
+	     (setq insert-string key)))
+	 (when insert-string
+	   (insert insert-string)))))
     ((default)
      (error "No database loaded"))))
 

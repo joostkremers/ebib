@@ -405,25 +405,24 @@ Having a BibTeX database manager running inside Emacs has an additional
 advantage: it makes it trivially easy to insert BibTeX keys in your LaTeX
 documents.
 
-Ebib provides two functions for this. First, if you're in a LaTeX buffer,
-you can call the function =ebib-insert-bibtex-key=. When you invoke this
-command, Emacs prompts you for a key from the database(s) associated with
-the current buffer. You can type the key, using TAB-completion, and after
-hitting =RET=, Emacs puts a BibTeX citation at the cursor position in the
-current buffer with the key you selected.
+Ebib provides two functions for this. First, if you're in a LaTeX buffer, you
+can call the function =ebib-insert-bibtex-key=. When you invoke this command,
+Emacs prompts you for a key from the database(s) associated with the current
+buffer, a citation command (that has to be typed *without* the backslash) and any
+optional argument(s) the command allows. You can type the key using
+TAB-completion, and after hitting =RET=, Emacs puts a BibTeX citation at the
+cursor position in the current buffer with the key you selected.
 
-You can also do it the other way around: if you're in the index buffer in
-Ebib, you can *push* an entry to a LaTeX buffer. To do this, use the key =p=.
-Ebib will ask you for a buffer to push the entry to, and will then insert
-the string =\cite{<key>}= at the current cursor position in the buffer you've
-supplied.
+You can also do it the other way around: if you're in the index buffer in Ebib,
+you can *push* an entry to a LaTeX buffer. To do this, use the key =p=. Ebib will
+ask you for a buffer to push the entry to, a citation command and also any
+optional arguments, and then insert a citation at the current cursor position in
+the buffer you've supplied.
 
-By default, both =ebib-insert-bibtex-key= and the command key =p= in the index
-buffer insert the key into the LaTeX buffer with command =\cite=. It is
-possible to change this, however. In fact, it is possible to define
-multiple insertion strings, so that you can have Ebib insert a variety of
-citation commands with an entry key. For details on defining and using
-custom insertion strings, see [[#insertion-strings][Insertion Strings]].
+For the citation command that =ebib-insert-bibtex-key= and the command key =p= ask
+for can be any command that you need. But it is also possible to predefine a
+list of citation commands which you can then enter at this prompt using tab
+completion. For details on setting this up, see [[#insertion-commands][Insertion Commands]].
 
 There is another function that is available outside Ebib:
 =ebib-entry-summary=. This command reads the key under the cursor in the
@@ -1344,7 +1343,7 @@ of references formatted by BibTeX. =(ebib-latex-database)=
   
   =o= :: open a =.bib= file. =(ebib-load-bibtex-file)=
 
-  =p= :: push an entry to a LaTeX buffer =(ebib-push-entry-key)=
+  =p= :: push an entry to a LaTeX buffer =(ebib-push-bibtex-key)=
 
   =; p= :: push the marked entries to a LaTeX buffer.
  
@@ -1593,45 +1592,27 @@ the key of each entry, but if this is too little information, you can use
 this option to display e.g. the title of each entry as well.
 
 
-*** Insertion Strings
-#insertion-strings
+*** Insertion Commands
+#insertion-commands
 
-With the command =ebib-insert-bibtex-key= or with the command key =p= in the
-index buffer, you can insert a BibTeX key into a LaTeX buffer. This option
-allows you to customise the string that Ebib inserts in the buffer.
+With the command =ebib-insert-bibtex-key= or with the command key =p= in the index
+buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you
+to define the commands that are available through tab completion when these
+functions ask for a citation command.
 
-In fact, it is possible to define multiple strings. Each string must be
-numbered: this number provides a way to identify the string that you want
-to use. You can select the desired string by calling =ebib-insert-bibtex-key=
-or by hitting =p= with a numeric prefix argument corresponding to the string.
+The citation commands must be given *without* the leading backslash, as Ebib adds one.
+Furthermore, you need to specify how many optional arguments each command can
+have. When Ebib prompts you for a citation key, it will ask for as many optional
+arguments as you specify here. (If you don't want to be asked for those optional
+arguments, just fill in 0.)
 
-Each string *must* contain a =%s= directive, which is replaced with the BibTeX
-key. For example, it is possible to define the following:
+When Ebib prompts you for a citation command, the commands specified in this
+option can be obtained through tab completion. However, it is not necessary to
+fill in a command from this list here. You can also enter another command (in
+which case Ebib asks for exactly one optional argument) or even no command at
+all. In the latter case, Ebib does not ask for any optional arguments and simply
+puts the key in the buffer without adding a backslash or curly braces.
 
-<example>
-0:  {%s}
-1:  \cite{%s}
-2:  \nocite{%s}
-</example>
-
-With this, typing =M-2 M-x ebib-insert-bibtex-key=, followed by a BibTeX key
-inserts the command <verb>\nocite{<key>}</verb> into the current
-buffer. Typing =M-2 p= in the index buffer does the same for the LaTeX buffer
-you choose. (Note that the prefix argument also works when you have bound
-=ebib-insert-bibtex-key= to a key sequence. That is, if you have bound it to
-say =C-c b=, typing =M-2 C-c b= inserts the second string.)
-
-Even if you have specified multiple strings, you can still use
-=ebib-insert-bibtex-key= or hit =p= without prefix argument. In that case, Ebib
-just inserts string number 1. Note that if you define only one custom
-string, it still needs to be numbered. Give it number 1, so that you can
-enter it without prefix argument.
-
-The default value of this option is =((0 . "%s") (1 . "\cite{%s}"))=. With
-this setting, both =ebib-insert-bibtex-key= and =p= insert the key with the
-LaTeX command <verb>\cite</verb> by default, and they can furthemore be
-used with a prefix argument =0= (i.e. =M-0 ebib-insert-bibtex-key= or =M-0 p=) to
-insert just the bare key, without a <verb>\cite</verb> command.
 
 
 *** Sort Order

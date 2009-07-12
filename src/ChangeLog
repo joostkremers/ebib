@@ -1,3 +1,10 @@
+2009-07-12  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-push-bibtex-key): renamed from ebib-push-entry-key
+	in accordance with ebib-insert-bibtex-key.
+	(ebib-insertion-commands): new.
+	(ebib-insertion-strings): removed.
+
 2008-08-01  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-entry-types-hash): removed.
