@@ -1359,6 +1359,7 @@ killed and the database has been modified."
 (ebib-key index "m" ebib-mark-entry)
 (ebib-key index "M" ebib-merge-bibtex-file)
 (ebib-key index "n" ebib-search-next)
+(ebib-key index "N" ebib-search-crossref)
 (ebib-key index [(control n)] ebib-next-entry)
 (ebib-key index [(meta n)] ebib-index-scroll-up)
 (ebib-key index "o" ebib-load-bibtex-file)
@@ -2283,6 +2284,14 @@ only that field is searched."
 		     (setq result (cons field result))))
 	       entry))
     result))
+
+(defun ebib-search-crossref ()
+  "Searches the database for the key of the current entry.
+This is useful in searching the entries that cross-reference the
+current entry."
+  (interactive)
+  (setq ebib-search-string (car (edb-cur-entry ebib-cur-db)))
+  (ebib-search-next))
 
 (defun ebib-edit-strings ()
   "Edits the @STRING definitions in the database."
@@ -3578,7 +3587,7 @@ be found."
 	   (error "Entry `%s' not found" key)
 	 (let ((index-window (get-buffer-window ebib-index-buffer)))
 	   (if (not index-window)
-	       (with-output-to-temp-buffer "*Help*"
+	       (with-help-window "*Help*"
 		 (ebib-format-fields entry 'princ))
 	     (with-selected-window index-window
 	       (setq ebib-cur-db database)
