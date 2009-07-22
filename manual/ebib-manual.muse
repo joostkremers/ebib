@@ -419,10 +419,10 @@ ask you for a buffer to push the entry to, a citation command and also any
 optional arguments, and then insert a citation at the current cursor position in
 the buffer you've supplied.
 
-For the citation command that =ebib-insert-bibtex-key= and the command key =p= ask
-for can be any command that you need. But it is also possible to predefine a
-list of citation commands which you can then enter at this prompt using tab
-completion. For details on setting this up, see [[#insertion-commands][Insertion Commands]].
+The citation command that =ebib-insert-bibtex-key= and the command key =p= ask for
+can be any command that you need. But it is also possible to predefine a list of
+citation commands which you can then enter at this prompt using tab completion.
+For details on setting this up, see [[#insertion-commands][Insertion Commands]].
 
 There is another function that is available outside Ebib:
 =ebib-entry-summary=. This command reads the key under the cursor in the
