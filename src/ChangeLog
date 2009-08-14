@@ -1,10 +1,15 @@
+2009-08-15  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-multiline-edit-mode): changed into a minor mode
+	that provides key bindings for saving and leaving the multiline
+	edit buffer.
+
 2009-08-14  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-multiline-mode): new.
 	(ebib-create-buffers): changed to set the major mode of the
 	multiline edit buffer to the value of ebib-multiline-mode instead
 	of to ebib-multiline-edit-mode.
-	(ebib-multiline-edit-mode): removed.
 
 2009-07-13  Joost Kremers  <joostkremers@yahoo.com>
 

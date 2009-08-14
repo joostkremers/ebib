@@ -1227,6 +1227,7 @@ buffers and reads the rc file."
   (setq ebib-multiline-buffer (get-buffer-create "*Ebib-edit*"))
   (set-buffer ebib-multiline-buffer)
   (funcall ebib-multiline-mode)
+  (ebib-multiline-edit-mode t)
   ;; then we create a buffer to hold the fields of the current entry.
   (setq ebib-entry-buffer (get-buffer-create " *Ebib-entry*"))
   (set-buffer ebib-entry-buffer)
@@ -3316,13 +3317,11 @@ to append them to."
 ;; multiline edit ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-;; (define-derived-mode ebib-multiline-edit-mode
-;;   text-mode "Ebib-edit"
-;;   "Major mode for editing multiline values in Ebib."
-;;   ;; we redefine some basic keys because we need them to leave this buffer.
-;;   (local-set-key "\C-xb" 'ebib-quit-multiline-edit)
-;;   (local-set-key "\C-x\C-s" 'ebib-save-from-multiline-edit)
-;;   (local-set-key "\C-xk" 'ebib-cancel-multiline-edit))
+(define-minor-mode ebib-multiline-edit-mode
+  "Minor mode for Ebib's multiline edit buffer."
+  nil nil '(("\C-c|q" . ebib-quit-multiline-edit)
+	    ("\C-c|c" . ebib-cancel-multiline-edit)
+	    ("\C-c|s" . ebib-save-from-multiline-edit)))
 
 (defun ebib-multiline-edit (type &optional starttext)
   "Switches to Ebib's multiline edit buffer.
