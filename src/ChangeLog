@@ -3,6 +3,8 @@
 	* ebib.el (ebib-multiline-edit-mode): changed into a minor mode
 	that provides key bindings for saving and leaving the multiline
 	edit buffer.
+	(ebib-key): modified to allow customising the second key in the
+	bindings in the multiline edit buffer.
 
 2009-08-14  Joost Kremers  <joostkremers@yahoo.com>
 

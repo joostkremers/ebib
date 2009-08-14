@@ -352,8 +352,10 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (defvar ebib-current-field nil "The current field.") 
 (defvar ebib-current-string nil "The current @STRING definition.")
 
-;; the prefix key is stored in a variable so that the user can customise it.
+;; the prefix key and the multiline key are stored in a variable so that the
+;; user can customise them.
 (defvar ebib-prefix-key ?\;)
+(defvar ebib-multiline-key ?\|)
 
 ;; this is an AucTeX variable, but we want to check its value, so let's
 ;; keep the compiler from complaining.
@@ -1320,7 +1322,16 @@ killed and the database has been modified."
     `(progn
        (define-key ebib-index-mode-map (format "%c" ebib-prefix-key) nil)
        (define-key ebib-index-mode-map ,key 'ebib-prefix-map)
-       (setq ebib-prefix-key (string-to-char ,key))))))
+       (setq ebib-prefix-key (string-to-char ,key))))
+   ((eq buffer 'multiline)
+    `(progn
+       (define-key ebib-multiline-edit-mode-map "\C-c" nil)
+       (mapc #'(lambda (command)
+		 (define-key ebib-multiline-edit-mode-map (format "\C-c%s%c" ,key (car command)) (cdr command)))
+	     '((?q . ebib-quit-multiline-edit)
+	       (?c . ebib-cancel-multiline-edit)
+	       (?s . ebib-save-from-multiline-edit)))
+       (setq ebib-multiline-key (string-to-char ,key))))))
 
 (defvar ebib-index-mode-map
   (let ((map (make-keymap)))
