@@ -78,6 +78,11 @@ For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
   :type '(repeat (cons :tag "Command" (string) (integer :tag "Optional arguments"))))
 
+(defcustom ebib-multiline-mode 'text-mode
+  "*The major mode of the multiline edit buffer."
+  :group 'ebib
+  :type '(function :tag "Mode function"))
+
 (defcustom ebib-sort-order nil
   "*The fields on which the BibTeX entries are to be sorted in the .bib file.
 Sorting is done on different sort levels, and each sort level contains one
@@ -1221,7 +1226,7 @@ buffers and reads the rc file."
   ;; present in an edit buffer.
   (setq ebib-multiline-buffer (get-buffer-create "*Ebib-edit*"))
   (set-buffer ebib-multiline-buffer)
-  (ebib-multiline-edit-mode)
+  (funcall ebib-multiline-mode)
   ;; then we create a buffer to hold the fields of the current entry.
   (setq ebib-entry-buffer (get-buffer-create " *Ebib-entry*"))
   (set-buffer ebib-entry-buffer)
@@ -3307,17 +3312,17 @@ to append them to."
   (select-window (ebib-temp-window) nil)
   (ebib-multiline-edit 'string (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;
-;; multiline edit mode ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;
+;; multiline edit ;;
+;;;;;;;;;;;;;;;;;;;;
 
-(define-derived-mode ebib-multiline-edit-mode
-  text-mode "Ebib-edit"
-  "Major mode for editing multiline values in Ebib."
-  ;; we redefine some basic keys because we need them to leave this buffer.
-  (local-set-key "\C-xb" 'ebib-quit-multiline-edit)
-  (local-set-key "\C-x\C-s" 'ebib-save-from-multiline-edit)
-  (local-set-key "\C-xk" 'ebib-cancel-multiline-edit))
+;; (define-derived-mode ebib-multiline-edit-mode
+;;   text-mode "Ebib-edit"
+;;   "Major mode for editing multiline values in Ebib."
+;;   ;; we redefine some basic keys because we need them to leave this buffer.
+;;   (local-set-key "\C-xb" 'ebib-quit-multiline-edit)
+;;   (local-set-key "\C-x\C-s" 'ebib-save-from-multiline-edit)
+;;   (local-set-key "\C-xk" 'ebib-cancel-multiline-edit))
 
 (defun ebib-multiline-edit (type &optional starttext)
   "Switches to Ebib's multiline edit buffer.
