@@ -743,7 +743,7 @@ Apart from database entries, BibTeX allows three more types of elements to
 appear in a =.bib= file. These are =@comment=, =@preamble= and =@string= definitions.
 Ebib provides facilities to handle the latter two. =@comment= definitions cannot
 be added to a =.bib= file through Ebib, and if Ebib finds one in a =.bib= file, it
-is simply ignored.
+is simply ignored (and dropped from the file when you save it).
 
 =@preamble= and =@string= definitions can be handled, however. Ebib allows you to
 add one =@preamble= definition to the database. In principle, BibTeX allows more
@@ -767,8 +767,8 @@ file:
 Creating or editing a =@preamble= definition in Ebib is done by hitting =P=
 (uppercase =P=) in the index buffer. Ebib uses the multiline edit buffer for
 editing the text of the =@preamble= definition, which means that as discussed
-above, =C-x b= stores the =@preamble= text and returns focus to the index buffer,
-while =C-x k= returns focus to the index buffer while abandoning any changes you
+above, =C-c | q= stores the =@preamble= text and returns focus to the index buffer,
+while =C-c | c= returns focus to the index buffer while abandoning any changes you
 may have made. (For details on using the multiline edit buffer, see
 [[#multiline-edit-buffer][The Multiline Edit Buffer]].)
 
