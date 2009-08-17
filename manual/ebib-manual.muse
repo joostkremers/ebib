@@ -569,6 +569,12 @@ instead of simply providing a <verb>\nocite{*}</verb> command, this file
 contains a =tabular= environment for each entry in the database listing all the
 fields of that entry and their values.
 
+The entries are separated by a =\bigskip=, but if you set the option =Print Newpage=
+in the customisation buffer (or in the Print menu), the entries are separated by
+a =\newpage=, so that every entry is on a separate page. The latter option is
+useful when printing actual index cards (though you'd probably have to change
+the page size with the =geometry= package as well).
+
 By default, the index cards only show single-line field values. That is,
 multiline values are normally excluded. If you want to include multiline values
 in the print-out, you have to set the option =Print Multiline= in the Options menu
@@ -1234,6 +1240,10 @@ defaults that can be defined in the customisation buffer. Setting or unsetting
 them in the Options menu only changes them for the duration of your Emacs
 session, it doesn't affect the default setting.
 
+The same is true for the printing options that are in the Print menu. When set
+or unset in the menu, the default values specified in the customisation buffer
+do not change.
+
 
 * The Ebib Buffers
 #ebib-buffers
@@ -1756,6 +1766,13 @@ This option specifies the preamble that is to be added to the LaTeX file Ebib
 creates for printing the database as index cards. By default, the preamble is
 empty. You can set your own <verb>\usepackage</verb> commands, or anything else
 you may need.
+
+
+*** Print Newline
+
+With this option set, Ebib puts every entry on a separate page when printing
+index cards. When this option is unset (the default), the entries are separated
+by a small amount of whitespace only.
 
 
 *** Print Multiline

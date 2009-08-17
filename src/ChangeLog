@@ -38,6 +38,11 @@
 	(ebib-multiline-mode): renamed from ebib-multiline-edit-mode.
 	(ebib-multiline-menu): new.
 	(ebib-multiline-help): new.
+	(ebib-print-newpage): new.
+	(ebib-print-entries): now uses ebib-print-newpage.
+	(ebib-index-menu): updated: moved the print options to the print
+	menu; added option for ebib-print-newpage.
+	(ebib-toggle-print-newpage): new.
 
 2009-08-15  Joost Kremers  <joostkremers@yahoo.com>
 

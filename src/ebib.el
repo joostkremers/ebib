@@ -182,6 +182,11 @@ Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
 
+(defcustom ebib-print-newpage nil
+  "*If set, each entry is printed on a separate page."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-print-multiline nil
   "*If set, multiline fields are included when printing the database."
   :group 'ebib
@@ -1444,8 +1449,12 @@ killed and the database has been modified."
     ["Open URL" ebib-browse-url (gethash ebib-standard-url-field ebib-cur-entry-hash)]
     ["View File" ebib-view-file (gethash ebib-standard-file-field ebib-cur-entry-hash)]
     ("Print Entries"
+     ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
      ["As Index Cards" ebib-print-entries ebib-cur-db]
-     ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-virtual ebib-cur-db)))])
+     ["Print Multiline Fields" ebib-toggle-print-multiline :enable t
+      :style toggle :selected ebib-print-multiline]
+     ["Print Cards on Separate Pages" ebib-toggle-print-newpage :enable t
+      :style toggle :selected ebib-print-newpage])
     "--"
     ("Options"
      ["Show Hidden Fields" ebib-toggle-hidden :enable t
@@ -1456,8 +1465,6 @@ killed and the database has been modified."
       :style toggle :selected ebib-save-xrefs-first]
      ["Allow Identical Fields" ebib-toggle-identical-fields :enable t
       :style toggle :selected ebib-allow-identical-fields]
-     ["Print Multiline Fields" ebib-toggle-print-multiline :enable t
-      :style toggle :selected ebib-print-multiline]
      ["Full Layout" ebib-toggle-layout :enable t
       :style toggle :selected (eq ebib-layout 'full)]
      ["Modify Entry Types" ebib-customize-entry-types t] 
@@ -2162,11 +2169,6 @@ Can also be used to change a virtual database into a real one."
   (interactive)
   (setq ebib-allow-identical-fields (not ebib-allow-identical-fields)))
 
-(defun ebib-toggle-print-multiline ()
-  "Toggle whether multiline fields are printed."
-  (interactive)
-  (setq ebib-print-multiline (not ebib-print-multiline)))
-
 (defun ebib-toggle-layout ()
   "Toggles the Ebib layout."
   (interactive)
@@ -2175,6 +2177,16 @@ Can also be used to change a virtual database into a real one."
     (setq ebib-layout 'full))
   (ebib-lower)
   (ebib))
+
+(defun ebib-toggle-print-newpage ()
+  "Toggle whether index cards are printed with a newpage after each card."
+  (interactive)
+  (setq ebib-print-newpage (not ebib-print-newpage)))
+  
+(defun ebib-toggle-print-multiline ()
+  "Toggle whether multiline fields are printed."
+  (interactive)
+  (setq ebib-print-multiline (not ebib-print-multiline)))  
 
 (defun ebib-delete-entry ()
   "Deletes the current entry from the database."
@@ -2483,7 +2495,9 @@ Either prints the entire database, or the marked entries."
 							   field (to-raw value))))))
 				 (cdr (ebib-get-all-fields (gethash 'type* entry)))))
 			 (insert "\\end{tabular}\n\n")
-			 (insert "\\bigskip\n\n"))
+			 (insert (if ebib-print-newpage
+				     "\\newpage\n\n"
+				   "\\bigskip\n\n")))
 		     entries)
 	       (insert "\\end{document}\n")
 	       (write-region (point-min) (point-max) tempfile))
