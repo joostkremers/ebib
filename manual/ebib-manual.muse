@@ -40,6 +40,14 @@ for XEmacs):
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 </example>
 
+On a default installation, the load path probably only contains system
+directories. If you want to put =ebib.el= somewhere in your home directory, you
+can create a directory and add it to your load path:
+
+<example>
+(setq load-path (cons "~/.emacs.d" load-path))
+</example>
+
 Note: if you do not know what your load path is set to, go to the =*scratch*=
 buffer, type =load-path= on an empty line, put the cursor right after it and type
 =C-j=. The value of =load-path= will then appear in the buffer.
@@ -68,7 +76,7 @@ emacs -batch -f batch-byte-compile ebib.el
 
 (Substitute =emacs= with =xemacs= if you use XEmacs.) This will create a file
 =ebib.elc=, which Emacs will load instead of =ebib.el=. Byte-compiling Ebib may
-produce a warning about functions that are ``not known to be defined''. This can
+produce a warning about functions that are "not known to be defined". This can
 be safely ignored. GNU Emacs and XEmacs have some small differences, and the
 functions reported in this warning are those used by the other version. Ebib
 makes sure that the correct functions are called.
@@ -95,6 +103,9 @@ In this chapter, all basic functions of Ebib are described, so that you can get
 startet with it. At times, reference will be made to later chapters, where more
 specific functions are described.
 
+Ebib has a menu through which most functions can be accessed. Especially some of
+the lesser used functions can only be accessed through the menu (unless you
+assign key shortcuts to them, of course.)
 
 
 ** Getting Started
@@ -114,7 +125,7 @@ you have opened remain loaded, and you can return to them by typing =M-x ebib=
 again.
 
 
-*** Opening a =.bib= file
+*** Opening a =.bib= File
 
 Loading a =.bib= file into Ebib is done with the command =o=. Ebib reads the file
 that you specify, and reports how many entries it found, how many =@string=
@@ -126,9 +137,9 @@ edited. Therefore, you should make sure that all the entry types and fields that
 your databases use are defined. A sensible set has been predefined, so that
 anyone who's using standard BibTeX entry types should have no problem loading an
 existing =.bib= file into Ebib. If, however, you have custom entry types, or
-custom fields in your =.bib= files, you should read the chapter on customising
-Ebib to learn how to define them, so that Ebib knows about them. (See
-[[#entry-types][Entry types]].)
+custom fields in your =.bib= files, you should define them. This can be done by
+selecting "Options | Modify Entry Types" from the Ebib menu. (See also the
+chapter on customising Ebib, esp. [[#entry-types][Entry types]].)
 
 Every time Ebib reads a =.bib= file, it produces a few log messages. These are
 written into a special buffer =*Ebib-log*=. If Ebib encounters entry types in the
@@ -143,7 +154,7 @@ which an error occurs is not read. Entries occurring after the problematic one
 are read.
 
 
-*** Navigating a =.bib= file
+*** Navigating a =.bib= File
 
 Once you've opened a =.bib= file, the keys of all the entries in the file are
 shown in alphabetical order in the index buffer in the top Ebib window. (In
@@ -239,12 +250,13 @@ entries in the index buffer: the cursor keys =up= and =down=, =C-p= and =C-n=, o
 =k=. =Space= and =PgDn= move to the next set of fields, while =PgUp= and =b= move to the
 previous set of fields. =g= and =G=, and =Home= and =End= also work as expected.
 
-Editing a field value can be done with =e=. For most fields, Ebib simply asks you
-for a string value in the minibuffer. (Here, =RET= confirms the edit, while =C-g=
-cancels it.) Although BibTeX requires that field values be surrounded by braces
-{} (or double quotes "", but Ebib does not use those, even though it can of
-course handle them when they are used in an existing =.bib= file) you do not need
-to type these. Ebib adds them when it saves the =.bib= file.
+Editing a field value can be done with =e=. (In fact, in the entry buffer, =ENTER=
+is equivalent to =e=.) For most fields, Ebib simply asks you for a string value in
+the minibuffer. (Here, =ENTER= confirms the edit, while =C-g= cancels it.) Although
+BibTeX requires that field values be surrounded by braces {} (or double quotes
+"", but Ebib does not use those, even though it can of course handle them when
+they are used in an existing =.bib= file) you do not need to type these. Ebib adds
+them when it saves the =.bib= file.
 
 Some fields, however, are handled in a special way. The first of these is the
 =type= field: if you edit this field, you must enter one of the predefined entry
@@ -306,7 +318,7 @@ For more details on working with the multiline edit buffer, see
 [[#multiline-edit-buffer][The Multiline Edit Buffer]].
 
 
-*** Copy, cut, paste (yank), and delete
+*** Copy, Cut, Paste (Yank), and Delete
 
 A few more commands are available when you're in the entry buffer editing field
 values. The commands =c=, =x= and =y= implement a copy and paste system: =c= copies the
@@ -316,8 +328,9 @@ text in the kill ring. You can type =y= repeatedly to get the same effect you ge
 in Emacs when you type =M-y= after an initial =C-y=: every additional use of =y= moves
 back in the kill ring.
 
-Lastly, there is the command =d=, which deletes the contents of the current field,
-without asking questions and without storing the text in the kill ring.
+Lastly, there is the command =d=, which deletes the contents of the current field
+without storing the text in the kill ring. (It asks for confirmation, though,
+just to make sure.)
 
 Note that =y= only works when the current field does not have a value yet. This is
 to prevent you from accidentally overwriting a field value. If you do want to
@@ -337,14 +350,12 @@ creates a backup file under the same name appended with a tilde:
 =<filename>.bib~=.
 
 If you have multiple databases open, have made changes in more than one of them,
-and want to save all of them without going through each yourself, you can use =S=.
-(That's a capital =S=.) This command saves all modified databases.
+and want to save all of them without going through each yourself, you can save
+all databases at once through the menu.
 
-Another way to save a database is to use the command =w=. Use this if you want to
-write the database to another file than the one it was loaded from. Ebib will
-ask you for a filename to save to, and will of course warn you if that file
-happens to exist already. Note that this command is similar to =C-x C-w= in Emacs,
-so that after using it, the new =.bib= file becomes associated with the database.
+The menu also provides a way to save the database to another name. This command
+is similar to =C-x C-w= in Emacs, so that after using it, the new =.bib= file
+becomes associated with the database.
 
 
 ** Searching
@@ -397,12 +408,12 @@ can call the function =ebib-insert-bibtex-key=. When you invoke this command,
 Emacs prompts you for a key from the database(s) associated with the current
 buffer, a citation command (that has to be typed *without* the backslash) and any
 optional argument(s) the command allows. You can type the key using
-TAB-completion, and after hitting =RET=, Emacs puts a BibTeX citation at the
+TAB-completion, and after hitting =ENTER=, Emacs puts a BibTeX citation at the
 cursor position in the current buffer with the key you selected.
 
 You can also do it the other way around: if you're in the index buffer in Ebib,
-you can *push* an entry to a LaTeX buffer. To do this, use the key =p=. Ebib will
-ask you for a buffer to push the entry to, a citation command and also any
+you can *push* an entry to a LaTeX buffer. To do this, use the command =p=. Ebib
+will ask you for a buffer to push the entry to, a citation command and also any
 optional arguments, and then insert a citation at the current cursor position in
 the buffer you've supplied.
 
@@ -431,7 +442,7 @@ should therefore not be set by any package. For this reasons, Ebib does not set
 this command automatically.)
 
 
-*** Consulting databases from within a LaTeX file
+*** Consulting Databases from within a LaTeX File
 
 The commands =ebib-insert-bibtex-key= and =ebib-entry-summary= must consult the
 database or databases loaded in Ebib, and Ebib tries to be smart about which
@@ -510,75 +521,6 @@ field first in the =.bib= file. Without this, BibTeX's cross-referencing will no
 work reliably.
 
 
-** Printing the Database
-#printing-database
-
-Sometimes it may be useful to have a =.pdf= file or print-out of your database.
-Although Ebib does not actually do the printing itself, it can create a LaTeX
-file for you that you can compile and print. In fact, there are two ways of
-doing this.
-
-The first is the command =L=. This command creates a simple LaTeX document that
-essentially contains a <verb>\nocite{*}</verb> command followed by a
-<verb>\bibliography</verb> command referring to the =.bib= file belonging to the
-current database. You can then run the usual sequence of LaTeX, BibTeX, LaTeX,
-LaTeX on this file, creating a document containing a list of all the references
-in your database.
-
-The second command for printing a database is =P=. This command also creates a
-LaTeX file. However, instead of simply providing a <verb>\nocite{*}</verb>
-command, =P= creates a =tabular= environment for each entry in the database listing
-all the fields of that entry and their values.
-
-The difference between =L= and =P= should be obvious: with =L=, you get a list of
-references created by BibTeX. This means that the references look the way they
-will when actually used in a document, but it also means that the list only
-contains the information that BibTeX deems relevant.
-
-With =P= you get an overview of your database with *all* the field values of each
-entry, including the ones that BibTeX does not use. The entries are not
-formatted as literature references, but in a way similar to how they are shown
-in Ebib.
-
-By default, =P= only shows single-line field values. That is, multiline values are
-normally excluded. If you want to include multiline values in the print-out, you
-have to set the option =Print Multiline= in Ebib's customisation buffer. (See
-[[#customisation-buffer][The Customisation Buffer]].) With this option set, Ebib will include all multiline
-values in the LaTeX file that =P= creates. Note however that Ebib does not change
-anything about the formatting of the text in a multiline value. So if you plan
-to make (heavy) use of this option, make sure that the way you type your text
-conforms to LaTeX's conventions (e.g. empty lines to mark paragraphs, etc.) and
-doesn't contain any characters such as =&= that are illegal in LaTeX. (Or,
-alternatively, use LaTeX code in your multiline fields.)
-
-As mentioned, when you use either =L= or =P=, Ebib creates a LaTeX file. More
-precisely, it creates a temporary buffer and writes the LaTeX code into it, and
-then saves the contents of that buffer to a file. After it has done that, Ebib
-lowers itself and instruct Emacs to open the file in a buffer, which will then
-be properly set up as a LaTeX buffer. From there you can run LaTeX and view the
-result.
-
-Before doing all this, Ebib asks you which file to write to. Be careful with
-this: since this is supposed to be a temporary file, Ebib simply assumes that if
-you provide a filename of an existing file, it can overwrite that file without
-warning!
-
-A better way to tell Ebib which file to use is to set the option =Print Tempfile=
-in Ebib's customisation buffer to some temporary file. When this option is set,
-Ebib will always use this file to write to, and will not ask you for a filename
-anymore when you type =L= or =P=.
-
-There are two more customisation options for printing the database. These are
-=Print Preamble= and =LaTeX Preamble=. With these options, you can specify what Ebib
-should put in the preamble of the LaTeX files it creates. Use this if you want
-to use specific packages (e.g. <verb>\usepackage{a4}</verb> or
-<verb>\usepackage{times})</verb>. This is especially useful for =L=, since by
-default, Ebib uses BibTeX's standard bibliography style. With the option =LaTeX
-Preamble= you can set your preferred bibliography style. Details are discussed in
-the chapter on customisation, see [[#customisation-buffer][The Customisation Buffer]].
-
-
-
 ** Marking Entries
 
 Commands in the index buffer generally operate on one single entry, or on all
@@ -590,18 +532,85 @@ inverse video (in GNU Emacs) or white on red (in XEmacs; note that the face
 properties of marked entries can be customised through the customisation option
 [[#marked-face][Marked Face]].)
 
-Of the commands discussed so far, four can be used on marked entries: =d=, =p=, =L=
-and =P=. Note, however, that it is not enough to mark the entries you want and
-then type any of these commands. If you do so, they will behave as if no entries
-were marked. To get these commands to work on the marked entries, you have to
-type a semicolon before them. That is, =; d= deletes all marked entries, and =; L=
-and =; P= create a LaTeX file of only the marked entries. The command =m= itself can
-also be used with the =;= prefix. If there are any marked entries, =; m= unmarks
-them all. Otherwise, =; m= marks all entries.
+Of the commands discussed so far, two can be used on marked entries: =d= and =p=.
+Note, however, that it is not enough to mark the entries you want and then type
+any of these commands. If you do so, they will behave as if no entries were
+marked. To get these commands to work on the marked entries, you have to type a
+semicolon before them. That is, =; d= deletes all marked entries, =; p= pushes all
+marked entries to a LaTeX buffer. The command =m= itself can also be used with the
+=;= prefix. If there are any marked entries, =; m= unmarks them all. Otherwise, =; m=
+marks all entries.
 
-=; p= pushes all marked entries to a LaTeX buffer. It does so by putting them all
-in a single =\cite= command, separated by commas, not by putting them in separate
-=\cite= commands.
+When using =; p= to push all marked entries to a LaTeX buffer, they are put in a
+single citation command, separated by commas. Ebib does not create a citation
+command for each entry separately.
+
+
+** Printing the Database
+#printing-database
+
+Sometimes it may be useful to have a =.pdf= file or print-out of your database.
+Although Ebib does not actually do the printing itself, it can create a LaTeX
+file for you that you can compile and print. In fact, there are two ways of
+doing this.
+
+The print options are available in the Ebib menu when the index buffer is
+active. You can print the entries as index cards or as a bibliography.
+
+If you print your entries as a bibliography, Ebib creates a simple LaTeX
+document that essentially contains a <verb>\nocite{*}</verb> command followed by
+a <verb>\bibliography</verb> command referring to the =.bib= file belonging to the
+current database. You can then run the usual sequence of LaTeX, BibTeX, LaTeX,
+LaTeX on this file, creating a document containing a list of all the references
+in your database.
+
+If you choose to print as index cards, Ebib also creates a LaTeX file. However,
+instead of simply providing a <verb>\nocite{*}</verb> command, this file
+contains a =tabular= environment for each entry in the database listing all the
+fields of that entry and their values.
+
+By default, the index cards only show single-line field values. That is,
+multiline values are normally excluded. If you want to include multiline values
+in the print-out, you have to set the option =Print Multiline= in the Options menu
+or in Ebib's customisation buffer. (See [[#customisation-buffer][The Customisation Buffer]].) With this
+option set, Ebib includes all multiline values in the LaTeX file that it
+creates. Note however that Ebib does not change anything about the formatting of
+the text in a multiline value. So if you plan to make (heavy) use of this
+option, make sure that the way you type your text conforms to LaTeX's
+conventions (e.g. empty lines to mark paragraphs, etc.) and doesn't contain any
+characters such as =&= that are illegal in LaTeX. (Or, alternatively, use LaTeX
+code in your multiline fields.)
+
+As mentioned, when you "print" the database, Ebib really just creates a LaTeX
+file. More precisely, it creates a temporary buffer and writes the LaTeX code
+into it, and then saves the contents of that buffer to a file. After it has done
+that, Ebib lowers itself and instruct Emacs to open the file in a buffer, which
+will then be properly set up as a LaTeX buffer. From there you can run LaTeX and
+view the result.
+
+Before doing all this, Ebib asks you which file to write to. Be careful with
+this: since this is supposed to be a temporary file, Ebib simply assumes that if
+you provide a filename of an existing file, it can overwrite that file without
+warning!
+
+A better way to tell Ebib which file to use is to set the option =Print Tempfile=
+in Ebib's customisation buffer to some temporary file. When this option is set,
+Ebib will always use this file to write to, and will not ask you for a filename
+anymore.
+
+Note that both print options operate on all entries of the database. If there
+are marked entries in the database, however, only those are printed.
+
+There are two more customisation options for printing the database. These are
+=Print Preamble= and =LaTeX Preamble=. With these options, you can specify what Ebib
+should put in the preamble of the LaTeX files it creates. Use this if you want
+to use specific packages (e.g. <verb>\usepackage{a4}</verb> or
+<verb>\usepackage{times})</verb>. This is especially useful for printing a
+bibliography, since by default, Ebib uses BibTeX's standard bibliography style.
+With the option =LaTeX Preamble= you can set your preferred bibliography style.
+Details are discussed in the chapter on customisation, see
+[[#customisation-buffer][The Customisation Buffer]].
+
 
 
 ** Calling a Browser
@@ -705,7 +714,7 @@ Furthermore, pressing =z= in the index buffer leaves Ebib, but keeps the buffers
 visible. You can get back to Ebib with the command =M-x ebib= (or any key bound to
 it, of course), or simply by manually switching to the index buffer. If you want
 to remove the Ebib buffers from the frame but keep Ebib in the background, you
-can use =Z= (i.e. capital =Z=) in the index buffer. (Note that =Z= is also available
+can use =Z= (i.e. uppercase =Z=) in the index buffer. (Note that =Z= is also available
 in the full-frame layout, but there it is identical to =z=.)
 
 Lastly, the command =ebib-entry-summary= checks whether the Ebib buffers are
@@ -749,12 +758,13 @@ file:
          # "\newcommand{\singleletter}[1]{#1} " }
 </example>
 
-Creating or editing a =@preamble= definition in Ebib is done by hitting =r= in the
-index buffer. Ebib uses the multiline edit buffer for editing the text of the
-=@preamble= definition, which means that as discussed above, =C-x b= stores the
-=@preamble= text and returns focus to the index buffer, while =C-x k= returns focus
-to the index buffer while abandoning any changes you may have made. (For details
-on using the multiline edit buffer, see [[#multiline-edit-buffer][The Multiline Edit Buffer]].)
+Creating or editing a =@preamble= definition in Ebib is done by hitting =P=
+(uppercase =P=) in the index buffer. Ebib uses the multiline edit buffer for
+editing the text of the =@preamble= definition, which means that as discussed
+above, =C-x b= stores the =@preamble= text and returns focus to the index buffer,
+while =C-x k= returns focus to the index buffer while abandoning any changes you
+may have made. (For details on using the multiline edit buffer, see
+[[#multiline-edit-buffer][The Multiline Edit Buffer]].)
 
 In order to create a =@preamble= as shown above in Ebib, you only have to type the
 text between the braces. Ebib takes care of including the braces of the
@@ -773,9 +783,9 @@ and saves them in one =@preamble= definition.
 
 ** =@String= Definitions
 
-If you press =t= in the index buffer, Ebib hides the entry buffer in the lower
-window and replaces it with the *strings buffer*. In this buffer, you can add,
-delete and edit =@string= definitions.
+If you press =S= (that's a uppercase =S=) in the index buffer, Ebib hides the entry
+buffer in the lower window and replaces it with the *strings buffer*. In this
+buffer, you can add, delete and edit =@string= definitions.
 
 Adding a =@string= definition is done with the command =a=. This will first ask you
 for an abbreviation and then for the value to be associated with that
@@ -824,15 +834,15 @@ this:
 title = 1966 # WGA
 </example>
 
-<literal style="texinfo">@noindent</literal>which will produce ``1966 World Gnus
-Almanac''. Or you can do:
+<literal style="texinfo">@noindent</literal>which will produce "1966 World Gnus
+Almanac". Or you can do:
 
 <example>
 month = "1~" # jan
 </example>
 
-<literal style="texinfo">@noindent</literal>which will produce someting like ``1
-January'', assuming your bibliography style has defined the abbreviation =jan=.
+<literal style="texinfo">@noindent</literal>which will produce someting like "1
+January", assuming your bibliography style has defined the abbreviation =jan=.
 All this is possible with Ebib, simply by entering the exact text including
 quotes or braces around the strings, and marking the relevant field as raw.
 
@@ -844,7 +854,7 @@ Ebib only accepts =@string= definitions that are in the database, so that by usi
 completion to complete a partial string.
 
 
-** Sorting the =.bib= file
+** Sorting the =.bib= File
 #sorting-bib-file
 
 By default, the entries in the database are saved to the =.bib= file in
@@ -903,12 +913,12 @@ As described in the previous chapter, adding entries to a database can be done
 manually with the key =a=. There are other ways of adding entries to a database,
 however.
 
-With the command =M= you can merge a second =.bib= file into your current database.
-When you hit =M=, you are asked for a filename. Ebib then reads the entries in
-this file and adds them to the database. Duplicate entries (that is, entries
-with an entry key that already exists in the database) will not be loaded. Ebib
-logs a warning about each duplicate entry to its log buffer, and displays a
-warning after loading the =.bib= file when this happens.
+In the index buffer, the Ebib menu has an option to merge a second .bib file
+into the current database. Ebib reads the entries in this file and adds them to
+the database. Duplicate entries (that is, entries with an entry key that already
+exists in the database) will not be loaded. Ebib logs a warning about each
+duplicate entry to its log buffer and displays a warning after loading the =.bib=
+file when this happens.
 
 Another way to add entries to a database is to import them from an Emacs buffer.
 If, for example, you find ready-formatted BibTeX entries in a text file or e.g.
@@ -1000,7 +1010,7 @@ occurrence, not the last.) When additional fields appear more than once in an
 entry, BibTeX does not warn you, since it ignores those fields anyway. Here,
 too, Ebib's standard behaviour is to ignore all but the last value.
 
-However, some online reference management services ``use'' this feature of
+However, some online reference management services "use" this feature of
 BibTeX in that they put multiple =keywords= fields in the BibTeX entries that they
 produce. If you were to import such an entry into Ebib, you would lose all your
 keywords except the last one. To remedy this, you can tell Ebib that it should
@@ -1047,11 +1057,11 @@ mechanism in the form of *virtual databases*.
 A virtual database is a database that is not associated with any =.bib= file.
 Rather, it is created from another database by selecting entries from it based
 on a specific search pattern, called a *filter*. This allows you, for example, to
-select all entries from a database that contain the string ``Jones'' in their
+select all entries from a database that contain the string "Jones" in their
 =author= field. A filter can be as complex as you want: you can select all entries
-that do *not* contain ``Jones'' in the =author= field, or all entries that contain
-``Jones'' in either the =author= or the =editor= field, or all entries that contain
-``Jones'' in the =author= field, and ``symbiotic hybernation'' in the =keyword=
+that do *not* contain "Jones" in the =author= field, or all entries that contain
+"Jones" in either the =author= or the =editor= field, or all entries that contain
+"Jones" in the =author= field, and "symbiotic hybernation" in the =keyword=
 field, etc. Basically, the filter can consist of an arbitray number of search
 criteria combined with the logical operators =and, or= and =not=.
 
@@ -1060,7 +1070,7 @@ criteria combined with the logical operators =and, or= and =not=.
 
 Creating a virtual database is simple: press =&=, and Ebib will ask you for a
 field to select on, and for a regular expression to select with. So if you want
-to select all entries that contain ``Jones'' in the =author= field, you press =&=
+to select all entries that contain "Jones" in the =author= field, you press =&=
 and type =author= as the field and =Jones= as the regexp to filter on.
 
 Ebib will then create a virtual database containing the entries matching your
@@ -1072,7 +1082,7 @@ If you don't want to filter on one specific field but rather want to select all
 entries that match a certain regexp in any field, you can type =any= as the field
 to filter on. So specifying =any= as the field and =Jones= as the regexp, the
 virtual database will select all entries that have a field that contains
-``Jones'' in them.
+"Jones" in them.
 
 
 *** Complex Filters
@@ -1080,19 +1090,19 @@ virtual database will select all entries that have a field that contains
 Once you have a virtual database, it remains associated with the database it was
 created from. This means that you can refine or extend the selection (i.e. the
 filter) that the virtual database is based on. If, in the current example, you
-want to include all the entries that have ``Jones'' in the =editor= field, you
+want to include all the entries that have "Jones" in the =editor= field, you
 have to perform a logical =or= operation: you want to select an entry if it
-contains ``Jones'' in the =author= field (which you already did) *or* if it contains
-``Jones'' in the =editor= field.
+contains "Jones" in the =author= field (which you already did) *or* if it contains
+"Jones" in the =editor= field.
 
 A short sidenote: the first impulse in a case like this might be to use =and=
-instead of =or=: after all, you want to select all entries that contain ``Jones''
-in the =author= field *and* all entries that contain ``Jones'' in the =editor= field.
+instead of =or=: after all, you want to select all entries that contain "Jones"
+in the =author= field *and* all entries that contain "Jones" in the =editor= field.
 However, the filter that you build up is used to test each entry *individually*
 whether it meets the selection criterion. An entry meets the criterion if it
-contains ``Jones'' in the =author= field *or* if it contains ``Jones'' in the =editor=
+contains "Jones" in the =author= field *or* if it contains "Jones" in the =editor=
 field. Therefore, =or= is the required operator in this case. If you would use
-=and=, you would only get those entries that contain ``Jones'' in both the =author=
+=and=, you would only get those entries that contain "Jones" in both the =author=
 *and* =editor= fields.
 
 To perform a logical =or= operation, press the key =|=. As before, you will be asked
@@ -1101,8 +1111,8 @@ Ebib will then update the virtual database with all entries in the original
 database that match the additional criterion.
 
 It is also possible to perform a logical =and= on the virtual database. Use this
-if you want to select those entries that contain ``Jones'' in the =author= field
-and e.g. ``symbiotic hybernation'' in the =keyword= field. A logical =and= operation
+if you want to select those entries that contain "Jones" in the =author= field
+and e.g. "symbiotic hybernation" in the =keyword= field. A logical =and= operation
 is done with the key =&=. (Note: this is the same key that is used to create a
 virtual database. In fact, you can also create a virtual database with =|=: when
 used in a normal database, =&= and =|= are equivalent. They are only different in
@@ -1114,15 +1124,15 @@ is, the negative prefix argument performs a logical =not= operation on the searc
 criterion.
 
 That is, if you want to select all entries from a database that do *not* contain
-``Jones'' in the =author= field, you can do this by typing =M-- &= and then filling
+"Jones" in the =author= field, you can do this by typing =M-- &= and then filling
 out the relevant field and regexp. This prefix argument is available both in
 real and in virtual databases.
 
 There is another way of performing a logical =not= operation, which is only
 available in virtual databases: by pressing the key =~=, you invert the current
 filter. That is, if you have a virtual database with all the entries containing
-``Jones'' in the =author= or in the =editor= field, and you press =~=, the selection
-is inverted, and now contains all entries that do *not* have ``Jones'' in the
+"Jones" in the =author= or in the =editor= field, and you press =~=, the selection
+is inverted, and now contains all entries that do *not* have "Jones" in the
 =author= or =editor= field.
 
 Although =~= and the negative prefix argument to =&= or =|= both perform logical =not=
@@ -1150,18 +1160,17 @@ contents of fields. It is also not possible to import entries to them or merge
 another file with them. Furthermore, it is not possible to export entries to
 them or from them.
 
-A virtual database cannot be saved in the normal way with =s=, and the command =S=
+A virtual database cannot be saved in the normal way with =s=, and the menu option
 to save all databases ignores virtual databases. If you want to save a virtual
 database, you can use the command =w=. This command not only saves the virtual
 database, it also changes it into a normal database, and detaches it from its
 original source database, so that you can modify it without affecting the source
 database.
 
-The command =L= also doesn't work with virtual databases. The reason for this is
-that the virtual database is not associated with an actual =.bib= file, so there
-is no file to create a list of references from. However, it is possible to use
-the command =P= with a virtual database to create a list of entries. See
-[[#printing-database][Printing the Database]], for details on these two commands.
+The print bibliography command also doesn't work with virtual databases. The
+reason for this is that the virtual database is not associated with an actual
+=.bib= file, so there is no file to create a list of references from. However, it
+is possible to print index cards frm a virtual database.
 
 
 ** The Multiline Edit Buffer
@@ -1172,12 +1181,12 @@ which is used to edit field values that contain newlines (so-called *multiline
 fields*), and also to edit the contents of the =@preamble= command. This section
 discusses the details of this buffer.
 
-Ebib enters multiline edit mode in one of three cases: when you press =P= in the
-index buffer, to edit the =@preamble= definition, when you hit =l= in the entry
-buffer to edit the current field as multiline, or when you hit =e= on the =annote=
-field, or on a field whose value already is multiline.
+Ebib enters multiline edit mode in one of three cases: when you edit the
+=@preamble= definition, when you hit =l= in the entry buffer to edit the current
+field as multiline, or when you hit =e= on the =annote= field, or on a field whose
+value already is multiline.
 
-The mode that is used in the multiline edit buffer is user-condigurable. The
+The mode that is used in the multiline edit buffer is user-configurable. The
 default value is =text-mode=, but if you prefer to use some other mode, you can
 specify this through the customization options. (Personally, I use =markdown-mode=
 in the multiline edit buffer, so that I can use [[http://daringfireball.net/projects/markdown/][markdown]] to write annotations,
@@ -1191,13 +1200,13 @@ bound to key sequences through the minor mode ebib-multiline-edit-mode, which is
 activated automatically in the multiline edit buffer.
 
 =ebib-quit-multiline-edit=, bound to =C-c | q=, leaves the multiline edit buffer and
-stores the text in the database. If you invoke this command when the buffer is
-empty (including the final newline!) and you were editing a field value or the
-=@preamble=, the field value or preamble is deleted. (This is in fact the *only* way
-to delete the =@preamble= definition. Field values on the other hand can also be
-deleted by hitting =x= or =d= on them in the entry buffer.) If you were editing a
-=@string= value, Ebib will just complain, because string definitions cannot be
-empty.
+stores the text in the database. If you invoke this command when you've deleted
+all contents of the buffer (including the final newline!) and you were editing a
+field value or the =@preamble=, the field value or preamble is deleted. (This is
+in fact the *only* way to delete the =@preamble= definition. Field values on the
+other hand can also be deleted by hitting =x= or =d= on them in the entry buffer.)
+If you were editing a =@string= value, Ebib will just complain, because string
+definitions cannot be empty.
 
 =ebib-cancel-multiline-edit=, bound to =C-c | c=, also leaves the multiline edit
 buffer, but it does so without storing the text. The original value of the
@@ -1215,6 +1224,15 @@ provided to allow you to do this from within the buffer.
 It is possible to change the second key of these commands, if you find =|=
 inconvenient. See [[#modifying-key-bindings][Modifying Key Bindings]] for
 details.
+
+
+** The Options Menu
+In the index buffer, Ebib's menu has an Options submenu. This menu gives you
+quick access to Ebib's customisation buffer, and it also provides checkboxes for
+several settings that can be toggled on and off. All of these settings have
+defaults that can be defined in the customisation buffer. Setting or unsetting
+them in the Options menu only changes them for the duration of your Emacs
+session, it doesn't affect the default setting.
 
 
 * The Ebib Buffers
@@ -1271,8 +1289,6 @@ database. =(ebib-virtual-db-not)=
 
   =c= :: close the database. =(ebib-close-database)=
   
-  =C= :: customise Ebib. =(ebib-customize)=
-
   =d= :: delete the current entry. =(ebib-delete-entry)=
 
   =; d= :: delete all marked entries.
@@ -1290,6 +1306,8 @@ viewer. With numeric prefix argument, extract the *n*-th filename.
 
   =G= :: equivalent to =End=.
 
+  =h= :: show the info node on the index buffer. (=ebib-index-help=)
+
   =H= :: show/hide hidden fields. =(ebib-toggle-hidden)=
 
   =j= :: equivalent to =Down=.
@@ -1301,17 +1319,10 @@ will ask you for a database number if there is none. =(ebib-switch-to-database)=
 
   =l= :: show the log buffer. (=ebib-show-log=)
 
-  =L= :: create a LaTeX file from the current database that produces a list of
-references formatted by BibTeX. =(ebib-latex-database)=
-
-  =; L= :: create a LaTeX file with the marked entries only.
-
   =m= :: mark (or unmark) the current entry. =(ebib-mark-entry)=
 
   =; m= :: unmark all marked entries.
 
-  =M= :: merge a =.bib= file. =(ebib-merge-bibtex-file)=
-  
   =n= :: find next occurrence of the search string. =(ebib-search-next)=
 
   =N= :: search for entries cross-referencing the current one. =(ebib-search-crossref)=
@@ -1330,12 +1341,7 @@ references formatted by BibTeX. =(ebib-latex-database)=
 
   =M-p= :: equivalent to =PgUp=.
 
-  =P= :: create a LaTeX file for printing the database, listing the entire
-contents of each entry. =(ebib-print-database)=
-
-  =; P= :: create a LaTeX file with the marked entries.
-
-  =r= :: show and edit the =@preamble= definition in the
+  =P= :: show and edit the =@preamble= definition in the
 database. =(ebib-edit-preamble)=
 
   =q= :: quit Ebib. This sets all variables to nil, unloads the database(s) and
@@ -1343,9 +1349,7 @@ quits Ebib. =(ebib-quit)=
 
   =s= :: save the database. =(ebib-save-current-database)=
 
-  =S= :: save all modified databases. =(ebib-save-all-databases)=
-
-  =t= :: show and edit the =@string= definitions in the database.
+  =S= :: show and edit the =@string= definitions in the database.
 =(ebib-edit-strings)=
 
   =u= :: extract a URL from the =url= field and send it to a browser. With numeric
@@ -1353,8 +1357,6 @@ prefix argument, extract the *n*-th url.
 
   =V= :: Display the filter of the current virtual database in the minibuffer.
 With prefix argument: reapply the filter. =(ebib-print-filter)=
-
-  =w= :: write the database to a different file. =(ebib-write-database)=
 
   =x= :: export the current entry to a file, or, when used with numeric prefix
 argument, to another database. =(ebib-export-entry)=
@@ -1373,7 +1375,12 @@ prefix argument, to another database. =(ebib-export-preamble)=
 
   =Z= :: put Ebib in the background. =(ebib-lower)=
 
-One function is not bound to any key: =ebib-print-filename=.
+Functions not bound to any key: =ebib-print-filename=, =ebib-customize=,
+=ebib-merge-bibtex-file=, =ebib-write-database=, =ebib-save-all-databases=,
+=ebib-print-entries=, =ebib-latex-entries=, =ebib-toggle-hidden=,
+=ebib-toggle-timestamp=, =ebib-toggle-identical-fields=,
+=ebib-toggle-print-multiline=, =ebib-toggle-layout=.
+
 
 ** The Entry Buffer
 
@@ -1409,6 +1416,8 @@ viewer. With numeric prefix argument, extract the *n*-th filename.
   
   =G= :: equivalent to =End=.
 
+  =h= :: show the info node on the entry buffer. (=ebib-entry-help=)
+
   =j= :: go to the next field. =(ebib-next-field)=
 
   =k= :: go to the previous field. =(ebib-prev-field)=
@@ -1426,7 +1435,7 @@ viewer. With numeric prefix argument, extract the *n*-th filename.
   =q= :: quit editing the current entry and return focus to the index buffer.
 =(ebib-quit-entry-buffer)=
 
-  =r= :: toggle a field's ``raw'' status. =(ebib-toggle-raw)=
+  =r= :: toggle a field's "raw" status. =(ebib-toggle-raw)=
   
   =s= :: insert an abbreviation from the =@string= definitions in the
 database. =(ebib-insert-abbreviation)=
@@ -1474,6 +1483,8 @@ asked for confirmation. =(ebib-delete-string)=
   
   =G= :: equivalent to =End=.
 
+  =h= :: show the info node on the strings buffer. (=ebib-strings-help=)
+
   =j= :: equivalent to =Down=.
 
   =k= :: equivalent to =Up=.
@@ -1511,9 +1522,9 @@ customise those, you have to use the file =~/.ebibrc=.
 #customisation-buffer
 
 Ebib's customisation group is a subgroup of the =Tex= group. It can be invoked by
-typing =M-x customize-group RET ebib RET=, or by pressing =C= in the index buffer.
-This chapter gives a short description of all the options available in the
-customisation buffer.
+typing =M-x customize-group RET ebib RET=, or going to the Options menu and
+selecting "Customize Ebib". This chapter gives a short description of all the
+options available in the customisation buffer.
 
 
 *** Default Type
@@ -1548,9 +1559,16 @@ abstract, keywords, file= and =timestamp=.
 #layout
 
 The default value of this option is =full=, which means that Ebib takes over the
-entire frame when it runs. Alternatively, you can select to specify a width (in
-characters) yourself, in which case Ebib takes up the right part of the frame,
-leaving the left part free. See [[#screen-layout][Screen Layout]] for details.
+entire frame when it runs. Alternatively, you can select =custom=, in which case
+you can specify the width of the Ebib windows yourself. In this case, Ebib takes
+up the right part of the frame, leaving the left part free. See [[#screen-layout][Screen Layout]]
+for details.
+
+
+*** Width
+
+The width of the Ebib windows when =ebib-layout= is set to =custom=. Default value
+is 80.
 
 
 *** Index Window Size
@@ -1576,11 +1594,11 @@ buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you
 to define the commands that are available through tab completion when these
 functions ask for a citation command.
 
-The citation commands must be given *without* the leading backslash, as Ebib adds
-one. Furthermore, you need to specify how many optional arguments each command
-can have. When Ebib prompts you for a citation key, it will ask for as many
-optional arguments as you specify here. (If you don't want to be asked for those
-optional arguments, just fill in 0.)
+The citation commands should be given without the leading backslash, as Ebib
+adds one. Furthermore, you need to specify how many optional arguments each
+command can have. When Ebib prompts you for a citation key, it will ask for as
+many optional arguments as you specify here. (If you don't want to be asked for
+those optional arguments, just fill in 0.)
 
 When Ebib prompts you for a citation command, the commands specified in this
 option can be obtained through tab completion. However, it is not necessary to
@@ -1590,7 +1608,7 @@ all. In the latter case, Ebib does not ask for any optional arguments and simply
 puts the key in the buffer without adding a backslash or curly braces.
 
 
-*** Multiline Edit Mode
+*** Multiline Major Mode
 
 This specifies the major mode used in the multiline edit buffer. The default
 value is =text-mode=. Note that the value *must* be a command for a major mode.
@@ -1735,22 +1753,22 @@ subdirectories.
 *** Print Preamble
 
 This option specifies the preamble that is to be added to the LaTeX file Ebib
-creates for printing the database (i.e., the =P= command). By default, the
-preamble is empty. You can set your own <verb>\usepackage</verb> commands, or
-anything else you may need.
+creates for printing the database as index cards. By default, the preamble is
+empty. You can set your own <verb>\usepackage</verb> commands, or anything else
+you may need.
 
 
 *** Print Multiline
 
-When this options is set, Ebib includes multiline field values when it creates a
-LaTeX file with =P= (=ebib-print-database=). When unset, multiline values are
-excluded, which saves space. By default, this option is unset.
+When this options is set, Ebib includes multiline field values when you print
+index cards . When unset, multiline values are excluded, which saves space. By
+default, this option is unset.
 
 
 *** Latex Preamble
 
 This option specifies the preamble to be added to the LaTeX file for creating a
-list of references from the database (i.e., the =L= command). By default, the line
+list of references from the database. By default, the line
 <verb>\bibliographystyle{plain}</verb> is put in the preamble, but you may want
 to specify your own BibTeX packages and options.
 
@@ -1788,10 +1806,10 @@ define an entry that has only obligatory or only optional fields.
 ** Modifying Key Bindings
 #modifying-key-bindings
 
-If you are unhappy about Ebib's standard key bindings, you can change them to
-anything you like. To do this, you have to create a file =~/.ebibrc= and write
-your preferred key bindings in it. A key binding definition is built up as
-follows:
+If you are unhappy about Ebib's standard key bindings and would like to change
+them, or if you would like to bind a command that is only available through the
+menu to a key, you can do so by creating a file =~/.ebibrc= and writing your
+preferred key bindings in it. A key binding definition is built up as follows:
 
 <example>
 (ebib-key <buffer> <key> <command>)
@@ -1826,6 +1844,10 @@ If a command can be called with a prefix key (as for example =ebib-delete-entry=
 can), =ebib-key= will automatically rebind the prefixed version as well. So in the
 example above, the first line not only binds =D=, it also binds =; D=. Similarly,
 the second line not only unbinds =d=, but also =; d=.
+
+Note that if you bind the print commands to a key (=ebib-print-entries= and
+=ebib-latex-entries=) they are automatically set up to accept the prefix key as
+well.
 
 It is also possible to redefine the prefix key itself. To do this, you must
 specify =mark-prefix= for =<buffer>=. The value of =<command>= is irrelevant here, so

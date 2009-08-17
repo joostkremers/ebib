@@ -27,6 +27,7 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (require 'cl)
+(require 'easymenu)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
@@ -55,12 +56,17 @@
 (defcustom ebib-layout 'full
   "*Ebib window layout.
 Full width: Ebib occupies the entire Emacs frame.
-
-Specify width: Ebib occupies the right side of the Emacs frame,
+Custom width: Ebib occupies the right side of the Emacs frame,
 with the left side free for another window."
   :group 'ebib
   :type '(choice (const :tag "Full width" full)
-		 (integer :tag "Specify width")))
+		 (const :tag "Custom width" custom)))
+
+(defcustom ebib-width 80
+  "*Width of the Ebib windows.
+Only takes effect if EBIB-LAYOUT is set to CUSTOM."
+  :group 'ebib
+  :type 'integer)
 
 (defcustom ebib-index-window-size 10
   "*The number of lines used for the index buffer window."
@@ -78,7 +84,7 @@ For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
   :type '(repeat (cons :tag "Command" (string) (integer :tag "Optional arguments"))))
 
-(defcustom ebib-multiline-mode 'text-mode
+(defcustom ebib-multiline-major-mode 'text-mode
   "*The major mode of the multiline edit buffer."
   :group 'ebib
   :type '(function :tag "Mode function"))
@@ -344,12 +350,14 @@ Its value can be 'strings, 'fields, or 'preamble.")
 
 (defvar ebib-hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
-;; these two variables are set when the user enters the entry buffer
-(defvar ebib-cur-entry-hash nil "The hash table containing the data of the current entry.")
+;; this variable is set when the user enters the entry buffer
 (defvar ebib-cur-entry-fields nil "The fields of the type of the current entry.")
 
-;; and these two are set by EBIB-FILL-ENTRY-BUFFER and EBIB-FILL-STRINGS-BUFFER, respectively
+;; these two are set by EBIB-FILL-ENTRY-BUFFER
+(defvar ebib-cur-entry-hash nil "The hash table containing the data of the current entry.")
 (defvar ebib-current-field nil "The current field.") 
+
+;; and this one by EBIB-FILL-STRINGS-BUFFER
 (defvar ebib-current-string nil "The current @STRING definition.")
 
 ;; the prefix key and the multiline key are stored in a variable so that the
@@ -953,6 +961,7 @@ field contents."
       (ebib-format-fields (gethash (car (edb-cur-entry ebib-cur-db))
 				   (edb-database ebib-cur-db)) 'insert match-str)
       (setq ebib-current-field 'type*)
+      (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
       (goto-char (point-min))
       (ebib-set-fields-highlight))))
 ;;      (skip-chars-forward "^ "))))
@@ -1124,7 +1133,6 @@ added."
 
 (defun ebib-search-key-in-buffer (entry-key)
   "Searches ENTRY-KEY in the index buffer.
-
 Moves point to the first character of the key and returns point."
   (goto-char (point-min))
   (search-forward entry-key)
@@ -1195,7 +1203,7 @@ current window."
   (if (eq ebib-layout 'full)
       (delete-other-windows)
     (setq ebib-pre-ebib-window (selected-window))
-    (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-layout) t)))
+    (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
       (select-window ebib-window nil)))
   (let* ((index-window (selected-window))
 	 (entry-window (split-window index-window ebib-index-window-size)))
@@ -1228,8 +1236,8 @@ buffers and reads the rc file."
   ;; present in an edit buffer.
   (setq ebib-multiline-buffer (get-buffer-create "*Ebib-edit*"))
   (set-buffer ebib-multiline-buffer)
-  (funcall ebib-multiline-mode)
-  (ebib-multiline-edit-mode t)
+  (funcall ebib-multiline-major-mode)
+  (ebib-multiline-mode t)
   ;; then we create a buffer to hold the fields of the current entry.
   (setq ebib-entry-buffer (get-buffer-create " *Ebib-entry*"))
   (set-buffer ebib-entry-buffer)
@@ -1325,9 +1333,9 @@ killed and the database has been modified."
        (setq ebib-prefix-key (string-to-char ,key))))
    ((eq buffer 'multiline)
     `(progn
-       (define-key ebib-multiline-edit-mode-map "\C-c" nil)
+       (define-key ebib-multiline-mode-map "\C-c" nil)
        (mapc #'(lambda (command)
-		 (define-key ebib-multiline-edit-mode-map (format "\C-c%s%c" ,key (car command)) (cdr command)))
+		 (define-key ebib-multiline-mode-map (format "\C-c%s%c" ,key (car command)) (cdr command)))
 	     '((?q . ebib-quit-multiline-edit)
 	       (?c . ebib-cancel-multiline-edit)
 	       (?s . ebib-save-from-multiline-edit)))
@@ -1359,7 +1367,6 @@ killed and the database has been modified."
 (ebib-key index "a" ebib-add-entry)
 (ebib-key index "b" ebib-index-scroll-down)
 (ebib-key index "c" ebib-close-database)
-(ebib-key index "C" ebib-customize)
 (ebib-key index "d" ebib-delete-entry)
 (ebib-key index "e" ebib-edit-entry)
 (ebib-key index "E" ebib-edit-keyname)
@@ -1367,14 +1374,12 @@ killed and the database has been modified."
 (ebib-key index "F" ebib-follow-crossref)
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
-(ebib-key index "H" ebib-toggle-hidden)
+(ebib-key index "h" ebib-index-help)
 (ebib-key index "j" ebib-next-entry)
 (ebib-key index "J" ebib-switch-to-database)
 (ebib-key index "k" ebib-prev-entry)
 (ebib-key index "l" ebib-show-log)
-(ebib-key index "L" ebib-latex-entries)
 (ebib-key index "m" ebib-mark-entry)
-(ebib-key index "M" ebib-merge-bibtex-file)
 (ebib-key index "n" ebib-search-next)
 (ebib-key index "N" ebib-search-crossref)
 (ebib-key index [(control n)] ebib-next-entry)
@@ -1383,15 +1388,12 @@ killed and the database has been modified."
 (ebib-key index "p" ebib-push-bibtex-key)
 (ebib-key index [(control p)] ebib-prev-entry)
 (ebib-key index [(meta p)] ebib-index-scroll-down)
-(ebib-key index "P" ebib-print-entries)
-(ebib-key index "r" ebib-edit-preamble)
+(ebib-key index "P" ebib-edit-preamble)
 (ebib-key index "q" ebib-quit)
 (ebib-key index "s" ebib-save-current-database)
-(ebib-key index "S" ebib-save-all-databases)
-(ebib-key index "t" ebib-edit-strings)
+(ebib-key index "S" ebib-edit-strings)
 (ebib-key index "u" ebib-browse-url)
 (ebib-key index "V" ebib-print-filter)
-(ebib-key index "w" ebib-write-database)
 (ebib-key index "x" ebib-export-entry)
 (ebib-key index "\C-xb" ebib-leave-ebib-windows)
 (ebib-key index "\C-xk" ebib-quit)
@@ -1417,6 +1419,55 @@ killed and the database has been modified."
   "Major mode for the Ebib index buffer."
   (setq buffer-read-only t)
   (setq truncate-lines t))
+
+(easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
+  '("Ebib"
+    ["Open Database..." ebib-load-bibtex-file t]
+    ["Merge Database..." ebib-merge-bibtex-file (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+    ["Save Database" ebib-save-current-database (and ebib-cur-db
+						     (edb-modified ebib-cur-db))]
+    ["Save All Databases" ebib-save-all-databases (ebib-modified-p)]
+    ["Save Database As..." ebib-write-database ebib-cur-db]
+    ["Close Database" ebib-close-database ebib-cur-db]
+    "--"
+    ("Entry"
+     ["Add" ebib-add-entry (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+     ["Edit" ebib-edit-entry (and ebib-cur-db
+				  (edb-cur-entry ebib-cur-db)
+				  (not (edb-virtual ebib-cur-db)))]
+     ["Delete" ebib-delete-entry (and ebib-cur-db
+				      (edb-cur-entry ebib-cur-db)
+				      (not (edb-virtual ebib-cur-db)))])
+    ["Edit Strings" ebib-edit-strings (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+    ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+    "--"
+    ["Open URL" ebib-browse-url (gethash ebib-standard-url-field ebib-cur-entry-hash)]
+    ["View File" ebib-view-file (gethash ebib-standard-file-field ebib-cur-entry-hash)]
+    ("Print Entries"
+     ["As Index Cards" ebib-print-entries ebib-cur-db]
+     ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-virtual ebib-cur-db)))])
+    "--"
+    ("Options"
+     ["Show Hidden Fields" ebib-toggle-hidden :enable t
+      :style toggle :selected (not ebib-hide-hidden-fields)]
+     ["Use Timestamp" ebib-toggle-timestamp :enable t
+      :style toggle :selected ebib-use-timestamp]
+     ["Save Cross-Referenced Entries First" ebib-toggle-xrefs-first :enable t
+      :style toggle :selected ebib-save-xrefs-first]
+     ["Allow Identical Fields" ebib-toggle-identical-fields :enable t
+      :style toggle :selected ebib-allow-identical-fields]
+     ["Print Multiline Fields" ebib-toggle-print-multiline :enable t
+      :style toggle :selected ebib-print-multiline]
+     ["Full Layout" ebib-toggle-layout :enable t
+      :style toggle :selected (eq ebib-layout 'full)]
+     ["Modify Entry Types" ebib-customize-entry-types t] 
+     ["Customize Ebib" ebib-customize t])
+    ["View Log Buffer" ebib-show-log t]
+    ["Lower Ebib" ebib-lower t]
+    ["Quit" ebib-quit t]
+    ["Help on Ebib" ebib-info t]))
+
+(easy-menu-add ebib-index-menu ebib-index-mode-map)
 
 (defun ebib-fill-index-buffer ()
   "Fills the index buffer with the list of keys in EBIB-CUR-DB.
@@ -1455,6 +1506,12 @@ to \"none\"."
   (interactive)
   (ebib-lower)
   (customize-group 'ebib))
+
+(defun ebib-customize-entry-types ()
+  "Customizes EBIB-ENTRY-TYPES."
+  (interactive)
+  (ebib-lower)
+  (customize-variable 'ebib-entry-types))
 
 (defun ebib-log (type format-string &rest args)
   "Writes a message to Ebib's log buffer.
@@ -1872,7 +1929,6 @@ buffer if Ebib is not occupying the entire frame."
   (interactive)
   (ebib-execute-when
     ((real-db entries)
-     (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
      (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
      (select-window (get-buffer-window ebib-entry-buffer) nil))
     ((default)
@@ -2086,9 +2142,39 @@ Can also be used to change a virtual database into a real one."
   (ebib-fill-index-buffer))
 
 (defun ebib-toggle-hidden ()
+  "Toggle viewing hidden fields."
   (interactive)
   (setq ebib-hide-hidden-fields (not ebib-hide-hidden-fields))
   (ebib-fill-entry-buffer))
+
+(defun ebib-toggle-timestamp ()
+  "Toggle using timestamp for new entries."
+    (interactive)
+    (setq ebib-use-timestamp (not ebib-use-timestamp)))
+
+(defun ebib-toggle-xrefs-first ()
+  "Toggle saving of crossreferenced entries first."
+  (interactive)
+  (setq ebib-save-xrefs-first (not ebib-save-xrefs-first)))
+
+(defun ebib-toggle-identical-fields ()
+  "Toggle whether Ebib allows identical fields when opening a .bib file."
+  (interactive)
+  (setq ebib-allow-identical-fields (not ebib-allow-identical-fields)))
+
+(defun ebib-toggle-print-multiline ()
+  "Toggle whether multiline fields are printed."
+  (interactive)
+  (setq ebib-print-multiline (not ebib-print-multiline)))
+
+(defun ebib-toggle-layout ()
+  "Toggles the Ebib layout."
+  (interactive)
+  (if (eq ebib-layout 'full)
+      (setq ebib-layout 'custom)
+    (setq ebib-layout 'full))
+  (ebib-lower)
+  (ebib))
 
 (defun ebib-delete-entry ()
   "Deletes the current entry from the database."
@@ -2368,9 +2454,10 @@ Either prints the entire database, or the marked entries."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (let ((entries (if (ebib-called-with-prefix)
-			(edb-marked-entries ebib-cur-db)
-		      (edb-keys-list ebib-cur-db))))
+     (let ((entries (or (when (or (ebib-called-with-prefix)
+				  (equal '(menu-bar) (elt (this-command-keys-vector) 0)))
+			  (edb-marked-entries ebib-cur-db))
+			(edb-keys-list ebib-cur-db))))
        (if-str (tempfile (if (not (string= "" ebib-print-tempfile))
 			     ebib-print-tempfile
 			   (read-file-name "Use temp file: " "~/" nil nil)))
@@ -2422,7 +2509,9 @@ Operates either on all entries or on the marked entries."
 			 (insert (format "%s\n" string)))
 		     ebib-latex-preamble))
 	     (insert "\n\\begin{document}\n\n")
-	     (if (ebib-called-with-prefix)
+	     (if (and (or (ebib-called-with-prefix)
+			  (equal '(menu-bar) (elt (this-command-keys-vector) 0)))
+		      (edb-marked-entries ebib-cur-db))
 		 (mapc #'(lambda (entry)
 			   (insert (format "\\nocite{%s}\n" entry)))
 		       (edb-marked-entries ebib-cur-db))
@@ -2705,7 +2794,9 @@ The user is prompted for the buffer to push the entry into."
 					collect (read-from-minibuffer (format "Optional argument %d: " i)))))
 		   (while (equal (car opt-args) "")  ; empty args at the beginning of the list don't need
 		     (setq opt-args (cdr opt-args))) ; to be included.
-		   (setq insert-string (format "\\%s%s{%s}" command
+		   (setq insert-string (format "%s%s%s{%s}"
+					       (if (= (aref command 0) 92) "" "\\") ; add a backslash if the user didn't type one.
+					       command
 					       (mapconcat #'(lambda (str)
 							      (format "[%s]" str))
 							  opt-args "")
@@ -2718,6 +2809,18 @@ The user is prompted for the buffer to push the entry into."
 	     (message "Pushed entries to buffer %s" buffer)))))
       ((default)
        (beep)))))
+
+(defun ebib-index-help ()
+  "Shows the info node of Ebib's index buffer."
+  (interactive)
+  (ebib-lower)
+  (info "(ebib) The Index Buffer"))
+
+(defun ebib-info ()
+  "Shows Ebib's info node."
+  (interactive)
+  (ebib-lower)
+  (info "(ebib)"))
 
 ;;;;;;;;;;;;;;;;
 ;; entry-mode ;;
@@ -2732,6 +2835,7 @@ The user is prompted for the buffer to push the entry into."
     (define-key map [next] 'ebib-goto-next-set)
     (define-key map [home] 'ebib-goto-first-field)
     (define-key map [end] 'ebib-goto-last-field)
+    (define-key map [return] 'ebib-edit-field)
     (define-key map " " 'ebib-goto-next-set)
     (define-key map "b" 'ebib-goto-prev-set)
     (define-key map "c" 'ebib-copy-field-contents)
@@ -2740,6 +2844,7 @@ The user is prompted for the buffer to push the entry into."
     (define-key map "f" 'ebib-view-file-in-field)
     (define-key map "g" 'ebib-goto-first-field)
     (define-key map "G" 'ebib-goto-last-field)
+    (define-key map "h" 'ebib-entry-help)
     (define-key map "j" 'ebib-next-field)
     (define-key map "k" 'ebib-prev-field)
     (define-key map "l" 'ebib-edit-multiline-field)
@@ -3018,10 +3123,11 @@ The deleted text is not put in the kill ring."
   (interactive)
   (if (eq ebib-current-field 'type*)
       (beep)
-    (remhash ebib-current-field ebib-cur-entry-hash)
-    (ebib-redisplay-current-field)
-    (ebib-set-modified t)
-    (message "Field contents deleted.")))
+    (when (y-or-n-p "Delete field contents? ")
+      (remhash ebib-current-field ebib-cur-entry-hash)
+      (ebib-redisplay-current-field)
+      (ebib-set-modified t)
+      (message "Field contents deleted."))))
 
 (defun ebib-toggle-raw ()
   "Toggles the raw status of the current field contents."
@@ -3075,6 +3181,12 @@ The deleted text is not put in the kill ring."
 	(ebib-redisplay-current-field)
 	(ebib-next-field)))))
 
+(defun ebib-entry-help ()
+  "Shows the info node for Ebib's entry buffer."
+  (interactive)
+  (ebib-lower)
+  (info "(ebib) The Entry Buffer"))
+
 ;;;;;;;;;;;;;;;;;;
 ;; strings-mode ;;
 ;;;;;;;;;;;;;;;;;;
@@ -3096,6 +3208,7 @@ The deleted text is not put in the kill ring."
     (define-key map "e" 'ebib-edit-string)
     (define-key map "g" 'ebib-goto-first-string)
     (define-key map "G" 'ebib-goto-last-string)
+    (define-key map "h" 'ebib-strings-help)
     (define-key map "j" 'ebib-next-string)
     (define-key map "k" 'ebib-prev-string)
     (define-key map "l" 'ebib-edit-multiline-string)
@@ -3324,15 +3437,32 @@ to append them to."
   (select-window (ebib-temp-window) nil)
   (ebib-multiline-edit 'string (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
 
+(defun ebib-strings-help ()
+  "Shows the info node on Ebib's strings buffer."
+  (interactive)
+  (ebib-lower)
+  (info "(ebib) The Strings Buffer"))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; multiline edit ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(define-minor-mode ebib-multiline-edit-mode
+(define-minor-mode ebib-multiline-mode
   "Minor mode for Ebib's multiline edit buffer."
-  nil nil '(("\C-c|q" . ebib-quit-multiline-edit)
+  :init-value nil :lighter nil :global nil
+  :keymap '(("\C-c|q" . ebib-quit-multiline-edit)
 	    ("\C-c|c" . ebib-cancel-multiline-edit)
-	    ("\C-c|s" . ebib-save-from-multiline-edit)))
+	    ("\C-c|s" . ebib-save-from-multiline-edit)
+	    ("\C-c|h" . ebib-multiline-help)))
+
+(easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu"
+  '("Ebib"
+    ["Store Text and Exit" ebib-quit-multiline-edit t]
+    ["Cancel Edit" ebib-cancel-multiline-edit t]
+    ["Save Text" ebib-save-from-multiline-edit t]
+    ["Help" ebib-multiline-help t]))
+
+(easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
 (defun ebib-multiline-edit (type &optional starttext)
   "Switches to Ebib's multiline edit buffer.
@@ -3418,6 +3548,12 @@ The text being edited is stored before saving the database."
 	  (setq text (from-raw text))  ; strings cannot be raw
 	  (puthash ebib-current-string text (edb-strings ebib-cur-db))))))
     (ebib-set-modified t))
+
+(defun ebib-multiline-help ()
+  "Show the info node on Ebib's multiline edit buffer."
+  (interactive)
+  (ebib-lower)
+  (info "(ebib) The Multiline Edit Buffer"))
 
 ;;;;;;;;;;;;;;;;;;;
 ;; ebib-log-mode ;;

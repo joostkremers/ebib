@@ -1,3 +1,44 @@
+2009-08-17  Joost Kremers  <joostkremers@yahoo.com>
+
+	* ebib.el (ebib-layout): changed possible values: use symbol
+	custom instead of an integer.
+	(ebib-width): new.
+	(ebib-multiline-major-mode): renamed from ebib-multiline-mode.
+	(ebib-cur-entry-hash): now set by ebib-fill-entry-buffer.
+	(ebib-fill-entry-buffer): now sets ebib-cur-entry-hash.
+	(ebib-setup-windows): now uses ebib-width.
+	(ebib-create-buffers): sets up ebib-multiline-edit-buffer with the
+	user-customizable major mode and with ebib-multiline-mode as minor
+	mode.
+	(ebib-key): changed to allow customising the key bindings in the
+	multiline edit buffer.
+	(ebib-index-mode-map): key bindings "C", "H", "r", "t" and "w",
+	removed; "P" reassigned to ebib-edit-preamble, "S" to
+	ebib-edit-strings; "h" added.
+	(ebib-index-menu): new.
+	(ebib-customize-entry-types): new.
+	(ebib-edit-entry): no longer sets ebib-cur-entry-hash.
+	(ebib-toggle-timestamp): new.
+	(ebib-toggle-xrefs-first): new.
+	(ebib-toggle-identical-fields): new.
+	(ebib-toggle-print-multiline): new.
+	(ebib-toggle-layout): new.
+	(ebib-print-entries): now checks if it's called from the menu,
+	then prints only marked entries, if there are any.
+	(ebib-latex-entries): same.
+	(ebib-push-bibtex-key): now checks if the command the user enters
+	has a backslash and only adds one if it doesn't.
+	(ebib-index-help): new.
+	(ebib-info): new.
+	(ebib-entry-mode-map): key bindings [return] and "h" added.
+	(ebib-delete-field-contents): added a confirmation.
+	(ebib-entry-help): new.
+	(ebib-strings-mode-map): key binding "h" added.
+	(ebib-strings-help): new.
+	(ebib-multiline-mode): renamed from ebib-multiline-edit-mode.
+	(ebib-multiline-menu): new.
+	(ebib-multiline-help): new.
+
 2009-08-15  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-multiline-edit-mode): changed into a minor mode
