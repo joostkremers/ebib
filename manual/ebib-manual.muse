@@ -979,7 +979,8 @@ corresponding open database.
 Ebib provides the possibility to add a timestamp to every new entry, recording
 the time it was added to the database. The timestamp is recorded in the
 (additional) field =timestamp=. (By default, this field is not shown, but you can
-make it visible by pressing =H= in the index buffer.)
+make it visible by checking the option "Show Hidden Fields" in the Options
+menu.)
 
 You can tell Ebib to create timestamps by setting the option =Use Timestamp= in
 Ebib's customisation buffer. With this option set, a timestamp is included in
@@ -1317,8 +1318,6 @@ viewer. With numeric prefix argument, extract the *n*-th filename.
   =G= :: equivalent to =End=.
 
   =h= :: show the info node on the index buffer. (=ebib-index-help=)
-
-  =H= :: show/hide hidden fields. =(ebib-toggle-hidden)=
 
   =j= :: equivalent to =Down=.
 
