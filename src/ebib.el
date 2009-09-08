@@ -706,6 +706,10 @@ successful, and NIL otherwise."
 	     (ebib-set-modified t ,goal-db)
 	     (message ,message ,num)))))))
 
+(defmacro ebib-cur-entry-key ()
+  "Returns the key of the current entry in EBIB-CUR-DB."
+  `(car (edb-cur-entry ebib-cur-db)))
+
 (defmacro ebib-export-to-file (prompt-string message insert-fn)
   "Exports data to a file.
 PROMPT-STRING is the string that is used to ask for the filename
@@ -1131,10 +1135,6 @@ added."
 	(if sort
 	    (sort (cons abbr (edb-strings-list db)) 'string<)
 	  (cons abbr (edb-strings-list db)))))
-
-(defmacro ebib-cur-entry-key ()
-  "Returns the key of the current entry in EBIB-CUR-DB."
-  `(car (edb-cur-entry ebib-cur-db)))
 
 (defun ebib-search-key-in-buffer (entry-key)
   "Searches ENTRY-KEY in the index buffer.

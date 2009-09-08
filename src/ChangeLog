@@ -1,3 +1,8 @@
+2009-09-08  Joost Kremers  <joostkremers@sourceforge.net>
+
+	* ebib.el (ebib-cur-entry-key): moved to a position earlier in the
+	file, because it was defined after it was first used.
+
 2009-08-17  Joost Kremers  <joostkremers@yahoo.com>
 
 	* ebib.el (ebib-layout): changed possible values: use symbol
