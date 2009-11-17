@@ -2,6 +2,8 @@ body {
     font-family: Verdana, "Bitstream Vera Sans", sans-serif;
     background-color: #c9c9c9;
     color: #33333A;
+    line-height: 140%;
+    font-size: 100%;
 }
 
 a {
@@ -15,8 +17,17 @@ a:hover {
     color: #cf1212;
 }
 
+h1.title {
+    text-align: center;
+    font-size: 2em;
+}
+
 h1 {
-    text-align: center
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.3em;
 }
 
 img {
@@ -24,23 +35,19 @@ img {
 }
 
 #main {
-    position: absolute;
-/*     margin-right: 20%; */
-    margin-left: 50px;
-    top: 0px;
+    margin-left: 30%;
+    max-width: 40em;
+    top: 140px;
     text-align: justify;
-    width: 600px;
 }
 
 #menu {
-    position: absolute;
-/*     margin-left: 78%; */
-    margin-left: 750px;
-    top: 20px;
-    width: 180px;
-    text-align: center;
-    background-color: #a01c1c;
+    position: fixed;
+    margin-left: 5%;
+    padding: 2%;
     height: 600px;
+    width: 130px;
+    background-color: #6b1d1d;
     color: #c9c9c9;
 }
 
@@ -58,4 +65,8 @@ img {
     width: 100%;
     position: absolute;
     bottom: 0%;
+}
+
+.centering {
+    text-align: center;
 }

@@ -32,7 +32,7 @@ img {
     width: 600px;
 }
 
-#menu {
+#TOC {
     position: absolute;
 /*     margin-left: 78%; */
     margin-left: 710px;
@@ -44,12 +44,12 @@ img {
     color: #c9c9c9;
 }
 
-#menu a {
+#TOC a {
     text-decoration: none;
     color: #ffa71d;
 }
 
-#menu a:hover {
+#TOC a:hover {
     text-decoration: none;
     color: #ffdf20;
 }
