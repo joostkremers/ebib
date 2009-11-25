@@ -1,0 +1,9 @@
+# pandoc-mode settings file for ebib.text #
+# saved on 2009.11.19 18:41 #
+
+read::markdown
+write::texinfo
+output::t
+standalone::t
+table-of-contents::t
+output-dir::/home/joost/src/ebib/manual/texi
