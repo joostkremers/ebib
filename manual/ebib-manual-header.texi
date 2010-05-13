@@ -1,18 +1,22 @@
 \input texinfo  @c -*-texinfo-*-
 
-@setfilename <lisp>(concat (muse-page-name) ".info")</lisp>
-@settitle <lisp>(muse-publishing-directive "title")</lisp>
+@c %**start of header
+@setfilename ebib.info
+@settitle Ebib manual v1.9.0
+@ %** end of header
 
-@documentencoding iso-8859-1
+@documentencoding utf-8
 
 @iftex
 @finalout
 @end iftex
 
 @titlepage
-@title <lisp>(muse-publishing-directive "title")</lisp>
-@author <lisp>(muse-publishing-directive "author")</lisp>
+@title Ebib manual
+@author Joost Kremers
 @end titlepage
+
+
 
 @dircategory Emacs
 @direntry
