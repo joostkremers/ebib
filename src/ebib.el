@@ -3638,9 +3638,17 @@ or on the region if it is active."
 
 (defun ebib-get-db-from-filename (filename)
   "Returns the database struct associated with FILENAME."
+  (when (file-name-absolute-p filename)
+    (setq filename (expand-file-name filename))) ; expand ~, . and ..
   (catch 'found
     (mapc #'(lambda (db)
-	     (if (string= (file-name-nondirectory (edb-filename db)) filename)
+	      (if (string= filename
+			   ; if filename is absolute, we want to compare to the
+			   ; absolute filename of the database, otherwise we
+			   ; should use only the non-directory component.
+			   (if (file-name-absolute-p filename)
+			       (edb-filename db)
+			     (file-name-nondirectory (edb-filename db))))
 		 (throw 'found db)))
 	  ebib-databases)
     nil))
