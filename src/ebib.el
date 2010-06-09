@@ -78,11 +78,14 @@ Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
-(defcustom ebib-insertion-commands '(("cite" . 1))
+(defcustom ebib-insertion-commands '(("cite" 1 nil))
   "*A list of commands that can be used to insert an entry into a (La)TeX buffer.
 For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
-  :type '(repeat (cons :tag "Command" (string) (integer :tag "Optional arguments"))))
+  :type '(repeat (list :tag "Citation command" (string :tag "Command")
+		       (integer :tag "Optional arguments")
+		       (choice (const :tag "Single obligatory argument" nil)
+			       (const :tag "Multiple obligatory arguments" t)))))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "*The major mode of the multiline edit buffer."
@@ -230,7 +233,7 @@ Each string is added to the preamble on a separate line."
 		  (caddr entry)))
 	value))
 
-(defcustom ebib-entry-types 
+(defcustom ebib-entry-types
   '((article                                              ;; name of entry type
      (author title journal year)                          ;; obligatory fields
      (volume number pages month note))                    ;; optional fields
@@ -256,7 +259,7 @@ Each string is added to the preamble on a separate line."
      (editor pages organization publisher address month note))
 
     (manual
-     (title) 
+     (title)
      (author organization address edition month year note))
 
     (misc
@@ -360,7 +363,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
 
 ;; these two are set by EBIB-FILL-ENTRY-BUFFER
 (defvar ebib-cur-entry-hash nil "The hash table containing the data of the current entry.")
-(defvar ebib-current-field nil "The current field.") 
+(defvar ebib-current-field nil "The current field.")
 
 ;; and this one by EBIB-FILL-STRINGS-BUFFER
 (defvar ebib-current-string nil "The current @STRING definition.")
@@ -543,7 +546,7 @@ the result."
      ((eq (string-to-char string) ?\{)
       ;; we remove all occurrences of `\{' and of `\}' from the string:
       (let ((clear-str (remove-from-string (remove-from-string string "[\\][{]")
-					   "[\\][}]")))                  	 
+					   "[\\][}]")))
 	(while (and (in-string ?\{ clear-str) (in-string ?\} clear-str))
 	  (setq clear-str (remove-from-string clear-str "{[^{]*?}")))
 	(> (length clear-str) 0)))
@@ -746,7 +749,7 @@ display the actual filename."
 (defun ebib-get-all-fields (entry-type)
   "Returns all the fields of ENTRY-TYPE."
   (cons 'type* (append (ebib-get-obl-fields entry-type)
-		       (ebib-get-opt-fields entry-type) 
+		       (ebib-get-opt-fields entry-type)
 		       ebib-additional-fields)))
 
 (defmacro ebib-retrieve-entry (entry-key db)
@@ -857,7 +860,7 @@ display the actual filename."
       (let ((beg (point)))
 	(end-of-line)
 	(delete-region beg (point)))
-      (insert (format "%-18s %s" ebib-current-string 
+      (insert (format "%-18s %s" ebib-current-string
 		      (if (multiline-p str)
 			  (concat "+" (first-line str))
 			(concat " " str))))
@@ -1467,7 +1470,7 @@ killed and the database has been modified."
       :style toggle :selected ebib-allow-identical-fields]
      ["Full Layout" ebib-toggle-layout :enable t
       :style toggle :selected (eq ebib-layout 'full)]
-     ["Modify Entry Types" ebib-customize-entry-types t] 
+     ["Modify Entry Types" ebib-customize-entry-types t]
      ["Customize Ebib" ebib-customize t])
     ["View Log Buffer" ebib-show-log t]
     ["Lower Ebib" ebib-lower t]
@@ -1540,7 +1543,7 @@ signal the user to check the log for warnings or errors."
      ((eq type 'message)
       (apply 'message format-string args)))
     (insert (apply 'format  (concat format-string "\n") args))))
-  
+
 (defun ebib-load-bibtex-file (&optional file)
   "Loads a BibTeX file into Ebib."
   (interactive)
@@ -1560,7 +1563,7 @@ signal the user to check the log for warnings or errors."
       (with-temp-buffer
 	(with-syntax-table ebib-syntax-table
 	  (insert-file-contents file)
-	  ;; if the user makes any changes, we'll want to create a back-up. 
+	  ;; if the user makes any changes, we'll want to create a back-up.
 	  (setf (edb-make-backup ebib-cur-db) t)
 	  (let ((result (ebib-find-bibtex-entries nil)))
 	    (setf (edb-n-entries ebib-cur-db) (car result))
@@ -1759,7 +1762,7 @@ POINT is moved back to the beginning of the line."
 
 (defun ebib-get-field-contents (limit)
   "Gets the contents of a BibTeX field.
-LIMIT indicates the end of the entry, beyond which the function will not 
+LIMIT indicates the end of the entry, beyond which the function will not
 search."
   (skip-chars-forward "#%'(),=} \n\t\f" limit)
   (let ((beg (point)))
@@ -2047,7 +2050,7 @@ EBIB-USE-TIMESTAMP is T."
 
 (defun ebib-compare-xrefs (x y)
   (gethash 'crossref (ebib-retrieve-entry x ebib-cur-db)))
-  
+
 (defun ebib-format-database (db)
   "Writes database DB into the current buffer in BibTeX format."
   (when (edb-preamble db)
@@ -2055,7 +2058,7 @@ EBIB-USE-TIMESTAMP is T."
   (ebib-format-strings db)
   (let ((sorted-list (copy-list (edb-keys-list db))))
     (cond
-     (ebib-save-xrefs-first 
+     (ebib-save-xrefs-first
       (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
      (ebib-sort-order
       (setq sorted-list (sort sorted-list 'ebib-entry<))))
@@ -2182,11 +2185,11 @@ Can also be used to change a virtual database into a real one."
   "Toggle whether index cards are printed with a newpage after each card."
   (interactive)
   (setq ebib-print-newpage (not ebib-print-newpage)))
-  
+
 (defun ebib-toggle-print-multiline ()
   "Toggle whether multiline fields are printed."
   (interactive)
-  (setq ebib-print-multiline (not ebib-print-multiline)))  
+  (setq ebib-print-multiline (not ebib-print-multiline)))
 
 (defun ebib-delete-entry ()
   "Deletes the current entry from the database."
@@ -2333,7 +2336,7 @@ a filename is asked to which the entry is appended."
 				      (edb-marked-entries ebib-cur-db))))))
     ((default)
      (beep))))
-     
+
 (defun ebib-search ()
   "Search the current Ebib database.
 The search is conducted with STRING-MATCH and can therefore be a
@@ -2779,6 +2782,25 @@ modified."
   (unless (eq ebib-layout 'full)
     (set-window-dedicated-p (selected-window) t)))
 
+(defun ebib-create-citation-command (command n-opt-args key)
+  "Create a LaTeX citation command with COMMAND and KEY.
+N-OPT-ARGS is the number of optional arguments COMMAND takes. A
+backslash is prefixed to COMMAND if none is present (and COMMAND
+is non-empty)."
+  (let ((opt-args (loop for i from 1 to n-opt-args
+			collect (read-from-minibuffer (format "Cite %s with optional argument %d: " key i)))))
+    (while (equal (car opt-args) "") ; empty args at the beginning of the list don't need
+      (setq opt-args (cdr opt-args)))	; to be included.
+    (format "%s%s%s{%s}"
+	    (if (or (string= command "")
+		    (= (aref command 0) 92))
+		"" "\\") ; add a backslash if the user didn't type one.
+	    command
+	    (mapconcat #'(lambda (str)
+			   (format "[%s]" str))
+		       opt-args "")
+	    key)))
+
 (defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
 The user is prompted for the buffer to push the entry into."
@@ -2789,38 +2811,35 @@ The user is prompted for the buffer to push the entry into."
        (let ((buffer (read-buffer (if called-with-prefix
 				      "Push marked entries to buffer: "
 				    "Push entry to buffer: ")
-				  ebib-push-buffer t))
-	     insert-string)
+				  ebib-push-buffer t)))
 	 (when buffer
 	   (setq ebib-push-buffer buffer)
-	   (let ((keys (if called-with-prefix
-			   (when (edb-marked-entries ebib-cur-db)
-			     (mapconcat #'(lambda (x) x)
-					(edb-marked-entries ebib-cur-db)
-					","))
-			 (car (edb-cur-entry ebib-cur-db)))))
-	     (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-					       nil nil nil ebib-insertion-commands))
-		 (let* ((n-opt-args (or
-				     (cdr (assoc command ebib-insertion-commands))
-				     1))
-			(opt-args (loop for i from 1 to n-opt-args
-					collect (read-from-minibuffer (format "Optional argument %d: " i)))))
-		   (while (equal (car opt-args) "")  ; empty args at the beginning of the list don't need
-		     (setq opt-args (cdr opt-args))) ; to be included.
-		   (setq insert-string (format "%s%s%s{%s}"
-					       (if (= (aref command 0) 92) "" "\\") ; add a backslash if the user didn't type one.
-					       command
-					       (mapconcat #'(lambda (str)
-							      (format "[%s]" str))
-							  opt-args "")
-					       keys)))
-	       (setq insert-string keys)))
-	   (when insert-string
-	     (save-excursion
-	       (set-buffer buffer)
-	       (insert insert-string))
-	     (message "Pushed entries to buffer %s" buffer)))))
+	   (if-str (command (completing-read "Command to use: " ebib-insertion-commands
+					     nil nil nil ebib-minibuf-hist))
+	       (let* ((n-opt-args (or (cadr (assoc command ebib-insertion-commands))
+				      1))
+		      (allow-mult-args (caddr (assoc command ebib-insertion-commands)))
+		      (key (if (and called-with-prefix ; if there are marked entries...
+				    (edb-marked-entries ebib-cur-db))
+			       (if allow-mult-args ; and the command allows multiple separate args
+				   (car (edb-marked-entries ebib-cur-db)) ; just take the first one here
+				 (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
+					    (edb-marked-entries ebib-cur-db)
+					    ","))
+			     (car (edb-cur-entry ebib-cur-db)))) ; if there are no marked entries, take the current entry
+		      (first (ebib-create-citation-command command n-opt-args key))
+		      (rest (when (and called-with-prefix ; if we have marked entries...
+				       (edb-marked-entries ebib-cur-db)
+				       allow-mult-args) ; and a command that allows multiple separate arguments
+			      (mapcar #'(lambda (key) ; we need to process the rest of the entries
+					  (ebib-create-citation-command "" n-opt-args key))
+				      (cdr (edb-marked-entries ebib-cur-db)))))
+		      (insert-string (apply #'concat first rest)))
+		 (when insert-string
+		   (save-excursion
+		     (set-buffer buffer)
+		     (insert insert-string))
+		   (message "Pushed entries to buffer %s" buffer)))))))
       ((default)
        (beep)))))
 
@@ -3000,7 +3019,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 	      (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
 	      (ebib-set-modified t))))
     (select-window (get-buffer-window ebib-entry-buffer) nil)))
-  
+
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
   ;; we don't want the completion buffer to be shown in the index window,
@@ -3431,7 +3450,7 @@ to append them to."
   (when ebib-current-string ; there is always a current string, unless there are no strings
     (let ((num (ebib-prefix prefix)))
       (if num
-	  (ebib-export-to-db 
+	  (ebib-export-to-db
 	   num "All @STRING definitions copied to database %d"
 	   #'(lambda (db)
 	       (mapc #'(lambda (abbr)
@@ -3709,7 +3728,7 @@ completion works."
        (when collection
 	 (let ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist)))
 	   (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-					     nil nil nil ebib-insertion-commands))
+					     nil nil nil ebib-minibuf-hist))
 	       (let* ((n-opt-args (or
 				   (cdr (assoc command ebib-insertion-commands))
 				   1))
