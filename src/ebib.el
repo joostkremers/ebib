@@ -84,8 +84,8 @@ For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
   :type '(repeat (list :tag "Citation command" (string :tag "Command")
 		       (integer :tag "Optional arguments")
-		       (choice (const :tag "Single obligatory argument" nil)
-			       (const :tag "Multiple obligatory arguments" t)))))
+		       (choice (const :tag "Standard command" nil)
+			       (const :tag "Multicite command" t)))))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "*The major mode of the multiline edit buffer."
