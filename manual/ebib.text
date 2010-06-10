@@ -1840,8 +1840,6 @@ The default entry types and fields are the following:
      booklet
        title
        author howpublished address month year note
-
-\newpage
   
      inbook
        author title chapter pages publisher year
