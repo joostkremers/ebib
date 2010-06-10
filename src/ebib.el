@@ -2814,32 +2814,34 @@ The user is prompted for the buffer to push the entry into."
 				  ebib-push-buffer t)))
 	 (when buffer
 	   (setq ebib-push-buffer buffer)
-	   (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-					     nil nil nil ebib-minibuf-hist))
-	       (let* ((n-opt-args (or (cadr (assoc command ebib-insertion-commands))
-				      1))
-		      (allow-mult-args (caddr (assoc command ebib-insertion-commands)))
-		      (key (if (and called-with-prefix ; if there are marked entries...
-				    (edb-marked-entries ebib-cur-db))
-			       (if allow-mult-args ; and the command allows multiple separate args
-				   (car (edb-marked-entries ebib-cur-db)) ; just take the first one here
-				 (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
-					    (edb-marked-entries ebib-cur-db)
-					    ","))
-			     (car (edb-cur-entry ebib-cur-db)))) ; if there are no marked entries, take the current entry
-		      (first (ebib-create-citation-command command n-opt-args key))
-		      (rest (when (and called-with-prefix ; if we have marked entries...
-				       (edb-marked-entries ebib-cur-db)
-				       allow-mult-args) ; and a command that allows multiple separate arguments
-			      (mapcar #'(lambda (key) ; we need to process the rest of the entries
-					  (ebib-create-citation-command "" n-opt-args key))
-				      (cdr (edb-marked-entries ebib-cur-db)))))
-		      (insert-string (apply #'concat first rest)))
-		 (when insert-string
-		   (save-excursion
-		     (set-buffer buffer)
-		     (insert insert-string))
-		   (message "Pushed entries to buffer %s" buffer)))))))
+	   (let (insert-string)
+	     (if-str (command (completing-read "Command to use: " ebib-insertion-commands
+					       nil nil nil ebib-minibuf-hist))
+		 (let* ((n-opt-args (or (cadr (assoc command ebib-insertion-commands))
+					1))
+			(allow-mult-args (caddr (assoc command ebib-insertion-commands)))
+			(key (if (and called-with-prefix ; if there are marked entries...
+				      (edb-marked-entries ebib-cur-db))
+				 (if allow-mult-args ; and the command allows multiple separate args
+				     (car (edb-marked-entries ebib-cur-db)) ; just take the first one here
+				   (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
+					      (edb-marked-entries ebib-cur-db)
+					      ","))
+			       (car (edb-cur-entry ebib-cur-db)))) ; if there are no marked entries, take the current entry
+			(first (ebib-create-citation-command command n-opt-args key))
+			(rest (when (and called-with-prefix ; if we have marked entries...
+					 (edb-marked-entries ebib-cur-db)
+					 allow-mult-args) ; and a command that allows multiple separate arguments
+				(mapcar #'(lambda (key) ; we need to process the rest of the entries
+					    (ebib-create-citation-command "" n-opt-args key))
+					(cdr (edb-marked-entries ebib-cur-db))))))
+		      (setq insert-string (apply #'concat first rest)))
+	       (setq insert-string (car (edb-cur-entry ebib-cur-db))))
+	     (when insert-string
+	       (save-excursion
+		 (set-buffer buffer)
+		 (insert insert-string))
+	       (message "Pushed entries to buffer %s" buffer))))))
       ((default)
        (beep)))))
 
@@ -3710,7 +3712,7 @@ completion works."
     ((database)
      (or ebib-local-bibtex-filenames
 	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let (collection insert-string)
+     (let (collection)
        (if (eq ebib-local-bibtex-filenames 'none)
 	   (if (null (edb-cur-entry ebib-cur-db))
 	       (error "No entries found in current database")
@@ -3726,24 +3728,17 @@ completion works."
 						  collection))))))
 	       ebib-local-bibtex-filenames))
        (when collection
-	 (let ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist)))
-	   (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-					     nil nil nil ebib-minibuf-hist))
-	       (let* ((n-opt-args (or
-				   (cdr (assoc command ebib-insertion-commands))
-				   1))
-		      (opt-args (loop for i from 1 to n-opt-args
-				      collect (read-from-minibuffer (format "Optional argument %d: " i)))))
-		 (while (equal (car opt-args) "")  ; empty args at the beginning of the list don't need
-		   (setq opt-args (cdr opt-args))) ; to be included.
-		 (setq insert-string (format "\\%s%s{%s}" command
-					     (mapconcat #'(lambda (str)
-							    (format "[%s]" str))
-							opt-args "")
-					     key)))
-	     (setq insert-string key)))
-	 (when insert-string
-	   (insert insert-string)))))
+	 (let* ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist))
+		(insert-string (if-str (command (completing-read "Command to use: " ebib-insertion-commands
+								 nil nil nil ebib-minibuf-hist))
+				   (ebib-create-citation-command command
+								 (or
+								  (cadr (assoc command ebib-insertion-commands))
+								  1)
+								 key)
+				 key)))
+	   (when insert-string
+	     (insert insert-string))))))
     ((default)
      (error "No database loaded"))))
 
