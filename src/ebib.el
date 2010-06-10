@@ -922,17 +922,17 @@ The keys of HASHTABLE must be either symbols or strings."
 	      (setq string ""))))
       (if (raw-p string)
 	  (setq raw "*")
-	(setq string (to-raw string))) ; we have to make the string look nice
+	(setq string (to-raw string)))	; we have to make the string look nice
       (when match-str
-	(multiple-value-setq (string matched) (match-all match-str string)))
-      (when (multiline-p string)
-	;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
-	;; multiline is local and therefore the object it refers to should
-	;; be GC'ed when the function returns. but for some reason, the
-	;; plus sign is persistent, and if it's been highlighted as the
-	;; result of a search, it stays that way.
-	(setq multiline (propertize "+" 'face nil))
-	(setq string (first-line string))))
+	(multiple-value-setq (string matched) (match-all match-str string))))
+    (when (multiline-p string)
+      ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
+      ;; multiline is local and therefore the object it refers to should
+      ;; be GC'ed when the function returns. but for some reason, the
+      ;; plus sign is persistent, and if it's been highlighted as the
+      ;; result of a search, it stays that way.
+      (setq multiline (propertize "+" 'face nil))
+      (setq string (first-line string)))
     (when (and matched
 	       (string= multiline "+"))
       (add-text-properties 0 1 '(face highlight) multiline))
