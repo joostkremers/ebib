@@ -4,5 +4,5 @@
 read::markdown
 write::latex
 output::ebib-manual.tex
-custom-header::/home/joost/src/ebib/manual/header.tex
-output-dir::/home/joost/src/ebib/manual/pdf
+custom-header::~/src/ebib/manual/header.tex
+output-dir::~/src/ebib/manual/pdf

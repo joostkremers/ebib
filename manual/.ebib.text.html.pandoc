@@ -1,9 +1,9 @@
 # pandoc-mode settings file for ebib.text #
-# saved on 2009.11.17 12:16 #
+# saved on 2010.06.10 14:25 #
 
 read::markdown
 write::html
 output::ebib-manual.html
 css::ebib-manual.css
 standalone::t
-output-dir::/home/joost/src/ebib/manual/html
+output-dir::~/src/ebib/manual/html

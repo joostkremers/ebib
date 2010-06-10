@@ -1569,7 +1569,7 @@ option to display e.g. the title of each entry as well.
 
 ### Insertion Commands ###
 
-**Default value**: `((cite . 1))`.\newline
+**Default value**: `((cite 1 nil))`.\newline
 
 \noindent With the command `ebib-insert-bibtex-key` or with the command key `p`
 in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This
@@ -1582,12 +1582,31 @@ command can have. When Ebib prompts you for a citation key, it will ask for as
 many optional arguments as you specify here. (If you don't want to be asked for
 those optional arguments, just fill in 0.)
 
+Lastly, there is also the possibility to specify that a command is a multicite
+command. When you push a number of marked entries and provide a multicite
+command, Ebib asks you for optional arguments for each entry key and the
+citation is formatted properly:
+
+    \parencites[35]{jones1996}[88--120]{winston2008}[23]{key3}
+
+With a regular command, Ebib only asks you for one set of optional arguments and
+puts all marked entries in a single argument:
+
+    \cite{jones1996,winston2008}
+
+If you push just a single entry, multicite commands don't behave differently
+from regular commands. Note that with `ebib-insert-bibtex-key`, it's not
+possible to insert more than one key, so multicite commands behave just like
+regular commands if you insert an entry this way.
+
 When Ebib prompts you for a citation command, the commands specified in this
 option can be obtained through tab completion. However, it is not necessary to
 fill in a command from this list here. You can also enter another command (in
 which case Ebib asks for exactly one optional argument) or even no command at
 all. In the latter case, Ebib does not ask for any optional arguments and simply
 puts the key in the buffer without adding anything else.
+
+
 
 
 ### Multiline Major Mode ###
