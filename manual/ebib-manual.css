@@ -39,10 +39,12 @@ img {
     top: 120px;
     width: 250px;
     background-color: #a01c1c;
-    height: 770px;
+    /* height: 770px; */
     padding: 10px;
     color: #c9c9c9;
 }
+
+#TOC > ul > li > ul > li ul { display: none; }
 
 #TOC a {
     text-decoration: none;
