@@ -1265,6 +1265,24 @@ buffers and reads the rc file."
   (set-buffer ebib-index-buffer)
   (ebib-index-mode))
 
+(defun ebib-start-on-entry (entry)
+  "Starts Ebib on ENTRY.
+ENTRY must be an entry in the last autoloaded database if Ebib is
+started for the first time or in the current database if Ebib is
+running in the background. If ENTRY is not found, the first or
+current entry is shown."
+  (interactive "sEntry to display: ")
+  (ebib)
+  (let ((entry? (member entry (edb-keys-list ebib-cur-db))))
+    (if entry?
+	(progn
+	  (setf (edb-cur-entry ebib-cur-db) entry?)
+	  (set-buffer ebib-index-buffer)
+	  (goto-char (point-min))
+	  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+	  (ebib-select-entry))
+      (message "No entry `%s' in current database " entry))))
+
 (defun ebib-quit ()
   "Quits Ebib.
 The Ebib buffers are killed, all variables except the keymaps are set to nil."
