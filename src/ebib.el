@@ -588,10 +588,11 @@ the result."
 	(goto-char (point-min))
 	(while (progn
 		 (setq middle (/ (+ lower upper 1) 2))
-		 (goto-line middle)     ; if this turns out to be where we need to be,
-		 (beginning-of-line)    ; this puts POINT at the right spot.
-		 (> (- upper lower) 1)) ; if upper and lower differ by only 1, we have found the
-					; position to insert the entry in.
+		 (goto-char (point-min))
+		 (forward-line (1- middle)) ; if this turns out to be where we need to be,
+		 (beginning-of-line)        ; this puts POINT at the right spot.
+		 (> (- upper lower) 1))     ; if upper and lower differ by only 1, we have found the
+					    ; position to insert the entry in.
 	  (save-excursion
 	    (let ((beg (point)))
 	      (end-of-line)
@@ -1946,7 +1947,8 @@ buffer if Ebib is not occupying the entire frame."
     ((entries)
      (setf (edb-cur-entry ebib-cur-db) (last (edb-keys-list ebib-cur-db)))
      (set-buffer ebib-index-buffer)
-     (goto-line (edb-n-entries ebib-cur-db))
+     (goto-char (point-min))
+     (forward-line (1- (edb-n-entries ebib-cur-db)))
      (ebib-set-index-highlight)
      (ebib-fill-entry-buffer))
     ((default)
