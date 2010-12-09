@@ -1184,8 +1184,10 @@ is a list of fields that are considered in order for the sort value."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
-(defun ebib ()
-  "Ebib, a BibTeX database manager."
+(defun ebib (&optional key)
+  "Ebib, a BibTeX database manager.
+Optional argument key specifies the entry of the current database
+that is to be displayed."
   (interactive)
   (if (or (equal (window-buffer) ebib-index-buffer)
 	  (equal (window-buffer) ebib-entry-buffer))
@@ -1203,7 +1205,18 @@ is a list of fields that are considered in order for the sort value."
     (let ((index-window (get-buffer-window ebib-index-buffer)))
       (if index-window
           (select-window index-window nil)
-        (ebib-setup-windows)))))
+        (ebib-setup-windows)))
+    ;; if ebib is called with an argument, we look for it
+    (when key
+      (let ((exists? (member key (edb-keys-list ebib-cur-db))))
+	(if exists?
+	    (progn
+	      (setf (edb-cur-entry ebib-cur-db) exists?)
+	      (set-buffer ebib-index-buffer)
+	      (goto-char (point-min))
+	      (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+	      (ebib-select-entry))
+	  (message "No entry `%s' in current database " key))))))
 
 (defun ebib-setup-windows ()
   "Creates the window configuration we want for Ebib in the
@@ -1266,24 +1279,6 @@ buffers and reads the rc file."
   (setq ebib-index-buffer (get-buffer-create " none"))
   (set-buffer ebib-index-buffer)
   (ebib-index-mode))
-
-(defun ebib-start-on-entry (entry)
-  "Starts Ebib on ENTRY.
-ENTRY must be an entry in the last autoloaded database if Ebib is
-started for the first time or in the current database if Ebib is
-running in the background. If ENTRY is not found, the first or
-current entry is shown."
-  (interactive "sEntry to display: ")
-  (ebib)
-  (let ((entry? (member entry (edb-keys-list ebib-cur-db))))
-    (if entry?
-	(progn
-	  (setf (edb-cur-entry ebib-cur-db) entry?)
-	  (set-buffer ebib-index-buffer)
-	  (goto-char (point-min))
-	  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-	  (ebib-select-entry))
-      (message "No entry `%s' in current database " entry))))
 
 (defun ebib-quit ()
   "Quits Ebib.
