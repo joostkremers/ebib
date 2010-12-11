@@ -1151,7 +1151,7 @@ value already is multiline.
 
 The mode that is used in the multiline edit buffer is user-configurable. The
 default value is `text-mode`, but if you prefer to use some other mode, you can
-specify this through the customization options. (Personally, I use
+specify this through the customisation options. (Personally, I use
 `markdown-mode` in the multiline edit buffer, so that I can use
 [`markdown`](http://daringfireball.net/projects/markdown/) to write annotations,
 which provides an easy way to create headers, use bold and italic, etc., in
@@ -1617,7 +1617,7 @@ puts the key in the buffer without adding anything else.
 that the value *must* be a command for a major mode.
 
 
-###  Sort Order ###
+### Sort Order ###
 
 **Default value**: `nil`.\newline
 
@@ -1628,7 +1628,7 @@ sort level to enter a sort field. If you want to add more than one sort field to
 the sort level, simply hit `INS` again.
 
 
-###  Save Xrefs First ###
+### Save Xrefs First ###
 
 **Default value**: `nil`.\newline
 
@@ -1639,7 +1639,7 @@ option `Save Xrefs First` in Ebib's customisation buffer. With this option set,
 BibTeX's crossreferencing options work as intended.
 
 
-###  Crossref Face ###
+### Crossref Face ###
 
 **Default value**: `((t (:foreground "red")))`.\newline
 
@@ -1647,7 +1647,7 @@ BibTeX's crossreferencing options work as intended.
 this face. By default, the face has red as foreground colour.
 
 
-###  Selected Face ###
+### Selected Face ###
 
 **Default value**: `((t (:inverse-video t)))` (GNU Emacs)\newline
  `((t (:foreground "white" :background "red")))` (XEmacs).\newline
@@ -1659,7 +1659,7 @@ background and a white foreground colour. This option allows you to change these
 defaults.
 
 
-###  Use Timestamp ###
+### Use Timestamp ###
 
 **Default value**: `nil`.\newline
 
@@ -1668,7 +1668,7 @@ entry, recording the date and time it was added to the database. See
 [Timestamps](#timestamps).
 
 
-###  Timestamp Format ###
+### Timestamp Format ###
 
 **Default value**: `"%a %b %e %T %Y"`.\newline
 
@@ -1679,7 +1679,7 @@ representation. The default value produces a timestamp of the form `"Mon Mar 12
 `format-time-string` for the forms that the format string can take.
 
 
-###  Standard Url Field ###
+### Standard Url Field ###
 
 **Default value**: `url`.\newline
 
@@ -1687,7 +1687,7 @@ representation. The default value produces a timestamp of the form `"Mon Mar 12
 index buffer.
 
 
-###  Url Regexp ###
+### Url Regexp ###
 
 **Default value**: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+`.\newline
 
@@ -1698,7 +1698,7 @@ with `http://` or `https://` and does not contain whitespace or one of the
 characters `' " <` or `>`.
 
 
-###  Browser Command ###
+### Browser Command ###
 
 **Default value**: `nil`.\newline
 
@@ -1710,7 +1710,7 @@ For this to work, the browser that you use must be able to handle a URL on the
 command line.
 
 
-###  Standard File Field ###
+### Standard File Field ###
 
 **Default value**: `file`.\newline
 
@@ -1718,7 +1718,7 @@ command line.
 the index buffer.
 
 
-###  File Associations ###
+### File Associations ###
 
 **Default value**: `(("pdf" . "xpdf") ("ps" . "gv"))`.\newline
 
@@ -1734,7 +1734,7 @@ first.) If you prefer to use this mode, simply leave the program field blank for
 the relevant file type.
 
 
-###  File Regexp ###
+### File Regexp ###
 
 **Default value**: `[^?|\:*<>\" \n\t\f]+`.\newline
 
@@ -1748,7 +1748,7 @@ files is not so straightforward. It is therefore not advisable to put anything
 but filenames in the `file` field.
 
 
-###  File Search Dirs ###
+### File Search Dirs ###
 
 **Default value**: `~`.\newline
 
@@ -1757,7 +1757,7 @@ is not recursive: only the files listed here are searched, not their
 subdirectories.
 
 
-###  Print Preamble ###
+### Print Preamble ###
 
 **Default value**: `nil`.\newline
 
@@ -1766,7 +1766,7 @@ file Ebib creates for printing the database as index cards. You can set your own
 `\usepackage` commands, or anything else you may need.
 
 
-###  Print Newline ###
+### Print Newline ###
 
 **Default value**: `nil`.\newline
 
@@ -1775,7 +1775,7 @@ printing index cards. When this option is unset, the entries are separated by a
 small amount of whitespace only.
 
 
-###  Print Multiline ###
+### Print Multiline ###
 
 **Default value**: `nil`.\newline
 
@@ -1784,7 +1784,7 @@ you print index cards. When unset, multiline values are excluded, which saves
 space.
 
 
-###  Latex Preamble ###
+### Latex Preamble ###
 
 **Default value**: `\bibliographystyle{plain}`.\newline
 
@@ -1793,7 +1793,7 @@ creating a list of references from the database. The default is to use the
 `plain` style, but you may want to specify your own BibTeX packages and options.
 
 
-###  Print Tempfile ###
+### Print Tempfile ###
 
 **Default value**: `nil`.\newline
 
@@ -1803,7 +1803,7 @@ unset, Ebib will ask for a filename each time either of these commands is
 called.
 
 
-###  Allow Identical Fields ###
+### Allow Identical Fields ###
 
 **Default value**: `nil`.\newline
 
@@ -1813,7 +1813,7 @@ separated by semicolons (see
 [Multiple Identical Fields](#multiple-identical-fields)).
 
 
-###  Entry Types ###
+### Entry Types ###
 
 **Default value**: see below.\newline
 
@@ -1882,7 +1882,7 @@ The default entry types and fields are the following:
        month year
   
 
-##  Modifying Key Bindings ##
+## Modifying Key Bindings ##
 
 If you are unhappy about Ebib's standard key bindings and would like to change
 them, or if you would like to bind a command that is only available through the
