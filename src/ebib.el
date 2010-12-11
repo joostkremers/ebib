@@ -989,8 +989,7 @@ either T or NIL."
     (setq db ebib-cur-db))
   (setf (edb-modified db) mod)
   (when (eq db ebib-cur-db)
-    (save-excursion
-      (set-buffer ebib-index-buffer)
+    (with-current-buffer ebib-index-buffer
       (set-buffer-modified-p mod))))
 
 (defun ebib-modified-p ()
@@ -1547,8 +1546,7 @@ MESSAGE; WARNING, which logs the message and sets the variable
 EBIB-LOG-ERROR to 0; or ERROR, which logs the message and sets
 the variable EBIB-LOG-ERROR to 1. The latter two can be used to
 signal the user to check the log for warnings or errors."
-  (save-excursion
-    (set-buffer ebib-log-buffer)
+  (with-current-buffer ebib-log-buffer
     (cond
      ((eq type 'warning)
       (or ebib-log-error ; if ebib-error-log is already set to 1, we don't want to overwrite it!
@@ -2854,8 +2852,7 @@ The user is prompted for the buffer to push the entry into."
 		      (setq insert-string (apply #'concat first rest)))
 	       (setq insert-string (car (edb-cur-entry ebib-cur-db))))
 	     (when insert-string
-	       (save-excursion
-		 (set-buffer buffer)
+	       (with-current-buffer buffer
 		 (insert insert-string))
 	       (message "Pushed entries to buffer %s" buffer))))))
       ((default)
