@@ -700,7 +700,7 @@ COPY-FN is the function that actually copies the relevant
 data. It must take as argument the database to which the data is
 to be copied. COPY-FN must return T if the copying was
 successful, and NIL otherwise."
-  (let ((goal-db (gensym)))
+  (let ((goal-db (make-symbol "goal-db")))
     `(let ((,goal-db (nth (1- ,num) ebib-databases)))
        (cond
 	((not ,goal-db)
@@ -725,7 +725,7 @@ contents is appended to the file the user enters.
 MESSAGE is shown in the echo area when the export was
 successful. It must contain a %s directive, which is used to
 display the actual filename."
-  (let ((filename (gensym)))
+  (let ((filename (make-symbol "filename")))
     `(let ((insert-default-directory (not ebib-export-filename)))
        (if-str (,filename (read-file-name
 			   ,prompt-string "~/" nil nil ebib-export-filename))
@@ -887,7 +887,7 @@ overlay is not moved.  FIELD must be a symbol."
       ;; make sure we can get back to our original position, if the field
       ;; cannot be found in the buffer:
       (let ((current-pos (point)))
-	(when (evenp direction)
+	(when (eq (logand direction 1) 0) ; if direction is even
 	  (goto-char start))
 	(unless (funcall fn (concat "^" (symbol-name field)) limit t)
 	  (goto-char current-pos)))))
@@ -2072,7 +2072,7 @@ EBIB-USE-TIMESTAMP is T."
   (when (edb-preamble db)
     (insert (format "@PREAMBLE{%s}\n\n" (edb-preamble db))))
   (ebib-format-strings db)
-  (let ((sorted-list (copy-list (edb-keys-list db))))
+  (let ((sorted-list (copy-tree (edb-keys-list db))))
     (cond
      (ebib-save-xrefs-first
       (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
