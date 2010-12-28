@@ -2850,11 +2850,19 @@ The user is prompted for the buffer to push the entry into."
 					    (ebib-create-citation-command "" n-opt-args key))
 					(cdr (edb-marked-entries ebib-cur-db))))))
 		      (setq insert-string (apply #'concat first rest)))
-	       (setq insert-string (car (edb-cur-entry ebib-cur-db))))
+	       ;; if the user did not provide a comand, we just insert the
+	       ;; current entry, or the marked entries, separated by commas:
+	       (setq insert-string
+		     (if (and called-with-prefix
+			      (edb-marked-entries ebib-cur-db))
+			 (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
+				    (edb-marked-entries ebib-cur-db)
+				    ",")
+		       (car (edb-cur-entry ebib-cur-db))))
 	     (when insert-string
 	       (with-current-buffer buffer
 		 (insert insert-string))
-	       (message "Pushed entries to buffer %s" buffer))))))
+	       (message "Pushed entries to buffer %s" buffer)))))))
       ((default)
        (beep)))))
 
