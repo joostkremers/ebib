@@ -44,7 +44,7 @@ echo
     fi
 )
 
-(cd $BASE/release-files
+(cd $BASE
     cp INSTALL README ../"$full_name"
     echo "Copied release files to $full_name"
     echo
