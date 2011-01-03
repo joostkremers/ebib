@@ -1144,7 +1144,7 @@ added."
   "Searches ENTRY-KEY in the index buffer.
 Moves point to the first character of the key and returns point."
   (goto-char (point-min))
-  (search-forward entry-key)
+  (re-search-forward (concat "^" entry-key))
   (beginning-of-line)
   (point))
 
