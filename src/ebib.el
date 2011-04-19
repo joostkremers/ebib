@@ -904,6 +904,26 @@ The keys of HASHTABLE must be either symbols or strings."
 	     hashtable)
     result))
 
+(defun ebib-get-field-value (field entry-key &optional db)
+  "Returns the value of FIELD in the entry ENTRY-KEY in DB.
+Actually returns a list with the value of FIELD as the first
+element. The second element is T if the value was obtained from a
+cross-referenced entry.
+
+If DB is nil, it defaults to the current database."
+  (unless db
+    (setq db ebib-cur-db))
+  (let ((entry (ebib-retrieve-entry entry-key db)))
+    (if entry
+	(or
+	 (let ((val (copy-sequence (gethash field entry))))
+	   (if val
+	       (values val nil)))
+	 (let ((xref (ebib-retrieve-entry (to-raw (gethash 'crossref entry)) db)))
+	   (if xref
+	       (values (gethash field xref) t))))
+      (values nil nil))))
+
 (defun ebib-get-field-highlighted (field current-entry &optional match-str)
   ;; note: we need to work on a copy of the string, otherwise the highlights
   ;; are made to the string as stored in the database. hence copy-sequence.
