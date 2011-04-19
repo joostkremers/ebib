@@ -3150,7 +3150,7 @@ viewed."
   "Copies the contents of the current field to the kill ring."
   (interactive)
   (unless (eq ebib-current-field 'type*)
-    (let ((contents (gethash ebib-current-field ebib-cur-entry-hash)))
+    (let ((contents (car (ebib-get-field-value ebib-current-field (ebib-cur-entry-key)))))
       (when (stringp contents)
 	(kill-new contents)
 	(message "Field contents copied.")))))
