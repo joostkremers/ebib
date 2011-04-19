@@ -1766,15 +1766,15 @@ POINT is moved back to the beginning of the line."
 	  (when (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
 	    (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
 	      (unless (eq field-type 'type*) ; the 'type*' key holds the entry type, so we can't use it
-		(let ((field-contents (ebib-get-field-contents limit)))
+		(let ((field-contents (ebib-read-field-contents limit)))
 		  (when field-contents
 		    (funcall fn field-type field-contents fields))))))))
       (when (> (hash-table-count fields) 0)
 	(puthash 'type* entry-type fields)
 	fields))))
 
-(defun ebib-get-field-contents (limit)
-  "Gets the contents of a BibTeX field.
+(defun ebib-read-field-contents (limit)
+  "Reads the contents of a BibTeX field from a .bib file.
 LIMIT indicates the end of the entry, beyond which the function will not
 search."
   (skip-chars-forward "#%'(),=} \n\t\f" limit)
