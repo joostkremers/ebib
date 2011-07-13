@@ -2816,24 +2816,32 @@ modified."
   (unless (eq ebib-layout 'full)
     (set-window-dedicated-p (selected-window) t)))
 
-(defun ebib-create-citation-command (command n-opt-args key)
+(defun ebib-create-citation-command (command n-opt-args key mode)
   "Create a LaTeX citation command with COMMAND and KEY.
 N-OPT-ARGS is the number of optional arguments COMMAND takes. A
 backslash is prefixed to COMMAND if none is present (and COMMAND
-is non-empty)."
+is non-empty). MODE is the major mode of the push buffer. If this
+is 'org-mode, the citation command is formatted as an org-mode
+link. Any other value created a standard TeX citation."
   (let ((opt-args (loop for i from 1 to n-opt-args
 			collect (read-from-minibuffer (format "Cite %s with optional argument %d: " key i)))))
     (while (equal (car opt-args) "") ; empty args at the beginning of the list don't need
       (setq opt-args (cdr opt-args)))	; to be included.
-    (format "%s%s%s{%s}"
-	    (if (or (string= command "")
-		    (= (aref command 0) 92))
-		"" "\\") ; add a backslash if the user didn't type one.
-	    command
-	    (mapconcat #'(lambda (str)
-			   (format "[%s]" str))
-		       opt-args "")
-	    key)))
+    (if (eq mode 'org-mode)
+	(format "[[%s:%s][%s]]"
+		command key
+		(if opt-args       ; if the user provided an optional argument,
+		    (car opt-args) ; it is included as the link description,t
+		  key))            ; otherwise the key becomes the description.
+      (format "%s%s%s{%s}"
+	      (if (or (string= command "")
+		      (= (aref command 0) 92))
+		  "" "\\") ; add a backslash if the user didn't type one.
+	      command
+	      (mapconcat #'(lambda (str)
+			     (format "[%s]" str))
+			 opt-args "")
+	      key))))
 
 (defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
@@ -2862,12 +2870,12 @@ The user is prompted for the buffer to push the entry into."
 					      (edb-marked-entries ebib-cur-db)
 					      ","))
 			       (car (edb-cur-entry ebib-cur-db)))) ; if there are no marked entries, take the current entry
-			(first (ebib-create-citation-command command n-opt-args key))
+			(first (ebib-create-citation-command command n-opt-args key (buffer-local-value 'major-mode (get-buffer buffer))))
 			(rest (when (and called-with-prefix ; if we have marked entries...
 					 (edb-marked-entries ebib-cur-db)
 					 allow-mult-args) ; and a command that allows multiple separate arguments
 				(mapcar #'(lambda (key) ; we need to process the rest of the entries
-					    (ebib-create-citation-command "" n-opt-args key))
+					    (ebib-create-citation-command "" n-opt-args key (buffer-local-value 'major-mode (get-buffer buffer))))
 					(cdr (edb-marked-entries ebib-cur-db))))))
 		   (setq insert-string (apply #'concat first rest)))
 	       ;; if the user did not provide a comand, we just insert the
@@ -3776,7 +3784,8 @@ completion works."
 								 (or
 								  (cadr (assoc command ebib-insertion-commands))
 								  1)
-								 key)
+								 key
+								 (buffer-local-value 'major-mode (current-buffer)))
 				 key)))
 	   (when insert-string
 	     (insert insert-string))))))
