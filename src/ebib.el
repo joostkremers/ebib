@@ -2012,10 +2012,12 @@ buffer if Ebib is not occupying the entire frame."
       (ebib-execute-when
 	((marked-entries)
 	 (setf (edb-marked-entries ebib-cur-db) nil)
-	 (ebib-fill-index-buffer))
+	 (ebib-fill-index-buffer)
+	 (message "All entries unmarked"))
 	((entries)
 	 (setf (edb-marked-entries ebib-cur-db) (copy-sequence (edb-keys-list ebib-cur-db)))
-	 (ebib-fill-index-buffer))
+	 (ebib-fill-index-buffer)
+	 (message "All entries marked"))
 	((default)
 	 (beep)))
     (ebib-execute-when
