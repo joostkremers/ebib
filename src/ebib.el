@@ -1531,6 +1531,7 @@ to \"none\"."
 			(save-excursion
 			  (let ((beg (progn
 				       (beginning-of-line)
+				       (forward-line -1)
 				       (point))))
 			    (skip-chars-forward "^ ")
 			    (add-text-properties beg (point) '(face ebib-marked-face))))))
