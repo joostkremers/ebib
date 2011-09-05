@@ -1,6 +1,6 @@
 ;; Ebib v==VERSION==
 ;;
-;; Copyright (c) 2003-2010 Joost Kremers
+;; Copyright (c) 2003-2011 Joost Kremers
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
