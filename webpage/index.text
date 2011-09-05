@@ -159,7 +159,7 @@ Tar balls of Ebib releases can be downloaded from the
 contains the source code, and the manual in info and html format. Installation
 instructions can be found in the manual.
 
-There is also a public [git repository](http://repo.or.cz/w/ebib.git) for Ebib.
+There is also a public [git repository](https://github.com/joostkremers/ebib.git) for Ebib.
 From there, you can get the latest sources, provided you have
 [git](http://git.or.cz/) installed.
 
