@@ -120,7 +120,8 @@ of entries, so it is not compatible with setting the Sort Order option."
 (defcustom ebib-use-timestamp nil
   "*If true, new entries will get a time stamp.
 The time stamp will be stored in a field \"timestamp\" that can
-be made visible with the `H' command in the index buffer."
+be made visible with the command \\[ebib-toggle-hidden] in the
+index buffer."
   :group 'ebib
   :type 'boolean)
 
