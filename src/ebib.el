@@ -30,6 +30,8 @@
   (require 'cl))
 (require 'easymenu)
 
+(declare-function bibtex-generate-autokey "bibtex" nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -1421,6 +1423,7 @@ killed and the database has been modified."
 (ebib-key index "j" ebib-next-entry)
 (ebib-key index "J" ebib-switch-to-database)
 (ebib-key index "k" ebib-prev-entry)
+(ebib-key index "K" ebib-generate-autokey)
 (ebib-key index "l" ebib-show-log)
 (ebib-key index "m" ebib-mark-entry)
 (ebib-key index "n" ebib-search-next)
@@ -1906,6 +1909,24 @@ buffer if Ebib is not occupying the entire frame."
     ((default)
      (beep))))
 
+(defun ebib-generate-autokey ()
+  "Automatically generate a key for the current entry.
+This function uses the function BIBTEX-GENERATE-AUTOKEY to
+generate the key, see that function's documentation for details."
+  (interactive)
+  (ebib-execute-when
+    ((entries)
+     (let ((new-key
+	    (with-temp-buffer
+	      (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db nil)
+	      (goto-char (point-min))
+	      (bibtex-generate-autokey))))
+       (if (member new-key (edb-keys-list ebib-cur-db))
+	   (error (format "Key `%s' already exists" new-key))
+	 (ebib-update-keyname new-key))))
+    ((default)
+     (beep))))
+
 (defun ebib-close-database ()
   "Closes the current BibTeX database."
   (interactive)
@@ -1990,22 +2011,27 @@ buffer if Ebib is not occupying the entire frame."
 					 cur-keyname))
 	   (if (member new-keyname (edb-keys-list ebib-cur-db))
 	       (error (format "Key `%s' already exists" new-keyname))
-	     (unless (string= cur-keyname new-keyname)
-	       (let ((fields (ebib-retrieve-entry cur-keyname ebib-cur-db))
-		     (marked (member cur-keyname (edb-marked-entries ebib-cur-db))))
-		 (ebib-remove-entry-from-db cur-keyname ebib-cur-db)
-		 (ebib-remove-key-from-buffer cur-keyname)
-		 (ebib-insert-entry new-keyname fields ebib-cur-db t nil)
-		 (setf (edb-cur-entry ebib-cur-db) (member new-keyname (edb-keys-list ebib-cur-db)))
-		 (sort-in-buffer (edb-n-entries ebib-cur-db) new-keyname)
-		 (with-buffer-writable
-		   (ebib-display-entry new-keyname))
-		 (forward-line -1) ; move one line up to position the cursor on the new entry.
-		 (ebib-set-index-highlight)
-		 (ebib-set-modified t)
-		 (when marked (ebib-mark-entry))))))))
+	     (ebib-update-keyname new-keyname)))))
     ((default)
      (beep))))
+
+(defun ebib-update-keyname (new-key)
+  "Changes the key of the current BibTeX entry to NEW-KEY."
+  (let ((cur-key (ebib-cur-entry-key)))
+    (unless (string= cur-key new-key)
+      (let ((fields (ebib-retrieve-entry cur-key ebib-cur-db))
+	    (marked (member cur-key (edb-marked-entries ebib-cur-db))))
+	(ebib-remove-entry-from-db cur-key ebib-cur-db)
+	(ebib-remove-key-from-buffer cur-key)
+	(ebib-insert-entry new-key fields ebib-cur-db t nil)
+	(setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
+	(sort-in-buffer (edb-n-entries ebib-cur-db) new-key)
+	(with-buffer-writable
+	  (ebib-display-entry new-key))
+	(forward-line -1) ; move one line up to position the cursor on the new entry.
+	(ebib-set-index-highlight)
+	(ebib-set-modified t)
+	(when marked (ebib-mark-entry))))))
 
 (defun ebib-mark-entry ()
   "Marks or unmarks the current entry."
