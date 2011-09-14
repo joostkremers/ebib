@@ -1929,6 +1929,9 @@ generate the key, see that function's documentation for details."
      (let ((new-key
 	    (with-temp-buffer
 	      (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db nil)
+	      (let ((x-ref (ebib-get-field-value 'crossref (ebib-cur-entry-key))))
+		(if x-ref
+		    (ebib-format-entry (to-raw (car x-ref)) ebib-cur-db nil)))
 	      (goto-char (point-min))
 	      (bibtex-generate-autokey))))
        (if (member new-key (edb-keys-list ebib-cur-db))
