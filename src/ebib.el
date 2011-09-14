@@ -29,6 +29,7 @@
 (eval-when-compile
   (require 'cl))
 (require 'easymenu)
+(require 'bibtex)
 
 (declare-function bibtex-generate-autokey "bibtex" nil)
 
