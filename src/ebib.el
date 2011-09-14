@@ -82,7 +82,7 @@ Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
-(defcustom ebib-auto-generate-keys nil
+(defcustom ebib-autogenerate-keys nil
   "*If set, Ebib generates key automatically.
 Uses the function BIBTEX-GENERATE-AUTOKEY, see there for
 customization options."
@@ -1892,7 +1892,7 @@ buffer if Ebib is not occupying the entire frame."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (if-str (entry-key (if ebib-auto-generate-keys
+     (if-str (entry-key (if ebib-autogenerate-keys
 			    "<new-entry>"
 			  (read-string "New entry key: ")))
 	 (progn
