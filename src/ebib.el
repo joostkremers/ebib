@@ -82,6 +82,13 @@ Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
+(defcustom ebib-auto-generate-keys nil
+  "*If set, Ebib generates key automatically.
+Uses the function BIBTEX-GENERATE-AUTOKEY, see there for
+customization options."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-insertion-commands '(("cite" 1 nil))
   "*A list of commands that can be used to insert an entry into a (La)TeX buffer.
 For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
@@ -1885,7 +1892,9 @@ buffer if Ebib is not occupying the entire frame."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (if-str (entry-key (read-string "New entry key: "))
+     (if-str (entry-key (if ebib-auto-generate-keys
+			    "<new-entry>"
+			  (read-string "New entry key: ")))
 	 (progn
 	   (if (member entry-key (edb-keys-list ebib-cur-db))
 	       (error "Key already exists")
@@ -2987,9 +2996,13 @@ The user is prompted for the buffer to push the entry into."
   (setq truncate-lines t))
 
 (defun ebib-quit-entry-buffer ()
-  "Quits editing the entry."
+  "Quits editing the entry.
+If the key of the current entry is <new-entry>, a new key is
+automatically generated using BIBTEX-GENERATE-AUTOKEY."
   (interactive)
-  (select-window (get-buffer-window ebib-index-buffer) nil))
+  (select-window (get-buffer-window ebib-index-buffer) nil)
+  (if (equal (ebib-cur-entry-key) "<new-entry>")
+      (ebib-generate-autokey)))
 
 (defun ebib-find-visible-field (field direction)
   "Finds the first visible field before or after FIELD.
