@@ -1924,7 +1924,9 @@ generate the key, see that function's documentation for details."
 	      (bibtex-generate-autokey))))
        (if (member new-key (edb-keys-list ebib-cur-db))
 	   (error (format "Key `%s' already exists" new-key))
-	 (ebib-update-keyname new-key))))
+	 (if (equal new-key "")
+	     (error (format "Cannot create key"))
+	   (ebib-update-keyname new-key)))))
     ((default)
      (beep))))
 
