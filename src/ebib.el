@@ -1915,7 +1915,7 @@ This function uses the function BIBTEX-GENERATE-AUTOKEY to
 generate the key, see that function's documentation for details."
   (interactive)
   (ebib-execute-when
-    ((entries)
+    ((real-db entries)
      (let ((new-key
 	    (with-temp-buffer
 	      (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db nil)
