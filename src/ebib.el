@@ -82,6 +82,15 @@ Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
+(defcustom ebib-uniquify-keys nil
+  "*Create unique keys.
+If set, Ebib will not complain about duplicate keys but will
+instead create a unique key by adding an identifier to it.
+Identifiers are created from consecutive letters of the
+alphabet, starting with `b'."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-autogenerate-keys nil
   "*If set, Ebib generates key automatically.
 Uses the function BIBTEX-GENERATE-AUTOKEY, see there for
@@ -1897,27 +1906,38 @@ buffer if Ebib is not occupying the entire frame."
 			  (read-string "New entry key: ")))
 	 (progn
 	   (if (member entry-key (edb-keys-list ebib-cur-db))
-	       (error "Key already exists")
-	     (set-buffer ebib-index-buffer)
-	     (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
-	     ;; we create the hash table *before* the call to
-	     ;; ebib-display-entry, because that function refers to the
-	     ;; hash table if ebib-index-display-fields is set.
-	     (let ((fields (make-hash-table)))
-	       (puthash 'type* ebib-default-type fields)
-	       (ebib-insert-entry entry-key fields ebib-cur-db t t))
-	     (with-buffer-writable
-	       (ebib-display-entry entry-key))
-	     (forward-line -1) ; move one line up to position the cursor on the new entry.
-	     (ebib-set-index-highlight)
-	     (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
-	     (ebib-fill-entry-buffer)
-	     (ebib-edit-entry)
-	     (ebib-set-modified t)))))
+	       (if ebib-uniquify-keys
+		   (setq entry-key (ebib-uniquify-key entry-key))
+		 (error "Key already exists")))
+	   (set-buffer ebib-index-buffer)
+	   (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
+	   ;; we create the hash table *before* the call to
+	   ;; ebib-display-entry, because that function refers to the
+	   ;; hash table if ebib-index-display-fields is set.
+	   (let ((fields (make-hash-table)))
+	     (puthash 'type* ebib-default-type fields)
+	     (ebib-insert-entry entry-key fields ebib-cur-db t t))
+	   (with-buffer-writable
+	     (ebib-display-entry entry-key))
+	   (forward-line -1) ; move one line up to position the cursor on the new entry.
+	   (ebib-set-index-highlight)
+	   (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
+	   (ebib-fill-entry-buffer)
+	   (ebib-edit-entry)
+	   (ebib-set-modified t))))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
     ((default)
      (beep))))
+
+(defun ebib-uniquify-key (key)
+  "Creates a unique key from KEY."
+  (let* ((suffix ?b)
+	 (unique-key (concat key (list suffix))))
+    (while (member unique-key (edb-keys-list ebib-cur-db))
+      (setq suffix (1+ suffix))
+      (setq unique-key (concat key (list suffix))))
+    unique-key))
 
 (defun ebib-generate-autokey ()
   "Automatically generate a key for the current entry.
@@ -2029,22 +2049,24 @@ generate the key, see that function's documentation for details."
 (defun ebib-update-keyname (new-key)
   "Changes the key of the current BibTeX entry to NEW-KEY."
   (if (member new-key (edb-keys-list ebib-cur-db))
-      (error (format "Key `%s' already exists" new-key))
-    (let ((cur-key (ebib-cur-entry-key)))
-      (unless (string= cur-key new-key)
-	(let ((fields (ebib-retrieve-entry cur-key ebib-cur-db))
-	      (marked (member cur-key (edb-marked-entries ebib-cur-db))))
-	  (ebib-remove-entry-from-db cur-key ebib-cur-db)
-	  (ebib-remove-key-from-buffer cur-key)
-	  (ebib-insert-entry new-key fields ebib-cur-db t nil)
-	  (setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
-	  (sort-in-buffer (edb-n-entries ebib-cur-db) new-key)
-	  (with-buffer-writable
-	    (ebib-display-entry new-key))
-	  (forward-line -1) ; move one line up to position the cursor on the new entry.
-	  (ebib-set-index-highlight)
-	  (ebib-set-modified t)
-	  (when marked (ebib-mark-entry)))))))
+      (if ebib-uniquify-keys
+	  (setq new-key (ebib-uniquify-key new-key))
+	(error (format "Key `%s' already exists" new-key))))
+  (let ((cur-key (ebib-cur-entry-key)))
+    (unless (string= cur-key new-key)
+      (let ((fields (ebib-retrieve-entry cur-key ebib-cur-db))
+	    (marked (member cur-key (edb-marked-entries ebib-cur-db))))
+	(ebib-remove-entry-from-db cur-key ebib-cur-db)
+	(ebib-remove-key-from-buffer cur-key)
+	(ebib-insert-entry new-key fields ebib-cur-db t nil)
+	(setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
+	(sort-in-buffer (edb-n-entries ebib-cur-db) new-key)
+	(with-buffer-writable
+	  (ebib-display-entry new-key))
+	(forward-line -1) ; move one line up to position the cursor on the new entry.
+	(ebib-set-index-highlight)
+	(ebib-set-modified t)
+	(when marked (ebib-mark-entry))))))
 
 (defun ebib-mark-entry ()
   "Marks or unmarks the current entry."
