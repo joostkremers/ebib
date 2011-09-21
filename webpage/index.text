@@ -79,6 +79,7 @@ quite a few extra features that make managing your BibTeX files easier.
  - creating and editing `@string` and `@preamble` definitions is supported.
  - BibTeX entry and field types can be customised, allowing adaptation for
    non-standard and personal bibliography styles.
+ - automatic creation of entry keys.
  - field values containing newlines are supported, allowing the creation
    of annotated bibliographies.
  - the database can be saved with the entries in the `.bib` file sorted on
@@ -122,6 +123,7 @@ quite a few extra features that make managing your BibTeX files easier.
  - entries can be imported from text buffers or from the `*scratch*` buffer
    (allowing copy & paste of BibTeX entries, e.g. from the Internet).
  - a URL stored in a BibTeX field can be extracted and sent to a browser.
+ - files stored in a BibTeX field can be opened with user-configurable viewers.
  - a time stamp can be added to each new entry, allowing you to keep track
    of new additions in the database.
  - (parts of) databases can be printed, either as a list of references
