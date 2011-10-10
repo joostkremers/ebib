@@ -39,7 +39,7 @@
 
 ;; user customisation
 
-(defgroup ebib nil "Ebib: a BibTeX database manager" :group 'Tex)
+(defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
 
 (defcustom ebib-default-type 'article
   "*The default type for a newly created BibTeX entry."
