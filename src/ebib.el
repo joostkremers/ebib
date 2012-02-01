@@ -791,9 +791,19 @@ display the actual filename."
 		       (ebib-get-opt-fields entry-type)
 		       ebib-additional-fields)))
 
-(defmacro ebib-retrieve-entry (entry-key db)
-  "Returns the hash table of the fields stored in DB under ENTRY-KEY."
-  `(gethash ,entry-key (edb-database ,db)))
+(defun ebib-retrieve-entry (entry-key database)
+  "Returns the hash table of the fields stored in DATABASE under ENTRY-KEY.
+DATABASE can also be a list of databases. In that case, the first
+matching entry is returned."
+  (catch 'found
+    (mapc #'(lambda (db)
+	      (let ((entry (gethash entry-key (edb-database db))))
+		(when entry
+		  (throw 'found entry))))
+	  (if (not (listp database))
+	      (list database)
+	    database))
+    nil)) ; if no entry was found, we must return nil
 
 (defun ebib-erase-buffer (buffer)
   (set-buffer buffer)
@@ -2199,7 +2209,7 @@ Can also be used to change a virtual database into a real one."
   (interactive)
   (ebib-execute-when
     ((database)
-     (if-str (new-filename (read-file-name "Save to file: " "~/"))
+     (if-str (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
 	 (progn
 	   (with-temp-buffer
 	     (ebib-format-database ebib-cur-db)
@@ -2381,6 +2391,28 @@ current entry is not changed."
 	   (ebib-fill-entry-buffer)))))
     ((default)
      (beep))))
+
+;; the exporting functions will have to be redesigned completely. for now (1 Feb
+;; 2012) we just define a new function ebib-export-entries. in the long run,
+;; this should be the general exporting function, calling other functions as the
+;; need arises.
+
+(defun ebib-export-entries (entries &optional source-db filename)
+  "Exports ENTRIES from SOURCE-DB to FILENAME.
+ENTRIES is a list of entry keys. If FILENAME is not provided, the
+user is asked for one."
+  (unless filename
+       (setq filename (read-file-name
+			   "File to export entries to:" "~/" nil nil ebib-export-filename)))
+  (unless source-db
+    (setq source-db ebib-cur-db))
+  (with-temp-buffer
+    (insert "\n")
+    (mapc #'(lambda (key)
+	      (ebib-format-entry key ebib-cur-db nil))
+	  entries)
+    (append-to-file (point-min) (point-max) filename)
+    (setq ebib-export-filename filename)))
 
 (defun ebib-export-entry (prefix)
   "Copies entries to another database.
@@ -3830,7 +3862,7 @@ returns the symbol NONE."
 	(insert-buffer-substring texfile-buffer))
       (save-excursion
 	(goto-char (point-min))
-	(if (re-search-forward "\\\\bibliography{\\(.*?\\)}" nil t)
+	(if (re-search-forward "\\\\\\(no\\)*bibliography{\\(.*?\\)}" nil t)
 	    (mapcar #'(lambda (file)
 			(ensure-extension file "bib"))
 		    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*"))
@@ -3923,6 +3955,43 @@ be found."
 	     (ebib-fill-entry-buffer))))))
     ((default)
      (error "No database(s) loaded"))))
+
+(defun ebib-create-bib-from-bbl ()
+  "Create a .bib file for the current LaTeX document.
+The LaTeX document must have a .bbl file associated with it. All
+bibitems are extracted from this file and a new .bib file is
+created containing only these entries."
+  (interactive)
+  (ebib-execute-when
+    ((database)
+     (or ebib-local-bibtex-filenames
+	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+     (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
+	    (bbl-file (concat filename-sans-extension ".bbl"))
+	    (bib-file (concat filename-sans-extension ".bib")))
+       (unless (file-exists-p bbl-file)
+	 (error "No .bbl file exists. Run BibTeX first"))
+       (when (or (not (file-exists-p bib-file))
+		 (y-or-n-p (format "%s already exists. Overwrite? " (file-name-nondirectory bib-file))))
+	 (when (file-exists-p bib-file)
+	   (delete-file bib-file))
+	 (let ((databases
+		(delq nil (mapcar #'(lambda (file)
+				      (ebib-get-db-from-filename file))
+				  ebib-local-bibtex-filenames))))
+	   (with-temp-buffer
+	     (insert-file-contents bbl-file)
+	     (ebib-export-entries (ebib-read-entries-from-bbl) databases bib-file))))))
+    ((default)
+     (beep))))
+
+(defun ebib-read-entries-from-bbl ()
+  (interactive)
+  (goto-char (point-min))
+  (let (entries)
+    (while (re-search-forward "\\\\bibitem\\[.*?\\]{\\(.*?\\)}" nil t)
+      (add-to-list 'entries (match-string 1) t))
+    entries))
 
 (provide 'ebib)
 
