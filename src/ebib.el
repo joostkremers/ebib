@@ -1,4 +1,4 @@
-;; Ebib v==VERSION==
+;;; ebib.el --- a BibTeX database manager
 ;;
 ;; Copyright (c) 2003-2011 Joost Kremers
 ;; All rights reserved.
@@ -25,6 +25,21 @@
 ;; THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+;;; Commentary:
+
+;; Ebib is a BibTeX database manager that runs in GNU Emacs and
+;; XEmacs. With Ebib, you can create and manage .bib-files, all within
+;; Emacs. It supports @string and @preamble definitions, multi-line field
+;; values, searching, and integration with Emacs' (La)TeX mode.
+
+;; See the Ebib manual for usage and installation instructions.
+
+;; The latest release version of Ebib, contact information and mailing list
+;; can be found at <http://ebib.sourceforge.net>. Development sources can be
+;; found at <https://github.com/joostkremers/ebib>.
+
+;; Code:
 
 (eval-when-compile
   (require 'cl))
