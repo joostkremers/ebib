@@ -3865,7 +3865,7 @@ returns the symbol NONE."
 	(if (re-search-forward "\\\\\\(no\\)*bibliography{\\(.*?\\)}" nil t)
 	    (mapcar #'(lambda (file)
 			(ensure-extension file "bib"))
-		    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*"))
+		    (split-string (buffer-substring-no-properties (match-beginning 2) (match-end 2)) ",[ ]*"))
 	  'none)))))
 
 (defun ebib-insert-bibtex-key ()
