@@ -3003,7 +3003,7 @@ The user is prompted for the buffer to push the entry into."
 		       (car (edb-cur-entry ebib-cur-db)))))
 	     (when insert-string
 	       (with-current-buffer buffer
-		 (insert insert-string))
+		 (insert (format "%s%s" (if (eq major-mode 'markdown-mode) "@" "") insert-string)))
 	       (message "Pushed entries to buffer %s" buffer))))))
       ((default)
        (beep)))))
@@ -3906,7 +3906,7 @@ completion works."
 								 (buffer-local-value 'major-mode (current-buffer)))
 				 key)))
 	   (when insert-string
-	     (insert insert-string))))))
+	     (insert (format "%s%s" (if (eq major-mode 'markdown-mode) "@" "") insert-string)))))))
     ((default)
      (error "No database loaded"))))
 
