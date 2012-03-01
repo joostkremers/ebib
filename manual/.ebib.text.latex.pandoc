@@ -1,8 +1,10 @@
 # pandoc-mode settings file for ebib.text #
-# saved on 2012.03.01 23:10 #
+# saved on 2012.03.01 23:16 #
 
+standalone::t
 read::markdown
 write::latex
 output::ebib-manual.tex
 output-dir::~/src/ebib/manual/pdf
 variable::geometry:a4paper
+latex-engine::xelatex
