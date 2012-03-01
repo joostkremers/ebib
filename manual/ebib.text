@@ -1512,7 +1512,7 @@ all the options available in the customisation buffer.
 
 ### Default Type ###
 
-**Default value**: `article`.\newline
+**Default value**: `article`.\
 
 \noindent The default type is the default entry type given to a new entry. Every
 entry in the Ebib database must have a type, because the type defines which
@@ -1522,7 +1522,7 @@ which can be customised through this option.
 
 ### Preload Bib Files ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent This option allows you to specify which file(s) Ebib is to load when
 it starts up. Specify one file per line, press the `INS` button to add more
@@ -1532,7 +1532,7 @@ files. You can complete a partial filename with `M-TAB`.
 ### Additional Fields ###
 
 **Default value**: `crossref` `url` `annote` `abstract` `keywords` `file`
-  `timestamp`.\newline
+  `timestamp`.\
 
 \noindent The additional fields are those fields that are available for all
 entry types, and which BibTeX generally ignores. This option allows you to
@@ -1542,7 +1542,7 @@ field per line, press the `INS` button to add more fields.
 
 ### Layout ###
 
-**Default value**: `full`.\newline
+**Default value**: `full`.\
 
 \noindent When set to `full`, Ebib takes over the entire frame when it runs.
 Alternatively, you can select `custom`, so that you can specify the width of the
@@ -1552,14 +1552,14 @@ leaving the left part free. See [Screen Layout](#screen-layout) for details.
 
 ### Width ###
 
-**Default value**: 80.\newline
+**Default value**: 80.\
 
 \noindent The width of the Ebib windows when `ebib-layout` is set to `custom`.
 
 
 ### Index Window Size ###
 
-**Default value**: 10.\newline
+**Default value**: 10.\
 
 \noindent This option lets you specify the size of the index window at the top
 of the Ebib screen.
@@ -1567,7 +1567,7 @@ of the Ebib screen.
 
 ### Index Display Fields ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent This option allows you to specify fields that should be displayed next
 to the entry key in the index buffer. By default, the index buffer only shows
@@ -1577,7 +1577,7 @@ option to display e.g. the title of each entry as well.
 
 ### Autogenerate Keys ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent This option specifies whether Ebib should autogenerate keys or not. If
 set, adding a new entry will not ask for a key. Instead, a temporary key
@@ -1591,7 +1591,7 @@ documentation string.
 
 ### Insertion Commands ###
 
-**Default value**: `((cite 1 nil))`.\newline
+**Default value**: `((cite 1 nil))`.\
 
 \noindent With the command `ebib-insert-bibtex-key` or with the command key `p`
 in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This
@@ -1633,7 +1633,7 @@ puts the key in the buffer without adding anything else.
 
 ### Multiline Major Mode ###
 
-**Default value**: `text-mode`.\newline
+**Default value**: `text-mode`.\
 
 \noindent This specifies the major mode used in the multiline edit buffer. Note
 that the value *must* be a command for a major mode.
@@ -1641,7 +1641,7 @@ that the value *must* be a command for a major mode.
 
 ### Sort Order ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent The use of this option is explained above, see
 [Sorting the .bib file](#sorting-bib-file). To create a sort order, click the
@@ -1652,7 +1652,7 @@ the sort level, simply hit `INS` again.
 
 ### Save Xrefs First ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent For cross-referencing to work, the cross-referencing entries must
 appear in the `.bib` file *before* the cross-referenced entries. In order to
@@ -1663,7 +1663,7 @@ BibTeX's crossreferencing options work as intended.
 
 ### Crossref Face ###
 
-**Default value**: `((t (:foreground "red")))`.\newline
+**Default value**: `((t (:foreground "red")))`.\
 
 \noindent Field values inherited from a cross-referenced entry are marked with
 this face. By default, the face has red as foreground colour.
@@ -1671,8 +1671,9 @@ this face. By default, the face has red as foreground colour.
 
 ### Selected Face ###
 
-**Default value**: `((t (:inverse-video t)))` (GNU Emacs)\newline
- `((t (:foreground "white" :background "red")))` (XEmacs).\newline
+**Default value**:\
+`((t (:inverse-video t)))` (GNU Emacs)\
+ `((t (:foreground "white" :background "red")))` (XEmacs).\
 
 \noindent When entries are selected (with `m`), they are highlighted in this
 face. By default, GNU Emacs uses the text property `highlight`. XEmacs only
@@ -1683,7 +1684,7 @@ defaults.
 
 ### Use Timestamp ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent If this option is set, Ebib will add a `timestamp` field to every new
 entry, recording the date and time it was added to the database. See
@@ -1692,7 +1693,7 @@ entry, recording the date and time it was added to the database. See
 
 ### Timestamp Format ###
 
-**Default value**: `"%a %b %e %T %Y"`.\newline
+**Default value**: `"%a %b %e %T %Y"`.\
 
 \noindent This option specifies the format string that is used to create the
 timestamp. The format string is used by `format-time-string` to create a time
@@ -1703,7 +1704,7 @@ representation. The default value produces a timestamp of the form `"Mon Mar 12
 
 ### Standard Url Field ###
 
-**Default value**: `url`.\newline
+**Default value**: `url`.\
 
 \noindent This is the field that Ebib searches for URLs if you press `u` in the
 index buffer.
@@ -1711,7 +1712,7 @@ index buffer.
 
 ### Url Regexp ###
 
-**Default value**: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+`.\newline
+**Default value**: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+`.\
 
 \noindent This is the regular expression that Ebib uses to search for URLs in a
 field. With the default value, Ebib considers everything that is in a LaTeX
@@ -1722,7 +1723,7 @@ characters `' " <` or `>`.
 
 ### Browser Command ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent If this option is unset, Ebib uses the Emacs function `browse-url` to
 start a browser. If this function does not exist, you can set this option. For
@@ -1734,7 +1735,7 @@ command line.
 
 ### Standard File Field ###
 
-**Default value**: `file`.\newline
+**Default value**: `file`.\
 
 \noindent This is the field that Ebib searches for filenames if you press `f` in
 the index buffer.
@@ -1742,7 +1743,7 @@ the index buffer.
 
 ### File Associations ###
 
-**Default value**: `(("pdf" . "xpdf") ("ps" . "gv"))`.\newline
+**Default value**: `(("pdf" . "xpdf") ("ps" . "gv"))`.\
 
 \noindent The programs used to view files. By default, programs for `.pdf` and
 `.ps` files are specified, which should be available on most linux systems. If
@@ -1758,7 +1759,7 @@ the relevant file type.
 
 ### File Regexp ###
 
-**Default value**: `[^?|\:*<>\" \n\t\f]+`.\newline
+**Default value**: `[^?|\:*<>\" \n\t\f]+`.\
 
 \noindent Regural expression used to find files in a field. The default value
 essentially means that every string of characters not containing any of the
@@ -1772,7 +1773,7 @@ but filenames in the `file` field.
 
 ### File Search Dirs ###
 
-**Default value**: `~`.\newline
+**Default value**: `~`.\
 
 \noindent List of directories that Ebib searches for files. Note that searching
 is not recursive: only the files listed here are searched, not their
@@ -1781,7 +1782,7 @@ subdirectories.
 
 ### Print Preamble ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent This option specifies the preamble that is to be added to the LaTeX
 file Ebib creates for printing the database as index cards. You can set your own
@@ -1790,7 +1791,7 @@ file Ebib creates for printing the database as index cards. You can set your own
 
 ### Print Newline ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent With this option set, Ebib puts every entry on a separate page when
 printing index cards. When this option is unset, the entries are separated by a
@@ -1799,7 +1800,7 @@ small amount of whitespace only.
 
 ### Print Multiline ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent When this options is set, Ebib includes multiline field values when
 you print index cards. When unset, multiline values are excluded, which saves
@@ -1808,7 +1809,7 @@ space.
 
 ### Latex Preamble ###
 
-**Default value**: `\bibliographystyle{plain}`.\newline
+**Default value**: `\bibliographystyle{plain}`.\
 
 \noindent This option specifies the preamble to be added to the LaTeX file for
 creating a list of references from the database. The default is to use the
@@ -1817,7 +1818,7 @@ creating a list of references from the database. The default is to use the
 
 ### Print Tempfile ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent This option specifies the name and location of the temporary file Ebib
 creates with the commands `ebib-print-database` and `ebib-latex-database`. When
@@ -1827,7 +1828,7 @@ called.
 
 ### Allow Identical Fields ###
 
-**Default value**: `nil`.\newline
+**Default value**: `nil`.\
 
 \noindent If this option is set, Ebib stores the values of multiple occurrences
 of a single field within an entry in a single occurrence of that field,
@@ -1837,7 +1838,7 @@ separated by semicolons (see
 
 ### Entry Types ###
 
-**Default value**: see below.\newline
+**Default value**: see below.\
 
 \noindent This option allows you to customise the entry types that Ebib uses.
 Each entry type has a name, a set of obligatory fields and a set of optional
