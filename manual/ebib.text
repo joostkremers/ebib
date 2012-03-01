@@ -547,16 +547,16 @@ The print options are available in the Ebib menu when the index buffer is
 active. You can print the entries as index cards or as a bibliography.
 
 If you print your entries as a bibliography, Ebib creates a simple LaTeX
-document that essentially contains a <verb>\nocite{*}</verb> command followed by
-a <verb>\bibliography</verb> command referring to the `.bib` file belonging to the
-current database. You can then run the usual sequence of LaTeX, BibTeX, LaTeX,
-LaTeX on this file, creating a document containing a list of all the references
-in your database.
+document that essentially contains a `\nocite{*}` command followed by a
+`\bibliography` command referring to the `.bib` file belonging to the current
+database. You can then run the usual sequence of LaTeX, BibTeX, LaTeX, LaTeX on
+this file, creating a document containing a list of all the references in your
+database.
 
 If you choose to print as index cards, Ebib also creates a LaTeX file. However,
-instead of simply providing a <verb>\nocite{*}</verb> command, this file
-contains a `tabular` environment for each entry in the database listing all the
-fields of that entry and their values.
+instead of simply providing a `\nocite{*}` command, this file contains a
+`tabular` environment for each entry in the database listing all the fields of
+that entry and their values.
 
 The entries are separated by a `\bigskip`, but if you set the option `Print Newpage`
 in the customisation buffer (or in the Print menu), the entries are separated by
