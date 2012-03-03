@@ -2251,13 +2251,11 @@ Can also be used to change a virtual database into a real one."
 (defun ebib-save-all-databases ()
   "Saves all currently open databases if they were modified."
   (interactive)
-  (ebib-execute-when
-    ((database)
-     (mapc #'(lambda (db)
-	       (when (edb-modified db)
-		 (ebib-save-database db)))
-	   ebib-databases)
-     (message "All databases saved."))))
+  (mapc #'(lambda (db)
+	    (when (edb-modified db)
+	      (ebib-save-database db)))
+	ebib-databases)
+  (message "All databases saved."))
 
 (defun ebib-print-filename ()
   "Displays the filename of the current database in the minibuffer."
