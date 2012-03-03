@@ -2192,16 +2192,14 @@ EBIB-USE-TIMESTAMP is T."
 
 (defun ebib-save-database (db)
   "Saves the database DB."
-  (ebib-execute-when
-    ((real-db)
-     (when (and (edb-make-backup db)
-		(file-exists-p (edb-filename db)))
-       (rename-file (edb-filename db) (concat (edb-filename db) "~") t)
-       (setf (edb-make-backup db) nil))
-     (with-temp-buffer
-       (ebib-format-database db)
-       (write-region (point-min) (point-max) (edb-filename db)))
-     (ebib-set-modified nil db))))
+  (when (and (edb-make-backup db)
+	     (file-exists-p (edb-filename db)))
+    (rename-file (edb-filename db) (concat (edb-filename db) "~") t)
+    (setf (edb-make-backup db) nil))
+  (with-temp-buffer
+    (ebib-format-database db)
+    (write-region (point-min) (point-max) (edb-filename db)))
+  (ebib-set-modified nil db))
 
 (defun ebib-write-database ()
   "Writes the current database to a different file.
