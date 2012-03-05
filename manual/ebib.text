@@ -485,30 +485,33 @@ if two or more entries cross-reference the same entry, BibTeX automatically
 includes the cross-referenced entry in the bibliography (and puts a reduced
 reference in the cross-referencing entries).
 
-When you fill in the `crossref` field in Ebib, Ebib displays the values of the
-cross-referenced entry in the entry buffer. To indicate that they are just
-inherited values, they are marked with `ebib-crossref-face`, which by default is
-red. (You can customise it, of course. See the customisation option
-[Crossref Face](#crossref-face).) These values are just displayed for convenience: otherwise, Ebib
-treats these fields as if they are empty. That is, they cannot be edited (to
-edit them, you need to edit the cross-referenced entry), and it's not possible
-to copy these values to the kill ring.
+When you fill in the `crossref` field in Ebib, Ebib displays the values of
+the cross-referenced entry in the entry buffer. To indicate that they are
+just inherited values, they are marked with `ebib-crossref-face`, which by
+default is red. (You can customise it, of course. See the customisation
+option [Crossref Face](#crossref-face).) These values are just displayed
+for convenience: otherwise, Ebib treats these fields as if they are empty.
+That is, they cannot be edited (to edit them, you need to edit the
+cross-referenced entry), and it's not possible to copy these values to the
+kill ring.
 
-If you're viewing an entry that has a cross-reference and you want to go to the
-cross-referenced entry you can type `F`. This command reads the value of the
-`crossref` field and then displays that entry. If you want to do the reverse,
-i.e., see if the current entry is cross-referenced by any other entries, you can
-use the key `N`. What this command actually does is to make the key of the current
-entry the current search string and to search for its first occurrence *after* the
-current entry. Like the normal search command `/`, `N` does not wrap and only
-searches forward. So if you want to search for the next cross-referencing entry
-you need to press `n` (i.e., lowercase `n`), and to continue searching from the
-first entry, press `g` followed by `n`.
+If you're viewing an entry that has a cross-reference and you want to go to
+the cross-referenced entry you can type `F`. This command reads the value
+of the `crossref` field and then displays that entry. If you want to do the
+reverse, i.e., see if the current entry is cross-referenced by any other
+entries, you can use the same key `F`: if you type `F` on an entry that
+does not have a cross-reference, Ebib makes the key of the current entry
+the current search string and searches for its first occurrence after the
+current entry. Note that after Ebib has jumped to the first
+cross-referencing entry, you cannot type `F` again to find the next one.
+This command will take you back to the cross-referenced entry. In order to
+find the next cross-referencing entry, you have to type `n`, as with a
+normal search.
 
-Note that if you want to use BibTeX's cross-referencing options, you need to set
-the option [Save Xrefs first](#save-xrefs-first). This tells Ebib to save all entries with a `crossref`
-field first in the `.bib` file. Without this, BibTeX's cross-referencing will not
-work reliably.
+Note that if you want to use BibTeX's cross-referencing options, you need
+to set the option [Save Xrefs first](#save-xrefs-first). This tells Ebib to
+save all entries with a `crossref` field first in the `.bib` file. Without
+this, BibTeX's cross-referencing will not work reliably.
 
 
 ## Selecting Entries ##
