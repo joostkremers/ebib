@@ -2553,14 +2553,6 @@ only that field is searched."
 	       entry))
     result))
 
-(defun ebib-search-crossref ()
-  "Searches the database for the key of the current entry.
-This is useful in searching the entries that cross-reference the
-current entry."
-  (interactive)
-  (setq ebib-search-string (car (edb-cur-entry ebib-cur-db)))
-  (ebib-search-next))
-
 (defun ebib-edit-strings ()
   "Edits the @STRING definitions in the database."
   (interactive)
