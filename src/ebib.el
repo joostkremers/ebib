@@ -2267,15 +2267,21 @@ Can also be used to change a virtual database into a real one."
   (message (edb-filename ebib-cur-db)))
 
 (defun ebib-follow-crossref ()
-  "Goes to the entry mentioned in the crossref field of the current entry."
+  "Follow the crossref field and jump to that entry.
+If the current entry's crossref field is empty, search for the
+first entry with the current entry's key in its crossref field."
   (interactive)
   (let ((new-cur-entry (to-raw (gethash	'crossref
 					(ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-    (setf (edb-cur-entry ebib-cur-db)
-          (or (member new-cur-entry (edb-keys-list ebib-cur-db))
-              (edb-cur-entry ebib-cur-db))))
-  (ebib-fill-entry-buffer)
-  (ebib-fill-index-buffer))
+    (if new-cur-entry
+	(progn
+	  (setf (edb-cur-entry ebib-cur-db)
+		(or (member new-cur-entry (edb-keys-list ebib-cur-db))
+		    (edb-cur-entry ebib-cur-db)))
+	  (ebib-fill-entry-buffer)
+	  (ebib-fill-index-buffer))
+      (setq ebib-search-string (ebib-cur-entry-key))
+      (ebib-search-next))))
 
 (defun ebib-toggle-hidden ()
   "Toggle viewing hidden fields."
