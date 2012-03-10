@@ -2930,7 +2930,7 @@ N-OPT-ARGS is the number of optional arguments COMMAND takes. A
 backslash is prefixed to COMMAND if none is present (and COMMAND
 is non-empty). MODE is the major mode of the push buffer. If this
 is 'org-mode, the citation command is formatted as an org-mode
-link. Any other value created a standard TeX citation."
+link. Any other value creates a standard TeX citation."
   (let ((opt-args (loop for i from 1 to n-opt-args
 			collect (read-from-minibuffer (format "Cite %s with optional argument %d: " key i)))))
     (while (equal (car opt-args) "") ; empty args at the beginning of the list don't need
