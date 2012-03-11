@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@yahoo.com>
 ;; Maintainer: Joost Kremers <joostkremers@yahoo.com>
 ;; Created: 2003
-;; Version: 1.9.0
+;; Version: ==VERSION==
 ;; Keywords: text bibtex
 
 ;; Redistribution and use in source and binary forms, with or without
