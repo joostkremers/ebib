@@ -119,8 +119,8 @@ customization options."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-citation-commands '((latex-mode
-				     (("cite" "\\citet%<[%A]%>%<[%A]%>{%(%K%,)}")))
+(defcustom ebib-citation-commands '((any
+				     (("cite" "\\cite%<[%A]%>{%K}")))
 				    (org-mode
 				     (("ebib" "[ebib:%K][%A]")))
 				    (markdown-mode
@@ -2995,7 +2995,7 @@ The user is prompted for the buffer to push the entry into."
 	 (when buffer
 	   (setq ebib-push-buffer buffer)
 	   (let* ((format-list (or (cadr (assoc (buffer-local-value 'major-mode (get-buffer buffer)) ebib-citation-commands))
-				   (cadr (assoc 'latex-mode ebib-citation-commands))))
+				   (cadr (assoc 'any ebib-citation-commands))))
 		  (citation-command
 		   (if-str (format-string (cadr (assoc
 						 (completing-read "Command to use: " format-list nil nil nil ebib-minibuf-hist)
