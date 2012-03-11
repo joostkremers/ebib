@@ -57,7 +57,7 @@ img {
     -moz-box-shadow:    3px 3px 5px 6px #333333;
     -webkit-box-shadow: 3px 3px 5px 6px #333333;
     box-shadow:         3px 3px 5px 6px #333333;
-    position: fixed;
+    position: absolute;
     /* margin-left: 75%; */
     width: 20%;
     padding-right: 1%;
@@ -66,8 +66,7 @@ img {
     font-size: 75%;
 }
 
-/* #TOC > ul > li > ul > li ul { display: none; } */
-#TOC > ul > li > ul { display: none; }
+#TOC > ul > li > ul > li ul { display: none; }
 
 #TOC a {
     text-decoration: none;
