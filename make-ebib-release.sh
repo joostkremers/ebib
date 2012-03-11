@@ -36,16 +36,16 @@ echo
     else
 	echo Warning: ebib-manual.pdf not found!
     fi
-    if [ -f texi/ebib-manual.info ] ; then
-	mv texi/ebib-manual.info ../"$full_name"/info
+    if [ -f texi/ebib.info ] ; then
+	mv texi/ebib.info ../"$full_name"/info
 	echo "Moved info manual to $full_name/info"
     else
-	echo Warning: ebib-manual.info not found!
+	echo Warning: ebib.info not found!
     fi
 )
 
 (cd $BASE
-    cp INSTALL README.md ../"$full_name"
+    cp INSTALL README.md "$full_name"
     echo "Copied release files to $full_name"
     echo
 )
