@@ -6,9 +6,8 @@
 
 Ebib is a program with which you can manage BibTeX database files without having
 to edit the raw `.bib` files. It runs in GNU/Emacs, version 21.1 or higher
-(lower versions are not supported) and XEmacs (at least from version 21.4; lower
-version have not been tested, but may work.)
-  
+(lower versions are not supported).
+
 It should be noted that Ebib is *not* a minor or major mode for editing BibTeX
 files. It is a program in itself, which just happens to make use of Emacs as a
 working environment, in the same way that for example Gnus is.
@@ -27,8 +26,7 @@ X-based) BibTeX database managers.
 
 To install Ebib, so that it will be loaded automatically when Emacs is started,
 simply copy the file `ebib.el` to somewhere in your load path and add the
-following line to Emacs' init file (`~/.emacs` for GNU/Emacs, `~/.xemacs/init.el`
-for XEmacs):
+following line to Emacs' init file `~/.emacs`:
 
     (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
@@ -60,12 +58,8 @@ byte-compile-file`, or from your shell by going into the directory where you put
 
     emacs -batch -f batch-byte-compile ebib.el
 
-(Substitute `emacs` with `xemacs` if you use XEmacs.) This will create a file
-`ebib.elc`, which Emacs will load instead of `ebib.el`. Byte-compiling Ebib may
-produce a warning about functions that are "not known to be defined". This can
-be safely ignored. GNU Emacs and XEmacs have some small differences, and the
-functions reported in this warning are those used by the other version. Ebib
-makes sure that the correct functions are called.
+This will create a file `ebib.elc`, which Emacs will load instead of
+`ebib.el`.
 
 
 
@@ -518,14 +512,14 @@ this, BibTeX's cross-referencing will not work reliably.
 
 ## Selecting Entries ##
 
-Commands in the index buffer generally operate on one single entry, or on all
-entries. For some, however, it may sometimes be useful to perform them on more
-than one entry, but not necessarily all of them. This can be achieved by selecting
-entries. You can select the entries you want to perform a command on with the key
-`m`. This selects (or unselects) the current entry. Selected entries are displayed in
-inverse video (in GNU Emacs) or white on red (in XEmacs; note that the face
-properties of selected entries can be customised through the customisation option
-[Selected Face](#selected-face).)
+Commands in the index buffer generally operate on one single entry, or on
+all entries. For some, however, it may sometimes be useful to perform them
+on more than one entry, but not necessarily all of them. This can be
+achieved by selecting entries. You can select the entries you want to
+perform a command on with the key `m`. This selects (or unselects) the
+current entry. Selected entries are displayed in inverse video. Note that
+the face properties of selected entries can be customised through the
+customisation option [Selected Face](#selected-face).)
 
 Of the commands discussed so far, two can be used on selected entries: `d` and `p`.
 Note, however, that it is not enough to select the entries you want and then type
@@ -1777,14 +1771,10 @@ this face. By default, the face has red as foreground colour.
 ### Selected Face ###
 
 **Default value**:\
-`((t (:inverse-video t)))` (GNU Emacs)\
- `((t (:foreground "white" :background "red")))` (XEmacs).\
+`((t (:inverse-video t)))`\
 
-\noindent When entries are selected (with `m`), they are highlighted in this
-face. By default, GNU Emacs uses the text property `highlight`. XEmacs only
-allows this on terminals, therefore it displays selected entries with a red
-background and a white foreground colour. This option allows you to change these
-defaults.
+\noindent When entries are selected (with `m`), they are highlighted in
+this face. By default, it uses the text property `highlight`.
 
 
 ### Use Timestamp ###
