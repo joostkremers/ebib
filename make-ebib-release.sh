@@ -45,7 +45,7 @@ echo
 )
 
 (cd $BASE
-    cp INSTALL README ../"$full_name"
+    cp INSTALL README.md ../"$full_name"
     echo "Copied release files to $full_name"
     echo
 )
