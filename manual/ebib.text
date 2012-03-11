@@ -394,7 +394,9 @@ These are described later. (See [Virtual Databases](#virtual-databases).)
 
 Having a BibTeX database manager running inside Emacs has an additional
 advantage: it makes it trivially easy to insert BibTeX keys in your LaTeX
-documents.
+documents. In fact, this functionality doesn't just work with LaTeX, but
+also with other text modes that have some form of citation commands, as
+discussed below.
 
 Ebib provides two functions for this. First, if you're in a LaTeX buffer, you
 can call the function `ebib-insert-bibtex-key`. When you invoke this command,
@@ -410,10 +412,10 @@ will ask you for a buffer to push the entry to, a citation command and also any
 optional arguments, and then insert a citation at the current cursor position in
 the buffer you've supplied.
 
-The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for
-can be any command that you need. But it is also possible to predefine a list of
-citation commands which you can then enter at this prompt using tab completion.
-For details on setting this up, see [Insertion Commands](#insertion-commands).
+The citation command that `ebib-insert-bibtex-key` and the command key `p`
+ask for have to be defined before you can use them. (By default, only the
+`\cite` command has been predefined for LaTeX.) For details on setting this
+up, see [Citation Commands](#citation-commands).
 
 There is another function that is available outside Ebib: `ebib-entry-summary`.
 This command reads the key under the cursor in the current buffer and displays
@@ -1592,46 +1594,146 @@ function has a number of customisation options, which are described in its
 documentation string.
 
 
-### Insertion Commands ###
+### Citation Commands ###
 
-**Default value**: `((cite 1 nil))`.\
+**Default value**: 
+
+    ((any
+	  (("cite" "\\cite%<[%A]%>{%K}")))
+	 (org-mode
+	  (("ebib" "[ebib:%K][%A]")))
+	 (markdown-mode
+	  (("text" "@%K%< [%A]%>")
+       ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
+	   ("year" "[-@%K%< %A%>]"))))
 
 \noindent With the command `ebib-insert-bibtex-key` or with the command key `p`
 in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This
 option allows you to define the commands that are available through tab
 completion when these functions ask for a citation command.
 
-The citation commands should be given without the leading backslash, as Ebib
-adds one. Furthermore, you need to specify how many optional arguments each
-command can have. When Ebib prompts you for a citation key, it will ask for as
-many optional arguments as you specify here. (If you don't want to be asked for
-those optional arguments, just fill in 0.)
+Citation commands are defined for specific major modes or for all modes
+(under the heading `any`). Each command consists of an identifier, which
+you type when Ebib prompts you for a citation command, plus a format
+string. This format string can contain a few directives, which are used to
+add the citation key and any optional arguments. This format string can
+contain the following directives:
 
-Lastly, there is also the possibility to specify that a command is a multicite
-command. When you push a number of marked entries and provide a multicite
-command, Ebib asks you for optional arguments for each entry key and the
-citation is formatted properly:
+`%K`
+:    the entry key to be inserted.
+`%A`
+:    an argument, for which the user is prompted.
+`%<...%>`
+:    optional material surrounding a `%A` directive.
+`%(...%<sep>)`
+:    a so-called *repeater*, which contains material that can be repeated.
+     If present, the repeater must contain the entry key directive `%K`.
 
-    \parencites[35]{jones1996}[88--120]{winston2008}[23]{key3}
+In the simplest case, the format string contains just a %K directive:
+`\cite{%K}`. In this case, `%K` is replaced with the citation key and the
+result inserted. Usually, however, citation commands allow for optional
+arguments that are formatted as pre- or postnotes to the citation. For
+example, using the `natbib` package, you have citation commands available
+of the form:
 
-With a regular command, Ebib only asks you for one set of optional arguments and
-puts all marked entries in a single argument:
+    \citet[cf.][p. 50]{Jones1992}
 
-    \cite{jones1996,winston2008}
+In order to be able to insert such citations, the format string must
+contain `%A` directives:
 
-If you push just a single entry, multicite commands don't behave differently
-from regular commands. Note that with `ebib-insert-bibtex-key`, it's not
-possible to insert more than one key, so multicite commands behave just like
-regular commands if you insert an entry this way.
+    \citet[%A][%A]{%K}
 
-When Ebib prompts you for a citation command, the commands specified in this
-option can be obtained through tab completion. However, it is not necessary to
-fill in a command from this list here. You can also enter another command (in
-which case Ebib asks for exactly one optional argument) or even no command at
-all. In the latter case, Ebib does not ask for any optional arguments and simply
-puts the key in the buffer without adding anything else.
+With such a format string, Ebib asks the user to provide text for the two
+arguments and inserts it at the locations specified by the directives. Of
+course, it is possible to leave the arguments empty (by just hitting
+`RET`). With the format string above, this would yield the following
+citation in the LaTeX buffer:
 
+    \citet[][]{Jones1992}
 
+This is completely harmless, because LaTeX will simply ignore the empty
+arguments. However, you may prefer for the brackets not to appear if the
+arguments are empty. In that case, you can wrap the brackets and the `%A`
+directives in a `%<...%>` pair:
+
+    \citet%<[%A]%>%<[%A]%>{%K}
+
+Now, if you leave the arguments empty, Ebib produces the following
+citation:
+
+    \citet{Jones1992}
+
+Note however, that in this case there is in fact one problem associated
+with this format string. If you fill out the first argument but not the
+second, Ebib produces the wrong format string:
+
+    \citet[cf.]{Jones1992}
+
+If only one optional argument is provided, `natbib` assumes that it is a
+postnote, while what you intended is actually a prenote. Therefore, it is
+best not to make the second argument optional:
+
+    \citet%<[%A]%>[%A]{%K}
+
+This way, the second pair of brackets is always inserted, regardless of
+whether you provide a second argument or not.
+
+`Natbib` commands also accept multiple citation keys. When you call
+`ebib-insert-bibtex-key`, you can only provide one key, but in Ebib, you
+can mark multiple entry keys and then use `; p` to push them to a buffer.
+In this case, Ebib asks you for a separator and then inserts all keys into
+the position of `%K`:
+
+    \citet{Jones1992,Haddock2004}
+
+It is, however, also possible to specify in the format string that a
+certain sequence can be repeated and how the different elements should be
+separated. This is done by wrapping that portion of the format string that
+can be repeated in a `%(...%)` pair. Normally, you'll want to provide a
+separator, which is done by placing it between the `%` and the closing `)`:
+
+    \citet[%A][%A]{%(%K%,)}
+
+This format string says that the directive `%K` can be repeated and that
+multiple keys must be separated with a comma. The advantage of this is that
+you are no longer asked to provide a separator. However, this is not the
+only thing one can do, because it is also possible to put `%A` directives
+in the repeating part. This is useful for the `biblatex` package.
+`Biblatex` has so-called *multicite* commands, which take the following
+form:
+
+    \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
+
+Multicite commands can take more than one citation key in braces `{}` and
+each of those citation keys can take two optional arguments in brackets
+`[]`. In order to get such citations, you can provide the following format
+string:
+
+    \footcites%(%<[%A]%>[%A]{%K}%)
+
+Here, the entire sequence of two optional arguments and the obligatory
+citation key is wrapped in `%(...%)`, so that Ebib knows it can be
+repeated. If you now mark multiple entries in Ebib, press `; p` and select
+the `footcites` command, Ebib will put all the keys in the citation, asking
+you for two arguments for each citation key.
+
+Of course it is also possible to combine parts that are repeated with parts
+that are not repeated. In fact, that already happens in the previous
+example, because the part `\footcites` is not repeated. But the part that
+is not repeated may contain `%A` directives as well:
+
+    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+
+Multicite commands in `biblatex` take two additional arguments surrounded
+with parentheses. These are pre- and postnotes for the entire sequence of
+citations. They can be accommodated as shown.
+
+The function `ebib-insert-bibtex-key` can of course also be called from
+non-LaTeX buffers. For example, [org-mode](http://orgmode.org) can use
+bibliographic links, and so can [Pandoc](http://johnmacfarlane.net/pandoc/)
+markdown. For those two modes, citation commands have been predefined,
+which may provide some additional inspiration in case you want to create
+your own format strings.
 
 
 ### Multiline Major Mode ###
