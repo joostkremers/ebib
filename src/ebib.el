@@ -124,6 +124,14 @@ For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
 		       (choice (const :tag "Standard command" nil)
 			       (const :tag "Multicite command" t)))))
 
+(defcustom ebib-citation-commands nil
+  "*A list of commands that can be used to insert a citation into a buffer."
+  :group 'ebib
+  :type '(repeat (list :tag "Mode" (symbol :tag "Mode name")
+		       (repeat (list :tag "Citation command"
+				     (string :tag "Identifier")
+				     (string :tag "Format string"))))))
+
 (defcustom ebib-multiline-major-mode 'text-mode
   "*The major mode of the multiline edit buffer."
   :group 'ebib
