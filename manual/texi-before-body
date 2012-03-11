@@ -1,4 +1,4 @@
-INFO-DIR-SECTION Emacs
-START-INFO-DIR-ENTRY
+@dircategory Emacs
+@direntry
 * Ebib: (ebib).        A BibTeX database manager.
-END-INFO-DIR-ENTRY
+@end direntry
