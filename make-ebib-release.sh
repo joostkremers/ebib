@@ -17,8 +17,8 @@ echo "Created $BASE/$full_name and subdirectories"
 echo
 
 (cd $BASE/src
-    cp ebib.el ChangeLog ../"$full_name"
-    echo "Copied ebib.el and ChangeLog to $full_name"
+    cp ebib.el ../"$full_name"
+    echo "Copied ebib.el to $full_name"
     echo
 )
 
