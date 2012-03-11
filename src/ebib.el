@@ -115,17 +115,17 @@ customization options."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-insertion-commands '(("cite" 1 nil))
-  "*A list of commands that can be used to insert an entry into a (La)TeX buffer.
-For use with EBIB-INSERT-BIBTEX-KEY and EBIB-PUSH-BIBTEX-KEY."
-  :group 'ebib
-  :type '(repeat (list :tag "Citation command" (string :tag "Command")
-		       (integer :tag "Optional arguments")
-		       (choice (const :tag "Standard command" nil)
-			       (const :tag "Multicite command" t)))))
-
-(defcustom ebib-citation-commands nil
-  "*A list of commands that can be used to insert a citation into a buffer."
+(defcustom ebib-citation-commands '((latex-mode
+				     (("cite" "\\citet%<[%A]%>%<[%A]%>{%(%K%,)}")))
+				    (org-mode
+				     (("ebib" "[ebib:%K][%A]")))
+				    (markdown-mode
+				     (("text" "@%K%< [%A]%>")
+				      ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
+				      ("year" "[-@%K%< %A%>]"))))
+  "*A list of format strings to insert a citation into a buffer.
+These are used with EBIB-INSERT-BIBTEX-KEY and
+EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
   :type '(repeat (list :tag "Mode" (symbol :tag "Mode name")
 		       (repeat (list :tag "Citation command"
@@ -2932,32 +2932,50 @@ modified."
   (unless (eq ebib-layout 'full)
     (set-window-dedicated-p (selected-window) t)))
 
-(defun ebib-create-citation-command (command n-opt-args key mode)
-  "Create a LaTeX citation command with COMMAND and KEY.
-N-OPT-ARGS is the number of optional arguments COMMAND takes. A
-backslash is prefixed to COMMAND if none is present (and COMMAND
-is non-empty). MODE is the major mode of the push buffer. If this
-is 'org-mode, the citation command is formatted as an org-mode
-link. Any other value creates a standard TeX citation."
-  (let ((opt-args (loop for i from 1 to n-opt-args
-			collect (read-from-minibuffer (format "Cite %s with optional argument %d: " key i)))))
-    (while (equal (car opt-args) "") ; empty args at the beginning of the list don't need
-      (setq opt-args (cdr opt-args)))	; to be included.
-    (if (eq mode 'org-mode)
-	(format "[[%s:%s][%s]]"
-		command key
-		(if opt-args       ; if the user provided an optional argument,
-		    (car opt-args) ; it is included as the link description,t
-		  key))            ; otherwise the key becomes the description.
-      (format "%s%s%s{%s}"
-	      (if (or (string= command "")
-		      (= (aref command 0) 92))
-		  "" "\\") ; add a backslash if the user didn't type one.
-	      command
-	      (mapconcat #'(lambda (str)
-			     (format "[%s]" str))
-			 opt-args "")
-	      key))))
+(defun ebib-create-citation-command (format-string &optional key)
+  "Create a citation command using FORMAT-STRING.
+If FORMAT-STRING contains a %K directive, it is replaced with
+KEY. Furthermore, FORMAT-STRING may contain any number of %A
+directives for additional arguments to the citation. The user is
+asked to supply a string for each of them, which may be empty.
+
+Each %A directive may be wrapped in a %<...%> pair, containing
+optional material both before and after %A. If the user supplies
+an empty string for such an argument, the optional material
+surrounding it is not included in the citation command."
+  (when (and (string-match "%K" format-string)
+	     key)
+    (setq format-string (replace-match key t t format-string)))
+  (loop for n = 1 then (1+ n)
+	until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A" format-string)) do
+	(setq format-string (replace-match (if-str (argument (read-from-minibuffer (format "Argument %s%s: " n (if key
+														 (concat " for " key)
+													       ""))))
+					       (concat "\\1" argument "\\2")
+					     "")
+					   t nil format-string))
+	finally return format-string))
+
+(defun ebib-split-citation-string (format-string)
+  "Split up FORMAT-STRING.
+The return value is a list of (BEFORE REPEATER SEPARATOR AFTER),
+where BEFORE is the part before the repeating part of
+FORMAT-STRING, REPEATER the repeating part, SEPARATOR the string
+to be placed between each instance of REPEATER and AFTER the part
+after the last instance of REPEATER."
+  (let (before repeater separator after)
+    ;; first check if the format string has a repeater and if so, separate each component
+    (cond
+     ((string-match "\\(.*?\\)%(\\(.*\\)%\\(.*?\\))\\(.*\\)" format-string)
+      (setq before (match-string 1 format-string))
+      (setq repeater (match-string 2 format-string))
+      (setq separator (match-string 3 format-string))
+      (setq after (match-string 4 format-string)))
+     ((string-match "\\(.*?\\)\\(%K\\)\\(.*\\)" format-string)
+      (setq before (match-string 1 format-string))
+      (setq repeater (match-string 2 format-string))
+      (setq after (match-string 3 format-string))))
+    (values before repeater separator after)))
 
 (defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
@@ -2972,40 +2990,33 @@ The user is prompted for the buffer to push the entry into."
 				  ebib-push-buffer t)))
 	 (when buffer
 	   (setq ebib-push-buffer buffer)
-	   (let (insert-string)
-	     (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-					       nil nil nil ebib-minibuf-hist))
-		 (let* ((n-opt-args (or (cadr (assoc command ebib-insertion-commands))
-					1))
-			(allow-mult-args (caddr (assoc command ebib-insertion-commands)))
-			(key (if (and called-with-prefix ; if there are marked entries...
-				      (edb-marked-entries ebib-cur-db))
-				 (if allow-mult-args ; and the command allows multiple separate args
-				     (car (edb-marked-entries ebib-cur-db)) ; just take the first one here
-				   (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
+	   (let* ((format-list (or (cadr (assoc (buffer-local-value 'major-mode (get-buffer buffer)) ebib-citation-commands))
+				   (cadr (assoc 'latex-mode ebib-citation-commands))))
+		  (citation-command
+		   (if-str (format-string (cadr (assoc
+						 (completing-read "Command to use: " format-list nil nil nil ebib-minibuf-hist)
+						 format-list)))
+		       (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+			 (cond
+			  ((and called-with-prefix ; if there are marked entries and the user wants to push those
+				(edb-marked-entries ebib-cur-db))
+			   (concat (ebib-create-citation-command before)
+				   (mapconcat #'(lambda (key) ; then deal with the entries one by one
+						  (ebib-create-citation-command repeater key))
 					      (edb-marked-entries ebib-cur-db)
-					      ","))
-			       (car (edb-cur-entry ebib-cur-db)))) ; if there are no marked entries, take the current entry
-			(first (ebib-create-citation-command command n-opt-args key (buffer-local-value 'major-mode (get-buffer buffer))))
-			(rest (when (and called-with-prefix ; if we have marked entries...
-					 (edb-marked-entries ebib-cur-db)
-					 allow-mult-args) ; and a command that allows multiple separate arguments
-				(mapcar #'(lambda (key) ; we need to process the rest of the entries
-					    (ebib-create-citation-command "" n-opt-args key (buffer-local-value 'major-mode (get-buffer buffer))))
-					(cdr (edb-marked-entries ebib-cur-db))))))
-		   (setq insert-string (apply #'concat first rest)))
-	       ;; if the user did not provide a comand, we just insert the
-	       ;; current entry, or the marked entries, separated by commas:
-	       (setq insert-string
-		     (if (and called-with-prefix
-			      (edb-marked-entries ebib-cur-db))
-			 (mapconcat #'(lambda (x) x) ; otherwise take all the marked entries
+					      (if separator separator (read-from-minibuffer "Separator: ")))
+				   (ebib-create-citation-command after)))
+			  (t	    ; otherwise just take the current entry
+			   (ebib-create-citation-command (concat before repeater after) (ebib-cur-entry-key)))))
+		     (if (edb-marked-entries ebib-cur-db) ; if the user doesn't provide a command
+			 (mapconcat #'(lambda (key) ; we just insert the entry key or keys
+					key)
 				    (edb-marked-entries ebib-cur-db)
-				    ",")
-		       (car (edb-cur-entry ebib-cur-db)))))
-	     (when insert-string
+				    (read-from-minibuffer "Separator: "))
+		       (ebib-cur-entry-key)))))
+	     (when citation-command
 	       (with-current-buffer buffer
-		 (insert (format "%s%s" (if (eq major-mode 'markdown-mode) "@" "") insert-string)))
+		 (insert citation-command))
 	       (message "Pushed entries to buffer %s" buffer))))))
       ((default)
        (beep)))))
@@ -3870,6 +3881,31 @@ returns the symbol NONE."
 		    (split-string (buffer-substring-no-properties (match-beginning 2) (match-end 2)) ",[ ]*"))
 	  'none)))))
 
+(defun ebib-create-collection-from-db ()
+  "Create a collection of BibTeX keys.
+The source of the collection is either curent database or, if the
+current buffer is a LaTeX file containing a \\bibliography
+command, the BibTeX files in that command (if they are open in
+Ebib)."
+  (or ebib-local-bibtex-filenames
+      (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+  (let (collection)
+    (if (eq ebib-local-bibtex-filenames 'none)
+	(if (null (edb-cur-entry ebib-cur-db))
+	    (error "No entries found in current database")
+	  (setq collection (ebib-create-collection (edb-database ebib-cur-db))))
+      (mapc #'(lambda (file)
+		(let ((db (ebib-get-db-from-filename file)))
+		  (cond
+		   ((null db)
+		    (message "Database %s not loaded" file))
+		   ((null (edb-cur-entry db))
+		    (message "No entries in database %s" file))
+		   (t (setq collection (append (ebib-create-collection (edb-database db))
+					       collection))))))
+	    ebib-local-bibtex-filenames))
+    collection))
+
 (defun ebib-insert-bibtex-key ()
   "Inserts a BibTeX key at POINT.
 The user is prompted for a BibTeX key and has to choose one from
@@ -3879,36 +3915,22 @@ completion works."
   (interactive)
   (ebib-execute-when
     ((database)
-     (or ebib-local-bibtex-filenames
-	 (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let (collection)
-       (if (eq ebib-local-bibtex-filenames 'none)
-	   (if (null (edb-cur-entry ebib-cur-db))
-	       (error "No entries found in current database")
-	     (setq collection (ebib-create-collection (edb-database ebib-cur-db))))
-	 (mapc #'(lambda (file)
-		   (let ((db (ebib-get-db-from-filename file)))
-		     (cond
-		      ((null db)
-		       (message "Database %s not loaded" file))
-		      ((null (edb-cur-entry db))
-		       (message "No entries in database %s" file))
-		      (t (setq collection (append (ebib-create-collection (edb-database db))
-						  collection))))))
-	       ebib-local-bibtex-filenames))
+     (let ((collection (ebib-create-collection-from-db)))
        (when collection
 	 (let* ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist))
-		(insert-string (if-str (command (completing-read "Command to use: " ebib-insertion-commands
-								 nil nil nil ebib-minibuf-hist))
-				   (ebib-create-citation-command command
-								 (or
-								  (cadr (assoc command ebib-insertion-commands))
-								  1)
-								 key
-								 (buffer-local-value 'major-mode (current-buffer)))
-				 key)))
-	   (when insert-string
-	     (insert (format "%s%s" (if (eq major-mode 'markdown-mode) "@" "") insert-string)))))))
+		(format-list (or (cadr (assoc (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
+				 (cadr (assoc 'latex-mode ebib-citation-commands))))
+		(citation-command
+		 (if-str (format-string (cadr (assoc
+					       (completing-read "Command to use: " format-list nil nil nil ebib-minibuf-hist)
+					       format-list)))
+		     (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+		       (concat (ebib-create-citation-command before)
+			       (ebib-create-citation-command repeater key)
+			       (ebib-create-citation-command after)))
+		   key))) ; if the user didn't provide a command, we insert just the entry key
+	   (when citation-command
+	     (insert (format "%s" citation-command)))))))
     ((default)
      (error "No database loaded"))))
 
