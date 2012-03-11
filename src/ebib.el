@@ -1,10 +1,14 @@
 ;;; ebib.el --- a BibTeX database manager
-;;
-;; Copyright (c) 2003-2011 Joost Kremers
+
+;; Copyright (c) 2003-2012 Joost Kremers
 ;; All rights reserved.
-;;
+
 ;; Author: Joost Kremers <joostkremers@yahoo.com>
-;;
+;; Maintainer: Joost Kremers <joostkremers@yahoo.com>
+;; Created: 2003
+;; Version: 1.9.0
+;; Keywords: text bibtex
+
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
 ;; are met:
