@@ -26,11 +26,6 @@ alt="SourceForge.net Logo" /></a>
 Last modified: <br/>
 @@date
 
-
-<!-- [[http://validator.w3.org/check?uri=referer][images/valid-xhtml10-blue.png]] -->
-
-<!-- [[http://jigsaw.w3.org/css-validator/][images/valid-css-blue.png]] -->
-
 </div>
 
 </div>
@@ -63,7 +58,6 @@ quite a few extra features that make managing your BibTeX files easier.
 
 ### General ###
 
- - runs in GNU Emacs and XEmacs.
  - visual representation distinguishing obligatory, optional and
    additional fields.
  - copy/cut/paste mechanism for quickly copying field values. (This fully
@@ -101,7 +95,6 @@ quite a few extra features that make managing your BibTeX files easier.
 
 ### Searching ###
 
-
  - incremental search for BibTeX keys is supported.
  - simple regexp searches can be performed on a database, searching the
    contents of all fields of each entry.
@@ -113,9 +106,15 @@ quite a few extra features that make managing your BibTeX files easier.
 ### LaTeX integration ###
 
  - from within a LaTeX document, it is possible to select (using
-   TAB-completion) and insert a BibTeX key into the document.
+   TAB-completion) and insert a BibTeX key into the document. (This can
+   also be set up for other document formats that support automatic
+   bibliographies, such as [Org mode](http://orgmode.org) or
+   [Pandoc](http://johnmacfarlane.net/pandoc/) markdown.)
  - inside Ebib, it is possible to push entries to a LaTeX buffer.
  - quick summary of entries into a `*Help*` buffer.
+ - creating a `.bib` file from a `.bbl` file, allowing you to create a
+   `.bib` file for a LaTeX document containing only the references in the
+   document.
 
 
 ### Miscellaneous ###
@@ -136,10 +135,9 @@ Visually, Ebib is not very spectacular. But to get an impression of what it
 looks like, you can view the following two screenshots. The first shows
 Ebib's standard lay-out, with the list of entry keys in the top window and
 the fields of the currently highlighted entry in the bottom window. The
-string `Reuland' is highlighted as the result of a text search. The second
+string 'Reuland' is highlighted as the result of a text search. The second
 screenshot shows the strings buffer, where you can edit the `@string`
-definitions in the database. (By the way, the color theme here is Blue Sea,
-it has nothing to do with Ebib.)
+definitions in the database.
 
 <a href="images/ebib-1.png"> <img style="width:153px;height:108px"
 src="images/tn_ebib-1.png" alt="screenshot 1" /></a>

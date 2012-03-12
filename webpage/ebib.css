@@ -22,6 +22,16 @@ h1.title {
     font-size: 2em;
 }
 
+h2.author {
+    text-align: center;
+    font-size: 1.3em;
+}
+
+h3.date {
+    text-align: center;
+    font-size: 100%
+}
+
 h1 {
     font-size: 1.5em;
 }
@@ -35,13 +45,18 @@ img {
 }
 
 #main {
-    margin-left: 30%;
-    max-width: 40em;
+    margin: auto;
+    max-width: 45%;
     top: 140px;
     text-align: justify;
 }
 
 #menu {
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    -moz-box-shadow:    3px 3px 5px 6px #333333;
+    -webkit-box-shadow: 3px 3px 5px 6px #333333;
+    box-shadow:         3px 3px 5px 6px #333333;
     position: fixed;
     margin-left: 5%;
     padding: 2%;
@@ -50,6 +65,16 @@ img {
     background-color: #6b1d1d;
     color: #c9c9c9;
 }
+
+/* #menu { */
+/*     position: absolute; */
+/*     /\* margin-left: 75%; *\/ */
+/*     width: 20%; */
+/*     padding-right: 1%; */
+/*     background-color: #6b1d1d; */
+/*     color: #c9c9c9; */
+/*     font-size: 75%; */
+/* } */
 
 #menu a {
     text-decoration: none;
@@ -67,6 +92,7 @@ img {
     bottom: 0%;
 }
 
-.centering {
-    text-align: center;
+.footnotes {
+    margin: auto;
+    max-width: 50%;
 }
