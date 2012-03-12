@@ -765,7 +765,7 @@ customisation buffer, under the option
 [Preload Bib Files](#preload-bib-files).
 
 
-## `@Preamble` Definition ##
+## @Preamble Definition ##
 
 Apart from database entries, BibTeX allows three more types of elements to
 appear in a `.bib` file. These are `@comment`, `@preamble` and `@string`
@@ -811,7 +811,7 @@ Note that when Ebib loads a `.bib` file that contains more than one
 manner just described and saves them in one `@preamble` definition.
 
 
-## `@String` Definitions ##
+## @String Definitions ##
 
 If you press `S` (that's a uppercase `S`) in the index buffer, Ebib hides
 the entry buffer in the lower window and replaces it with the *strings
