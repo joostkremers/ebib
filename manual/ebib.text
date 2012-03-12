@@ -411,6 +411,15 @@ ask for have to be defined before you can use them. (By default, only the
 `\cite` command has been predefined for LaTeX.) For details on setting this
 up, see [Citation Commands](#citation-commands).
 
+Another Ebib command is available for LaTeX documents: the command
+`ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file
+associated with LaTeX document in the current buffer. This makes it easy to
+create a `.bib` file containing just the BibTeX entries that are used in
+the document. (One disadvantage is that cross-referenced entries aren't
+always in the `.bbl` file, depending on how your BibTeX style handles them.
+After using `ebib-create-bib-from-bbl` it may therefore be necessary to
+check whether you have all cross-referenced entries.)
+
 There is another function that is available outside Ebib: `ebib-entry-summary`.
 This command reads the key under the cursor in the current buffer and displays
 the field values associated with that key in a `*Help*` buffer. This allows you to
@@ -1623,7 +1632,7 @@ contain the following directives:
 :    a so-called *repeater*, which contains material that can be repeated.
      If present, the repeater must contain the entry key directive `%K`.
 
-In the simplest case, the format string contains just a %K directive:
+In the simplest case, the format string contains just a `%K` directive:
 `\cite{%K}`. In this case, `%K` is replaced with the citation key and the
 result inserted. Usually, however, citation commands allow for optional
 arguments that are formatted as pre- or postnotes to the citation. For
@@ -1673,10 +1682,10 @@ This way, the second pair of brackets is always inserted, regardless of
 whether you provide a second argument or not.
 
 `Natbib` commands also accept multiple citation keys. When you call
-`ebib-insert-bibtex-key`, you can only provide one key, but in Ebib, you
-can mark multiple entry keys and then use `; p` to push them to a buffer.
-In this case, Ebib asks you for a separator and then inserts all keys into
-the position of `%K`:
+`ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide
+one key, but when you're in Ebib, you can mark multiple entry keys and then
+use `; p` to push them to a buffer. In this case, Ebib asks you for a
+separator and then inserts all keys into the position of `%K`:
 
     \citet{Jones1992,Haddock2004}
 
