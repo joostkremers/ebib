@@ -456,6 +456,52 @@ the user, and should therefore not be set by any package. For this reasons,
 Ebib does not set this command automatically.)
 
 
+## Orgmode and markdown ##
+
+[Orgmode](http://orgmode.org) can handle various types of links and new
+link types can be created by the user. If you use orgmode to write papers
+and want to use bibliographic references, it is easy to set up orgmode to
+use Ebib. If you add the following line to `~/.emacs`:
+
+    (org-add-link-type "ebib" 'ebib)
+
+you can create org links of the following form:
+
+    [ebib:Jones1992][Jones (1992)]
+
+Orgmode will display this link simply as `Jones (1992)` in your buffer. If
+you click this link (or press `C-c C-o` on it), you will be taken to Ebib
+and shown the the entry `Jones1992` in the active database.
+
+A citation string for orgmode is predefined, so you can use
+`ebib-insert-bibtex-key` in orgmode buffers to insert links of the type
+above into your orgmode documents.
+
+Note that such org links aren't properly translated to LaTeX citation
+commands when you export your org file. For that, you'll need to set up a
+different link type for each citation command and provide functions for
+exporting them to LaTeX. The orgmode documentation explains how this is
+done.
+
+Another document format that provides support for automatically generating
+citations is [Pandoc](http://johnmacfarlane.net/pandoc/) markdown. Pandoc's
+handling of citations is more sofisticated than orgmode's, as it can
+automatically translate citations in markdown text into LaTeX
+(specifically: `natbib` or `biblatex`) commands, but it also supports
+citations when converting to other document formats. In order to use Ebib
+with Pandoc markdown, nothing needs to be set up: Ebib has predefined
+citation formats for the citations forms that Pandoc markdown supports:
+`text`, `paren` and `year`. The `text` format produces citations of the
+form `@Abney1987 [p. 50]`, the `paren` format produces
+`[cf. @Abney1987, p. 50]` and the `year` format, which suppresses the
+author in the (LaTeX/html/what have you) output, produces
+`[-@Abney1987 p. 50]`. Of these three, the `paren` type can contain
+multiple citations (e.g., `[cf. @Abney1987, p. 50; @Dahl2004, p. 204]`),
+which Ebib can handle as well. See [Citation Commands](#citation-commands)
+for further details.
+
+
+
 ## Consulting Databases from within a LaTeX File ##
 
 The commands `ebib-insert-bibtex-key` and `ebib-entry-summary` must consult
