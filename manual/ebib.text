@@ -1686,6 +1686,18 @@ only shows the key of each entry, but if this is too little information,
 you can use this option to display e.g. the title of each entry as well.
 
 
+### Uniquify Keys ###
+
+**Default value**: `nil`.\
+
+\noindent When you add a new entry to the database or when Ebib
+autogenerates a key (when [Autogenerate Keys](#autogenerate-keys) is set),
+a check is made to make sure that the new key doesn't already exist in the
+database. If it does, Ebib normally aborts the operation but when this
+option is set, Ebib instead tries to create a unique key by appending `b`
+or `c`, etc. to it.
+
+
 ### Autogenerate Keys ###
 
 **Default value**: `nil`.\
