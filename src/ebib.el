@@ -3923,7 +3923,7 @@ completion works."
        (when collection
 	 (let* ((key (completing-read "Key to insert: " collection nil t nil ebib-minibuf-hist))
 		(format-list (or (cadr (assoc (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
-				 (cadr (assoc 'latex-mode ebib-citation-commands))))
+				 (cadr (assoc 'any ebib-citation-commands))))
 		(citation-command
 		 (if-str (format-string (cadr (assoc
 					       (completing-read "Command to use: " format-list nil nil nil ebib-minibuf-hist)
