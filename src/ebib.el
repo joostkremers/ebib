@@ -3122,7 +3122,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
   (interactive)
   (let ((new-field (ebib-find-visible-field (next-elem ebib-current-field ebib-cur-entry-fields) 1)))
     (if (null new-field)
-	(when (interactive-p) ; i call this function after editing a field,
+	(when (called-interactively-p 'any) ; i call this function after editing a field,
 			      ; and we don't want a beep then
 	  (beep))
       (setq ebib-current-field new-field)
@@ -3264,7 +3264,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 	;; we move to the next field, but only if ebib-edit-field was
 	;; called interactively, otherwise we get a strange bug in
 	;; ebib-toggle-raw...
-	(if (interactive-p) (ebib-next-field))
+	(if (called-interactively-p 'any) (ebib-next-field))
 	(ebib-set-modified t))))))
 
 (defun ebib-browse-url-in-field (num)
@@ -3473,7 +3473,7 @@ The deleted text is not put in the kill ring."
   "Moves to the next string."
   (interactive)
   (if (equal ebib-current-string (last1 (edb-strings-list ebib-cur-db)))
-      (when (interactive-p) (beep))
+      (when (called-interactively-p 'any) (beep))
     (goto-char (ebib-highlight-start ebib-strings-highlight))
     (forward-line 1)
     (setq ebib-current-string (next-elem ebib-current-string (edb-strings-list ebib-cur-db)))
