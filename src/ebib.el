@@ -52,7 +52,10 @@
 (require 'easymenu)
 (require 'bibtex)
 
+;; make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)
+(unless (< emacs-major-version 24)
+  (bibtex-set-dialect)) ; this initializes some stuff that is needed for bibtex-generate-autokey
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
