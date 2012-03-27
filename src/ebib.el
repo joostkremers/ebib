@@ -3,8 +3,8 @@
 ;; Copyright (c) 2003-2012 Joost Kremers
 ;; All rights reserved.
 
-;; Author: Joost Kremers <joostkremers@yahoo.com>
-;; Maintainer: Joost Kremers <joostkremers@yahoo.com>
+;; Author: Joost Kremers <joostkremers@fastmail.fm>
+;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
 ;; Version: ==VERSION==
 ;; Keywords: text bibtex
