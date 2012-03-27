@@ -125,7 +125,7 @@ customization options."
 (defcustom ebib-citation-commands '((any
 				     (("cite" "\\cite%<[%A]%>{%K}")))
 				    (org-mode
-				     (("ebib" "[ebib:%K][%A]")))
+				     (("ebib" "[[ebib:%K][%A]]")))
 				    (markdown-mode
 				     (("text" "@%K%< [%A]%>")
 				      ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
