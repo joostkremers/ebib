@@ -223,12 +223,12 @@ Emacs (e.g. with doc-view-mode)."
 		       (string :tag "Extension") (string :tag "Command"))))
 
 (defcustom ebib-file-regexp "[^?|\\:*<>\" \n\t\f]+"
-  "*Regular expression to match filenames."
+  "*Regular expression to match filenames in the file field."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-file-search-dirs '("~")
-  "*List of directories to search for files."
+  "*List of directories to search when viewing external files."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
