@@ -192,7 +192,7 @@ this command extracts the url."
   :type 'symbol)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
-  "*Regular expression to extract urls."
+  "*Regular expression to extract urls from a field."
   :group 'ebib
   :type 'string)
 
@@ -223,7 +223,7 @@ Emacs (e.g. with doc-view-mode)."
 		       (string :tag "Extension") (string :tag "Command"))))
 
 (defcustom ebib-file-regexp "[^?|\\:*<>\" \n\t\f]+"
-  "*Regular expression to match filenames in the file field."
+  "*Regular expression to extract filenames from a field."
   :group 'ebib
   :type 'string)
 
