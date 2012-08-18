@@ -2779,21 +2779,18 @@ URLS must be a string of whitespace-separated URLs."
 
 (defun ebib-view-file (num)
   "Views a file in the standard file field.
-The standard file field may contain more than one filename, if
-they're whitespace-separated. In that case, a numeric prefix
-argument specifies which file to choose.
-
-By \"standard file field\" is meant the field defined in the
-customisation variable EBIB-STANDARD-FILE-FIELD. Its default
-value is `file'."
+The standard file field (see EBIB-STANDARD-FILE-FIELD) may
+contain more than one filename, if they're whitespace-separated.
+In that case, a numeric prefix argument specifies which file to
+choose."
   (interactive "p")
   (ebib-execute-when
     ((entries)
      (let ((filename (to-raw (gethash ebib-standard-file-field
 				      (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-       (when (not (and filename
-		       (ebib-call-file-viewer filename num)))
-	 (error "No valid filename found in field `%s'" ebib-standard-file-field))))
+       (if filename
+	   (ebib-call-file-viewer filename num)
+	 (error "Field `%s' is empty" ebib-standard-file-field))))
     ((default)
      (beep))))
 
@@ -2809,11 +2806,15 @@ FILES must be a string of whitespace-separated filenames."
 		      result)))
 	 (ext (file-name-extension file)))
     (let ((file-full-path (locate-file file ebib-file-search-dirs)))
-      (when file-full-path
-	(if-str (viewer (cdr (assoc ext ebib-file-associations)))
-	    (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path)
-	  (ebib-lower)
-	  (find-file file-full-path))))))
+      (if file-full-path
+	  (if-str (viewer (cdr (assoc ext ebib-file-associations)))
+	      (progn
+		(message "Executing `%s %s'" viewer file-full-path)
+		(start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+	    (message "Opening `%s'" file-full-path)
+	    (ebib-lower)
+	    (find-file file-full-path))
+	(error "File not found: `%s'" file)))))
 
 (defun ebib-virtual-db-and (not)
   "Filters entries into a virtual database.
@@ -3294,9 +3295,9 @@ filenames. The prefix argument indicates which file is to be
 viewed."
   (interactive "p")
   (let ((files (to-raw (gethash ebib-current-field ebib-cur-entry-hash))))
-    (if (not (and files
-		  (ebib-call-file-viewer files num)))
-	(error "No valid filename found in field `%s'" ebib-current-field))))
+    (if files
+	(ebib-call-file-viewer files num)
+	(error "Field `%s' is empty" ebib-current-field))))
 
 (defun ebib-copy-field-contents ()
   "Copies the contents of the current field to the kill ring."
