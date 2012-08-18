@@ -2732,13 +2732,9 @@ Operates either on all entries or on the marked entries."
 
 (defun ebib-browse-url (num)
   "Asks a browser to load the URL in the standard URL field.
-The standard URL field may contain more than one URL, if they're
-whitespace-separated. In that case, a numeric prefix argument
-specifies which URL to choose.
-
-By \"standard URL field\" is meant the field defined in the
-customisation variable EBIB-STANDARD-URL-FIELD. Its default value
-is `url'."
+The standard URL (see EBIB-STANDARD-URL-FIELD) field may contain
+more than one URL, if they're whitespace-separated. In that case,
+a numeric prefix argument specifies which URL to choose."
   (interactive "p")
   (ebib-execute-when
     ((entries)
