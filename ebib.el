@@ -75,6 +75,11 @@
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
+(defcustom ebib-preload-bib-search-dirs '("~")
+  "*List of directories to search for .bib files to be preloaded."
+  :group 'ebib
+  :type '(repeat :tag "Search directories for .bib files" (string :tag "Directory")))
+
 (defcustom ebib-additional-fields '(crossref url annote abstract
 					     keywords file timestamp)
   "*List of the additional fields."
@@ -1280,7 +1285,7 @@ that is to be displayed."
       (ebib-init)
       (if ebib-preload-bib-files
 	  (mapc #'(lambda (file)
-		    (ebib-load-bibtex-file file))
+		    (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
 		ebib-preload-bib-files)))
     ;; if ebib is visible, we just switch to the index buffer
     (let ((index-window (get-buffer-window ebib-index-buffer)))
