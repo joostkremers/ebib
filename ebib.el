@@ -2977,11 +2977,11 @@ after the last instance of REPEATER."
       (setq before (match-string 1 format-string)
 	    repeater (match-string 2 format-string)
 	    separator (match-string 3 format-string)
-	    after (match-string 4 format-string))
+	    after (match-string 4 format-string)))
      ((string-match "\\(.*?\\)\\(%K\\)\\(.*\\)" format-string)
       (setq before (match-string 1 format-string)
 	    repeater (match-string 2 format-string)
-	    after (match-string 3 format-string)))
+	    after (match-string 3 format-string))))
     (values before repeater separator after)))
 
 (defun ebib-push-bibtex-key ()
