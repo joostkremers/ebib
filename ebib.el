@@ -2737,9 +2737,10 @@ Operates either on all entries or on the marked entries."
 
 (defun ebib-browse-url (num)
   "Asks a browser to load the URL in the standard URL field.
-The standard URL (see EBIB-STANDARD-URL-FIELD) field may contain
-more than one URL, if they're whitespace-separated. In that case,
-a numeric prefix argument specifies which URL to choose."
+The standard URL field (see user option EBIB-STANDARD-URL-FIELD)
+may contain more than one URL, if they're whitespace-separated.
+In that case, a numeric prefix argument can be used to specify
+which URL to choose."
   (interactive "p")
   (ebib-execute-when
     ((entries)
@@ -2784,10 +2785,10 @@ URLS must be a string of whitespace-separated URLs."
 
 (defun ebib-view-file (num)
   "Views a file in the standard file field.
-The standard file field (see EBIB-STANDARD-FILE-FIELD) may
-contain more than one filename, if they're whitespace-separated.
-In that case, a numeric prefix argument specifies which file to
-choose."
+The standard file field (see option EBIB-STANDARD-FILE-FIELD) may
+contain more than one filename if they're whitespace-separated.
+In that case, a numeric prefix argument can be used to specify
+which file to choose."
   (interactive "p")
   (ebib-execute-when
     ((entries)
