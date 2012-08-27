@@ -1388,7 +1388,7 @@ buffers and reads the rc file."
   (setq ebib-log-buffer (get-buffer-create " *Ebib-log*"))
   (set-buffer ebib-log-buffer)
   (erase-buffer)
-  (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n\n")
+  (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
   (ebib-log-mode)
   ;; and lastly we create a buffer for the entry keys.
   (setq ebib-index-buffer (get-buffer-create " none"))
@@ -1725,7 +1725,7 @@ signal the user to check the log for warnings or errors."
   (ebib-fill-index-buffer)
   (when ebib-log-error
     (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-  (ebib-log 'log "\n\f\n"))
+  (ebib-log 'log ""))
 
 (defun ebib-merge-bibtex-file ()
   "Merges a BibTeX file into the database."
@@ -1734,29 +1734,29 @@ signal the user to check the log for warnings or errors."
     (if (not ebib-cur-db)
         (error "No database loaded. Use `o' to open a database")
       (let ((file (read-file-name "File to merge: ")))
-        (setq ebib-log-error nil)       ; we haven't found any errors
-        (ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
-        (with-temp-buffer
-          (with-syntax-table ebib-syntax-table
-            (insert-file-contents file)
-            (let ((n (ebib-find-bibtex-entries t)))
-              (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-              (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
-              (when (edb-strings-list ebib-cur-db)
-                (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-              (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-              (ebib-fill-entry-buffer)
-              (ebib-fill-index-buffer)
-              (ebib-set-modified t)
-              (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-                        (car n)
-                        (cadr n)
-                        (if (caddr n)
-                            "a"
-                          "no"))
-              (when ebib-log-error
-                (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-              (ebib-log 'log "\n\f\n"))))))))
+	(setq ebib-log-error nil)	; we haven't found any errors
+	(ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
+	(with-temp-buffer
+	  (with-syntax-table ebib-syntax-table
+	    (insert-file-contents file)
+	    (let ((n (ebib-find-bibtex-entries t)))
+	      (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
+	      (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
+	      (when (edb-strings-list ebib-cur-db)
+		(setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+	      (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+	      (ebib-fill-entry-buffer)
+	      (ebib-fill-index-buffer)
+	      (ebib-set-modified t)
+	      (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+			(car n)
+			(cadr n)
+			(if (caddr n)
+			    "a"
+			  "no"))
+	      (when ebib-log-error
+		(message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+	      (ebib-log 'log ""))))))))
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
