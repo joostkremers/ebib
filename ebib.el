@@ -928,7 +928,7 @@ matching entry is returned."
                                         (to-raw (gethash field cur-entry-hash))
                                         ""))
                                    ebib-index-display-fields
-                                   "; "))
+                                   "  "))
                     ""))))
 
 (defun ebib-redisplay-current-field ()
