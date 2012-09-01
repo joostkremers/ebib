@@ -1502,6 +1502,7 @@ killed and the database has been modified."
 (ebib-key index "|" ebib-virtual-db-or)
 (ebib-key index "~" ebib-virtual-db-not)
 (ebib-key index ";" ebib-prefix-map)
+(ebib-key index "?" ebib-info)
 (ebib-key index "a" ebib-add-entry)
 (ebib-key index "b" ebib-index-scroll-down)
 (ebib-key index "c" ebib-close-database)
