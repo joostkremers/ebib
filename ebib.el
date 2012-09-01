@@ -196,6 +196,14 @@ this command extracts the url."
   :group 'ebib
   :type 'symbol)
 
+(defcustom ebib-standard-doi-field 'doi
+  "*Standard field to store doi (digital object identifier) in.
+In the index buffer, the command ebib-browse-doi can be used to
+send a suitable url to a browser. This option sets the field from
+which this command extracts the doi."
+  :group 'ebib
+  :type 'symbol)
+
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
   "*Regular expression to extract urls from a field."
   :group 'ebib
@@ -356,6 +364,7 @@ Each string is added to the preamble on a separate line."
 ;; constants and variables that are set only once
 (defconst ebib-bibtex-identifier "[^\"#%'(),={} \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
 (defconst ebib-version "==VERSION==")
+(defconst ebib-doi-url "http://dx.doi.org/" "Prepend to turn doi field value into a web address.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
 ;; buffers and highlights
@@ -1493,6 +1502,7 @@ killed and the database has been modified."
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
 (ebib-key index "h" ebib-index-help)
+(ebib-key index "i" ebib-browse-doi)
 (ebib-key index "j" ebib-next-entry)
 (ebib-key index "J" ebib-switch-to-database)
 (ebib-key index "k" ebib-prev-entry)
@@ -1561,6 +1571,7 @@ killed and the database has been modified."
     ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
     "--"
     ["Open URL" ebib-browse-url (gethash ebib-standard-url-field ebib-cur-entry-hash)]
+    ["Open DOI" ebib-browse-doi (gethash ebib-standard-doi-field ebib-cur-entry-hash)]
     ["View File" ebib-view-file (gethash ebib-standard-file-field ebib-cur-entry-hash)]
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
@@ -2760,6 +2771,24 @@ which URL to choose."
          (error "Field `%s' is empty" ebib-standard-url-field))))
     ((default)
      (beep))))
+
+(defun ebib-browse-doi ()
+  "Asks a browser to load a modified URL in the standard DOI field.
+The standard DOI field may not contain more than one DOI.
+
+By \"standard DOI field\" is meant the field defined in the
+customization variable EBIB-STANDARD-DOI-FIELD. Its default value
+is `doi'."
+  (interactive)
+  (ebib-execute-when
+   ((entries)
+    (let ((doi (to-raw (gethash ebib-standard-doi-field
+                                (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+      (when (not (and doi
+                      (ebib-call-browser (concat ebib-doi-url doi) 1)))  ; '1' was 'num'
+        (error "No doi found in field `%s'" ebib-standard-doi-field))))
+   ((default)
+    (beep))))
 
 (defun ebib-call-browser (urls n)
   "Passes the Nth URL in URLS to a browser.
