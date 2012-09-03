@@ -266,15 +266,17 @@ There are two more customisation options for printing the database. These are `P
 
 ## Calling a Browser ##
 
-With more and more scientific literature becoming available on-line, it becomes common to store URLs in a BibTeX database. Sometimes you may want to load such a URL in your browser. Ebib provides a convenient way for doing so.
+With more and more scientific literature becoming available on-line, it becomes common to store URLs and DOIs in a BibTeX database. Sometimes you may want to load such a URL or a DOI in your browser. Ebib provides a convenient way for doing so.
 
 If you type `u` in the index buffer, Ebib takes the first URL stored in the `url` field of the current entry and passes it to your browser. Furthermore, in the entry buffer, you can use `u` on *any* field. If you happen to have more than one URL stored in the relevant field, and you want to pass the second (or third, etc.) to the browser, you can use a prefix argument. So typing `M-2 u` sends the second URL to your browser, `M-3 u` the third, and so on.
 
 It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' <` or `>` as a URL. Furthermore, Ebib regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. This behaviour is controlled by a regular expression that can be customised. (See [Url Regexp](#url-regexp).)
 
+Similarly, with the key `i` in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Ulike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser unchanged. A DOI is normally resolved through the URL `http://dx.doi.org/`, but if you prefer a different URL, you can customize the option [Doi Url](#doi-url).
+
 There exists an Emacs function `browse-url`, which provides a nifty interface to calling an external browser. In principle, Ebib uses this function. However, if this function is not present on your installation, you can set the option [Browser Command](#browser-command) to call the browser.
 
-As just explained, if you press `u` in the index buffer, Ebib searches the `url` field of the current entry for URLs. If you have the habit of putting your URLs in another field, however, you may change the customisation option [Standard Url Field](#standard-url-field) and tell Ebib to use another field for searching the URLs. (Keep in mind, though, that in the entry buffer, you can load a URL from any field.)
+As just explained, if you press `u` in the index buffer, Ebib searches the `url` field of the current entry for URLs. If you have the habit of putting your URLs in another field, however, you may change the customisation option [Standard Url Field](#standard-url-field) and tell Ebib to use another field for searching the URLs. The same can be done for the DOI field.
 
 
 ## Viewing Files ##
@@ -1042,6 +1044,20 @@ The function `ebib-insert-bibtex-key` can of course also be called from non-LaTe
 \noindent If this option is unset, Ebib uses the Emacs function `browse-url` to start a browser. If this function does not exist, you can set this option. For example, if you use the Firefox browser, set this option to `firefox`.
 
 For this to work, the browser that you use must be able to handle a URL on the command line.
+
+
+### Standard Doi Field ###
+
+**Default value**: `doi`.\
+
+\noindent The field Ebib uses to extract the DOI if you press `i` in the index buffer.
+
+
+### Doi Url ###
+
+**Default value**: `http://dx.doi.org/%s`
+
+The URL used to open a DOI. It must contain exactly one instance fo `%s`, which will be replaced with the DOI.
 
 
 ### Standard File Field ###

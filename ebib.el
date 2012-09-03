@@ -80,8 +80,14 @@
   :group 'ebib
   :type '(repeat :tag "Search directories for .bib files" (string :tag "Directory")))
 
-(defcustom ebib-additional-fields '(crossref url annote abstract
-                                             keywords file timestamp)
+(defcustom ebib-additional-fields '(crossref
+                                    url
+                                    annote
+                                    abstract
+                                    keywords
+                                    file
+                                    timestamp
+                                    doi)
   "*List of the additional fields."
   :group 'ebib
   :type '(repeat (symbol :tag "Field")))
@@ -196,14 +202,6 @@ this command extracts the url."
   :group 'ebib
   :type 'symbol)
 
-(defcustom ebib-standard-doi-field 'doi
-  "*Standard field to store doi (digital object identifier) in.
-In the index buffer, the command ebib-browse-doi can be used to
-send a suitable url to a browser. This option sets the field from
-which this command extracts the doi."
-  :group 'ebib
-  :type 'symbol)
-
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
   "*Regular expression to extract urls from a field."
   :group 'ebib
@@ -215,6 +213,20 @@ GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
   :type '(string :tag "Browser command"))
+
+(defcustom ebib-standard-doi-field 'doi
+  "*Standard field to store a DOI (digital object identifier) in.
+In the index buffer, the command ebib-browse-doi can be used to
+send a suitable url to a browser. This option sets the field from
+which this command extracts the doi."
+  :group 'ebib
+  :type 'symbol)
+
+(defcustom ebib-doi-url "http://dx.doi.org/%s"
+  "*URL for opening a doi.
+This value must contain one `%s', which will be replaced with the doi."
+  :group 'ebib
+  :type 'string)
 
 (defcustom ebib-standard-file-field 'file
   "*Standard field to store filenames in.
@@ -364,7 +376,6 @@ Each string is added to the preamble on a separate line."
 ;; constants and variables that are set only once
 (defconst ebib-bibtex-identifier "[^\"#%'(),={} \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
 (defconst ebib-version "==VERSION==")
-(defconst ebib-doi-url "http://dx.doi.org/" "Prepend to turn doi field value into a web address.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
 ;; buffers and highlights
@@ -2773,20 +2784,20 @@ which URL to choose."
      (beep))))
 
 (defun ebib-browse-doi ()
-  "Asks a browser to load a modified URL in the standard DOI field.
-The standard DOI field may not contain more than one DOI.
+  "Open the DOI in the standard DOI field in a browser.
+The stardard DOI field (see user option EBIB-STANDARD-DOI-FIELD)
+may contain only one DOI.
 
-By \"standard DOI field\" is meant the field defined in the
-customization variable EBIB-STANDARD-DOI-FIELD. Its default value
-is `doi'."
+The DOI is combined with the value of EBIB-DOI-URL before being
+sent to the browser."
   (interactive)
   (ebib-execute-when
    ((entries)
     (let ((doi (to-raw (gethash ebib-standard-doi-field
                                 (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-      (when (not (and doi
-                      (ebib-call-browser (concat ebib-doi-url doi) 1)))  ; '1' was 'num'
-        (error "No doi found in field `%s'" ebib-standard-doi-field))))
+      (if doi
+          (ebib-call-browser (format ebib-doi-url doi) 1)  ; '1' was 'num'
+        (error "No DOI found in field `%s'" ebib-standard-doi-field))))
    ((default)
     (beep))))
 
