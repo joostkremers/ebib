@@ -1294,6 +1294,13 @@ is a list of fields that are considered in order for the sort value."
       (setq sortkey-list (cdr sortkey-list)))
     sort-string))
 
+(defadvice Info-exit (around ebib-info-exit activate)
+  "Quit info and return to Ebib, if Info was called from there."
+  (if (not (string= (buffer-name) " *Ebib info*"))
+      ad-do-it
+    ad-do-it
+    (ebib)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main program execution ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1390,6 +1397,8 @@ buffers and reads the rc file."
   (erase-buffer)
   (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
   (ebib-log-mode)
+  ;; create a buffer for Ebib info
+  (get-buffer-create " *Ebib info*")
   ;; and lastly we create a buffer for the entry keys.
   (setq ebib-index-buffer (get-buffer-create " none"))
   (set-buffer ebib-index-buffer)
@@ -3097,13 +3106,13 @@ The user is prompted for the buffer to push the entry into."
   "Shows the info node of Ebib's index buffer."
   (interactive)
   (ebib-lower)
-  (info "(ebib) The Index Buffer"))
+  (info "(ebib) The Index Buffer" " *Ebib info*"))
 
 (defun ebib-info ()
   "Shows Ebib's info node."
   (interactive)
   (ebib-lower)
-  (info "(ebib)"))
+  (info "(ebib)" " *Ebib info*"))
 
 ;;;;;;;;;;;;;;;;
 ;; entry-mode ;;
@@ -3472,7 +3481,7 @@ The deleted text is not put in the kill ring."
   "Shows the info node for Ebib's entry buffer."
   (interactive)
   (ebib-lower)
-  (info "(ebib) The Entry Buffer"))
+  (info "(ebib) The Entry Buffer" " *Ebib info*"))
 
 ;;;;;;;;;;;;;;;;;;
 ;; strings-mode ;;
@@ -3728,7 +3737,7 @@ to append them to."
   "Shows the info node on Ebib's strings buffer."
   (interactive)
   (ebib-lower)
-  (info "(ebib) The Strings Buffer"))
+  (info "(ebib) The Strings Buffer" " *Ebib info*"))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; multiline edit ;;
@@ -3840,7 +3849,7 @@ The text being edited is stored before saving the database."
   "Show the info node on Ebib's multiline edit buffer."
   (interactive)
   (ebib-lower)
-  (info "(ebib) The Multiline Edit Buffer"))
+  (info "(ebib) The Multiline Edit Buffer" " *Ebib info*"))
 
 ;;;;;;;;;;;;;;;;;;;
 ;; ebib-log-mode ;;
