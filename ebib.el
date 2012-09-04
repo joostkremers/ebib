@@ -1665,7 +1665,9 @@ the message to the log buffer and outputs it with the function
 MESSAGE; WARNING, which logs the message and sets the variable
 EBIB-LOG-ERROR to 0; or ERROR, which logs the message and sets
 the variable EBIB-LOG-ERROR to 1. The latter two can be used to
-signal the user to check the log for warnings or errors."
+signal the user to check the log for warnings or errors.
+
+This function adds a newline to the message being logged."
   (with-current-buffer ebib-log-buffer
     (cond
      ((eq type 'warning)
@@ -1725,7 +1727,7 @@ signal the user to check the log for warnings or errors."
   (ebib-fill-index-buffer)
   (when ebib-log-error
     (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-  (ebib-log 'log ""))
+  (ebib-log 'log "")) ; this adds a newline to the log buffer
 
 (defun ebib-merge-bibtex-file ()
   "Merges a BibTeX file into the database."
@@ -1756,7 +1758,7 @@ signal the user to check the log for warnings or errors."
 			  "no"))
 	      (when ebib-log-error
 		(message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-	      (ebib-log 'log ""))))))))
+	      (ebib-log 'log "")))))))) ; this adds a newline to the log buffer
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
