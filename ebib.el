@@ -669,8 +669,9 @@ the result."
                  (goto-char (point-min))
                  (forward-line (1- middle)) ; if this turns out to be where we need to be,
                  (beginning-of-line)        ; this puts POINT at the right spot.
-                 (> (- upper lower) 1))     ; if upper and lower differ by only 1, we have found the
-                                        ; position to insert the entry in.
+                 ;; if upper and lower differ by only 1, we have found the
+                 ;; position to insert the entry in.
+                 (> (- upper lower) 1))
           (save-excursion
             (let ((beg (point)))
               (end-of-line)
@@ -1746,29 +1747,29 @@ This function adds a newline to the message being logged."
     (if (not ebib-cur-db)
         (error "No database loaded. Use `o' to open a database")
       (let ((file (read-file-name "File to merge: ")))
-	(setq ebib-log-error nil)	; we haven't found any errors
-	(ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
-	(with-temp-buffer
-	  (with-syntax-table ebib-syntax-table
-	    (insert-file-contents file)
-	    (let ((n (ebib-find-bibtex-entries t)))
-	      (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-	      (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
-	      (when (edb-strings-list ebib-cur-db)
-		(setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-	      (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-	      (ebib-fill-entry-buffer)
-	      (ebib-fill-index-buffer)
-	      (ebib-set-modified t)
-	      (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-			(car n)
-			(cadr n)
-			(if (caddr n)
-			    "a"
-			  "no"))
-	      (when ebib-log-error
-		(message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-	      (ebib-log 'log "")))))))) ; this adds a newline to the log buffer
+        (setq ebib-log-error nil)       ; we haven't found any errors
+        (ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename ebib-cur-db))
+        (with-temp-buffer
+          (with-syntax-table ebib-syntax-table
+            (insert-file-contents file)
+            (let ((n (ebib-find-bibtex-entries t)))
+              (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
+              (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
+              (when (edb-strings-list ebib-cur-db)
+                (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+              (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+              (ebib-fill-entry-buffer)
+              (ebib-fill-index-buffer)
+              (ebib-set-modified t)
+              (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+                        (car n)
+                        (cadr n)
+                        (if (caddr n)
+                            "a"
+                          "no"))
+              (when ebib-log-error
+                (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+              (ebib-log 'log "")))))))) ; this adds a newline to the log buffer
 
 (defun ebib-find-bibtex-entries (timestamp)
   "Finds the BibTeX entries in the current buffer.
@@ -3199,8 +3200,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
   (interactive)
   (let ((new-field (ebib-find-visible-field (next-elem ebib-current-field ebib-cur-entry-fields) 1)))
     (if (null new-field)
-        (when (ebib-called-interactively) ; i call this function after editing a field,
-                                        ; and we don't want a beep then
+        (when (ebib-called-interactively) ; i call this function after editing a field, and we don't want a beep then
           (beep))
       (setq ebib-current-field new-field)
       (ebib-move-to-field ebib-current-field 1))))
@@ -3240,8 +3240,9 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
                   (null new-field))
           (setq new-field (ebib-find-visible-field (car ebib-additional-fields) 1)))
         (if (null new-field)
-            (ebib-goto-last-field)  ; if there was no further set to go to,
-                                        ; go to the last field of the current set
+            ;; if there was no further set to go to, go to the last field
+            ;; of the current set
+            (ebib-goto-last-field)
           (setq ebib-current-field new-field)
           (ebib-move-to-field ebib-current-field 1))))))
 
@@ -3925,9 +3926,10 @@ or on the region if it is active."
   (catch 'found
     (mapc #'(lambda (db)
               (if (string= filename
-                                        ; if filename is absolute, we want to compare to the
-                                        ; absolute filename of the database, otherwise we
-                                        ; should use only the non-directory component.
+                           ;; if filename is absolute, we want to compare
+                           ;; to the absolute filename of the database,
+                           ;; otherwise we should use only the
+                           ;; non-directory component.
                            (if (file-name-absolute-p filename)
                                (edb-filename db)
                              (file-name-nondirectory (edb-filename db))))
