@@ -44,39 +44,83 @@ File: ebib.info,  Node: Installation,  Next: Basic Usage,  Prev: Top,  Up: Top
 1 Installation
 **************
 
+* Menu:
+
+* Manual installation::
+* Starting Ebib::
+* Installing the info file::
+
+
+File: ebib.info,  Node: Manual installation,  Next: Starting Ebib,  Up: Installation
+
+1.1 Manual installation
+=======================
+
 To install Ebib, so that it will be loaded automatically when Emacs is
 started, simply copy the file `ebib.el' to somewhere in your load path
 and add the following line to Emacs' init file `~/.emacs':
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
 On a default installation, the load path probably only contains system
-directories. If you want to put `ebib.el' somewhere in your home
-directory, you can create a directory and add it to your load path:
-(setq load-path (cons "~/.emacs.d" load-path))
+directories. If you want to run `ebib.el' from somewhere else (e.g.,
+directly from the source directory), you can add this directory to your
+load path:
+(add-to-list 'load-path "~/src/ebib"))
 
 Note: if you do not know what your load path is set to, go to the
 `*scratch*' buffer, type `load-path' on an empty line, put the cursor
 right after it and type `C-j'. The value of `load-path' will then
 appear in the buffer.
 
-When Ebib is loaded, you can run it with `M-x ebib'. This command is
-also used to return to Ebib when you have put the program in the
-background. You can bind this command to a key sequence by putting
-something like the following in Emacs' init file:
+Alternatively, you can load Ebib directly by putting the following in
+`.emacs':
+(load "/path/to/ebib")
+
+The difference between `load' and `autoload' is that the former loads
+Ebib immediately and thus slows down Emacs' startup (a bit), while the
+latter loads Ebib only when it is called (and thus slows down Ebib's
+first time start up a bit).
+
+It is recommended to byte-compile the source, Ebib runs quite a lot
+faster when it is byte-compiled. You can do this either within Emacs
+with `M-x byte-compile-file' (recommended on OS X), or from your shell
+by going into the directory where you put `ebib.el' and typing:
+emacs -batch -f batch-byte-compile ebib.el
+
+This will create a file `ebib.elc', which Emacs will load instead of
+`ebib.el'
+
+
+File: ebib.info,  Node: Starting Ebib,  Next: Installing the info file,  Prev: Manual installation,  Up: Installation
+
+1.2 Starting Ebib
+=================
+
+Once Ebib has been installed and is loaded, you can start it with `M-x
+ebib'. This command is also used to return to Ebib when you have put
+the program in the background. You can bind this command to a key
+sequence by putting something like the following in Emacs' init file:
 (global-set-key "\C-ce" 'ebib)
 
 You can of course choose any key combination you like. (In Emacs, key
 combinations of `C-c' `<letter>' are reserved for the user, so that no
 package may set them.)
 
-It is recommended to byte-compile the source, Ebib runs quite a lot
-faster when it is byte-compiled. You can do this either within Emacs
-with `M-x byte-compile-file', or from your shell by going into the
-directory where you put `ebib.el' and typing:
-emacs -batch -f batch-byte-compile ebib.el
+
+File: ebib.info,  Node: Installing the info file,  Prev: Starting Ebib,  Up: Installation
 
-This will create a file `ebib.elc', which Emacs will load instead of
-`ebib.el'.
+1.3 Installing the info file
+============================
+
+The Ebib manual is available as an info file. If you want this to be
+accessible from within Emacs, you need to put it in a directory where
+Emacs can find it. One way to do this is to put `ebib.info' in one of
+the standard info directories. Make sure to run `install-info ebib.info
+dir', so that Emacs knows about the new info file.
+
+Alternatively, you can leave `ebib.info' in Ebib's source directory and
+add that dir to `Info-additional-directory-list'. It contains a
+suitable `dir' file, so there's no need to run `install-info'.
 
 
 File: ebib.info,  Node: Basic Usage,  Next: Advanced Features,  Prev: Installation,  Up: Top
@@ -2685,83 +2729,86 @@ s' to `C-c & q', `C-c & c' and `C-c & s', respectively.
 Tag Table:
 Node: Top184
 Node: Installation1370
-Node: Basic Usage3046
-Node: Getting Started4707
-Node: Opening a bib File5778
-Node: Navigating a bib File7649
-Node: Starting a New bib File10855
-Node: Editing the Database11307
-Node: Adding and Deleting Entries11785
-Node: Editing Fields Values13561
-Node: Editing Multiline Values16069
-Node: Copy Cut Paste Yank and Delete18282
-Node: Saving a Database19437
-Node: Searching20467
-Node: LaTeX Integration22835
-Node: Orgmode and markdown25867
-Node: Consulting Databases from within a LaTeX File28184
-Node: Cross-referencing30785
-Node: Selecting Entries33343
-Node: Printing the Database34870
-Node: Calling a Browser38988
-Node: Viewing Files41508
-Node: Advanced Features43853
-Node: Screen Layout44470
-Node: Preloading bib Files46127
-Node: @Preamble Definition47071
-Node: @String Definitions49351
-Node: Sorting the bib File52784
-Node: Merging and Importing55949
-Node: Exporting Entries57285
-Node: Timestamps59480
-Node: Multiple Identical Fields61245
-Node: Virtual Databases63268
-Node: Simple Selection64538
-Node: Complex Filters65639
-Node: Properties of Virtual Databases69635
-Node: The Multiline Edit Buffer70859
-Node: The Options Menu73863
-Node: The Ebib Buffers74620
-Node: The Index Buffer75096
-Node: The Entry Buffer79697
-Node: The Strings Buffer82052
-Node: Customisation83815
-Node: The Customisation Buffer84208
-Node: Default Type85341
-Node: Preload Bib Files85779
-Node: Preload Bib Search Dirs86184
-Node: Additional Fields86562
-Node: Layout87098
-Node: Width87560
-Node: Index Window Size87781
-Node: Index Display Fields88060
-Node: Uniquify Keys88551
-Node: Autogenerate Keys89112
-Node: Citation Commands89733
-Node: Multiline Major Mode95687
-Node: Sort Order96022
-Node: Save Xrefs First96532
-Node: Crossref Face97075
-Node: Selected Face97415
-Node: Use Timestamp97743
-Node: Timestamp Format98095
-Node: Standard Url Field98661
-Node: Url Regexp98944
-Node: Browser Command99490
-Node: Standard Doi Field99996
-Node: Doi Url100268
-Node: Standard File Field100573
-Node: File Associations100863
-Node: File Regexp101734
-Node: File Search Dirs102368
-Node: Print Preamble102713
-Node: Print Newline103107
-Node: Print Multiline103475
-Node: Latex Preamble103819
-Node: Print Tempfile104256
-Node: Allow Identical Fields104686
-Node: Entry Types105124
-Node: Modifying Key Bindings107083
+Node: Manual installation1564
+Node: Starting Ebib3191
+Node: Installing the info file3822
+Node: Basic Usage4507
+Node: Getting Started6168
+Node: Opening a bib File7239
+Node: Navigating a bib File9110
+Node: Starting a New bib File12316
+Node: Editing the Database12768
+Node: Adding and Deleting Entries13246
+Node: Editing Fields Values15022
+Node: Editing Multiline Values17530
+Node: Copy Cut Paste Yank and Delete19743
+Node: Saving a Database20898
+Node: Searching21928
+Node: LaTeX Integration24296
+Node: Orgmode and markdown27328
+Node: Consulting Databases from within a LaTeX File29645
+Node: Cross-referencing32246
+Node: Selecting Entries34804
+Node: Printing the Database36331
+Node: Calling a Browser40449
+Node: Viewing Files42969
+Node: Advanced Features45314
+Node: Screen Layout45931
+Node: Preloading bib Files47588
+Node: @Preamble Definition48532
+Node: @String Definitions50812
+Node: Sorting the bib File54245
+Node: Merging and Importing57410
+Node: Exporting Entries58746
+Node: Timestamps60941
+Node: Multiple Identical Fields62706
+Node: Virtual Databases64729
+Node: Simple Selection65999
+Node: Complex Filters67100
+Node: Properties of Virtual Databases71096
+Node: The Multiline Edit Buffer72320
+Node: The Options Menu75324
+Node: The Ebib Buffers76081
+Node: The Index Buffer76557
+Node: The Entry Buffer81158
+Node: The Strings Buffer83513
+Node: Customisation85276
+Node: The Customisation Buffer85669
+Node: Default Type86802
+Node: Preload Bib Files87240
+Node: Preload Bib Search Dirs87645
+Node: Additional Fields88023
+Node: Layout88559
+Node: Width89021
+Node: Index Window Size89242
+Node: Index Display Fields89521
+Node: Uniquify Keys90012
+Node: Autogenerate Keys90573
+Node: Citation Commands91194
+Node: Multiline Major Mode97148
+Node: Sort Order97483
+Node: Save Xrefs First97993
+Node: Crossref Face98536
+Node: Selected Face98876
+Node: Use Timestamp99204
+Node: Timestamp Format99556
+Node: Standard Url Field100122
+Node: Url Regexp100405
+Node: Browser Command100951
+Node: Standard Doi Field101457
+Node: Doi Url101729
+Node: Standard File Field102034
+Node: File Associations102324
+Node: File Regexp103195
+Node: File Search Dirs103829
+Node: Print Preamble104174
+Node: Print Newline104568
+Node: Print Multiline104936
+Node: Latex Preamble105280
+Node: Print Tempfile105717
+Node: Allow Identical Fields106147
+Node: Entry Types106585
+Node: Modifying Key Bindings108544
 
 End Tag Table
 

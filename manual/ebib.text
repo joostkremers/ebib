@@ -13,28 +13,45 @@ The advantage of having a BibTeX database manager inside Emacs is that X is no l
 
 # Installation #
 
+## Manual installation ##
+
 To install Ebib, so that it will be loaded automatically when Emacs is started, simply copy the file `ebib.el` to somewhere in your load path and add the following line to Emacs' init file `~/.emacs`:
 
     (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
-On a default installation, the load path probably only contains system directories. If you want to put `ebib.el` somewhere in your home directory, you can create a directory and add it to your load path:
+On a default installation, the load path probably only contains system directories. If you want to run `ebib.el` from somewhere else (e.g., directly from the source directory), you can add this directory to your load path:
 
-    (setq load-path (cons "~/.emacs.d" load-path))
+    (add-to-list 'load-path "~/src/ebib"))
 
 Note: if you do not know what your load path is set to, go to the `*scratch*` buffer, type `load-path` on an empty line, put the cursor right after it and type `C-j`. The value of `load-path` will then appear in the buffer.
 
-When Ebib is loaded, you can run it with `M-x ebib`. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs' init file:
+Alternatively, you can load Ebib directly by putting the following in `.emacs`:
+
+    (load "/path/to/ebib")
+
+The difference between `load` and `autoload` is that the former loads Ebib immediately and thus slows down Emacs' startup (a bit), while the latter loads Ebib only when it is called (and thus slows down Ebib's first time start up a bit).
+
+It is recommended to byte-compile the source, Ebib runs quite a lot faster when it is byte-compiled. You can do this either within Emacs with `M-x byte-compile-file` (recommended on OS X), or from your shell by going into the directory where you put `ebib.el` and typing:
+
+    emacs -batch -f batch-byte-compile ebib.el
+
+This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`
+
+
+## Starting Ebib ##
+
+Once Ebib has been installed and is loaded, you can start it with `M-x ebib`. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs' init file:
 
     (global-set-key "\C-ce" 'ebib)
 
 You can of course choose any key combination you like. (In Emacs, key combinations of `C-c` `<letter>` are reserved for the user, so that no package may set them.)
 
-It is recommended to byte-compile the source, Ebib runs quite a lot faster when it is byte-compiled. You can do this either within Emacs with `M-x byte-compile-file`, or from your shell by going into the directory where you put `ebib.el` and typing:
 
-    emacs -batch -f batch-byte-compile ebib.el
+## Installing the info file ##
 
-This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`.
+The Ebib manual is available as an info file. If you want this to be accessible from within Emacs, you need to put it in a directory where Emacs can find it. One way to do this is to put `ebib.info` in one of the standard info directories. Make sure to run `install-info ebib.info dir`, so that Emacs knows about the new info file.
 
+Alternatively, you can leave `ebib.info` in Ebib's source directory and add that dir to `Info-additional-directory-list`. It contains a suitable `dir` file, so there's no need to run `install-info`.
 
 
 # Basic Usage #
