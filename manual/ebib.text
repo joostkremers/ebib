@@ -587,6 +587,8 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `~`
 :    Perform a logical `not` on the current virtual database.
      `(ebib-virtual-db-not)`
+`?`
+:    display Ebib info. `(ebib-info)`
 `a`
 :    add an entry. `(ebib-add-entry)`
 `b`
