@@ -612,6 +612,8 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    equivalent to `End`.
 `h`
 :    show the info node on the index buffer. (`ebib-index-help`)
+`i`
+:    extract a DOI from the `doi` field, append it to a URL and open that in a browser (`ebib-browse-doi`)
 `j`
 :    equivalent to `Down`.
 `J`

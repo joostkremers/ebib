@@ -1689,6 +1689,10 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
 `h'
      show the info node on the index buffer. (`ebib-index-help')
 
+`i'
+     extract a DOI from the `doi' field, append it to a URL and open
+     that in a browser (`ebib-browse-doi')
+
 `j'
      equivalent to `Down'.
 
@@ -2770,45 +2774,45 @@ Node: The Multiline Edit Buffer72320
 Node: The Options Menu75324
 Node: The Ebib Buffers76081
 Node: The Index Buffer76557
-Node: The Entry Buffer81158
-Node: The Strings Buffer83513
-Node: Customisation85276
-Node: The Customisation Buffer85669
-Node: Default Type86802
-Node: Preload Bib Files87240
-Node: Preload Bib Search Dirs87645
-Node: Additional Fields88023
-Node: Layout88559
-Node: Width89021
-Node: Index Window Size89242
-Node: Index Display Fields89521
-Node: Uniquify Keys90012
-Node: Autogenerate Keys90573
-Node: Citation Commands91194
-Node: Multiline Major Mode97148
-Node: Sort Order97483
-Node: Save Xrefs First97993
-Node: Crossref Face98536
-Node: Selected Face98876
-Node: Use Timestamp99204
-Node: Timestamp Format99556
-Node: Standard Url Field100122
-Node: Url Regexp100405
-Node: Browser Command100951
-Node: Standard Doi Field101457
-Node: Doi Url101729
-Node: Standard File Field102034
-Node: File Associations102324
-Node: File Regexp103195
-Node: File Search Dirs103829
-Node: Print Preamble104174
-Node: Print Newline104568
-Node: Print Multiline104936
-Node: Latex Preamble105280
-Node: Print Tempfile105717
-Node: Allow Identical Fields106147
-Node: Entry Types106585
-Node: Modifying Key Bindings108544
+Node: The Entry Buffer81275
+Node: The Strings Buffer83630
+Node: Customisation85393
+Node: The Customisation Buffer85786
+Node: Default Type86919
+Node: Preload Bib Files87357
+Node: Preload Bib Search Dirs87762
+Node: Additional Fields88140
+Node: Layout88676
+Node: Width89138
+Node: Index Window Size89359
+Node: Index Display Fields89638
+Node: Uniquify Keys90129
+Node: Autogenerate Keys90690
+Node: Citation Commands91311
+Node: Multiline Major Mode97265
+Node: Sort Order97600
+Node: Save Xrefs First98110
+Node: Crossref Face98653
+Node: Selected Face98993
+Node: Use Timestamp99321
+Node: Timestamp Format99673
+Node: Standard Url Field100239
+Node: Url Regexp100522
+Node: Browser Command101068
+Node: Standard Doi Field101574
+Node: Doi Url101846
+Node: Standard File Field102151
+Node: File Associations102441
+Node: File Regexp103312
+Node: File Search Dirs103946
+Node: Print Preamble104291
+Node: Print Newline104685
+Node: Print Multiline105053
+Node: Latex Preamble105397
+Node: Print Tempfile105834
+Node: Allow Identical Fields106264
+Node: Entry Types106702
+Node: Modifying Key Bindings108661
 
 End Tag Table
 
