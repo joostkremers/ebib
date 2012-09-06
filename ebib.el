@@ -2873,7 +2873,9 @@ FILES must be a string of whitespace-separated filenames."
                         (setq start (match-end 0)))
                       result)))
          (ext (file-name-extension file)))
-    (let ((file-full-path (locate-file file ebib-file-search-dirs)))
+    (let ((file-full-path (or
+			   (locate-file file ebib-file-search-dirs)
+			   (locate-file (file-name-nondirectory file) ebib-file-search-dirs))))
       (if file-full-path
           (if-str (viewer (cdr (assoc ext ebib-file-associations)))
               (progn

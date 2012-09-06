@@ -920,10 +920,12 @@ Note that you can specify more than one directory.
 
 Note that Ebib does not search directories recursively. It is possible,
 however, to put subdirectories in the filenames. That is, if you put
-something like `a/abney1987.pdf' in the `file' field, Ebib searches for
+something like `a/Abney1987.pdf' in the `file' field, Ebib searches for
 the relevant file in a subdirectory `a/' of the directories listed in
-the option `File Search Dirs'. (Note that if you want to do this under
-Windows, you may want to remove the backslash from the file regexp.)
+the option File Search Dirs. As an extra service, Ebib also searches
+for the base filename, i.e., `Abney1987' in this particular case. This
+can come in handy when you keep the papers on your reading list in a
+separate directory.
 
 Ebib can call different external programs depending on the file type of
 the relevant file, but you have to specify which programs to call. The
@@ -2759,63 +2761,63 @@ Node: Selecting Entries34804
 Node: Printing the Database36331
 Node: Calling a Browser40449
 Node: Viewing Files42969
-Node: Advanced Features45314
-Node: Screen Layout45931
-Node: Preloading bib Files47588
-Node: @Preamble Definition48532
-Node: @String Definitions50812
-Node: Sorting the bib File54245
-Node: Merging and Importing57410
-Node: Exporting Entries58746
-Node: Timestamps60941
-Node: Multiple Identical Fields62706
-Node: Virtual Databases64729
-Node: Simple Selection65999
-Node: Complex Filters67100
-Node: Properties of Virtual Databases71096
-Node: The Multiline Edit Buffer72320
-Node: The Options Menu75324
-Node: The Ebib Buffers76081
-Node: The Index Buffer76557
-Node: The Entry Buffer81318
-Node: The Strings Buffer83673
-Node: Customisation85436
-Node: The Customisation Buffer85829
-Node: Default Type86962
-Node: Preload Bib Files87400
-Node: Preload Bib Search Dirs87805
-Node: Additional Fields88183
-Node: Layout88719
-Node: Width89181
-Node: Index Window Size89402
-Node: Index Display Fields89681
-Node: Uniquify Keys90172
-Node: Autogenerate Keys90733
-Node: Citation Commands91354
-Node: Multiline Major Mode97308
-Node: Sort Order97643
-Node: Save Xrefs First98153
-Node: Crossref Face98696
-Node: Selected Face99036
-Node: Use Timestamp99364
-Node: Timestamp Format99716
-Node: Standard Url Field100282
-Node: Url Regexp100565
-Node: Browser Command101111
-Node: Standard Doi Field101617
-Node: Doi Url101889
-Node: Standard File Field102194
-Node: File Associations102484
-Node: File Regexp103355
-Node: File Search Dirs103989
-Node: Print Preamble104334
-Node: Print Newline104728
-Node: Print Multiline105096
-Node: Latex Preamble105440
-Node: Print Tempfile105877
-Node: Allow Identical Fields106307
-Node: Entry Types106745
-Node: Modifying Key Bindings108704
+Node: Advanced Features45403
+Node: Screen Layout46020
+Node: Preloading bib Files47677
+Node: @Preamble Definition48621
+Node: @String Definitions50901
+Node: Sorting the bib File54334
+Node: Merging and Importing57499
+Node: Exporting Entries58835
+Node: Timestamps61030
+Node: Multiple Identical Fields62795
+Node: Virtual Databases64818
+Node: Simple Selection66088
+Node: Complex Filters67189
+Node: Properties of Virtual Databases71185
+Node: The Multiline Edit Buffer72409
+Node: The Options Menu75413
+Node: The Ebib Buffers76170
+Node: The Index Buffer76646
+Node: The Entry Buffer81407
+Node: The Strings Buffer83762
+Node: Customisation85525
+Node: The Customisation Buffer85918
+Node: Default Type87051
+Node: Preload Bib Files87489
+Node: Preload Bib Search Dirs87894
+Node: Additional Fields88272
+Node: Layout88808
+Node: Width89270
+Node: Index Window Size89491
+Node: Index Display Fields89770
+Node: Uniquify Keys90261
+Node: Autogenerate Keys90822
+Node: Citation Commands91443
+Node: Multiline Major Mode97397
+Node: Sort Order97732
+Node: Save Xrefs First98242
+Node: Crossref Face98785
+Node: Selected Face99125
+Node: Use Timestamp99453
+Node: Timestamp Format99805
+Node: Standard Url Field100371
+Node: Url Regexp100654
+Node: Browser Command101200
+Node: Standard Doi Field101706
+Node: Doi Url101978
+Node: Standard File Field102283
+Node: File Associations102573
+Node: File Regexp103444
+Node: File Search Dirs104078
+Node: Print Preamble104423
+Node: Print Newline104817
+Node: Print Multiline105185
+Node: Latex Preamble105529
+Node: Print Tempfile105966
+Node: Allow Identical Fields106396
+Node: Entry Types106834
+Node: Modifying Key Bindings108793
 
 End Tag Table
 
