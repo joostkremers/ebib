@@ -3346,11 +3346,6 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
     (re-search-forward "^crossref")
     (ebib-set-fields-highlight)))
 
-;; we should modify ebib-edit-field, so that it calls the appropriate
-;; helper function, which asks the user for the new value and just returns
-;; that. storing it should then be done by ebib-edit-field, no matter what
-;; sort of field the user edits.
-
 (defun ebib-edit-field ()
   "Edits a field of a BibTeX entry."
   (interactive)
