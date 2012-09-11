@@ -289,6 +289,42 @@ Each string is added to the preamble on a separate line."
   :group 'ebib
   :type 'boolean)
 
+(defcustom ebib-keywords-list nil
+  "*List of possible keywords."
+  :group 'ebib
+  :type '(repeat (string :tag "Keyword")))
+
+(defcustom ebib-keywords-file ""
+  "*File for storing keywords.
+This can be a file with a fully qualified path, in which case
+this file is used for all .bib files. It can also be a filename
+without a path, in which case Ebib tries to read the file from
+the same directory as the .bib file. This makes it possible to
+have different keyword files for different directories."
+  :group 'ebib
+  :type '(file))
+
+(defcustom ebib-keywords-file-save-on-exit 'ask
+  "*Action to take when keywords were added during the session.
+This option only makes sense if ebib-keywords-file is set."
+  :group 'ebib
+  :type '(choice (const :tag "Always save on exit" t)
+		 (const :tag "Do not save on exit" nil)
+		 (const :tag "Ask whether to save" ask)))
+
+(defcustom ebib-keywords-use-only-file nil
+  "*Whether to use only keywords from the keyword file.
+If both ebib-keywords-list and ebib-keywords-file are set, should
+the file take precedence or should both sets of keywords be
+combined?
+
+For .bib files that do not have an associated keyword file (i.e.,
+when using per-directory keyword files), ebib-keyword-list is
+always used, regardless of this setting."
+  :group 'ebib
+  :type '(choice (const :tag "Use only keyword file" t)
+		 (const :tag "Use keyword file and list" nil)))
+
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
 
