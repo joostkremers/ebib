@@ -296,13 +296,13 @@ Each string is added to the preamble on a separate line."
 
 (defcustom ebib-keywords-file ""
   "*File for storing keywords.
-This can be a file with a fully qualified path, in which case
-this file is used for all .bib files. It can also be a filename
-without a path, in which case Ebib tries to read the file from
-the same directory as the .bib file. This makes it possible to
-have different keyword files for different directories."
+Keywords can be stored in a single file, which is used for all
+.bib files, or in per-directory keyword files located in the same
+directory as the .bib file. In the latter case, the keyword file
+should specify just a name, not a path."
   :group 'ebib
-  :type '(file))
+  :type '(choice (file :tag "Use single keyword file")
+		 (string :value "ebib.keywords" :tag "Use per-directory keyword file")))
 
 (defcustom ebib-keywords-file-save-on-exit 'ask
   "*Action to take when keywords were added during the session.
