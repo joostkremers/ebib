@@ -13,9 +13,16 @@ The advantage of having a BibTeX database manager inside Emacs is that X is no l
 
 # Installation #
 
+## Package manager ##
+
+The easiest way to install Ebib is to use Emacs' package manager. Ebib is available as a package from the [Melpa package archive](http://melpa.milkbox.net/). If you add the Melpa archive to your `package-archive` list, you can install Ebib from the package manager. This will also install the Info file so you can access the Ebib manual within Emacs.
+
+Note: the package manager (`package.el`) is part of Emacs 24. Users of Emacs 23 have to install it first. See [Wikemacs](http://wikemacs.org/wiki/Package.el) for discussion.
+
+
 ## Manual installation ##
 
-To install Ebib, so that it will be loaded automatically when Emacs is started, simply copy the file `ebib.el` to somewhere in your load path and add the following line to Emacs' init file `~/.emacs`:
+You can also install Ebib manually by copying the file `ebib.el` to somewhere in your load path and add the following line to Emacs' init file `~/.emacs`:
 
     (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
@@ -38,6 +45,13 @@ It is recommended to byte-compile the source, Ebib runs quite a lot faster when 
 This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`
 
 
+## Installing the info file ##
+
+If you install Ebib through the package manager, the Info file is installed automatically as well. However, if you install Ebib manually, or run it from the source directory, this is not the case. If you want the Info file to be accessible from within Emacs, you need to put it in a directory where Emacs can find it. One way to do this is to put `ebib.info` in one of the standard info directories. Make sure to run `install-info ebib.info dir`, so that Emacs knows about the new info file.
+
+Alternatively, you can leave `ebib.info` in Ebib's source directory and add that dir to `Info-additional-directory-list`. It contains a suitable `dir` file, so there's no need to run `install-info`.
+
+
 ## Starting Ebib ##
 
 Once Ebib has been installed and is loaded, you can start it with `M-x ebib`. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs' init file:
@@ -45,13 +59,6 @@ Once Ebib has been installed and is loaded, you can start it with `M-x ebib`. Th
     (global-set-key "\C-ce" 'ebib)
 
 You can of course choose any key combination you like. (In Emacs, key combinations of `C-c` `<letter>` are reserved for the user, so that no package may set them.)
-
-
-## Installing the info file ##
-
-The Ebib manual is available as an info file. If you want this to be accessible from within Emacs, you need to put it in a directory where Emacs can find it. One way to do this is to put `ebib.info` in one of the standard info directories. Make sure to run `install-info ebib.info dir`, so that Emacs knows about the new info file.
-
-Alternatively, you can leave `ebib.info` in Ebib's source directory and add that dir to `Info-additional-directory-list`. It contains a suitable `dir` file, so there's no need to run `install-info`.
 
 
 # Basic Usage #
