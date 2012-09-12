@@ -446,6 +446,10 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (modify-syntax-entry ?\) "." ebib-syntax-table)
 (modify-syntax-entry ?\" "w" ebib-syntax-table)
 
+;; keywords
+(defvar ebib-keywords-from-file nil "List of general keywords read from the general keyword file.")
+(defvar ebib-keywords-per-directory nil "List of directories with associated keywords.")
+
 ;; the databases
 
 ;; each database is represented by a struct
@@ -460,6 +464,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
   (preamble nil)                            ; string with the @PREAMBLE definition
   (filename nil)                            ; name of the BibTeX file that holds this database
   (name nil)                                ; name of the database
+  (keywords nil)                            ; keywords associated with this database
   (modified nil)                            ; has this database been modified?
   (make-backup nil)                         ; do we need to make a backup of the .bib file?
   (virtual nil))                            ; is this a virtual database?
@@ -1339,6 +1344,35 @@ is a list of fields that are considered in order for the sort value."
     (setq ebib-info-flag nil)
     (ebib)))
 
+(defun read-file-to-list (filename)
+  "Return a list of lines from file FILENAME."
+  (if (and filename                               ; protect against 'filename' being 'nil'
+           (file-readable-p filename))
+      (with-temp-buffer
+        (insert-file-contents filename)
+        (split-string (buffer-string) "\n" t))))    ; 't' is omit nulls, blank lines in this case
+
+(defun ebib-keywords-set-keywords (db)
+  "Set the keywords for database DB."
+  ;; the keywords are stored in (edb-keywords db). note that we do this by
+  ;; pointing this field to either ebib-keywords-from-file, or to the
+  ;; relevant list in ebib-keywords-per-directory. the advantage is the
+  ;; list exists only once and, esp. in the case of per-directory keyword
+  ;; files, that two databases share the same keyword list. if keywords are
+  ;; added, they become available to *all* databases in the same directory.
+  (cond
+   (ebib-keywords-from-file   ; if there's a single keyword file in use
+    (setf (edb-keywords db) ebib-keywords-from-file))
+   (ebib-keywords-file   ; otherwise, we have per-directory files
+    (let ((dir (expand-file-name (file-name-directory (edb-filename db)))))
+      (setf (edb-keywords db)
+            (or (cadr (assoc dir ebib-keywords-per-directory)) ; if the directory is already in the list
+                (cadr (assoc dir
+                             (add-to-list 'ebib-keywords-per-directory    ; otherwise add it
+                                          (list dir
+                                                (read-list-from-file (concat dir ebib-keywords-file))))))))))
+   (t (setf (edb-keywords nil))))) ; apparently, there's just ebib-keywords-list, or nothing at all.
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main program execution ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1407,6 +1441,8 @@ buffers and reads the rc file."
   (put 'timestamp 'ebib-hidden t)
   (load "~/.ebibrc" t)
   (ebib-create-buffers)
+  (if (file-name-directory ebib-keywords-file) ; returns nil if there is no directory part
+      (setq ebib-keywords-from-file (read-file-to-list ebib-keywords-file)))
   (setq ebib-index-highlight (ebib-make-highlight 1 1 ebib-index-buffer))
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 ebib-entry-buffer))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 ebib-strings-buffer))
@@ -1462,7 +1498,9 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-fields-highlight nil
           ebib-strings-highlight nil
           ebib-export-filename nil
-          ebib-pre-ebib-window nil)
+          ebib-pre-ebib-window nil
+          ebib-keywords-from-file nil
+          ebib-keywords-per-directory nil)
     (set-window-configuration ebib-saved-window-config)
     (message "")))
 
