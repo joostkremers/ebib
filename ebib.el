@@ -3566,7 +3566,8 @@ The deleted text is not put in the kill ring."
   "Toggles the raw status of the current field contents."
   (interactive)
   (unless (or (eq ebib-current-field 'type*)
-              (eq ebib-current-field 'crossref))
+              (eq ebib-current-field 'crossref)
+              (eq ebib-current-field 'keywords))
     (let ((contents (gethash ebib-current-field ebib-cur-entry-hash)))
       (if (not contents)     ; if there is no value,
           (progn
