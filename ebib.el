@@ -1998,7 +1998,7 @@ POINT is moved back to the beginning of the line."
                   (let ((existing-contents (gethash field-type fields)))
                     (puthash field-type (if existing-contents
                                             (from-raw (concat (to-raw existing-contents)
-                                                              "; "
+                                                              ebib-keywords-separator
                                                               (to-raw field-contents)))
                                           field-contents)
                              fields))))))
