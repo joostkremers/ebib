@@ -3445,13 +3445,15 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
                        (ebib-keywords-add-keyword keyword ebib-cur-db))))))
     (select-window (get-buffer-window ebib-entry-buffer) nil)))
 
-(defun ebib-edit-field ()
+(defun ebib-edit-field (pfx)
   "Edits a field of a BibTeX entry."
-  (interactive)
+  (interactive "P")
   (cond
    ((eq ebib-current-field 'type*) (ebib-edit-entry-type))
    ((eq ebib-current-field 'crossref) (ebib-edit-crossref))
-   ((eq ebib-current-field 'keywords) (ebib-edit-keywords))
+   ((and (eq ebib-current-field 'keywords)
+         (not pfx))
+    (ebib-edit-keywords))
    ((eq ebib-current-field 'annote) (ebib-edit-multiline-field))
    (t
     (let ((init-contents (gethash ebib-current-field ebib-cur-entry-hash))
@@ -3568,7 +3570,7 @@ The deleted text is not put in the kill ring."
     (let ((contents (gethash ebib-current-field ebib-cur-entry-hash)))
       (if (not contents)     ; if there is no value,
           (progn
-            (ebib-edit-field)  ; the user can enter one, which we must then make raw
+            (ebib-edit-field nil)  ; the user can enter one, which we must then make raw
             (let ((new-contents (gethash ebib-current-field ebib-cur-entry-hash)))
               (when new-contents
                 ;; note: we don't have to check for empty string, since that is
