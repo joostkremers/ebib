@@ -325,6 +325,11 @@ always used, regardless of this setting."
   :type '(choice (const :tag "Use only keyword file" t)
 		 (const :tag "Use keyword file and list" nil)))
 
+(defcustom ebib-keywords-separator "; "
+  "*String separating keywords in the keyword field."
+  :group 'ebib
+  :type '(string :tag "Keyword separator:"))
+
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
 
@@ -449,6 +454,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
 ;; keywords
 (defvar ebib-keywords-from-file nil "List of general keywords read from the general keyword file.")
 (defvar ebib-keywords-per-directory nil "List of directories with associated keywords.")
+(defvar ebib-keywords-temporary nil "List of keywords added by the user. These are not saved when Ebib is closed.")
 
 ;; the databases
 
@@ -464,7 +470,8 @@ Its value can be 'strings, 'fields, or 'preamble.")
   (preamble nil)                            ; string with the @PREAMBLE definition
   (filename nil)                            ; name of the BibTeX file that holds this database
   (name nil)                                ; name of the database
-  (keywords nil)                            ; keywords associated with this database
+  (keywords nil)                            ; list of keywords for this database
+  (keyword-source nil)                      ; symbol indicating the source of the keywords
   (modified nil)                            ; has this database been modified?
   (make-backup nil)                         ; do we need to make a backup of the .bib file?
   (virtual nil))                            ; is this a virtual database?
@@ -1360,18 +1367,44 @@ is a list of fields that are considered in order for the sort value."
   ;; list exists only once and, esp. in the case of per-directory keyword
   ;; files, that two databases share the same keyword list. if keywords are
   ;; added, they become available to *all* databases in the same directory.
+  ;;
+  ;; furthermore, the source for the keywords is stored in
+  ;; (edb-keyword-source db). this helps us keep track of new keywords.
   (cond
-   (ebib-keywords-from-file   ; if there's a single keyword file in use
+   ;; if there's a single keyword file in use, use that
+   (ebib-keywords-from-file
+    (setf (edb-keyword-source db) 'single-file)
     (setf (edb-keywords db) ebib-keywords-from-file))
-   (ebib-keywords-file   ; otherwise, we have per-directory files
-    (let ((dir (expand-file-name (file-name-directory (edb-filename db)))))
-      (setf (edb-keywords db)
-            (or (cadr (assoc dir ebib-keywords-per-directory)) ; if the directory is already in the list
-                (cadr (assoc dir
-                             (add-to-list 'ebib-keywords-per-directory    ; otherwise add it
-                                          (list dir
-                                                (read-list-from-file (concat dir ebib-keywords-file))))))))))
-   (t (setf (edb-keywords nil))))) ; apparently, there's just ebib-keywords-list, or nothing at all.
+   ;; otherwise, check if we have per-directory files
+   ((not (string= ebib-keywords-file ""))
+    (let* ((dir (expand-file-name (file-name-directory (edb-filename db))))
+           (keyword-list (read-file-to-list (concat dir ebib-keywords-file))))
+      ;; and check if there is such a file in the current db's dir. if yes,
+      ;; use those keywords and add an entry to
+      ;; ebib-keywords-per-directory, if necessary.
+      (when keyword-list
+        (add-to-list 'ebib-keywords-per-directory ; add the dir if it's not in the list yet
+                     (list dir keyword-list)
+                     t #'(lambda (x y) (equal (car x) (car x))))
+        (setf (edb-keyword-source db) 'directory-file)
+        (setf (edb-keywords db) (cadr (assoc dir ebib-keywords-per-directory))))))))
+
+(defun ebib-keywords-add-keyword (keyword db)
+  "Add KEYWORD to the list of keywords for DB."
+  (if (null (edb-keyword-source db))
+      ;; if there are no database-specific keywords, store the new keyword temporarily
+      (add-to-list 'ebib-keywords-temporary keyword)
+    ;; otherwise add it to the database's keyword list and mark it as containing new keywords
+    (setcdr (last (edb-keywords db)) (list keyword))
+    (put (edb-keyword-source db) 'ebib-new-keyword t)))
+
+(defun ebib-keywords-for-database (db)
+  "Return the list of keywords for database DB."
+  (if (null (edb-keyword-source db))    ; there's just the general list of keywords
+      (append ebib-keywords-list ebib-keywords-temporary)
+    (if ebib-keywords-use-only-file    ; otherwise use the keywords of the database
+        (edb-keywords db)
+      (append ebib-keywords-list (edb-keywords db) ebib-keywords-temporary))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main program execution ;;
@@ -1500,7 +1533,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-export-filename nil
           ebib-pre-ebib-window nil
           ebib-keywords-from-file nil
-          ebib-keywords-per-directory nil)
+          ebib-keywords-per-directory nil
+          ebib-keywords-temporary nil)
     (set-window-configuration ebib-saved-window-config)
     (message "")))
 
@@ -1805,9 +1839,14 @@ This function adds a newline to the message being logged."
                         "no")))))
     ;; if the file does not exist, we need to issue a message.
     (ebib-log 'message "(New file)"))
-  ;; what we have to do in *any* case, is fill the index buffer. (this
-  ;; even works if there are no keys in the database, e.g. when the
-  ;; user opened a new file or if no BibTeX entries were found.
+  ;; add keywords for the new database
+  (ebib-keywords-set-keywords ebib-cur-db)
+  (if (edb-keyword-source ebib-cur-db)
+      (ebib-log 'log "Added keywords from %s: %S" ebib-keywords-file (edb-keywords ebib-cur-db))
+    (ebib-log 'log "Using general keyword list"))
+  ;; fill the index buffer. (this even works if there are no keys in the
+  ;; database, e.g. when the user opened a new file or if no BibTeX entries
+  ;; were found.
   (ebib-fill-index-buffer)
   (when ebib-log-error
     (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
@@ -3343,11 +3382,13 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
           (setq ebib-current-field new-field)
           (ebib-move-to-field ebib-current-field -1))))))
 
+;; the following edit functions make use of completion. since we don't want
+;; the completion buffer to be shown in the index window, we need to switch
+;; focus to an appropriate window first. we do this in an unwind-protect to
+;; make sure we always get back to the entry buffer.
+
 (defun ebib-edit-entry-type ()
   "Edits the entry type."
-  ;; we don't want the completion buffer to be shown in the index window,
-  ;; so we need to switch to an appropriate window first. we do this in an
-  ;; unwind-protect to make sure we always get back to the entry buffer.
   (unwind-protect
       (progn
         (if (eq ebib-layout 'full)
@@ -3363,9 +3404,6 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
-  ;; we don't want the completion buffer to be shown in the index window,
-  ;; so we need to switch to an appropriate window first. we do this in an
-  ;; unwind-protect to make sure we always get back to the entry buffer.
   (unwind-protect
       (progn
         (if (eq ebib-layout 'full)
@@ -3384,12 +3422,37 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
     (re-search-forward "^crossref")
     (ebib-set-fields-highlight)))
 
+(defun ebib-edit-keywords ()
+  "Edit the keyword field."
+  (unwind-protect
+      (progn
+        (if (eq ebib-layout 'full)
+            (other-window 1)
+          (select-window ebib-pre-ebib-window) nil)
+        ;; now we ask the user for keywords. note that we shadow the
+        ;; binding of minibuffer-local-completion-map so that we can unbind
+        ;; <SPC>, since keywords may contain spaces.
+        (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
+               (collection (ebib-keywords-for-database ebib-cur-db)))
+          (loop for keyword = (completing-read "Add keyword (ENTER to finish): " collection)
+                until (string= keyword "")
+                do (let ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash))))
+                     (puthash 'keywords (from-raw (if conts
+                                                      (concat conts ebib-keywords-separator keyword)
+                                                    keyword))
+                              ebib-cur-entry-hash)
+                     (ebib-redisplay-current-field)
+                     (unless (member keyword collection)
+                       (ebib-keywords-add-keyword keyword ebib-cur-db))))))
+    (select-window (get-buffer-window ebib-entry-buffer) nil)))
+
 (defun ebib-edit-field ()
   "Edits a field of a BibTeX entry."
   (interactive)
   (cond
    ((eq ebib-current-field 'type*) (ebib-edit-entry-type))
    ((eq ebib-current-field 'crossref) (ebib-edit-crossref))
+   ((eq ebib-current-field 'keywords) (ebib-edit-keywords))
    ((eq ebib-current-field 'annote) (ebib-edit-multiline-field))
    (t
     (let ((init-contents (gethash ebib-current-field ebib-cur-entry-hash))
