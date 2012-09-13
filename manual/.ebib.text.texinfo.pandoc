@@ -6,5 +6,5 @@ standalone::t
 read::markdown
 write::texinfo
 output::t
-output-dir::/home/joost/src/ebib/manual/texi
+output-dir::~/src/ebib/manual/texi
 include-before-body::~/src/ebib/manual/texi-before-body
