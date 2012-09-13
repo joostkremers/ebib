@@ -318,9 +318,8 @@ If both ebib-keywords-list and ebib-keywords-file are set, should
 the file take precedence or should both sets of keywords be
 combined?
 
-For .bib files that do not have an associated keyword file (i.e.,
-when using per-directory keyword files), ebib-keyword-list is
-always used, regardless of this setting."
+For .bib files that do not have an associated keyword file,
+ebib-keyword-list is always used, regardless of this setting."
   :group 'ebib
   :type '(choice (const :tag "Use only keyword file" t)
 		 (const :tag "Use keyword file and list" nil)))
