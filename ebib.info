@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 4.13 from ebib.texi.
+Dies ist ebib.info, hergestellt von Makeinfo Version 4.8 aus ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -77,12 +77,14 @@ File: ebib.info,  Node: Manual installation,  Next: Installing the info file,  P
 You can also install Ebib manually by copying the file `ebib.el' to
 somewhere in your load path and add the following line to Emacs' init
 file `~/.emacs':
+
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
 On a default installation, the load path probably only contains system
 directories. If you want to run `ebib.el' from somewhere else (e.g.,
 directly from the source directory), you can add this directory to your
 load path:
+
 (add-to-list 'load-path "~/src/ebib"))
 
 Note: if you do not know what your load path is set to, go to the
@@ -92,6 +94,7 @@ appear in the buffer.
 
 Alternatively, you can load Ebib directly by putting the following in
 `.emacs':
+
 (load "/path/to/ebib")
 
 The difference between `load' and `autoload' is that the former loads
@@ -103,6 +106,7 @@ It is recommended to byte-compile the source, Ebib runs quite a lot
 faster when it is byte-compiled. You can do this either within Emacs
 with `M-x byte-compile-file' (recommended on OS X), or from your shell
 by going into the directory where you put `ebib.el' and typing:
+
 emacs -batch -f batch-byte-compile ebib.el
 
 This will create a file `ebib.elc', which Emacs will load instead of
@@ -137,6 +141,7 @@ Once Ebib has been installed and is loaded, you can start it with `M-x
 ebib'. This command is also used to return to Ebib when you have put
 the program in the background. You can bind this command to a key
 sequence by putting something like the following in Emacs' init file:
+
 (global-set-key "\C-ce" 'ebib)
 
 You can of course choose any key combination you like. (In Emacs, key
@@ -603,6 +608,7 @@ in a text.
 Probably the easiest way to use both `ebib-insert-bibtex-key' and
 `ebib-entry-summary' is to bind them to a key sequence. For example,
 you could put the following in your `~/.emacs':
+
 (add-hook 'LaTeX-mode-hook #'(lambda ()
                                (local-set-key "\C-cb" 'ebib-insert-bibtex-key)))
 
@@ -621,9 +627,11 @@ Orgmode (http://orgmode.org) can handle various types of links and new
 link types can be created by the user. If you use orgmode to write
 papers and want to use bibliographic references, it is easy to set up
 orgmode to use Ebib. If you add the following line to `~/.emacs':
+
 (org-add-link-type "ebib" 'ebib)
 
 you can create org links of the following form:
+
 [ebib:Jones1992][Jones (1992)]
 
 Orgmode will display this link simply as `Jones (1992)' in your buffer.
@@ -1054,10 +1062,12 @@ principle, BibTeX allows more than one such definition, but really one
 suffices, because you can use the concatenation character `#' to
 include multiple TeX or LaTeX commands. So, rather than having two
 `@preamble' definitions such as:
+
 @preamble{ "\newcommand{\noopsort}[1]{} " }
 @preamble{ "\newcommand{\singleletter}[1]{#1} " }
 
 you can write this in your `.bib' file:
+
 @preamble{ "\newcommand{\noopsort}[1]{} "
          # "\newcommand{\singleletter}[1]{#1} " }
 
@@ -1075,6 +1085,7 @@ to type the text between the braces. Ebib takes care of including the
 braces of the `@preamble' command, but otherwise it saves the text
 exactly as you enter it. So in order to get the preamble above, you'd
 have to type the following in Ebib:
+
 "\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
 
 Note that when Ebib loads a `.bib' file that contains more than one
@@ -1130,12 +1141,15 @@ Ebib will ask you for one.
 Note that this also makes it possible to enter field values that are
 composed of concatenations of strings and abbreviations. The BibTeX
 documentation for example explains that if you have defined:
+
 @string{WGA = "World Gnus Almanac"}
 
 you can create a BibTeX field like this:
+
 title = 1966 # WGA
 
 which will produce "1966 World Gnus Almanac". Or you can do:
+
 month = "1~" # jan
 
 which will produce someting like "1 January", assuming your
@@ -1350,6 +1364,7 @@ collected and stored in the single occurrence, separated by semicolons.
 That is, Ebib does not retain the multiple occurrences, but it does
 retain the values. So suppose you have an entry that contains the
 following `keywords' fields:
+
 @book{jones1998,
     author = {Jones, Joan},
     year = {1998},
@@ -1361,6 +1376,7 @@ following `keywords' fields:
 
 If you load this entry into Ebib with the option `Allow Identical
 Fields' set, you will get the following:
+
 @book{jones1998,
     author = {Jones, Joan},
     year = {1998},
@@ -1550,7 +1566,7 @@ etc., in plain text.)
 
 Three commands are relevant for interacting with Ebib when you're in
 the multiline edit buffer, which are bound to key sequences in the
-minor mode ebib-multiline-edit-mode, which is activated automatically
+minor mode `ebib-multiline-edit-mode', which is activated automatically
 in the multiline edit buffer.
 
 `ebib-quit-multiline-edit', bound to `C-c | q', leaves the multiline
@@ -1578,9 +1594,29 @@ would be annoying to have to leave the multiline edit buffer every time
 you want to do this, so this command has been provided to allow you to
 do this from within the buffer.
 
-It is possible to change the second key of these commands, if you find
-`|' inconvenient. See Modifying Key Bindings (#modifying-key-bindings)
-for details.
+Admittedly, the key combinations of the multiline edit buffer are
+somewhat awkward. The reason for this is that these commands are part
+of a minor mode, which restricts the available keys to combinations of
+`C-c' plus a non-alphanumeric character. However, it is possible to
+change the key commands, if you wish. Ebib itself provides a method to
+change the second key of these commands: see Modifying Key Bindings
+(#modifying-key-bindings) for details. You could change the `|' to
+e.g., `c' or `C-c', if these do not conflict with any key commands in
+the major mode used for the multiline edit buffer.
+
+Even more drastically, you could put something like the following in
+your `~/.emacs':
+
+(eval-after-load 'ebib
+  '(progn
+     (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-quit-multiline-edit)
+     (define-key ebib-multiline-mode-map "\C-c\C-q" 'ebib-cancel-multiline-edit)
+     (define-key ebib-multiline-mode-map "\C-c\C-s" 'ebib-save-from-multiline-edit)))
+
+This sets up `C-c C-c', `C-c C-q' and `C-c C-s' for use in the
+multiline edit buffer. Since such key combinations are restricted for
+use with major modes, however, Ebib cannot set these up automatically,
+but as an Emacs user, you are free do do as you like, of course.
 
 
 File: ebib.info,  Node: The Options Menu,  Prev: The Multiline Edit Buffer,  Up: Advanced Features
@@ -2225,6 +2261,7 @@ File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: A
 ------------------------
 
 *Default value*:
+
 ((any
   (("cite" "\\cite%<[%A]%>{%K}")))
  (org-mode
@@ -2266,10 +2303,12 @@ the result inserted. Usually, however, citation commands allow for
 optional arguments that are formatted as pre- or postnotes to the
 citation. For example, using the `natbib' package, you have citation
 commands available of the form:
+
 \citet[cf.][p. 50]{Jones1992}
 
 In order to be able to insert such citations, the format string must
 contain `%A' directives:
+
 \citet[%A][%A]{%K}
 
 With such a format string, Ebib asks the user to provide text for the
@@ -2277,26 +2316,31 @@ two arguments and inserts it at the locations specified by the
 directives. Of course, it is possible to leave the arguments empty (by
 just hitting `RET'). With the format string above, this would yield the
 following citation in the LaTeX buffer:
+
 \citet[][]{Jones1992}
 
 This is completely harmless, because LaTeX will simply ignore the empty
 arguments. However, you may prefer for the brackets not to appear if
 the arguments are empty. In that case, you can wrap the brackets and
 the `%A' directives in a `%<...%>' pair:
+
 \citet%<[%A]%>%<[%A]%>{%K}
 
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
+
 \citet{Jones1992}
 
 Note however, that in this case there is in fact one problem associated
 with this format string. If you fill out the first argument but not the
 second, Ebib produces the wrong format string:
+
 \citet[cf.]{Jones1992}
 
 If only one optional argument is provided, `natbib' assumes that it is
 a postnote, while what you intended is actually a prenote. Therefore,
 it is best not to make the second argument optional:
+
 \citet%<[%A]%>[%A]{%K}
 
 This way, the second pair of brackets is always inserted, regardless of
@@ -2308,6 +2352,7 @@ provide one key, but when you're in Ebib, you can mark multiple entry
 keys and then use `; p' to push them to a buffer. In this case, Ebib
 asks you for a separator and then inserts all keys into the position of
 `%K':
+
 \citet{Jones1992,Haddock2004}
 
 It is, however, also possible to specify in the format string that a
@@ -2316,6 +2361,7 @@ be separated. This is done by wrapping that portion of the format
 string that can be repeated in a `%(...%)' pair. Normally, you'll want
 to provide a separator, which is done by placing it between the `%' and
 the closing `)':
+
 \citet[%A][%A]{%(%K%,)}
 
 This format string says that the directive `%K' can be repeated and
@@ -2325,12 +2371,14 @@ this is not the only thing one can do, because it is also possible to
 put `%A' directives in the repeating part. This is useful for the
 `biblatex' package. `Biblatex' has so-called _multicite_ commands,
 which take the following form:
+
 \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
 
 Multicite commands can take more than one citation key in braces `{}'
 and each of those citation keys can take two optional arguments in
 brackets `[]'. In order to get such citations, you can provide the
 following format string:
+
 \footcites%(%<[%A]%>[%A]{%K}%)
 
 Here, the entire sequence of two optional arguments and the obligatory
@@ -2343,6 +2391,7 @@ Of course it is also possible to combine parts that are repeated with
 parts that are not repeated. In fact, that already happens in the
 previous example, because the part `\footcites' is not repeated. But
 the part that is not repeated may contain `%A' directives as well:
+
 \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
 
 Multicite commands in `biblatex' take two additional arguments
@@ -2643,6 +2692,7 @@ optional fields, you can define an entry that has only obligatory or
 only optional fields.
 
 The default entry types and fields are the following:
+
  article                                               ;; name of entry type
    author title journal year                           ;; obligatory fields
    volume number pages month note                      ;; optional fields
@@ -2706,6 +2756,7 @@ change them, or if you would like to bind a command that is only
 available through the menu to a key, you can do so by creating a file
 `~/.ebibrc' and writing your preferred key bindings in it. A key
 binding definition is built up as follows:
+
 (ebib-key <buffer> <key> <command>)
 
 `<buffer>' is either `index', `entry' or `strings', for the
@@ -2718,11 +2769,13 @@ a single function: just add as many `ebib-key' statements as necessary.
 As an example, the following binds `C-s' to `ebib-search' in the index
 buffer, so that the database can be searched with `C-s' as well as with
 `/':
+
 (ebib-key index "\C-s" ebib-search)
 
 If you want to unbind a key, you can simply leave out `<command>'. So
 if you want to bind the command `ebib-delete-entry' to `D' rather than
 `d', you need to put the following in `.ebibrc':
+
 (ebib-key index "D" ebib-delete-entry)
 (ebib-key index "d")
 
@@ -2742,6 +2795,7 @@ prefix key as well.
 It is also possible to redefine the prefix key itself. To do this, you
 must specify `select-prefix' for `<buffer>'. The value of `<command>'
 is irrelevant here, so it can be left out:
+
 (ebib-key select-prefix ":")
 
 This sets up `:' as the new prefix key. Doing this automatically
@@ -2749,6 +2803,7 @@ unbinds the existing prefix key.
 
 As a final option, `ebib-key' allows you to redefine the second key in
 the key bindings of the multiline edit buffer:
+
 (ebib-key multiline "&")
 
 This piece of code changes the commands `C-c | q', `C-c | c' and `C-c |
@@ -2757,93 +2812,88 @@ s' to `C-c & q', `C-c & c' and `C-c & s', respectively.
 
 
 Tag Table:
-Node: Top184
-Node: Installation1370
-Node: Package manager1584
-Node: Manual installation2240
-Node: Installing the info file3856
-Node: Starting Ebib4729
-Node: Basic Usage5332
-Node: Getting Started6993
-Node: Opening a bib File8064
-Node: Navigating a bib File9935
-Node: Starting a New bib File13141
-Node: Editing the Database13593
-Node: Adding and Deleting Entries14071
-Node: Editing Fields Values15847
-Node: Editing Multiline Values18355
-Node: Copy Cut Paste Yank and Delete20568
-Node: Saving a Database21723
-Node: Searching22753
-Node: LaTeX Integration25121
-Node: Orgmode and markdown28153
-Node: Consulting Databases from within a LaTeX File30470
-Node: Cross-referencing33071
-Node: Selecting Entries35629
-Node: Printing the Database37156
-Node: Calling a Browser41274
-Node: Viewing Files43794
-Node: Advanced Features46228
-Node: Screen Layout46845
-Node: Preloading bib Files48502
-Node: @Preamble Definition49446
-Node: @String Definitions51726
-Node: Sorting the bib File55159
-Node: Merging and Importing58324
-Node: Exporting Entries59660
-Node: Timestamps61855
-Node: Multiple Identical Fields63620
-Node: Virtual Databases65643
-Node: Simple Selection66913
-Node: Complex Filters68014
-Node: Properties of Virtual Databases72010
-Node: The Multiline Edit Buffer73234
-Node: The Options Menu76238
-Node: The Ebib Buffers76995
-Node: The Index Buffer77471
-Node: The Entry Buffer82232
-Node: The Strings Buffer84587
-Node: Customisation86350
-Node: The Customisation Buffer86743
-Node: Default Type87876
-Node: Preload Bib Files88314
-Node: Preload Bib Search Dirs88719
-Node: Additional Fields89097
-Node: Layout89633
-Node: Width90095
-Node: Index Window Size90316
-Node: Index Display Fields90595
-Node: Uniquify Keys91086
-Node: Autogenerate Keys91647
-Node: Citation Commands92268
-Node: Multiline Major Mode98222
-Node: Sort Order98557
-Node: Save Xrefs First99067
-Node: Crossref Face99610
-Node: Selected Face99950
-Node: Use Timestamp100278
-Node: Timestamp Format100630
-Node: Standard Url Field101196
-Node: Url Regexp101479
-Node: Browser Command102025
-Node: Standard Doi Field102531
-Node: Doi Url102803
-Node: Standard File Field103108
-Node: File Associations103398
-Node: File Regexp104269
-Node: File Search Dirs104903
-Node: Print Preamble105248
-Node: Print Newline105642
-Node: Print Multiline106010
-Node: Latex Preamble106354
-Node: Print Tempfile106791
-Node: Allow Identical Fields107221
-Node: Entry Types107659
-Node: Modifying Key Bindings109618
+Node: Top187
+Node: Installation1373
+Node: Package manager1587
+Node: Manual installation2243
+Node: Installing the info file3863
+Node: Starting Ebib4736
+Node: Basic Usage5340
+Node: Getting Started7001
+Node: Opening a bib File8072
+Node: Navigating a bib File9943
+Node: Starting a New bib File13149
+Node: Editing the Database13601
+Node: Adding and Deleting Entries14079
+Node: Editing Fields Values15855
+Node: Editing Multiline Values18363
+Node: Copy Cut Paste Yank and Delete20576
+Node: Saving a Database21731
+Node: Searching22761
+Node: LaTeX Integration25129
+Node: Orgmode and markdown28162
+Node: Consulting Databases from within a LaTeX File30481
+Node: Cross-referencing33082
+Node: Selecting Entries35640
+Node: Printing the Database37167
+Node: Calling a Browser41285
+Node: Viewing Files43805
+Node: Advanced Features46239
+Node: Screen Layout46856
+Node: Preloading bib Files48513
+Node: @Preamble Definition49457
+Node: @String Definitions51740
+Node: Sorting the bib File55176
+Node: Merging and Importing58341
+Node: Exporting Entries59677
+Node: Timestamps61872
+Node: Multiple Identical Fields63637
+Node: Virtual Databases65662
+Node: Simple Selection66932
+Node: Complex Filters68033
+Node: Properties of Virtual Databases72029
+Node: The Multiline Edit Buffer73253
+Node: The Options Menu77343
+Node: The Ebib Buffers78100
+Node: The Index Buffer78576
+Node: The Entry Buffer83337
+Node: The Strings Buffer85692
+Node: Customisation87455
+Node: The Customisation Buffer87848
+Node: Default Type88981
+Node: Preload Bib Files89419
+Node: Preload Bib Search Dirs89824
+Node: Additional Fields90202
+Node: Layout90738
+Node: Width91200
+Node: Index Window Size91421
+Node: Index Display Fields91700
+Node: Uniquify Keys92191
+Node: Autogenerate Keys92752
+Node: Citation Commands93373
+Node: Multiline Major Mode99340
+Node: Sort Order99675
+Node: Save Xrefs First100185
+Node: Crossref Face100728
+Node: Selected Face101068
+Node: Use Timestamp101396
+Node: Timestamp Format101748
+Node: Standard Url Field102314
+Node: Url Regexp102597
+Node: Browser Command103143
+Node: Standard Doi Field103649
+Node: Doi Url103921
+Node: Standard File Field104226
+Node: File Associations104516
+Node: File Regexp105387
+Node: File Search Dirs106021
+Node: Print Preamble106366
+Node: Print Newline106760
+Node: Print Multiline107128
+Node: Latex Preamble107472
+Node: Print Tempfile107909
+Node: Allow Identical Fields108339
+Node: Entry Types108777
+Node: Modifying Key Bindings110737
 
 End Tag Table
-
-
-Local Variables:
-coding: utf-8
-End:

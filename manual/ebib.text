@@ -532,7 +532,7 @@ Ebib enters multiline edit mode in one of three cases: when you edit the `@pream
 
 The mode that is used in the multiline edit buffer is user-configurable. The default value is `text-mode`, but if you prefer to use some other mode, you can specify this through the customisation options. (Personally, I use `markdown-mode` in the multiline edit buffer, so that I can use [`markdown`](http://daringfireball.net/projects/markdown/) to write annotations, which provides an easy way to create headers, use bold and italic, etc., in plain text.)
 
-Three commands are relevant for interacting with Ebib when you're in the multiline edit buffer, which are bound to key sequences in the minor mode ebib-multiline-edit-mode, which is activated automatically in the multiline edit buffer.
+Three commands are relevant for interacting with Ebib when you're in the multiline edit buffer, which are bound to key sequences in the minor mode `ebib-multiline-edit-mode`, which is activated automatically in the multiline edit buffer.
 
 `ebib-quit-multiline-edit`, bound to `C-c | q`, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you've deleted all contents of the buffer (including the final newline!) and you were editing a field value or the `@preamble`, the field value or preamble is deleted. (This is in fact the *only* way to delete the `@preamble` definition. Field values on the other hand can also be deleted by hitting `x` or `d` on them in the entry buffer.) If you were editing a `@string` value, Ebib will just complain, because string definitions cannot be empty.
 
@@ -540,7 +540,19 @@ Three commands are relevant for interacting with Ebib when you're in the multili
 
 `ebib-save-from-multiline-edit`, bound to `C-c | s`, can be used in the multiline edit buffer to save the database. This command first stores the text in the database and then saves it. Because Ebib does not do an autosave of the current database, it is advisable to save the database manually every now and then to prevent data loss in case of crashes. It would be annoying to have to leave the multiline edit buffer every time you want to do this, so this command has been provided to allow you to do this from within the buffer.
 
-It is possible to change the second key of these commands, if you find `|` inconvenient. See [Modifying Key Bindings](#modifying-key-bindings) for details.
+Admittedly, the key combinations of the multiline edit buffer are somewhat awkward. The reason for this is that these commands are part of a minor mode, which restricts the available keys to combinations of `C-c` plus a non-alphanumeric character. However, it is possible to change the key commands, if you wish. Ebib itself provides a method to change the second key of these commands: see [Modifying Key Bindings](#modifying-key-bindings) for details. You could change the `|` to e.g., `c` or `C-c`, if these do not conflict with any key commands in the major mode used for the multiline edit buffer.
+
+Even more drastically, you could put something like the following in your `~/.emacs`:
+
+```Commonlisp
+(eval-after-load 'ebib
+  '(progn
+     (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-quit-multiline-edit)
+     (define-key ebib-multiline-mode-map "\C-c\C-q" 'ebib-cancel-multiline-edit)
+     (define-key ebib-multiline-mode-map "\C-c\C-s" 'ebib-save-from-multiline-edit)))
+```
+
+This sets up `C-c C-c`, `C-c C-q` and `C-c C-s` for use in the multiline edit buffer. Since such key combinations are restricted for use with major modes, however, Ebib cannot set these up automatically, but as an Emacs user, you are free do do as you like, of course.
 
 
 ## The Options Menu ##
