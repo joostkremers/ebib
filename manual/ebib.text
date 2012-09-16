@@ -167,7 +167,7 @@ Note that `y` only works when the current field does not have a value yet. This 
 
 ## Saving a Database ##
 
-When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing `s`. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to `C-x C-s` in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file under the same name appended with a tilde: `<filename>.bib~`.
+When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing `s`. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to `C-x C-s` in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option [Create Backups](#create-backups).
 
 If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu.
 
@@ -876,6 +876,13 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 **Default value**: `~`.\
 
 \noindent This is a list of directories Ebib searches for `.bib` files to be preloaded. Note that only the directories themselves are searched, not their subdirectories. 
+
+
+### Create Backups ###
+
+**Default value**: `t`.\
+
+\noindent Whether to create backups of `.bib` files. You can unset this option if you have your files under revision control, for example.
 
 
 ### Additional Fields ###
