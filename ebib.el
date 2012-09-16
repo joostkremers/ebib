@@ -80,6 +80,12 @@
   :group 'ebib
   :type '(repeat :tag "Search directories for .bib files" (string :tag "Directory")))
 
+(defcustom ebib-create-backups t
+  "*If set, create a backup file of a .bib file when it is first saved."
+  :group 'ebib
+   :type '(choice (const :tag "Create backups" t)
+                 (const :tag "Do not create backups" nil)))
+
 (defcustom ebib-additional-fields '(crossref
                                     url
                                     annote
@@ -2253,11 +2259,20 @@ EBIB-USE-TIMESTAMP is T."
       (setq sorted-list (sort sorted-list 'ebib-entry<))))
     (mapc #'(lambda (key) (ebib-format-entry key db nil)) sorted-list)))
 
+(defun ebib-make-backup (file)
+  "Create a backup of FILE.
+Honour EBIB-CREATE-BACKUPS and BACKUP-DIRECTORY-ALIST."
+  (when ebib-create-backups
+    (let ((backup-file (make-backup-file-name file)))
+      (if (file-writable-p backup-file)
+          (copy-file file backup-file t)
+        (ebib-log 'error "Could not create backup file `%s'" backup-file)))))
+
 (defun ebib-save-database (db)
   "Saves the database DB."
   (when (and (edb-make-backup db)
              (file-exists-p (edb-filename db)))
-    (rename-file (edb-filename db) (concat (edb-filename db) "~") t)
+    (ebib-make-backup (edb-filename db))
     (setf (edb-make-backup db) nil))
   (with-temp-buffer
     (ebib-format-database db)
