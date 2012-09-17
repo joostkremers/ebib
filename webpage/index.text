@@ -106,10 +106,10 @@ quite a few extra features that make managing your BibTeX files easier.
 ### LaTeX integration ###
 
  - from within a LaTeX document, it is possible to select (using
-   TAB-completion) and insert a BibTeX key into the document. (This can
+   TAB-completion) and insert a BibTeX key into the document. This can
    also be set up for other document formats that support automatic
-   bibliographies, such as [Org mode](http://orgmode.org) or
-   [Pandoc](http://johnmacfarlane.net/pandoc/) markdown.)
+   bibliographies: support for [Org mode](http://orgmode.org) and
+   [Pandoc](http://johnmacfarlane.net/pandoc/) markdown is included.
  - inside Ebib, it is possible to push entries to a LaTeX buffer.
  - quick summary of entries into a `*Help*` buffer.
  - creating a `.bib` file from a `.bbl` file, allowing you to create a
@@ -139,11 +139,11 @@ string 'Reuland' is highlighted as the result of a text search. The second
 screenshot shows the strings buffer, where you can edit the `@string`
 definitions in the database.
 
-<a href="images/ebib-1.png"> <img style="width:153px;height:108px"
-src="images/tn_ebib-1.png" alt="screenshot 1" /></a>
+<a href="images/Main-view.png"> <img style="width:160px;height:100px"
+src="images/tn-Main-view.png" alt="screenshot 1" /></a>
 
-<a href="images/ebib-2.png"> <img style="width:153px;height:108px"
-src="images/tn_ebib-2.png" alt="screenshot 2" /></a>
+<a href="images/Strings-buffer.png"> <img style="width:160px;height:100px"
+src="images/tn-Strings-buffer.png" alt="screenshot 2" /></a>
 
 
 ## Manual ##
