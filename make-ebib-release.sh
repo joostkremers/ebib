@@ -16,11 +16,9 @@ mkdir "$BASE/$full_name/info"
 echo "Created $BASE/$full_name and subdirectories"
 echo
 
-(cd $BASE/src
-    cp ebib.el ../"$full_name"
-    echo "Copied ebib.el to $full_name"
-    echo
-)
+cp ebib.el "$full_name"
+echo "Copied ebib.el to $full_name"
+echo
 
 (cd $BASE/manual
     if [ -f html/ebib-manual.html ] ; then
