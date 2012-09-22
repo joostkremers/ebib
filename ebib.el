@@ -3478,8 +3478,11 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
         ;; now we ask the user for keywords. note that we shadow the
         ;; binding of minibuffer-local-completion-map so that we can unbind
         ;; <SPC>, since keywords may contain spaces.
-        (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-               (collection (ebib-keywords-for-database ebib-cur-db)))
+        ;; note also that in emacs 24, we can use make-composed-keymap for this purpose:
+        ;; (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)
+        ;; but in emacs 23.1, this function doesn't exist.
+        (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
+              (collection (ebib-keywords-for-database ebib-cur-db)))
           (loop for keyword = (completing-read "Add keyword (ENTER to finish): " collection)
                 until (string= keyword "")
                 do (let ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash))))
