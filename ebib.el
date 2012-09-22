@@ -3495,8 +3495,8 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 
 (defun ebib-edit-field (pfx)
   "Edits a field of a BibTeX entry.
-If the prefix argument PFX is non-nil, do no allow the keywords
-field to be directly edited."
+With a prefix argument, the `keyword' field can be edited
+directly. For other fields, the prefix argument has no meaning."
   (interactive "P")
   (cond
    ((eq ebib-current-field 'type*) (ebib-edit-entry-type))
