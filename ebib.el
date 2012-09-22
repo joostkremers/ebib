@@ -290,7 +290,7 @@ Each string is added to the preamble on a separate line."
   :type 'boolean)
 
 (defcustom ebib-keywords-list nil
-  "*List of keywords held in your Emacs configuration file."
+  "*General list of keywords."
   :group 'ebib
   :type '(repeat (string :tag "Keyword")))
 
