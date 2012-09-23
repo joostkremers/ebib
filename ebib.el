@@ -1439,14 +1439,15 @@ keywords and the third the keywords added in this session."
 
 (defun ebib-keywords-save-all-new ()
   "Check if new keywords were added during the session and save them as required."
-  (let ((new (delq nil (mapcar #'(lambda (elt)    ; this would be easier with cl-remove...
+  (let ((keywords-file (file-name-nondirectory ebib-keywords-file))   ; strip path for succinctness
+        (new (delq nil (mapcar #'(lambda (elt)                        ; this would be easier with cl-remove
                                    (if (third elt)
                                        elt))
                                ebib-keywords-files-alist))))
     (when (and new
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p "[Ebib] New keywords were added: save "))))
+                        (y-or-n-p (format "New keywords were added. Save '%s'? " keywords-file)))))
       (mapc #'(lambda (elt)
                 (ebib-keywords-save-to-file elt))
             new))))
