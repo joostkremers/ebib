@@ -1428,11 +1428,14 @@ keywords and the third the keywords added in this session."
                   (file-name-directory (edb-filename db))))      ; per-directory keywords files
          (lst (assoc dir ebib-keywords-files-alist))
          (file (ebib-keywords-get-file db)))
-    (if (and (third lst)                     ; if there are new keywords
-             (or (eq ebib-keywords-file-save-on-exit 'always)
-                 (and (eq ebib-keywords-file-save-on-exit 'ask)
-                      (y-or-n-p "New keywords have been added. Save "))))
-        (ebib-keywords-save-to-file lst))))
+    (when (and (third lst)                     ; if there are new keywords
+               (or (eq ebib-keywords-file-save-on-exit 'always)
+                   (and (eq ebib-keywords-file-save-on-exit 'ask)
+                        (y-or-n-p "New keywords have been added. Save "))))
+      (ebib-keywords-save-to-file lst)
+      ;; now move the new keywords to the list of existing keywords
+      (setf (cadr lst) (append (second lst) (third lst)))
+      (setf (caddr lst) nil))))
 
 (defun ebib-keywords-save-all-new ()
   "Check if new keywords were added during the session and save them as required."
