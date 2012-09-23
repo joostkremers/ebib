@@ -3472,6 +3472,14 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
     (re-search-forward "^crossref")
     (ebib-set-fields-highlight)))
 
+(defun ebib-sort-keywords (keywords)
+  "Sort the KEYWORDS string, remove duplicates, and return it as a string."
+  (let* ((keywords-list (split-string keywords ebib-keywords-separator))        ; split
+         (keywords-list (sort keywords-list 'string<))                          ; sort in lexicographic order
+         (keywords-list (delete-dups keywords-list))                            ; remove duplicate entries
+         (output (mapconcat 'identity keywords-list ebib-keywords-separator)))  ; serialize
+    output))                                                                    ; expose return value
+
 (defun ebib-edit-keywords ()
   "Edit the keywords field."
   (unwind-protect
@@ -3479,20 +3487,21 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
         (if (eq ebib-layout 'full)
             (other-window 1)
           (select-window ebib-pre-ebib-window) nil)
-        ;; now we ask the user for keywords. note that we shadow the
-        ;; binding of minibuffer-local-completion-map so that we can unbind
-        ;; <SPC>, since keywords may contain spaces.
-        ;; note also that in emacs 24, we can use make-composed-keymap for this purpose:
-        ;; (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)
-        ;; but in emacs 23.1, this function doesn't exist.
+        ;; now we ask the user for keywords.  note that we shadow the binding of
+        ;; `minibuffer-local-completion-map' so that we can unbind <SPC>, since
+        ;; keywords may contain spaces.  note also that in emacs 24, we can use
+        ;; `make-composed-keymap' for this purpose: (make-composed-keymap
+        ;; '(keymap (32)) minibuffer-local-completion-map) but, in emacs 23.1,
+        ;; this function is not provided.
         (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
               (collection (ebib-keywords-for-database ebib-cur-db)))
-          (loop for keyword = (completing-read "Add keyword (ENTER to finish): " collection)
+          (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection)
                 until (string= keyword "")
                 do (let ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash))))
-                     (puthash 'keywords (from-raw (if conts
-                                                      (concat conts ebib-keywords-separator keyword)
-                                                    keyword))
+                     (puthash 'keywords (from-raw (ebib-sort-keywords ; keeps the keywords sorted
+                                                   (if conts
+                                                       (concat conts ebib-keywords-separator keyword)
+                                                     keyword)))
                               ebib-cur-entry-hash)
                      (ebib-set-modified t)
                      (ebib-redisplay-current-field)
