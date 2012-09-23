@@ -302,7 +302,7 @@ the same directories as the .bib files.  In the latter case, the
 keywords file should specify just the generic name and no path."
   :group 'ebib
   :type '(choice (file :tag "Use single keywords file")
-                 (string :value "ebib.keywords" :tag "Use per-directory keywords file")))
+                 (string :value "ebib-keywords.txt" :tag "Use per-directory keywords file")))
 
 (defcustom ebib-keywords-file-save-on-exit 'ask
   "*Action to take when new keywords are added during a session.
