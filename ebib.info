@@ -1184,8 +1184,8 @@ either set it to use a single keyword file, in which case you need to
 specify a file with its full path, or you can use per-directory keyword
 files, in which case you must provide a filename without a path. That
 is, if you use per-directory keyword files, the files have the same
-name in each directory. The default name is `ebib.keywords', but you
-can change that if you like, of course.
+name in each directory. The default name is `ebib-keywords.txt', but
+you can change that if you like, of course.
 
 Keyword files have a very simple format: they are text files with one
 keyword per line. So you can easily create or edit keyword files by
@@ -1211,6 +1211,11 @@ configured a keyword file. In that case, setting this option to use
 both the keyword list and the keyword file tells Ebib to offer keywords
 from both sources when you edit the keyword field. Otherwise, only the
 keyword file is used.
+
+It is also possible to tell Ebib to sort the keywords in the keywords
+field in alphabetical order. Set the option Keywords Field Keep Sorted
+(#keywords-field-keep-sorted) if you want to do this. Note that setting
+this option also automatically removes duplicates.
 
 Lastly, you can configure the separator used between keywords in the
 keyword field. By default, it is set to `"; "', i.e., semicolon plus
@@ -2136,6 +2141,7 @@ buffer.
 * Keywords File::
 * Keywords File Save On Exit::
 * Keywords Use Only File::
+* Keywords Field Keep Sorted::
 * Keywords Separator::
 * Additional Fields::
 * Layout::
@@ -2238,7 +2244,7 @@ whether to save), `always' (save automatically) and `never' (do not
 save).
 
 
-File: ebib.info,  Node: Keywords Use Only File,  Next: Keywords Separator,  Prev: Keywords File Save On Exit,  Up: The Customisation Buffer
+File: ebib.info,  Node: Keywords Use Only File,  Next: Keywords Field Keep Sorted,  Prev: Keywords File Save On Exit,  Up: The Customisation Buffer
 
 5.1.7 Keywords Use Only File
 ----------------------------
@@ -2248,9 +2254,20 @@ If a keyword file is provided, should keywords be taken _only_ from the
 file, or also from the keyword list.
 
 
-File: ebib.info,  Node: Keywords Separator,  Next: Additional Fields,  Prev: Keywords Use Only File,  Up: The Customisation Buffer
+File: ebib.info,  Node: Keywords Field Keep Sorted,  Next: Keywords Separator,  Prev: Keywords Use Only File,  Up: The Customisation Buffer
 
-5.1.8 Keywords Separator
+5.1.8 Keywords Field Keep Sorted
+--------------------------------
+
+*Default value*: `nil'.
+When set, the `keywords' field is automatically sorted alphabetically
+when you add keywords to it. In addition, duplicates are automatically
+removed.
+
+
+File: ebib.info,  Node: Keywords Separator,  Next: Additional Fields,  Prev: Keywords Field Keep Sorted,  Up: The Customisation Buffer
+
+5.1.9 Keywords Separator
 ------------------------
 
 *Default value*: `"; "'
@@ -2260,8 +2277,8 @@ String to insert between keywords in the `keyword' field.
 
 File: ebib.info,  Node: Additional Fields,  Next: Layout,  Prev: Keywords Separator,  Up: The Customisation Buffer
 
-5.1.9 Additional Fields
------------------------
+5.1.10 Additional Fields
+------------------------
 
 *Default value*: `crossref' `url' `annote' `abstract' `keywords' `file'
 `timestamp'.
@@ -2273,7 +2290,7 @@ Specify one field per line, press the `INS' button to add more fields.
 
 File: ebib.info,  Node: Layout,  Next: Width,  Prev: Additional Fields,  Up: The Customisation Buffer
 
-5.1.10 Layout
+5.1.11 Layout
 -------------
 
 *Default value*: `full'.
@@ -2286,7 +2303,7 @@ right part of the frame, leaving the left part free. See Screen Layout
 
 File: ebib.info,  Node: Width,  Next: Index Window Size,  Prev: Layout,  Up: The Customisation Buffer
 
-5.1.11 Width
+5.1.12 Width
 ------------
 
 *Default value*: 80.
@@ -2295,7 +2312,7 @@ The width of the Ebib windows when `ebib-layout' is set to `custom'.
 
 File: ebib.info,  Node: Index Window Size,  Next: Index Display Fields,  Prev: Width,  Up: The Customisation Buffer
 
-5.1.12 Index Window Size
+5.1.13 Index Window Size
 ------------------------
 
 *Default value*: 10.
@@ -2305,7 +2322,7 @@ the Ebib screen.
 
 File: ebib.info,  Node: Index Display Fields,  Next: Uniquify Keys,  Prev: Index Window Size,  Up: The Customisation Buffer
 
-5.1.13 Index Display Fields
+5.1.14 Index Display Fields
 ---------------------------
 
 *Default value*: `nil'.
@@ -2317,7 +2334,7 @@ can use this option to display e.g. the title of each entry as well.
 
 File: ebib.info,  Node: Uniquify Keys,  Next: Autogenerate Keys,  Prev: Index Display Fields,  Up: The Customisation Buffer
 
-5.1.14 Uniquify Keys
+5.1.15 Uniquify Keys
 --------------------
 
 *Default value*: `nil'.
@@ -2331,7 +2348,7 @@ option is set, Ebib instead tries to create a unique key by appending
 
 File: ebib.info,  Node: Autogenerate Keys,  Next: Citation Commands,  Prev: Uniquify Keys,  Up: The Customisation Buffer
 
-5.1.15 Autogenerate Keys
+5.1.16 Autogenerate Keys
 ------------------------
 
 *Default value*: `nil'.
@@ -2347,7 +2364,7 @@ described in its documentation string.
 
 File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: Autogenerate Keys,  Up: The Customisation Buffer
 
-5.1.16 Citation Commands
+5.1.17 Citation Commands
 ------------------------
 
 *Default value*:
@@ -2486,7 +2503,7 @@ strings.
 
 File: ebib.info,  Node: Multiline Major Mode,  Next: Sort Order,  Prev: Citation Commands,  Up: The Customisation Buffer
 
-5.1.17 Multiline Major Mode
+5.1.18 Multiline Major Mode
 ---------------------------
 
 *Default value*: `text-mode'.
@@ -2496,7 +2513,7 @@ that the value _must_ be a command for a major mode.
 
 File: ebib.info,  Node: Sort Order,  Next: Save Xrefs First,  Prev: Multiline Major Mode,  Up: The Customisation Buffer
 
-5.1.18 Sort Order
+5.1.19 Sort Order
 -----------------
 
 *Default value*: `nil'.
@@ -2509,7 +2526,7 @@ field to the sort level, simply hit `INS' again.
 
 File: ebib.info,  Node: Save Xrefs First,  Next: Crossref Face,  Prev: Sort Order,  Up: The Customisation Buffer
 
-5.1.19 Save Xrefs First
+5.1.20 Save Xrefs First
 -----------------------
 
 *Default value*: `nil'.
@@ -2523,7 +2540,7 @@ intended.
 
 File: ebib.info,  Node: Crossref Face,  Next: Selected Face,  Prev: Save Xrefs First,  Up: The Customisation Buffer
 
-5.1.20 Crossref Face
+5.1.21 Crossref Face
 --------------------
 
 *Default value*: `((t (:foreground "red")))'.
@@ -2533,7 +2550,7 @@ this face. By default, the face has red as foreground colour.
 
 File: ebib.info,  Node: Selected Face,  Next: Use Timestamp,  Prev: Crossref Face,  Up: The Customisation Buffer
 
-5.1.21 Selected Face
+5.1.22 Selected Face
 --------------------
 
 *Default value*:
@@ -2544,7 +2561,7 @@ face. By default, it uses the text property `highlight'.
 
 File: ebib.info,  Node: Use Timestamp,  Next: Timestamp Format,  Prev: Selected Face,  Up: The Customisation Buffer
 
-5.1.22 Use Timestamp
+5.1.23 Use Timestamp
 --------------------
 
 *Default value*: `nil'.
@@ -2555,7 +2572,7 @@ Timestamps (#timestamps).
 
 File: ebib.info,  Node: Timestamp Format,  Next: Standard Url Field,  Prev: Use Timestamp,  Up: The Customisation Buffer
 
-5.1.23 Timestamp Format
+5.1.24 Timestamp Format
 -----------------------
 
 *Default value*: `"%a %b %e %T %Y"'.
@@ -2569,7 +2586,7 @@ take.
 
 File: ebib.info,  Node: Standard Url Field,  Next: Url Regexp,  Prev: Timestamp Format,  Up: The Customisation Buffer
 
-5.1.24 Standard Url Field
+5.1.25 Standard Url Field
 -------------------------
 
 *Default value*: `url'.
@@ -2579,7 +2596,7 @@ index buffer.
 
 File: ebib.info,  Node: Url Regexp,  Next: Browser Command,  Prev: Standard Url Field,  Up: The Customisation Buffer
 
-5.1.25 Url Regexp
+5.1.26 Url Regexp
 -----------------
 
 *Default value*: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+'.
@@ -2592,7 +2609,7 @@ whitespace or one of the characters `' " <' or `>'.
 
 File: ebib.info,  Node: Browser Command,  Next: Standard Doi Field,  Prev: Url Regexp,  Up: The Customisation Buffer
 
-5.1.26 Browser Command
+5.1.27 Browser Command
 ----------------------
 
 *Default value*: `nil'.
@@ -2607,7 +2624,7 @@ on the command line.
 
 File: ebib.info,  Node: Standard Doi Field,  Next: Doi Url,  Prev: Browser Command,  Up: The Customisation Buffer
 
-5.1.27 Standard Doi Field
+5.1.28 Standard Doi Field
 -------------------------
 
 *Default value*: `doi'.
@@ -2617,7 +2634,7 @@ buffer.
 
 File: ebib.info,  Node: Doi Url,  Next: Standard File Field,  Prev: Standard Doi Field,  Up: The Customisation Buffer
 
-5.1.28 Doi Url
+5.1.29 Doi Url
 --------------
 
 *Default value*: `http://dx.doi.org/%s'
@@ -2628,7 +2645,7 @@ The URL used to open a DOI. It must contain exactly one instance fo
 
 File: ebib.info,  Node: Standard File Field,  Next: File Associations,  Prev: Doi Url,  Up: The Customisation Buffer
 
-5.1.29 Standard File Field
+5.1.30 Standard File Field
 --------------------------
 
 *Default value*: `file'.
@@ -2638,7 +2655,7 @@ the index buffer.
 
 File: ebib.info,  Node: File Associations,  Next: File Regexp,  Prev: Standard File Field,  Up: The Customisation Buffer
 
-5.1.30 File Associations
+5.1.31 File Associations
 ------------------------
 
 *Default value*: `(("pdf" . "xpdf") ("ps" . "gv"))'.
@@ -2657,7 +2674,7 @@ the program field blank for the relevant file type.
 
 File: ebib.info,  Node: File Regexp,  Next: File Search Dirs,  Prev: File Associations,  Up: The Customisation Buffer
 
-5.1.31 File Regexp
+5.1.32 File Regexp
 ------------------
 
 *Default value*: `[^?|\:*<>\" \n\t\f]+'.
@@ -2673,7 +2690,7 @@ advisable to put anything but filenames in the `file' field.
 
 File: ebib.info,  Node: File Search Dirs,  Next: Print Preamble,  Prev: File Regexp,  Up: The Customisation Buffer
 
-5.1.32 File Search Dirs
+5.1.33 File Search Dirs
 -----------------------
 
 *Default value*: `~'.
@@ -2684,7 +2701,7 @@ subdirectories.
 
 File: ebib.info,  Node: Print Preamble,  Next: Print Newline,  Prev: File Search Dirs,  Up: The Customisation Buffer
 
-5.1.33 Print Preamble
+5.1.34 Print Preamble
 ---------------------
 
 *Default value*: `nil'.
@@ -2695,7 +2712,7 @@ your own `\usepackage' commands, or anything else you may need.
 
 File: ebib.info,  Node: Print Newline,  Next: Print Multiline,  Prev: Print Preamble,  Up: The Customisation Buffer
 
-5.1.34 Print Newline
+5.1.35 Print Newline
 --------------------
 
 *Default value*: `nil'.
@@ -2706,7 +2723,7 @@ separated by a small amount of whitespace only.
 
 File: ebib.info,  Node: Print Multiline,  Next: Latex Preamble,  Prev: Print Newline,  Up: The Customisation Buffer
 
-5.1.35 Print Multiline
+5.1.36 Print Multiline
 ----------------------
 
 *Default value*: `nil'.
@@ -2717,7 +2734,7 @@ saves space.
 
 File: ebib.info,  Node: Latex Preamble,  Next: Print Tempfile,  Prev: Print Multiline,  Up: The Customisation Buffer
 
-5.1.36 Latex Preamble
+5.1.37 Latex Preamble
 ---------------------
 
 *Default value*: `\bibliographystyle{plain}'.
@@ -2729,7 +2746,7 @@ and options.
 
 File: ebib.info,  Node: Print Tempfile,  Next: Allow Identical Fields,  Prev: Latex Preamble,  Up: The Customisation Buffer
 
-5.1.37 Print Tempfile
+5.1.38 Print Tempfile
 ---------------------
 
 *Default value*: `nil'.
@@ -2741,7 +2758,7 @@ time either of these commands is called.
 
 File: ebib.info,  Node: Allow Identical Fields,  Next: Entry Types,  Prev: Print Tempfile,  Up: The Customisation Buffer
 
-5.1.38 Allow Identical Fields
+5.1.39 Allow Identical Fields
 -----------------------------
 
 *Default value*: `nil'.
@@ -2753,7 +2770,7 @@ separated by semicolons (see Multiple Identical Fields
 
 File: ebib.info,  Node: Entry Types,  Prev: Allow Identical Fields,  Up: The Customisation Buffer
 
-5.1.39 Entry Types
+5.1.40 Entry Types
 ------------------
 
 *Default value*: see below.
@@ -2914,63 +2931,64 @@ Node: Preloading bib Files47699
 Node: @Preamble Definition48643
 Node: @String Definitions50923
 Node: Managing keywords54353
-Node: Sorting the bib File59124
-Node: Merging and Importing62287
-Node: Exporting Entries63623
-Node: Timestamps65818
-Node: Multiple Identical Fields67583
-Node: Virtual Databases69608
-Node: Simple Selection70878
-Node: Complex Filters71979
-Node: Properties of Virtual Databases75975
-Node: The Multiline Edit Buffer77199
-Node: The Options Menu80203
-Node: The Ebib Buffers80960
-Node: The Index Buffer81436
-Node: The Entry Buffer86197
-Node: The Strings Buffer88552
-Node: Customisation90315
-Node: The Customisation Buffer90708
-Node: Default Type91958
-Node: Preload Bib Files92396
-Node: Preload Bib Search Dirs92801
-Node: Keywords list93175
-Node: Keywords File93446
-Node: Keywords File Save On Exit93882
-Node: Keywords Use Only File94257
-Node: Keywords Separator94593
-Node: Additional Fields94862
-Node: Layout95393
-Node: Width95857
-Node: Index Window Size96080
-Node: Index Display Fields96361
-Node: Uniquify Keys96854
-Node: Autogenerate Keys97417
-Node: Citation Commands98038
-Node: Multiline Major Mode103992
-Node: Sort Order104327
-Node: Save Xrefs First104837
-Node: Crossref Face105380
-Node: Selected Face105720
-Node: Use Timestamp106048
-Node: Timestamp Format106400
-Node: Standard Url Field106966
-Node: Url Regexp107249
-Node: Browser Command107795
-Node: Standard Doi Field108301
-Node: Doi Url108573
-Node: Standard File Field108878
-Node: File Associations109168
-Node: File Regexp110039
-Node: File Search Dirs110673
-Node: Print Preamble111018
-Node: Print Newline111412
-Node: Print Multiline111780
-Node: Latex Preamble112124
-Node: Print Tempfile112561
-Node: Allow Identical Fields112991
-Node: Entry Types113429
-Node: Modifying Key Bindings115388
+Node: Sorting the bib File59393
+Node: Merging and Importing62556
+Node: Exporting Entries63892
+Node: Timestamps66087
+Node: Multiple Identical Fields67852
+Node: Virtual Databases69877
+Node: Simple Selection71147
+Node: Complex Filters72248
+Node: Properties of Virtual Databases76244
+Node: The Multiline Edit Buffer77468
+Node: The Options Menu80472
+Node: The Ebib Buffers81229
+Node: The Index Buffer81705
+Node: The Entry Buffer86466
+Node: The Strings Buffer88821
+Node: Customisation90584
+Node: The Customisation Buffer90977
+Node: Default Type92258
+Node: Preload Bib Files92696
+Node: Preload Bib Search Dirs93101
+Node: Keywords list93475
+Node: Keywords File93746
+Node: Keywords File Save On Exit94182
+Node: Keywords Use Only File94557
+Node: Keywords Field Keep Sorted94901
+Node: Keywords Separator95286
+Node: Additional Fields95559
+Node: Layout96092
+Node: Width96556
+Node: Index Window Size96779
+Node: Index Display Fields97060
+Node: Uniquify Keys97553
+Node: Autogenerate Keys98116
+Node: Citation Commands98737
+Node: Multiline Major Mode104691
+Node: Sort Order105026
+Node: Save Xrefs First105536
+Node: Crossref Face106079
+Node: Selected Face106419
+Node: Use Timestamp106747
+Node: Timestamp Format107099
+Node: Standard Url Field107665
+Node: Url Regexp107948
+Node: Browser Command108494
+Node: Standard Doi Field109000
+Node: Doi Url109272
+Node: Standard File Field109577
+Node: File Associations109867
+Node: File Regexp110738
+Node: File Search Dirs111372
+Node: Print Preamble111717
+Node: Print Newline112111
+Node: Print Multiline112479
+Node: Latex Preamble112823
+Node: Print Tempfile113260
+Node: Allow Identical Fields113690
+Node: Entry Types114128
+Node: Modifying Key Bindings116087
 
 End Tag Table
 
