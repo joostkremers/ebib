@@ -1450,17 +1450,26 @@ keywords and the third the keywords added in this session."
       (setf (cadr lst) (append (second lst) (third lst)))
       (setf (caddr lst) nil))))
 
+(defun ebib-keywords-new-p ()
+  "Check whether there are new keywords.
+Returns NIL if there are no new keywords, or a list containing
+all the elements in EBIB-KEYWORDS-FILES-ALIST that contain new
+keywords."
+  (delq nil (mapcar #'(lambda (elt)                        ; this would be easier with cl-remove
+                        (if (third elt)
+                            elt))
+                    ebib-keywords-files-alist)))
+
 (defun ebib-keywords-save-all-new ()
   "Check if new keywords were added during the session and save them as required."
-  (let ((keywords-file (file-name-nondirectory ebib-keywords-file))   ; strip path for succinctness
-        (new (delq nil (mapcar #'(lambda (elt)                        ; this would be easier with cl-remove
-                                   (if (third elt)
-                                       elt))
-                               ebib-keywords-files-alist))))
+  (interactive)
+  (let ((new (ebib-keywords-new-p)))
     (when (and new
                (or (eq ebib-keywords-file-save-on-exit 'always)
+                   (ebib-called-interactively)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p (format "New keywords were added. Save '%s'? " keywords-file)))))
+                        (y-or-n-p (format "New keywords were added. Save '%s'? "
+                                          (file-name-nondirectory ebib-keywords-file)))))) ; strip path for succinctness
       (mapc #'(lambda (elt)
                 (ebib-keywords-save-to-file elt))
             new))))
@@ -1749,6 +1758,8 @@ keywords when Emacs is killed."
     ["Save All Databases" ebib-save-all-databases (ebib-modified-p)]
     ["Save Database As..." ebib-write-database ebib-cur-db]
     ["Close Database" ebib-close-database ebib-cur-db]
+    "--"
+    ["Save New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
     "--"
     ("Entry"
      ["Add" ebib-add-entry (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
