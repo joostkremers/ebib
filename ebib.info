@@ -1219,13 +1219,14 @@ per-directory keyword files are loaded when the first `.bib' file in
 that directory is opened. If you open a second `.bib' file from the
 same directory, Ebib won't reload the keywords file.
 
-There are a few more user options involving keywords: the option
-Keywords File Save On Exit (#keywords-file-save-on-exit) controls
-whether to save new keywords when a `.bib' file or Ebib is closed. If
-set to `always', keyword files are saved without asking for
-confirmation; if set to `ask', you are asked if you want to save new
-keywords, and the setting `never' does what you'd expect: no asking, no
-saving.
+When you close a database, Ebib checks if you have added new keywords
+to it and asks you if you want to save them. You can tell Ebib to save
+new keywords automatically by setting the option Keywords File Save On
+Exit (#keywords-file-save-on-exit) to `always'. Note that this doesn't
+save the keywords when you enter them, only when you close the database
+or quit Ebib. You can also set this option to `never', which means Ebib
+will discard new keywords when the database is closed. Note that there
+are also two menu options for saving keywords.
 
 The option Keywords Use Only File (#keywords-use-only-file) controls
 whether Ebib uses only the keyword file, or both the keyword file and
@@ -1235,7 +1236,7 @@ both the keyword list and the keyword file tells Ebib to offer keywords
 from both sources when you edit the keyword field. Otherwise, only the
 keyword file is used.
 
-It is also possible to tell Ebib to sort the keywords in the keywords
+It is also possible to tell Ebib to sort the keywords in the `keywords'
 field in alphabetical order. Set the option Keywords Field Keep Sorted
 (#keywords-field-keep-sorted) if you want to do this. Note that setting
 this option also automatically removes duplicates.
@@ -2985,65 +2986,65 @@ Node: Preloading bib Files48623
 Node: @Preamble Definition49567
 Node: @String Definitions51847
 Node: Managing keywords55277
-Node: Sorting the bib File60317
-Node: Merging and Importing63480
-Node: Exporting Entries64816
-Node: Timestamps67011
-Node: Multiple Identical Fields68776
-Node: Virtual Databases70801
-Node: Simple Selection72071
-Node: Complex Filters73172
-Node: Properties of Virtual Databases77168
-Node: The Multiline Edit Buffer78392
-Node: The Options Menu82481
-Node: The Ebib Buffers83238
-Node: The Index Buffer83714
-Node: The Entry Buffer88475
-Node: The Strings Buffer90830
-Node: Customisation92593
-Node: The Customisation Buffer92986
-Node: Default Type94286
-Node: Preload Bib Files94724
-Node: Preload Bib Search Dirs95129
-Node: Create Backups95504
-Node: Keywords list95826
-Node: Keywords File96088
-Node: Keywords File Save On Exit96524
-Node: Keywords Use Only File96899
-Node: Keywords Field Keep Sorted97243
-Node: Keywords Separator97628
-Node: Additional Fields97903
-Node: Layout98436
-Node: Width98900
-Node: Index Window Size99123
-Node: Index Display Fields99404
-Node: Uniquify Keys99897
-Node: Autogenerate Keys100460
-Node: Citation Commands101081
-Node: Multiline Major Mode107035
-Node: Sort Order107370
-Node: Save Xrefs First107880
-Node: Crossref Face108423
-Node: Selected Face108763
-Node: Use Timestamp109091
-Node: Timestamp Format109443
-Node: Standard Url Field110009
-Node: Url Regexp110292
-Node: Browser Command110838
-Node: Standard Doi Field111344
-Node: Doi Url111616
-Node: Standard File Field111921
-Node: File Associations112211
-Node: File Regexp113082
-Node: File Search Dirs113716
-Node: Print Preamble114061
-Node: Print Newline114455
-Node: Print Multiline114823
-Node: Latex Preamble115167
-Node: Print Tempfile115604
-Node: Allow Identical Fields116034
-Node: Entry Types116472
-Node: Modifying Key Bindings118431
+Node: Sorting the bib File60454
+Node: Merging and Importing63617
+Node: Exporting Entries64953
+Node: Timestamps67148
+Node: Multiple Identical Fields68913
+Node: Virtual Databases70938
+Node: Simple Selection72208
+Node: Complex Filters73309
+Node: Properties of Virtual Databases77305
+Node: The Multiline Edit Buffer78529
+Node: The Options Menu82618
+Node: The Ebib Buffers83375
+Node: The Index Buffer83851
+Node: The Entry Buffer88612
+Node: The Strings Buffer90967
+Node: Customisation92730
+Node: The Customisation Buffer93123
+Node: Default Type94423
+Node: Preload Bib Files94861
+Node: Preload Bib Search Dirs95266
+Node: Create Backups95641
+Node: Keywords list95963
+Node: Keywords File96225
+Node: Keywords File Save On Exit96661
+Node: Keywords Use Only File97036
+Node: Keywords Field Keep Sorted97380
+Node: Keywords Separator97765
+Node: Additional Fields98040
+Node: Layout98573
+Node: Width99037
+Node: Index Window Size99260
+Node: Index Display Fields99541
+Node: Uniquify Keys100034
+Node: Autogenerate Keys100597
+Node: Citation Commands101218
+Node: Multiline Major Mode107172
+Node: Sort Order107507
+Node: Save Xrefs First108017
+Node: Crossref Face108560
+Node: Selected Face108900
+Node: Use Timestamp109228
+Node: Timestamp Format109580
+Node: Standard Url Field110146
+Node: Url Regexp110429
+Node: Browser Command110975
+Node: Standard Doi Field111481
+Node: Doi Url111753
+Node: Standard File Field112058
+Node: File Associations112348
+Node: File Regexp113219
+Node: File Search Dirs113853
+Node: Print Preamble114198
+Node: Print Newline114592
+Node: Print Multiline114960
+Node: Latex Preamble115304
+Node: Print Tempfile115741
+Node: Allow Identical Fields116171
+Node: Entry Types116609
+Node: Modifying Key Bindings118568
 
 End Tag Table
 
