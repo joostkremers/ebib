@@ -1437,10 +1437,8 @@ keywords and the third the keywords added in this session."
 
 (defun ebib-keywords-save-new-keywords (db)
   "Check if new keywords were added to DB and save them as required."
-  (let* ((dir (or (file-name-directory ebib-keywords-file)       ; a single keywords file
-                  (file-name-directory (edb-filename db))))      ; per-directory keywords files
-         (lst (assoc dir ebib-keywords-files-alist))
-         (file (ebib-keywords-get-file db)))
+  (let ((lst (ebib-keywords-new-p db))
+        (file (ebib-keywords-get-file db)))
     (when (and (third lst)                     ; if there are new keywords
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
@@ -1450,15 +1448,28 @@ keywords and the third the keywords added in this session."
       (setf (cadr lst) (append (second lst) (third lst)))
       (setf (caddr lst) nil))))
 
-(defun ebib-keywords-new-p ()
+(defun ebib-keywords-save-cur-db ()
+  "Save new keywords for the current database."
+  (interactive)
+  (ebib-keywords-save-new-keywords ebib-cur-db))
+
+(defun ebib-keywords-new-p (&optional db)
   "Check whether there are new keywords.
 Returns NIL if there are no new keywords, or a list containing
 all the elements in EBIB-KEYWORDS-FILES-ALIST that contain new
-keywords."
-  (delq nil (mapcar #'(lambda (elt)                        ; this would be easier with cl-remove
-                        (if (third elt)
-                            elt))
-                    ebib-keywords-files-alist)))
+keywords.
+
+Optional argument DB specifies the database to check for."
+  (if db
+      (let* ((dir (or (file-name-directory ebib-keywords-file) ; a single keywords file
+                      (file-name-directory (edb-filename db)))) ; per-directory keywords files
+             (lst (assoc dir ebib-keywords-files-alist)))
+        (if (third lst)
+            lst))
+    (delq nil (mapcar #'(lambda (elt) ; this would be easier with cl-remove
+                          (if (third elt)
+                              elt))
+                      ebib-keywords-files-alist))))
 
 (defun ebib-keywords-save-all-new ()
   "Check if new keywords were added during the session and save them as required."
@@ -1759,7 +1770,8 @@ keywords when Emacs is killed."
     ["Save Database As..." ebib-write-database ebib-cur-db]
     ["Close Database" ebib-close-database ebib-cur-db]
     "--"
-    ["Save New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
+    ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib-keywords-new-p ebib-cur-db)]
+    ["Save All New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
     "--"
     ("Entry"
      ["Add" ebib-add-entry (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
