@@ -426,7 +426,7 @@ Also automatically remove duplicates."
   "*Face to indicate marked entries."
   :group 'ebib-faces)
 
-(defface ebib-field-face '((t (:inherit 'font-lock-keyword-face)))
+(defface ebib-field-face '((t (:inherit font-lock-keyword-face)))
   "*Face for field names."
   :group 'ebib-faces)
 
