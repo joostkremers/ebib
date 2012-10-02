@@ -1496,10 +1496,11 @@ Optional argument DB specifies the database to check for."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
-(defun ebib (&optional key)
+(defun ebib (&optional key redisplay)
   "Ebib, a BibTeX database manager.
-Optional argument key specifies the entry of the current database
-that is to be displayed."
+Optional argument KEY specifies the entry of the current database
+that is to be displayed. Optional argument REDISPLAY specifies
+whether the index and entry buffer must be redisplayed."
   (interactive)
   (if (or (equal (window-buffer) ebib-index-buffer)
           (equal (window-buffer) ebib-entry-buffer))
@@ -1518,6 +1519,9 @@ that is to be displayed."
       (if index-window
           (select-window index-window nil)
         (ebib-setup-windows)))
+    (when redisplay
+      (ebib-fill-entry-buffer)
+      (ebib-fill-index-buffer))
     ;; if ebib is called with an argument, we look for it
     (when key
       (let ((exists? (member key (edb-keys-list ebib-cur-db))))
@@ -4284,39 +4288,23 @@ be found."
     ((database)
      (or ebib-local-bibtex-filenames
          (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let ((key (read-string-at-point "\"#%'(),={} \n\t\f"))
-           entry
-           database)
+     (let ((key (read-string-at-point "\"#%'(),={} \n\t\f")))
        (if (eq ebib-local-bibtex-filenames 'none)
            (if (not (member key (edb-keys-list ebib-cur-db)))
-               (error "Entry `%s' is not in the current database" key)
-             (setq entry (gethash key (edb-database ebib-cur-db)))
-             (setq database ebib-cur-db))
-         (multiple-value-setq (entry database)
-           (catch 'found
-             (mapc #'(lambda (file)
-                       (let ((db (ebib-get-db-from-filename file)))
-                         (if (null db)
-                             (message "Database %s not loaded" file)
-                           (if (member key (edb-keys-list db))
-                               (throw 'found (values (gethash key (edb-database db)) db))))))
-                   ebib-local-bibtex-filenames)
-             (list nil nil))))
-       (if (null entry)
-           (error "Entry `%s' not found" key)
-         (let ((index-window (get-buffer-window ebib-index-buffer)))
-           (if (not index-window)
-               (with-help-window "*Help*"
-                 (ebib-format-fields entry 'princ))
-             (with-selected-window index-window
-               (setq ebib-cur-db database)
-               (ebib-fill-index-buffer)
-               (setf (edb-cur-entry ebib-cur-db) (member key (edb-keys-list ebib-cur-db)))
-               (goto-char (point-min))
-               (re-search-forward (format "^%s " key))
-               (beginning-of-line)
-               (ebib-set-index-highlight))
-             (ebib-fill-entry-buffer))))))
+               (error "Entry `%s' is not in the current database" key))
+         (let ((database (catch 'found
+                           (mapc #'(lambda (file)
+                                     (let ((db (ebib-get-db-from-filename file)))
+                                       (if (null db)
+                                           (message "Database %s not loaded" file)
+                                         (if (member key (edb-keys-list db))
+                                             (throw 'found db)))))
+                                 ebib-local-bibtex-filenames)
+                           nil))) ; we must return nil if the key wasn't found anywhere
+           (if (null database)
+               (error "Entry `%s' not found" key)
+             (setq ebib-cur-db database)))
+         (ebib key t))))
     ((default)
      (error "No database(s) loaded"))))
 
