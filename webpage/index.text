@@ -132,18 +132,22 @@ quite a few extra features that make managing your BibTeX files easier.
 ## Screenshots ##
 
 Visually, Ebib is not very spectacular. But to get an impression of what it
-looks like, you can view the following two screenshots. The first shows
+looks like, you can view the following three screenshots. The first shows
 Ebib's standard lay-out, with the list of entry keys in the top window and
-the fields of the currently highlighted entry in the bottom window. The
-string 'Reuland' is highlighted as the result of a text search. The second
-screenshot shows the strings buffer, where you can edit the `@string`
-definitions in the database.
+the fields of the currently highlighted entry in the bottom window. (The
+field values displayed in red come from the cross-referenced entry.) In the
+second, the string 'Reuland' is highlighted as the result of a text search.
+The third screenshot shows the strings buffer, where you can edit the
+`@string` definitions in the database.
 
 <a href="images/Main-view.png"> <img style="width:160px;height:100px"
-src="images/tn-Main-view.png" alt="screenshot 1" /></a>
+src="images/tn_Main-view.png" alt="screenshot 1" /></a>
+
+<a href="images/Search-view.png"> <img style="width:160px;height:100px"
+src="images/tn_Search-view.png" alt="screenshot 1" /></a>
 
 <a href="images/Strings-buffer.png"> <img style="width:160px;height:100px"
-src="images/tn-Strings-buffer.png" alt="screenshot 2" /></a>
+src="images/tn_Strings-buffer.png" alt="screenshot 2" /></a>
 
 
 ## Manual ##
