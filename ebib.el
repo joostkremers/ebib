@@ -175,16 +175,6 @@ of entries, so it is not compatible with setting the Sort Order option."
   :group 'ebib
   :type 'boolean)
 
-(defface ebib-crossref-face '((t (:foreground "red")))
-  "*Face used to indicate values inherited from crossreferenced entries."
-  :group 'ebib)
-
-(defface ebib-marked-face (if (featurep 'xemacs)
-                              '((t (:foreground "white" :background "red")))
-                            '((t (:inverse-video t))))
-  "*Face to indicate marked entries."
-  :group 'ebib)
-
 (defcustom ebib-use-timestamp nil
   "*If true, new entries will get a time stamp.
 The time stamp will be stored in a field \"timestamp\" that can
@@ -423,6 +413,22 @@ Also automatically remove duplicates."
                        (repeat :tag "Obligatory fields" (symbol :tag "Field"))
                        (repeat :tag "Optional fields" (symbol :tag "Field"))))
   :set 'ebib-set-unique-field-list)
+
+(defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
+
+(defface ebib-crossref-face '((t (:foreground "red")))
+  "*Face used to indicate values inherited from crossreferenced entries."
+  :group 'ebib-faces)
+
+(defface ebib-marked-face (if (featurep 'xemacs)
+                              '((t (:foreground "white" :background "red")))
+                            '((t (:inverse-video t))))
+  "*Face to indicate marked entries."
+  :group 'ebib-faces)
+
+(defface ebib-field-face '((t (:inherit font-lock-keyword-face)))
+  "*Face for field names."
+  :group 'ebib-faces)
 
 ;; generic for all databases
 
@@ -1015,7 +1021,7 @@ matching entry is returned."
       (let ((beg (point)))
         (end-of-line)
         (delete-region beg (point)))
-      (insert (format "%-17s " (symbol-name ebib-current-field))
+      (insert (propertize (format "%-17s " (symbol-name ebib-current-field)) 'face 'ebib-field-face)
               (ebib-get-field-highlighted ebib-current-field ebib-cur-entry-hash))
       (ebib-set-fields-highlight))))
 
@@ -1133,13 +1139,13 @@ If DB is nil, it defaults to the current database."
   (let* ((entry-type (gethash 'type* entry))
          (obl-fields (ebib-get-obl-fields entry-type))
          (opt-fields (ebib-get-opt-fields entry-type)))
-    (funcall fn (format "%-19s %s\n" "type" entry-type))
+    (funcall fn (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
     (mapc #'(lambda (fields)
               (funcall fn "\n")
               (mapcar #'(lambda (field)
                           (unless (and (get field 'ebib-hidden)
                                        ebib-hide-hidden-fields)
-                            (funcall fn (format "%-17s " field))
+                            (funcall fn (propertize (format "%-17s " field) 'face 'ebib-field-face))
                             (funcall fn (or
                                          (ebib-get-field-highlighted field entry match-str)
                                          ""))
