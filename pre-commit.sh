@@ -24,6 +24,8 @@
 # PREAMBLE
 
 PANDOC="manual/ebib.text"               # markdown source
+PANDOC_BBODY="manual/texi-before-body"  # texinfo headers
+TEXINFO="manual/texi/ebib.texi"         # texinfo output
 INFO="ebib.info"                        # GNU info output
 
 SCRIPT=$(basename "$0")
@@ -42,12 +44,26 @@ function confirm_file
     return 1
 }
 
-function oldest_first
+function run_pandoc
 {
-    local one="$1"
-    local two="$2"
-    test "$one" -ot "$two" && return 0  # "older than" test
-    echo "$SCRIPT: unexpected file ages: $one younger than $two"
+    local source="$1"
+    pandoc --read=markdown \
+           --write=texinfo \
+           --output="$TEXINFO" \
+           --include-before-body="$PANDOC_BBODY" \
+           --standalone \
+           --table-of-contents \
+           "$1" && return 0
+    echo "$SCRIPT: pandoc run failed"
+    let "errors++"
+    return 1
+}
+
+function run_makeinfo
+{
+    local source="$1"
+    makeinfo "$1" && return 0 # makeinfo puts the output file in the current dir
+    echo "$SCRIPT: makeinfo run failed"
     let "errors++"
     return 1
 }
@@ -67,7 +83,12 @@ errors=0
 confirm_file "$PANDOC"
 confirm_file "$INFO"
 check_exit   "$errors"
-oldest_first "$PANDOC" "$INFO"
+if [  "$INFO" -ot "$PANDOC" ] ; then
+    echo "$SCRIPT: regenerating info file"
+    git stash -q --keep-index
+    run_pandoc "$PANDOC" && run_makeinfo "$TEXINFO" && git add "$INFO"
+    git stash pop -q
+fi
 check_exit   "$errors"
 
 echo "$SCRIPT: documentation is current"
