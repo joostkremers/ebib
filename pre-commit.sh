@@ -13,13 +13,8 @@
 #    the 'pre-commit' hook is the first of four 'git'
 #    hooks that are run prior to each commit
 #
-#    this script currently blocks a commit if the
-#    documentation has not been regenerated correctly,
-#    as determined by the file modification times
-#
-#    a more sophisticated approach would invoke
-#    pandoc to create the documentation, perhaps with
-#    the aid of a makefile
+#    this script regenerates the info file if the source file for the
+#    manual (ebib.text) is newer than ebib.info.
 
 # PREAMBLE
 
