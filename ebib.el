@@ -325,6 +325,12 @@ For .bib files that do not have an associated keywords file,
   :group 'ebib
   :type '(string :tag "Keyword separator:"))
 
+(defcustom ebib-rc-file "~/.ebibrc"
+  "*Customization file for Ebib.
+This file is read when Ebib is started. It can be used to define custom keys or set custimzation variables (though the latter is easier through Customize)."
+  :group 'ebib
+  :type '(file :tag "Customization file:"))
+
 (defcustom ebib-keywords-field-keep-sorted nil
   "*Keep the keywords field sorted in alphabetical order.
 Also automatically remove duplicates."
@@ -1561,7 +1567,7 @@ buffers and reads the rc file."
         ebib-minibuf-hist nil
         ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
-  (load "~/.ebibrc" t)
+  (load ebib-rc-file t)
   (ebib-create-buffers)
   (if (file-name-directory ebib-keywords-file) ; returns nil if there is no directory part
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
