@@ -127,7 +127,8 @@ quite a few extra features that make managing your BibTeX files easier.
    of new additions in the database.
  - (parts of) databases can be printed, either as a list of references
    typeset by BibTeX, or directly as database entries.
-
+ - keywords can be stored in a file to aid in maintaining uniformity in
+   keywords within and across `.bib` files.
 
 ## Screenshots ##
 
