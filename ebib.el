@@ -3255,9 +3255,10 @@ surrounding it is not included in the citation command."
     (setq format-string (replace-match key t t format-string)))
   (loop for n = 1 then (1+ n)
         until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A" format-string)) do
-        (setq format-string (replace-match (if-str (argument (read-from-minibuffer (format "Argument %s%s: " n (if key
-                                                                                                                   (concat " for " key)
-                                                                                                                 ""))))
+        (setq format-string (replace-match (if-str (argument (save-match-data
+                                                               (read-from-minibuffer (format "Argument %s%s: " n (if key
+                                                                                                                     (concat " for " key)
+                                                                                                                   "")))))
                                                (concat "\\1" argument "\\2")
                                              "")
                                            t nil format-string))
