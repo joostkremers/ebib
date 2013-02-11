@@ -3002,45 +3002,11 @@ Operates either on all entries or on the marked entries."
        (ebib-fill-entry-buffer)
        (ebib-fill-index-buffer)))))
 
-(defun ebib-browse-url (num)
-  "Asks a browser to load the URL in the standard URL field.
-The standard URL field (see user option EBIB-STANDARD-URL-FIELD)
-may contain more than one URL, if they're whitespace-separated.
-In that case, a numeric prefix argument can be used to specify
-which URL to choose."
-  (interactive "p")
-  (ebib-execute-when
-    ((entries)
-     (let ((urls (to-raw (gethash ebib-standard-url-field
-                                  (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-       (if urls
-           (ebib-call-browser urls num)
-         (error "Field `%s' is empty" ebib-standard-url-field))))
-    ((default)
-     (beep))))
-
-(defun ebib-browse-doi ()
-  "Open the DOI in the standard DOI field in a browser.
-The stardard DOI field (see user option EBIB-STANDARD-DOI-FIELD)
-may contain only one DOI.
-
-The DOI is combined with the value of EBIB-DOI-URL before being
-sent to the browser."
-  (interactive)
-  (ebib-execute-when
-   ((entries)
-    (let ((doi (to-raw (gethash ebib-standard-doi-field
-                                (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
-      (if doi
-          (ebib-call-browser (format ebib-doi-url doi) 1)  ; '1' was 'num'
-        (error "No DOI found in field `%s'" ebib-standard-doi-field))))
-   ((default)
-    (beep))))
-
-(defun ebib-call-browser (urls n)
-  "Passes the Nth URL in URLS to a browser.
-URLS must be a string of whitespace-separated URLs."
-  ;; first we extract all valid urls and then pick the nth one
+(defun ebib-split-urls (urls n)
+  "Split URLS and return the Nth one.
+URLs are split using EBIB-REGEXP-URL. The URL is cleaned up a bit
+before being returned, i.e., an enclosing \\url{...} or <...> is
+removed."
   (let ((url (nth (1- n)
                   (let ((start 0)
                         (result nil))
@@ -3060,13 +3026,51 @@ URLS must be a string of whitespace-separated URLs."
          (t (error "Not a URL: `%s'" url)))
       ;; otherwise, we didn't find a url
       (error "No URL found in `%s'" urls))
-    (when url
-      (if (string= ebib-browser-command "")
-          (progn
-            (message "Calling BROWSE-URL on `%s'" url)
-            (browse-url url))
-        (message "Executing `%s %s'" ebib-browser-command url)
-        (start-process "Ebib-browser" nil ebib-browser-command url)))))
+    url))
+
+(defun ebib-browse-url (num)
+  "Asks a browser to load the URL in the standard URL field.
+The standard URL field (see user option EBIB-STANDARD-URL-FIELD)
+may contain more than one URL, if they're whitespace-separated.
+In that case, a numeric prefix argument can be used to specify
+which URL to choose."
+  (interactive "p")
+  (ebib-execute-when
+    ((entries)
+     (let ((urls (to-raw (gethash ebib-standard-url-field
+                                  (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+       (if urls
+           (ebib-call-browser (ebib-split-urls urls num))
+         (error "Field `%s' is empty" ebib-standard-url-field))))
+    ((default)
+     (beep))))
+
+(defun ebib-browse-doi ()
+  "Open the DOI in the standard DOI field in a browser.
+The stardard DOI field (see user option EBIB-STANDARD-DOI-FIELD)
+may contain only one DOI.
+
+The DOI is combined with the value of EBIB-DOI-URL before being
+sent to the browser."
+  (interactive)
+  (ebib-execute-when
+   ((entries)
+    (let ((doi (to-raw (gethash ebib-standard-doi-field
+                                (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+      (if doi
+          (ebib-call-browser (format ebib-doi-url doi))
+        (error "No DOI found in field `%s'" ebib-standard-doi-field))))
+   ((default)
+    (beep))))
+
+(defun ebib-call-browser (url)
+  "Passes URL to a browser."
+  (if (string= ebib-browser-command "")
+      (progn
+        (message "Calling BROWSE-URL on `%s'" url)
+        (browse-url url))
+    (message "Executing `%s %s'" ebib-browser-command url)
+    (start-process "Ebib-browser" nil ebib-browser-command url)))
 
 (defun ebib-view-file (num)
   "Views a file in the standard file field.
@@ -3617,7 +3621,7 @@ browser."
   (interactive "p")
   (let ((urls (to-raw (gethash ebib-current-field ebib-cur-entry-hash))))
     (if urls
-        (ebib-call-browser urls num)
+        (ebib-call-browser (ebib-split-urls urls num))
       (error "Field `%s' is empty" ebib-current-field))))
 
 (defun ebib-view-file-in-field (num)
