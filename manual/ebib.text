@@ -545,7 +545,7 @@ Virtual databases differ from normal databases in several ways. First, they cann
 
 A virtual database cannot be saved in the normal way with `s`, and the menu option to save all databases ignores virtual databases. If you want to save a virtual database, you can use the command `w`. This command not only saves the virtual database, it also changes it into a normal database, and detaches it from its original source database, so that you can modify it without affecting the source database.
 
-The print bibliography command also doesn't work with virtual databases. The reason for this is that the virtual database is not associated with an actual `.bib` file, so there is no file to create a list of references from. However, it is possible to print index cards frm a virtual database.
+The print bibliography command also doesn't work with virtual databases. The reason for this is that the virtual database is not associated with an actual `.bib` file, so there is no file to create a list of references from. However, it is possible to print index cards from a virtual database.
 
 
 ## The Multiline Edit Buffer ##
