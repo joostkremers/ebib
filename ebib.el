@@ -1737,7 +1737,6 @@ keywords when Emacs is killed."
 (ebib-key index "l" ebib-show-log)
 (ebib-key index "m" ebib-mark-entry)
 (ebib-key index "n" ebib-search-next)
-(ebib-key index "N" ebib-search-crossref)
 (ebib-key index [(control n)] ebib-next-entry)
 (ebib-key index [(meta n)] ebib-index-scroll-up)
 (ebib-key index "o" ebib-load-bibtex-file)
