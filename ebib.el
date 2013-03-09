@@ -3080,7 +3080,7 @@ which file to choose."
   (interactive "p")
   (ebib-execute-when
     ((entries)
-     (let ((filename (to-raw (ebib-get-field-value (ebib-cur-entry-key)))))
+     (let ((filename (to-raw (car (ebib-get-field-value (ebib-cur-entry-key))))))
        (if filename
            (ebib-call-file-viewer filename num)
          (error "Field `%s' is empty" ebib-standard-file-field))))
@@ -3628,7 +3628,7 @@ The field may contain a whitespace-separated set of
 filenames. The prefix argument indicates which file is to be
 viewed."
   (interactive "p")
-  (let ((files (to-raw (ebib-get-field-value ebib-current-field (ebib-cur-entry-key)))))
+  (let ((files (to-raw (car (ebib-get-field-value ebib-current-field (ebib-cur-entry-key))))))
     (if files
         (ebib-call-file-viewer files num)
       (error "Field `%s' is empty" ebib-current-field))))
