@@ -85,7 +85,7 @@ Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the fil
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, it will log a warning. If Ebib finds something that it believes to be incorrect, an error will be logged. If any warnings or errors occur while loading the `.bib` file, Ebib tells you so after loading the file. To view the log file, press `l` in the index buffer.
 
-Note that even if it detects warnings or errors, Ebib will try to continue parsing the rest of the `.bib` file. That means that normally, only the entry in which an error occurs is not read. Entries occurring after the problematic one are read.
+Note that if Ebib detects warnings or errors, it will simply skip the offending entry and continue parsing the rest of the `.bib` file. That means that entries in which an error occurs are not read, and if you then save the file, they will not be saved. So keep an eye out for error messages after loading a `.bib` file: if there is something that Ebib cannot parse, you may lose entries. (Though Ebib will create a backup before overwriting a file.)
 
 
 ### Navigating a `.bib` File ###
