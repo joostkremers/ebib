@@ -439,9 +439,11 @@ Also automatically remove duplicates."
 ;; generic for all databases
 
 ;; constants and variables that are set only once
-(defconst ebib-bibtex-identifier "[^\"#%'(),={} \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
+(defconst ebib-bibtex-identifier "[^^\"@\\&$#%',={}() \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
+(defconst ebib-key-regexp "[^^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defconst ebib-version "==VERSION==")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
+;; "\"@',\#}{~%&$^"
 
 ;; buffers and highlights
 (defvar ebib-index-buffer nil "The index buffer.")
@@ -2071,7 +2073,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
                (skip-chars-forward " \n\t\f") ; note the space!
                (point))))
     (when (looking-at-goto-end (concat "\\("
-                                       ebib-bibtex-identifier
+                                       ebib-key-regexp
                                        "\\)[ \t\n\f]*,")
                                1)       ; this delimits the entry key
       (let ((entry-key (buffer-substring-no-properties beg (point))))
