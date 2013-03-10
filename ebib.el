@@ -338,6 +338,21 @@ Also automatically remove duplicates."
   :type '(choice (const :tag "Sort keywords field" t)
                  (const :tag "Do not sort keywords field" nil)))
 
+(defcustom ebib-biblatex-inheritance nil
+  "*Inheritance scheme for cross-referencing.
+Inheritances are specified per entry type. The source is the
+field name in the cross-referencing entry, the target the field
+in the cross-referenced entry.
+
+To define inheritances for all entry types, specify `all' as the
+entry type. If you combine inheritances for `all' with
+entry-specific inheritances, the latter override the former."
+  :group 'ebib
+  :type '(repeat (group (symbol :tag "Entry type")
+                        (repeat :tag "Inherited fields"
+                                (group (symbol :tag "Source")
+                                       (symbol :tag "Target"))))))
+
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
 
@@ -1030,7 +1045,7 @@ matching entry is returned."
         (end-of-line)
         (delete-region beg (point)))
       (insert (propertize (format "%-17s " (symbol-name ebib-current-field)) 'face 'ebib-field-face)
-              (ebib-get-field-highlighted ebib-current-field ebib-cur-entry-hash))
+              (ebib-get-field-highlighted ebib-current-field (ebib-cur-entry-key)))
       (ebib-set-fields-highlight))))
 
 (defun ebib-redisplay-current-string ()
@@ -1096,55 +1111,73 @@ If DB is nil, it defaults to the current database."
   (let ((entry (ebib-retrieve-entry entry-key db)))
     (if entry
         (or
-         (let ((val (copy-sequence (gethash field entry))))
+         (let ((val (gethash field entry)))
+           (if (stringp val)
+               (setq val (copy-sequence val)))
            (if val
                (values val nil)))
          (let ((xref (ebib-retrieve-entry (to-raw (gethash 'crossref entry)) db)))
            (if xref
-               (values (gethash field xref) t))))
+             (let ((entry-type (gethash 'type* entry)))
+               (values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
       (values nil nil))))
 
-(defun ebib-get-field-highlighted (field current-entry &optional match-str)
+(defun ebib-get-xref-field (field entry-type)
+  "Return the field from which FIELD inherits in ENTRY-TYPE.
+For BibTeX, a field simply inherits from the same field in the
+cross-referenced entry. BibLaTeX, however, allows complex
+inheritance relations, so that e.g., the field `booktitle' may
+inherit from the field `title' in the cross-referenced entry.
+
+The inheritance scheme is stored in `ebib-biblatex-inheritance'."
+  (let ((inheritances (or (cadr (assq entry-type ebib-biblatex-inheritance))
+                          (cadr (assq 'all ebib-biblatex-inheritance)))))
+    (or (cadr (assq field inheritances))
+        field)))
+
+(defun ebib-get-field-highlighted (field key &optional match-str db)
   ;; note: we need to work on a copy of the string, otherwise the highlights
   ;; are made to the string as stored in the database. hence copy-sequence.
-  (let ((case-fold-search t)
-        (string (copy-sequence (gethash field current-entry)))
-        (raw " ")
-        (multiline " ")
-        (matched nil))
+  (or db (setq db ebib-cur-db))
+  (let* ((case-fold-search t)
+         (value (ebib-get-field-value field key db))
+         (string (if (car value)
+                     (copy-sequence (car value))))
+         (xref (cadr value))
+         (raw " ")
+         (multiline " ")
+         (matched nil))
     ;; we have to do a couple of things now:
     ;; - remove {} or "" around the string, if they're there
     ;; - search for match-str
     ;; - properly adjust the string if it's multiline
     ;; but all this is not necessary if there was no string
-    (if (null string)
-        (let* ((xref (to-raw (gethash 'crossref current-entry)))
-               (xref-entry (ebib-retrieve-entry xref ebib-cur-db)))
-          (when xref-entry
-            (setq string (copy-sequence (gethash field xref-entry)))
-            (if string
-                (setq string (propertize (to-raw string) 'face 'ebib-crossref-face 'fontified t))
-              (setq string ""))))
+    (when string
+      (if xref
+          (setq string (propertize string 'face 'ebib-crossref-face 'fontified t)))
       (if (raw-p string)
           (setq raw "*")
-        (setq string (to-raw string)))  ; we have to make the string look nice
+        (setq string (to-raw string))) ; we have to make the string look nice
       (when match-str
-        (multiple-value-setq (string matched) (match-all match-str string))))
-    (when (multiline-p string)
-      ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
-      ;; multiline is local and therefore the object it refers to should
-      ;; be GC'ed when the function returns. but for some reason, the
-      ;; plus sign is persistent, and if it's been highlighted as the
-      ;; result of a search, it stays that way.
-      (setq multiline (propertize "+" 'face nil))
-      (setq string (first-line string)))
-    (when (and matched
-               (string= multiline "+"))
-      (add-text-properties 0 1 '(face highlight) multiline))
+        (multiple-value-setq (string matched) (match-all match-str string)))
+      (when (multiline-p string)
+        ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
+        ;; multiline is local and therefore the object it refers to should
+        ;; be GC'ed when the function returns. but for some reason, the
+        ;; plus sign is persistent, and if it's been highlighted as the
+        ;; result of a search, it stays that way.
+        (setq multiline (propertize "+" 'face nil))
+        (setq string (first-line string)))
+      (when (and matched
+                 (string= multiline "+"))
+        (add-text-properties 0 1 '(face highlight) multiline)))
     (concat raw multiline string)))
 
-(defun ebib-format-fields (entry fn &optional match-str)
-  (let* ((entry-type (gethash 'type* entry))
+(defun ebib-format-fields (key fn &optional match-str db)
+  (or db
+      (setq db ebib-cur-db))
+  (let* ((entry (ebib-retrieve-entry key db))
+         (entry-type (gethash 'type* entry))
          (obl-fields (ebib-get-obl-fields entry-type))
          (opt-fields (ebib-get-opt-fields entry-type)))
     (funcall fn (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
@@ -1155,7 +1188,7 @@ If DB is nil, it defaults to the current database."
                                        ebib-hide-hidden-fields)
                             (funcall fn (propertize (format "%-17s " field) 'face 'ebib-field-face))
                             (funcall fn (or
-                                         (ebib-get-field-highlighted field entry match-str)
+                                         (ebib-get-field-highlighted field key match-str)
                                          ""))
                             (funcall fn "\n")))
                       fields))
@@ -1172,13 +1205,12 @@ field contents."
                (edb-keys-list ebib-cur-db) ; does it contain entries?
                (gethash (car (edb-cur-entry ebib-cur-db))
                         (edb-database ebib-cur-db))) ; does the current entry exist?
-      (ebib-format-fields (gethash (car (edb-cur-entry ebib-cur-db))
-                                   (edb-database ebib-cur-db)) 'insert match-str)
+      (ebib-format-fields (car (edb-cur-entry ebib-cur-db))
+                          'insert match-str)
       (setq ebib-current-field 'type*)
       (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
       (goto-char (point-min))
       (ebib-set-fields-highlight))))
-;;      (skip-chars-forward "^ "))))
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
