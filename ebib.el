@@ -1900,7 +1900,8 @@ This function adds a newline to the message being logged."
     (insert (apply 'format  (concat (if (eq type 'error)
                                         (propertize format-string 'face 'font-lock-warning-face)
                                       format-string)
-                                    "\n") args))))
+                                    "\n")
+                   args))))
 
 (defun ebib-load-bibtex-file (&optional file)
   "Loads a BibTeX file into Ebib."
@@ -2025,7 +2026,7 @@ is set to T."
              ;; anything else we report as an unknown entry type.
              (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
                 (ebib-match-paren-forward (point-max)))))
-          (ebib-log 'error "Error: illegal entry type. Skipping"))))
+          (ebib-log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos)))))
     (list n-entries n-strings preamble)))
 
 (defun ebib-read-string ()
@@ -2050,7 +2051,7 @@ database. Returns the string if one was read, nil otherwise."
                         (ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
                                                    (line-number-at-pos) abbr))
                       (ebib-insert-string abbr string ebib-cur-db))))))
-        (ebib-log 'error "Error: illegal string identifier. Skipping")))))
+        (ebib-log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
 
 (defun ebib-read-preamble ()
   "Reads the @PREAMBLE definition and stores it in EBIB-PREAMBLE.
@@ -2088,7 +2089,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
             (when fields             ; if fields were found, we store them, and return T.
               (ebib-insert-entry entry-key fields ebib-cur-db nil timestamp)
               t))))
-      (ebib-log 'error "Error: illegal entry key found. Skipping."))))
+      (ebib-log 'error "Error: illegal entry key found at line %d. Skipping" (line-number-at-pos)))))
 
 (defun ebib-find-bibtex-fields (entry-type limit)
   "Finds the fields of the BibTeX entry that starts on the line POINT is on.
@@ -2122,7 +2123,7 @@ POINT is moved back to the beginning of the line."
                 (let ((field-contents (ebib-read-field-contents limit)))
                   (when field-contents
                     (funcall fn field-type field-contents fields)))))
-            (ebib-log 'error "Error: illegal field name found. Skipping"))))
+            (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos)))))
       (when (> (hash-table-count fields) 0)
         (puthash 'type* entry-type fields)
         fields))))
