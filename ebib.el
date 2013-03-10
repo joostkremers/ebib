@@ -1897,7 +1897,10 @@ This function adds a newline to the message being logged."
       (setq ebib-log-error 1))
      ((eq type 'message)
       (apply 'message format-string args)))
-    (insert (apply 'format  (concat format-string "\n") args))))
+    (insert (apply 'format  (concat (if (eq type 'error)
+                                        (propertize format-string 'face 'font-lock-warning-face)
+                                      format-string)
+                                    "\n") args))))
 
 (defun ebib-load-bibtex-file (&optional file)
   "Loads a BibTeX file into Ebib."
@@ -2003,7 +2006,7 @@ is set to T."
     (goto-char (point-min))
     (while (re-search-forward "^@" nil t) ; find the next entry
       (let ((beg (point)))
-        (when (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
+        (if (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
           (let ((entry-type (downcase (buffer-substring-no-properties beg (point)))))
             (looking-at-goto-end "[[:space:]]*[\(\{]")
             (cond
@@ -2021,7 +2024,8 @@ is set to T."
                   (setq n-entries (1+ n-entries))))
              ;; anything else we report as an unknown entry type.
              (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
-                (ebib-match-paren-forward (point-max))))))))
+                (ebib-match-paren-forward (point-max)))))
+          (ebib-log 'error "Error: illegal entry type. Skipping"))))
     (list n-entries n-strings preamble)))
 
 (defun ebib-read-string ()
@@ -2034,7 +2038,7 @@ database. Returns the string if one was read, nil otherwise."
                  (point))))
     (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
     (let ((beg (point)))
-      (when (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
+      (if (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
         (if-str (abbr (buffer-substring-no-properties beg (point)))
             (progn
               (skip-chars-forward "^\"{" limit)
@@ -2045,7 +2049,8 @@ database. Returns the string if one was read, nil otherwise."
                     (if (member abbr (edb-strings-list ebib-cur-db))
                         (ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
                                                    (line-number-at-pos) abbr))
-                      (ebib-insert-string abbr string ebib-cur-db))))))))))
+                      (ebib-insert-string abbr string ebib-cur-db))))))
+        (ebib-log 'error "Error: illegal string identifier. Skipping")))))
 
 (defun ebib-read-preamble ()
   "Reads the @PREAMBLE definition and stores it in EBIB-PREAMBLE.
@@ -2072,7 +2077,7 @@ also depends on EBIB-USE-TIMESTAMP.)"
         (beg (progn
                (skip-chars-forward " \n\t\f") ; note the space!
                (point))))
-    (when (looking-at-goto-end (concat "\\("
+    (if (looking-at-goto-end (concat "\\("
                                        ebib-key-regexp
                                        "\\)[ \t\n\f]*,")
                                1)       ; this delimits the entry key
@@ -2082,7 +2087,8 @@ also depends on EBIB-USE-TIMESTAMP.)"
           (let ((fields (ebib-find-bibtex-fields (intern-soft entry-type) entry-limit)))
             (when fields             ; if fields were found, we store them, and return T.
               (ebib-insert-entry entry-key fields ebib-cur-db nil timestamp)
-              t)))))))
+              t))))
+      (ebib-log 'error "Error: illegal entry key found. Skipping."))))
 
 (defun ebib-find-bibtex-fields (entry-type limit)
   "Finds the fields of the BibTeX entry that starts on the line POINT is on.
@@ -2110,12 +2116,13 @@ POINT is moved back to the beginning of the line."
                (eq (char-after) ?,)) ; and make sure we are really on a comma.
         (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
         (let ((beg (point)))
-          (when (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
+          (if (looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
             (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
               (unless (eq field-type 'type*) ; the 'type*' key holds the entry type, so we can't use it
                 (let ((field-contents (ebib-read-field-contents limit)))
                   (when field-contents
-                    (funcall fn field-type field-contents fields))))))))
+                    (funcall fn field-type field-contents fields)))))
+            (ebib-log 'error "Error: illegal field name found. Skipping"))))
       (when (> (hash-table-count fields) 0)
         (puthash 'type* entry-type fields)
         fields))))
