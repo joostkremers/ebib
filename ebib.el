@@ -66,22 +66,22 @@
 (defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
 
 (defcustom ebib-default-type 'article
-  "*The default type for a newly created BibTeX entry."
+  "The default type for a newly created BibTeX entry."
   :group 'ebib
   :type 'symbol)
 
 (defcustom ebib-preload-bib-files nil
-  "*List of .bib files to load automatically when Ebib starts."
+  "List of .bib files to load automatically when Ebib starts."
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
 (defcustom ebib-preload-bib-search-dirs '("~")
-  "*List of directories to search for .bib files to be preloaded."
+  "List of directories to search for .bib files to be preloaded."
   :group 'ebib
   :type '(repeat :tag "Search directories for .bib files" (string :tag "Directory")))
 
 (defcustom ebib-create-backups t
-  "*If set, create a backup file of a .bib file when it is first saved."
+  "If set, create a backup file of a .bib file when it is first saved."
   :group 'ebib
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
@@ -94,12 +94,12 @@
                                     file
                                     timestamp
                                     doi)
-  "*List of the additional fields."
+  "List of the additional fields."
   :group 'ebib
   :type '(repeat (symbol :tag "Field")))
 
 (defcustom ebib-layout 'full
-  "*Ebib window layout.
+  "Ebib window layout.
 Full width: Ebib occupies the entire Emacs frame.
 Custom width: Ebib occupies the right side of the Emacs frame,
 with the left side free for another window."
@@ -108,23 +108,23 @@ with the left side free for another window."
                  (const :tag "Custom width" custom)))
 
 (defcustom ebib-width 80
-  "*Width of the Ebib windows.
+  "Width of the Ebib windows.
 Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :group 'ebib
   :type 'integer)
 
 (defcustom ebib-index-window-size 10
-  "*The number of lines used for the index buffer window."
+  "The number of lines used for the index buffer window."
   :group 'ebib
   :type 'integer)
 
 (defcustom ebib-index-display-fields nil
-  "*List of the fields to display in the index buffer."
+  "List of the fields to display in the index buffer."
   :group 'ebib
   :type '(repeat (symbol :tag "Index Field")))
 
 (defcustom ebib-uniquify-keys nil
-  "*Create unique keys.
+  "Create unique keys.
 If set, Ebib will not complain about duplicate keys but will
 instead create a unique key by adding an identifier to it.
 Identifiers are created from consecutive letters of the
@@ -133,7 +133,7 @@ alphabet, starting with `b'."
   :type 'boolean)
 
 (defcustom ebib-autogenerate-keys nil
-  "*If set, Ebib generates key automatically.
+  "If set, Ebib generates key automatically.
 Uses the function BIBTEX-GENERATE-AUTOKEY, see there for
 customization options."
   :group 'ebib
@@ -147,7 +147,7 @@ customization options."
                                      (("text" "@%K%< [%A]%>")
                                       ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
                                       ("year" "[-@%K%< %A%>]"))))
-  "*A list of format strings to insert a citation into a buffer.
+  "A list of format strings to insert a citation into a buffer.
 These are used with EBIB-INSERT-BIBTEX-KEY and
 EBIB-PUSH-BIBTEX-KEY."
   :group 'ebib
@@ -157,26 +157,26 @@ EBIB-PUSH-BIBTEX-KEY."
                                      (string :tag "Format string"))))))
 
 (defcustom ebib-multiline-major-mode 'text-mode
-  "*The major mode of the multiline edit buffer."
+  "The major mode of the multiline edit buffer."
   :group 'ebib
   :type '(function :tag "Mode function"))
 
 (defcustom ebib-sort-order nil
-  "*The fields on which the BibTeX entries are to be sorted in the .bib file.
+  "The fields on which the BibTeX entries are to be sorted in the .bib file.
 Sorting is done on different sort levels, and each sort level contains one
 or more sort keys."
   :group 'ebib
   :type '(repeat (repeat :tag "Sort level" (symbol :tag "Sort field"))))
 
 (defcustom ebib-save-xrefs-first nil
-  "*If true, entries with a crossref field will be saved first in the .bib-file.
+  "If true, entries with a crossref field will be saved first in the .bib-file.
 Setting this option has unpredictable results for the sort order
 of entries, so it is not compatible with setting the Sort Order option."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-use-timestamp nil
-  "*If true, new entries will get a time stamp.
+  "If true, new entries will get a time stamp.
 The time stamp will be stored in a field \"timestamp\" that can
 be made visible with the command \\[ebib-toggle-hidden] in the
 index buffer."
@@ -184,14 +184,14 @@ index buffer."
   :type 'boolean)
 
 (defcustom ebib-timestamp-format "%a %b %e %T %Y"
-  "*Format of the time string used in the timestamp.
+  "Format of the time string used in the timestamp.
 The format is passed unmodified to FORMAT-TIME-STRING, see the
 documentation of that function for details."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-standard-url-field 'url
-  "*Standard field to store urls in.
+  "Standard field to store urls in.
 In the index buffer, the command ebib-browse-url can be used to
 send a url to a browser. This option sets the field from which
 this command extracts the url."
@@ -199,19 +199,19 @@ this command extracts the url."
   :type 'symbol)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
-  "*Regular expression to extract urls from a field."
+  "Regular expression to extract urls from a field."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-browser-command ""
-  "*Command to call the browser with.
+  "Command to call the browser with.
 GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
   :type '(string :tag "Browser command"))
 
 (defcustom ebib-standard-doi-field 'doi
-  "*Standard field to store a DOI (digital object identifier) in.
+  "Standard field to store a DOI (digital object identifier) in.
 In the index buffer, the command ebib-browse-doi can be used to
 send a suitable url to a browser. This option sets the field from
 which this command extracts the doi."
@@ -219,13 +219,13 @@ which this command extracts the doi."
   :type 'symbol)
 
 (defcustom ebib-doi-url "http://dx.doi.org/%s"
-  "*URL for opening a doi.
+  "URL for opening a doi.
 This value must contain one `%s', which will be replaced with the doi."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-standard-file-field 'file
-  "*Standard field to store filenames in.
+  "Standard field to store filenames in.
 In the index buffer, the command ebib-view-file can be used to
 view a file externally. This option sets the field from which
 this command extracts the filename."
@@ -234,7 +234,7 @@ this command extracts the filename."
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
-  "*List of file associations.
+  "List of file associations.
 Lists file extensions together with external programs to handle
 files with those extensions. If the external program is left
 blank, Ebib tries to handle the file internally in
@@ -244,54 +244,54 @@ Emacs (e.g. with doc-view-mode)."
                        (string :tag "Extension") (string :tag "Command"))))
 
 (defcustom ebib-file-regexp "[^?|\\:*<>\" \n\t\f]+"
-  "*Regular expression to extract filenames from a field."
+  "Regular expression to extract filenames from a field."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-file-search-dirs '("~")
-  "*List of directories to search when viewing external files."
+  "List of directories to search when viewing external files."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
 (defcustom ebib-print-preamble nil
-  "*Preamble used for the LaTeX file for printing the database.
+  "Preamble used for the LaTeX file for printing the database.
 Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
 
 (defcustom ebib-print-newpage nil
-  "*If set, each entry is printed on a separate page."
+  "If set, each entry is printed on a separate page."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-print-multiline nil
-  "*If set, multiline fields are included when printing the database."
+  "If set, multiline fields are included when printing the database."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-latex-preamble '("\\bibliographystyle{plain}")
-  "*Preamble used for the LaTeX file for BibTeXing the database.
+  "Preamble used for the LaTeX file for BibTeXing the database.
 Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
 
 (defcustom ebib-print-tempfile ""
-  "*Temporary file for use with EBIB-PRINT-DATABASE and EBIB-LATEX-DATABASE."
+  "Temporary file for use with EBIB-PRINT-DATABASE and EBIB-LATEX-DATABASE."
   :group 'ebib
   :type '(file))
 
 (defcustom ebib-allow-identical-fields nil
-  "*If set, Ebib handles multiple occurrences of a field gracefully."
+  "If set, Ebib handles multiple occurrences of a field gracefully."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-keywords-list nil
-  "*General list of keywords."
+  "General list of keywords."
   :group 'ebib
   :type '(repeat (string :tag "Keyword")))
 
 (defcustom ebib-keywords-file ""
-  "*Single or generic file name for storing keywords.
+  "Single or generic file name for storing keywords.
 Keywords can be stored in a single keywords file, which is used
 for all .bib files, or in per-directory keywords files located in
 the same directories as the .bib files.  In the latter case, the
@@ -301,7 +301,7 @@ keywords file should specify just the generic name and no path."
                  (string :value "ebib-keywords.txt" :tag "Use per-directory keywords file")))
 
 (defcustom ebib-keywords-file-save-on-exit 'ask
-  "*Action to take when new keywords are added during a session.
+  "Action to take when new keywords are added during a session.
 This option only makes sense if `ebib-keywords-file' is set."
   :group 'ebib
   :type '(choice (const :tag "Always save on exit" always)
@@ -309,7 +309,7 @@ This option only makes sense if `ebib-keywords-file' is set."
                  (const :tag "Ask whether to save" ask)))
 
 (defcustom ebib-keywords-use-only-file nil
-  "*Whether or not to use only keywords from the keywords file.
+  "Whether or not to use only keywords from the keywords file.
 If both `ebib-keywords-list' and `ebib-keywords-file' are set,
 should the file take precedence or should both sets of keywords
 be combined?
@@ -321,25 +321,25 @@ For .bib files that do not have an associated keywords file,
                  (const :tag "Use keywords file and list" nil)))
 
 (defcustom ebib-keywords-separator "; "
-  "*String for separating keywords in the keywords field."
+  "String for separating keywords in the keywords field."
   :group 'ebib
   :type '(string :tag "Keyword separator:"))
 
 (defcustom ebib-rc-file "~/.ebibrc"
-  "*Customization file for Ebib.
+  "Customization file for Ebib.
 This file is read when Ebib is started. It can be used to define custom keys or set custimzation variables (though the latter is easier through Customize)."
   :group 'ebib
   :type '(file :tag "Customization file:"))
 
 (defcustom ebib-keywords-field-keep-sorted nil
-  "*Keep the keywords field sorted in alphabetical order.
+  "Keep the keywords field sorted in alphabetical order.
 Also automatically remove duplicates."
   :group 'ebib
   :type '(choice (const :tag "Sort keywords field" t)
                  (const :tag "Do not sort keywords field" nil)))
 
 (defcustom ebib-biblatex-inheritance nil
-  "*Inheritance scheme for cross-referencing.
+  "Inheritance scheme for cross-referencing.
 Inheritances are specified per entry type. The source is the
 field name in the cross-referencing entry, the target the field
 in the cross-referenced entry.
@@ -438,17 +438,17 @@ entry-specific inheritances, the latter override the former."
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
 (defface ebib-crossref-face '((t (:foreground "red")))
-  "*Face used to indicate values inherited from crossreferenced entries."
+  "Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib-faces)
 
 (defface ebib-marked-face (if (featurep 'xemacs)
                               '((t (:foreground "white" :background "red")))
                             '((t (:inverse-video t))))
-  "*Face to indicate marked entries."
+  "Face to indicate marked entries."
   :group 'ebib-faces)
 
 (defface ebib-field-face '((t (:inherit font-lock-keyword-face)))
-  "*Face for field names."
+  "Face for field names."
   :group 'ebib-faces)
 
 ;; generic for all databases
