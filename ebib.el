@@ -954,9 +954,9 @@ matching entry is returned."
     nil)) ; if no entry was found, we must return nil
 
 (defun ebib-erase-buffer (buffer)
-  (set-buffer buffer)
-  (with-buffer-writable
-    (erase-buffer)))
+  (with-current-buffer buffer
+    (with-buffer-writable
+      (erase-buffer))))
 
 (defun ebib-make-highlight (begin end buffer)
   (let (highlight)
@@ -990,78 +990,78 @@ matching entry is returned."
     (delete-overlay highlight)))
 
 (defun ebib-set-index-highlight ()
-  (set-buffer ebib-index-buffer)
-  (beginning-of-line)
-  (let ((beg (point)))
-    (if ebib-index-display-fields
-        (end-of-line)
-      (skip-chars-forward "^ "))
-    (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)
-    (beginning-of-line)))
+  (with-current-buffer ebib-index-buffer
+    (beginning-of-line)
+    (let ((beg (point)))
+      (if ebib-index-display-fields
+          (end-of-line)
+        (skip-chars-forward "^ "))
+      (ebib-move-highlight ebib-index-highlight beg (point) ebib-index-buffer)
+      (beginning-of-line))))
 
 (defun ebib-set-fields-highlight ()
-  (set-buffer ebib-entry-buffer)
-  (beginning-of-line)
-  (let ((beg (point)))
-    (looking-at-goto-end "[^ \t\n\f]*")
-    (ebib-move-highlight ebib-fields-highlight beg (point) ebib-entry-buffer)
-    (beginning-of-line)))
+  (with-current-buffer ebib-entry-buffer
+    (beginning-of-line)
+    (let ((beg (point)))
+      (looking-at-goto-end "[^ \t\n\f]*")
+      (ebib-move-highlight ebib-fields-highlight beg (point) ebib-entry-buffer)
+      (beginning-of-line))))
 
 (defun ebib-set-strings-highlight ()
-  (set-buffer ebib-strings-buffer)
-  (beginning-of-line)
-  (let ((beg (point)))
-    (looking-at-goto-end "[^ \t\n\f]*")
-    (ebib-move-highlight ebib-strings-highlight beg (point) ebib-strings-buffer)
-    (beginning-of-line)))
+  (with-current-buffer ebib-strings-buffer
+    (beginning-of-line)
+    (let ((beg (point)))
+      (looking-at-goto-end "[^ \t\n\f]*")
+      (ebib-move-highlight ebib-strings-highlight beg (point) ebib-strings-buffer)
+      (beginning-of-line))))
 
 (defun ebib-display-entry (entry-key)
   "Displays ENTRY-KEY in the index buffer at POINT."
-  (set-buffer ebib-index-buffer)
-  (insert (format "%-30s %s\n"
-                  entry-key
-                  (if ebib-index-display-fields
-                      (let ((cur-entry-hash (ebib-retrieve-entry entry-key ebib-cur-db)))
-                        (mapconcat #'(lambda (field)
-                                       (or
-                                        (to-raw (gethash field cur-entry-hash))
-                                        ""))
-                                   ebib-index-display-fields
-                                   "  "))
-                    ""))))
+  (with-current-buffer ebib-index-buffer
+    (insert (format "%-30s %s\n"
+                    entry-key
+                    (if ebib-index-display-fields
+                        (let ((cur-entry-hash (ebib-retrieve-entry entry-key ebib-cur-db)))
+                          (mapconcat #'(lambda (field)
+                                         (or
+                                          (to-raw (gethash field cur-entry-hash))
+                                          ""))
+                                     ebib-index-display-fields
+                                     "  "))
+                      "")))))
 
 (defun ebib-redisplay-current-field ()
   "Redisplays the contents of the current field in the entry buffer."
-  (set-buffer ebib-entry-buffer)
-  (if (eq ebib-current-field 'crossref)
-      (progn
-        (ebib-fill-entry-buffer)
-        (setq ebib-current-field 'crossref)
-        (re-search-forward "^crossref")
-        (ebib-set-fields-highlight))
-    (with-buffer-writable
-      (goto-char (ebib-highlight-start ebib-fields-highlight))
-      (let ((beg (point)))
-        (end-of-line)
-        (delete-region beg (point)))
-      (insert (propertize (format "%-17s " (symbol-name ebib-current-field)) 'face 'ebib-field-face)
-              (ebib-get-field-highlighted ebib-current-field (ebib-cur-entry-key)))
-      (ebib-set-fields-highlight))))
+  (with-current-buffer ebib-entry-buffer
+    (if (eq ebib-current-field 'crossref)
+        (progn
+          (ebib-fill-entry-buffer)
+          (setq ebib-current-field 'crossref)
+          (re-search-forward "^crossref")
+          (ebib-set-fields-highlight))
+      (with-buffer-writable
+        (goto-char (ebib-highlight-start ebib-fields-highlight))
+        (let ((beg (point)))
+          (end-of-line)
+          (delete-region beg (point)))
+        (insert (propertize (format "%-17s " (symbol-name ebib-current-field)) 'face 'ebib-field-face)
+                (ebib-get-field-highlighted ebib-current-field (ebib-cur-entry-key)))
+        (ebib-set-fields-highlight)))))
 
 (defun ebib-redisplay-current-string ()
   "Redisplays the current string definition in the strings buffer."
-  (set-buffer ebib-strings-buffer)
-  (with-buffer-writable
-    (let ((str (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
-      (goto-char (ebib-highlight-start ebib-strings-highlight))
-      (let ((beg (point)))
-        (end-of-line)
-        (delete-region beg (point)))
-      (insert (format "%-18s %s" ebib-current-string
-                      (if (multiline-p str)
-                          (concat "+" (first-line str))
-                        (concat " " str))))
-      (ebib-set-strings-highlight))))
+  (with-current-buffer ebib-strings-buffer
+    (with-buffer-writable
+      (let ((str (to-raw (gethash ebib-current-string (edb-strings ebib-cur-db)))))
+        (goto-char (ebib-highlight-start ebib-strings-highlight))
+        (let ((beg (point)))
+          (end-of-line)
+          (delete-region beg (point)))
+        (insert (format "%-18s %s" ebib-current-string
+                        (if (multiline-p str)
+                            (concat "+" (first-line str))
+                          (concat " " str))))
+        (ebib-set-strings-highlight)))))
 
 (defun ebib-move-to-field (field direction)
   "Moves the fields overlay to the line containing FIELD.
@@ -1073,20 +1073,20 @@ overlay is not moved.  FIELD must be a symbol."
 
   ;;Note: this function does NOT change the value of EBIB-CURRENT-FIELD!
 
-  (set-buffer ebib-entry-buffer)
-  (if (eq field 'type*)
-      (goto-char (point-min))
-    (multiple-value-bind (fn start limit) (if (>= direction 0)
-                                              (values 're-search-forward (point-min) (point-max))
-                                            (values 're-search-backward (point-max) (point-min)))
-      ;; make sure we can get back to our original position, if the field
-      ;; cannot be found in the buffer:
-      (let ((current-pos (point)))
-        (when (eq (logand direction 1) 0) ; if direction is even
-          (goto-char start))
-        (unless (funcall fn (concat "^" (symbol-name field)) limit t)
-          (goto-char current-pos)))))
-  (ebib-set-fields-highlight))
+  (with-current-buffer ebib-entry-buffer
+    (if (eq field 'type*)
+        (goto-char (point-min))
+      (multiple-value-bind (fn start limit) (if (>= direction 0)
+                                                (values 're-search-forward (point-min) (point-max))
+                                              (values 're-search-backward (point-max) (point-min)))
+        ;; make sure we can get back to our original position, if the field
+        ;; cannot be found in the buffer:
+        (let ((current-pos (point)))
+          (when (eq (logand direction 1) 0) ; if direction is even
+            (goto-char start))
+          (unless (funcall fn (concat "^" (symbol-name field)) limit t)
+            (goto-char current-pos)))))
+    (ebib-set-fields-highlight)))
 
 (defun ebib-create-collection (hashtable)
   "Creates a list from the keys in HASHTABLE that can be used as COLLECTION in COMPLETING-READ.
@@ -1198,19 +1198,19 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
   "Fills the entry buffer with the fields of the current entry.
 MATCH-STRING is a regexp that will be highlighted when it occurs in the
 field contents."
-  (set-buffer ebib-entry-buffer)
-  (with-buffer-writable
-    (erase-buffer)
-    (when (and ebib-cur-db ; do we have a database?
-               (edb-keys-list ebib-cur-db) ; does it contain entries?
-               (gethash (car (edb-cur-entry ebib-cur-db))
-                        (edb-database ebib-cur-db))) ; does the current entry exist?
-      (ebib-format-fields (car (edb-cur-entry ebib-cur-db))
-                          'insert match-str)
-      (setq ebib-current-field 'type*)
-      (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
-      (goto-char (point-min))
-      (ebib-set-fields-highlight))))
+  (with-current-buffer ebib-entry-buffer
+    (with-buffer-writable
+      (erase-buffer)
+      (when (and ebib-cur-db               ; do we have a database?
+                 (edb-keys-list ebib-cur-db) ; does it contain entries?
+                 (gethash (car (edb-cur-entry ebib-cur-db))
+                          (edb-database ebib-cur-db))) ; does the current entry exist?
+        (ebib-format-fields (car (edb-cur-entry ebib-cur-db))
+                            'insert match-str)
+        (setq ebib-current-field 'type*)
+        (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
+        (goto-char (point-min))
+        (ebib-set-fields-highlight)))))
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
@@ -1568,10 +1568,10 @@ whether the index and entry buffer must be redisplayed."
         (if exists?
             (progn
               (setf (edb-cur-entry ebib-cur-db) exists?)
-              (set-buffer ebib-index-buffer)
-              (goto-char (point-min))
-              (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-              (ebib-select-entry))
+              (with-current-buffer ebib-index-buffer
+                (goto-char (point-min))
+                (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+                (ebib-select-entry)))
           (message "No entry `%s' in current database " key))))))
 
 (defun ebib-setup-windows ()
@@ -1618,27 +1618,27 @@ buffers and reads the rc file."
   ;; have a name beginning with a space, because undo-info is normally
   ;; present in an edit buffer.
   (setq ebib-multiline-buffer (get-buffer-create "*Ebib-edit*"))
-  (set-buffer ebib-multiline-buffer)
-  (funcall ebib-multiline-major-mode)
-  (ebib-multiline-mode t)
+  (with-current-buffer ebib-multiline-buffer
+    (funcall ebib-multiline-major-mode)
+    (ebib-multiline-mode t))
   ;; then we create a buffer to hold the fields of the current entry.
   (setq ebib-entry-buffer (get-buffer-create " *Ebib-entry*"))
-  (set-buffer ebib-entry-buffer)
-  (ebib-entry-mode)
+  (with-current-buffer ebib-entry-buffer
+    (ebib-entry-mode))
   ;; then we create a buffer to hold the @STRING definitions
   (setq ebib-strings-buffer (get-buffer-create " *Ebib-strings*"))
-  (set-buffer ebib-strings-buffer)
-  (ebib-strings-mode)
+  (with-current-buffer ebib-strings-buffer
+    (ebib-strings-mode))
   ;; the log buffer
   (setq ebib-log-buffer (get-buffer-create " *Ebib-log*"))
-  (set-buffer ebib-log-buffer)
-  (erase-buffer)
-  (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
-  (ebib-log-mode)
+  (with-current-buffer ebib-log-buffer
+    (erase-buffer)
+    (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
+    (ebib-log-mode))
   ;; and lastly we create a buffer for the entry keys.
   (setq ebib-index-buffer (get-buffer-create " none"))
-  (set-buffer ebib-index-buffer)
-  (ebib-index-mode))
+  (with-current-buffer ebib-index-buffer
+    (ebib-index-mode)))
 
 (defun ebib-quit ()
   "Quits Ebib.
@@ -1868,34 +1868,34 @@ keywords when Emacs is killed."
   "Fills the index buffer with the list of keys in EBIB-CUR-DB.
 If EBIB-CUR-DB is nil, the buffer is just erased and its name set
 to \"none\"."
-  (set-buffer ebib-index-buffer)
-  (let ((buffer-read-only nil))
-    (erase-buffer)
-    (if ebib-cur-db
-        (progn
-          ;; we may call this function when there are no entries in the
-          ;; database. if so, we don't need to do this:
-          (when (edb-cur-entry ebib-cur-db)
-            (mapc #'(lambda (entry)
-                      (ebib-display-entry entry)
-                      (when (member entry (edb-marked-entries ebib-cur-db))
-                        (save-excursion
-                          (let ((beg (progn
-                                       (beginning-of-line)
-                                       (forward-line -1)
-                                       (point))))
-                            (skip-chars-forward "^ ")
-                            (add-text-properties beg (point) '(face ebib-marked-face))))))
-                  (edb-keys-list ebib-cur-db))
-            (goto-char (point-min))
-            (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-            (beginning-of-line)
-            (ebib-set-index-highlight))
-          (set-buffer-modified-p (edb-modified ebib-cur-db))
-          (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                       (length (member ebib-cur-db ebib-databases)))))
-                                 (edb-name ebib-cur-db))))
-      (rename-buffer " none"))))
+  (with-current-buffer ebib-index-buffer
+    (let ((buffer-read-only nil))
+      (erase-buffer)
+      (if ebib-cur-db
+          (progn
+            ;; we may call this function when there are no entries in the
+            ;; database. if so, we don't need to do this:
+            (when (edb-cur-entry ebib-cur-db)
+              (mapc #'(lambda (entry)
+                        (ebib-display-entry entry)
+                        (when (member entry (edb-marked-entries ebib-cur-db))
+                          (save-excursion
+                            (let ((beg (progn
+                                         (beginning-of-line)
+                                         (forward-line -1)
+                                         (point))))
+                              (skip-chars-forward "^ ")
+                              (add-text-properties beg (point) '(face ebib-marked-face))))))
+                    (edb-keys-list ebib-cur-db))
+              (goto-char (point-min))
+              (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+              (beginning-of-line)
+              (ebib-set-index-highlight))
+            (set-buffer-modified-p (edb-modified ebib-cur-db))
+            (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                         (length (member ebib-cur-db ebib-databases)))))
+                                   (edb-name ebib-cur-db))))
+        (rename-buffer " none")))))
 
 (defun ebib-customize ()
   "Switches to Ebib's customisation group."
@@ -2254,22 +2254,22 @@ buffer if Ebib is not occupying the entire frame."
                (if ebib-uniquify-keys
                    (setq entry-key (ebib-uniquify-key entry-key))
                  (error "Key already exists")))
-           (set-buffer ebib-index-buffer)
-           (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
-           ;; we create the hash table *before* the call to
-           ;; ebib-display-entry, because that function refers to the
-           ;; hash table if ebib-index-display-fields is set.
-           (let ((fields (make-hash-table)))
-             (puthash 'type* ebib-default-type fields)
-             (ebib-insert-entry entry-key fields ebib-cur-db t t))
-           (with-buffer-writable
-             (ebib-display-entry entry-key))
-           (forward-line -1) ; move one line up to position the cursor on the new entry.
-           (ebib-set-index-highlight)
-           (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
-           (ebib-fill-entry-buffer)
-           (ebib-edit-entry)
-           (ebib-set-modified t))))
+           (with-current-buffer ebib-index-buffer
+             (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
+             ;; we create the hash table *before* the call to
+             ;; ebib-display-entry, because that function refers to the
+             ;; hash table if ebib-index-display-fields is set.
+             (let ((fields (make-hash-table)))
+               (puthash 'type* ebib-default-type fields)
+               (ebib-insert-entry entry-key fields ebib-cur-db t t))
+             (with-buffer-writable
+               (ebib-display-entry entry-key))
+             (forward-line -1) ; move one line up to position the cursor on the new entry.
+             (ebib-set-index-highlight)
+             (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
+             (ebib-fill-entry-buffer)
+             (ebib-edit-entry)
+             (ebib-set-modified t)))))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
     ((default)
@@ -2328,19 +2328,19 @@ generate the key, see that function's documentation for details."
            ;; otherwise, we have to clean up a little and empty all the buffers.
            (setq ebib-cur-db nil)
            (mapc #'(lambda (buf) ; this is just to avoid typing almost the same thing three times...
-                     (set-buffer (car buf))
-                     (with-buffer-writable
-                       (erase-buffer))
-                     (ebib-delete-highlight (cadr buf)))
+                     (with-current-buffer (car buf)
+                       (with-buffer-writable
+                         (erase-buffer))
+                       (ebib-delete-highlight (cadr buf))))
                  (list (list ebib-entry-buffer ebib-fields-highlight)
                        (list ebib-index-buffer ebib-index-highlight)
                        (list ebib-strings-buffer ebib-strings-highlight)))
            ;; multiline edit buffer
-           (set-buffer ebib-multiline-buffer)
-           (with-buffer-writable
-             (erase-buffer))
-           (set-buffer ebib-index-buffer)
-           (rename-buffer " none"))
+           (with-current-buffer ebib-multiline-buffer
+             (with-buffer-writable
+               (erase-buffer)))
+           (with-current-buffer ebib-index-buffer
+             (rename-buffer " none")))
          (message "Database closed."))))))
 
 (defun ebib-goto-first-entry ()
@@ -2349,10 +2349,10 @@ generate the key, see that function's documentation for details."
   (ebib-execute-when
     ((entries)
      (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-     (set-buffer ebib-index-buffer)
-     (goto-char (point-min))
-     (ebib-set-index-highlight)
-     (ebib-fill-entry-buffer))
+     (with-current-buffer ebib-index-buffer
+       (goto-char (point-min))
+       (ebib-set-index-highlight)
+       (ebib-fill-entry-buffer)))
     ((default)
      (beep))))
 
@@ -2362,11 +2362,11 @@ generate the key, see that function's documentation for details."
   (ebib-execute-when
     ((entries)
      (setf (edb-cur-entry ebib-cur-db) (last (edb-keys-list ebib-cur-db)))
-     (set-buffer ebib-index-buffer)
-     (goto-char (point-min))
-     (forward-line (1- (edb-n-entries ebib-cur-db)))
-     (ebib-set-index-highlight)
-     (ebib-fill-entry-buffer))
+     (with-current-buffer ebib-index-buffer
+       (goto-char (point-min))
+       (forward-line (1- (edb-n-entries ebib-cur-db)))
+       (ebib-set-index-highlight)
+       (ebib-fill-entry-buffer)))
     ((default)
      (beep))))
 
@@ -2431,21 +2431,21 @@ generate the key, see that function's documentation for details."
          (beep)))
     (ebib-execute-when
       ((entries)
-       (set-buffer ebib-index-buffer)
-       (with-buffer-writable
-         (if (member (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db))
-             (progn
-               (setf (edb-marked-entries ebib-cur-db)
-                     (delete (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db)))
-               (remove-text-properties (ebib-highlight-start ebib-index-highlight)
-                                       (ebib-highlight-end ebib-index-highlight)
-                                       '(face ebib-marked-face)))
-           (setf (edb-marked-entries ebib-cur-db) (sort (cons (ebib-cur-entry-key)
-                                                              (edb-marked-entries ebib-cur-db))
-                                                        'string<))
-           (add-text-properties (ebib-highlight-start ebib-index-highlight)
-                                (ebib-highlight-end ebib-index-highlight)
-                                '(face ebib-marked-face)))))
+       (with-current-buffer ebib-index-buffer
+         (with-buffer-writable
+           (if (member (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db))
+               (progn
+                 (setf (edb-marked-entries ebib-cur-db)
+                       (delete (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db)))
+                 (remove-text-properties (ebib-highlight-start ebib-index-highlight)
+                                         (ebib-highlight-end ebib-index-highlight)
+                                         '(face ebib-marked-face)))
+             (setf (edb-marked-entries ebib-cur-db) (sort (cons (ebib-cur-entry-key)
+                                                                (edb-marked-entries ebib-cur-db))
+                                                          'string<))
+             (add-text-properties (ebib-highlight-start ebib-index-highlight)
+                                  (ebib-highlight-end ebib-index-highlight)
+                                  '(face ebib-marked-face))))))
       ((default)
        (beep)))))
 
@@ -2853,12 +2853,12 @@ current entry."
          (if (null cur-search-entry)
              (message (format "`%s' not found" ebib-search-string))
            (setf (edb-cur-entry ebib-cur-db) cur-search-entry)
-           (set-buffer ebib-index-buffer)
-           (goto-char (point-min))
-           (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-           (beginning-of-line)
-           (ebib-set-index-highlight)
-           (ebib-fill-entry-buffer ebib-search-string)))))
+           (with-current-buffer ebib-index-buffer
+             (goto-char (point-min))
+             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+             (beginning-of-line)
+             (ebib-set-index-highlight)
+             (ebib-fill-entry-buffer ebib-search-string))))))
     ((default)
      (beep))))
 
@@ -3915,19 +3915,19 @@ The deleted text is not put in the kill ring."
 
 (defun ebib-fill-strings-buffer ()
   "Fills the strings buffer with the @STRING definitions."
-  (set-buffer ebib-strings-buffer)
-  (with-buffer-writable
-    (erase-buffer)
-    (dolist (elem (edb-strings-list ebib-cur-db))
-      (let ((str (to-raw (gethash elem (edb-strings ebib-cur-db)))))
-        (insert (format "%-18s %s\n" elem
-                        (if (multiline-p str)
-                            (concat "+" (first-line str))
-                          (concat " " str)))))))
-  (goto-char (point-min))
-  (setq ebib-current-string (car (edb-strings-list ebib-cur-db)))
-  (ebib-set-strings-highlight)
-  (set-buffer-modified-p nil))
+  (with-current-buffer ebib-strings-buffer
+    (with-buffer-writable
+      (erase-buffer)
+      (dolist (elem (edb-strings-list ebib-cur-db))
+        (let ((str (to-raw (gethash elem (edb-strings ebib-cur-db)))))
+          (insert (format "%-18s %s\n" elem
+                          (if (multiline-p str)
+                              (concat "+" (first-line str))
+                            (concat " " str)))))))
+    (goto-char (point-min))
+    (setq ebib-current-string (car (edb-strings-list ebib-cur-db)))
+    (ebib-set-strings-highlight)
+    (set-buffer-modified-p nil)))
 
 (defun ebib-edit-string ()
   "Edits the value of an @STRING definition
