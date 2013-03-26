@@ -975,6 +975,13 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 \noindent The width of the Ebib windows when `ebib-layout` is set to `custom`.
 
 
+### Vertical Window Split ###
+
+**Default value**: off.\
+
+\noindent Normally, the index buffer is displayed at the top of the Emacs frame. If this option is set, the index buffer is displayed on the left.
+
+
 ### Index Window Size ###
 
 **Default value**: 10.\

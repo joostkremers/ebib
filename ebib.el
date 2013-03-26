@@ -108,13 +108,9 @@ with the left side free for another window."
                  (const :tag "Custom width" custom)))
 
 (defcustom ebib-window-vertical-split nil
-  "If non-nil, splits ebib windows side by side(following way).
-         +---+-------------+
-         |   |             |
-         |   |             |
-         |   |             |
-         |   |             |
-         +---+-------------+"
+  "If non-nil, split Ebib windows side by side.
+If you set this option, you should probably set
+`ebib-index-window-size' to a larger value."
   :group 'ebib
   :type 'boolean)
 
@@ -125,7 +121,9 @@ Only takes effect if EBIB-LAYOUT is set to CUSTOM."
   :type 'integer)
 
 (defcustom ebib-index-window-size 10
-  "The number of lines used for the index buffer window."
+  "The size of the index buffer window.
+This is either the height of the window, or, if
+`ebib-window-vertical-split' is set, the width of the window."
   :group 'ebib
   :type 'integer)
 

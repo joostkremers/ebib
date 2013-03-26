@@ -2225,6 +2225,7 @@ buffer.
 * Additional Fields::
 * Layout::
 * Width::
+* Vertical Window Split::
 * Index Window Size::
 * Index Display Fields::
 * Uniquify Keys::
@@ -2342,37 +2343,44 @@ File: ebib.info,  Node: Layout,  Next: Width,  Prev: Additional Fields,  Up: The
 
 *Default value*: `full'.
 
-File: ebib.info,  Node: Width,  Next: Index Window Size,  Prev: Layout,  Up: The Customisation Buffer
+File: ebib.info,  Node: Width,  Next: Vertical Window Split,  Prev: Layout,  Up: The Customisation Buffer
 
 5.1.13 Width
 ------------
 
 *Default value*: 80.
 
-File: ebib.info,  Node: Index Window Size,  Next: Index Display Fields,  Prev: Width,  Up: The Customisation Buffer
+File: ebib.info,  Node: Vertical Window Split,  Next: Index Window Size,  Prev: Width,  Up: The Customisation Buffer
 
-5.1.14 Index Window Size
+5.1.14 Vertical Window Split
+----------------------------
+
+*Default value*: off.
+
+File: ebib.info,  Node: Index Window Size,  Next: Index Display Fields,  Prev: Vertical Window Split,  Up: The Customisation Buffer
+
+5.1.15 Index Window Size
 ------------------------
 
 *Default value*: 10.
 
 File: ebib.info,  Node: Index Display Fields,  Next: Uniquify Keys,  Prev: Index Window Size,  Up: The Customisation Buffer
 
-5.1.15 Index Display Fields
+5.1.16 Index Display Fields
 ---------------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Uniquify Keys,  Next: Autogenerate Keys,  Prev: Index Display Fields,  Up: The Customisation Buffer
 
-5.1.16 Uniquify Keys
+5.1.17 Uniquify Keys
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Autogenerate Keys,  Next: Citation Commands,  Prev: Uniquify Keys,  Up: The Customisation Buffer
 
-5.1.17 Autogenerate Keys
+5.1.18 Autogenerate Keys
 ------------------------
 
 *Default value*: `nil'.
@@ -2383,7 +2391,7 @@ described in its documentation string.
 
 File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: Autogenerate Keys,  Up: The Customisation Buffer
 
-5.1.18 Citation Commands
+5.1.19 Citation Commands
 ------------------------
 
 *Default value*:
@@ -2530,35 +2538,35 @@ strings.
 
 File: ebib.info,  Node: Multiline Major Mode,  Next: Sort Order,  Prev: Citation Commands,  Up: The Customisation Buffer
 
-5.1.19 Multiline Major Mode
+5.1.20 Multiline Major Mode
 ---------------------------
 
 *Default value*: `text-mode'.
 
 File: ebib.info,  Node: Sort Order,  Next: Save Xrefs First,  Prev: Multiline Major Mode,  Up: The Customisation Buffer
 
-5.1.20 Sort Order
+5.1.21 Sort Order
 -----------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Save Xrefs First,  Next: Crossref Face,  Prev: Sort Order,  Up: The Customisation Buffer
 
-5.1.21 Save Xrefs First
+5.1.22 Save Xrefs First
 -----------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Crossref Face,  Next: Selected Face,  Prev: Save Xrefs First,  Up: The Customisation Buffer
 
-5.1.22 Crossref Face
+5.1.23 Crossref Face
 --------------------
 
 *Default value*: `((t (:foreground "red")))'.
 
 File: ebib.info,  Node: Selected Face,  Next: Use Timestamp,  Prev: Crossref Face,  Up: The Customisation Buffer
 
-5.1.23 Selected Face
+5.1.24 Selected Face
 --------------------
 
 *Default value*:
@@ -2566,35 +2574,35 @@ File: ebib.info,  Node: Selected Face,  Next: Use Timestamp,  Prev: Crossref Fac
 
 File: ebib.info,  Node: Use Timestamp,  Next: Timestamp Format,  Prev: Selected Face,  Up: The Customisation Buffer
 
-5.1.24 Use Timestamp
+5.1.25 Use Timestamp
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Timestamp Format,  Next: Standard Url Field,  Prev: Use Timestamp,  Up: The Customisation Buffer
 
-5.1.25 Timestamp Format
+5.1.26 Timestamp Format
 -----------------------
 
 *Default value*: `"%a %b %e %T %Y"'.
 
 File: ebib.info,  Node: Standard Url Field,  Next: Url Regexp,  Prev: Timestamp Format,  Up: The Customisation Buffer
 
-5.1.26 Standard Url Field
+5.1.27 Standard Url Field
 -------------------------
 
 *Default value*: `url'.
 
 File: ebib.info,  Node: Url Regexp,  Next: Browser Command,  Prev: Standard Url Field,  Up: The Customisation Buffer
 
-5.1.27 Url Regexp
+5.1.28 Url Regexp
 -----------------
 
 *Default value*: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+'.
 
 File: ebib.info,  Node: Browser Command,  Next: Standard Doi Field,  Prev: Url Regexp,  Up: The Customisation Buffer
 
-5.1.28 Browser Command
+5.1.29 Browser Command
 ----------------------
 
 *Default value*: `nil'.
@@ -2604,14 +2612,14 @@ on the command line.
 
 File: ebib.info,  Node: Standard Doi Field,  Next: Doi Url,  Prev: Browser Command,  Up: The Customisation Buffer
 
-5.1.29 Standard Doi Field
+5.1.30 Standard Doi Field
 -------------------------
 
 *Default value*: `doi'.
 
 File: ebib.info,  Node: Doi Url,  Next: Standard File Field,  Prev: Standard Doi Field,  Up: The Customisation Buffer
 
-5.1.30 Doi Url
+5.1.31 Doi Url
 --------------
 
 *Default value*: `http://dx.doi.org/%s'
@@ -2622,14 +2630,14 @@ The URL used to open a DOI. It must contain exactly one instance fo
 
 File: ebib.info,  Node: Standard File Field,  Next: File Associations,  Prev: Doi Url,  Up: The Customisation Buffer
 
-5.1.31 Standard File Field
+5.1.32 Standard File Field
 --------------------------
 
 *Default value*: `file'.
 
 File: ebib.info,  Node: File Associations,  Next: File Regexp,  Prev: Standard File Field,  Up: The Customisation Buffer
 
-5.1.32 File Associations
+5.1.33 File Associations
 ------------------------
 
 *Default value*: `(("pdf" . "xpdf") ("ps" . "gv"))'.
@@ -2641,7 +2649,7 @@ the program field blank for the relevant file type.
 
 File: ebib.info,  Node: File Regexp,  Next: File Search Dirs,  Prev: File Associations,  Up: The Customisation Buffer
 
-5.1.33 File Regexp
+5.1.34 File Regexp
 ------------------
 
 *Default value*: `[^?|\:*<>\" \n\t\f]+'.
@@ -2652,56 +2660,56 @@ advisable to put anything but filenames in the `file' field.
 
 File: ebib.info,  Node: File Search Dirs,  Next: Print Preamble,  Prev: File Regexp,  Up: The Customisation Buffer
 
-5.1.34 File Search Dirs
+5.1.35 File Search Dirs
 -----------------------
 
 *Default value*: `~'.
 
 File: ebib.info,  Node: Print Preamble,  Next: Print Newline,  Prev: File Search Dirs,  Up: The Customisation Buffer
 
-5.1.35 Print Preamble
+5.1.36 Print Preamble
 ---------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Print Newline,  Next: Print Multiline,  Prev: Print Preamble,  Up: The Customisation Buffer
 
-5.1.36 Print Newline
+5.1.37 Print Newline
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Print Multiline,  Next: Latex Preamble,  Prev: Print Newline,  Up: The Customisation Buffer
 
-5.1.37 Print Multiline
+5.1.38 Print Multiline
 ----------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Latex Preamble,  Next: Print Tempfile,  Prev: Print Multiline,  Up: The Customisation Buffer
 
-5.1.38 Latex Preamble
+5.1.39 Latex Preamble
 ---------------------
 
 *Default value*: `\bibliographystyle{plain}'.
 
 File: ebib.info,  Node: Print Tempfile,  Next: Allow Identical Fields,  Prev: Latex Preamble,  Up: The Customisation Buffer
 
-5.1.39 Print Tempfile
+5.1.40 Print Tempfile
 ---------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Allow Identical Fields,  Next: Entry Types,  Prev: Print Tempfile,  Up: The Customisation Buffer
 
-5.1.40 Allow Identical Fields
+5.1.41 Allow Identical Fields
 -----------------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Entry Types,  Prev: Allow Identical Fields,  Up: The Customisation Buffer
 
-5.1.41 Entry Types
+5.1.42 Entry Types
 ------------------
 
 *Default value*: see below.
@@ -2930,90 +2938,92 @@ Node: Customisation93849
 Ref: #customisation93958
 Node: The Customisation Buffer94242
 Ref: #the-customisation-buffer94404
-Node: Default Type95542
-Ref: #default-type95678
-Node: Preload Bib Files95706
-Ref: #preload-bib-files95884
-Node: Preload Bib Search Dirs95908
-Ref: #preload-bib-search-dirs96100
-Node: Create Backups96122
-Ref: #create-backups96292
-Node: Keywords list96314
-Ref: #keywords-list96472
-Node: Keywords File96496
-Ref: #keywords-file96666
-Node: Keywords File Save On Exit96689
-Ref: #keywords-file-save-on-exit96894
-Node: Keywords Use Only File96918
-Ref: #keywords-use-only-file97128
-Node: Keywords Field Keep Sorted97152
-Ref: #keywords-field-keep-sorted97362
-Node: Keywords Separator97386
-Ref: #keywords-separator97577
-Node: Additional Fields97602
-Ref: #additional-fields97771
-Node: Layout97856
-Ref: #layout97990
-Node: Width98015
-Ref: #width98147
-Node: Index Window Size98168
-Ref: #index-window-size98338
-Node: Index Display Fields98359
-Ref: #index-display-fields98543
-Node: Uniquify Keys98567
-Ref: #uniquify-keys98737
-Node: Autogenerate Keys98761
-Ref: #autogenerate-keys98936
-Node: Citation Commands99133
-Ref: #citation-commands99315
-Node: Multiline Major Mode104822
-Ref: #multiline-major-mode105003
-Node: Sort Order105033
-Ref: #sort-order105193
-Node: Save Xrefs First105217
-Ref: #save-xrefs-first105382
-Node: Crossref Face105406
-Ref: #crossref-face105568
-Node: Selected Face105614
-Ref: #selected-face105773
-Node: Use Timestamp105817
-Ref: #use-timestamp105979
-Node: Timestamp Format106003
-Ref: #timestamp-format106176
-Node: Standard Url Field106213
-Ref: #standard-url-field106387
-Node: Url Regexp106411
-Ref: #url-regexp106568
-Node: Browser Command106629
-Ref: #browser-command106796
-Node: Standard Doi Field106914
-Ref: #standard-doi-field107084
-Node: Doi Url107108
-Ref: #doi-url107260
-Node: Standard File Field107413
-Ref: #standard-file-field107588
-Node: File Associations107613
-Ref: #file-associations107788
-Node: File Regexp108106
-Ref: #file-regexp108266
-Node: File Search Dirs108501
-Ref: #file-search-dirs108668
-Node: Print Preamble108690
-Ref: #print-preamble108855
-Node: Print Newline108879
-Ref: #print-newline109041
-Node: Print Multiline109065
-Ref: #print-multiline109231
-Node: Latex Preamble109255
-Ref: #latex-preamble109420
-Node: Print Tempfile109466
-Ref: #print-tempfile109638
-Node: Allow Identical Fields109662
-Ref: #allow-identical-fields109847
-Node: Entry Types109871
-Ref: #entry-types110011
-Node: Modifying Key Bindings111594
-Ref: #modifying-key-bindings111752
+Node: Default Type95568
+Ref: #default-type95704
+Node: Preload Bib Files95732
+Ref: #preload-bib-files95910
+Node: Preload Bib Search Dirs95934
+Ref: #preload-bib-search-dirs96126
+Node: Create Backups96148
+Ref: #create-backups96318
+Node: Keywords list96340
+Ref: #keywords-list96498
+Node: Keywords File96522
+Ref: #keywords-file96692
+Node: Keywords File Save On Exit96715
+Ref: #keywords-file-save-on-exit96920
+Node: Keywords Use Only File96944
+Ref: #keywords-use-only-file97154
+Node: Keywords Field Keep Sorted97178
+Ref: #keywords-field-keep-sorted97388
+Node: Keywords Separator97412
+Ref: #keywords-separator97603
+Node: Additional Fields97628
+Ref: #additional-fields97797
+Node: Layout97882
+Ref: #layout98016
+Node: Width98041
+Ref: #width98177
+Node: Vertical Window Split98198
+Ref: #vertical-window-split98377
+Node: Index Window Size98399
+Ref: #index-window-size98585
+Node: Index Display Fields98606
+Ref: #index-display-fields98790
+Node: Uniquify Keys98814
+Ref: #uniquify-keys98984
+Node: Autogenerate Keys99008
+Ref: #autogenerate-keys99183
+Node: Citation Commands99380
+Ref: #citation-commands99562
+Node: Multiline Major Mode105069
+Ref: #multiline-major-mode105250
+Node: Sort Order105280
+Ref: #sort-order105440
+Node: Save Xrefs First105464
+Ref: #save-xrefs-first105629
+Node: Crossref Face105653
+Ref: #crossref-face105815
+Node: Selected Face105861
+Ref: #selected-face106020
+Node: Use Timestamp106064
+Ref: #use-timestamp106226
+Node: Timestamp Format106250
+Ref: #timestamp-format106423
+Node: Standard Url Field106460
+Ref: #standard-url-field106634
+Node: Url Regexp106658
+Ref: #url-regexp106815
+Node: Browser Command106876
+Ref: #browser-command107043
+Node: Standard Doi Field107161
+Ref: #standard-doi-field107331
+Node: Doi Url107355
+Ref: #doi-url107507
+Node: Standard File Field107660
+Ref: #standard-file-field107835
+Node: File Associations107860
+Ref: #file-associations108035
+Node: File Regexp108353
+Ref: #file-regexp108513
+Node: File Search Dirs108748
+Ref: #file-search-dirs108915
+Node: Print Preamble108937
+Ref: #print-preamble109102
+Node: Print Newline109126
+Ref: #print-newline109288
+Node: Print Multiline109312
+Ref: #print-multiline109478
+Node: Latex Preamble109502
+Ref: #latex-preamble109667
+Node: Print Tempfile109713
+Ref: #print-tempfile109885
+Node: Allow Identical Fields109909
+Ref: #allow-identical-fields110094
+Node: Entry Types110118
+Ref: #entry-types110258
+Node: Modifying Key Bindings111841
+Ref: #modifying-key-bindings111999
 
 End Tag Table
 
