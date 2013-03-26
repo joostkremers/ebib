@@ -199,7 +199,7 @@ The citation command that `ebib-insert-bibtex-key` and the command key `p` ask f
 
 Another Ebib command is available for LaTeX documents: the command `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. (One disadvantage is that cross-referenced entries aren't always in the `.bbl` file, depending on how your BibTeX style handles them. After using `ebib-create-bib-from-bbl` it may therefore be necessary to check whether you have all cross-referenced entries.)
 
-There is another function that is available outside Ebib: `ebib-entry-summary`. This command reads the key under the cursor in the current buffer and displays the field values associated with that key in a `*Help*` buffer. This allows you to quickly check a reference in a text.
+There is another function that is available outside Ebib: `ebib-entry-summary`. This command reads the key under the cursor in the current buffer and starts Ebib on that entry. This allows you to quickly check a reference in a text.
 
 Probably the easiest way to use both `ebib-insert-bibtex-key` and `ebib-entry-summary` is to bind them to a key sequence. For example, you could put the following in your `~/.emacs`:
 
@@ -333,7 +333,7 @@ In the split-frame layout, the Ebib windows are displayed on the right of the cu
 
 Furthermore, pressing `z` in the index buffer leaves Ebib, but keeps the buffers visible. You can get back to Ebib with the command `M-x ebib` (or any key bound to it, of course), or simply by manually switching to the index buffer. If you want to remove the Ebib buffers from the frame but keep Ebib in the background, you can use `Z` (i.e. uppercase `Z`) in the index buffer. (Note that `Z` is also available in the full-frame layout, but there it is identical to `z`.)
 
-Lastly, the command `ebib-entry-summary` checks whether the Ebib buffers are visible in the frame. If they are, it does not output the entry info in a `*Help*` buffer, but rather displays the entry in Ebib itself.
+Another alternative is to use Ebib in the full-frame layout but set the option [Window Vertical Split(#window-vertical-split). This will display the index buffer to the left of the frame rather than at the top.
 
 
 ## Preloading `.bib` Files ##
