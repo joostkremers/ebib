@@ -107,6 +107,17 @@ with the left side free for another window."
   :type '(choice (const :tag "Full width" full)
                  (const :tag "Custom width" custom)))
 
+(defcustom ebib-window-vertical-split nil
+  "If non-nil, splits ebib windows side by side(following way).
+         +---+-------------+
+         |   |             |
+         |   |             |
+         |   |             |
+         |   |             |
+         +---+-------------+"
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-width 80
   "Width of the Ebib windows.
 Only takes effect if EBIB-LAYOUT is set to CUSTOM."
@@ -1585,7 +1596,8 @@ current window."
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
       (select-window ebib-window nil)))
   (let* ((index-window (selected-window))
-         (entry-window (split-window index-window ebib-index-window-size)))
+         (entry-window (split-window index-window ebib-index-window-size
+                                     ebib-window-vertical-split)))
     (switch-to-buffer ebib-index-buffer)
     (set-window-buffer entry-window ebib-entry-buffer)
     (unless (eq ebib-layout 'full)
