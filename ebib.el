@@ -3235,22 +3235,18 @@ a logical `not' is applied to the selection."
     (setf (edb-make-backup new-db) nil)
     new-db))
 
-(defmacro contains (field regexp)
-  ;; Note: the variable ENTRY is *not* bound in this macro! The function
-  ;; calling CONTAINS *must* set ENTRY to an actual Ebib entry. The point
-  ;; of this macro is to facilitate defining filters for virtual databases.
-  ;; It enables us to define filters of the form:
-
-  ;; (and (not (contains author "Chomsky")) (contains year "1995"))
-
-  `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field))))
-
 (defun ebib-run-filter (filter db)
   "Runs FILTER on DB"
+  ;; The filter uses a macro `contains', which we locally define here. This
+  ;; macro in turn uses a dynamic variable `entry', which we must set
+  ;; before eval'ing the filter.
+  (setq filter `(cl-macrolet ((contains (field regexp)
+                                        `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
+                  ,filter))
   (setf (edb-keys-list db)
         (sort (let ((result nil))
                 (maphash #'(lambda (key value)
-                             (let ((entry value)) ; this is necessary for actually running the filter
+                             (let ((entry value))
                                (when (eval filter)
                                  (setq result (cons key result)))))
                          (edb-database db))
