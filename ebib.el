@@ -4267,7 +4267,9 @@ The text being edited is stored before saving the database."
 (defun ebib-quit-log-buffer ()
   "Exits the log buffer."
   (interactive)
-  (switch-to-buffer nil)
+  (if ebib-popup-entry-window
+      (delete-window)
+    (switch-to-buffer nil))
   (ebib-pop-to-buffer 'index))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
