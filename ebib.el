@@ -2290,7 +2290,9 @@ buffer if Ebib is not occupying the entire frame."
    ((and soft (not (eq ebib-layout 'full)))
     (select-window ebib-window-before))
    ((and soft (not ebib-display-entry-buffer-on-startup))
-    (other-window 1))
+    (other-window 1)
+    (if (member (current-buffer) (mapcar #'cdr ebib-buffer-alist))
+        (switch-to-buffer nil)))
    (t (set-window-configuration ebib-saved-window-config)))
   (mapc #'(lambda (buffer)
             (bury-buffer buffer))
@@ -2805,7 +2807,10 @@ the entry buffer and switch to it."
     ((entries)
      (ebib-select-entry)
      (when (not ebib-display-entry-buffer-on-startup)
-       (ebib-edit-entry-internal)))
+       ;; this makes the entry buffer visible but then switches to the
+       ;; index buffer again.
+       (ebib-pop-to-buffer 'entry)
+       (ebib-pop-to-buffer 'index)))
     ((default)
      (beep))))
 
