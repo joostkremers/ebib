@@ -1838,7 +1838,7 @@ keywords when Emacs is killed."
 (ebib-key index [next] ebib-index-scroll-up)
 (ebib-key index [home] ebib-goto-first-entry)
 (ebib-key index [end] ebib-goto-last-entry)
-(ebib-key index [return] ebib-select-entry)
+(ebib-key index [return] ebib-select-and-popup-entry)
 (ebib-key index " " ebib-index-scroll-up)
 (ebib-key index "/" ebib-search)
 (ebib-key index "&" ebib-virtual-db-and)
@@ -2356,7 +2356,7 @@ buffer if Ebib is not occupying the entire frame."
              (ebib-set-index-highlight)
              (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
              (ebib-fill-entry-buffer)
-             (ebib-edit-entry)
+             (ebib-edit-entry-internal)
              (ebib-set-modified t)))))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
@@ -2463,10 +2463,14 @@ generate the key, see that function's documentation for details."
   (interactive)
   (ebib-execute-when
     ((real-db entries)
-     (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
-     (ebib-pop-to-buffer 'entry))
+     (ebib-edit-entry-internal))
     ((default)
      (beep))))
+
+(defun ebib-edit-entry-internal ()
+  "Helper function for `ebib-edit-entry'."
+  (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
+  (ebib-pop-to-buffer 'entry))
 
 (defun ebib-edit-keyname ()
   "Changes the key of a BibTeX entry."
@@ -2792,23 +2796,31 @@ current entry is not changed."
      (ebib-search-key-in-buffer (ebib-cur-entry-key))
      (ebib-set-index-highlight))))
 
-(defun ebib-select-entry ()
-  "Makes the entry at POINT the current entry."
+(defun ebib-select-and-popup-entry ()
+  "Make the entry at point current and display it.
+If `ebib-display-entry-buffer-on-startup' is unset, also popup
+the entry buffer and switch to it."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (beginning-of-line)
-     (let ((beg (point)))
-       (let* ((key (save-excursion
-                     (skip-chars-forward "^ ")
-                     (buffer-substring-no-properties beg (point))))
-              (new-cur-entry (member key (edb-keys-list ebib-cur-db))))
-         (when new-cur-entry
-           (setf (edb-cur-entry ebib-cur-db) new-cur-entry)
-           (ebib-set-index-highlight)
-           (ebib-fill-entry-buffer)))))
+     (ebib-select-entry)
+     (when (not ebib-display-entry-buffer-on-startup)
+       (ebib-edit-entry-internal)))
     ((default)
      (beep))))
+
+(defun ebib-select-entry ()
+  "Make the entry at point current."
+  (beginning-of-line)
+  (let ((beg (point)))
+    (let* ((key (save-excursion
+                  (skip-chars-forward "^ ")
+                  (buffer-substring-no-properties beg (point))))
+           (new-cur-entry (member key (edb-keys-list ebib-cur-db))))
+      (when new-cur-entry
+        (setf (edb-cur-entry ebib-cur-db) new-cur-entry)
+        (ebib-set-index-highlight)
+        (ebib-fill-entry-buffer)))))
 
 ;; the exporting functions will have to be redesigned completely. for now (1 Feb
 ;; 2012) we just define a new function ebib-export-entries. in the long run,
