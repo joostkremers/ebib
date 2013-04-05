@@ -17,7 +17,7 @@ The advantage of having a BibTeX database manager inside Emacs is that X is no l
 
 The easiest way to install Ebib is to use Emacs' package manager. Ebib is available as a package from the [Melpa package archive](http://melpa.milkbox.net/). If you add the Melpa archive to your `package-archive` list, you can install Ebib from the package manager. This will also install the Info file so you can access the Ebib manual within Emacs.
 
-Note: the package manager (`package.el`) is part of Emacs 24. Users of Emacs 23 have to install it first. See [Wikemacs](http://wikemacs.org/wiki/Package.el) for discussion.
+Note: the package manager (`package.el`) is part of Emacs 24. Users of Emacs 23 have to install it first. See the [ELPA page on emacswiki.org](http://emacswiki.org/emacs/ELPA) for discussion.
 
 
 ## Manual installation ##
