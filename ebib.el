@@ -1665,7 +1665,7 @@ whether the index and entry buffer must be redisplayed."
 
 (defun ebib-setup-windows ()
   "Creates the window configuration we want for Ebib in the
-current window."
+current frame."
   ;; we save the current window configuration.
   (setq ebib-saved-window-config (current-window-configuration))
   (setq ebib-buffer-before (current-buffer))
