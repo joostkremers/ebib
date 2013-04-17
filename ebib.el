@@ -1670,7 +1670,7 @@ current window."
   (setq ebib-saved-window-config (current-window-configuration))
   (setq ebib-buffer-before (current-buffer))
   (if (eq ebib-layout 'full)
-      (when (not ebib-display-entry-buffer-on-startup)
+      (when ebib-display-entry-buffer-on-startup
         (delete-other-windows))
     (setq ebib-window-before (selected-window))
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
