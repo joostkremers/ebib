@@ -66,8 +66,8 @@ This will also install the Info file so you can access the Ebib manual
 within Emacs.
 
 Note: the package manager (`package.el') is part of Emacs 24. Users of
-Emacs 23 have to install it first. See Wikemacs
-(http://wikemacs.org/wiki/Package.el) for discussion.
+Emacs 23 have to install it first. See the ELPA page on emacswiki.org
+(http://emacswiki.org/emacs/ELPA) for discussion.
 
 
 File: ebib.info,  Node: Manual installation,  Next: Installing the info file,  Prev: Package manager,  Up: Installation
@@ -2845,184 +2845,184 @@ Node: Installation1382
 Ref: #installation1495
 Node: Package manager1596
 Ref: #package-manager1727
-Node: Manual installation2252
-Ref: #manual-installation2424
-Node: Installing the info file3872
-Ref: #installing-the-info-file4052
-Node: Starting Ebib4745
-Ref: #starting-ebib4875
-Node: Basic Usage5349
-Ref: #basic-usage5474
-Node: Getting Started7010
-Ref: #getting-started7141
-Node: Opening a bib File8081
-Ref: #opening-a-.bib-file8236
-Node: Navigating a bib File10163
-Ref: #navigating-a-.bib-file10356
-Node: Starting a New bib File13380
-Ref: #starting-a-new-.bib-file13550
-Node: Editing the Database13832
-Ref: #editing-the-database13999
-Node: Adding and Deleting Entries14310
-Ref: #adding-and-deleting-entries14491
-Node: Editing Fields Values16098
-Ref: #editing-fields-values16300
-Node: Editing Multiline Values18606
-Ref: #editing-multiline-values18817
-Node: Copy Cut Paste Yank and Delete20828
-Ref: #copy-cut-paste-yank-and-delete21031
-Node: Saving a Database21983
-Ref: #saving-a-database22138
-Node: Searching23117
-Ref: #searching23253
-Node: LaTeX Integration25490
-Ref: #latex-integration25645
-Node: Orgmode and markdown28482
-Ref: #orgmode-and-markdown28679
-Node: Consulting Databases from within a LaTeX File30807
-Ref: #consulting-databases-from-within-a-latex-file31054
-Node: Cross-referencing33408
-Ref: #cross-referencing33596
-Node: Selecting Entries36641
-Ref: #selecting-entries36805
-Node: Printing the Database38173
-Ref: #printing-the-database38347
-Node: Calling a Browser42309
-Ref: #calling-a-browser42471
-Node: Viewing Files44851
-Ref: #viewing-files44975
-Node: Advanced Features47308
-Ref: #advanced-features47449
-Node: Screen Layout47947
-Ref: #screen-layout48078
-Node: Preloading bib Files49607
-Ref: #preloading-.bib-files49787
-Node: @Preamble Definition50562
-Ref: #preamble-definition50742
-Node: @String Definitions52854
-Ref: #string-definitions53029
-Node: Managing keywords56287
-Ref: #managing-keywords56458
-Node: Sorting the bib File61493
-Ref: #sorting-the-.bib-file61678
-Node: Merging and Importing64662
-Ref: #merging-and-importing64843
-Node: Exporting Entries65998
-Ref: #exporting-entries66161
-Node: Timestamps68193
-Ref: #timestamps68346
-Node: Multiple Identical Fields69958
-Ref: #multiple-identical-fields70143
-Node: Virtual Databases71990
-Ref: #virtual-databases72174
-Node: Simple Selection73265
-Ref: #simple-selection73406
-Node: Complex Filters74366
-Ref: #complex-filters74545
-Node: Properties of Virtual Databases78362
-Ref: #properties-of-virtual-databases78548
-Node: The Multiline Edit Buffer79587
-Ref: #the-multiline-edit-buffer79778
-Node: The Options Menu83683
-Ref: #the-options-menu83830
-Node: The Ebib Buffers84440
-Ref: #the-ebib-buffers84581
-Node: The Index Buffer84921
-Ref: #the-index-buffer85056
-Node: The Entry Buffer89682
-Ref: #the-entry-buffer89844
-Node: The Strings Buffer92037
-Ref: #the-strings-buffer92178
-Node: Customisation93800
-Ref: #customisation93909
-Node: The Customisation Buffer94193
-Ref: #the-customisation-buffer94355
-Node: Default Type95519
-Ref: #default-type95655
-Node: Preload Bib Files95683
-Ref: #preload-bib-files95861
-Node: Preload Bib Search Dirs95885
-Ref: #preload-bib-search-dirs96077
-Node: Create Backups96099
-Ref: #create-backups96269
-Node: Keywords list96291
-Ref: #keywords-list96449
-Node: Keywords File96473
-Ref: #keywords-file96643
-Node: Keywords File Save On Exit96666
-Ref: #keywords-file-save-on-exit96871
-Node: Keywords Use Only File96895
-Ref: #keywords-use-only-file97105
-Node: Keywords Field Keep Sorted97129
-Ref: #keywords-field-keep-sorted97339
-Node: Keywords Separator97363
-Ref: #keywords-separator97554
-Node: Additional Fields97579
-Ref: #additional-fields97748
-Node: Layout97833
-Ref: #layout97967
-Node: Width97992
-Ref: #width98128
-Node: Vertical Window Split98149
-Ref: #vertical-window-split98328
-Node: Index Window Size98350
-Ref: #index-window-size98536
-Node: Index Display Fields98557
-Ref: #index-display-fields98741
-Node: Uniquify Keys98765
-Ref: #uniquify-keys98935
-Node: Autogenerate Keys98959
-Ref: #autogenerate-keys99134
-Node: Citation Commands99331
-Ref: #citation-commands99513
-Node: Multiline Major Mode105020
-Ref: #multiline-major-mode105201
-Node: Sort Order105231
-Ref: #sort-order105391
-Node: Save Xrefs First105415
-Ref: #save-xrefs-first105580
-Node: Crossref Face105604
-Ref: #crossref-face105766
-Node: Selected Face105812
-Ref: #selected-face105971
-Node: Use Timestamp106015
-Ref: #use-timestamp106177
-Node: Timestamp Format106201
-Ref: #timestamp-format106374
-Node: Standard Url Field106411
-Ref: #standard-url-field106585
-Node: Url Regexp106609
-Ref: #url-regexp106766
-Node: Browser Command106827
-Ref: #browser-command106994
-Node: Standard Doi Field107112
-Ref: #standard-doi-field107282
-Node: Doi Url107306
-Ref: #doi-url107458
-Node: Standard File Field107611
-Ref: #standard-file-field107786
-Node: File Associations107811
-Ref: #file-associations107986
-Node: File Regexp108304
-Ref: #file-regexp108464
-Node: File Search Dirs108699
-Ref: #file-search-dirs108866
-Node: Print Preamble108888
-Ref: #print-preamble109053
-Node: Print Newline109077
-Ref: #print-newline109239
-Node: Print Multiline109263
-Ref: #print-multiline109429
-Node: Latex Preamble109453
-Ref: #latex-preamble109618
-Node: Print Tempfile109664
-Ref: #print-tempfile109836
-Node: Allow Identical Fields109860
-Ref: #allow-identical-fields110045
-Node: Entry Types110069
-Ref: #entry-types110209
-Node: Modifying Key Bindings111792
-Ref: #modifying-key-bindings111950
+Node: Manual installation2270
+Ref: #manual-installation2442
+Node: Installing the info file3890
+Ref: #installing-the-info-file4070
+Node: Starting Ebib4763
+Ref: #starting-ebib4893
+Node: Basic Usage5367
+Ref: #basic-usage5492
+Node: Getting Started7028
+Ref: #getting-started7159
+Node: Opening a bib File8099
+Ref: #opening-a-.bib-file8254
+Node: Navigating a bib File10181
+Ref: #navigating-a-.bib-file10374
+Node: Starting a New bib File13398
+Ref: #starting-a-new-.bib-file13568
+Node: Editing the Database13850
+Ref: #editing-the-database14017
+Node: Adding and Deleting Entries14328
+Ref: #adding-and-deleting-entries14509
+Node: Editing Fields Values16116
+Ref: #editing-fields-values16318
+Node: Editing Multiline Values18624
+Ref: #editing-multiline-values18835
+Node: Copy Cut Paste Yank and Delete20846
+Ref: #copy-cut-paste-yank-and-delete21049
+Node: Saving a Database22001
+Ref: #saving-a-database22156
+Node: Searching23135
+Ref: #searching23271
+Node: LaTeX Integration25508
+Ref: #latex-integration25663
+Node: Orgmode and markdown28500
+Ref: #orgmode-and-markdown28697
+Node: Consulting Databases from within a LaTeX File30825
+Ref: #consulting-databases-from-within-a-latex-file31072
+Node: Cross-referencing33426
+Ref: #cross-referencing33614
+Node: Selecting Entries36659
+Ref: #selecting-entries36823
+Node: Printing the Database38191
+Ref: #printing-the-database38365
+Node: Calling a Browser42327
+Ref: #calling-a-browser42489
+Node: Viewing Files44869
+Ref: #viewing-files44993
+Node: Advanced Features47326
+Ref: #advanced-features47467
+Node: Screen Layout47965
+Ref: #screen-layout48096
+Node: Preloading bib Files49625
+Ref: #preloading-.bib-files49805
+Node: @Preamble Definition50580
+Ref: #preamble-definition50760
+Node: @String Definitions52872
+Ref: #string-definitions53047
+Node: Managing keywords56305
+Ref: #managing-keywords56476
+Node: Sorting the bib File61511
+Ref: #sorting-the-.bib-file61696
+Node: Merging and Importing64680
+Ref: #merging-and-importing64861
+Node: Exporting Entries66016
+Ref: #exporting-entries66179
+Node: Timestamps68211
+Ref: #timestamps68364
+Node: Multiple Identical Fields69976
+Ref: #multiple-identical-fields70161
+Node: Virtual Databases72008
+Ref: #virtual-databases72192
+Node: Simple Selection73283
+Ref: #simple-selection73424
+Node: Complex Filters74384
+Ref: #complex-filters74563
+Node: Properties of Virtual Databases78380
+Ref: #properties-of-virtual-databases78566
+Node: The Multiline Edit Buffer79605
+Ref: #the-multiline-edit-buffer79796
+Node: The Options Menu83701
+Ref: #the-options-menu83848
+Node: The Ebib Buffers84458
+Ref: #the-ebib-buffers84599
+Node: The Index Buffer84939
+Ref: #the-index-buffer85074
+Node: The Entry Buffer89700
+Ref: #the-entry-buffer89862
+Node: The Strings Buffer92055
+Ref: #the-strings-buffer92196
+Node: Customisation93818
+Ref: #customisation93927
+Node: The Customisation Buffer94211
+Ref: #the-customisation-buffer94373
+Node: Default Type95537
+Ref: #default-type95673
+Node: Preload Bib Files95701
+Ref: #preload-bib-files95879
+Node: Preload Bib Search Dirs95903
+Ref: #preload-bib-search-dirs96095
+Node: Create Backups96117
+Ref: #create-backups96287
+Node: Keywords list96309
+Ref: #keywords-list96467
+Node: Keywords File96491
+Ref: #keywords-file96661
+Node: Keywords File Save On Exit96684
+Ref: #keywords-file-save-on-exit96889
+Node: Keywords Use Only File96913
+Ref: #keywords-use-only-file97123
+Node: Keywords Field Keep Sorted97147
+Ref: #keywords-field-keep-sorted97357
+Node: Keywords Separator97381
+Ref: #keywords-separator97572
+Node: Additional Fields97597
+Ref: #additional-fields97766
+Node: Layout97851
+Ref: #layout97985
+Node: Width98010
+Ref: #width98146
+Node: Vertical Window Split98167
+Ref: #vertical-window-split98346
+Node: Index Window Size98368
+Ref: #index-window-size98554
+Node: Index Display Fields98575
+Ref: #index-display-fields98759
+Node: Uniquify Keys98783
+Ref: #uniquify-keys98953
+Node: Autogenerate Keys98977
+Ref: #autogenerate-keys99152
+Node: Citation Commands99349
+Ref: #citation-commands99531
+Node: Multiline Major Mode105038
+Ref: #multiline-major-mode105219
+Node: Sort Order105249
+Ref: #sort-order105409
+Node: Save Xrefs First105433
+Ref: #save-xrefs-first105598
+Node: Crossref Face105622
+Ref: #crossref-face105784
+Node: Selected Face105830
+Ref: #selected-face105989
+Node: Use Timestamp106033
+Ref: #use-timestamp106195
+Node: Timestamp Format106219
+Ref: #timestamp-format106392
+Node: Standard Url Field106429
+Ref: #standard-url-field106603
+Node: Url Regexp106627
+Ref: #url-regexp106784
+Node: Browser Command106845
+Ref: #browser-command107012
+Node: Standard Doi Field107130
+Ref: #standard-doi-field107300
+Node: Doi Url107324
+Ref: #doi-url107476
+Node: Standard File Field107629
+Ref: #standard-file-field107804
+Node: File Associations107829
+Ref: #file-associations108004
+Node: File Regexp108322
+Ref: #file-regexp108482
+Node: File Search Dirs108717
+Ref: #file-search-dirs108884
+Node: Print Preamble108906
+Ref: #print-preamble109071
+Node: Print Newline109095
+Ref: #print-newline109257
+Node: Print Multiline109281
+Ref: #print-multiline109447
+Node: Latex Preamble109471
+Ref: #latex-preamble109636
+Node: Print Tempfile109682
+Ref: #print-tempfile109854
+Node: Allow Identical Fields109878
+Ref: #allow-identical-fields110063
+Node: Entry Types110087
+Ref: #entry-types110227
+Node: Modifying Key Bindings111810
+Ref: #modifying-key-bindings111968
 
 End Tag Table
 

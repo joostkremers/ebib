@@ -669,15 +669,15 @@ After BODY is executed, the buffer modified flag is unset."
 
 (defmacro ebib-with-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
-If `ebib-layout' is not 'full, make the current window dedicated
-after executing BODY."
+Restore the dedicated status after executing BODY."
   (declare (indent defun))
-  `(unwind-protect
-       (progn
-         (set-window-dedicated-p (selected-window) nil)
-         ,@body)
-     (unless (eq ebib-layout 'full)
-       (set-window-dedicated-p (selected-window) t))))
+  `(let ((dedicated (window-dedicated-p)))
+     (unwind-protect
+         (progn
+           (set-window-dedicated-p (selected-window) nil)
+           ,@body)
+       (if dedicated
+           (set-window-dedicated-p (selected-window) t)))))
 
 (defmacro safe-write-region (start end filename &optional append visit lockname mustbenew)
   "XEmacs does not have the MUSTBENEW argument, so this is a way to implement it."
