@@ -102,25 +102,28 @@
 
 (defcustom ebib-layout 'full
   "Ebib window layout.
-Full width: Ebib occupies the entire Emacs frame.
-Custom width: Ebib occupies the right side of the Emacs frame,
-with the left side free for another window."
+This option defines how Ebib displays the buffers its uses. By
+default, Ebib takes over the entire frame and creates two windows
+to display the index and the entry buffer. Alternatively, Ebib
+can display only the index buffer in a window of the size
+`ebib-index-window-size', displaying the entry buffer only when
+it is needed. A third option uses the right part of the frame to
+the size of `ebib-width' to display both the index and the entry
+buffer."
   :group 'ebib-windows
-  :type '(choice (const :tag "Full width" full)
+  :type '(choice (const :tag "Use full frame" full)
+                 (const :tag "Display only index window" index-only)
                  (const :tag "Custom width" custom)))
 
 (defcustom ebib-popup-entry-window nil
-  "If non-NIL, the entry window is displayed in a popup window."
-  :group 'ebib-windows
-  :type 'boolean)
-
-(defcustom ebib-display-entry-buffer-on-startup t
-  "If non-NIL, the entry window is displayed on startup."
+  "If non-NIL, create a popup window to display the entry window.
+This option has no effect unless `ebib-layout' is set to
+`index-only'."
   :group 'ebib-windows
   :type 'boolean)
 
 (defcustom ebib-window-vertical-split nil
-  "If non-NIL, split Ebib windows side by side.
+  "If non-NIL, display the index buffer at the left of the frame.
 If you set this option, you should probably set
 `ebib-index-window-size' to a larger value."
   :group 'ebib-windows
@@ -1078,9 +1081,9 @@ Note, The argument ALIST has no function."
 The argument ALIST has no function."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
-    (select-window window)
-    (switch-to-buffer buffer nil t)
-    window)))
+      (select-window window)
+      (switch-to-buffer buffer nil t)
+      window)))
 
 (defun ebib-pop-to-buffer (buffer)
   "Select or create a window to display BUFFER and display it.
@@ -1093,7 +1096,7 @@ error if there is no window displaying the index buffer.
 For any other buffer, if there is a visible Ebib buffer other
 than the index buffer, switch to its window and display BUFFER.
 If there is no Ebib window, use the largest non-dedicated window
-or, if `ebib-popup-entry-window' is set, pop up a new window. If
+or, if `ebib-layout' is set to `popup', pop up a new window. If
 all else fails, pop up a new frame."
   (if (or (not (eq buffer 'index))
           (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
@@ -1664,26 +1667,26 @@ whether the index and entry buffer must be redisplayed."
           (message "No entry `%s' in current database " key))))))
 
 (defun ebib-setup-windows ()
-  "Creates the window configuration we want for Ebib in the
-current frame."
+  "Creates Ebib's window configuration in the current frame."
   ;; we save the current window configuration.
   (setq ebib-saved-window-config (current-window-configuration))
   (setq ebib-buffer-before (current-buffer))
-  (if (eq ebib-layout 'full)
-      (when ebib-display-entry-buffer-on-startup
-        (delete-other-windows))
+  (cond
+   ((eq ebib-layout 'full)
+    (delete-other-windows))
+   ((eq ebib-layout 'custom)
     (setq ebib-window-before (selected-window))
     (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
-      (select-window ebib-window)))
+      (select-window ebib-window))))
   (let* ((index-window (selected-window))
          (entry-window (split-window index-window ebib-index-window-size
                                      ebib-window-vertical-split)))
     (switch-to-buffer (cdr (assoc 'index ebib-buffer-alist)))
+    (unless (eq ebib-layout 'index-only)
+      (set-window-buffer entry-window (cdr (assoc 'entry ebib-buffer-alist))))
     (set-window-dedicated-p index-window t)
-    (if ebib-display-entry-buffer-on-startup
-        (set-window-buffer entry-window (cdr (assoc 'entry ebib-buffer-alist))))
-    (unless (eq ebib-layout 'full)
-      (set-window-dedicated-p entry-window t))))
+    (if (eq ebib-layout 'custom)
+        (set-window-dedicated-p entry-window t))))
 
 (defun ebib-init ()
   "Initialises Ebib.
@@ -2287,9 +2290,9 @@ buffer if Ebib is not occupying the entire frame."
   (unless (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
     (error "Ebib is not active "))
   (cond
-   ((and soft (not (eq ebib-layout 'full)))
+   ((and soft (eq ebib-layout 'custom))
     (select-window ebib-window-before))
-   ((and soft (not ebib-display-entry-buffer-on-startup))
+   ((and soft (eq ebib-layout 'index-only))
     (other-window 1)
     (if (member (current-buffer) (mapcar #'cdr ebib-buffer-alist))
         (switch-to-buffer nil)))
@@ -2800,13 +2803,13 @@ current entry is not changed."
 
 (defun ebib-select-and-popup-entry ()
   "Make the entry at point current and display it.
-If `ebib-display-entry-buffer-on-startup' is unset, also popup
-the entry buffer and switch to it."
+If `ebib-layout' is set to `index-only', also popup the entry
+buffer and switch to it."
   (interactive)
   (ebib-execute-when
     ((entries)
      (ebib-select-entry)
-     (when (not ebib-display-entry-buffer-on-startup)
+     (when (eq ebib-layout 'index-only)
        ;; this makes the entry buffer visible but then switches to the
        ;; index buffer again.
        (ebib-pop-to-buffer 'entry)
@@ -3532,10 +3535,12 @@ The user is prompted for the buffer to push the entry into."
 If the key of the current entry is <new-entry>, a new key is
 automatically generated using BIBTEX-GENERATE-AUTOKEY."
   (interactive)
-  (if ebib-popup-entry-window
-      (delete-window)
-    (unless ebib-display-entry-buffer-on-startup
-      (switch-to-buffer nil)))
+  (cond
+   ((and ebib-popup-entry-window
+         (eq ebib-layout 'index-only))
+    (delete-window))
+   ((eq ebib-layout 'index-only)
+    (switch-to-buffer nil)))
   (ebib-pop-to-buffer 'index)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
   (if (equal (ebib-cur-entry-key) "<new-entry>")
@@ -3636,47 +3641,28 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
           (setq ebib-current-field new-field)
           (ebib-move-to-field ebib-current-field -1))))))
 
-;; the following edit functions make use of completion. since we don't want
-;; the completion buffer to be shown in the index window, we need to switch
-;; focus to an appropriate window first. we do this in an unwind-protect to
-;; make sure we always get back to the entry buffer.
-
 (defun ebib-edit-entry-type ()
   "Edits the entry type."
-  (unwind-protect
+  (if-str (new-type (completing-read "type: " ebib-entry-types nil t))
       (progn
-        (if (eq ebib-layout 'full)
-            (other-window 1)
-          (select-window ebib-window-before))
-        (if-str (new-type (completing-read "type: " ebib-entry-types nil t))
-            (progn
-              (puthash 'type* (intern-soft new-type) ebib-cur-entry-hash)
-              (ebib-fill-entry-buffer)
-              (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
-              (ebib-set-modified t))))
-    (ebib-pop-to-buffer 'entry)))
-    ;;(select-window (get-buffer-window (cdr (assoc 'entry ebib-buffer-alist))))))
+        (puthash 'type* (intern-soft new-type) ebib-cur-entry-hash)
+        (ebib-fill-entry-buffer)
+        (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
+        (ebib-set-modified t))))
 
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
-  (unwind-protect
-      (progn
-        (if (eq ebib-layout 'full)
-            (other-window 1)
-          (select-window ebib-window-before))
-        (let ((collection (ebib-create-collection (edb-database ebib-cur-db))))
-          (if-str (key (completing-read "Key to insert in `crossref': " collection nil t))
-              (progn
-                (puthash 'crossref (from-raw key) ebib-cur-entry-hash)
-                (ebib-set-modified t)))))
-    (ebib-pop-to-buffer 'entry)
-    ;; (select-window (get-buffer-window (cdr (assoc 'entry ebib-buffer-alist))) nil)
-    ;; we now redisplay the entire entry buffer, so that the crossref'ed
-    ;; fields show up. this also puts the cursor back on the type field.
-    (ebib-fill-entry-buffer)
-    (setq ebib-current-field 'crossref)
-    (re-search-forward "^crossref")
-    (ebib-set-fields-highlight)))
+  (let ((collection (ebib-create-collection (edb-database ebib-cur-db))))
+    (if-str (key (completing-read "Key to insert in `crossref': " collection nil t))
+        (progn
+          (puthash 'crossref (from-raw key) ebib-cur-entry-hash)
+          (ebib-set-modified t))))
+  ;; we now redisplay the entire entry buffer, so that the crossref'ed
+  ;; fields show up. this also puts the cursor back on the type field.
+  (ebib-fill-entry-buffer)
+  (setq ebib-current-field 'crossref)
+  (re-search-forward "^crossref")
+  (ebib-set-fields-highlight))
 
 (defun ebib-sort-keywords (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string."
@@ -3687,34 +3673,26 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 
 (defun ebib-edit-keywords ()
   "Edit the keywords field."
-  (unwind-protect
-      (progn
-        (if (eq ebib-layout 'full)
-            (other-window 1)
-          (select-window ebib-window-before))
-        ;; now we ask the user for keywords. note that we shadow the
-        ;; binding of `minibuffer-local-completion-map' so that we can
-        ;; unbind <SPC>, since keywords may contain spaces. note also that
-        ;; in emacs 24, we can use `make-composed-keymap' for this purpose,
-        ;; but in emacs 23.1, this function is not available.
-        (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
-              (collection (ebib-keywords-for-database ebib-cur-db)))
-          (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection)
-                until (string= keyword "")
-                do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
-                          (new-conts (if conts
-                                         (concat conts ebib-keywords-separator keyword)
-                                       keyword)))
-                     (puthash 'keywords (from-raw (if ebib-keywords-field-keep-sorted
-                                                      (ebib-sort-keywords new-conts)
-                                                    new-conts))
-                              ebib-cur-entry-hash)
-                     (ebib-set-modified t)
-                     (ebib-redisplay-current-field)
-                     (unless (member keyword collection)
-                       (ebib-keywords-add-keyword keyword ebib-cur-db))))))
-    (ebib-pop-to-buffer 'entry)))
-    ;; (select-window (get-buffer-window (cdr (assoc 'entry ebib-buffer-alist))) nil)))
+  ;; we shadow the binding of `minibuffer-local-completion-map' so that we
+  ;; can unbind <SPC>, since keywords may contain spaces. note also that in
+  ;; emacs 24, we can use `make-composed-keymap' for this purpose, but in
+  ;; emacs 23.1, this function is not available.
+  (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
+        (collection (ebib-keywords-for-database ebib-cur-db)))
+    (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection)
+          until (string= keyword "")
+          do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
+                    (new-conts (if conts
+                                   (concat conts ebib-keywords-separator keyword)
+                                 keyword)))
+               (puthash 'keywords (from-raw (if ebib-keywords-field-keep-sorted
+                                                (ebib-sort-keywords new-conts)
+                                              new-conts))
+                        ebib-cur-entry-hash)
+               (ebib-set-modified t)
+               (ebib-redisplay-current-field)
+               (unless (member keyword collection)
+                 (ebib-keywords-add-keyword keyword ebib-cur-db))))))
 
 (defun ebib-edit-field (pfx)
   "Edits a field of a BibTeX entry.
@@ -3940,7 +3918,8 @@ The deleted text is not put in the kill ring."
 (defun ebib-quit-strings-buffer ()
   "Quits editing the @STRING definitions."
   (interactive)
-  (if ebib-popup-entry-window
+  (if (and (eq ebib-layout 'index-only)
+           ebib-popup-entry-window)
       (delete-window)
     (switch-to-buffer nil))
   (ebib-pop-to-buffer 'index))
@@ -4208,8 +4187,8 @@ STARTTEXT is a string that contains the initial text of the buffer."
   "Leaves the multiline edit buffer.
 Restores the previous buffer in the window that the multiline
 edit buffer was shown in."
-  ;; (switch-to-buffer ebib-pre-multiline-buffer)
-  (if ebib-popup-entry-window
+  (if (and (eq ebib-layout 'index-only)
+           ebib-popup-entry-window)
       (delete-window)
     (switch-to-buffer nil))
   (cond
@@ -4284,7 +4263,8 @@ The text being edited is stored before saving the database."
 (defun ebib-quit-log-buffer ()
   "Exits the log buffer."
   (interactive)
-  (if ebib-popup-entry-window
+  (if (and (eq ebib-layout 'index-only)
+           ebib-popup-entry-window)
       (delete-window)
     (switch-to-buffer nil))
   (ebib-pop-to-buffer 'index))
