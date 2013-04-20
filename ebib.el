@@ -3540,7 +3540,7 @@ automatically generated using BIBTEX-GENERATE-AUTOKEY."
          (eq ebib-layout 'index-only))
     (delete-window))
    ((eq ebib-layout 'index-only)
-    (switch-to-buffer nil)))
+    (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
   (if (equal (ebib-cur-entry-key) "<new-entry>")
@@ -3922,7 +3922,7 @@ The deleted text is not put in the kill ring."
            ebib-popup-entry-window)
       (delete-window)
     (ebib-with-window-nondedicated
-      (switch-to-buffer nil)))
+      (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index))
 
 (defun ebib-prev-string ()
@@ -4191,7 +4191,7 @@ edit buffer was shown in."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (switch-to-buffer nil))
+    (switch-to-buffer nil t t))
   (cond
    ((eq ebib-editing 'preamble)
     (ebib-pop-to-buffer 'index))
@@ -4267,7 +4267,7 @@ The text being edited is stored before saving the database."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (switch-to-buffer nil))
+    (switch-to-buffer nil t t))
   (ebib-pop-to-buffer 'index))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
