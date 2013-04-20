@@ -4267,7 +4267,8 @@ The text being edited is stored before saving the database."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (switch-to-buffer nil t t))
+    (ebib-with-window-nondedicated
+      (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
