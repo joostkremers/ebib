@@ -3518,9 +3518,9 @@ The user is prompted for the buffer to push the entry into."
     (define-key map "s" 'ebib-insert-abbreviation)
     (define-key map "u" 'ebib-browse-url-in-field)
     (define-key map "x" 'ebib-cut-field-contents)
-    (define-key map "\C-xb" 'undefined)
-    (define-key map "\C-xk" 'undefined)
     (define-key map "y" 'ebib-yank-field-contents)
+    (define-key map "\C-xb" 'ebib-quit-entry-buffer)
+    (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     map)
   "Keymap for the Ebib entry buffer.")
 
@@ -3904,8 +3904,8 @@ The deleted text is not put in the kill ring."
     (define-key map "q" 'ebib-quit-strings-buffer)
     (define-key map "x" 'ebib-export-string)
     (define-key map "X" 'ebib-export-all-strings)
-    (define-key map "\C-xb" 'disabled)
-    (define-key map "\C-xk" 'disabled)
+    (define-key map "\C-xb" 'ebib-quit-strings-buffer)
+    (define-key map "\C-xk" 'ebib-quit-strings-buffer)
     map)
   "Keymap for the ebib strings buffer.")
 
