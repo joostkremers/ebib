@@ -3921,7 +3921,8 @@ The deleted text is not put in the kill ring."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (switch-to-buffer nil))
+    (ebib-with-window-nondedicated
+      (switch-to-buffer nil)))
   (ebib-pop-to-buffer 'index))
 
 (defun ebib-prev-string ()
