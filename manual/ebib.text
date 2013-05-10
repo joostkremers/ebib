@@ -325,15 +325,19 @@ Ebib can call different external programs depending on the file type of the rele
 The features discussed in the previous chapter should be sufficient to get started using Ebib. However, Ebib has several more advanced features, which are described in this chapter.
 
 
-## Screen Layout ##
+## Window Management ##
 
-By default, Ebib takes over the entire Emacs frame it is started in. If you have a wide enough screen, however, it may be more convenient to have Ebib take up only part of the frame, so that you can have the LaTeX text you're working on and Ebib visible at the same time. The option [Layout](#layout) allows you to do this, by giving you the ability to choose between a full-frame or a split-frame layout.
+By default, Ebib takes over the entire Emacs frame it is started in, displaying the index window at the top and the entry window below it. There are a few options to change this behaviour, however. They are all part of the customisation group `ebib-windows`, and allow you to specify two alternative ways to deal with Ebib windows.
 
-In the split-frame layout, the Ebib windows are displayed on the right of the current frame, with the left part free for your document. In this layout, some aspects of Ebib behave somewhat differently. Most importantly, the multiline edit buffer is not displayed in the lower Ebib window, but in the non-Ebib window on the left. (Obviously, after leaving the multiline edit buffer, the original buffer is restored to that window.)
+The main option that controls Ebib's window behaviour is [Layout](#layout). If you set this option to display only the index buffer on startup, Ebib does not display the entry buffer when it is started. Instead, only the index buffer is displayed, which can be navigated in the usual manner. The entry buffer is only displayed when you edit an entry or add a new one. When you've finished editing and move back to the index buffer, the entry buffer is hidden again.
 
-Furthermore, pressing `z` in the index buffer leaves Ebib, but keeps the buffers visible. You can get back to Ebib with the command `M-x ebib` (or any key bound to it, of course), or simply by manually switching to the index buffer. If you want to remove the Ebib buffers from the frame but keep Ebib in the background, you can use `Z` (i.e. uppercase `Z`) in the index buffer. (Note that `Z` is also available in the full-frame layout, but there it is identical to `z`.)
+The entry buffer is also displayed if you press `RET`. When you do this, the index buffer remains selected, so you can use this to display the fields of an entry without moving focus to the entry window. If you navigate the index buffer, the entry buffer remains visible, updating its contents as you move around. Note that when layout option is set to not display the entry buffer, the key `z` does not hide the index window. Rather, it just selects another, non-Ebib window. In order to hide the index window, you can use `Z` (that is a capital `Z`).
 
-Another alternative is to use Ebib in the full-frame layout but set the option [Window Vertical Split(#window-vertical-split). This will display the index buffer to the left of the frame rather than at the top.
+A third option to deal with windows is to set the layout to a custom width. In this case, Ebib takes up the right part of the frame, displaying the index and entry buffers. The width of the Ebib windows can then be set with the option [Width](#width), which defaults to 80. Note that in this case, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it. Here, too, the key `z` switches to a non-Ebib window without hiding the Ebib windows. Use capital `Z` to hide them.
+
+If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option [Popup Entry Window](#popup-entry-window). Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
+
+Further relevant options are [Window Vertical Split](#window-vertical-split), which displays the index buffer to the left of the frame rather than at the top, and [Index Window Size](#index-window-size), which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
 
 
 ## Preloading `.bib` Files ##
@@ -807,6 +811,10 @@ Functions not bound to any key:
 `x`
 :    cut the contents of the current field. Like `c`, `x` puts the contents of the
      current field in the kill ring. `(ebib-cut-field-contents)`
+`C-x b`
+:    equivalent to `q`.
+`C-x k`
+:    equivalent to `q`.
 `y`
 :    yank the last element in the kill ring to the current field. Repeated use of
      `y` functions like `C-y/M-y`. Note that no text will be yanked if the field
@@ -871,6 +879,10 @@ Functions not bound to any key:
 `X`
 :    export all the `@string` definitions to a file or, when used with a prefix
      argument, to another database. `(ebib-export-all-strings)`
+`C-x b`
+:    equivalent to `q`.
+`C-x k`
+:    equivalent to `q`.
 
 
 # Customisation #
@@ -965,7 +977,7 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 
 **Default value**: `full`.\
 
-\noindent When set to `full`, Ebib takes over the entire frame when it runs. Alternatively, you can select `custom`, so that you can specify the width of the Ebib windows yourself. In this case, Ebib takes up the right part of the frame, leaving the left part free. See [Screen Layout](#screen-layout) for details.
+\noindent When set to `full`, Ebib takes over the entire frame when it runs. Alternatively, you can select `index-only`, which means that only the index buffer is displayed upon startup. Lastly, if you select`custom`, you can specify the width of the Ebib windows yourself. In this case, Ebib takes up the right part of the frame, leaving the left part free. See [Window Management](#window-management) for details.
 
 
 ### Width ###
@@ -975,7 +987,14 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 \noindent The width of the Ebib windows when `ebib-layout` is set to `custom`.
 
 
-### Vertical Window Split ###
+### Popup Entry Window ###
+
+**Default value**: off.\
+
+\noindent If this option is set, Ebib pops up a new window to display the entry buffer (which is destroyed again when focus is moved back to the index buffer). Note that this option only takes effect if [Layout](#layout) is set to `index-only`.
+
+
+### Window Vertical Split ###
 
 **Default value**: off.\
 
@@ -986,7 +1005,7 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 
 **Default value**: 10.\
 
-\noindent This option lets you specify the size of the index window at the top of the Ebib screen.
+\noindent This option lets you specify the size of the index window at the top (or left) of the Ebib screen.
 
 
 ### Index Display Fields ###
@@ -1073,7 +1092,7 @@ This way, the second pair of brackets is always inserted, regardless of whether 
 
     \citet{Jones1992,Haddock2004}
 
-It is, however, also possible to specify in the format string that a certain sequence can be repeated and how the different elements should be separated. This is done by wrapping that portion of the format string that can be repeated in a `%(...%)` pair. Normally, you'll want to provide a separator, which is done by placing it between the `%` and the closing `)`:
+It is, however, also possible to specify in the format string that a certain sequence can be repeated and how the different elements should be separated. This is done by wrapping that portion of the format string that can be repeated in a `%(...%)` pair. Normally, you'll want to provide a separator, which is done by placing it between the `%` and the closing parenthesis:
 
     \citet[%A][%A]{%(%K%,)}
 

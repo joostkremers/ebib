@@ -994,7 +994,7 @@ features, which are described in this chapter.
 
 * Menu:
 
-* Screen Layout::
+* Window Management::
 * Preloading bib Files::
 * @Preamble Definition::
 * @String Definitions::
@@ -1009,41 +1009,61 @@ features, which are described in this chapter.
 * The Options Menu::
 
 
-File: ebib.info,  Node: Screen Layout,  Next: Preloading bib Files,  Up: Advanced Features
+File: ebib.info,  Node: Window Management,  Next: Preloading bib Files,  Up: Advanced Features
 
-3.1 Screen Layout
-=================
+3.1 Window Management
+=====================
 
-By default, Ebib takes over the entire Emacs frame it is started in. If
-you have a wide enough screen, however, it may be more convenient to
-have Ebib take up only part of the frame, so that you can have the
-LaTeX text you're working on and Ebib visible at the same time. The
-option *note Layout: #layout. allows you to do this, by giving you the
-ability to choose between a full-frame or a split-frame layout.
+By default, Ebib takes over the entire Emacs frame it is started in,
+displaying the index window at the top and the entry window below it.
+There are a few options to change this behaviour, however. They are all
+part of the customisation group `ebib-windows', and allow you to
+specify two alternative ways to deal with Ebib windows.
 
-In the split-frame layout, the Ebib windows are displayed on the right
-of the current frame, with the left part free for your document. In
-this layout, some aspects of Ebib behave somewhat differently. Most
-importantly, the multiline edit buffer is not displayed in the lower
-Ebib window, but in the non-Ebib window on the left. (Obviously, after
-leaving the multiline edit buffer, the original buffer is restored to
-that window.)
+The main option that controls Ebib's window behaviour is *note Layout:
+#layout. If you set this option to display only the index buffer on
+startup, Ebib does not display the entry buffer when it is started.
+Instead, only the index buffer is displayed, which can be navigated in
+the usual manner. The entry buffer is only displayed when you edit an
+entry or add a new one. When you've finished editing and move back to
+the index buffer, the entry buffer is hidden again.
 
-Furthermore, pressing `z' in the index buffer leaves Ebib, but keeps
-the buffers visible. You can get back to Ebib with the command `M-x
-ebib' (or any key bound to it, of course), or simply by manually
-switching to the index buffer. If you want to remove the Ebib buffers
-from the frame but keep Ebib in the background, you can use `Z' (i.e.
-uppercase `Z') in the index buffer. (Note that `Z' is also available in
-the full-frame layout, but there it is identical to `z'.)
+The entry buffer is also displayed if you press `RET'. When you do
+this, the index buffer remains selected, so you can use this to display
+the fields of an entry without moving focus to the entry window. If you
+navigate the index buffer, the entry buffer remains visible, updating
+its contents as you move around. Note that when layout option is set to
+not display the entry buffer, the key `z' does not hide the index
+window. Rather, it just selects another, non-Ebib window. In order to
+hide the index window, you can use `Z' (that is a capital `Z').
 
-Another alternative is to use Ebib in the full-frame layout but set the
-option [Window Vertical Split(#window-vertical-split). This will
-display the index buffer to the left of the frame rather than at the
-top.
+A third option to deal with windows is to set the layout to a custom
+width. In this case, Ebib takes up the right part of the frame,
+displaying the index and entry buffers. The width of the Ebib windows
+can then be set with the option *note Width: #width, which defaults to
+80. Note that in this case, the multiline edit buffer is not displayed
+in the same window as the entry buffer. Rather, Ebib uses another,
+non-Ebib window to display it. Here, too, the key `z' switches to a
+non-Ebib window without hiding the Ebib windows. Use capital `Z' to
+hide them.
+
+If you set Ebib's layout to display only the index buffer on startup,
+you can additionally set the option *note Popup Entry Window:
+#popup-entry-window. Normally, Ebib will reuse an existing window to
+display the entry buffer (and restore its original buffer when you
+leave the entry buffer). With this option set, however, Ebib uses the
+Emacs function `display-buffer-popup-window' to create a new window
+(which is destroyed again when you leave the entry buffer).
+
+Further relevant options are *note Window Vertical Split:
+#window-vertical-split, which displays the index buffer to the left of
+the frame rather than at the top, and *note Index Window Size:
+#index-window-size, which determines the size of the index window
+(either its height or its width, depending on whether the index window
+is displayed at the top or on the left of the frame.)
 
 
-File: ebib.info,  Node: Preloading bib Files,  Next: @Preamble Definition,  Prev: Screen Layout,  Up: Advanced Features
+File: ebib.info,  Node: Preloading bib Files,  Next: @Preamble Definition,  Prev: Window Management,  Up: Advanced Features
 
 3.2 Preloading `.bib' Files
 ===========================
@@ -2088,6 +2108,12 @@ File: ebib.info,  Node: The Entry Buffer,  Next: The Strings Buffer,  Prev: The 
      contents of the current field in the kill ring.
      `(ebib-cut-field-contents)'
 
+`C-x b'
+     equivalent to `q'.
+
+`C-x k'
+     equivalent to `q'.
+
 `y'
      yank the last element in the kill ring to the current field.
      Repeated use of `y' functions like `C-y/M-y'. Note that no text
@@ -2181,6 +2207,12 @@ File: ebib.info,  Node: The Strings Buffer,  Prev: The Entry Buffer,  Up: The Eb
      export all the `@string' definitions to a file or, when used with
      a prefix argument, to another database. `(ebib-export-all-strings)'
 
+`C-x b'
+     equivalent to `q'.
+
+`C-x k'
+     equivalent to `q'.
+
 
 File: ebib.info,  Node: Customisation,  Prev: The Ebib Buffers,  Up: Top
 
@@ -2224,7 +2256,8 @@ buffer.
 * Additional Fields::
 * Layout::
 * Width::
-* Vertical Window Split::
+* Popup Entry Window::
+* Window Vertical Split::
 * Index Window Size::
 * Index Display Fields::
 * Uniquify Keys::
@@ -2342,44 +2375,51 @@ File: ebib.info,  Node: Layout,  Next: Width,  Prev: Additional Fields,  Up: The
 
 *Default value*: `full'.
 
-File: ebib.info,  Node: Width,  Next: Vertical Window Split,  Prev: Layout,  Up: The Customisation Buffer
+File: ebib.info,  Node: Width,  Next: Popup Entry Window,  Prev: Layout,  Up: The Customisation Buffer
 
 5.1.13 Width
 ------------
 
 *Default value*: 80.
 
-File: ebib.info,  Node: Vertical Window Split,  Next: Index Window Size,  Prev: Width,  Up: The Customisation Buffer
+File: ebib.info,  Node: Popup Entry Window,  Next: Window Vertical Split,  Prev: Width,  Up: The Customisation Buffer
 
-5.1.14 Vertical Window Split
+5.1.14 Popup Entry Window
+-------------------------
+
+*Default value*: off.
+
+File: ebib.info,  Node: Window Vertical Split,  Next: Index Window Size,  Prev: Popup Entry Window,  Up: The Customisation Buffer
+
+5.1.15 Window Vertical Split
 ----------------------------
 
 *Default value*: off.
 
-File: ebib.info,  Node: Index Window Size,  Next: Index Display Fields,  Prev: Vertical Window Split,  Up: The Customisation Buffer
+File: ebib.info,  Node: Index Window Size,  Next: Index Display Fields,  Prev: Window Vertical Split,  Up: The Customisation Buffer
 
-5.1.15 Index Window Size
+5.1.16 Index Window Size
 ------------------------
 
 *Default value*: 10.
 
 File: ebib.info,  Node: Index Display Fields,  Next: Uniquify Keys,  Prev: Index Window Size,  Up: The Customisation Buffer
 
-5.1.16 Index Display Fields
+5.1.17 Index Display Fields
 ---------------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Uniquify Keys,  Next: Autogenerate Keys,  Prev: Index Display Fields,  Up: The Customisation Buffer
 
-5.1.17 Uniquify Keys
+5.1.18 Uniquify Keys
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Autogenerate Keys,  Next: Citation Commands,  Prev: Uniquify Keys,  Up: The Customisation Buffer
 
-5.1.18 Autogenerate Keys
+5.1.19 Autogenerate Keys
 ------------------------
 
 *Default value*: `nil'.
@@ -2390,7 +2430,7 @@ described in its documentation string.
 
 File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: Autogenerate Keys,  Up: The Customisation Buffer
 
-5.1.19 Citation Commands
+5.1.20 Citation Commands
 ------------------------
 
 *Default value*:
@@ -2488,7 +2528,7 @@ certain sequence can be repeated and how the different elements should
 be separated. This is done by wrapping that portion of the format
 string that can be repeated in a `%(...%)' pair. Normally, you'll want
 to provide a separator, which is done by placing it between the `%' and
-the closing `)':
+the closing parenthesis:
 
 \citet[%A][%A]{%(%K%,)}
 
@@ -2537,35 +2577,35 @@ strings.
 
 File: ebib.info,  Node: Multiline Major Mode,  Next: Sort Order,  Prev: Citation Commands,  Up: The Customisation Buffer
 
-5.1.20 Multiline Major Mode
+5.1.21 Multiline Major Mode
 ---------------------------
 
 *Default value*: `text-mode'.
 
 File: ebib.info,  Node: Sort Order,  Next: Save Xrefs First,  Prev: Multiline Major Mode,  Up: The Customisation Buffer
 
-5.1.21 Sort Order
+5.1.22 Sort Order
 -----------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Save Xrefs First,  Next: Crossref Face,  Prev: Sort Order,  Up: The Customisation Buffer
 
-5.1.22 Save Xrefs First
+5.1.23 Save Xrefs First
 -----------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Crossref Face,  Next: Selected Face,  Prev: Save Xrefs First,  Up: The Customisation Buffer
 
-5.1.23 Crossref Face
+5.1.24 Crossref Face
 --------------------
 
 *Default value*: `((t (:foreground "red")))'.
 
 File: ebib.info,  Node: Selected Face,  Next: Use Timestamp,  Prev: Crossref Face,  Up: The Customisation Buffer
 
-5.1.24 Selected Face
+5.1.25 Selected Face
 --------------------
 
 *Default value*:
@@ -2573,35 +2613,35 @@ File: ebib.info,  Node: Selected Face,  Next: Use Timestamp,  Prev: Crossref Fac
 
 File: ebib.info,  Node: Use Timestamp,  Next: Timestamp Format,  Prev: Selected Face,  Up: The Customisation Buffer
 
-5.1.25 Use Timestamp
+5.1.26 Use Timestamp
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Timestamp Format,  Next: Standard Url Field,  Prev: Use Timestamp,  Up: The Customisation Buffer
 
-5.1.26 Timestamp Format
+5.1.27 Timestamp Format
 -----------------------
 
 *Default value*: `"%a %b %e %T %Y"'.
 
 File: ebib.info,  Node: Standard Url Field,  Next: Url Regexp,  Prev: Timestamp Format,  Up: The Customisation Buffer
 
-5.1.27 Standard Url Field
+5.1.28 Standard Url Field
 -------------------------
 
 *Default value*: `url'.
 
 File: ebib.info,  Node: Url Regexp,  Next: Browser Command,  Prev: Standard Url Field,  Up: The Customisation Buffer
 
-5.1.28 Url Regexp
+5.1.29 Url Regexp
 -----------------
 
 *Default value*: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+'.
 
 File: ebib.info,  Node: Browser Command,  Next: Standard Doi Field,  Prev: Url Regexp,  Up: The Customisation Buffer
 
-5.1.29 Browser Command
+5.1.30 Browser Command
 ----------------------
 
 *Default value*: `nil'.
@@ -2611,14 +2651,14 @@ on the command line.
 
 File: ebib.info,  Node: Standard Doi Field,  Next: Doi Url,  Prev: Browser Command,  Up: The Customisation Buffer
 
-5.1.30 Standard Doi Field
+5.1.31 Standard Doi Field
 -------------------------
 
 *Default value*: `doi'.
 
 File: ebib.info,  Node: Doi Url,  Next: Standard File Field,  Prev: Standard Doi Field,  Up: The Customisation Buffer
 
-5.1.31 Doi Url
+5.1.32 Doi Url
 --------------
 
 *Default value*: `http://dx.doi.org/%s'
@@ -2629,14 +2669,14 @@ The URL used to open a DOI. It must contain exactly one instance fo
 
 File: ebib.info,  Node: Standard File Field,  Next: File Associations,  Prev: Doi Url,  Up: The Customisation Buffer
 
-5.1.32 Standard File Field
+5.1.33 Standard File Field
 --------------------------
 
 *Default value*: `file'.
 
 File: ebib.info,  Node: File Associations,  Next: File Regexp,  Prev: Standard File Field,  Up: The Customisation Buffer
 
-5.1.33 File Associations
+5.1.34 File Associations
 ------------------------
 
 *Default value*: `(("pdf" . "xpdf") ("ps" . "gv"))'.
@@ -2648,7 +2688,7 @@ the program field blank for the relevant file type.
 
 File: ebib.info,  Node: File Regexp,  Next: File Search Dirs,  Prev: File Associations,  Up: The Customisation Buffer
 
-5.1.34 File Regexp
+5.1.35 File Regexp
 ------------------
 
 *Default value*: `[^?|\:*<>\" \n\t\f]+'.
@@ -2659,56 +2699,56 @@ advisable to put anything but filenames in the `file' field.
 
 File: ebib.info,  Node: File Search Dirs,  Next: Print Preamble,  Prev: File Regexp,  Up: The Customisation Buffer
 
-5.1.35 File Search Dirs
+5.1.36 File Search Dirs
 -----------------------
 
 *Default value*: `~'.
 
 File: ebib.info,  Node: Print Preamble,  Next: Print Newline,  Prev: File Search Dirs,  Up: The Customisation Buffer
 
-5.1.36 Print Preamble
+5.1.37 Print Preamble
 ---------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Print Newline,  Next: Print Multiline,  Prev: Print Preamble,  Up: The Customisation Buffer
 
-5.1.37 Print Newline
+5.1.38 Print Newline
 --------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Print Multiline,  Next: Latex Preamble,  Prev: Print Newline,  Up: The Customisation Buffer
 
-5.1.38 Print Multiline
+5.1.39 Print Multiline
 ----------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Latex Preamble,  Next: Print Tempfile,  Prev: Print Multiline,  Up: The Customisation Buffer
 
-5.1.39 Latex Preamble
+5.1.40 Latex Preamble
 ---------------------
 
 *Default value*: `\bibliographystyle{plain}'.
 
 File: ebib.info,  Node: Print Tempfile,  Next: Allow Identical Fields,  Prev: Latex Preamble,  Up: The Customisation Buffer
 
-5.1.40 Print Tempfile
+5.1.41 Print Tempfile
 ---------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Allow Identical Fields,  Next: Entry Types,  Prev: Print Tempfile,  Up: The Customisation Buffer
 
-5.1.41 Allow Identical Fields
+5.1.42 Allow Identical Fields
 -----------------------------
 
 *Default value*: `nil'.
 
 File: ebib.info,  Node: Entry Types,  Prev: Allow Identical Fields,  Up: The Customisation Buffer
 
-5.1.42 Entry Types
+5.1.43 Entry Types
 ------------------
 
 *Default value*: see below.
@@ -2893,136 +2933,138 @@ Node: Viewing Files44869
 Ref: #viewing-files44993
 Node: Advanced Features47326
 Ref: #advanced-features47467
-Node: Screen Layout47965
-Ref: #screen-layout48096
-Node: Preloading bib Files49625
-Ref: #preloading-.bib-files49805
-Node: @Preamble Definition50580
-Ref: #preamble-definition50760
-Node: @String Definitions52872
-Ref: #string-definitions53047
-Node: Managing keywords56305
-Ref: #managing-keywords56476
-Node: Sorting the bib File61511
-Ref: #sorting-the-.bib-file61696
-Node: Merging and Importing64680
-Ref: #merging-and-importing64861
-Node: Exporting Entries66016
-Ref: #exporting-entries66179
-Node: Timestamps68211
-Ref: #timestamps68364
-Node: Multiple Identical Fields69976
-Ref: #multiple-identical-fields70161
-Node: Virtual Databases72008
-Ref: #virtual-databases72192
-Node: Simple Selection73283
-Ref: #simple-selection73424
-Node: Complex Filters74384
-Ref: #complex-filters74563
-Node: Properties of Virtual Databases78380
-Ref: #properties-of-virtual-databases78566
-Node: The Multiline Edit Buffer79605
-Ref: #the-multiline-edit-buffer79796
-Node: The Options Menu83701
-Ref: #the-options-menu83848
-Node: The Ebib Buffers84458
-Ref: #the-ebib-buffers84599
-Node: The Index Buffer84939
-Ref: #the-index-buffer85074
-Node: The Entry Buffer89700
-Ref: #the-entry-buffer89862
-Node: The Strings Buffer92055
-Ref: #the-strings-buffer92196
-Node: Customisation93818
-Ref: #customisation93927
-Node: The Customisation Buffer94211
-Ref: #the-customisation-buffer94373
-Node: Default Type95537
-Ref: #default-type95673
-Node: Preload Bib Files95701
-Ref: #preload-bib-files95879
-Node: Preload Bib Search Dirs95903
-Ref: #preload-bib-search-dirs96095
-Node: Create Backups96117
-Ref: #create-backups96287
-Node: Keywords list96309
-Ref: #keywords-list96467
-Node: Keywords File96491
-Ref: #keywords-file96661
-Node: Keywords File Save On Exit96684
-Ref: #keywords-file-save-on-exit96889
-Node: Keywords Use Only File96913
-Ref: #keywords-use-only-file97123
-Node: Keywords Field Keep Sorted97147
-Ref: #keywords-field-keep-sorted97357
-Node: Keywords Separator97381
-Ref: #keywords-separator97572
-Node: Additional Fields97597
-Ref: #additional-fields97766
-Node: Layout97851
-Ref: #layout97985
-Node: Width98010
-Ref: #width98146
-Node: Vertical Window Split98167
-Ref: #vertical-window-split98346
-Node: Index Window Size98368
-Ref: #index-window-size98554
-Node: Index Display Fields98575
-Ref: #index-display-fields98759
-Node: Uniquify Keys98783
-Ref: #uniquify-keys98953
-Node: Autogenerate Keys98977
-Ref: #autogenerate-keys99152
-Node: Citation Commands99349
-Ref: #citation-commands99531
-Node: Multiline Major Mode105038
-Ref: #multiline-major-mode105219
-Node: Sort Order105249
-Ref: #sort-order105409
-Node: Save Xrefs First105433
-Ref: #save-xrefs-first105598
-Node: Crossref Face105622
-Ref: #crossref-face105784
-Node: Selected Face105830
-Ref: #selected-face105989
-Node: Use Timestamp106033
-Ref: #use-timestamp106195
-Node: Timestamp Format106219
-Ref: #timestamp-format106392
-Node: Standard Url Field106429
-Ref: #standard-url-field106603
-Node: Url Regexp106627
-Ref: #url-regexp106784
-Node: Browser Command106845
-Ref: #browser-command107012
-Node: Standard Doi Field107130
-Ref: #standard-doi-field107300
-Node: Doi Url107324
-Ref: #doi-url107476
-Node: Standard File Field107629
-Ref: #standard-file-field107804
-Node: File Associations107829
-Ref: #file-associations108004
-Node: File Regexp108322
-Ref: #file-regexp108482
-Node: File Search Dirs108717
-Ref: #file-search-dirs108884
-Node: Print Preamble108906
-Ref: #print-preamble109071
-Node: Print Newline109095
-Ref: #print-newline109257
-Node: Print Multiline109281
-Ref: #print-multiline109447
-Node: Latex Preamble109471
-Ref: #latex-preamble109636
-Node: Print Tempfile109682
-Ref: #print-tempfile109854
-Node: Allow Identical Fields109878
-Ref: #allow-identical-fields110063
-Node: Entry Types110087
-Ref: #entry-types110227
-Node: Modifying Key Bindings111810
-Ref: #modifying-key-bindings111968
+Node: Window Management47969
+Ref: #window-management48112
+Node: Preloading bib Files50881
+Ref: #preloading-.bib-files51065
+Node: @Preamble Definition51840
+Ref: #preamble-definition52020
+Node: @String Definitions54132
+Ref: #string-definitions54307
+Node: Managing keywords57565
+Ref: #managing-keywords57736
+Node: Sorting the bib File62771
+Ref: #sorting-the-.bib-file62956
+Node: Merging and Importing65940
+Ref: #merging-and-importing66121
+Node: Exporting Entries67276
+Ref: #exporting-entries67439
+Node: Timestamps69471
+Ref: #timestamps69624
+Node: Multiple Identical Fields71236
+Ref: #multiple-identical-fields71421
+Node: Virtual Databases73268
+Ref: #virtual-databases73452
+Node: Simple Selection74543
+Ref: #simple-selection74684
+Node: Complex Filters75644
+Ref: #complex-filters75823
+Node: Properties of Virtual Databases79640
+Ref: #properties-of-virtual-databases79826
+Node: The Multiline Edit Buffer80865
+Ref: #the-multiline-edit-buffer81056
+Node: The Options Menu84961
+Ref: #the-options-menu85108
+Node: The Ebib Buffers85718
+Ref: #the-ebib-buffers85859
+Node: The Index Buffer86199
+Ref: #the-index-buffer86334
+Node: The Entry Buffer90960
+Ref: #the-entry-buffer91122
+Node: The Strings Buffer93381
+Ref: #the-strings-buffer93522
+Node: Customisation95210
+Ref: #customisation95319
+Node: The Customisation Buffer95603
+Ref: #the-customisation-buffer95765
+Node: Default Type96952
+Ref: #default-type97088
+Node: Preload Bib Files97116
+Ref: #preload-bib-files97294
+Node: Preload Bib Search Dirs97318
+Ref: #preload-bib-search-dirs97510
+Node: Create Backups97532
+Ref: #create-backups97702
+Node: Keywords list97724
+Ref: #keywords-list97882
+Node: Keywords File97906
+Ref: #keywords-file98076
+Node: Keywords File Save On Exit98099
+Ref: #keywords-file-save-on-exit98304
+Node: Keywords Use Only File98328
+Ref: #keywords-use-only-file98538
+Node: Keywords Field Keep Sorted98562
+Ref: #keywords-field-keep-sorted98772
+Node: Keywords Separator98796
+Ref: #keywords-separator98987
+Node: Additional Fields99012
+Ref: #additional-fields99181
+Node: Layout99266
+Ref: #layout99400
+Node: Width99425
+Ref: #width99558
+Node: Popup Entry Window99579
+Ref: #popup-entry-window99753
+Node: Window Vertical Split99775
+Ref: #window-vertical-split99967
+Node: Index Window Size99989
+Ref: #index-window-size100175
+Node: Index Display Fields100196
+Ref: #index-display-fields100380
+Node: Uniquify Keys100404
+Ref: #uniquify-keys100574
+Node: Autogenerate Keys100598
+Ref: #autogenerate-keys100773
+Node: Citation Commands100970
+Ref: #citation-commands101152
+Node: Multiline Major Mode106667
+Ref: #multiline-major-mode106848
+Node: Sort Order106878
+Ref: #sort-order107038
+Node: Save Xrefs First107062
+Ref: #save-xrefs-first107227
+Node: Crossref Face107251
+Ref: #crossref-face107413
+Node: Selected Face107459
+Ref: #selected-face107618
+Node: Use Timestamp107662
+Ref: #use-timestamp107824
+Node: Timestamp Format107848
+Ref: #timestamp-format108021
+Node: Standard Url Field108058
+Ref: #standard-url-field108232
+Node: Url Regexp108256
+Ref: #url-regexp108413
+Node: Browser Command108474
+Ref: #browser-command108641
+Node: Standard Doi Field108759
+Ref: #standard-doi-field108929
+Node: Doi Url108953
+Ref: #doi-url109105
+Node: Standard File Field109258
+Ref: #standard-file-field109433
+Node: File Associations109458
+Ref: #file-associations109633
+Node: File Regexp109951
+Ref: #file-regexp110111
+Node: File Search Dirs110346
+Ref: #file-search-dirs110513
+Node: Print Preamble110535
+Ref: #print-preamble110700
+Node: Print Newline110724
+Ref: #print-newline110886
+Node: Print Multiline110910
+Ref: #print-multiline111076
+Node: Latex Preamble111100
+Ref: #latex-preamble111265
+Node: Print Tempfile111311
+Ref: #print-tempfile111483
+Node: Allow Identical Fields111507
+Ref: #allow-identical-fields111692
+Node: Entry Types111716
+Ref: #entry-types111856
+Node: Modifying Key Bindings113439
+Ref: #modifying-key-bindings113597
 
 End Tag Table
 
