@@ -107,9 +107,9 @@ default, Ebib takes over the entire frame and creates two windows
 to display the index and the entry buffer. Alternatively, Ebib
 can display only the index buffer in a window of the size
 `ebib-index-window-size', displaying the entry buffer only when
-it is needed. A third option uses the right part of the frame to
-the size of `ebib-width' to display both the index and the entry
-buffer."
+it is needed (see `ebib-popup-entry-window' as well). A third
+option uses the right part of the frame to the size of
+`ebib-width' to display both the index and the entry buffer."
   :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
                  (const :tag "Display only index window" index-only)
@@ -117,8 +117,14 @@ buffer."
 
 (defcustom ebib-popup-entry-window nil
   "If non-NIL, create a popup window to display the entry window.
-This option has no effect unless `ebib-layout' is set to
-`index-only'."
+By default, if `ebib-layout' is set to `index-only', Ebib will
+use an existing window to display the entry buffer when needed.
+If this option is set, however, Ebib will use the function
+`display-buffer-pop-up-window' to show the entry buffer,
+which (usually) means that a new window will be created.
+
+Note that setting this option has no effect unless `ebib-layout'
+is set to `index-only'."
   :group 'ebib-windows
   :type 'boolean)
 
