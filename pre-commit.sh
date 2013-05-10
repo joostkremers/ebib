@@ -42,6 +42,7 @@ function confirm_file
 function run_pandoc
 {
     local source="$1"
+    echo "$SCRIPT: running pandoc"
     pandoc --read=markdown \
            --write=texinfo \
            --output="$TEXINFO" \
@@ -57,6 +58,7 @@ function run_pandoc
 function run_makeinfo
 {
     local source="$1"
+    echo "$SCRIPT: runnig makeinfo"
     makeinfo "$1" && return 0 # makeinfo puts the output file in the current dir
     echo "$SCRIPT: makeinfo run failed"
     let "errors++"
