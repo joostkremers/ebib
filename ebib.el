@@ -4477,7 +4477,7 @@ created containing only these entries."
   (interactive)
   (goto-char (point-min))
   (let (entries)
-    (while (re-search-forward "\\\\bibitem\\[.*?\\]{\\(.*?\\)}" nil t)
+    (while (re-search-forward "\\\\bibitem\\[\\(?:.\\|\n[^\n]\\)*\\]{\\(.*?\\)}" nil t)
       (add-to-list 'entries (match-string 1) t))
     entries))
 
