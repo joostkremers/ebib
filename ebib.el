@@ -2980,13 +2980,21 @@ current entry."
   "Searches one entry of the ebib database.
 Returns a list of fields in ENTRY that match the regexp
 SEARCH-STR, or NIL if no matches were found. If FIELD is given,
-only that field is searched."
+only that field is searched.
+
+Normally, the `type*' field, which stores the entry type, is not
+searched, but it is possible to seach for specific entry types by
+specifying `type*' for FIELD (note the asterisk). In that case,
+the search string can still be a string, but only exact matches
+will return a result."
   (let ((case-fold-search t)  ; we want to ensure a case-insensitive search
         (result nil))
     (if field
         (let ((value (gethash field entry)))
-          (when (and (stringp value) ; the type* field has a symbol as value
-                     (string-match search-str value))
+          (when (or (and (stringp value)
+                         (string-match search-str value))
+                    (and (symbolp value)
+                         (string= search-str (symbol-name value))))  ; the type* field has a symbol as value
             (setq result (list field))))
       (maphash #'(lambda (field value)
                    (when (and (stringp value) ; the type* field has a symbol as value
@@ -3307,10 +3315,11 @@ a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s(contains <field> <regexp>)%s. Enter field: "
                                         (if (< not 0) "(not " "")
                                         (if (< not 0) ")" ""))
-                                (cons '("any" 0)
-                                      (mapcar #'(lambda (x)
-                                                  (cons (symbol-name x) 0))
-                                              (append ebib-unique-field-list ebib-additional-fields)))
+                                (append  (list '("any" . 0)
+                                               '("type*" . 0))
+                                         (mapcar #'(lambda (x)
+                                                     (cons (symbol-name x) 0))
+                                                 (append ebib-unique-field-list ebib-additional-fields)))
                                 nil t)))
     (setq field (intern-soft field))
     (let ((regexp (read-string (format "Filter: %s(contains %s <regexp>)%s. Enter regexp: "
