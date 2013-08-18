@@ -3253,9 +3253,11 @@ which file to choose."
                              (locate-file file ebib-file-search-dirs)
                              (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
                              file)))))
-    (let ((file-full-path (if (or (file-exists-p filename) (null n))
-                            filename
-                            (funcall nth-filename filename n))))
+		(let ((file-full-path (locate-file filename ebib-file-search-dirs)))
+			(if (not file-full-path)
+				(cond
+					(n (setq file-full-path (funcall nth-filename filename n)))
+					((file-exists-p filename) (setq file-full-path filename))))
       (if (file-exists-p file-full-path)
         (progn
           (setq file-full-path (expand-file-name file-full-path))
