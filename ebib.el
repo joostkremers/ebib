@@ -3249,36 +3249,37 @@ which file to choose."
      (beep))))
 
 (defun ebib-call-file-viewer (filename &optional n)
-  "Open FILENAME with an external viewer. Optionally, pass the Nth file in a string of whitespace-separated filenames."
-  (let ((nth-filename '(lambda (filenames n)
-                         (let ((file (nth (1- n)
-                                       (let ((start 0)
-                                             (result nil))
-                                         (while (string-match ebib-file-regexp filenames start)
-                                           (add-to-list 'result (match-string 0 filenames) t)
-                                           (setq start (match-end 0)))
-                                         result))))
-                           (or
-                             (locate-file file ebib-file-search-dirs)
-                             (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
-                             file)))))
-    (let ((file-full-path (locate-file filename ebib-file-search-dirs)))
-      (if (not file-full-path)
-        (cond
-          ((file-exists-p filename) (setq file-full-path filename))
-          (n (setq file-full-path (funcall nth-filename filename n)))))
-      (if (file-exists-p file-full-path)
-        (progn
-          (setq file-full-path (expand-file-name file-full-path))
-          (let ((ext (file-name-extension file-full-path)))
+  "Open FILENAME with an external viewer.
+FILENAME can also be a string of whitespace-separated filenames,
+in which case the Nth file is opened (N defaults to 1)."
+  (let ((file-full-path (locate-file filename ebib-file-search-dirs)))
+    (unless file-full-path
+      ;; Note: if FILENAME is a full path, LOCATE-FILE will return it even
+      ;; if it's not in EBIB-FILE-SEARCH-DIRS. So if LOCATE-FILE returns
+      ;; NIL, we're (most likely) dealing with a list of files.
+      (or n (setq n 1))
+      (setq file-full-path
+            (let ((file (nth (1- n)
+                             (let ((start 0)
+                                   (result nil))
+                               (while (string-match ebib-file-regexp filename start)
+                                 (add-to-list 'result (match-string 0 filename) t)
+                                 (setq start (match-end 0)))
+                               result))))
+              (or
+               (locate-file file ebib-file-search-dirs)
+               (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
+               (expand-file-name file)))))
+    (if (file-exists-p file-full-path)
+        (let ((ext (file-name-extension file-full-path)))
           (if-str (viewer (cdr (assoc ext ebib-file-associations)))
-            (progn
-              (message "Executing `%s %s'" viewer file-full-path)
-              (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+              (progn
+                (message "Executing `%s %s'" viewer file-full-path)
+                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
-            (ffind-file file-full-path))))
-        (error "File not found: `%s'" file-full-path)))))
+            (find-file file-full-path)))
+      (error "File not found: `%s'" file-full-path))))
 
 (defun ebib-virtual-db-and (not)
   "Filters entries into a virtual database.

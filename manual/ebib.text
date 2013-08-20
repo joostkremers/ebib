@@ -309,7 +309,7 @@ As just explained, if you press `u` in the index buffer, Ebib searches the `url`
 
 If you have electronic versions of the papers in your database stored on your computer, you can use Ebib to call external viewers for these files. The interface for this is similar to that for calling a browser: if you press `f` in the index buffer, Ebib searches the `file` field for a filename and when it finds one, calls an appropriate viewer.
 
-Just as with `u`, you can use `f` in the entry buffer as well, in which case it can be used on any field, not just the `file` field. It is also possible to have more than one filename in a field: you can select the one you want to view with the prefix argument.
+Just as with `u`, you can use `f` in the entry buffer as well, in which case it can be used on any field, not just the `file` field. It is also possible to have more than one filename in a field: you can select the one you want to view with the prefix argument. Note that if you have more than one filename in the `file` field, Ebib assumes they are whitespace-separated, which means that you cannot have filenames with spaces in them. (If there's only one filename, it *can* contain spaces.)
 
 Just as in the case of URLs, you can customise several things about the file view functionality. The option [Standard File Field](#standard-file-field) allows you to customise the field that `f` extracts filenames from when pressed in the index buffer. Extracting filenames is done with a regular expression, which can be customised through the option [File Regexp](#file-regexp).
 

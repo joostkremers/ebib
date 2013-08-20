@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 4.13 from
+Dies ist ebib.info, hergestellt von Makeinfo Version 4.8 aus
 manual/texi/ebib.texi.
 
 INFO-DIR-SECTION Emacs
@@ -79,12 +79,14 @@ You can also install Ebib manually by copying the file `ebib.el' to
 somewhere in your load path and add the following line to Emacs' init
 file `~/.emacs':
 
+
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
 
 On a default installation, the load path probably only contains system
 directories. If you want to run `ebib.el' from somewhere else (e.g.,
 directly from the source directory), you can add this directory to your
 load path:
+
 
 (add-to-list 'load-path "~/src/ebib"))
 
@@ -95,6 +97,7 @@ appear in the buffer.
 
 Alternatively, you can load Ebib directly by putting the following in
 `.emacs':
+
 
 (load "/path/to/ebib")
 
@@ -107,6 +110,7 @@ It is recommended to byte-compile the source, Ebib runs quite a lot
 faster when it is byte-compiled. You can do this either within Emacs
 with `M-x byte-compile-file' (recommended on OS X), or from your shell
 by going into the directory where you put `ebib.el' and typing:
+
 
 emacs -batch -f batch-byte-compile ebib.el
 
@@ -142,6 +146,7 @@ Once Ebib has been installed and is loaded, you can start it with `M-x
 ebib'. This command is also used to return to Ebib when you have put
 the program in the background. You can bind this command to a key
 sequence by putting something like the following in Emacs' init file:
+
 
 (global-set-key "\C-ce" 'ebib)
 
@@ -240,7 +245,7 @@ should have no problem loading an existing `.bib' file into Ebib. If,
 however, you have custom entry types, or custom fields in your `.bib'
 files, you should define them. This can be done by selecting "Options |
 Modify Entry Types" from the Ebib menu. (See also the chapter on
-customising Ebib, esp. *note Entry Types: #entry-types.)
+customising Ebib, esp. *Note Entry Types: #entry-types.)
 
 Every time Ebib reads a `.bib' file, it produces a few log messages.
 These are written into a special buffer `*Ebib-log*'. If Ebib
@@ -267,7 +272,7 @@ File: ebib.info,  Node: Navigating a bib File,  Next: Starting a New bib File,  
 Once you've opened a `.bib' file, the keys of all the entries in the
 file are shown in alphabetical order in the index buffer in the top
 Ebib window. (In fact, it is possible to show more than just the entry
-key in this buffer. See *note Index Display Fields:
+key in this buffer. See *Note Index Display Fields:
 #index-display-fields. on how to accomplish this.) The first entry is
 highlighted, meaning it is the current entry. The fields it holds and
 their values are shown in the entry buffer in the bottom Ebib window.
@@ -291,7 +296,7 @@ additional fields, for example, to add personal comments to the works
 in your database. Ebib by default defines the following additional
 fields: `crossref', `url', `annote', `abstract', `keywords', `file' and
 `timestamp'. If these are not sufficient for you, you need to customise
-Ebib and add your own fields. (See *note Additional Fields:
+Ebib and add your own fields. (See *Note Additional Fields:
 #additional-fields, if you need to find out how to do that.)
 
 To move around in the index buffer, you can use the `up' and `down'
@@ -357,7 +362,7 @@ the entry key must be unique, Ebib will complain if you enter a key
 that already exists.
 
 You can also have Ebib automatically generate entry keys: if you set
-the customisation option *note Autogenerate Keys: #autogenerate-keys,
+the customisation option *Note Autogenerate Keys: #autogenerate-keys,
 Ebib does not ask you for a key when you add a new entry. Instead, it
 creates a temporary key (of the form `<new-entry>'). When you have
 finished entering the field values for the new entry, Ebib
@@ -376,7 +381,7 @@ asked for confirmation, but once you've confirmed, the entry is gone,
 and it is not possible to bring it back. There is no undo in Ebib. (If
 you haven't saved the database yet, it is still possible to retrieve
 the deleted entry from the `.bib' file, and otherwise it may still be
-in the backup file that Ebib creates. See *note Saving a Database:
+in the backup file that Ebib creates. See *Note Saving a Database:
 #saving-a-database.)
 
 
@@ -467,7 +472,7 @@ regardless of the fact whether it is the `annote' field or not, Ebib
 puts you in the multiline edit buffer. Therefore, you need `l' only if
 you want to give a field a multiline value when it doesn't have one yet.
 
-For more details on working with the multiline edit buffer, see *note
+For more details on working with the multiline edit buffer, see *Note
 The Multiline Edit Buffer: #the-multiline-edit-buffer.
 
 
@@ -507,7 +512,7 @@ saves the database to the file it was loaded from without asking for
 confirmation. (It is similar to `C-x C-s' in Emacs.) If you're saving a
 file for the first time after loading it, Ebib creates a backup file.
 (Ebib honours `backup-directory-alist' when saving backups. Note that
-you can also disable backups altogether with the option *note Create
+you can also disable backups altogether with the option *Note Create
 Backups: #create-backups.
 
 If you have multiple databases open, have made changes in more than one
@@ -560,7 +565,7 @@ searching. To continue searching from the top, hit `g' and then `n'.
 
 The functions described here form Ebib's basic search functionality.
 Ebib also has a much more powerful search mechanism in the form of
-_virtual databases_. These are described later. (See *note Virtual
+_virtual databases_. These are described later. (See *Note Virtual
 Databases: #virtual-databases.)
 
 
@@ -593,7 +598,7 @@ citation at the current cursor position in the buffer you've supplied.
 The citation command that `ebib-insert-bibtex-key' and the command key
 `p' ask for have to be defined before you can use them. (By default,
 only the `\cite' command has been predefined for LaTeX.) For details on
-setting this up, see *note Citation Commands: #citation-commands.
+setting this up, see *Note Citation Commands: #citation-commands.
 
 Another Ebib command is available for LaTeX documents: the command
 `ebib-create-bib-from-bbl' creates a `.bib' file from the `.bbl' file
@@ -614,6 +619,7 @@ Probably the easiest way to use both `ebib-insert-bibtex-key' and
 `ebib-entry-summary' is to bind them to a key sequence. For example,
 you could put the following in your `~/.emacs':
 
+
 (add-hook 'LaTeX-mode-hook #'(lambda ()
                                (local-set-key "\C-cb" 'ebib-insert-bibtex-key)))
 
@@ -633,9 +639,11 @@ link types can be created by the user. If you use orgmode to write
 papers and want to use bibliographic references, it is easy to set up
 orgmode to use Ebib. If you add the following line to `~/.emacs':
 
+
 (org-add-link-type "ebib" 'ebib)
 
 you can create org links of the following form:
+
 
 [ebib:Jones1992][Jones (1992)]
 
@@ -667,7 +675,7 @@ produces `[cf. @Abney1987, p. 50]' and the `year' format, which
 suppresses the author in the (LaTeX/html/what have you) output,
 produces `[-@Abney1987 p. 50]'. Of these three, the `paren' type can
 contain multiple citations (e.g., `[cf. @Abney1987, p. 50; @Dahl2004,
-p. 204]'), which Ebib can handle as well. See *note Citation Commands:
+p. 204]'), which Ebib can handle as well. See *Note Citation Commands:
 #citation-commands. for further details.
 
 
@@ -740,7 +748,7 @@ When you fill in the `crossref' field in Ebib, Ebib displays the values
 of the cross-referenced entry in the entry buffer. To indicate that
 they are just inherited values, they are marked with
 `ebib-crossref-face', which by default is red. (You can customise it,
-of course. See the customisation option *note Crossref Face:
+of course. See the customisation option *Note Crossref Face:
 #crossref-face.) These values are merely displayed for convenience:
 they cannot be edited. (They can be copied, however).
 
@@ -771,7 +779,7 @@ the cross-referenced entry. In order to find the next cross-referencing
 entry, you have to type `n', as with a normal search.
 
 Note that if you want to use BibTeX's cross-referencing options, you
-need to set the option *note Save Xrefs first: #save-xrefs-first. This
+need to set the option *Note Save Xrefs first: #save-xrefs-first. This
 tells Ebib to save all entries with a `crossref' field first in the
 `.bib' file. Without this, BibTeX's cross-referencing will not work
 reliably.
@@ -789,7 +797,7 @@ This can be achieved by selecting entries. You can select the entries
 you want to perform a command on with the key `m'. This selects (or
 unselects) the current entry. Selected entries are displayed in inverse
 video. Note that the face properties of selected entries can be
-customised through the customisation option *note Selected Face:
+customised through the customisation option *Note Selected Face:
 #selected-face.)
 
 Of the commands discussed so far, two can be used on selected entries:
@@ -844,7 +852,7 @@ By default, the index cards only show single-line field values. That
 is, multiline values are normally excluded. If you want to include
 multiline values in the print-out, you have to set the option `Print
 Multiline' in the Options menu or in Ebib's customisation buffer. (See
-*note The Customisation Buffer: #the-customisation-buffer.) With this
+*Note The Customisation Buffer: #the-customisation-buffer.) With this
 option set, Ebib includes all multiline values in the LaTeX file that
 it creates. Note however that Ebib does not change anything about the
 formatting of the text in a multiline value. So if you plan to make
@@ -882,7 +890,7 @@ it creates. Use this if you want to use specific packages (e.g.
 for printing a bibliography, since by default, Ebib uses BibTeX's
 standard bibliography style. With the option `LaTeX Preamble' you can
 set your preferred bibliography style. Details are discussed in the
-chapter on customisation, see *note The Customisation Buffer:
+chapter on customisation, see *Note The Customisation Buffer:
 #the-customisation-buffer.
 
 
@@ -911,7 +919,7 @@ every string of characters that starts with `http://' or `https://' and
 that does not contain whitespace or any of the characters `" ' <' or
 `>' as a URL. Furthermore, Ebib regards everything that is enclosed in
 a LaTeX `\url{...}' command as a URL. This behaviour is controlled by a
-regular expression that can be customised. (See *note Url Regexp:
+regular expression that can be customised. (See *Note Url Regexp:
 #url-regexp.)
 
 Similarly, with the key `i' in the index buffer you can send a DOI to a
@@ -919,19 +927,19 @@ browser. The DOI must be stored in the `doi' field. Ulike URLs, there
 can only be one DOI in this field. The whole contents of the field is
 assumed to be the DOI and is sent to the browser unchanged. A DOI is
 normally resolved through the URL `http://dx.doi.org/', but if you
-prefer a different URL, you can customize the option *note Doi Url:
+prefer a different URL, you can customize the option *Note Doi Url:
 #doi-url.
 
 There exists an Emacs function `browse-url', which provides a nifty
 interface to calling an external browser. In principle, Ebib uses this
 function. However, if this function is not present on your
-installation, you can set the option *note Browser Command:
+installation, you can set the option *Note Browser Command:
 #browser-command. to call the browser.
 
 As just explained, if you press `u' in the index buffer, Ebib searches
 the `url' field of the current entry for URLs. If you have the habit of
 putting your URLs in another field, however, you may change the
-customisation option *note Standard Url Field: #standard-url-field. and
+customisation option *Note Standard Url Field: #standard-url-field. and
 tell Ebib to use another field for searching the URLs. The same can be
 done for the DOI field.
 
@@ -950,16 +958,19 @@ for a filename and when it finds one, calls an appropriate viewer.
 Just as with `u', you can use `f' in the entry buffer as well, in which
 case it can be used on any field, not just the `file' field. It is also
 possible to have more than one filename in a field: you can select the
-one you want to view with the prefix argument.
+one you want to view with the prefix argument. Note that if you have
+more than one filename in the `file' field, Ebib assumes they are
+whitespace-separated, which means that you cannot have filenames with
+spaces in them. (If there's only one filename, it _can_ contain spaces.)
 
 Just as in the case of URLs, you can customise several things about the
-file view functionality. The option *note Standard File Field:
+file view functionality. The option *Note Standard File Field:
 #standard-file-field. allows you to customise the field that `f'
 extracts filenames from when pressed in the index buffer. Extracting
 filenames is done with a regular expression, which can be customised
-through the option *note File Regexp: #file-regexp.
+through the option *Note File Regexp: #file-regexp.
 
-The option *note File Search Dirs: #file-search-dirs. allows you to
+The option *Note File Search Dirs: #file-search-dirs. allows you to
 tell Ebib which directories it needs to search for files. The default
 value is `~', which means Ebib just looks in your home dir. Since this
 is probably not where you keep your files, you may want to customise
@@ -976,7 +987,7 @@ separate directory.
 
 Ebib can call different external programs depending on the file type of
 the relevant file, but you have to specify which programs to call. The
-option *note File Associations: #file-associations. allows you to do
+option *Note File Associations: #file-associations. allows you to do
 this. By default, `.pdf' and `.ps' files are handled, by `xpdf' and
 `gv', respectively. You can specify further file types by their
 extensions (do not include the dot). The program is searched for in
@@ -1020,7 +1031,7 @@ There are a few options to change this behaviour, however. They are all
 part of the customisation group `ebib-windows', and allow you to
 specify two alternative ways to deal with Ebib windows.
 
-The main option that controls Ebib's window behaviour is *note Layout:
+The main option that controls Ebib's window behaviour is *Note Layout:
 #layout. If you set this option to display only the index buffer on
 startup, Ebib does not display the entry buffer when it is started.
 Instead, only the index buffer is displayed, which can be navigated in
@@ -1040,7 +1051,7 @@ hide the index window, you can use `Z' (that is a capital `Z').
 A third option to deal with windows is to set the layout to a custom
 width. In this case, Ebib takes up the right part of the frame,
 displaying the index and entry buffers. The width of the Ebib windows
-can then be set with the option *note Width: #width, which defaults to
+can then be set with the option *Note Width: #width, which defaults to
 80. Note that in this case, the multiline edit buffer is not displayed
 in the same window as the entry buffer. Rather, Ebib uses another,
 non-Ebib window to display it. Here, too, the key `z' switches to a
@@ -1048,16 +1059,16 @@ non-Ebib window without hiding the Ebib windows. Use capital `Z' to
 hide them.
 
 If you set Ebib's layout to display only the index buffer on startup,
-you can additionally set the option *note Popup Entry Window:
+you can additionally set the option *Note Popup Entry Window:
 #popup-entry-window. Normally, Ebib will reuse an existing window to
 display the entry buffer (and restore its original buffer when you
 leave the entry buffer). With this option set, however, Ebib uses the
 Emacs function `display-buffer-popup-window' to create a new window
 (which is destroyed again when you leave the entry buffer).
 
-Further relevant options are *note Window Vertical Split:
+Further relevant options are *Note Window Vertical Split:
 #window-vertical-split, which displays the index buffer to the left of
-the frame rather than at the top, and *note Index Window Size:
+the frame rather than at the top, and *Note Index Window Size:
 #index-window-size, which determines the size of the index window
 (either its height or its width, depending on whether the index window
 is displayed at the top or on the left of the frame.)
@@ -1072,13 +1083,13 @@ Chances are that you will be doing most of your work with one or a few
 `.bib' files, and you may find yourself opening the same file or files
 every time you start Ebib. If so, you can tell Ebib to always load
 specific `.bib' files on startup. To do this, specify the files in
-Ebib's customisation buffer, under the option *note Preload Bib Files:
+Ebib's customisation buffer, under the option *Note Preload Bib Files:
 #preload-bib-files.
 
 By default, `.bib' files are searched for in your home directory. Since
 this is most likely not where you keep the files, you need to specify
 either the file's full path or a relative path starting from your home
-directory. Alternatively, you can customize the option *note Preload
+directory. Alternatively, you can customize the option *Note Preload
 Bib Search Dirs: #preload-bib-search-dirs. to specify one or more
 directories in which Ebib should search the `.bib' files.
 
@@ -1102,10 +1113,12 @@ suffices, because you can use the concatenation character `#' to
 include multiple TeX or LaTeX commands. So, rather than having two
 `@preamble' definitions such as:
 
+
 @preamble{ "\newcommand{\noopsort}[1]{} " }
 @preamble{ "\newcommand{\singleletter}[1]{#1} " }
 
 you can write this in your `.bib' file:
+
 
 @preamble{ "\newcommand{\noopsort}[1]{} "
          # "\newcommand{\singleletter}[1]{#1} " }
@@ -1116,7 +1129,7 @@ buffer for editing the text of the `@preamble' definition, which means
 that as discussed above, `C-c | q' stores the `@preamble' text and
 returns focus to the index buffer, while `C-c | c' returns focus to the
 index buffer while abandoning any changes you may have made. (For
-details on using the multiline edit buffer, see *note The Multiline
+details on using the multiline edit buffer, see *Note The Multiline
 Edit Buffer: #the-multiline-edit-buffer.)
 
 In order to create a `@preamble' as shown above in Ebib, you only have
@@ -1124,6 +1137,7 @@ to type the text between the braces. Ebib takes care of including the
 braces of the `@preamble' command, but otherwise it saves the text
 exactly as you enter it. So in order to get the preamble above, you'd
 have to type the following in Ebib:
+
 
 "\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
 
@@ -1181,13 +1195,16 @@ Note that this also makes it possible to enter field values that are
 composed of concatenations of strings and abbreviations. The BibTeX
 documentation for example explains that if you have defined:
 
+
 @string{WGA = "World Gnus Almanac"}
 
 you can create a BibTeX field like this:
 
+
 title = 1966 # WGA
 
 which will produce "1966 World Gnus Almanac". Or you can do:
+
 
 month = "1~" # jan
 
@@ -1240,7 +1257,7 @@ Remembering keywords is practical, but it is even more useful if
 remembered keywords can be saved, so that they are available the next
 time you start Ebib. There are two ways of doing this: first, there is
 an option `ebib-keywords-list' that you can use to store keywords. (See
-*note Keywords List: #keywords-list.) Keywords stored in this option
+*Note Keywords List: #keywords-list.) Keywords stored in this option
 will be available for TAB completion to all databases in Ebib. New
 keywords, however, will not automatically be stored. If you find you
 need a keyword not on the list and want to make it permanent, you'll
@@ -1252,7 +1269,7 @@ so you have to choose one). You can either configure a single keyword
 file, with keywords that are available to all databases, or you can
 configure per-directory keyword files, with keywords that are available
 for all `.bib' files in the same directory. You can set up keyword
-files by configuring the option *note Keywords File: #keywords-file.
+files by configuring the option *Note Keywords File: #keywords-file.
 You can either set it to use a single keyword file, in which case you
 need to specify a file with its full path, or you can use per-directory
 keyword files, in which case you must provide a filename without a
@@ -1271,14 +1288,14 @@ same directory, Ebib won't reload the keywords file.
 
 When you close a database, Ebib checks if you have added new keywords
 to it and asks you if you want to save them. You can tell Ebib to save
-new keywords automatically by setting the option *note Keywords File
+new keywords automatically by setting the option *Note Keywords File
 Save On Exit: #keywords-file-save-on-exit. to `always'. Note that this
 doesn't save the keywords when you enter them, only when you close the
 database or quit Ebib. You can also set this option to `never', which
 means Ebib will discard new keywords when the database is closed. Note
 that there are also two menu options for saving keywords.
 
-The option *note Keywords Use Only File: #keywords-use-only-file.
+The option *Note Keywords Use Only File: #keywords-use-only-file.
 controls whether Ebib uses only the keyword file, or both the keyword
 file and the configured keyword list. This option is only useful when
 you have configured a keyword file. In that case, setting this option
@@ -1287,7 +1304,7 @@ keywords from both sources when you edit the keyword field. Otherwise,
 only the keyword file is used.
 
 It is also possible to tell Ebib to sort the keywords in the `keywords'
-field in alphabetical order. Set the option *note Keywords Field Keep
+field in alphabetical order. Set the option *Note Keywords Field Keep
 Sorted: #keywords-field-keep-sorted. if you want to do this. Note that
 setting this option also automatically removes duplicates.
 
@@ -1353,7 +1370,7 @@ _not_ use the second sort level to sort that entry. It uses the entry
 key. The second sort level is only used if the first yields _identical_
 values for two or more entries.)
 
-Note that if you have set the option `Save Xrefs First' (see *note
+Note that if you have set the option `Save Xrefs First' (see *Note
 Cross-referencing: #cross-referencing.), it is pointless to set a sort
 order. Saving cross-referencing entries first messes up any sort order,
 so Ebib simply ignores the sort order if `Save Xrefs First' is set.
@@ -1488,7 +1505,7 @@ entries that they produce. If you were to import such an entry into
 Ebib, you would lose all your keywords except the last one. To remedy
 this, you can tell Ebib that it should allow multiple occurrences of a
 single field in a BibTeX entry. You can do this by setting the
-customisation option *note Allow Identical Fields:
+customisation option *Note Allow Identical Fields:
 #allow-identical-fields.
 
 With this option set, Ebib collapses the multiple occurrences into a
@@ -1497,6 +1514,7 @@ collected and stored in the single occurrence, separated by semicolons.
 That is, Ebib does not retain the multiple occurrences, but it does
 retain the values. So suppose you have an entry that contains the
 following `keywords' fields:
+
 
 @book{jones1998,
     author = {Jones, Joan},
@@ -1509,6 +1527,7 @@ following `keywords' fields:
 
 If you load this entry into Ebib with the option `Allow Identical
 Fields' set, you will get the following:
+
 
 @book{jones1998,
     author = {Jones, Joan},
@@ -1524,7 +1543,7 @@ File: ebib.info,  Node: Virtual Databases,  Next: The Multiline Edit Buffer,  Pr
 ======================
 
 In the previous chapter, Ebib's basic search functionality was
-discussed. (See *note Searching: #searching.) Ebib also provides a much
+discussed. (See *Note Searching: #searching.) Ebib also provides a much
 more sophisticated search and filtering mechanism in the form of
 _virtual databases_.
 
@@ -1740,13 +1759,14 @@ somewhat awkward. The reason for this is that these commands are part
 of a minor mode, which restricts the available keys to combinations of
 `C-c' plus a non-alphanumeric character. However, it is possible to
 change the key commands, if you wish. Ebib itself provides a method to
-change the second key of these commands: see *note Modifying Key
+change the second key of these commands: see *Note Modifying Key
 Bindings: #modifying-key-bindings. for details. You could change the
 `|' to e.g., `c' or `C-c', if these do not conflict with any key
 commands in the major mode used for the multiline edit buffer.
 
 Even more drastically, you could put something like the following in
 your `~/.emacs':
+
 
 (eval-after-load 'ebib
   '(progn
@@ -1786,7 +1806,7 @@ File: ebib.info,  Node: The Ebib Buffers,  Next: Customisation,  Prev: Advanced 
 This chapter lists all the key commands that exist in Ebib, with a
 short description and the actual command that they call. The latter
 information is needed if you want to customise Ebib's key bindings.
-(See *note Modifying Key Bindings: #modifying-key-bindings.)
+(See *Note Modifying Key Bindings: #modifying-key-bindings.)
 
 * Menu:
 
@@ -2443,6 +2463,7 @@ File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: A
 
 *Default value*:
 
+
 ((any
   (("cite" "\\cite%<[%A]%>{%K}")))
  (org-mode
@@ -2480,10 +2501,12 @@ optional arguments that are formatted as pre- or postnotes to the
 citation. For example, using the `natbib' package, you have citation
 commands available of the form:
 
+
 \citet[cf.][p. 50]{Jones1992}
 
 In order to be able to insert such citations, the format string must
 contain `%A' directives:
+
 
 \citet[%A][%A]{%K}
 
@@ -2493,6 +2516,7 @@ directives. Of course, it is possible to leave the arguments empty (by
 just hitting `RET'). With the format string above, this would yield the
 following citation in the LaTeX buffer:
 
+
 \citet[][]{Jones1992}
 
 This is completely harmless, because LaTeX will simply ignore the empty
@@ -2500,10 +2524,12 @@ arguments. However, you may prefer for the brackets not to appear if
 the arguments are empty. In that case, you can wrap the brackets and
 the `%A' directives in a `%<...%>' pair:
 
+
 \citet%<[%A]%>%<[%A]%>{%K}
 
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
+
 
 \citet{Jones1992}
 
@@ -2511,11 +2537,13 @@ Note however, that in this case there is in fact one problem associated
 with this format string. If you fill out the first argument but not the
 second, Ebib produces the wrong format string:
 
+
 \citet[cf.]{Jones1992}
 
 If only one optional argument is provided, `natbib' assumes that it is
 a postnote, while what you intended is actually a prenote. Therefore,
 it is best not to make the second argument optional:
+
 
 \citet%<[%A]%>[%A]{%K}
 
@@ -2529,6 +2557,7 @@ keys and then use `; p' to push them to a buffer. In this case, Ebib
 asks you for a separator and then inserts all keys into the position of
 `%K':
 
+
 \citet{Jones1992,Haddock2004}
 
 It is, however, also possible to specify in the format string that a
@@ -2537,6 +2566,7 @@ be separated. This is done by wrapping that portion of the format
 string that can be repeated in a `%(...%)' pair. Normally, you'll want
 to provide a separator, which is done by placing it between the `%' and
 the closing parenthesis:
+
 
 \citet[%A][%A]{%(%K%,)}
 
@@ -2548,12 +2578,14 @@ put `%A' directives in the repeating part. This is useful for the
 `biblatex' package. `Biblatex' has so-called _multicite_ commands,
 which take the following form:
 
+
 \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
 
 Multicite commands can take more than one citation key in braces `{}'
 and each of those citation keys can take two optional arguments in
 brackets `[]'. In order to get such citations, you can provide the
 following format string:
+
 
 \footcites%(%<[%A]%>[%A]{%K}%)
 
@@ -2567,6 +2599,7 @@ Of course it is also possible to combine parts that are repeated with
 parts that are not repeated. In fact, that already happens in the
 previous example, because the part `\footcites' is not repeated. But
 the part that is not repeated may contain `%A' directives as well:
+
 
 \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
 
@@ -2768,6 +2801,7 @@ only optional fields.
 
 The default entry types and fields are the following:
 
+
  article                                               ;; name of entry type
    author title journal year                           ;; obligatory fields
    volume number pages month note                      ;; optional fields
@@ -2832,12 +2866,13 @@ available through the menu to a key, you can do so by creating a file
 `~/.ebibrc' and writing your preferred key bindings in it. A key
 binding definition is built up as follows:
 
+
 (ebib-key <buffer> <key> <command>)
 
 `<buffer>' is either `index', `entry' or `strings', for the
 corresponding buffer. `<key>' is a standard Emacs key description, and
 `<command>' is the Ebib command to be associated with the key. The
-commands that can be used here are listed in *note The Ebib Buffers:
+commands that can be used here are listed in *Note The Ebib Buffers:
 #the-ebib-buffers. Note that it is possible to bind more than one key
 to a single function: just add as many `ebib-key' statements as
 necessary.
@@ -2846,11 +2881,13 @@ As an example, the following binds `C-s' to `ebib-search' in the index
 buffer, so that the database can be searched with `C-s' as well as with
 `/':
 
+
 (ebib-key index "\C-s" ebib-search)
 
 If you want to unbind a key, you can simply leave out `<command>'. So
 if you want to bind the command `ebib-delete-entry' to `D' rather than
 `d', you need to put the following in `.ebibrc':
+
 
 (ebib-key index "D" ebib-delete-entry)
 (ebib-key index "d")
@@ -2872,6 +2909,7 @@ It is also possible to redefine the prefix key itself. To do this, you
 must specify `select-prefix' for `<buffer>'. The value of `<command>'
 is irrelevant here, so it can be left out:
 
+
 (ebib-key select-prefix ":")
 
 This sets up `:' as the new prefix key. Doing this automatically
@@ -2879,6 +2917,7 @@ unbinds the existing prefix key.
 
 As a final option, `ebib-key' allows you to redefine the second key in
 the key bindings of the multiline edit buffer:
+
 
 (ebib-key multiline "&")
 
@@ -2888,195 +2927,190 @@ s' to `C-c & q', `C-c & c' and `C-c & s', respectively.
 
 
 Tag Table:
-Node: Top196
-Node: Installation1382
-Ref: #installation1495
-Node: Package manager1596
-Ref: #package-manager1727
-Node: Manual installation2270
-Ref: #manual-installation2442
-Node: Installing the info file3890
-Ref: #installing-the-info-file4070
-Node: Starting Ebib4763
-Ref: #starting-ebib4893
-Node: Basic Usage5367
-Ref: #basic-usage5492
-Node: Getting Started7028
-Ref: #getting-started7159
-Node: Opening a bib File8099
-Ref: #opening-a-.bib-file8254
-Node: Navigating a bib File10181
-Ref: #navigating-a-.bib-file10374
-Node: Starting a New bib File13398
-Ref: #starting-a-new-.bib-file13568
-Node: Editing the Database13850
-Ref: #editing-the-database14017
-Node: Adding and Deleting Entries14328
-Ref: #adding-and-deleting-entries14509
-Node: Editing Fields Values16116
-Ref: #editing-fields-values16318
-Node: Editing Multiline Values18624
-Ref: #editing-multiline-values18835
-Node: Copy Cut Paste Yank and Delete20846
-Ref: #copy-cut-paste-yank-and-delete21049
-Node: Saving a Database22001
-Ref: #saving-a-database22156
-Node: Searching23135
-Ref: #searching23271
-Node: LaTeX Integration25508
-Ref: #latex-integration25663
-Node: Orgmode and markdown28500
-Ref: #orgmode-and-markdown28697
-Node: Consulting Databases from within a LaTeX File30825
-Ref: #consulting-databases-from-within-a-latex-file31072
-Node: Cross-referencing33426
-Ref: #cross-referencing33614
-Node: Selecting Entries36659
-Ref: #selecting-entries36823
-Node: Printing the Database38191
-Ref: #printing-the-database38365
-Node: Calling a Browser42327
-Ref: #calling-a-browser42489
-Node: Viewing Files44869
-Ref: #viewing-files44993
-Node: Advanced Features47326
-Ref: #advanced-features47467
-Node: Window Management47969
-Ref: #window-management48112
-Node: Preloading bib Files50881
-Ref: #preloading-.bib-files51065
-Node: @Preamble Definition51840
-Ref: #preamble-definition52020
-Node: @String Definitions54132
-Ref: #string-definitions54307
-Node: Managing keywords57565
-Ref: #managing-keywords57736
-Node: Sorting the bib File62771
-Ref: #sorting-the-.bib-file62956
-Node: Merging and Importing65940
-Ref: #merging-and-importing66121
-Node: Exporting Entries67276
-Ref: #exporting-entries67439
-Node: Timestamps69471
-Ref: #timestamps69624
-Node: Multiple Identical Fields71236
-Ref: #multiple-identical-fields71421
-Node: Virtual Databases73268
-Ref: #virtual-databases73452
-Node: Simple Selection74543
-Ref: #simple-selection74684
-Node: Complex Filters76107
-Ref: #complex-filters76286
-Node: Properties of Virtual Databases80103
-Ref: #properties-of-virtual-databases80289
-Node: The Multiline Edit Buffer81328
-Ref: #the-multiline-edit-buffer81519
-Node: The Options Menu85424
-Ref: #the-options-menu85571
-Node: The Ebib Buffers86181
-Ref: #the-ebib-buffers86322
-Node: The Index Buffer86662
-Ref: #the-index-buffer86797
-Node: The Entry Buffer91423
-Ref: #the-entry-buffer91585
-Node: The Strings Buffer93844
-Ref: #the-strings-buffer93985
-Node: Customisation95673
-Ref: #customisation95782
-Node: The Customisation Buffer96066
-Ref: #the-customisation-buffer96228
-Node: Default Type97415
-Ref: #default-type97551
-Node: Preload Bib Files97579
-Ref: #preload-bib-files97757
-Node: Preload Bib Search Dirs97781
-Ref: #preload-bib-search-dirs97973
-Node: Create Backups97995
-Ref: #create-backups98165
-Node: Keywords list98187
-Ref: #keywords-list98345
-Node: Keywords File98369
-Ref: #keywords-file98539
-Node: Keywords File Save On Exit98562
-Ref: #keywords-file-save-on-exit98767
-Node: Keywords Use Only File98791
-Ref: #keywords-use-only-file99001
-Node: Keywords Field Keep Sorted99025
-Ref: #keywords-field-keep-sorted99235
-Node: Keywords Separator99259
-Ref: #keywords-separator99450
-Node: Additional Fields99475
-Ref: #additional-fields99644
-Node: Layout99729
-Ref: #layout99863
-Node: Width99888
-Ref: #width100021
-Node: Popup Entry Window100042
-Ref: #popup-entry-window100216
-Node: Window Vertical Split100238
-Ref: #window-vertical-split100430
-Node: Index Window Size100452
-Ref: #index-window-size100638
-Node: Index Display Fields100659
-Ref: #index-display-fields100843
-Node: Uniquify Keys100867
-Ref: #uniquify-keys101037
-Node: Autogenerate Keys101061
-Ref: #autogenerate-keys101236
-Node: Citation Commands101433
-Ref: #citation-commands101615
-Node: Multiline Major Mode107130
-Ref: #multiline-major-mode107311
-Node: Sort Order107341
-Ref: #sort-order107501
-Node: Save Xrefs First107525
-Ref: #save-xrefs-first107690
-Node: Crossref Face107714
-Ref: #crossref-face107876
-Node: Selected Face107922
-Ref: #selected-face108081
-Node: Use Timestamp108125
-Ref: #use-timestamp108287
-Node: Timestamp Format108311
-Ref: #timestamp-format108484
-Node: Standard Url Field108521
-Ref: #standard-url-field108695
-Node: Url Regexp108719
-Ref: #url-regexp108876
-Node: Browser Command108937
-Ref: #browser-command109104
-Node: Standard Doi Field109222
-Ref: #standard-doi-field109392
-Node: Doi Url109416
-Ref: #doi-url109568
-Node: Standard File Field109721
-Ref: #standard-file-field109896
-Node: File Associations109921
-Ref: #file-associations110096
-Node: File Regexp110414
-Ref: #file-regexp110574
-Node: File Search Dirs110809
-Ref: #file-search-dirs110976
-Node: Print Preamble110998
-Ref: #print-preamble111163
-Node: Print Newline111187
-Ref: #print-newline111349
-Node: Print Multiline111373
-Ref: #print-multiline111539
-Node: Latex Preamble111563
-Ref: #latex-preamble111728
-Node: Print Tempfile111774
-Ref: #print-tempfile111946
-Node: Allow Identical Fields111970
-Ref: #allow-identical-fields112155
-Node: Entry Types112179
-Ref: #entry-types112319
-Node: Modifying Key Bindings113902
-Ref: #modifying-key-bindings114060
+Node: Top199
+Node: Installation1385
+Ref: #installation1498
+Node: Package manager1599
+Ref: #package-manager1730
+Node: Manual installation2273
+Ref: #manual-installation2445
+Node: Installing the info file3897
+Ref: #installing-the-info-file4077
+Node: Starting Ebib4770
+Ref: #starting-ebib4900
+Node: Basic Usage5375
+Ref: #basic-usage5500
+Node: Getting Started7036
+Ref: #getting-started7167
+Node: Opening a bib File8107
+Ref: #opening-a-.bib-file8262
+Node: Navigating a bib File10189
+Ref: #navigating-a-.bib-file10382
+Node: Starting a New bib File13406
+Ref: #starting-a-new-.bib-file13576
+Node: Editing the Database13858
+Ref: #editing-the-database14025
+Node: Adding and Deleting Entries14336
+Ref: #adding-and-deleting-entries14517
+Node: Editing Fields Values16124
+Ref: #editing-fields-values16326
+Node: Editing Multiline Values18632
+Ref: #editing-multiline-values18843
+Node: Copy Cut Paste Yank and Delete20854
+Ref: #copy-cut-paste-yank-and-delete21057
+Node: Saving a Database22009
+Ref: #saving-a-database22164
+Node: Searching23143
+Ref: #searching23279
+Node: LaTeX Integration25516
+Ref: #latex-integration25671
+Node: Orgmode and markdown28509
+Ref: #orgmode-and-markdown28706
+Node: Consulting Databases from within a LaTeX File30836
+Ref: #consulting-databases-from-within-a-latex-file31083
+Node: Cross-referencing33437
+Ref: #cross-referencing33625
+Node: Selecting Entries36670
+Ref: #selecting-entries36834
+Node: Printing the Database38202
+Ref: #printing-the-database38376
+Node: Calling a Browser42338
+Ref: #calling-a-browser42500
+Node: Viewing Files44880
+Ref: #viewing-files45004
+Node: Advanced Features47568
+Ref: #advanced-features47709
+Node: Window Management48211
+Ref: #window-management48354
+Node: Preloading bib Files51123
+Ref: #preloading-.bib-files51307
+Node: @Preamble Definition52082
+Ref: #preamble-definition52262
+Node: @String Definitions54377
+Ref: #string-definitions54552
+Node: Managing keywords57813
+Ref: #managing-keywords57984
+Node: Sorting the bib File63019
+Ref: #sorting-the-.bib-file63204
+Node: Merging and Importing66188
+Ref: #merging-and-importing66369
+Node: Exporting Entries67524
+Ref: #exporting-entries67687
+Node: Timestamps69719
+Ref: #timestamps69872
+Node: Multiple Identical Fields71484
+Ref: #multiple-identical-fields71669
+Node: Virtual Databases73518
+Ref: #virtual-databases73702
+Node: Simple Selection74793
+Ref: #simple-selection74934
+Node: Complex Filters76357
+Ref: #complex-filters76536
+Node: Properties of Virtual Databases80353
+Ref: #properties-of-virtual-databases80539
+Node: The Multiline Edit Buffer81578
+Ref: #the-multiline-edit-buffer81769
+Node: The Options Menu85675
+Ref: #the-options-menu85822
+Node: The Ebib Buffers86432
+Ref: #the-ebib-buffers86573
+Node: The Index Buffer86913
+Ref: #the-index-buffer87048
+Node: The Entry Buffer91674
+Ref: #the-entry-buffer91836
+Node: The Strings Buffer94095
+Ref: #the-strings-buffer94236
+Node: Customisation95924
+Ref: #customisation96033
+Node: The Customisation Buffer96317
+Ref: #the-customisation-buffer96479
+Node: Default Type97666
+Ref: #default-type97802
+Node: Preload Bib Files97830
+Ref: #preload-bib-files98008
+Node: Preload Bib Search Dirs98032
+Ref: #preload-bib-search-dirs98224
+Node: Create Backups98246
+Ref: #create-backups98416
+Node: Keywords list98438
+Ref: #keywords-list98596
+Node: Keywords File98620
+Ref: #keywords-file98790
+Node: Keywords File Save On Exit98813
+Ref: #keywords-file-save-on-exit99018
+Node: Keywords Use Only File99042
+Ref: #keywords-use-only-file99252
+Node: Keywords Field Keep Sorted99276
+Ref: #keywords-field-keep-sorted99486
+Node: Keywords Separator99510
+Ref: #keywords-separator99701
+Node: Additional Fields99726
+Ref: #additional-fields99895
+Node: Layout99980
+Ref: #layout100114
+Node: Width100139
+Ref: #width100272
+Node: Popup Entry Window100293
+Ref: #popup-entry-window100467
+Node: Window Vertical Split100489
+Ref: #window-vertical-split100681
+Node: Index Window Size100703
+Ref: #index-window-size100889
+Node: Index Display Fields100910
+Ref: #index-display-fields101094
+Node: Uniquify Keys101118
+Ref: #uniquify-keys101288
+Node: Autogenerate Keys101312
+Ref: #autogenerate-keys101487
+Node: Citation Commands101684
+Ref: #citation-commands101866
+Node: Multiline Major Mode107394
+Ref: #multiline-major-mode107575
+Node: Sort Order107605
+Ref: #sort-order107765
+Node: Save Xrefs First107789
+Ref: #save-xrefs-first107954
+Node: Crossref Face107978
+Ref: #crossref-face108140
+Node: Selected Face108186
+Ref: #selected-face108345
+Node: Use Timestamp108389
+Ref: #use-timestamp108551
+Node: Timestamp Format108575
+Ref: #timestamp-format108748
+Node: Standard Url Field108785
+Ref: #standard-url-field108959
+Node: Url Regexp108983
+Ref: #url-regexp109140
+Node: Browser Command109201
+Ref: #browser-command109368
+Node: Standard Doi Field109486
+Ref: #standard-doi-field109656
+Node: Doi Url109680
+Ref: #doi-url109832
+Node: Standard File Field109985
+Ref: #standard-file-field110160
+Node: File Associations110185
+Ref: #file-associations110360
+Node: File Regexp110678
+Ref: #file-regexp110838
+Node: File Search Dirs111073
+Ref: #file-search-dirs111240
+Node: Print Preamble111262
+Ref: #print-preamble111427
+Node: Print Newline111451
+Ref: #print-newline111613
+Node: Print Multiline111637
+Ref: #print-multiline111803
+Node: Latex Preamble111827
+Ref: #latex-preamble111992
+Node: Print Tempfile112038
+Ref: #print-tempfile112210
+Node: Allow Identical Fields112234
+Ref: #allow-identical-fields112419
+Node: Entry Types112443
+Ref: #entry-types112583
+Node: Modifying Key Bindings114167
+Ref: #modifying-key-bindings114325
 
 End Tag Table
-
-
-Local Variables:
-coding: utf-8
-End:
