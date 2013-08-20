@@ -3248,29 +3248,37 @@ which file to choose."
     ((default)
      (beep))))
 
-(defun ebib-call-file-viewer (files n)
-  "Passes the Nth file in FILES to an external viewer.
-FILES must be a string of whitespace-separated filenames."
-  (let* ((file (nth (1- n)
-                    (let ((start 0)
-                          (result nil))
-                      (while (string-match ebib-file-regexp files start)
-                        (add-to-list 'result (match-string 0 files) t)
-                        (setq start (match-end 0)))
-                      result)))
-         (ext (file-name-extension file)))
-    (let ((file-full-path (or
-                           (locate-file file ebib-file-search-dirs)
-                           (locate-file (file-name-nondirectory file) ebib-file-search-dirs))))
-      (if file-full-path
+(defun ebib-call-file-viewer (filename &optional n)
+  "Open FILENAME with an external viewer. Optionally, pass the Nth file in a string of whitespace-separated filenames."
+  (let ((nth-filename '(lambda (filenames n)
+                         (let ((file (nth (1- n)
+                                       (let ((start 0)
+                                             (result nil))
+                                         (while (string-match ebib-file-regexp filenames start)
+                                           (add-to-list 'result (match-string 0 filenames) t)
+                                           (setq start (match-end 0)))
+                                         result))))
+                           (or
+                             (locate-file file ebib-file-search-dirs)
+                             (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
+                             file)))))
+    (let ((file-full-path (locate-file filename ebib-file-search-dirs)))
+      (if (not file-full-path)
+        (cond
+          ((file-exists-p filename) (setq file-full-path filename))
+          (n (setq file-full-path (funcall nth-filename filename n)))))
+      (if (file-exists-p file-full-path)
+        (progn
+          (setq file-full-path (expand-file-name file-full-path))
+          (let ((ext (file-name-extension file-full-path)))
           (if-str (viewer (cdr (assoc ext ebib-file-associations)))
-              (progn
-                (message "Executing `%s %s'" viewer file-full-path)
-                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+            (progn
+              (message "Executing `%s %s'" viewer file-full-path)
+              (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
-            (find-file file-full-path))
-        (error "File not found: `%s'" file)))))
+            (ffind-file file-full-path))))
+        (error "File not found: `%s'" file-full-path)))))
 
 (defun ebib-virtual-db-and (not)
   "Filters entries into a virtual database.
