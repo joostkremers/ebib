@@ -1582,16 +1582,17 @@ keywords and the third the keywords added in this session."
 
 (defun ebib-keywords-save-new-keywords (db)
   "Check if new keywords were added to DB and save them as required."
-  (let ((lst (ebib-keywords-new-p db))
-        (file (ebib-keywords-get-file db)))
-    (when (and (third lst)                     ; if there are new keywords
-               (or (eq ebib-keywords-file-save-on-exit 'always)
-                   (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p "New keywords have been added. Save "))))
-      (ebib-keywords-save-to-file lst)
-      ;; now move the new keywords to the list of existing keywords
-      (setf (cadr lst) (append (second lst) (third lst)))
-      (setf (caddr lst) nil))))
+  (unless (edb-virtual db) ; virtual databases don't get new keywords
+    (let ((lst (ebib-keywords-new-p db))
+          (file (ebib-keywords-get-file db)))
+      (when (and (third lst)            ; if there are new keywords
+                 (or (eq ebib-keywords-file-save-on-exit 'always)
+                     (and (eq ebib-keywords-file-save-on-exit 'ask)
+                          (y-or-n-p "New keywords have been added. Save "))))
+        (ebib-keywords-save-to-file lst)
+        ;; now move the new keywords to the list of existing keywords
+        (setf (cadr lst) (append (second lst) (third lst)))
+        (setf (caddr lst) nil)))))
 
 (defun ebib-keywords-save-cur-db ()
   "Save new keywords for the current database."
