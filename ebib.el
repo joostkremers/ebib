@@ -2045,55 +2045,62 @@ This function adds a newline to the message being logged."
   (interactive)
   (unless file
     (setq file (ensure-extension (read-file-name "File to open: " "~/") "bib")))
-  (setq ebib-cur-db (ebib-create-new-database))
-  (setf (edb-filename ebib-cur-db) (expand-file-name file))
-  (setf (edb-name ebib-cur-db) (file-name-nondirectory (edb-filename ebib-cur-db)))
-  (setq ebib-log-error nil) ; we haven't found any errors
-  (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") (edb-filename ebib-cur-db))
-  ;; first, we empty the buffers
-  (ebib-erase-buffer (cdr (assoc 'index ebib-buffer-alist)))
-  (ebib-erase-buffer (cdr (assoc 'entry ebib-buffer-alist)))
-  (if (file-readable-p file)
-      ;; if the user entered the name of an existing file, we load it
-      ;; by putting it in a buffer and then parsing it.
-      (with-temp-buffer
-        (with-syntax-table ebib-syntax-table
-          (insert-file-contents file)
-          ;; if the user makes any changes, we'll want to create a back-up.
-          (setf (edb-make-backup ebib-cur-db) t)
-          (let ((result (ebib-find-bibtex-entries nil)))
-            (setf (edb-n-entries ebib-cur-db) (car result))
-            (when (edb-keys-list ebib-cur-db)
-              (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<)))
-            (when (edb-strings-list ebib-cur-db)
-              (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-            (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-            ;; and fill the buffers. note that filling a buffer also makes
-            ;; that buffer active. therefore we do EBIB-FILL-INDEX-BUFFER
-            ;; later.
-            (ebib-set-modified nil)
-            (ebib-fill-entry-buffer)
-            ;; and now we tell the user the result
-            (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-                      (car result)
-                      (cadr result)
-                      (if (caddr result)
-                          "a"
-                        "no")))))
-    ;; if the file does not exist, we need to issue a message.
-    (ebib-log 'message "(New file)"))
-  ;; add keywords for the new database
-  (ebib-keywords-load-keywords ebib-cur-db)
-  (if ebib-keywords-files-alist
-      (ebib-log 'log "Using keywords from %s." (ebib-keywords-get-file ebib-cur-db))
-    (ebib-log 'log "Using general keyword list."))
-  ;; fill the index buffer. (this even works if there are no keys
-  ;; in the database, for example when the user opened a new file
-  ;; or if no BibTeX entries were found.
-  (ebib-fill-index-buffer)
-  (when ebib-log-error
-    (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
-  (ebib-log 'log "")) ; this adds a newline to the log buffer
+  (let* ((full-name (expand-file-name file))
+         (db (ebib-get-db-from-filename full-name)))
+    (if db ; FILE is already open in Ebib.
+        (progn
+          (setq ebib-cur-db db)
+          (ebib-fill-entry-buffer)
+          (ebib-fill-index-buffer))
+      (setq ebib-cur-db (ebib-create-new-database))
+      (setf (edb-filename ebib-cur-db) full-name)
+      (setf (edb-name ebib-cur-db) (file-name-nondirectory (edb-filename ebib-cur-db)))
+      (setq ebib-log-error nil) ; we haven't found any errors
+      (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") (edb-filename ebib-cur-db))
+      ;; first, we empty the buffers
+      (ebib-erase-buffer (cdr (assoc 'index ebib-buffer-alist)))
+      (ebib-erase-buffer (cdr (assoc 'entry ebib-buffer-alist)))
+      (if (file-readable-p full-name)
+          ;; if the user entered the name of an existing file, we load it
+          ;; by putting it in a buffer and then parsing it.
+          (with-temp-buffer
+            (with-syntax-table ebib-syntax-table
+              (insert-file-contents full-name)
+              ;; if the user makes any changes, we'll want to create a back-up.
+              (setf (edb-make-backup ebib-cur-db) t)
+              (let ((result (ebib-find-bibtex-entries nil)))
+                (setf (edb-n-entries ebib-cur-db) (car result))
+                (when (edb-keys-list ebib-cur-db)
+                  (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<)))
+                (when (edb-strings-list ebib-cur-db)
+                  (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
+                (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+                ;; and fill the buffers. note that filling a buffer also makes
+                ;; that buffer active. therefore we do EBIB-FILL-INDEX-BUFFER
+                ;; later.
+                (ebib-set-modified nil)
+                (ebib-fill-entry-buffer)
+                ;; and now we tell the user the result
+                (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+                          (car result)
+                          (cadr result)
+                          (if (caddr result)
+                              "a"
+                            "no")))))
+        ;; if the file does not exist, we need to issue a message.
+        (ebib-log 'message "(New file)"))
+      ;; add keywords for the new database
+      (ebib-keywords-load-keywords ebib-cur-db)
+      (if ebib-keywords-files-alist
+          (ebib-log 'log "Using keywords from %s." (ebib-keywords-get-file ebib-cur-db))
+        (ebib-log 'log "Using general keyword list."))
+      ;; fill the index buffer. (this even works if there are no keys
+      ;; in the database, for example when the user opened a new file
+      ;; or if no BibTeX entries were found.
+      (ebib-fill-index-buffer)
+      (when ebib-log-error
+        (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
+      (ebib-log 'log "")))) ; this adds a newline to the log buffer
 
 (defun ebib-merge-bibtex-file ()
   "Merges a BibTeX file into the database."
