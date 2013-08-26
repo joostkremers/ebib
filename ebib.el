@@ -1636,11 +1636,12 @@ Optional argument DB specifies the database to check for."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
-(defun ebib (&optional key redisplay)
+(defun ebib (&optional arg redisplay)
   "Ebib, a BibTeX database manager.
-Optional argument KEY specifies the entry of the current database
-that is to be displayed. Optional argument REDISPLAY specifies
-whether the index and entry buffer must be redisplayed."
+Optional argument ARG specifies the entry of the current database
+that is to be displayed, or a file to load (which must end in
+`.bib'). Optional argument REDISPLAY specifies whether the index
+and entry buffer must be redisplayed."
   (interactive)
   (if (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
       (error "Ebib already active")
@@ -1661,17 +1662,19 @@ whether the index and entry buffer must be redisplayed."
     (when redisplay
       (ebib-fill-entry-buffer)
       (ebib-fill-index-buffer))
-    ;; if ebib is called with an argument, we look for it
-    (when key
-      (let ((exists? (member key (edb-keys-list ebib-cur-db))))
-        (if exists?
-            (progn
-              (setf (edb-cur-entry ebib-cur-db) exists?)
-              (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-                (goto-char (point-min))
-                (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-                (ebib-select-entry)))
-          (message "No entry `%s' in current database " key))))))
+    ;; If Ebib is called with an argument, we look for it.
+    (when arg
+      (if (string= (file-name-extension arg) "bib")
+          (ebib-load-bibtex-file (expand-file-name arg))
+        (let ((exists? (member arg (edb-keys-list ebib-cur-db))))
+          (if exists?
+              (progn
+                (setf (edb-cur-entry ebib-cur-db) exists?)
+                (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+                  (goto-char (point-min))
+                  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+                  (ebib-select-entry)))
+            (message "No entry `%s' in current database " arg)))))))
 
 (defun ebib-setup-windows ()
   "Creates Ebib's window configuration in the current frame."
