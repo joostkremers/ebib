@@ -1636,33 +1636,31 @@ Optional argument DB specifies the database to check for."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
-(defun ebib (&optional arg redisplay)
+(defun ebib (&optional arg)
   "Ebib, a BibTeX database manager.
 Optional argument ARG specifies the entry of the current database
 that is to be displayed, or a file to load (which must end in
 `.bib'). Optional argument REDISPLAY specifies whether the index
-and entry buffer must be redisplayed."
+and entry buffer must be redisplayed. (Note that if ARG is
+prodived, the buffers are redisplayed anyway.)"
   (interactive)
   (if (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
       (error "Ebib already active")
-    ;; we save the buffer from which ebib is called
+    ;; We save the buffer from which Ebib is called.
     (setq ebib-push-buffer (current-buffer))
-    ;; initialize ebib if required
+    ;; Initialize Ebib if required.
     (unless ebib-initialized
       (ebib-init)
       (if ebib-preload-bib-files
           (mapc #'(lambda (file)
                     (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
                 ebib-preload-bib-files)))
-    ;; if ebib is visible, we just switch to the index buffer
+    ;; If Ebib is visible, we just switch to the index buffer.
     (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
       (if index-window
           (select-window index-window)
         (ebib-setup-windows)))
-    (when redisplay
-      (ebib-fill-entry-buffer)
-      (ebib-fill-index-buffer))
-    ;; If Ebib is called with an argument, we look for it.
+    ;; Check for an optional argument.
     (when arg
       (if (string= (file-name-extension arg) "bib")
           (ebib-load-bibtex-file (expand-file-name arg))
@@ -4462,7 +4460,7 @@ be found."
            (if (null database)
                (error "Entry `%s' not found" key)
              (setq ebib-cur-db database)))
-         (ebib key t))))
+         (ebib key))))
     ((default)
      (error "No database(s) loaded"))))
 
