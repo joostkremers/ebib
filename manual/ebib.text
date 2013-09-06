@@ -191,13 +191,13 @@ The functions described here form Ebib's basic search functionality. Ebib also h
 
 Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it trivially easy to insert BibTeX keys in your LaTeX documents. In fact, this functionality doesn't just work with LaTeX, but also with other text modes that have some form of citation commands, as discussed below.
 
-Ebib provides two functions for this. First, if you're in a LaTeX buffer, you can call the function `ebib-insert-bibtex-key`. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command (that has to be typed *without* the backslash) and any optional argument(s) the command allows. You can type the key using TAB-completion, and after hitting `RET`, Emacs puts a BibTeX citation at the cursor position in the current buffer with the key you selected.
+Ebib provides two functions for this. First, if you're in a LaTeX buffer, you can call the function `ebib-insert-bibtex-key`. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can type the key using TAB-completion, and after hitting `RET`, Emacs puts a BibTeX citation at the cursor position in the current buffer with the key you selected.
 
 You can also do it the other way around: if you're in the index buffer in Ebib, you can *push* an entry to a LaTeX buffer. To do this, use the command `p`. Ebib will ask you for a buffer to push the entry to, a citation command and also any optional arguments, and then insert a citation at the current cursor position in the buffer you've supplied.
 
 The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for have to be defined before you can use them. (By default, only the `\cite` command has been predefined for LaTeX.) For details on setting this up, see [Citation Commands](#citation-commands).
 
-Another Ebib command is available for LaTeX documents: the command `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. (One disadvantage is that cross-referenced entries aren't always in the `.bbl` file, depending on how your BibTeX style handles them. After using `ebib-create-bib-from-bbl` it may therefore be necessary to check whether you have all cross-referenced entries.)
+Another Ebib command is available for LaTeX documents: the command `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. (One disadvantage is that cross-referenced entries aren't always in the `.bbl` file, depending on how your BibTeX style handles them. After using `ebib-create-bib-from-bbl` it may therefore be necessary to check whether you have all cross-referenced entries.)
 
 There is another function that is available outside Ebib: `ebib-entry-summary`. This command reads the key under the cursor in the current buffer and starts Ebib on that entry. This allows you to quickly check a reference in a text.
 
@@ -1042,7 +1042,7 @@ Ebib uses the function `bibtex-generate-autokey` to generate the key. This funct
        ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
 	   ("year" "[-@%K%< %A%>]"))))
 
-\noindent With the command `ebib-insert-bibtex-key` or with the command key `p` in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you to define the commands that are available through tab completion when these functions ask for a citation command.
+\noindent With the command `ebib-insert-bibtex-key` or with the command key `p` in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you to define the commands that are available through TAB completion when these functions ask for a citation command.
 
 Citation commands are defined for specific major modes or for all modes (under the heading `any`). Each command consists of an identifier, which you type when Ebib prompts you for a citation command, plus a format string. This format string can contain a few directives, which are used to add the citation key and any optional arguments. This format string can contain the following directives:
 
