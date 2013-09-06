@@ -132,7 +132,7 @@ You can move between fields with the same keys that you use to move between entr
 
 Editing a field value can be done with `e`. (In fact, in the entry buffer, `RET` is equivalent to `e`.) For most fields, Ebib simply asks you for a string value in the minibuffer. (Here, `RET` confirms the edit, while `C-g` cancels it.) Although BibTeX requires that field values be surrounded by braces {} (or double quotes "", but Ebib does not use those, even though it can of course handle them when they are used in an existing `.bib` file) you do not need to type these. Ebib adds them when it saves the `.bib` file.
 
-Some fields, however, are handled in a special way. The first of these is the `type` field: if you edit this field, you must enter one of the predefined entry types. Ebib won't allow you to enter anything else. You can use tab-completion in this case. Similarly, if you edit the `crossref` field, Ebib requires that you fill in a key from the database. Here, too, you can use tab-completion.
+Some fields, however, are handled in a special way. The first of these is the `type` field: if you edit this field, you must enter one of the predefined entry types. Ebib won't allow you to enter anything else. You can use tab-completion in this case. Similarly, if you edit the `crossref` field, Ebib requires that you fill in a key from the database. Here, too, you can use tab-completion. The fields `keywords` and `file` are also treated differently, see [Managing keywords](#managing-keywords) and [Viewing Files](#viewing-files), respectively.
 
 Note that if you're adding a new entry, Ebib automatically puts you in the entry buffer after you've typed the entry key: you don't have to type `e` to move to the entry buffer. When creating a new entry, it is best to set the `type` field first, because the `type` field determines which other fields are available for an entry.
 
@@ -307,17 +307,13 @@ As just explained, if you press `u` in the index buffer, Ebib searches the `url`
 
 ## Viewing Files ##
 
-If you have electronic versions of the papers in your database stored on your computer, you can use Ebib to call external viewers for these files. The interface for this is similar to that for calling a browser: if you press `f` in the index buffer, Ebib searches the `file` field for a filename and when it finds one, calls an appropriate viewer.
+If you have electronic versions of the papers in your database stored on your computer, or any other file associated with your entries (e.g., notes, if you store those in separate files) you can use Ebib to call external viewers for these files or have them opened in Emacs. The interface for this is similar to that for calling a browser: if you press `f` in the index buffer, Ebib searches the `file` field for a filename and when it finds one, calls an appropriate viewer. And just as with `u`, you can use `f` in the entry buffer as well, in which case it can be used on any field, not just the `file` field.
 
-Just as with `u`, you can use `f` in the entry buffer as well, in which case it can be used on any field, not just the `file` field. It is also possible to have more than one filename in a field: you can select the one you want to view with the prefix argument. Note that if you have more than one filename in the `file` field, Ebib assumes they are whitespace-separated, which means that you cannot have filenames with spaces in them. (If there's only one filename, it *can* contain spaces.)
+It is also possible to have more than one filename in a field: you can select the one you want to view with prefix argument: `M-2 f` for the second file, etc. Filenames are separated by `"; "` (semicolon-space), although this separator can be customised (see [Filename Separator](#filename-separator) for details). There is no need to type this separator yourself, though. When you edit the `file` field, you should enter just a *single* filename (TAB completion works) and hit ENTER. Ebib then puts the filename in the `file` field and adds the separator when necessary. You are then asked for another filename. If you don't want to enter another, just hit ENTER again and you are returned to the entry buffer.
 
-Just as in the case of URLs, you can customise several things about the file view functionality. The option [Standard File Field](#standard-file-field) allows you to customise the field that `f` extracts filenames from when pressed in the index buffer. Extracting filenames is done with a regular expression, which can be customised through the option [File Regexp](#file-regexp).
+With the option [File Search Dirs](#file-search-dirs), you can tell Ebib in which directories it should search for files in the `file` field. Ebib does not search directories recursively, but you can specify a relative path in the `file` field. That is, if you put something like `a/Abney1987.pdf` in the `file` field, Ebib searches for the relevant file in a subdirectory `a/` of the directories listed in the option File Search Dirs. As an extra service, Ebib also searches for the base filename, i.e., `Abney1987` in this particular case. Note, by the way, that the first directory in File Search Dirs is used as the starting directory for filename completion when editing the `file` field.
 
-The option [File Search Dirs](#file-search-dirs) allows you to tell Ebib which directories it needs to search for files. The default value is `~`, which means Ebib just looks in your home dir. Since this is probably not where you keep your files, you may want to customise this. Note that you can specify more than one directory.
-
-Note that Ebib does not search directories recursively. It is possible, however, to put subdirectories in the filenames. That is, if you put something like `a/Abney1987.pdf` in the `file` field, Ebib searches for the relevant file in a subdirectory `a/` of the directories listed in the option File Search Dirs. As an extra service, Ebib also searches for the base filename, i.e., `Abney1987` in this particular case. This can come in handy when you keep the papers on your reading list in a separate directory.
-
-Ebib can call different external programs depending on the file type of the relevant file, but you have to specify which programs to call. The option [File Associations](#file-associations) allows you to do this. By default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`, respectively. You can specify further file types by their extensions (do not include the dot). The program is searched for in `PATH`, but you can of course specify the full path to the program.
+Ebib can call different external programs depending on the file type of the relevant file, but you have to specify which programs to call. The option [File Associations](#file-associations) allows you to do this. By default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`, respectively. You can specify further file types by their extensions (do not include the dot). The program is searched for in `PATH`, but you can of course specify the full path to the program. If you leave the command blank, files of the relevant type are opened in Emacs.  Use this if you have separate text files for notes, or if you want to read pdf files in Emacs with `doc-view-mode`.
 
 
 # Advanced Features #
@@ -401,9 +397,9 @@ which will produce someting like "1 January", assuming your bibliography style h
 An easy way to enter a `@string` abbreviation as a field value is to use the key `s` instead of `e`. If you type `s`, Ebib asks you for a `@string` abbreviation to put in the current field, and automatically marks the field as raw. With this command, Ebib only accepts `@string` definitions that are in the database, so that by using `s` you can make sure you don't make any typos. Note that you can use tab completion to complete a partial string.
 
 
-## Managing keywords ##
+## Managing Keywords ##
 
-Ebib provides some options for handling keywords. By default, there is a `keyword` field in the list of additional fields. Editing this field is a bit different from other fields, however. Instead of just entering a string and hitting ENTER to store it and return to the entry buffer, you should enter a single keyword and hit enter. The keyword will then be added to the keywords already present and you are asked to enter the next keyword. If you've added all keywords you want, you just hit ENTER to finish.
+Ebib provides a few special options for handling keywords. By default, there is a `keyword` field in the list of additional fields. Editing this field is a bit different from other fields. Instead of just entering a string and hitting ENTER to store it and return to the entry buffer, you should enter a single keyword and hit enter. The keyword will then be added to the keywords already present and you are asked to enter the next keyword. If you've added all keywords you want, just hit ENTER to finish.
 
 The advantage of doing it this way is that you can reuse keywords: once you've added a keyword to one entry, Ebib remembers it. The next time you want to use the same keyword for a different entry, you just need to type the first (few) letters, hit TAB and the keyword will be completed. That makes it easier to ensure you use the exact same keywords in different entries.
 
@@ -1208,25 +1204,21 @@ The URL used to open a DOI. It must contain exactly one instance fo `%s`, which 
 
 **Default value**: `file`.\
 
-\noindent This is the field that Ebib searches for filenames if you press `f` in the index buffer.
+\noindent This is the field that Ebib searches for filenames if you press `f` in the index buffer. The special editing behaviour for files as described in [Viewing Files](#viewing-files) applies to this field.
 
 
 ### File Associations ###
 
 **Default value**: `(("pdf" . "xpdf") ("ps" . "gv"))`.\
 
-\noindent The programs used to view files. By default, programs for `.pdf` and `.ps` files are specified, which should be available on most linux systems. If you prefer other programs or are running on Windows, you can specify them here. Note that Ebib searches the PATH for the programs, but you can also specify full path names. Of course, it is also possible to add new associations.
-
-Note that GNU/Emacs 23 comes with `doc-view-mode`, which provides a way to view `.pdf` and `.ps` files inside Emacs. (The files are converted to `.png` format first.) If you prefer to use this mode, simply leave the program field blank for the relevant file type.
+\noindent The programs used to view files. By default, programs for `.pdf` and `.ps` files are specified, which should be available on most linux systems. If you prefer other programs or are running on Windows, you can specify them here. Note that Ebib searches the PATH for the programs, but you can also specify full path names. If you leave the command field blank, files of the relevant type are opened in Emacs.
 
 
-### File Regexp ###
+### Filename Separator ###
 
-**Default value**: `[^?|\:*<>\" \n\t\f]+`.\
+**Default value**: `; `.\
 
-\noindent Regural expression used to find files in a field. The default value essentially means that every string of characters not containing any of the characters `? | \ : * < > "` or space, newline, tab of formfeed is recognised as a file name.
-
-Note that URLs can easily by recognised by the prefix `http:`, but recognising files is not so straightforward. It is therefore not advisable to put anything but filenames in the `file` field.
+\noindent String to separate filenames in the `file` field (or whichever field is the standard file field). This string is automatically added when adding files to the `file` field and it is also used to extract filenames when viewing files.
 
 
 ### File Search Dirs ###
@@ -1377,3 +1369,6 @@ As a final option, `ebib-key` allows you to redefine the second key in the key b
 This piece of code changes the commands `C-c | q`, `C-c | c` and `C-c | s` to `C-c & q`, `C-c & c` and `C-c & s`, respectively.
 
 </div>
+
+<!--  LocalWords:  dirs
+ -->

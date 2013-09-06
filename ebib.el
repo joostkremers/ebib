@@ -273,8 +273,10 @@ Emacs (e.g. with doc-view-mode)."
   :type '(repeat (cons :tag "File association"
                        (string :tag "Extension") (string :tag "Command"))))
 
-(defcustom ebib-file-regexp "[^?|\\:*<>\" \n\t\f]+"
-  "Regular expression to extract filenames from a field."
+(defcustom ebib-filename-separator "; "
+  "Separator for filenames in `ebib-standard-file-field'.
+The contents of the file field is split up using this separator,
+each string is assumed to be a filename."
   :group 'ebib
   :type 'string)
 
@@ -3258,14 +3260,8 @@ in which case the Nth file is opened (N defaults to 1)."
       ;; if it's not in EBIB-FILE-SEARCH-DIRS. So if LOCATE-FILE returns
       ;; NIL, we're (most likely) dealing with a list of files.
       (or n (setq n 1))
-      (setq file-full-path
-            (let ((file (nth (1- n)
-                             (let ((start 0)
-                                   (result nil))
-                               (while (string-match ebib-file-regexp filename start)
-                                 (add-to-list 'result (match-string 0 filename) t)
-                                 (setq start (match-end 0)))
-                               result))))
+      (let ((file (nth (1- n) (split-string filename ebib-filename-separator t))))
+        (setq file-full-path
               (or
                (locate-file file ebib-file-search-dirs)
                (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
@@ -3719,10 +3715,56 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
                (unless (member keyword collection)
                  (ebib-keywords-add-keyword keyword ebib-cur-db))))))
 
+(defun ebib-edit-file-field ()
+  "Edit the `ebib-standard-file-field'.
+Filenames are added to the standard file field separated by
+`ebib-filename-separator'. The first directory in
+`ebib-file-search-dirs' is used as the start directory."
+  (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs))))
+    (loop for file = (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion)
+          until (or (string= file "")
+                    (string= file start-dir))
+          do (let* ((short-file (ebib-file-relative-name (expand-file-name file)))
+                    (conts (to-raw (gethash ebib-standard-file-field ebib-cur-entry-hash)))
+                    (new-conts (if conts
+                                   (concat conts ebib-filename-separator short-file)
+                                 short-file)))
+               (puthash ebib-standard-file-field (from-raw new-conts) ebib-cur-entry-hash)
+               (ebib-set-modified t)
+               (ebib-redisplay-current-field)))))
+
+(defun ebib-file-relative-name (file)
+  "Return a name for FILE relative to `ebib-file-search-dirs'.
+If FILE is not in (a subdirectory of) one of the directories in
+`ebib-file-search-dirs', return FILE."
+  ;; We first create a list of names relative to each dir in
+  ;; ebib-file-search-dirs, discarding those that start with `..'
+  (let* ((names (delq nil (mapcar #'(lambda (dir)
+                                      (let ((rel-name (file-relative-name file dir)))
+                                        (unless (string-prefix-p ".." rel-name)
+                                          rel-name)))
+                                  ebib-file-search-dirs)))
+         ;; Then we take the shortest one...
+         (name (car (sort names #'(lambda (x y)
+                                    (< (length x) (length y)))))))
+    ;; ...and return it, or the filename itself if it couldn't be
+    ;; relativized.
+    (or name file)))
+
 (defun ebib-edit-field (pfx)
-  "Edits a field of a BibTeX entry.
-With a prefix argument, the `keyword' field can be edited
-directly. For other fields, the prefix argument has no meaning."
+  "Edit a field of a BibTeX entry.
+Most fields are edited directly using the minibuffer, but a few
+are handled specially: the `type' and `crossref` fields offer
+completion, the `annote' field is edited as a multiline field,
+the `keyword' field adds keywords one by one, also allowing
+completion, and the field in `ebib-standard-file-field' uses
+filename completion and shortens filenames if they are in (a
+subdirectory of) one of the directories in
+`ebib-file-search-dirs'.
+
+With a prefix argument, the `keyword' field and the field in
+`ebib-standard-file-field' can be edited directly. For other
+fields, the prefix argument has no meaning."
   (interactive "P")
   (cond
    ((eq ebib-current-field 'type*) (ebib-edit-entry-type))
@@ -3730,6 +3772,9 @@ directly. For other fields, the prefix argument has no meaning."
    ((and (eq ebib-current-field 'keywords)
          (not pfx))
     (ebib-edit-keywords))
+   ((and (eq ebib-current-field ebib-standard-file-field)
+         (not pfx))
+    (ebib-edit-file-field))
    ((eq ebib-current-field 'annote) (ebib-edit-multiline-field))
    (t
     (let ((init-contents (gethash ebib-current-field ebib-cur-entry-hash))
