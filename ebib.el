@@ -271,7 +271,9 @@ blank, Ebib tries to handle the file internally in
 Emacs (e.g. with doc-view-mode)."
   :group 'ebib
   :type '(repeat (cons :tag "File association"
-                       (string :tag "Extension") (string :tag "Command"))))
+                       (string :tag "Extension")
+                       (choice (const :tag "Open in Emacs" nil)
+                               (string :tag "Run external command")))))
 
 (defcustom ebib-filename-separator "; "
   "Separator for filenames in `ebib-standard-file-field'.
