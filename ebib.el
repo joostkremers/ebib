@@ -3243,10 +3243,9 @@ sent to the browser."
 (defun ebib-view-file (num)
   "Views a file in the standard file field.
 The standard file field (see option EBIB-STANDARD-FILE-FIELD) may
-contain more than one filename if they're whitespace-separated.
-In that case, a numeric prefix argument can be used to specify
-which file to choose."
-  (interactive "p")
+contain more than one filename. In that case, a numeric prefix
+argument can be used to specify which file to choose."
+  (interactive "P")
   (ebib-execute-when
     ((entries)
      (let ((filename (to-raw (car (ebib-get-field-value ebib-standard-file-field
@@ -3259,30 +3258,33 @@ which file to choose."
 
 (defun ebib-call-file-viewer (filename &optional n)
   "Open FILENAME with an external viewer.
-FILENAME can also be a string of whitespace-separated filenames,
-in which case the Nth file is opened (N defaults to 1)."
-  (let ((file-full-path (locate-file filename ebib-file-search-dirs)))
-    (unless file-full-path
-      ;; Note: if FILENAME is a full path, LOCATE-FILE will return it even
-      ;; if it's not in EBIB-FILE-SEARCH-DIRS. So if LOCATE-FILE returns
-      ;; NIL, we're (most likely) dealing with a list of files.
-      (or n (setq n 1))
-      (let ((file (nth (1- n) (split-string filename ebib-filename-separator t))))
-        (setq file-full-path
-              (or
-               (locate-file file ebib-file-search-dirs)
-               (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
-               (expand-file-name file)))))
-    (if (file-exists-p file-full-path)
-        (let ((ext (file-name-extension file-full-path)))
-          (if-str (viewer (cdr (assoc ext ebib-file-associations)))
-              (progn
-                (message "Executing `%s %s'" viewer file-full-path)
-                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
-            (message "Opening `%s'" file-full-path)
-            (ebib-lower)
-            (find-file file-full-path)))
-      (error "File not found: `%s'" file-full-path))))
+FILENAME can also be a string of filenames separated by
+`ebib-filename-separator', in which case the Nth file is
+opened. If N is NIL, the user is asked to enter a number."
+  (let ((files (split-string filename ebib-filename-separator t)))
+    (cond
+     ((null (cdr files))                ; there's only one file
+      (setq n 1))
+     ((not (integerp n))  ; the user did not pass a numeric prefix argument
+      (setq n (string-to-number (read-string (format "Select file to open [1-%d]: " (length files)))))))
+    (if (or (< n 1)    ; if the user provided a number that is out of range
+            (> n (length files)))
+        (setq n 1))
+    (let* ((file (nth (1- n) files))
+           (file-full-path
+            (or (locate-file file ebib-file-search-dirs)
+                (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
+                (expand-file-name file))))
+      (if (file-exists-p file-full-path)
+          (let ((ext (file-name-extension file-full-path)))
+            (if-str (viewer (cdr (assoc ext ebib-file-associations)))
+                (progn
+                  (message "Executing `%s %s'" viewer file-full-path)
+                  (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+              (message "Opening `%s'" file-full-path)
+              (ebib-lower)
+              (find-file file-full-path)))
+        (error "File not found: `%s'" file-full-path)))))
 
 (defun ebib-virtual-db-and (not)
   "Filters entries into a virtual database.
@@ -3811,9 +3813,9 @@ fields, the prefix argument has no meaning."
 
 (defun ebib-browse-url-in-field (num)
   "Browses a URL in the current field.
-The field may contain a whitespace-separated set of URLs. The
-prefix argument indicates which URL is to be sent to the
-browser."
+The field may contain multiple URLs (as defined by
+`ebib-url-regexp'). The prefix argument indicates which URL is to
+be sent to the browser."
   (interactive "p")
   (let ((urls (to-raw (gethash ebib-current-field ebib-cur-entry-hash))))
     (if urls
@@ -3822,10 +3824,10 @@ browser."
 
 (defun ebib-view-file-in-field (num)
   "Views a file in the current field.
-The field may contain a whitespace-separated set of
-filenames. The prefix argument indicates which file is to be
+The field may contain multiple filenames, in which case the
+prefix argument can be used to specify which file is to be
 viewed."
-  (interactive "p")
+  (interactive "P")
   (let ((files (to-raw (car (ebib-get-field-value ebib-current-field (ebib-cur-entry-key))))))
     (if files
         (ebib-call-file-viewer files num)

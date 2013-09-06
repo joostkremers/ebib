@@ -951,19 +951,19 @@ interface for this is similar to that for calling a browser: if you
 press `f' in the index buffer, Ebib searches the `file' field for a
 filename and when it finds one, calls an appropriate viewer. And just
 as with `u', you can use `f' in the entry buffer as well, in which case
-it can be used on any field, not just the `file' field.
+it can be used on any field, not just the `file' field. It is also
+possible to have more than one filename in a field. In that case, Ebib
+asks you which one you want to open. If you want to open the first one
+you can just hit ENTER. Alternatively, you can provide a prefix
+argument: `M-2 f' for the second file, etc.
 
-It is also possible to have more than one filename in a field: you can
-select the one you want to view with prefix argument: `M-2 f' for the
-second file, etc. Filenames are separated by `"; "' (semicolon-space),
-although this separator can be customised (see *note Filename
-Separator: #filename-separator. for details). There is no need to type
-this separator yourself, though. When you edit the `file' field, you
-should enter just a _single_ filename (TAB completion works) and hit
-ENTER. Ebib then puts the filename in the `file' field and adds the
-separator when necessary. You are then asked for another filename. If
-you don't want to enter another, just hit ENTER again and you are
-returned to the entry buffer.
+When you edit the `file' field, you should type one filename at a time
+(TAB completion works). When you hit ENTER, Ebib adds the filename to
+the `file' field, adding a separator if necessary, and then asks you
+for the next file. If you don't want to add another, just hit ENTER.
+The default separator is `"; "' (semicolon-space), but this can be
+customised (see *note Filename Separator: #filename-separator. for
+details).
 
 With the option *note File Search Dirs: #file-search-dirs, you can tell
 Ebib in which directories it should search for files in the `file'
@@ -977,16 +977,16 @@ by the way, that the first directory in File Search Dirs is used as the
 starting directory for filename completion when editing the `file'
 field.
 
-Ebib can call different external programs depending on the file type of
-the relevant file, but you have to specify which programs to call. The
-option *note File Associations: #file-associations. allows you to do
-this. By default, `.pdf' and `.ps' files are handled, by `xpdf' and
-`gv', respectively. You can specify further file types by their
-extensions (do not include the dot). The program is searched for in
-`PATH', but you can of course specify the full path to the program. If
-you leave the command blank, files of the relevant type are opened in
-Emacs. Use this if you have separate text files for notes, or if you
-want to read pdf files in Emacs with `doc-view-mode'.
+Ebib can call different external programs depending on the file
+extension of the relevant file. The option *note File Associations:
+#file-associations. allows you to specify which programs to call for
+which types of files. By default, `.pdf' and `.ps' files are handled,
+by `xpdf' and `gv', respectively. You can specify further file types by
+their extensions (do not include the dot). The program is searched for
+in `PATH', but you can of course specify the full path to the program.
+There is also the option to open files in Emacs. Use this if you have
+separate text files for notes, or if you want to read pdf files in
+Emacs with `doc-view-mode'.
 
 
 File: ebib.info,  Node: Advanced Features,  Next: The Ebib Buffers,  Prev: Basic Usage,  Up: Top
@@ -2936,140 +2936,140 @@ Node: Calling a Browser42451
 Ref: #calling-a-browser42613
 Node: Viewing Files44993
 Ref: #viewing-files45117
-Node: Advanced Features47825
-Ref: #advanced-features47966
-Node: Window Management48468
-Ref: #window-management48611
-Node: Preloading bib Files51380
-Ref: #preloading-.bib-files51564
-Node: @Preamble Definition52339
-Ref: #preamble-definition52519
-Node: @String Definitions54631
-Ref: #string-definitions54806
-Node: Managing Keywords58064
-Ref: #managing-keywords58235
-Node: Sorting the bib File63266
-Ref: #sorting-the-.bib-file63451
-Node: Merging and Importing66435
-Ref: #merging-and-importing66616
-Node: Exporting Entries67771
-Ref: #exporting-entries67934
-Node: Timestamps69966
-Ref: #timestamps70119
-Node: Multiple Identical Fields71731
-Ref: #multiple-identical-fields71916
-Node: Virtual Databases73763
-Ref: #virtual-databases73947
-Node: Simple Selection75038
-Ref: #simple-selection75179
-Node: Complex Filters76602
-Ref: #complex-filters76781
-Node: Properties of Virtual Databases80598
-Ref: #properties-of-virtual-databases80784
-Node: The Multiline Edit Buffer81823
-Ref: #the-multiline-edit-buffer82014
-Node: The Options Menu85919
-Ref: #the-options-menu86066
-Node: The Ebib Buffers86676
-Ref: #the-ebib-buffers86817
-Node: The Index Buffer87157
-Ref: #the-index-buffer87292
-Node: The Entry Buffer91918
-Ref: #the-entry-buffer92080
-Node: The Strings Buffer94339
-Ref: #the-strings-buffer94480
-Node: Customisation96168
-Ref: #customisation96277
-Node: The Customisation Buffer96561
-Ref: #the-customisation-buffer96723
-Node: Default Type97917
-Ref: #default-type98053
-Node: Preload Bib Files98081
-Ref: #preload-bib-files98259
-Node: Preload Bib Search Dirs98283
-Ref: #preload-bib-search-dirs98475
-Node: Create Backups98497
-Ref: #create-backups98667
-Node: Keywords list98689
-Ref: #keywords-list98847
-Node: Keywords File98871
-Ref: #keywords-file99041
-Node: Keywords File Save On Exit99064
-Ref: #keywords-file-save-on-exit99269
-Node: Keywords Use Only File99293
-Ref: #keywords-use-only-file99503
-Node: Keywords Field Keep Sorted99527
-Ref: #keywords-field-keep-sorted99737
-Node: Keywords Separator99761
-Ref: #keywords-separator99952
-Node: Additional Fields99977
-Ref: #additional-fields100146
-Node: Layout100231
-Ref: #layout100365
-Node: Width100390
-Ref: #width100523
-Node: Popup Entry Window100544
-Ref: #popup-entry-window100718
-Node: Window Vertical Split100740
-Ref: #window-vertical-split100932
-Node: Index Window Size100954
-Ref: #index-window-size101140
-Node: Index Display Fields101161
-Ref: #index-display-fields101345
-Node: Uniquify Keys101369
-Ref: #uniquify-keys101539
-Node: Autogenerate Keys101563
-Ref: #autogenerate-keys101738
-Node: Citation Commands101935
-Ref: #citation-commands102117
-Node: Multiline Major Mode107632
-Ref: #multiline-major-mode107813
-Node: Sort Order107843
-Ref: #sort-order108003
-Node: Save Xrefs First108027
-Ref: #save-xrefs-first108192
-Node: Crossref Face108216
-Ref: #crossref-face108378
-Node: Selected Face108424
-Ref: #selected-face108583
-Node: Use Timestamp108627
-Ref: #use-timestamp108789
-Node: Timestamp Format108813
-Ref: #timestamp-format108986
-Node: Standard Url Field109023
-Ref: #standard-url-field109197
-Node: Url Regexp109221
-Ref: #url-regexp109378
-Node: Browser Command109439
-Ref: #browser-command109606
-Node: Standard Doi Field109724
-Ref: #standard-doi-field109894
-Node: Doi Url109918
-Ref: #doi-url110070
-Node: Standard File Field110223
-Ref: #standard-file-field110398
-Node: File Associations110423
-Ref: #file-associations110605
-Node: Filename Separator110658
-Ref: #filename-separator110839
-Node: File Search Dirs110861
-Ref: #file-search-dirs111035
-Node: Print Preamble111057
-Ref: #print-preamble111222
-Node: Print Newline111246
-Ref: #print-newline111408
-Node: Print Multiline111432
-Ref: #print-multiline111598
-Node: Latex Preamble111622
-Ref: #latex-preamble111787
-Node: Print Tempfile111833
-Ref: #print-tempfile112005
-Node: Allow Identical Fields112029
-Ref: #allow-identical-fields112214
-Node: Entry Types112238
-Ref: #entry-types112378
-Node: Modifying Key Bindings113961
-Ref: #modifying-key-bindings114119
+Node: Advanced Features47766
+Ref: #advanced-features47907
+Node: Window Management48409
+Ref: #window-management48552
+Node: Preloading bib Files51321
+Ref: #preloading-.bib-files51505
+Node: @Preamble Definition52280
+Ref: #preamble-definition52460
+Node: @String Definitions54572
+Ref: #string-definitions54747
+Node: Managing Keywords58005
+Ref: #managing-keywords58176
+Node: Sorting the bib File63207
+Ref: #sorting-the-.bib-file63392
+Node: Merging and Importing66376
+Ref: #merging-and-importing66557
+Node: Exporting Entries67712
+Ref: #exporting-entries67875
+Node: Timestamps69907
+Ref: #timestamps70060
+Node: Multiple Identical Fields71672
+Ref: #multiple-identical-fields71857
+Node: Virtual Databases73704
+Ref: #virtual-databases73888
+Node: Simple Selection74979
+Ref: #simple-selection75120
+Node: Complex Filters76543
+Ref: #complex-filters76722
+Node: Properties of Virtual Databases80539
+Ref: #properties-of-virtual-databases80725
+Node: The Multiline Edit Buffer81764
+Ref: #the-multiline-edit-buffer81955
+Node: The Options Menu85860
+Ref: #the-options-menu86007
+Node: The Ebib Buffers86617
+Ref: #the-ebib-buffers86758
+Node: The Index Buffer87098
+Ref: #the-index-buffer87233
+Node: The Entry Buffer91859
+Ref: #the-entry-buffer92021
+Node: The Strings Buffer94280
+Ref: #the-strings-buffer94421
+Node: Customisation96109
+Ref: #customisation96218
+Node: The Customisation Buffer96502
+Ref: #the-customisation-buffer96664
+Node: Default Type97858
+Ref: #default-type97994
+Node: Preload Bib Files98022
+Ref: #preload-bib-files98200
+Node: Preload Bib Search Dirs98224
+Ref: #preload-bib-search-dirs98416
+Node: Create Backups98438
+Ref: #create-backups98608
+Node: Keywords list98630
+Ref: #keywords-list98788
+Node: Keywords File98812
+Ref: #keywords-file98982
+Node: Keywords File Save On Exit99005
+Ref: #keywords-file-save-on-exit99210
+Node: Keywords Use Only File99234
+Ref: #keywords-use-only-file99444
+Node: Keywords Field Keep Sorted99468
+Ref: #keywords-field-keep-sorted99678
+Node: Keywords Separator99702
+Ref: #keywords-separator99893
+Node: Additional Fields99918
+Ref: #additional-fields100087
+Node: Layout100172
+Ref: #layout100306
+Node: Width100331
+Ref: #width100464
+Node: Popup Entry Window100485
+Ref: #popup-entry-window100659
+Node: Window Vertical Split100681
+Ref: #window-vertical-split100873
+Node: Index Window Size100895
+Ref: #index-window-size101081
+Node: Index Display Fields101102
+Ref: #index-display-fields101286
+Node: Uniquify Keys101310
+Ref: #uniquify-keys101480
+Node: Autogenerate Keys101504
+Ref: #autogenerate-keys101679
+Node: Citation Commands101876
+Ref: #citation-commands102058
+Node: Multiline Major Mode107573
+Ref: #multiline-major-mode107754
+Node: Sort Order107784
+Ref: #sort-order107944
+Node: Save Xrefs First107968
+Ref: #save-xrefs-first108133
+Node: Crossref Face108157
+Ref: #crossref-face108319
+Node: Selected Face108365
+Ref: #selected-face108524
+Node: Use Timestamp108568
+Ref: #use-timestamp108730
+Node: Timestamp Format108754
+Ref: #timestamp-format108927
+Node: Standard Url Field108964
+Ref: #standard-url-field109138
+Node: Url Regexp109162
+Ref: #url-regexp109319
+Node: Browser Command109380
+Ref: #browser-command109547
+Node: Standard Doi Field109665
+Ref: #standard-doi-field109835
+Node: Doi Url109859
+Ref: #doi-url110011
+Node: Standard File Field110164
+Ref: #standard-file-field110339
+Node: File Associations110364
+Ref: #file-associations110546
+Node: Filename Separator110599
+Ref: #filename-separator110780
+Node: File Search Dirs110802
+Ref: #file-search-dirs110976
+Node: Print Preamble110998
+Ref: #print-preamble111163
+Node: Print Newline111187
+Ref: #print-newline111349
+Node: Print Multiline111373
+Ref: #print-multiline111539
+Node: Latex Preamble111563
+Ref: #latex-preamble111728
+Node: Print Tempfile111774
+Ref: #print-tempfile111946
+Node: Allow Identical Fields111970
+Ref: #allow-identical-fields112155
+Node: Entry Types112179
+Ref: #entry-types112319
+Node: Modifying Key Bindings113902
+Ref: #modifying-key-bindings114060
 
 End Tag Table
 
