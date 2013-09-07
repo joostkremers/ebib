@@ -233,12 +233,13 @@ this command extracts the url."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-browser-command ""
+(defcustom ebib-browser-command nil
   "Command to call the browser with.
 GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
-  :type '(string :tag "Browser command"))
+  :type '(choice (const :tag "Use standard browser")
+          (string :tag "Specify browser command")))
 
 (defcustom ebib-standard-doi-field 'doi
   "Standard field to store a DOI (digital object identifier) in.
@@ -3170,45 +3171,30 @@ Operates either on all entries or on the marked entries."
        (ebib-fill-entry-buffer)
        (ebib-fill-index-buffer)))))
 
-(defun ebib-split-urls (urls n)
-  "Split URLS and return the Nth one.
-URLs are split using EBIB-REGEXP-URL. The URL is cleaned up a bit
-before being returned, i.e., an enclosing \\url{...} or <...> is
-removed."
-  (let ((url (nth (1- n)
-                  (let ((start 0)
-                        (result nil))
-                    (while (string-match ebib-url-regexp urls start)
-                      (add-to-list 'result (match-string 0 urls) t)
-                      (setq start (match-end 0)))
-                    result))))
-    (if url
-        (cond
-         ;; first see if the url is contained in \url{...}
-         ((string-match "\\\\url{\\(.*?\\)}" url)
-          (setq url (match-string 1 url)))
-         ;; then check for http(s), or whatever the user customized
-         ((string-match ebib-url-regexp url)
-          (setq url (match-string 0 url)))
-         ;; this clause probably won't be reached, but just in case
-         (t (error "Not a URL: `%s'" url)))
-      ;; otherwise, we didn't find a url
-      (error "No URL found in `%s'" urls))
-    url))
+(defun ebib-extract-urls (string)
+  "Extract URLs from STRING.
+What counts as a URL is defined by `ebib-url-regexp'. Return the
+URLs as a list of strings. Parts of the string that are not
+recognized as URLs are discarded."
+  (let ((start 0)
+        (result nil))
+    (while (string-match ebib-url-regexp string start)
+      (add-to-list 'result (match-string 0 string) t)
+      (setq start (match-end 0)))
+    result))
 
 (defun ebib-browse-url (num)
-  "Asks a browser to load the URL in the standard URL field.
-The standard URL field (see user option EBIB-STANDARD-URL-FIELD)
-may contain more than one URL, if they're whitespace-separated.
-In that case, a numeric prefix argument can be used to specify
-which URL to choose."
-  (interactive "p")
+  "Browse the URL in the standard URL field.
+If this field contains more than one URL, ask the user which one
+to open. Alternatively, the user can provide a numeric prefix
+argument."
+  (interactive "P")
   (ebib-execute-when
     ((entries)
      (let ((urls (to-raw (gethash ebib-standard-url-field
                                   (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
        (if urls
-           (ebib-call-browser (ebib-split-urls urls num))
+           (ebib-call-browser urls num)
          (error "Field `%s' is empty" ebib-standard-url-field))))
     ((default)
      (beep))))
@@ -3231,14 +3217,30 @@ sent to the browser."
    ((default)
     (beep))))
 
-(defun ebib-call-browser (url)
-  "Passes URL to a browser."
-  (if (string= ebib-browser-command "")
-      (progn
-        (message "Calling BROWSE-URL on `%s'" url)
-        (browse-url url))
-    (message "Executing `%s %s'" ebib-browser-command url)
-    (start-process "Ebib-browser" nil ebib-browser-command url)))
+(defun ebib-call-browser (string &optional n)
+  "Call a browser with the Nth URL in STRING.
+STRING is a string containing one or more URLs. If there is more
+than one, N specifies which one to pass to the browser. If N
+is NIL, the user is asked which URL to open."
+  (let ((urls (ebib-extract-urls string)))
+    (cond
+     ((null (cdr urls))                 ; there's only one URL
+      (setq n 1))
+     ((not (integerp n)) ; the user didn't provide a numeric prefix argument
+      (setq n (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls)))))))
+    (if (or (< n 1)             ; if the user provide a number out of range
+            (> n (length urls)))
+        (setq n 1))
+    (let ((url (nth (1- n) urls)))
+      (when url
+        (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
+            (setq url (match-string 1 url)))
+        (if ebib-browser-command
+            (progn
+              (message "Executing `%s %s'" ebib-browser-command url)
+              (start-process "Ebib-browser" nil ebib-browser-command url))
+          (message "Opening `%s'" url)
+          (browse-url url))))))
 
 (defun ebib-view-file (num)
   "Views a file in the standard file field.
@@ -3812,14 +3814,14 @@ fields, the prefix argument has no meaning."
         (ebib-set-modified t))))))
 
 (defun ebib-browse-url-in-field (num)
-  "Browses a URL in the current field.
-The field may contain multiple URLs (as defined by
-`ebib-url-regexp'). The prefix argument indicates which URL is to
-be sent to the browser."
-  (interactive "p")
+  "Browse a URL in the current field.
+If the field may contain multiple URLs (as defined by
+`ebib-url-regexp'), the user is asked which one to open.
+Altertanively, a numeric prefix argument can be passed."
+  (interactive "P")
   (let ((urls (to-raw (gethash ebib-current-field ebib-cur-entry-hash))))
     (if urls
-        (ebib-call-browser (ebib-split-urls urls num))
+        (ebib-call-browser urls num)
       (error "Field `%s' is empty" ebib-current-field))))
 
 (defun ebib-view-file-in-field (num)
