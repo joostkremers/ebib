@@ -2365,7 +2365,7 @@ buffer if Ebib is not occupying the entire frame."
     ((real-db)
      (if-str (entry-key (if ebib-autogenerate-keys
                             "<new-entry>"
-                          (read-string "New entry key: " nil ebib-key-history)))
+                          (read-string "New entry key: " nil 'ebib-key-history)))
          (progn
            (if (member entry-key (edb-keys-list ebib-cur-db))
                (if ebib-uniquify-keys
@@ -2509,7 +2509,7 @@ generate the key, see that function's documentation for details."
      (let ((cur-keyname (ebib-cur-entry-key)))
        (if-str (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
                                          cur-keyname
-                                         ebib-key-history))
+                                         'ebib-key-history))
            (ebib-update-keyname new-keyname))))
     ((default)
      (beep))))
@@ -3345,13 +3345,13 @@ a logical `not' is applied to the selection."
                                          (mapcar #'(lambda (x)
                                                      (cons (symbol-name x) 0))
                                                  (append ebib-unique-field-list ebib-additional-fields)))
-                                nil t nil ebib-field-history)))
+                                nil t nil 'ebib-field-history)))
     (setq field (intern-soft field))
     (let ((regexp (read-string (format "Filter: %s(contains %s <regexp>)%s. Enter regexp: "
                                        (if (< not 0) "(not " "")
                                        field
                                        (if (< not 0) ")" ""))
-                               nil ebib-filter-history)))
+                               nil 'ebib-filter-history)))
       (ebib-execute-when
         ((virtual-db)
          (setf (edb-virtual ebib-cur-db) `(,bool ,(edb-virtual ebib-cur-db)
@@ -3484,7 +3484,7 @@ The user is prompted for the buffer to push the entry into."
                                    (cadr (assoc 'any ebib-citation-commands))))
                   (citation-command
                    (if-str (format-string (cadr (assoc
-                                                 (completing-read "Command to use: " format-list nil nil nil ebib-cite-command-history)
+                                                 (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                  format-list)))
                        (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                          (cond
@@ -3695,7 +3695,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
 (defun ebib-edit-crossref ()
   "Edits the crossref field."
   (let ((collection (ebib-create-collection (edb-database ebib-cur-db))))
-    (if-str (key (completing-read "Key to insert in `crossref': " collection nil t nil ebib-key-history))
+    (if-str (key (completing-read "Key to insert in `crossref': " collection nil t nil 'ebib-key-history))
         (progn
           (puthash 'crossref (from-raw key) ebib-cur-entry-hash)
           (ebib-set-modified t))))
@@ -3721,7 +3721,7 @@ NIL. If EBIB-HIDE-HIDDEN-FIELDS is NIL, return FIELD."
   ;; emacs 23.1, this function is not available.
   (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
         (collection (ebib-keywords-for-database ebib-cur-db)))
-    (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil ebib-keyword-history)
+    (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keyword-history)
           until (string= keyword "")
           do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
                     (new-conts (if conts
@@ -4145,7 +4145,7 @@ When the user enters an empty string, the value is not changed."
 (defun ebib-add-string ()
   "Creates a new @STRING definition."
   (interactive)
-  (if-str (new-abbr (read-string "New @STRING abbreviation: " nil ebib-key-history))
+  (if-str (new-abbr (read-string "New @STRING abbreviation: " nil 'ebib-key-history))
       (progn
         (if (member new-abbr (edb-strings-list ebib-cur-db))
             (error (format "%s already exists" new-abbr)))
@@ -4479,12 +4479,12 @@ completion works."
     ((database)
      (let ((collection (ebib-create-collection-from-db)))
        (when collection
-         (let* ((key (completing-read "Key to insert: " collection nil t nil ebib-key-history))
+         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib-key-history))
                 (format-list (or (cadr (assoc (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
                                  (cadr (assoc 'any ebib-citation-commands))))
                 (citation-command
                  (if-str (format-string (cadr (assoc
-                                               (completing-read "Command to use: " format-list nil nil nil ebib-cite-command-history)
+                                               (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                format-list)))
                      (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                        (concat (ebib-create-citation-command before)
