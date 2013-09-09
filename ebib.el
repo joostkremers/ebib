@@ -3337,7 +3337,7 @@ logical OR with the entries in the original database."
   "Filters the current database to a virtual database.
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
-  (let ((field (completing-read (format "Filter: %s(contains <field> <regexp>)%s. Enter field: "
+  (let ((field (completing-read (format "Filter: %s(contains <field> <search string>)%s. Enter field: "
                                         (if (< not 0) "(not " "")
                                         (if (< not 0) ")" ""))
                                 (append  (list '("any" . 0)
@@ -3347,11 +3347,14 @@ a logical `not' is applied to the selection."
                                                  (append ebib-unique-field-list ebib-additional-fields)))
                                 nil t nil 'ebib-field-history)))
     (setq field (intern-soft field))
-    (let ((regexp (read-string (format "Filter: %s(contains %s <regexp>)%s. Enter regexp: "
+    (let* ((prompt (format "Filter: %s(contains %s <search string>)%s. Enter %s: "
                                        (if (< not 0) "(not " "")
                                        field
-                                       (if (< not 0) ")" ""))
-                               nil 'ebib-filter-history)))
+                                       (if (< not 0) ")" "")
+                                       (if (string= field "type*") "entry type" "regexp")))
+           (regexp (if (string= field "type*")
+                       (completing-read prompt ebib-entry-types nil t nil 'ebib-filter-history)
+                     (read-string prompt nil 'ebib-filter-history))))
       (ebib-execute-when
         ((virtual-db)
          (setf (edb-virtual ebib-cur-db) `(,bool ,(edb-virtual ebib-cur-db)
