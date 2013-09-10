@@ -1803,22 +1803,16 @@ keywords when Emacs is killed."
 
 (eval-and-compile
   (define-prefix-command 'ebib-prefix-map)
-  (suppress-keymap ebib-prefix-map)
-  (defvar ebib-prefixed-functions '(ebib-delete-entry
-                                    ebib-latex-entries
-                                    ebib-mark-entry
-                                    ebib-print-entries
-                                    ebib-push-bibtex-key
-                                    ebib-export-entry)))
+  (suppress-keymap ebib-prefix-map))
 
 ;; macro to redefine key bindings.
 
-(defmacro ebib-key (buffer key &optional command)
+(defmacro ebib-key (buffer key &optional command prefixed)
   (cond
    ((eq buffer 'index)
     (let ((one `(define-key ebib-index-mode-map ,key (quote ,command)))
-          (two (when (or (null command)
-                         (member command ebib-prefixed-functions))
+          (two (when (or prefixed
+                         (null command))
                  `(define-key ebib-prefix-map ,key (quote ,command)))))
       (if two
           `(progn ,one ,two)
@@ -1869,7 +1863,7 @@ keywords when Emacs is killed."
 (ebib-key index "a" ebib-add-entry)
 (ebib-key index "b" ebib-index-scroll-down)
 (ebib-key index "c" ebib-close-database)
-(ebib-key index "d" ebib-delete-entry)
+(ebib-key index "d" ebib-delete-entry t)
 (ebib-key index "e" ebib-edit-entry)
 (ebib-key index "E" ebib-edit-keyname)
 (ebib-key index "f" ebib-view-file)
@@ -1883,12 +1877,12 @@ keywords when Emacs is killed."
 (ebib-key index "k" ebib-prev-entry)
 (ebib-key index "K" ebib-generate-autokey)
 (ebib-key index "l" ebib-show-log)
-(ebib-key index "m" ebib-mark-entry)
+(ebib-key index "m" ebib-mark-entry t)
 (ebib-key index "n" ebib-search-next)
 (ebib-key index [(control n)] ebib-next-entry)
 (ebib-key index [(meta n)] ebib-index-scroll-up)
 (ebib-key index "o" ebib-load-bibtex-file)
-(ebib-key index "p" ebib-push-bibtex-key)
+(ebib-key index "p" ebib-push-bibtex-key t)
 (ebib-key index [(control p)] ebib-prev-entry)
 (ebib-key index [(meta p)] ebib-index-scroll-down)
 (ebib-key index "P" ebib-edit-preamble)
@@ -1897,7 +1891,7 @@ keywords when Emacs is killed."
 (ebib-key index "S" ebib-edit-strings)
 (ebib-key index "u" ebib-browse-url)
 (ebib-key index "V" ebib-print-filter)
-(ebib-key index "x" ebib-export-entry)
+(ebib-key index "x" ebib-export-entry t)
 (ebib-key index "\C-xb" ebib-leave-ebib-windows)
 (ebib-key index "\C-xk" ebib-quit)
 (ebib-key index "X" ebib-export-preamble)
