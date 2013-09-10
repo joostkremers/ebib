@@ -1127,17 +1127,18 @@ all else fails, pop up a new frame."
 (defun ebib-display-entry (entry-key)
   "Displays ENTRY-KEY in the index buffer at POINT."
   (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-    (insert (format "%-30s %s\n"
-                    entry-key
-                    (if ebib-index-display-fields
-                        (let ((cur-entry-hash (ebib-retrieve-entry entry-key ebib-cur-db)))
-                          (mapconcat #'(lambda (field)
-                                         (or
-                                          (to-raw (gethash field cur-entry-hash))
-                                          ""))
-                                     ebib-index-display-fields
-                                     "  "))
-                      "")))))
+    (with-buffer-writable
+      (insert (format "%-30s %s\n"
+                      entry-key
+                      (if ebib-index-display-fields
+                          (let ((cur-entry-hash (ebib-retrieve-entry entry-key ebib-cur-db)))
+                            (mapconcat #'(lambda (field)
+                                           (or
+                                            (to-raw (gethash field cur-entry-hash))
+                                            ""))
+                                       ebib-index-display-fields
+                                       "  "))
+                        ""))))))
 
 (defun ebib-redisplay-current-field ()
   "Redisplays the contents of the current field in the entry buffer."
@@ -2369,8 +2370,7 @@ buffer if Ebib is not occupying the entire frame."
              (let ((fields (make-hash-table)))
                (puthash 'type* ebib-default-type fields)
                (ebib-insert-entry entry-key fields ebib-cur-db t t))
-             (with-buffer-writable
-               (ebib-display-entry entry-key))
+             (ebib-display-entry entry-key)
              (forward-line -1) ; move one line up to position the cursor on the new entry.
              (ebib-set-index-highlight)
              (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
@@ -2518,8 +2518,7 @@ generate the key, see that function's documentation for details."
         (ebib-insert-entry new-key fields ebib-cur-db t nil)
         (setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
         (sort-in-buffer (length (edb-keys-list ebib-cur-db)) new-key)
-        (with-buffer-writable
-          (ebib-display-entry new-key))
+        (ebib-display-entry new-key)
         (forward-line -1) ; move one line up to position the cursor on the new entry.
         (ebib-set-index-highlight)
         (ebib-set-modified t)
