@@ -1650,9 +1650,7 @@ Optional argument DB specifies the database to check for."
   "Ebib, a BibTeX database manager.
 Optional argument ARG specifies the entry of the current database
 that is to be displayed, or a file to load (which must end in
-`.bib'). Optional argument REDISPLAY specifies whether the index
-and entry buffer must be redisplayed. (Note that if ARG is
-prodived, the buffers are redisplayed anyway.)"
+`.bib')."
   (interactive)
   (if (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
       (error "Ebib already active")
