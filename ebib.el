@@ -1972,6 +1972,11 @@ keywords when Emacs is killed."
 
 (easy-menu-add ebib-index-menu ebib-index-mode-map)
 
+(defun ebib-redisplay ()
+  "Redisplay the index and entry buffers."
+  (ebib-fill-index-buffer)
+  (ebib-fill-entry-buffer))
+
 (defun ebib-fill-index-buffer ()
   "Fills the index buffer with the list of keys in EBIB-CUR-DB.
 If EBIB-CUR-DB is nil, the buffer is just erased and its name set
@@ -2053,8 +2058,7 @@ This function adds a newline to the message being logged."
     (if db ; FILE is already open in Ebib.
         (progn
           (setq ebib-cur-db db)
-          (ebib-fill-entry-buffer)
-          (ebib-fill-index-buffer))
+          (ebib-redisplay))
       (setq ebib-cur-db (ebib-create-new-database))
       (setf (edb-filename ebib-cur-db) full-name)
       (setf (edb-name ebib-cur-db) (file-name-nondirectory (edb-filename ebib-cur-db)))
@@ -2077,11 +2081,7 @@ This function adds a newline to the message being logged."
                 (when (edb-strings-list ebib-cur-db)
                   (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
                 (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-                ;; and fill the buffers. note that filling a buffer also makes
-                ;; that buffer active. therefore we do EBIB-FILL-INDEX-BUFFER
-                ;; later.
                 (ebib-set-modified nil)
-                (ebib-fill-entry-buffer)
                 ;; and now we tell the user the result
                 (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                           (car result)
@@ -2099,7 +2099,7 @@ This function adds a newline to the message being logged."
       ;; fill the index buffer. (this even works if there are no keys
       ;; in the database, for example when the user opened a new file
       ;; or if no BibTeX entries were found.
-      (ebib-fill-index-buffer)
+      (ebib-redisplay)
       (when ebib-log-error
         (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))
       (ebib-log 'log "")))) ; this adds a newline to the log buffer
@@ -2121,8 +2121,7 @@ This function adds a newline to the message being logged."
               (when (edb-strings-list ebib-cur-db)
                 (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
               (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-              (ebib-fill-entry-buffer)
-              (ebib-fill-index-buffer)
+              (ebib-redisplay)
               (ebib-set-modified t)
               (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                         (car n)
@@ -2432,8 +2431,7 @@ generate the key, see that function's documentation for details."
                                      (last1 ebib-databases)))
                (unless (edb-cur-entry ebib-cur-db)
                  (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db)))
-               (ebib-fill-entry-buffer)
-               (ebib-fill-index-buffer))
+               (ebib-redisplay))
            ;; otherwise, we have to clean up a little and empty all the buffers.
            (setq ebib-cur-db nil)
            (mapc #'(lambda (buf) ; this is just to avoid typing almost the same thing three times...
@@ -2720,8 +2718,7 @@ first entry with the current entry's key in its crossref field."
           (setf (edb-cur-entry ebib-cur-db)
                 (or (member new-cur-entry (edb-keys-list ebib-cur-db))
                     (edb-cur-entry ebib-cur-db)))
-          (ebib-fill-entry-buffer)
-          (ebib-fill-index-buffer))
+          (ebib-redisplay))
       (setq ebib-search-string (ebib-cur-entry-key))
       (ebib-search-next))))
 
@@ -2777,8 +2774,7 @@ first entry with the current entry's key in its crossref field."
                  (edb-marked-entries ebib-cur-db))
            (message "Marked entries deleted.")
            (ebib-set-modified t)
-           (ebib-fill-entry-buffer)
-           (ebib-fill-index-buffer)))
+           (ebib-redisplay)))
         ((default)
          (beep)))
     (ebib-execute-when
@@ -3148,8 +3144,7 @@ Operates either on all entries or on the marked entries."
     (if new-db
         (progn
           (setq ebib-cur-db new-db)
-          (ebib-fill-entry-buffer)
-          (ebib-fill-index-buffer))
+          (ebib-redisplay))
       (error "Database %d does not exist" num))))
 
 (defun ebib-next-database ()
@@ -3160,8 +3155,7 @@ Operates either on all entries or on the marked entries."
        (unless new-db
          (setq new-db (car ebib-databases)))
        (setq ebib-cur-db new-db)
-       (ebib-fill-entry-buffer)
-       (ebib-fill-index-buffer)))))
+       (ebib-redisplay)))))
 
 (defun ebib-prev-database ()
   (interactive)
@@ -3171,8 +3165,7 @@ Operates either on all entries or on the marked entries."
        (unless new-db
          (setq new-db (last1 ebib-databases)))
        (setq ebib-cur-db new-db)
-       (ebib-fill-entry-buffer)
-       (ebib-fill-index-buffer)))))
+       (ebib-redisplay)))))
 
 (defun ebib-extract-urls (string)
   "Extract URLs from STRING.
@@ -3323,8 +3316,7 @@ logical OR with the entries in the original database."
                (cadr (edb-virtual ebib-cur-db))
              `(not ,(edb-virtual ebib-cur-db))))
      (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
-     (ebib-fill-entry-buffer)
-     (ebib-fill-index-buffer))
+     (ebib-redisplay))
     ((default)
      (beep))))
 
@@ -3359,8 +3351,7 @@ a logical `not' is applied to the selection."
         ((real-db)
          (setq ebib-cur-db (ebib-create-virtual-db field regexp not))))
       (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
-      (ebib-fill-entry-buffer)
-      (ebib-fill-index-buffer))))
+      (ebib-redisplay))))
 
 (defun ebib-create-virtual-db (field regexp not)
   "Creates a virtual database based on EBIB-CUR-DB."
@@ -3406,8 +3397,7 @@ modified."
     ((virtual-db)
      (when num
        (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
-       (ebib-fill-entry-buffer)
-       (ebib-fill-index-buffer))
+       (ebib-redisplay))
      (message "%S" (edb-virtual ebib-cur-db)))
     ((default)
      (beep))))
@@ -4384,8 +4374,7 @@ or on the region if it is active."
                   (when (edb-strings-list ebib-cur-db)
                     (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
                   (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-                  (ebib-fill-entry-buffer)
-                  (ebib-fill-index-buffer)
+                  (ebib-redisplay)
                   (ebib-set-modified t)
                   (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
                                    (car n)
