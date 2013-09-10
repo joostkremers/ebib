@@ -553,7 +553,6 @@ Its value can be 'strings, 'fields, or 'preamble.")
   (keys-list nil)                           ; sorted list of the keys in the database
   (cur-entry nil)                           ; sublist of KEYS-LIST that starts with the current entry
   (marked-entries nil)                      ; list of marked entries
-  (n-entries 0)                             ; number of entries stored in this database
   (strings (make-hash-table :test 'equal))  ; hashtable with the @STRING definitions
   (strings-list nil)                        ; sorted list of the @STRING abbreviations
   (preamble nil)                            ; string with the @PREAMBLE definition
@@ -1462,7 +1461,6 @@ must also be set to T."
     (puthash 'timestamp (from-raw (format-time-string ebib-timestamp-format)) fields))
   (puthash entry-key fields (edb-database db))
   (ebib-set-modified t db)
-  (setf (edb-n-entries db) (1+ (edb-n-entries db)))
   (setf (edb-keys-list db)
         (if sort
             (sort (cons entry-key (edb-keys-list db)) 'string<)
@@ -2074,7 +2072,6 @@ This function adds a newline to the message being logged."
               ;; if the user makes any changes, we'll want to create a back-up.
               (setf (edb-make-backup ebib-cur-db) t)
               (let ((result (ebib-find-bibtex-entries nil)))
-                (setf (edb-n-entries ebib-cur-db) (car result))
                 (when (edb-keys-list ebib-cur-db)
                   (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<)))
                 (when (edb-strings-list ebib-cur-db)
@@ -2121,7 +2118,6 @@ This function adds a newline to the message being logged."
             (insert-file-contents file)
             (let ((n (ebib-find-bibtex-entries t)))
               (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-              (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
               (when (edb-strings-list ebib-cur-db)
                 (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
               (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
@@ -2368,7 +2364,7 @@ buffer if Ebib is not occupying the entire frame."
                    (setq entry-key (ebib-uniquify-key entry-key))
                  (error "Key already exists")))
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-             (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
+             (sort-in-buffer (1+ (length (edb-keys-list ebib-cur-db))) entry-key)
              ;; we create the hash table *before* the call to
              ;; ebib-display-entry, because that function refers to the
              ;; hash table if ebib-index-display-fields is set.
@@ -2477,7 +2473,7 @@ generate the key, see that function's documentation for details."
      (setf (edb-cur-entry ebib-cur-db) (last (edb-keys-list ebib-cur-db)))
      (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
        (goto-char (point-min))
-       (forward-line (1- (edb-n-entries ebib-cur-db)))
+       (forward-line (1- (length (edb-keys-list ebib-cur-db))))
        (ebib-set-index-highlight)
        (ebib-fill-entry-buffer)))
     ((default)
@@ -2524,7 +2520,7 @@ generate the key, see that function's documentation for details."
         (ebib-remove-key-from-buffer cur-key)
         (ebib-insert-entry new-key fields ebib-cur-db t nil)
         (setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
-        (sort-in-buffer (edb-n-entries ebib-cur-db) new-key)
+        (sort-in-buffer (length (edb-keys-list ebib-cur-db)) new-key)
         (with-buffer-writable
           (ebib-display-entry new-key))
         (forward-line -1) ; move one line up to position the cursor on the new entry.
@@ -2804,7 +2800,6 @@ to become the new current entry. It it is NIL, the entry after
 the deleted one becomes the new current entry. If it is T, the
 current entry is not changed."
   (remhash entry-key (edb-database db))
-  (setf (edb-n-entries db) (1- (edb-n-entries db)))
   (cond
    ((null new-cur-entry) (setq new-cur-entry (cadr (edb-cur-entry db))))
    ((stringp new-cur-entry) t)
@@ -3399,7 +3394,6 @@ a logical `not' is applied to the selection."
                          (edb-database db))
                 result)
               'string<))
-  (setf (edb-n-entries db) (length (edb-keys-list db)))
   (setf (edb-cur-entry db) (edb-keys-list db)))
 
 (defun ebib-print-filter (num)
@@ -4387,7 +4381,6 @@ or on the region if it is active."
                 (insert-buffer-substring buffer)
                 (let ((n (ebib-find-bibtex-entries t)))
                   (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-                  (setf (edb-n-entries ebib-cur-db) (length (edb-keys-list ebib-cur-db)))
                   (when (edb-strings-list ebib-cur-db)
                     (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
                   (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
