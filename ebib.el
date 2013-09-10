@@ -1493,9 +1493,9 @@ Moves point to the first character of the key and returns point."
 ;; ebib-entry<, if the user has defined a sort order.
 
 (defun ebib-entry< (x y)
-  "Returns T if entry X is smaller than entry Y.
-The entries are compared based on the fields listed in EBIB-SORT-ORDER. X
-and Y should be keys of entries in the current database."
+  "Return T if entry X is smaller than entry Y.
+The entries are compared based on the fields listed in
+EBIB-SORT-ORDER."
   (let* ((sort-list ebib-sort-order)
          (sortstring-x (to-raw (ebib-get-sortstring x (car sort-list))))
          (sortstring-y (to-raw (ebib-get-sortstring y (car sort-list)))))
@@ -1509,13 +1509,15 @@ and Y should be keys of entries in the current database."
       (string< x y))))
 
 (defun ebib-get-sortstring (entry-key sortkey-list)
-  "Returns the field value on which the entry ENTRY-KEY is to be sorted.
-ENTRY-KEY must be the key of an entry in the current database. SORTKEY-LIST
-is a list of fields that are considered in order for the sort value."
+  "Return the field value on which the entry ENTRY-KEY is to be sorted.
+This function depends on a dynamically bound variable DB that
+should point to the database containing the entry referred to by
+ENTRY-KEY. SORTKEY-LIST is a list of fields that are considered
+in order for the sort value."
   (let ((sort-string nil))
     (while (and sortkey-list
                 (null (setq sort-string (gethash (car sortkey-list)
-                                                 (ebib-retrieve-entry entry-key ebib-cur-db)))))
+                                                 (ebib-retrieve-entry entry-key db))))) ; TODO check if dynamic var works
       (setq sortkey-list (cdr sortkey-list)))
     sort-string))
 
@@ -2610,7 +2612,11 @@ EBIB-USE-TIMESTAMP is T."
   (insert "\n"))
 
 (defun ebib-compare-xrefs (x y)
-  (gethash 'crossref (ebib-retrieve-entry x ebib-cur-db)))
+  "Return non-NIL if X has a `crossref' field."
+  ;; If X has a crossref field, it must/can be sorted before Y. Note that
+  ;; this function depends on a dynamic variable DB being bound to the
+  ;; database containing X and Y.
+  (gethash 'crossref (ebib-retrieve-entry x db))) ; TODO check if dynamic var works.
 
 (defun ebib-format-database (db)
   "Writes database DB into the current buffer in BibTeX format."
