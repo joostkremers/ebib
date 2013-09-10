@@ -1903,6 +1903,7 @@ keywords when Emacs is killed."
 (ebib-key index "X" ebib-export-preamble)
 (ebib-key index "z" ebib-leave-ebib-windows)
 (ebib-key index "Z" ebib-lower)
+(ebib-key index [ns-drag-file] ebib-add-entry-for-filename)
 
 (defun ebib-switch-to-database-nth (key)
   (interactive (list (if (featurep 'xemacs)
@@ -2391,6 +2392,50 @@ buffer if Ebib is not occupying the entire frame."
      (error "No database open. Use `o' to open a database first"))
     ((default)
      (beep))))
+
+;;A lot of this is from ebib-add-entry, should refactor.
+(defun ebib-add-file-entry (filename)
+  "Adds a new stub entry to the database for a given filename."
+  (ebib-execute-when
+    ((real-db)
+      ;;auto-generate unique new-key
+      (let ((key-list (edb-keys-list ebib-cur-db))
+            (entry-key "<new-entry>")
+            (key-count 1))
+        (while (member entry-key key-list)
+          (setq entry-key (format "<new-entry-%d>" key-count))
+          (incf key-count))
+        (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+          (sort-in-buffer (1+ (edb-n-entries ebib-cur-db)) entry-key)
+          (let ((fields (make-hash-table))
+                (short-file (ebib-file-relative-name (expand-file-name filename))))
+            (puthash 'type* ebib-default-type fields)
+            (puthash ebib-standard-file-field (from-raw short-file) fields)
+            (ebib-insert-entry entry-key fields ebib-cur-db t t))
+          (with-buffer-writable
+            (ebib-display-entry entry-key))
+          (forward-line -1)
+          (ebib-set-index-highlight)
+          (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
+          (ebib-fill-entry-buffer)
+          (ebib-set-modified t))))
+    ((no-database)
+     (error "No database open. Use `o' to open a database first"))
+    ((default)
+     (beep))))
+
+(defun add-filename-entries (filelist)
+  "Add entry stubs for all files in FILELIST and any descendant files in directories."
+  (dolist (file-path filelist)
+    (if (file-directory-p file-path)
+      (add-filename-entries (directory-files file-path t "^\\([^.]\\)")) ;ignore hidden files
+      (ebib-add-file-entry file-path))))
+
+(defun ebib-add-entry-for-filename ()
+  "Adds entry stubs for drag-and-drop files."
+  (interactive)
+  (add-filename-entries ns-input-file)
+  (setq ns-input-file nil))
 
 (defun ebib-uniquify-key (key)
   "Creates a unique key from KEY."
