@@ -1723,6 +1723,7 @@ buffers and reads the rc file."
   (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
+  (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
   (setq ebib-initialized t))
 
 (defun ebib-create-buffers ()
@@ -1781,6 +1782,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-keywords-files-alist nil
           ebib-keywords-list-per-session nil)
     (set-window-configuration ebib-saved-window-config)
+    (remove-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
     (message "")))
 
 (defun ebib-kill-emacs-query-function ()
@@ -1794,8 +1796,6 @@ keywords when Emacs is killed."
               (yes-or-no-p "Ebib holds modified databases. Kill anyway? ")))
     (ebib-keywords-save-all-new)
     t))
-
-(add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
 
 ;;;;;;;;;;;;;;;;
 ;; index-mode ;;
