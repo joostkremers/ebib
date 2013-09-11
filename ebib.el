@@ -244,7 +244,7 @@ this command extracts the url."
 GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
-  :type '(choice (const :tag "Use standard browser")
+  :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
 
 (defcustom ebib-standard-doi-field 'doi
