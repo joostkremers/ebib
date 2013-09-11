@@ -1999,9 +1999,7 @@ keywords when Emacs is killed."
     "--"
     ("Entry"
      ["Add" ebib-add-entry (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
-     ["Edit" ebib-edit-entry (and ebib-cur-db
-                                  (edb-cur-entry ebib-cur-db)
-                                  (not (edb-filter ebib-cur-db)))]
+     ["Edit" ebib-edit-entry ebib-cur-keys-list]
      ["Delete" ebib-delete-entry (and ebib-cur-db
                                       (edb-cur-entry ebib-cur-db)
                                       (not (edb-filter ebib-cur-db)))])
