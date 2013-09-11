@@ -2032,28 +2032,33 @@ to \"none\"."
           ;; Set a header line if there is a filter.
           (setq header-line-format (if (edb-filter ebib-cur-db)
                                        (ebib-pp-filter (edb-filter ebib-cur-db))))
-          ;; Make sure the current entry is among the visible entries.
-          (unless (member (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)
-            (setf (edb-cur-entry ebib-cur-db) (car ebib-cur-keys-list)))
-          (mapc #'(lambda (entry)
-                    (ebib-display-entry entry)
-                    (when (member entry (edb-marked-entries ebib-cur-db))
-                      (save-excursion
-                        (let ((beg (progn
-                                     (beginning-of-line)
-                                     (forward-line -1)
-                                     (point))))
-                          (skip-chars-forward "^ ")
-                          (add-text-properties beg (point) '(face ebib-marked-face))))))
-                ebib-cur-keys-list)
-          (goto-char (point-min))
-          (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
-          (beginning-of-line)
-          (ebib-set-index-highlight))
-        (set-buffer-modified-p (edb-modified ebib-cur-db))
-        (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                     (length (member ebib-cur-db ebib-databases)))))
-                               (edb-name ebib-cur-db)))))))
+          ;; It may be that no entry satisfies the filter.
+          (if (not ebib-cur-keys-list)
+              (message "No entries matching the filter")
+            ;; Make sure the current entry is among the visible entries.
+            (unless (member (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)
+              (setf (edb-cur-entry ebib-cur-db) (car ebib-cur-keys-list)))
+            (mapc #'(lambda (entry)
+                      (ebib-display-entry entry)
+                      (when (member entry (edb-marked-entries ebib-cur-db))
+                        (save-excursion
+                          (let ((beg (progn
+                                       (beginning-of-line)
+                                       (forward-line -1)
+                                       (point))))
+                            (skip-chars-forward "^ ")
+                            (add-text-properties beg (point) '(face ebib-marked-face))))))
+                  ebib-cur-keys-list)
+            (goto-char (point-min))
+            (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
+            (beginning-of-line)
+            (ebib-set-index-highlight))
+          ;; TODO Setting the buffer's modified flag and renaming it
+          ;; shouldn't be done here.
+          (set-buffer-modified-p (edb-modified ebib-cur-db))
+          (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                       (length (member ebib-cur-db ebib-databases)))))
+                                 (edb-name ebib-cur-db))))))))
 
 (defun ebib-customize ()
   "Switches to Ebib's customisation group."
