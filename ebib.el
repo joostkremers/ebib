@@ -148,6 +148,11 @@ This is either the height of the window, or, if
   :group 'ebib-windows
   :type 'integer)
 
+(defcustom ebib-display-filter-as-lisp nil
+  "If set, display filters as Lisp expressions."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer."
   :group 'ebib
@@ -2026,7 +2031,7 @@ to \"none\"."
                   (edb-keys-list ebib-cur-db)))
           ;; Set a header line if there is a filter.
           (setq header-line-format (if (edb-filter ebib-cur-db)
-                                       (format "%S" (edb-filter ebib-cur-db))))
+                                       (ebib-pp-filter (edb-filter ebib-cur-db))))
           ;; Make sure the current entry is among the visible entries.
           (unless (member (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)
             (setf (edb-cur-entry ebib-cur-db) (car ebib-cur-keys-list)))
@@ -3377,9 +3382,9 @@ on the entries."
   "Filter the current database.
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
-  (let ((field (completing-read (format "Filter: %s(contains <field> <search string>)%s. Enter field: "
-                                        (if (< not 0) "(not " "")
-                                        (if (< not 0) ")" ""))
+  (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
+                                        (if (< not 0) "not " "")
+                                        (if (< not 0) "" ""))
                                 (append  (list '("any" . 0)
                                                '("type*" . 0))
                                          (mapcar #'(lambda (x)
@@ -3387,10 +3392,10 @@ a logical `not' is applied to the selection."
                                                  (append ebib-unique-field-list ebib-additional-fields)))
                                 nil t nil 'ebib-field-history)))
     (setq field (intern-soft field))
-    (let* ((prompt (format "Filter: %s(contains %s <search string>)%s. Enter %s: "
-                                       (if (< not 0) "(not " "")
+    (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
+                                       (if (< not 0) "not " "")
                                        field
-                                       (if (< not 0) ")" "")
+                                       (if (< not 0) "" "")
                                        (if (string= field "type*") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "type*")
@@ -3412,12 +3417,35 @@ a logical `not' is applied to the selection."
       (ebib-run-filter ebib-cur-db)
       (ebib-redisplay))))
 
+(defun ebib-pp-filter (filter)
+  "Convert FILTER into a string in infix notation."
+  (if ebib-display-filter-as-lisp
+      (format "%S" (edb-filter ebib-cur-db))
+    (let ((pp-filter (ebib-pp-filter-helper filter)))
+      (string-match "\\`(\\(.*\\))\\'" pp-filter)
+      (match-string 1 pp-filter))))
+
+(defun ebib-pp-filter-helper (filter)
+  "Helper function for `ebib-pp-filter'."
+  (cond
+   ((listp filter)
+    (let ((op (first filter)))
+      (cond
+       ((eq op 'not)
+        (format "not %s" (ebib-pp-filter-helper (second filter))))
+       ((member op '(and or contains))
+        (format "(%s %s %s)" (ebib-pp-filter-helper (second filter)) op (ebib-pp-filter-helper (third filter)))))))
+   ((stringp filter)
+    (format "\"%s\"" filter))
+   ((symbolp filter)
+    (format "%s" filter))))
+
 (defun ebib-filter-show ()
   "Display the filter of the current virtual database in the minibuffer."
   (interactive)
   (ebib-execute-when
     ((filtered-db)
-     (message "%S" (edb-filter ebib-cur-db)))
+     (message (ebib-pp-filter (edb-filter ebib-cur-db))))
     ((default)
      (beep))))
 
