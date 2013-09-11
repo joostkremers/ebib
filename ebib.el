@@ -1994,24 +1994,6 @@ keywords when Emacs is killed."
   (ebib-fill-index-buffer)
   (ebib-fill-entry-buffer))
 
-(defun ebib-run-filter (db)
-  "Run the filter of DB.
-Return a list of entry keys that match DB's filter."
-  ;; The filter uses a macro `contains', which we locally define here. This
-  ;; macro in turn uses a dynamic variable `entry', which we must set
-  ;; before eval'ing the filter.
-  (let ((filter `(cl-macrolet ((contains (field regexp)
-                                         `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
-                   ,(edb-filter db))))
-    (sort (let ((result nil))
-            (maphash #'(lambda (key value)
-                         (let ((entry value))
-                           (when (eval filter)
-                             (setq result (cons key result)))))
-                     (edb-database db))
-            result)
-          'string<)))
-
 (defun ebib-fill-index-buffer ()
   "Fills the index buffer with the list of keys in `ebib-cur-db'.
 If `ebib-cur-db' is nil, the buffer is just erased and its name set
@@ -3421,6 +3403,24 @@ a logical `not' is applied to the selection."
                                  `(not (contains ,field ,regexp))))))
       (ebib-run-filter ebib-cur-db)
       (ebib-redisplay))))
+
+(defun ebib-run-filter (db)
+  "Run the filter of DB.
+Return a list of entry keys that match DB's filter."
+  ;; The filter uses a macro `contains', which we locally define here. This
+  ;; macro in turn uses a dynamic variable `entry', which we must set
+  ;; before eval'ing the filter.
+  (let ((filter `(cl-macrolet ((contains (field regexp)
+                                         `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
+                   ,(edb-filter db))))
+    (sort (let ((result nil))
+            (maphash #'(lambda (key value)
+                         (let ((entry value))
+                           (when (eval filter)
+                             (setq result (cons key result)))))
+                     (edb-database db))
+            result)
+          'string<)))
 
 (defun ebib-pp-filter (filter)
   "Convert FILTER into a string in infix notation."
