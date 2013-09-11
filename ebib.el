@@ -2485,7 +2485,8 @@ generate the key, see that function's documentation for details."
              (with-buffer-writable
                (erase-buffer)))
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-             (rename-buffer " none")))
+             (rename-buffer " none"))
+           (setq ebib-cur-keys-list nil))
          (message "Database closed."))))))
 
 (defun ebib-goto-first-entry ()
