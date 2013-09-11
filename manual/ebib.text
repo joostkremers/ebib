@@ -1012,6 +1012,15 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 \noindent This option lets you specify the size of the index window at the top (or left) of the Ebib screen.
 
 
+### Index Mode Line ###
+
+**Default value**: `("  " mode-line-modified "%20b" " Entry %l" (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))`
+
+\noindent This option lets you set the mode line of the index buffer. By default, the mode line displays whether the database has been modified, the name of the current database, the entry number and whether the current database is virtual or not.
+
+If you prefer to have the standard Emacs mode line, set this option to "Use standard mode line".
+
+
 ### Index Display Fields ###
 
 **Default value**: `nil`.\

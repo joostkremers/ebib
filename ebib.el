@@ -148,6 +148,12 @@ This is either the height of the window, or, if
   :group 'ebib-windows
   :type 'integer)
 
+(defcustom ebib-index-mode-line '("  " mode-line-modified "%20b" " Entry %l" (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))
+  "The mode line for the index window."
+  :group 'ebib-windows
+  :type '(choice (const :tag "Use standard mode line" nil)
+                 (sexp :tag "Customize mode line")))
+
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer."
   :group 'ebib
@@ -239,7 +245,7 @@ GNU/Emacs has a function call-browser, which is used if this
 option is unset."
   :group 'ebib
   :type '(choice (const :tag "Use standard browser")
-          (string :tag "Specify browser command")))
+                 (string :tag "Specify browser command")))
 
 (defcustom ebib-standard-doi-field 'doi
   "Standard field to store a DOI (digital object identifier) in.
@@ -1756,7 +1762,9 @@ buffers and reads the rc file."
   (add-to-list 'ebib-buffer-alist (cons 'index (get-buffer-create " none")))
   (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
     (ebib-index-mode)
-    (buffer-disable-undo)))
+    (buffer-disable-undo)
+    (if ebib-index-mode-line
+        (setq mode-line-format ebib-index-modeline))))
 
 (defun ebib-quit ()
   "Quits Ebib.
