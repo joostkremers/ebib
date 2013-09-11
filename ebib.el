@@ -1715,7 +1715,6 @@ buffers and reads the rc file."
         ebib-current-field nil
         ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
-  (load ebib-rc-file t)
   (ebib-create-buffers)
   (if (file-name-directory ebib-keywords-file) ; returns nil if there is no directory part
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
@@ -1725,6 +1724,7 @@ buffers and reads the rc file."
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
   (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
+  (load ebib-rc-file t)
   (setq ebib-initialized t))
 
 (defun ebib-create-buffers ()
@@ -3381,9 +3381,13 @@ a logical `not' is applied to the selection."
                                        field
                                        (if (< not 0) ")" "")
                                        (if (string= field "type*") "entry type" "regexp")))
-           (regexp (if (string= field "type*")
-                       (completing-read prompt ebib-entry-types nil t nil 'ebib-filter-history)
-                     (read-string prompt nil 'ebib-filter-history))))
+           (regexp (cond
+                    ((string= field "type*")
+                     (completing-read prompt ebib-entry-types nil t nil 'ebib-filter-history))
+                    ((string= field "keywords") 
+                     (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keyword-history))
+                    (t
+                     (read-string prompt nil 'ebib-filter-history)))))
       (ebib-execute-when
         ((filtered-db)
          (setf (edb-filter ebib-cur-db) `(,bool ,(edb-filter ebib-cur-db)
