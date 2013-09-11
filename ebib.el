@@ -1495,38 +1495,6 @@ Moves point to the first character of the key and returns point."
   (beginning-of-line)
   (point))
 
-;; when we sort entries, we either use string< on the entry keys, or
-;; ebib-entry<, if the user has defined a sort order.
-
-(defun ebib-entry< (x y)
-  "Return T if entry X is smaller than entry Y.
-The entries are compared based on the fields listed in
-`ebib-sort-order'."
-  (let* ((sort-list ebib-sort-order)
-         (sortstring-x (to-raw (ebib-get-sortstring x (car sort-list))))
-         (sortstring-y (to-raw (ebib-get-sortstring y (car sort-list)))))
-    (while (and sort-list
-                (string= sortstring-x sortstring-y))
-      (setq sort-list (cdr sort-list))
-      (setq sortstring-x (to-raw (ebib-get-sortstring x (car sort-list))))
-      (setq sortstring-y (to-raw (ebib-get-sortstring y (car sort-list)))))
-    (if (and sortstring-x sortstring-y)
-        (string< sortstring-x sortstring-y)
-      (string< x y))))
-
-(defun ebib-get-sortstring (entry-key sortkey-list)
-  "Return the field value on which the entry ENTRY-KEY is to be sorted.
-This function depends on a dynamically bound variable DB that
-should point to the database containing the entry referred to by
-ENTRY-KEY. SORTKEY-LIST is a list of fields that are considered
-in order for the sort value."
-  (let ((sort-string nil))
-    (while (and sortkey-list
-                (null (setq sort-string (gethash (car sortkey-list)
-                                                 (ebib-retrieve-entry entry-key db))))) ; TODO check if dynamic var works
-      (setq sortkey-list (cdr sortkey-list)))
-    sort-string))
-
 (defvar ebib-info-flag nil "Flag to indicate whether Ebib called Info or not.")
 
 (defadvice Info-exit (after ebib-info-exit activate)
@@ -2611,25 +2579,57 @@ If TIMESTAMP is T, a timestamp is added to the entry if
            (edb-strings db))
   (insert "\n"))
 
-(defun ebib-compare-xrefs (x y)
-  "Return non-NIL if X has a `crossref' field."
-  ;; If X has a crossref field, it must/can be sorted before Y. Note that
-  ;; this function depends on a dynamic variable DB being bound to the
-  ;; database containing X and Y.
-  (gethash 'crossref (ebib-retrieve-entry x db))) ; TODO check if dynamic var works.
+;; when we sort entries, we either use string< on the entry keys, or
+;; ebib-entry<, if the user has defined a sort order.
+
+(defun ebib-get-sortstring (entry-key sortkey-list db)
+  "Return the field value on which the entry ENTRY-KEY is to be sorted.
+DB is the database that contains the entry referred to by
+ENTRY-KEY. SORTKEY-LIST is a list of fields that are considered
+in order for the sort value."
+  (let ((sort-string nil)
+        (entry (ebib-retrieve-entry entry-key db)))
+    (while (and sortkey-list
+                (null (setq sort-string (gethash (car sortkey-list) entry))))
+      (setq sortkey-list (cdr sortkey-list)))
+    sort-string))
 
 (defun ebib-format-database (db)
-  "Writes database DB into the current buffer in BibTeX format."
-  (when (edb-preamble db)
-    (insert (format "@PREAMBLE{%s}\n\n" (edb-preamble db))))
-  (ebib-format-strings db)
-  (let ((sorted-list (copy-tree (edb-keys-list db))))
-    (cond
-     (ebib-save-xrefs-first
-      (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
-     (ebib-sort-order
-      (setq sorted-list (sort sorted-list 'ebib-entry<))))
-    (mapc #'(lambda (key) (ebib-format-entry key db nil)) sorted-list)))
+  "Write database DB into the current buffer in BibTeX format."
+  ;; We define two comparison functions for `sort'. These must simply
+  ;; return T if the first element is to be sorted before the second.
+  (cl-flet
+      ;; The first one is simple: if X has a crossref field, it must be
+      ;; sorted before Y (or at least *can* be, if Y also has a crossref
+      ;; field).
+      ((ebib-compare-xrefs (x y)
+                           (gethash 'crossref (ebib-retrieve-entry x db)))
+       ;; This one's a bit trickier. We iterate over the lists of fields in
+       ;; `ebib-sort-order'. For each level, `ebib-get-sortstring' then
+       ;; returns the string that can be used for sorting. If all fails,
+       ;; sorting is done on the basis of the entry key.
+       (ebib-entry< (x y)
+                    (let* ((sort-list ebib-sort-order)
+                           (sortstring-x (to-raw (ebib-get-sortstring x (car sort-list) db)))
+                           (sortstring-y (to-raw (ebib-get-sortstring y (car sort-list) db))))
+                      (while (and sort-list
+                                  (string= sortstring-x sortstring-y))
+                        (setq sort-list (cdr sort-list))
+                        (setq sortstring-x (to-raw (ebib-get-sortstring x (car sort-list) db)))
+                        (setq sortstring-y (to-raw (ebib-get-sortstring y (car sort-list) db))))
+                      (if (and sortstring-x sortstring-y)
+                          (string< sortstring-x sortstring-y)
+                        (string< x y))))) 
+    (when (edb-preamble db)
+      (insert (format "@PREAMBLE{%s}\n\n" (edb-preamble db))))
+    (ebib-format-strings db)
+    (let ((sorted-list (copy-tree (edb-keys-list db))))
+      (cond
+       (ebib-save-xrefs-first
+        (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
+       (ebib-sort-order
+        (setq sorted-list (sort sorted-list 'ebib-entry<))))
+      (mapc #'(lambda (key) (ebib-format-entry key db nil)) sorted-list))))
 
 (defun ebib-make-backup (file)
   "Create a backup of FILE.
