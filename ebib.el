@@ -1317,10 +1317,7 @@ field contents."
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
     (with-buffer-writable
       (erase-buffer)
-      (when (and ebib-cur-db               ; do we have a database?
-                 (edb-cur-entry ebib-cur-db) ; does it contain entries?
-                 (gethash (edb-cur-entry ebib-cur-db)
-                          (edb-database ebib-cur-db))) ; does the current entry exist?
+      (when ebib-cur-keys-list         ; are there entries being displayed?
         (ebib-format-fields (edb-cur-entry ebib-cur-db)
                             'insert match-str)
         (setq ebib-current-field 'type*)
