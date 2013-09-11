@@ -48,7 +48,16 @@
 ;; Code:
 
 (eval-when-compile
-  (require 'cl))
+  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
+      (progn
+        (require 'cl)
+        (defalias 'cl-remove 'remove*)
+        (defalias 'cl-flet 'flet)
+        (defalias 'cl-loop 'loop)
+        (defalias 'cl-caddr 'caddr)
+        (defalias 'cl-multiple-value-bind 'multiple-value-bind)
+        (defalias 'cl-macrolet 'macrolet))
+    (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
 
@@ -3427,17 +3436,17 @@ surrounding it is not included in the citation command."
   (when (and (string-match "%K" format-string)
              key)
     (setq format-string (replace-match key t t format-string)))
-  (loop for n = 1 then (1+ n)
-        until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A" format-string))
-        do (setq format-string
-                 (replace-match (if-str (argument (save-match-data
-                                                    (read-from-minibuffer (format "Argument %s%s: " n (if key
-                                                                                                          (concat " for " key)
-                                                                                                        "")))))
-                                        (concat "\\1" argument "\\2")
-                                        "")
-                                t nil format-string))
-        finally return format-string))
+  (cl-loop for n = 1 then (1+ n)
+           until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A" format-string))
+           do (setq format-string
+                    (replace-match (if-str (argument (save-match-data
+                                                       (read-from-minibuffer (format "Argument %s%s: " n (if key
+                                                                                                             (concat " for " key)
+                                                                                                           "")))))
+                                       (concat "\\1" argument "\\2")
+                                     "")
+                                   t nil format-string))
+           finally return format-string))
 
 (defun ebib-split-citation-string (format-string)
   "Split up FORMAT-STRING.
@@ -3714,20 +3723,20 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
   ;; emacs 23.1, this function is not available.
   (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
         (collection (ebib-keywords-for-database ebib-cur-db)))
-    (loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keyword-history)
-          until (string= keyword "")
-          do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
-                    (new-conts (if conts
-                                   (concat conts ebib-keywords-separator keyword)
-                                 keyword)))
-               (puthash 'keywords (from-raw (if ebib-keywords-field-keep-sorted
-                                                (ebib-sort-keywords new-conts)
-                                              new-conts))
-                        ebib-cur-entry-hash)
-               (ebib-set-modified t)
-               (ebib-redisplay-current-field)
-               (unless (member keyword collection)
-                 (ebib-keywords-add-keyword keyword ebib-cur-db))))))
+    (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keyword-history)
+             until (string= keyword "")
+             do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
+                       (new-conts (if conts
+                                      (concat conts ebib-keywords-separator keyword)
+                                    keyword)))
+                  (puthash 'keywords (from-raw (if ebib-keywords-field-keep-sorted
+                                                   (ebib-sort-keywords new-conts)
+                                                 new-conts))
+                           ebib-cur-entry-hash)
+                  (ebib-set-modified t)
+                  (ebib-redisplay-current-field)
+                  (unless (member keyword collection)
+                    (ebib-keywords-add-keyword keyword ebib-cur-db))))))
 
 (defun ebib-edit-file-field ()
   "Edit the `ebib-standard-file-field'.
@@ -3735,17 +3744,17 @@ Filenames are added to the standard file field separated by
 `ebib-filename-separator'. The first directory in
 `ebib-file-search-dirs' is used as the start directory."
   (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs))))
-    (loop for file = (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion)
-          until (or (string= file "")
-                    (string= file start-dir))
-          do (let* ((short-file (ebib-file-relative-name (expand-file-name file)))
-                    (conts (to-raw (gethash ebib-standard-file-field ebib-cur-entry-hash)))
-                    (new-conts (if conts
-                                   (concat conts ebib-filename-separator short-file)
-                                 short-file)))
-               (puthash ebib-standard-file-field (from-raw new-conts) ebib-cur-entry-hash)
-               (ebib-set-modified t)
-               (ebib-redisplay-current-field)))))
+    (cl-loop for file = (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion)
+             until (or (string= file "")
+                       (string= file start-dir))
+             do (let* ((short-file (ebib-file-relative-name (expand-file-name file)))
+                       (conts (to-raw (gethash ebib-standard-file-field ebib-cur-entry-hash)))
+                       (new-conts (if conts
+                                      (concat conts ebib-filename-separator short-file)
+                                    short-file)))
+                  (puthash ebib-standard-file-field (from-raw new-conts) ebib-cur-entry-hash)
+                  (ebib-set-modified t)
+                  (ebib-redisplay-current-field)))))
 
 (defun ebib-file-relative-name (file)
   "Return a name for FILE relative to `ebib-file-search-dirs'.
