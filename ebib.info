@@ -770,15 +770,15 @@ BibLaTeX is still rudimentary. It will be improved in the future, but
 for the moment it should help you get started if you use BibLaTeX.
 
 If you're viewing an entry that has a cross-reference and you want to
-go to the cross-referenced entry you can type `F'. This command reads
+go to the cross-referenced entry you can type `C'. This command reads
 the value of the `crossref' field and then displays that entry. If you
 want to do the reverse, i.e., see if the current entry is
-cross-referenced by any other entries, you can use the same key `F': if
-you type `F' on an entry that does not have a cross-reference, Ebib
+cross-referenced by any other entries, you can use the same key `C': if
+you type `C' on an entry that does not have a cross-reference, Ebib
 makes the key of the current entry the current search string and
 searches for its first occurrence after the current entry. Note that
 after Ebib has jumped to the first cross-referencing entry, you cannot
-type `F' again to find the next one. This command will take you back to
+type `C' again to find the next one. This command will take you back to
 the cross-referenced entry. In order to find the next cross-referencing
 entry, you have to type `n', as with a normal search.
 
@@ -1577,8 +1577,8 @@ their operands. That is, `x and y' is written as `(and x y)'.)
 If you don't want to filter on one specific field but rather want to
 select all entries that match a certain regexp in any field, you can
 type `any' as the field to filter on. So specifying `any' as the field
-and `Jones' as the regexp, the virtual database will select all entries
-that have a field that contains "Jones" in them.
+and `Jones' as the regexp, the filter selects all entries that have a
+field that contains "Jones" in them.
 
 Note that you can also select items based on their entry type. In order
 to do that, you need to specify `type*' as the field to search, which
@@ -1619,18 +1619,16 @@ the `author' _and_ `editor' fields.
 
 To perform a logical `or' operation, press the key `|'. As before, you
 will be asked which field you want to filter on, and which regexp you
-want to filter with. Ebib will then update the virtual database with
-all entries in the original database that match the additional
-criterion.
+want to filter with. Ebib will then update the database.
 
-It is also possible to perform a logical `and' on the virtual database.
-Use this if you want to select those entries that contain "Jones" in
-the `author' field and e.g. "symbiotic hibernation" in the `keyword'
-field. A logical `and' operation is done with the key `&'. (Note: this
-is the same key that is used to create the filter. In fact, you can
-create a filter with `|' as well: when used in an unfiltered database,
-`&' and `|' are equivalent. They are only different when a filter is
-already active.)
+It is also possible to perform a logical `and' on the filter. Use this
+if you want to select those entries that contain "Jones" in the
+`author' field and e.g. "symbiotic hibernation" in the `keyword' field.
+A logical `and' operation is done with the key `&'. (Note: this is the
+same key that is used to create the filter. In fact, you can create a
+filter with `|' as well: when used in an unfiltered database, `&' and
+`|' are equivalent. They are only different when a filter is already
+active.)
 
 Both the `&' and `|' commands can be used with the negative prefix
 argument `M--' (or `C-u -', which is identical). In this case, the
@@ -1639,16 +1637,15 @@ performs a logical `not' operation on the search criterion.
 
 That is, if you want to select all entries from a database that do
 _not_ contain "Jones" in the `author' field, you can do this by typing
-`M-- &' and then filling out the relevant field and regexp. This prefix
-argument is available both in real and in virtual databases.
+`M-- &' and then filling out the relevant field and regexp.
 
 There is another way of performing a logical `not' operation, which is
 only available in when a filter is active: by pressing the key `~', you
-invert the current filter. That is, if you have a virtual database with
-all the entries containing "Jones" in the `author' or in the `editor'
-field, and you press `~', the selection is inverted, and now contains
-all entries that do _not_ have "Jones" in the `author' or `editor'
-field.
+invert the current filter. That is, if you have a filtered database
+with all the entries containing "Jones" in the `author' or in the
+`editor' field, and you press `~', the selection is inverted, and now
+contains all entries that do _not_ have "Jones" in the `author' or
+`editor' field.
 
 Although `~' and the negative prefix argument to `&' or `|' both
 perform logical `not' operations, they are _not_ equivalent: `~'
@@ -1667,7 +1664,7 @@ press `Fc'. For convenience, this action is also available with `c',
 which normally closes a database. If a filter is active, however, it
 simply cancels the filter. (If you find this behaviour confusing, you
 can rebind the `c' key to the function `ebib-close-database'. See *note
-Modifying Key Bindings: #modifying-key-bindings. for details.
+Modifying Key Bindings: #modifying-key-bindings. for details.)
 
 
 File: ebib.info,  Node: Properties of Filtered Databases,  Prev: Complex Filters,  Up: Filters
@@ -1858,18 +1855,15 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      search the database. `(ebib-search)'
 
 `&'
-     Create a virtual database, or perform a logical `and' on the
-     current virtual database. With negative prefix argument: apply a
-     logical `not' to the selectional criterion. `(ebib-virtual-db-and)'
+     Create a filter, or perform a logical `and' on the current filter.
+     With negative prefix argument: apply a logical `not' to the
+     selectional criterion. `(ebib-filter-and)'
 
 `|'
-     Create a virtual database, or perform a logical `or' on the
-     current virtual database. With negative prefix argument: apply a
-     logical `not' to the selectional criterion. `(ebib-virtual-db-or)'
-
-`~'
-     Perform a logical `not' on the current virtual database.
-     `(ebib-virtual-db-not)'
+     Create a filter, or perform a logical `or' on the current filter.
+     With negative prefix argument: apply a logical `not' to the
+     selectional criterion. `(ebib-filter-or)' `~' Perform a logical
+     `not' on the current filter. `(ebib-filter-not)'
 
 `?'
      display Ebib info. `(ebib-info)'
@@ -1881,7 +1875,10 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      equivalent to `Pgup'.
 
 `c'
-     close the database. `(ebib-close-database)'
+     close the database or cancel the current filter. `(ebib-index-c)'
+
+`C'
+     follow `crossref' field. `(ebib-follow-crossref)'
 
 `d'
      delete the current entry. `(ebib-delete-entry)'
@@ -1901,7 +1898,19 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      _n_-th filename.
 
 `F'
-     follow `crossref' field. `(ebib-follow-crossref)'
+     prefix key for filter actions.
+
+`F c'
+     cancel the current filter. `(ebib-filter-cancel)'
+
+`F r'
+     reapply the current filter. `(ebib-filter-reapply)'
+
+`F v'
+     display the filter in the minibuffer. `(ebib-filter-show)'
+
+`F w'
+     write the filtered entries to a file. `(ebib-write-database)'
 
 `g'
      equivalent to `Home'.
@@ -1982,11 +1991,6 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
 `u'
      extract a URL from the `url' field and send it to a browser. With
      numeric prefix argument, extract the _n_-th url.
-
-`V'
-     Display the filter of the current virtual database in the
-     minibuffer. With prefix argument: reapply the filter.
-     `(ebib-print-filter)'
 
 `x'
      export the current entry to a file, or, when used with numeric
@@ -2976,114 +2980,114 @@ Node: Filters73769
 Ref: #filters73923
 Node: Simple Selection74947
 Ref: #simple-selection75078
-Node: Complex Filters76669
-Ref: #complex-filters76839
-Node: Properties of Filtered Databases80674
-Ref: #properties-of-filtered-databases80853
-Node: The Multiline Edit Buffer82303
-Ref: #the-multiline-edit-buffer82484
-Node: The Options Menu86389
-Ref: #the-options-menu86536
-Node: The Ebib Buffers87146
-Ref: #the-ebib-buffers87287
-Node: The Index Buffer87627
-Ref: #the-index-buffer87762
-Node: The Entry Buffer92388
-Ref: #the-entry-buffer92550
-Node: The Strings Buffer94809
-Ref: #the-strings-buffer94950
-Node: Customisation96638
-Ref: #customisation96747
-Node: The Customisation Buffer97031
-Ref: #the-customisation-buffer97193
-Node: Default Type98387
-Ref: #default-type98523
-Node: Preload Bib Files98551
-Ref: #preload-bib-files98729
-Node: Preload Bib Search Dirs98753
-Ref: #preload-bib-search-dirs98945
-Node: Create Backups98967
-Ref: #create-backups99137
-Node: Keywords list99159
-Ref: #keywords-list99317
-Node: Keywords File99341
-Ref: #keywords-file99511
-Node: Keywords File Save On Exit99534
-Ref: #keywords-file-save-on-exit99739
-Node: Keywords Use Only File99763
-Ref: #keywords-use-only-file99973
-Node: Keywords Field Keep Sorted99997
-Ref: #keywords-field-keep-sorted100207
-Node: Keywords Separator100231
-Ref: #keywords-separator100422
-Node: Additional Fields100447
-Ref: #additional-fields100616
-Node: Layout100701
-Ref: #layout100835
-Node: Width100860
-Ref: #width100993
-Node: Popup Entry Window101014
-Ref: #popup-entry-window101188
-Node: Window Vertical Split101210
-Ref: #window-vertical-split101402
-Node: Index Window Size101424
-Ref: #index-window-size101610
-Node: Index Display Fields101631
-Ref: #index-display-fields101815
-Node: Uniquify Keys101839
-Ref: #uniquify-keys102009
-Node: Autogenerate Keys102033
-Ref: #autogenerate-keys102208
-Node: Citation Commands102405
-Ref: #citation-commands102587
-Node: Multiline Major Mode108102
-Ref: #multiline-major-mode108283
-Node: Sort Order108313
-Ref: #sort-order108473
-Node: Save Xrefs First108497
-Ref: #save-xrefs-first108662
-Node: Crossref Face108686
-Ref: #crossref-face108848
-Node: Selected Face108894
-Ref: #selected-face109053
-Node: Use Timestamp109097
-Ref: #use-timestamp109259
-Node: Timestamp Format109283
-Ref: #timestamp-format109456
-Node: Standard Url Field109493
-Ref: #standard-url-field109667
-Node: Url Regexp109691
-Ref: #url-regexp109848
-Node: Browser Command109909
-Ref: #browser-command110076
-Node: Standard Doi Field110194
-Ref: #standard-doi-field110364
-Node: Doi Url110388
-Ref: #doi-url110540
-Node: Standard File Field110693
-Ref: #standard-file-field110868
-Node: File Associations110893
-Ref: #file-associations111075
-Node: Filename Separator111128
-Ref: #filename-separator111309
-Node: File Search Dirs111331
-Ref: #file-search-dirs111505
-Node: Print Preamble111527
-Ref: #print-preamble111692
-Node: Print Newline111716
-Ref: #print-newline111878
-Node: Print Multiline111902
-Ref: #print-multiline112068
-Node: Latex Preamble112092
-Ref: #latex-preamble112257
-Node: Print Tempfile112303
-Ref: #print-tempfile112475
-Node: Allow Identical Fields112499
-Ref: #allow-identical-fields112684
-Node: Entry Types112708
-Ref: #entry-types112848
-Node: Modifying Key Bindings114431
-Ref: #modifying-key-bindings114589
+Node: Complex Filters76655
+Ref: #complex-filters76825
+Node: Properties of Filtered Databases80493
+Ref: #properties-of-filtered-databases80672
+Node: The Multiline Edit Buffer82122
+Ref: #the-multiline-edit-buffer82303
+Node: The Options Menu86208
+Ref: #the-options-menu86355
+Node: The Ebib Buffers86965
+Ref: #the-ebib-buffers87106
+Node: The Index Buffer87446
+Ref: #the-index-buffer87581
+Node: The Entry Buffer92319
+Ref: #the-entry-buffer92481
+Node: The Strings Buffer94740
+Ref: #the-strings-buffer94881
+Node: Customisation96569
+Ref: #customisation96678
+Node: The Customisation Buffer96962
+Ref: #the-customisation-buffer97124
+Node: Default Type98318
+Ref: #default-type98454
+Node: Preload Bib Files98482
+Ref: #preload-bib-files98660
+Node: Preload Bib Search Dirs98684
+Ref: #preload-bib-search-dirs98876
+Node: Create Backups98898
+Ref: #create-backups99068
+Node: Keywords list99090
+Ref: #keywords-list99248
+Node: Keywords File99272
+Ref: #keywords-file99442
+Node: Keywords File Save On Exit99465
+Ref: #keywords-file-save-on-exit99670
+Node: Keywords Use Only File99694
+Ref: #keywords-use-only-file99904
+Node: Keywords Field Keep Sorted99928
+Ref: #keywords-field-keep-sorted100138
+Node: Keywords Separator100162
+Ref: #keywords-separator100353
+Node: Additional Fields100378
+Ref: #additional-fields100547
+Node: Layout100632
+Ref: #layout100766
+Node: Width100791
+Ref: #width100924
+Node: Popup Entry Window100945
+Ref: #popup-entry-window101119
+Node: Window Vertical Split101141
+Ref: #window-vertical-split101333
+Node: Index Window Size101355
+Ref: #index-window-size101541
+Node: Index Display Fields101562
+Ref: #index-display-fields101746
+Node: Uniquify Keys101770
+Ref: #uniquify-keys101940
+Node: Autogenerate Keys101964
+Ref: #autogenerate-keys102139
+Node: Citation Commands102336
+Ref: #citation-commands102518
+Node: Multiline Major Mode108033
+Ref: #multiline-major-mode108214
+Node: Sort Order108244
+Ref: #sort-order108404
+Node: Save Xrefs First108428
+Ref: #save-xrefs-first108593
+Node: Crossref Face108617
+Ref: #crossref-face108779
+Node: Selected Face108825
+Ref: #selected-face108984
+Node: Use Timestamp109028
+Ref: #use-timestamp109190
+Node: Timestamp Format109214
+Ref: #timestamp-format109387
+Node: Standard Url Field109424
+Ref: #standard-url-field109598
+Node: Url Regexp109622
+Ref: #url-regexp109779
+Node: Browser Command109840
+Ref: #browser-command110007
+Node: Standard Doi Field110125
+Ref: #standard-doi-field110295
+Node: Doi Url110319
+Ref: #doi-url110471
+Node: Standard File Field110624
+Ref: #standard-file-field110799
+Node: File Associations110824
+Ref: #file-associations111006
+Node: Filename Separator111059
+Ref: #filename-separator111240
+Node: File Search Dirs111262
+Ref: #file-search-dirs111436
+Node: Print Preamble111458
+Ref: #print-preamble111623
+Node: Print Newline111647
+Ref: #print-newline111809
+Node: Print Multiline111833
+Ref: #print-multiline111999
+Node: Latex Preamble112023
+Ref: #latex-preamble112188
+Node: Print Tempfile112234
+Ref: #print-tempfile112406
+Node: Allow Identical Fields112430
+Ref: #allow-identical-fields112615
+Node: Entry Types112639
+Ref: #entry-types112779
+Node: Modifying Key Bindings114362
+Ref: #modifying-key-bindings114520
 
 End Tag Table
 

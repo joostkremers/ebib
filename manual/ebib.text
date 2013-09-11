@@ -256,7 +256,7 @@ When you fill in the `crossref` field in Ebib, Ebib displays the values of the c
 
 BibLaTeX has a more sophisticated cross-referencing mechanism. While cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry in BibTeX, BibLaTeX has the option to specify that, e.g., the `booktitle` field of the entry type `incollection` inherits from the `title` field of the cross-referenced entry. If you want Ebib to honour such inheritances, you can customise the variable `ebib-biblatex-inheritances`. This variable allows you to specify inheritance relations for individual entry types, or, by specifying `all` as the entry type, for all entry types. (Note that the former always override the latter.) Currently, this support for BibLaTeX is still rudimentary. It will be improved in the future, but for the moment it should help you get started if you use BibLaTeX.
 
-If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `F`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `F`: if you type `F` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `F` again to find the next one. This command will take you back to the cross-referenced entry. In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
+If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. This command will take you back to the cross-referenced entry. In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
 
 Note that if you want to use BibTeX's cross-referencing options, you need to set the option [Save Xrefs first](#save-xrefs-first). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, BibTeX's cross-referencing will not work reliably.
 
@@ -521,7 +521,7 @@ Creating a filter is simple: press `&`, and Ebib will ask you for a field to sel
 
 Ebib then runs this filter on the database, so that only those entries are shown that match the filter. At the top of the index window you will see your filter (in Lisp notation, so the operators come before their operands. That is, `x and y` is written as `(and x y)`.)
 
-If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp, the virtual database will select all entries that have a field that contains "Jones" in them.
+If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp, the filter selects all entries that have a field that contains "Jones" in them.
 
 Note that you can also select items based on their entry type. In order to do that, you need to specify `type*` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `type*` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`. You can use TAB completion in this case, by the way.
 
@@ -534,21 +534,21 @@ Once you have a filter on your database, you can refine or extend it. For exampl
 
 A short sidenote: the first impulse in a case like this might be to use `and` instead of `or`: after all, you want to select all entries that contain "Jones" in the `author` field *and* all entries that contain "Jones" in the `editor` field. However, the filter that you build up is used to test each entry *individually* whether it meets the selection criterion. An entry meets the criterion if it contains "Jones" in the `author` field *or* if it contains "Jones" in the `editor` field. Therefore, `or` is the required operator in this case. If you would use `and`, you would only get those entries that contain "Jones" in both the `author` *and* `editor` fields.
 
-To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the virtual database with all entries in the original database that match the additional criterion.
+To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the database.
 
-It is also possible to perform a logical `and` on the virtual database. Use this if you want to select those entries that contain "Jones" in the `author` field and e.g. "symbiotic hibernation" in the `keyword` field. A logical `and` operation is done with the key `&`. (Note: this is the same key that is used to create the filter. In fact, you can create a filter with `|` as well: when used in an unfiltered database, `&` and `|` are equivalent. They are only different when a filter is already active.)
+It is also possible to perform a logical `and` on the filter. Use this if you want to select those entries that contain "Jones" in the `author` field and e.g. "symbiotic hibernation" in the `keyword` field. A logical `and` operation is done with the key `&`. (Note: this is the same key that is used to create the filter. In fact, you can create a filter with `|` as well: when used in an unfiltered database, `&` and `|` are equivalent. They are only different when a filter is already active.)
 
 Both the `&` and `|` commands can be used with the negative prefix argument `M--` (or `C-u -`, which is identical). In this case, the search criterion is negated. That is, the negative prefix argument performs a logical `not` operation on the search criterion.
 
-That is, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp. This prefix argument is available both in real and in virtual databases.
+That is, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp.
 
-There is another way of performing a logical `not` operation, which is only available in when a filter is active: by pressing the key `~`, you invert the current filter. That is, if you have a virtual database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
+There is another way of performing a logical `not` operation, which is only available in when a filter is active: by pressing the key `~`, you invert the current filter. That is, if you have a filtered database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
 
 Although `~` and the negative prefix argument to `&` or `|` both perform logical `not` operations, they are *not* equivalent: `~` negates the entire filter built up so far, while the negative prefix argument only negates the single selection criterion you enter with it.
 
 When a filter is active, the filter itself is displayed at the top of the index buffer. If the index window is too small to display the entire filter (which can easily happen if Ebib is set to split the frame vertically rather than horizontally), you can press `F v` (capital `F`, small `v`), which will display the filter in the minibuffer.
 
-To cancel the filter and return to the normal view of the database, press `Fc`. For convenience, this action is also available with `c`, which normally closes a database. If a filter is active, however, it simply cancels the filter. (If you find this behaviour confusing, you can rebind the `c` key to the function `ebib-close-database`. See [Modifying Key Bindings](#modifying-key-bindings) for details.
+To cancel the filter and return to the normal view of the database, press `Fc`. For convenience, this action is also available with `c`, which normally closes a database. If a filter is active, however, it simply cancels the filter. (If you find this behaviour confusing, you can rebind the `c` key to the function `ebib-close-database`. See [Modifying Key Bindings](#modifying-key-bindings) for details.)
 
 
 
@@ -625,8 +625,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `End`
 :    go to last entry. `(ebib-goto-last-entry)`
 `Return`
-:    make the entry under the cursor current. Use after e.g. `C-s`.
-     `(ebib-select-entry)`
+:    make the entry under the cursor current. Use after e.g. `C-s`. `(ebib-select-entry)`
 `Space`
 :    equivalent to `PgDn`.
 `1-9`
@@ -634,16 +633,10 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `/`
 :    search the database. `(ebib-search)`
 `&`
-:    Create a virtual database, or perform a logical `and` on the current virtual
-     database. With negative prefix argument: apply a logical `not` to the
-     selectional criterion. `(ebib-virtual-db-and)`
+:    Create a filter, or perform a logical `and` on the current filter. With negative prefix argument: apply a logical `not` to the selectional criterion. `(ebib-filter-and)`
 `|`
-:    Create a virtual database, or perform a logical `or` on the current virtual
-     database. With negative prefix argument: apply a logical `not` to the
-     selectional criterion. `(ebib-virtual-db-or)`
-`~`
-:    Perform a logical `not` on the current virtual database.
-     `(ebib-virtual-db-not)`
+:   Create a filter, or perform a logical `or` on the current filter. With negative prefix argument: apply a logical `not` to the selectional criterion. `(ebib-filter-or)` `~`
+:    Perform a logical `not` on the current filter. `(ebib-filter-not)`
 `?`
 :    display Ebib info. `(ebib-info)`
 `a`
@@ -651,7 +644,9 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `b`
 :    equivalent to `Pgup`.
 `c`
-:    close the database. `(ebib-close-database)`
+:    close the database or cancel the current filter. `(ebib-index-c)`
+`C`
+:    follow `crossref` field. `(ebib-follow-crossref)`
 `d`
 :    delete the current entry. `(ebib-delete-entry)`
 `; d`
@@ -664,7 +659,15 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    extract a filename from the `file` field and send it to an appropriate viewer.
      With numeric prefix argument, extract the *n*-th filename.
 `F`
-:    follow `crossref` field. `(ebib-follow-crossref)`
+:    prefix key for filter actions.
+`F c`
+:    cancel the current filter. `(ebib-filter-cancel)`
+`F r`
+:    reapply the current filter. `(ebib-filter-reapply)`
+`F v`
+:    display the filter in the minibuffer. `(ebib-filter-show)`
+`F w`
+:    write the filtered entries to a file. `(ebib-write-database)`
 `g`
 :    equivalent to `Home`.
 `G`
@@ -718,9 +721,6 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `u`
 :    extract a URL from the `url` field and send it to a browser. With numeric
      prefix argument, extract the *n*-th url.
-`V`
-:    Display the filter of the current virtual database in the minibuffer.
-     With prefix argument: reapply the filter. `(ebib-print-filter)`
 `x`
 :    export the current entry to a file, or, when used with numeric prefix
      argument, to another database. `(ebib-export-entry)`
