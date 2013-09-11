@@ -853,7 +853,7 @@ MATCH acts just like the argument to MATCH-END, and defaults to
     (cond
      ((eq env 'entries)
       '(and ebib-cur-db
-            (edb-cur-entry ebib-cur-db)))
+            (edb-keys-list ebib-cur-db)))
      ((eq env 'marked-entries)
       '(and ebib-cur-db
             (edb-marked-entries ebib-cur-db)))
@@ -2015,7 +2015,7 @@ to \"none\"."
           (rename-buffer " none")          
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
-        (when (edb-cur-entry ebib-cur-db)
+        (when (edb-keys-list ebib-cur-db)
           (setq ebib-cur-keys-list
                 (if (edb-filter ebib-cur-db)
                     (ebib-run-filter ebib-cur-db)
