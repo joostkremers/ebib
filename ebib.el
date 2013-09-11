@@ -1863,7 +1863,7 @@ keywords when Emacs is killed."
 (ebib-key index "?" ebib-info)
 (ebib-key index "a" ebib-add-entry)
 (ebib-key index "b" ebib-index-scroll-down)
-(ebib-key index "c" ebib-close-database)
+(ebib-key index "c" ebib-index-c)
 (ebib-key index "C" ebib-follow-crossref)
 (ebib-key index "d" ebib-delete-entry t)
 (ebib-key index "e" ebib-edit-entry)
@@ -1913,11 +1913,15 @@ keywords when Emacs is killed."
       '(1 2 3 4 5 6 7 8 9))
 
 ;; The filter keymap
-(define-prefix-command 'ebib-filter-map)
-(suppress-keymap 'ebib-filter-map)
-(define-key ebib-filter-map "c" 'ebib-filter-cancel)
-(define-key ebib-filter-map "v" 'ebib-filter-show)
-;;(define-key ebib-filter-map "s" 'ebib-filter-save)
+(eval-and-compile
+  (define-prefix-command 'ebib-filter-map)
+  (suppress-keymap 'ebib-filter-map)
+  (define-key ebib-filter-map "c" 'ebib-filter-cancel)
+  (define-key ebib-filter-map "v" 'ebib-filter-show)
+  (define-key ebib-filter-map "r" 'ebib-filter-reapply)
+  ;;(define-key ebib-filter-map "s" 'ebib-filter-save)
+  ;;(define-key ebib-filter-map "l" 'ebib-filter-load)
+  (define-key ebib-filter-map "w" 'ebib-write-database))
 
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
@@ -2453,6 +2457,13 @@ generate the key, see that function's documentation for details."
     ((default)
      (beep))))
 
+(defun ebib-index-c ()
+  "Helper function for the `c' key in the index buffer."
+  (interactive)
+  (if (edb-filter ebib-cur-db)
+      (ebib-filter-cancel)
+    (ebib-close-database)))
+
 (defun ebib-close-database ()
   "Closes the current BibTeX database."
   (interactive)
@@ -2649,12 +2660,18 @@ If TIMESTAMP is T, a timestamp is added to the entry if
   ;; database containing X and Y.
   (gethash 'crossref (ebib-retrieve-entry x db))) ; TODO check if dynamic var works.
 
-(defun ebib-format-database (db)
-  "Writes database DB into the current buffer in BibTeX format."
+(defun ebib-format-database-as-bibtex (&optional db)
+  "Writes database DB into the current buffer in BibTeX format.
+DB defaults to the current database; in that case only the
+entries in `ebib-cur-keys-list' are formatted."
+  (or db
+      (setq db ebib-cur-db))
   (when (edb-preamble db)
     (insert (format "@PREAMBLE{%s}\n\n" (edb-preamble db))))
   (ebib-format-strings db)
-  (let ((sorted-list (copy-tree (edb-keys-list db))))
+  (let ((sorted-list (copy-tree (if (eq db ebib-cur-db)
+                                    ebib-cur-keys-list
+                                  (edb-keys-list db)))))
     (cond
      (ebib-save-xrefs-first
       (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
@@ -2678,42 +2695,36 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
     (ebib-make-backup (edb-filename db))
     (setf (edb-make-backup db) nil))
   (with-temp-buffer
-    (ebib-format-database db)
+    (ebib-format-database-as-bibtex db)
     (write-region (point-min) (point-max) (edb-filename db)))
   (ebib-set-modified nil db))
 
 (defun ebib-write-database ()
   "Writes the current database to a different file.
 If the current database is filtered, only the entries that match
-the filter are saved. The original file in not deleted."
+the filter are saved. The original file is not deleted."
   (interactive)
   (ebib-execute-when
     ((database)
      (if-str (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
          (progn
-           ;; If there is an active filter, remove all entries not matching
-           ;; it and unset the filter.
-           (when (edb-filter ebib-cur-db)
-             (mapc #'(lambda (entry)
-                       (if (not (member entry ebib-cur-keys-list))
-                           (ebib-remove-entry-from-db entry ebib-cur-db t)))
-                   (edb-keys-list ebib-cur-db))
-             (setf (edb-filter ebib-cur-db) nil)))
-       ;; Now save the database.
-       (with-temp-buffer
-         (ebib-format-database ebib-cur-db)
-         (safe-write-region (point-min) (point-max) new-filename nil nil nil t))
-       ;; if SAFE-WRITE-REGION was cancelled by the user because he
-       ;; didn't want to overwrite an already existing file with his
-       ;; new database, it throws an error, so the next lines will not
-       ;; be executed. hence we can safely set (EDB-FILENAME DB) and
-       ;; (EDB-NAME DB).
-       (setf (edb-filename ebib-cur-db) new-filename)
-       (setf (edb-name ebib-cur-db) (file-name-nondirectory new-filename))
-       (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                    (length (member ebib-cur-db ebib-databases)))))
-                              (edb-name ebib-cur-db))) 
-       (ebib-set-modified nil)))
+           (with-temp-buffer
+             (ebib-format-database-as-bibtex ebib-cur-db)
+             (safe-write-region (point-min) (point-max) new-filename nil nil nil t))
+           ;; if SAFE-WRITE-REGION was cancelled by the user because he didn't
+           ;; want to overwrite an already existing file with his new database,
+           ;; it throws an error, so the next lines will not be executed. hence
+           ;; we can safely set (EDB-FILENAME DB) and (EDB-NAME DB). We only do
+           ;; that if there was no active filter, though. If there was, we just
+           ;; issue a message.
+           (if (edb-filter ebib-cur-db)
+               (message "Wrote filtered entries as new database to %s" new-filename)
+             (setf (edb-filename ebib-cur-db) new-filename)
+             (setf (edb-name ebib-cur-db) (file-name-nondirectory new-filename))
+             (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                          (length (member ebib-cur-db ebib-databases)))))
+                                    (edb-name ebib-cur-db)))) 
+           (ebib-set-modified nil))))
     ((default)
      (beep))))
 
@@ -3409,6 +3420,11 @@ a logical `not' is applied to the selection."
      (message "%S" (edb-filter ebib-cur-db)))
     ((default)
      (beep))))
+
+(defun ebib-filter-reapply ()
+  "Reapply the current filter."
+  (interactive)
+  (ebib-redisplay))
 
 (defun ebib-filter-cancel ()
   "Cancel the current filter."
