@@ -2588,9 +2588,6 @@ If TIMESTAMP is T, a timestamp is added to the entry if
            (edb-strings db))
   (insert "\n"))
 
-;; when we sort entries, we either use string< on the entry keys, or
-;; ebib-entry<, if the user has defined a sort order.
-
 (defun ebib-get-sortstring (entry-key sortkey-list db)
   "Return the field value on which the entry ENTRY-KEY is to be sorted.
 DB is the database that contains the entry referred to by
@@ -2606,7 +2603,7 @@ in order for the sort value."
 (defun ebib-format-database (db)
   "Write database DB into the current buffer in BibTeX format."
   ;; We define two comparison functions for `sort'. These must simply
-  ;; return T if the first element is to be sorted before the second.
+  ;; return non-NIL if the first element is to be sorted before the second.
   (cl-flet
       ;; The first one is simple: if X has a crossref field, it must be
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
