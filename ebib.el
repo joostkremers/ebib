@@ -1764,7 +1764,7 @@ buffers and reads the rc file."
     (ebib-index-mode)
     (buffer-disable-undo)
     (if ebib-index-mode-line
-        (setq mode-line-format ebib-index-modeline))))
+        (setq mode-line-format ebib-index-mode-line))))
 
 (defun ebib-quit ()
   "Quits Ebib.
