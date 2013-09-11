@@ -1714,7 +1714,6 @@ buffers and reads the rc file."
         ebib-current-field nil
         ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
-  (load ebib-rc-file t)
   (ebib-create-buffers)
   (if (file-name-directory ebib-keywords-file) ; returns nil if there is no directory part
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
@@ -1724,6 +1723,7 @@ buffers and reads the rc file."
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
   (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
+  (load ebib-rc-file t)
   (setq ebib-initialized t))
 
 (defun ebib-create-buffers ()
