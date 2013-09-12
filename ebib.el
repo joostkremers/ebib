@@ -2609,33 +2609,30 @@ in order for the sort value."
       ;; The first one is simple: if X has a crossref field, it must be
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
       ;; field).
-      ((ebib-compare-xrefs (x y)
-                           (gethash 'crossref (ebib-retrieve-entry x db)))
+      ((compare-xrefs (x y)
+                      (gethash 'crossref (ebib-retrieve-entry x db)))
        ;; This one's a bit trickier. We iterate over the lists of fields in
        ;; `ebib-sort-order'. For each level, `ebib-get-sortstring' then
        ;; returns the string that can be used for sorting. If all fails,
        ;; sorting is done on the basis of the entry key.
-       (ebib-entry< (x y)
-                    (let* ((sort-list ebib-sort-order)
-                           (sortstring-x (to-raw (ebib-get-sortstring x (car sort-list) db)))
-                           (sortstring-y (to-raw (ebib-get-sortstring y (car sort-list) db))))
-                      (while (and sort-list
-                                  (string= sortstring-x sortstring-y))
-                        (setq sort-list (cdr sort-list))
-                        (setq sortstring-x (to-raw (ebib-get-sortstring x (car sort-list) db)))
-                        (setq sortstring-y (to-raw (ebib-get-sortstring y (car sort-list) db))))
-                      (if (and sortstring-x sortstring-y)
-                          (string< sortstring-x sortstring-y)
-                        (string< x y))))) 
+       (entry< (x y)
+               (let (sortstring-x sortstring-y)
+                 (cl-loop for sort-list in ebib-sort-order do
+                          (setq sortstring-x (to-raw (ebib-get-sortstring x sort-list db)))
+                          (setq sortstring-y (to-raw (ebib-get-sortstring y sort-list db)))
+                          while (string= sortstring-x sortstring-y))
+                 (if (and sortstring-x sortstring-y)
+                     (string< sortstring-x sortstring-y)
+                   (string< x y)))))
     (when (edb-preamble db)
       (insert (format "@PREAMBLE{%s}\n\n" (edb-preamble db))))
     (ebib-format-strings db)
     (let ((sorted-list (copy-tree (edb-keys-list db))))
       (cond
        (ebib-save-xrefs-first
-        (setq sorted-list (sort sorted-list 'ebib-compare-xrefs)))
+        (setq sorted-list (sort sorted-list #'compare-xrefs)))
        (ebib-sort-order
-        (setq sorted-list (sort sorted-list 'ebib-entry<))))
+        (setq sorted-list (sort sorted-list #'entry<))))
       (mapc #'(lambda (key) (ebib-format-entry key db nil)) sorted-list))))
 
 (defun ebib-make-backup (file)
