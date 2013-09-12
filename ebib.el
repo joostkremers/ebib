@@ -363,7 +363,9 @@ For .bib files that do not have an associated keywords file,
 
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
-This file is read when Ebib is started. It can be used to define custom keys or set custimzation variables (though the latter is easier through Customize)."
+This file is read when Ebib is started. It can be used to define
+custom keys or set custimzation variables (though the latter is
+easier through Customize)."
   :group 'ebib
   :type '(file :tag "Customization file:"))
 
@@ -373,7 +375,7 @@ This file is read when Ebib is started. It can be used to define custom keys or 
   :type 'boolean)
 
 (defcustom ebib-filters-ignore-case t
-  "When set, ignore case in filter names."
+  "If set, ignore case in filter names."
   :group 'ebib
   :type 'boolean)
 
