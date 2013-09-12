@@ -51,6 +51,7 @@
   (require 'cl))
 (require 'easymenu)
 (require 'bibtex)
+(require 'pp)
 
 ;; make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)
@@ -147,11 +148,6 @@ This is either the height of the window, or, if
 `ebib-window-vertical-split' is set, the width of the window."
   :group 'ebib-windows
   :type 'integer)
-
-(defcustom ebib-display-filter-as-lisp nil
-  "If set, display filters as Lisp expressions."
-  :group 'ebib
-  :type 'boolean)
 
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer."
@@ -371,6 +367,21 @@ This file is read when Ebib is started. It can be used to define custom keys or 
   :group 'ebib
   :type '(file :tag "Customization file:"))
 
+(defcustom ebib-filters-display-as-lisp nil
+  "If set, display filters as Lisp expressions."
+  :group 'ebib
+  :type 'boolean)
+
+(defcustom ebib-filters-ignore-case t
+  "When set, ignore case in filter names."
+  :group 'ebib
+  :type 'boolean)
+
+(defcustom ebib-filters-default-file "~/ebib-filters"
+  "File for saving filters."
+  :group 'ebib
+  :type 'file)
+
 (defcustom ebib-keywords-field-keep-sorted nil
   "Keep the keywords field sorted in alphabetical order.
 Also automatically remove duplicates."
@@ -508,7 +519,7 @@ entry-specific inheritances, the latter override the former."
 
 ;; general bookkeeping
 (defvar ebib-field-history nil "Minibuffer field name history.")
-(defvar ebib-filter-history nil "Minibuffer history for filters.")
+(defvar ebib-filters-history nil "Minibuffer history for filters.")
 (defvar ebib-cite-command-history nil "Minibuffer history for citation commands.")
 (defvar ebib-key-history nil "Minibuffer history for entry keys.")
 (defvar ebib-keyword-history nil "Minibuffer history for keywords.")
@@ -533,6 +544,8 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (modify-syntax-entry ?\( "." ebib-syntax-table)
 (modify-syntax-entry ?\) "." ebib-syntax-table)
 (modify-syntax-entry ?\" "w" ebib-syntax-table)
+
+(defvar ebib-filters-alist nil "Alist of saved filters.")
 
 ;; keywords
 ;;
@@ -1323,17 +1336,17 @@ to \"none\"."
     (let ((buffer-read-only nil))
       (erase-buffer)
       (if (not ebib-cur-db)
-          (rename-buffer " none")          
+          (rename-buffer " none")
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
         (when (edb-keys-list ebib-cur-db)
           (setq ebib-cur-keys-list
                 (if (edb-filter ebib-cur-db)
-                    (ebib-run-filter ebib-cur-db)
+                    (ebib-filters-run-filter ebib-cur-db)
                   (edb-keys-list ebib-cur-db)))
           ;; Set a header line if there is a filter.
           (setq header-line-format (if (edb-filter ebib-cur-db)
-                                       (ebib-pp-filter (edb-filter ebib-cur-db))))
+                                       (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
           ;; It may be that no entry satisfies the filter.
           (if (not ebib-cur-keys-list)
               (message "No entries matching the filter")
@@ -1774,6 +1787,7 @@ buffers and reads the rc file."
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
                                                     (read-file-to-list ebib-keywords-file) nil)))
   (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
+  (ebib-filters-load-file ebib-filters-default-file)
   (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
@@ -1821,6 +1835,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
             (yes-or-no-p "There are modified databases. Quit anyway? ")
           (y-or-n-p "Quit Ebib? "))
     (ebib-keywords-save-all-new)
+    (if ebib-filters-alist
+        (ebib-filters-save-file ebib-filters-default-file))
     (mapc #'(lambda (buffer)
               (kill-buffer buffer))
           (mapcar #'cdr ebib-buffer-alist))
@@ -1835,7 +1851,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-window-before nil
           ebib-buffer-before nil
           ebib-keywords-files-alist nil
-          ebib-keywords-list-per-session nil)
+          ebib-keywords-list-per-session nil
+          ebib-filters-alist nil)
     (set-window-configuration ebib-saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
     (message "")))
@@ -1910,9 +1927,9 @@ keywords when Emacs is killed."
 (ebib-key index [return] ebib-select-and-popup-entry)
 (ebib-key index " " ebib-index-scroll-up)
 (ebib-key index "/" ebib-search)
-(ebib-key index "&" ebib-filter-and)
-(ebib-key index "|" ebib-filter-or)
-(ebib-key index "~" ebib-filter-not)
+(ebib-key index "&" ebib-filters-logical-and)
+(ebib-key index "|" ebib-filters-logical-or)
+(ebib-key index "~" ebib-filters-logical-not)
 (ebib-key index ";" ebib-prefix-map)
 (ebib-key index "?" ebib-info)
 (ebib-key index "a" ebib-add-entry)
@@ -1923,7 +1940,7 @@ keywords when Emacs is killed."
 (ebib-key index "e" ebib-edit-entry)
 (ebib-key index "E" ebib-edit-keyname)
 (ebib-key index "f" ebib-view-file)
-(ebib-key index "F" ebib-filter-map)
+(ebib-key index "F" ebib-filters-map)
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
 (ebib-key index "h" ebib-index-help)
@@ -1966,16 +1983,23 @@ keywords when Emacs is killed."
             'ebib-switch-to-database-nth))
       '(1 2 3 4 5 6 7 8 9))
 
-;; The filter keymap
+;; The filters keymap
 (eval-and-compile
-  (define-prefix-command 'ebib-filter-map)
-  (suppress-keymap 'ebib-filter-map)
-  (define-key ebib-filter-map "c" 'ebib-filter-cancel)
-  (define-key ebib-filter-map "v" 'ebib-filter-show)
-  (define-key ebib-filter-map "r" 'ebib-filter-reapply)
-  ;;(define-key ebib-filter-map "s" 'ebib-filter-save)
-  ;;(define-key ebib-filter-map "l" 'ebib-filter-load)
-  (define-key ebib-filter-map "w" 'ebib-write-database))
+  (define-prefix-command 'ebib-filters-map)
+  (suppress-keymap 'ebib-filters-map)
+  (define-key ebib-filters-map "a" 'ebib-filters-apply-filter)
+  (define-key ebib-filters-map "c" 'ebib-filters-cancel-filter)
+  (define-key ebib-filters-map "d" 'ebib-filters-delete-filter)
+  (define-key ebib-filters-map "D" 'ebib-filters-delete-all-filters)
+  (define-key ebib-filters-map "l" 'ebib-filters-read-from-file)
+  (define-key ebib-filters-map "r" 'ebib-filters-reapply-filter)
+  (define-key ebib-filters-map "R" 'ebib-filters-rename-filter)
+  (define-key ebib-filters-map "s" 'ebib-filters-store-filter)
+  (define-key ebib-filters-map "S" 'ebib-filters-save-filters)
+  (define-key ebib-filters-map "v" 'ebib-filters-view-filter)
+  (define-key ebib-filters-map "V" 'ebib-filters-view-all-filters)
+  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file)
+  (define-key ebib-filters-map "W" 'ebib-write-database))
 
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
@@ -2447,7 +2471,7 @@ generate the key, see that function's documentation for details."
   "Helper function for the `c' key in the index buffer."
   (interactive)
   (if (edb-filter ebib-cur-db)
-      (ebib-filter-cancel)
+      (ebib-filters-cancel-filter)
     (ebib-close-database)))
 
 (defun ebib-close-database ()
@@ -2465,7 +2489,7 @@ generate the key, see that function's documentation for details."
          (if ebib-databases     ; do we still have another database loaded?
              (progn
                (setq ebib-cur-db (or new-db
-                                     (last1 ebib-databases))) 
+                                     (last1 ebib-databases)))
                (ebib-redisplay))
            ;; otherwise, we have to clean up a little and empty all the buffers.
            (setq ebib-cur-db nil)
@@ -2710,7 +2734,7 @@ the filter are saved. The original file is not deleted."
              (setf (edb-name ebib-cur-db) (file-name-nondirectory new-filename))
              (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                           (length (member ebib-cur-db ebib-databases)))))
-                                    (edb-name ebib-cur-db)))) 
+                                    (edb-name ebib-cur-db))))
            (ebib-set-modified nil))))
     ((default)
      (beep))))
@@ -3324,29 +3348,31 @@ opened. If N is NIL, the user is asked to enter a number."
               (find-file file-full-path)))
         (error "File not found: `%s'" file-full-path)))))
 
-(defun ebib-filter-and (not)
+(defun ebib-filters-logical-and (not)
   "Filter the current database.
 If the current database is filtered already, perform a logical
 AND on the entries."
   (interactive "p")
   (ebib-execute-when
     ((entries)
-     (ebib-filter-db 'and not))
+     (ebib-filters-create-filter 'and not)
+     (ebib-redisplay))
     ((default)
      (beep))))
 
-(defun ebib-filter-or (not)
+(defun ebib-filters-logical-or (not)
   "Filter the current database.
 If the current database is filtered already, perform a logical OR
 on the entries."
   (interactive "p")
   (ebib-execute-when
     ((entries)
-     (ebib-filter-db 'or not))
+     (ebib-filters-create-filter 'or not)
+     (ebib-redisplay))
     ((default)
      (beep))))
 
-(defun ebib-filter-not ()
+(defun ebib-filters-logical-not ()
   "Negate the current filter."
   (interactive)
   (ebib-execute-when
@@ -3355,13 +3381,128 @@ on the entries."
            (if (eq (car (edb-filter ebib-cur-db)) 'not)
                (cadr (edb-filter ebib-cur-db))
              `(not ,(edb-filter ebib-cur-db))))
-     (ebib-run-filter ebib-cur-db)
      (ebib-redisplay))
     ((default)
      (beep))))
 
-(defun ebib-filter-db (bool not)
-  "Filter the current database.
+(defun ebib-filters-view-filter ()
+  "Display the filter of the current virtual database in the minibuffer."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (message (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
+    ((default)
+     (message "No filter is active."))))
+
+(defun ebib-filters-view-all-filters ()
+  "Display all filters in a *Help* buffer."
+  (interactive)
+  (with-help-window (help-buffer)
+    (let ((print-length nil)
+          (print-level nil)
+          (print-circle nil))
+      (princ "Currently stored filters:\n\n")
+      (if ebib-filters-alist
+          (pp ebib-filters-alist)
+        (princ "None.")))))
+
+(defun ebib-filters-reapply-filter ()
+  "Reapply the current filter."
+  (interactive)
+  (ebib-redisplay))
+
+(defun ebib-filters-cancel-filter ()
+  "Cancel the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (setf (edb-filter ebib-cur-db) nil)
+     (ebib-redisplay))
+    ((default)
+     (beep))))
+
+(defun ebib-filters-select-filter (prompt)
+  "Select a filter from the saved filters.
+Return the filter as a list (NAME FILTER)."
+  (let ((name (completing-read prompt
+                               (sort (copy-alist ebib-filters-alist)
+                                     #'(lambda (x y) (string-lessp (car x) (car y))))
+                               nil t)))
+    (ebib-filters-get-filter name)))
+
+(defun ebib-filters-rename-filter ()
+  "Rename a filter."
+  (interactive)
+  (let ((filter (ebib-filters-select-filter "Rename filter: "))
+        (new-name (read-from-minibuffer "Enter new name: ")))
+    (if (ebib-filters-exists-p new-name)
+        (error (format "A filter named `%s' already exists" new-name))
+      (setcar filter new-name))))
+
+(defun ebib-filters-store-filter ()
+  "Store the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (let ((name (read-from-minibuffer "Enter filter name: ")))
+       (when (or (not (ebib-filters-exists-p name))
+                 (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
+         (ebib-filters-add-filter name (edb-filter ebib-cur-db))
+         (message "Filter stored."))))
+    ((default) (beep))))
+
+(defun ebib-filters-apply-filter ()
+  "Select a filter and apply it to the current database."
+  (interactive)
+  (ebib-execute-when
+    ((real-db)
+     (let ((filter (ebib-filters-select-filter "Apply filter: ")))
+       (when filter
+           (setf (edb-filter ebib-cur-db) (cadr filter))
+           (ebib-redisplay))))
+    ((filtered-db)
+     (error "A stored filter can only be applied to a real database"))))
+
+(defun ebib-filters-delete-filter ()
+  "Delete a filter from the stored filters."
+  (interactive)
+  (let ((filter (ebib-filters-select-filter "Delete filter: ")))
+    (when filter
+        (setq ebib-filters-alist (delq filter ebib-filters-alist))
+    (message "Filter %s deleted" (car filter)))))
+
+(defun ebib-filters-delete-all-filters ()
+  "Delete all stored filters."
+  (interactive)
+  (setq ebib-filters-alist nil)
+  (message "All stored filters deleted."))
+
+(defun ebib-filters-read-from-file (file)
+  "Read filters from FILE."
+  (interactive "fRead filters from file: ")
+  (setq file (expand-file-name file))
+  (setq ebib-log-error nil)
+  (let ((overwrite
+         (if ebib-filters-alist
+             (eq ?o (read-char-choice "There are stored filters: (o)verwrite/(a)ppend? " '(?o ?a))))))
+    (ebib-filters-load-file file overwrite))
+  (if (and ebib-log-error
+           (= ebib-log-error 1))
+      (message "No filters found in %s" file)
+    (message "Filters loaded from %s" file)))
+
+(defun ebib-filters-save-filters ()
+  "Save all filters in `ebib-filters-default-file'."
+  (interactive)
+  (ebib-filters-save-file ebib-filters-default-file))
+
+(defun ebib-filters-write-to-file (file)
+  "Write filters to FILE."
+  (interactive "FSave filters to file: ")
+  (ebib-filters-save-file file))
+
+(defun ebib-filters-create-filter (bool not)
+  "Create a filter interactively and store in the current database.
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
@@ -3381,11 +3522,11 @@ a logical `not' is applied to the selection."
                                        (if (string= field "type*") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "type*")
-                     (completing-read prompt ebib-entry-types nil t nil 'ebib-filter-history))
-                    ((string= field "keywords") 
+                     (completing-read prompt ebib-entry-types nil t nil 'ebib-filters-history))
+                    ((string= field "keywords")
                      (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keyword-history))
                     (t
-                     (read-string prompt nil 'ebib-filter-history)))))
+                     (read-string prompt nil 'ebib-filters-history)))))
       (ebib-execute-when
         ((filtered-db)
          (setf (edb-filter ebib-cur-db) `(,bool ,(edb-filter ebib-cur-db)
@@ -3395,11 +3536,9 @@ a logical `not' is applied to the selection."
         ((real-db)
          (setf (edb-filter ebib-cur-db) (if (>= not 0)
                                    `(contains ,field ,regexp)
-                                 `(not (contains ,field ,regexp))))))
-      (ebib-run-filter ebib-cur-db)
-      (ebib-redisplay))))
+                                 `(not (contains ,field ,regexp)))))))))
 
-(defun ebib-run-filter (db)
+(defun ebib-filters-run-filter (db)
   "Run the filter of DB.
 Return a list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
@@ -3417,52 +3556,86 @@ Return a list of entry keys that match DB's filter."
             result)
           'string<)))
 
-(defun ebib-pp-filter (filter)
+(defun ebib-filters-pp-filter (filter)
   "Convert FILTER into a string in infix notation."
-  (if ebib-display-filter-as-lisp
+  (if ebib-filters-display-as-lisp
       (format "%S" (edb-filter ebib-cur-db))
-    (let ((pp-filter (ebib-pp-filter-helper filter)))
+    (let ((pp-filter (ebib-filters-pp-filter-helper filter)))
       (string-match "\\`(\\(.*\\))\\'" pp-filter)
       (match-string 1 pp-filter))))
 
-(defun ebib-pp-filter-helper (filter)
-  "Helper function for `ebib-pp-filter'."
+(defun ebib-filters-pp-filter-helper (filter)
+  "Helper function for `ebib-filters-pp-filter'."
   (cond
    ((listp filter)
     (let ((op (first filter)))
       (cond
        ((eq op 'not)
-        (format "not %s" (ebib-pp-filter-helper (second filter))))
+        (format "not %s" (ebib-filters-pp-filter-helper (second filter))))
        ((member op '(and or contains))
-        (format "(%s %s %s)" (ebib-pp-filter-helper (second filter)) op (ebib-pp-filter-helper (third filter)))))))
+        (format "(%s %s %s)" (ebib-filters-pp-filter-helper (second filter)) op (ebib-filters-pp-filter-helper (third filter)))))))
    ((stringp filter)
     (format "\"%s\"" filter))
    ((symbolp filter)
     (format "%s" filter))))
 
-(defun ebib-filter-show ()
-  "Display the filter of the current virtual database in the minibuffer."
-  (interactive)
-  (ebib-execute-when
-    ((filtered-db)
-     (message (ebib-pp-filter (edb-filter ebib-cur-db))))
-    ((default)
-     (beep))))
+(defun ebib-filters-read-from-buffer ()
+  "Read a filters alist from the current buffer.
+Return the alist as a list object."
+  (goto-char (point-min))
+  (when (search-forward "(" nil t)
+    (forward-char -1)
+    (read (current-buffer))))
 
-(defun ebib-filter-reapply ()
-  "Reapply the current filter."
-  (interactive)
-  (ebib-redisplay))
+(defun ebib-filters-load-file (file &optional overwrite)
+  "Load filters from FILE.
+The new filters are added to the ones in `ebib-filters-alist,
+unless OVERWRITE is non-NIL, in which case any existing filters
+are overwritten."
+  (when (file-readable-p file)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (goto-char (point-min))
+      (let ((flist (ebib-filters-read-from-buffer)))
+        (if (listp flist)
+            (setq ebib-filters-alist
+                  (if overwrite
+                      flist
+                    (append ebib-filters-alist flist)))
+          (ebib-log 'error "Invalid filter list in %s" file))))
+    (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)))
 
-(defun ebib-filter-cancel ()
-  "Cancel the current filter."
-  (interactive)
-  (ebib-execute-when
-    ((filtered-db)
-     (setf (edb-filter ebib-cur-db) nil)
-     (ebib-redisplay))
-    ((default)
-     (beep))))
+(defun ebib-filters-save-file (file)
+  "Write `ebib-filters-alist' to FILE"
+  (with-temp-buffer
+    (let ((print-length nil)
+          (print-level nil)
+          (print-circle nil))
+      (insert ";; -*- mode: emacs-lisp -*-\n\n")
+      (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
+      (pp ebib-filters-alist (current-buffer))
+      (condition-case nil ;; TODO I should use this for the keywords file as well, so that ebib-quit doesn't terminate prematurely.
+	  (write-region (point-min) (point-max) file)
+	(file-error (message "Can't write %s" file))))))
+
+(defun ebib-filters-add-filter (name filter)
+  "Add FILTER under NAME in `ebib-filters-alist'.
+If a filter with NAME already exists, it is overwritten."
+  (if (ebib-filters-exists-p name)
+      (setcdr (ebib-filters-get-filter name) filter)
+    (push (list name filter) ebib-filters-alist)))
+
+(defun ebib-filters-get-filter (name &optional noerror)
+  "Return the filter record corresponding to NAME.
+Return a list (NAME FILTER) if found. If there is no
+filter named NAME, raise an error, unless NOERROR is non-NIL."
+  (or (assoc-string name ebib-filters-alist ebib-filters-ignore-case)
+      (unless noerror
+        (error "Invalid filter %s" name))))
+
+(defun ebib-filters-exists-p (name)
+  "Return non-NIL if a filter with NAME already exists."
+  (assoc-string name ebib-filters-alist ebib-filters-ignore-case))
 
 (defun ebib-show-log ()
   "Displays the contents of the log buffer."
