@@ -857,7 +857,7 @@ MATCH acts just like the argument to MATCH-END, and defaults to
     "Helper function for `ebib-execute-when'."
     (cond
      ((eq env 'entries)
-      '(and ebib-cur-keys-list))
+      'ebib-cur-keys-list)
      ((eq env 'marked-entries)
       '(and ebib-cur-db
             (edb-marked-entries ebib-cur-db)))
