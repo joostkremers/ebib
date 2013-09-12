@@ -2419,6 +2419,28 @@ ascending sequence."
     ((default)
      (beep))))
 
+(defun ebib-add-file-entry (&optional filepath disablepromptp db)
+  "Add an entry stub for an optional FILEPATH to DB. If FILEPATH
+is a list, add entries for each file contained within. If
+FILEPATH is a directory, add entries for all its contents. And
+if FILEPATH is not given, prompt the user to browse in the
+minibuffer. By default, if FILEPATH is not given, prompt the
+user to browse a for file to add using the minibuffer. Disable
+this behavior by setting DISABLEPROMPTP to T."
+  (interactive)
+  (if (and (null filepath) (null disablepromptp))
+    (setq filepath (read-file-name "Add file or directory: " (car ebib-file-search-dirs))))
+  (cond
+    ((listp filepath)
+      (dolist (fp filepath) (ebib-add-file-entry fp t db)))
+    ((file-directory-p filepath)
+      (ebib-add-file-entry (directory-files filepath t "^\\([^.]\\)") t db)) ;ignore hidden files
+    ((file-exists-p filepath)
+      (ebib-add-entry-stub (list (cons ebib-standard-file-field filepath)) db)
+      (ebib-fill-entry-buffer))
+    (t
+      (error "Invalid file %s" filepath))))
+
 (defun ebib-uniquify-key (key)
   "Creates a unique key from KEY."
   (let* ((suffix ?b)
