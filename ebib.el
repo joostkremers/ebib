@@ -158,7 +158,7 @@ This is either the height of the window, or, if
   :group 'ebib-windows
   :type 'integer)
 
-(defcustom ebib-index-mode-line '("  " mode-line-modified "%20b" " Entry %l" (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))
+(defcustom ebib-index-mode-line '("%e" mode-line-front-space mode-line-modified mode-line-buffer-identification "     Entry %l" (:eval (offlineimap-mode-line)) (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))
   "The mode line for the index window."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
