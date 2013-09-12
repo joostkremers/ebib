@@ -51,6 +51,7 @@
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
         (require 'cl)
+        (defalias 'cl-defstruct 'defstruct)
         (defalias 'cl-remove 'remove*)
         (defalias 'cl-flet 'flet)
         (defalias 'cl-loop 'loop)
@@ -563,7 +564,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
 ;; the databases
 
 ;; each database is represented by a struct
-(defstruct edb
+(cl-defstruct edb
   (database (make-hash-table :test 'equal)) ; hashtable containing the database itself
   (keys-list nil)                           ; sorted list of the keys in the database
   (cur-entry nil)                           ; sublist of `keys-list' that starts with the current entry
