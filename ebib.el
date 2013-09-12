@@ -379,7 +379,7 @@ easier through Customize)."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-filters-default-file "~/ebib-filters"
+(defcustom ebib-filters-default-file "~/.emacs.d/ebib-filters"
   "File for saving filters."
   :group 'ebib
   :type 'file)
