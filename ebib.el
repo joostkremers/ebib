@@ -1837,8 +1837,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
             (yes-or-no-p "There are modified databases. Quit anyway? ")
           (y-or-n-p "Quit Ebib? "))
     (ebib-keywords-save-all-new)
-    (if ebib-filters-alist
-        (ebib-filters-save-file ebib-filters-default-file))
+    (ebib-filters-update-filters-file)
     (mapc #'(lambda (buffer)
               (kill-buffer buffer))
           (mapcar #'cdr ebib-buffer-alist))
@@ -3495,9 +3494,10 @@ Return the filter as a list (NAME FILTER)."
     (message "Filters loaded from %s" file)))
 
 (defun ebib-filters-save-filters ()
-  "Save all filters in `ebib-filters-default-file'."
+  "Save all filters in `ebib-filters-default-file'.
+If there are no stored filters, the filter file is deleted."
   (interactive)
-  (ebib-filters-save-file ebib-filters-default-file))
+  (ebib-filters-update-filters-file))
 
 (defun ebib-filters-write-to-file (file)
   "Write filters to FILE."
@@ -3601,10 +3601,9 @@ are overwritten."
       (goto-char (point-min))
       (let ((flist (ebib-filters-read-from-buffer)))
         (if (listp flist)
-            (setq ebib-filters-alist
-                  (if overwrite
-                      flist
-                    (append ebib-filters-alist flist)))
+            (if overwrite
+                (setq ebib-filters-alist flist)
+              (mapc #'ebib-filters-add-filter flist))
           (ebib-log 'warning "No filters found in %s" file))))
     (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)))
 
@@ -3620,6 +3619,18 @@ are overwritten."
       (condition-case nil ;; TODO I should use this for the keywords file as well, so that ebib-quit doesn't terminate prematurely.
 	  (write-region (point-min) (point-max) file)
 	(file-error (message "Can't write %s" file))))))
+
+(defun ebib-filters-update-filters-file ()
+  "Update the filters file.
+If there are stored filters, they are saved to
+`ebib-filters-default-file', otherwise this file is deleted."
+  (if ebib-filters-alist
+      (ebib-filters-save-file ebib-filters-default-file)
+    (condition-case nil
+        (when (file-exists-p ebib-filters-default-file)
+          (delete-file ebib-filters-default-file delete-by-moving-to-trash)
+          (message "Filter file %s deleted." ebib-filters-default-file))
+      (file-error (message "Can't delete %s" ebib-filters-default-file)))))
 
 (defun ebib-filters-add-filter (name filter)
   "Add FILTER under NAME in `ebib-filters-alist'.
