@@ -2870,6 +2870,7 @@ current entry is not changed."
    (t (setq new-cur-entry (edb-cur-entry ebib-cur-db))))
   ;; Remove the deleted entry from our bookkeeping lists.
   (setf (edb-keys-list db) (delete entry-key (edb-keys-list db)))
+  (setf ebib-cur-keys-list (delete entry-key ebib-cur-keys-list))
   (setf (edb-marked-entries db) (delete entry-key (edb-marked-entries db)))
   ;; if new-cur-entry is NIL, the last entry was deleted.
   (setf (edb-cur-entry db) (or new-cur-entry (last1 (edb-keys-list db)))))
