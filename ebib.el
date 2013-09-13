@@ -3490,7 +3490,7 @@ Return the filter as a list (NAME FILTER)."
              (eq ?o (read-char-choice "There are stored filters: (o)verwrite/(a)ppend? " '(?o ?a))))))
     (ebib-filters-load-file file overwrite))
   (if (and ebib-log-error
-           (= ebib-log-error 1))
+           (= ebib-log-error 0))
       (message "No filters found in %s" file)
     (message "Filters loaded from %s" file)))
 
@@ -3605,7 +3605,7 @@ are overwritten."
                   (if overwrite
                       flist
                     (append ebib-filters-alist flist)))
-          (ebib-log 'error "Invalid filter list in %s" file))))
+          (ebib-log 'warning "No filters found in %s" file))))
     (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)))
 
 (defun ebib-filters-save-file (file)
