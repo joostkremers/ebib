@@ -1988,11 +1988,14 @@ keywords when Emacs is killed."
 (eval-and-compile
   (define-prefix-command 'ebib-filters-map)
   (suppress-keymap 'ebib-filters-map)
+  (define-key ebib-filters-map "&" 'ebib-filters-logical-and)
+  (define-key ebib-filters-map "|" 'ebib-filters-logical-or)
+  (define-key ebib-filters-map "~" 'ebib-filters-logical-not)
   (define-key ebib-filters-map "a" 'ebib-filters-apply-filter)
   (define-key ebib-filters-map "c" 'ebib-filters-cancel-filter)
   (define-key ebib-filters-map "d" 'ebib-filters-delete-filter)
   (define-key ebib-filters-map "D" 'ebib-filters-delete-all-filters)
-  (define-key ebib-filters-map "l" 'ebib-filters-read-from-file)
+  (define-key ebib-filters-map "l" 'ebib-filters-load-from-file)
   (define-key ebib-filters-map "r" 'ebib-filters-reapply-filter)
   (define-key ebib-filters-map "R" 'ebib-filters-rename-filter)
   (define-key ebib-filters-map "s" 'ebib-filters-store-filter)
@@ -3393,7 +3396,7 @@ on the entries."
     ((filtered-db)
      (message (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
     ((default)
-     (message "No filter is active."))))
+     (error "No filter is active"))))
 
 (defun ebib-filters-view-all-filters ()
   "Display all filters in a *Help* buffer."
@@ -3410,7 +3413,11 @@ on the entries."
 (defun ebib-filters-reapply-filter ()
   "Reapply the current filter."
   (interactive)
-  (ebib-redisplay))
+  (ebib-execute-when
+    ((filtered-db)
+     (ebib-redisplay))
+    ((default)
+     (error "No filter is active"))))
 
 (defun ebib-filters-cancel-filter ()
   "Cancel the current filter."
@@ -3425,12 +3432,14 @@ on the entries."
 (defun ebib-filters-select-filter (prompt)
   "Select a filter from the saved filters.
 Return the filter as a list (NAME FILTER)."
-  (let* ((completing-ignore-case ebib-filters-ignore-case)
-         (name (completing-read prompt
-                                (sort (copy-alist ebib-filters-alist)
-                                      #'(lambda (x y) (string-lessp (car x) (car y))))
-                                nil t)))
-    (ebib-filters-get-filter name)))
+  (if (not ebib-filters-alist)
+      (error "No stored filters")
+    (let* ((completing-ignore-case ebib-filters-ignore-case)
+           (name (completing-read prompt
+                                  (sort (copy-alist ebib-filters-alist)
+                                        #'(lambda (x y) (string-lessp (car x) (car y))))
+                                  nil t)))
+      (ebib-filters-get-filter name))))
 
 (defun ebib-filters-rename-filter ()
   "Rename a filter."
@@ -3451,7 +3460,8 @@ Return the filter as a list (NAME FILTER)."
                  (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
          (ebib-filters-add-filter name (edb-filter ebib-cur-db) 'overwrite)
          (message "Filter stored."))))
-    ((default) (beep))))
+    ((default)
+     (beep))))
 
 (defun ebib-filters-apply-filter ()
   "Select a filter and apply it to the current database."
@@ -3479,8 +3489,11 @@ Return the filter as a list (NAME FILTER)."
   (setq ebib-filters-alist nil)
   (message "All stored filters deleted."))
 
-(defun ebib-filters-read-from-file (file)
-  "Read filters from FILE."
+(defun ebib-filters-load-from-file (file)
+  "Read filters from FILE.
+If there are stored filters, ask whether they should be
+overwritten en bloc or whether the new filters should be
+appended."
   (interactive "fRead filters from file: ")
   (setq file (expand-file-name file))
   (setq ebib-log-error nil)
@@ -3508,7 +3521,7 @@ If there are no stored filters, the filter file is deleted."
       (ebib-filters-save-file file))))
 
 (defun ebib-filters-create-filter (bool not)
-  "Create a filter interactively and store in the current database.
+  "Create a filter interactively and store it in the current database.
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
@@ -3595,9 +3608,9 @@ Return the alist as a list object."
 
 (defun ebib-filters-load-file (file &optional overwrite)
   "Load filters from FILE.
-The new filters are added to the ones in `ebib-filters-alist'. If
-OVERWRITE is non-NIL, existing filters are overwritten in the
-case of a name conflict."
+If OVERWRITE in non-NIL, the existing filters are discarded.
+Otherwise the new filters are added to the existing ones, unless
+there is a name conflict."
   (when (file-readable-p file)
     (with-temp-buffer
       (insert-file-contents file)
@@ -3605,10 +3618,12 @@ case of a name conflict."
       (let ((flist (ebib-filters-read-from-buffer)))
         (if (not (listp flist))
             (ebib-log 'warning "No filters found in %s" file)
+          (ebib-log 'log "%s: Loading filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)
+          (if overwrite
+              (setq ebib-filters-alist nil))
           (mapc #'(lambda (filter)
-                    (ebib-filters-add-filter (car filter) (cadr filter) overwrite))
-                flist)
-          (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file))))))
+                    (ebib-filters-add-filter (car filter) (cadr filter)))
+                flist))))))
 
 (defun ebib-filters-save-file (file)
   "Write `ebib-filters-alist' to FILE"
@@ -3635,13 +3650,13 @@ If there are stored filters, they are saved to
           (message "Filter file %s deleted." ebib-filters-default-file))
       (file-error (message "Can't delete %s" ebib-filters-default-file)))))
 
-(defun ebib-filters-add-filter (name filter overwrite)
+(defun ebib-filters-add-filter (name filter &optional overwrite)
   "Add FILTER under NAME in `ebib-filters-alist'.
-If a filter with NAME already exists and OVERWRITE is non-NIL, it
-is overwritten."
+If a filter with NAME already exists, the filter is not added."
   (if (ebib-filters-exists-p name)
       (if overwrite
-          (setcdr (ebib-filters-get-filter name) (list filter)))
+          (setcdr (ebib-filters-get-filter name) (list filter))
+        (ebib-log 'message "Filter name conflict: \"%s\"." name))
     (push (list name filter) ebib-filters-alist)))
 
 (defun ebib-filters-get-filter (name &optional noerror)
