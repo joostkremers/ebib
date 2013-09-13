@@ -1313,6 +1313,29 @@ The URL used to open a DOI. It must contain exactly one instance fo `%s`, which 
 \noindent If this option is set, Ebib stores the values of multiple occurrences of a single field within an entry in a single occurrence of that field, separated by semicolons (see [Multiple Identical Fields](#multiple-identical-fields)).
 
 
+### Filters Default File ###
+
+**Default value**: `"~/.emacs.d/ebib-filters"`
+
+\noindent The file used for saving stored filters.
+
+
+### Filters Display As Lisp ###
+
+**Default value**: `nil`
+
+\noindent If set, filters are displayed as Lisp expressions, i.e., in prefix notation `(contains <field> "string")`.
+
+
+
+### Filters Ignore Case ###
+
+**Default value**: `t`
+
+\noindent If set, filter names are case-insensitive.
+
+
+
 ### Entry Types ###
 
 **Default value**: see below.\
