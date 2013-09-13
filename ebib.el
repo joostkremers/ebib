@@ -3449,7 +3449,7 @@ Return the filter as a list (NAME FILTER)."
      (let ((name (read-from-minibuffer "Enter filter name: ")))
        (when (or (not (ebib-filters-exists-p name))
                  (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
-         (ebib-filters-add-filter name (edb-filter ebib-cur-db))
+         (ebib-filters-add-filter name (edb-filter ebib-cur-db) 'overwrite)
          (message "Filter stored."))))
     ((default) (beep))))
 
@@ -3592,20 +3592,20 @@ Return the alist as a list object."
 
 (defun ebib-filters-load-file (file &optional overwrite)
   "Load filters from FILE.
-The new filters are added to the ones in `ebib-filters-alist,
-unless OVERWRITE is non-NIL, in which case any existing filters
-are overwritten."
+The new filters are added to the ones in `ebib-filters-alist'. If
+OVERWRITE is non-NIL, existing filters are overwritten in the
+case of a name conflict."
   (when (file-readable-p file)
     (with-temp-buffer
       (insert-file-contents file)
       (goto-char (point-min))
       (let ((flist (ebib-filters-read-from-buffer)))
-        (if (listp flist)
-            (if overwrite
-                (setq ebib-filters-alist flist)
-              (mapc #'ebib-filters-add-filter flist))
-          (ebib-log 'warning "No filters found in %s" file))))
-    (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)))
+        (if (not (listp flist))
+            (ebib-log 'warning "No filters found in %s" file)
+          (mapc #'(lambda (filter)
+                    (ebib-filters-add-filter (car filter) (cadr filter) overwrite))
+                flist)
+          (ebib-log 'log "%s: Loaded filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file))))))
 
 (defun ebib-filters-save-file (file)
   "Write `ebib-filters-alist' to FILE"
@@ -3632,11 +3632,13 @@ If there are stored filters, they are saved to
           (message "Filter file %s deleted." ebib-filters-default-file))
       (file-error (message "Can't delete %s" ebib-filters-default-file)))))
 
-(defun ebib-filters-add-filter (name filter)
+(defun ebib-filters-add-filter (name filter overwrite)
   "Add FILTER under NAME in `ebib-filters-alist'.
-If a filter with NAME already exists, it is overwritten."
+If a filter with NAME already exists and OVERWRITE is non-NIL, it
+is overwritten."
   (if (ebib-filters-exists-p name)
-      (setcdr (ebib-filters-get-filter name) filter)
+      (if overwrite
+          (setcdr (ebib-filters-get-filter name) (list filter)))
     (push (list name filter) ebib-filters-alist)))
 
 (defun ebib-filters-get-filter (name &optional noerror)
