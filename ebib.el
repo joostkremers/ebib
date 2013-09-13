@@ -3499,10 +3499,13 @@ If there are no stored filters, the filter file is deleted."
   (interactive)
   (ebib-filters-update-filters-file))
 
-(defun ebib-filters-write-to-file (file)
+(defun ebib-filters-write-to-file ()
   "Write filters to FILE."
-  (interactive "FSave filters to file: ")
-  (ebib-filters-save-file file))
+  (interactive)
+  (if (not ebib-filters-alist)
+      (message "No stored filters")
+    (let ((file (read-file-name "Save filters to file: ")))
+      (ebib-filters-save-file file))))
 
 (defun ebib-filters-create-filter (bool not)
   "Create a filter interactively and store in the current database.
