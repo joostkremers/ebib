@@ -57,9 +57,11 @@
         (defalias 'cl-loop 'loop)
         (defalias 'cl-macrolet 'macrolet)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
+        (defalias 'cl-multiple-value-setq 'multiple-value-setq)
         (defalias 'cl-remove 'remove*)
         (defalias 'cl-second 'second)
-        (defalias 'cl-third 'third))
+        (defalias 'cl-third 'third)
+        (defalias 'cl-values 'values))
     (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
@@ -854,7 +856,7 @@ The return value is a list of two elements: the first is the
 modified string, the second either t or nil, indicating whether a
 match was found at all."
   (cl-do ((counter 0 (match-end 0)))
-      ((not (string-match match-str string counter)) (values string (not (= counter 0))))
+      ((not (string-match match-str string counter)) (cl-values string (not (= counter 0))))
     (add-text-properties (match-beginning 0) (match-end 0) '(face highlight) string)))
 
 (defun looking-at-goto-end (str &optional match)
@@ -1209,9 +1211,9 @@ overlay is not moved.  FIELD must be a symbol."
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
     (if (eq field 'type*)
         (goto-char (point-min))
-      (multiple-value-bind (fn start limit) (if (>= direction 0)
-                                                (values 're-search-forward (point-min) (point-max))
-                                              (values 're-search-backward (point-max) (point-min)))
+      (cl-multiple-value-bind (fn start limit) (if (>= direction 0)
+                                                (cl-values 're-search-forward (point-min) (point-max))
+                                              (cl-values 're-search-backward (point-max) (point-min)))
         ;; make sure we can get back to our original position, if the field
         ;; cannot be found in the buffer:
         (let ((current-pos (point)))
@@ -1248,12 +1250,12 @@ If DB is nil, it defaults to the current database."
            (if (stringp val)
                (setq val (copy-sequence val)))
            (if val
-               (values val nil)))
+               (cl-values val nil)))
          (let ((xref (ebib-retrieve-entry (to-raw (gethash 'crossref entry)) db)))
            (if xref
              (let ((entry-type (gethash 'type* entry)))
-               (values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
-      (values nil nil))))
+               (cl-values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
+      (cl-values nil nil))))
 
 (defun ebib-get-xref-field (field entry-type)
   "Return the field from which FIELD inherits in ENTRY-TYPE.
@@ -1292,7 +1294,7 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
           (setq raw "*")
         (setq string (to-raw string))) ; we have to make the string look nice
       (when match-str
-        (multiple-value-setq (string matched) (match-all match-str string)))
+        (cl-multiple-value-setq (string matched) (match-all match-str string)))
       (when (multiline-p string)
         ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
         ;; multiline is local and therefore the object it refers to should
@@ -3469,7 +3471,7 @@ after the last instance of REPEATER."
       (setq before (match-string 1 format-string)
             repeater (match-string 2 format-string)
             after (match-string 3 format-string))))
-    (values before repeater separator after)))
+    (cl-values before repeater separator after)))
 
 (defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
@@ -3490,7 +3492,7 @@ The user is prompted for the buffer to push the entry into."
                    (if-str (format-string (cadr (assoc
                                                  (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                  format-list)))
-                       (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+                       (cl-multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                          (cond
                           ((and called-with-prefix ; if there are marked entries and the user wants to push those
                                 (edb-marked-entries ebib-cur-db))
@@ -4488,7 +4490,7 @@ completion works."
                  (if-str (format-string (cadr (assoc
                                                (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                format-list)))
-                     (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+                     (cl-multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                        (concat (ebib-create-citation-command before)
                                (ebib-create-citation-command repeater key)
                                (ebib-create-citation-command after)))
