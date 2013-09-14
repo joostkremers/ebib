@@ -57,7 +57,9 @@
         (defalias 'cl-loop 'loop)
         (defalias 'cl-macrolet 'macrolet)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
-        (defalias 'cl-remove 'remove*))
+        (defalias 'cl-remove 'remove*)
+        (defalias 'cl-second 'second)
+        (defalias 'cl-third 'third))
     (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
@@ -1545,7 +1547,7 @@ Moves point to the first character of the key and returns point."
       (add-to-list 'ebib-keywords-list-per-session keyword t)
     (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
                    (file-name-directory (edb-filename db)))))    ; per-directory keywords files
-      (push keyword (third (assoc dir ebib-keywords-files-alist))))))
+      (push keyword (cl-third (assoc dir ebib-keywords-files-alist))))))
 
 (defun ebib-keywords-for-database (db)
   "Return the list of keywords for database DB.
@@ -1556,7 +1558,7 @@ When the keywords come from a file, add the keywords in
     (let* ((dir (or (file-name-directory ebib-keywords-file)     ; a single keywords file
                     (file-name-directory (edb-filename db))))    ; per-directory keywords files
            (lst (assoc dir ebib-keywords-files-alist)))
-      (append (second lst) (third lst)))))
+      (append (cl-second lst) (cl-third lst)))))
 
 (defun ebib-keywords-get-file (db)
   "Return the name of the keywords file for DB."
@@ -1577,7 +1579,7 @@ keywords and the third the keywords added in this session."
         (with-temp-buffer
           (mapc #'(lambda (keyword)
                     (insert (format "%s\n" keyword)))
-                (append (second keyword-file-descr) (third keyword-file-descr)))
+                (append (cl-second keyword-file-descr) (cl-third keyword-file-descr)))
           (write-region (point-min) (point-max) file))
       (ebib-log 'warning "Could not write to keyword file `%s'" file))))
 
@@ -1586,13 +1588,13 @@ keywords and the third the keywords added in this session."
   (unless (edb-virtual db) ; virtual databases don't get new keywords
     (let ((lst (ebib-keywords-new-p db))
           (file (ebib-keywords-get-file db)))
-      (when (and (third lst)            ; if there are new keywords
+      (when (and (cl-third lst)            ; if there are new keywords
                  (or (eq ebib-keywords-file-save-on-exit 'always)
                      (and (eq ebib-keywords-file-save-on-exit 'ask)
                           (y-or-n-p "New keywords have been added. Save "))))
         (ebib-keywords-save-to-file lst)
         ;; now move the new keywords to the list of existing keywords
-        (setf (cadr lst) (append (second lst) (third lst)))
+        (setf (cadr lst) (append (cl-second lst) (cl-third lst)))
         (setf (cl-caddr lst) nil)))))
 
 (defun ebib-keywords-save-cur-db ()
@@ -1611,10 +1613,10 @@ Optional argument DB specifies the database to check for."
       (let* ((dir (or (file-name-directory ebib-keywords-file) ; a single keywords file
                       (file-name-directory (edb-filename db)))) ; per-directory keywords files
              (lst (assoc dir ebib-keywords-files-alist)))
-        (if (third lst)
+        (if (cl-third lst)
             lst))
     (delq nil (mapcar #'(lambda (elt) ; this would be easier with cl-remove
-                          (if (third elt)
+                          (if (cl-third elt)
                               elt))
                       ebib-keywords-files-alist))))
 
