@@ -177,7 +177,7 @@ When you have undertaken any kind of editing action on a database, it is marked 
 
 If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu.
 
-The menu also provides a way to save the database to another name. This command is similar to `C-x C-w` in Emacs, so that after using it, the new `.bib` file becomes associated with the database.
+The menu also provides a way to save the database to another name (or use `M-x ebib-write-database`). This command is similar to `C-x C-w` in Emacs, so that after using it, the new `.bib` file becomes associated with the database.
 
 
 ## Searching ##
@@ -190,7 +190,7 @@ Ebib searches all the fields of each entry. It is not possible with `/` to speci
 
 A search term may of course appear more than once in the database. To search for the next occurrence, type `n`. This will continue searching for the search string in the rest of the database. Again, the first entry found to contain the search string is displayed. Note that `n` does not wrap: if the end of the database is reached, Ebib stops searching. To continue searching from the top, hit `g` and then `n`.
 
-The functions described here form Ebib's basic search functionality. Ebib also has a much more powerful search mechanism in the form of *virtual databases*. These are described later. (See [Virtual Databases](#virtual-databases).)
+The functions described here form Ebib's basic search functionality. Ebib also has a much more powerful search mechanism in the form of *filters*. These are described in [Filters](#filters).)
 
 
 ## LaTeX Integration ##
@@ -256,7 +256,7 @@ When you fill in the `crossref` field in Ebib, Ebib displays the values of the c
 
 BibLaTeX has a more sophisticated cross-referencing mechanism. While cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry in BibTeX, BibLaTeX has the option to specify that, e.g., the `booktitle` field of the entry type `incollection` inherits from the `title` field of the cross-referenced entry. If you want Ebib to honour such inheritances, you can customise the variable `ebib-biblatex-inheritances`. This variable allows you to specify inheritance relations for individual entry types, or, by specifying `all` as the entry type, for all entry types. (Note that the former always override the latter.) Currently, this support for BibLaTeX is still rudimentary. It will be improved in the future, but for the moment it should help you get started if you use BibLaTeX.
 
-If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `F`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `F`: if you type `F` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `F` again to find the next one. This command will take you back to the cross-referenced entry. In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
+If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. This command will take you back to the cross-referenced entry. In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
 
 Note that if you want to use BibTeX's cross-referencing options, you need to set the option [Save Xrefs first](#save-xrefs-first). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, BibTeX's cross-referencing will not work reliably.
 
@@ -495,7 +495,7 @@ With this option set, Ebib collapses the multiple occurrences into a single occu
         ...
         keywords = {sleep},
         keywords = {winter},
-        keywords = {hybernation}
+        keywords = {hibernation}
     }
     
 If you load this entry into Ebib with the option `Allow Identical Fields` set, you will get the following:
@@ -504,58 +504,70 @@ If you load this entry into Ebib with the option `Allow Identical Fields` set, y
         author = {Jones, Joan},
         year = {1998},
         ...
-        keywords = {sleep; winter; hybernation}
+        keywords = {sleep; winter; hibernation}
     }
 
 
-## Virtual Databases ##
+## Filters ##
 
-In the previous chapter, Ebib's basic search functionality was discussed. (See [Searching](#searching).) Ebib also provides a much more sophisticated search and filtering mechanism in the form of *virtual databases*.
+As discussed, Ebib has a straightforward search functionality that can be invoked with `/`. There is, however, also a much more sophisticated search mechanism that makes use of *filters*.
 
-A virtual database is a database that is not associated with any `.bib` file. Rather, it is created from another database by selecting entries from it based on a specific search pattern, called a *filter*. This allows you, for example, to select all entries from a database that contain the string "Jones" in their `author` field. A filter can be as complex as you want: you can select all entries that do *not* contain "Jones" in the `author` field, or all entries that contain "Jones" in either the `author` or the `editor` field, or all entries that contain "Jones" in the `author` field, and "symbiotic hybernation" in the `keyword` field, etc. Basically, the filter can consist of an arbitray number of search criteria combined with the logical operators `and, or` and `not`.
+A filter is basically a search expression that selects entries from the current database. When you apply a filter to a database, only the entries that match are shown. With filters, you can, for example, select all entries from a database that contain the string "Jones" in their `author` field. A filter can be as complex as you want: you can select all entries that do *not* contain "Jones" in the `author` field, or all entries that contain "Jones" in either the `author` or the `editor` field, or all entries that contain "Jones" in the `author` field, and "symbiotic hibernation" in the `keyword` field, etc. Basically, the filter can consist of an arbitary number of search criteria combined with the logical operators `and, or` and `not`.
 
 
 ### Simple Selection ###
 
-Creating a virtual database is simple: press `&`, and Ebib will ask you for a field to select on, and for a regular expression to select with. So if you want to select all entries that contain "Jones" in the `author` field, you press `&` and type `author` as the field and `Jones` as the regexp to filter on.
+Creating a filter is simple: press `&`, and Ebib will ask you for a field to select on, and for a regular expression to select with. So if you want to select all entries that contain "Jones" in the `author` field, you press `&` and type `author` as the field and `Jones` as the regexp to filter on. Ebib then runs this filter on the database, and only shows those entries that match the filter. To indicate that a filter is active, the active filter is displayed in a header line at the top of the index buffer. (The filter can be displayed in Lisp form, if you prefer: customise [Filters Display As Lisp](#filters-display-as-lisp) to do so.)
 
-Ebib will then create a virtual database containing the entries matching your selection criterion. A virtual database has the same name as the database it is based on, prepended with `V:`. It also has a number like any other database, and you can move back and forth to other databases with the number or cursor keys.
+If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp, the filter selects all entries that have a field that contains "Jones" in them.
 
-If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp, the virtual database will select all entries that have a field that contains "Jones" in them.
+Note that you can also select items based on their entry type. In order to do that, you need to specify `type*` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `type*` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`. You can use TAB completion in this case, by the way.
 
-Note that you can also select items based on their entry type. In order to do that, you need to specify `type*` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `type*` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`.
+If you specify the `keywords` field, the keywords associated with your database are available for TAB completion as well. Though you can enter any search term, of course.
 
 
 ### Complex Filters ###
 
-Once you have a virtual database, it remains associated with the database it was created from. This means that you can refine or extend the selection (i.e. the filter) that the virtual database is based on. If, in the current example, you want to include all the entries that have "Jones" in the `editor` field, you have to perform a logical `or` operation: you want to select an entry if it contains "Jones" in the `author` field (which you already did) *or* if it contains "Jones" in the `editor` field.
+Once you have a filter on your database, you can refine or extend it. For example, suppose you want to add all entries that have "Jones" in the editor field to your selection as well. I this case you need to do a logical `or` operation: you want to select an entry if it contains "Jones" in the `author` field (which you already did) *or* if it contains "Jones" in the `editor` field.
 
 A short sidenote: the first impulse in a case like this might be to use `and` instead of `or`: after all, you want to select all entries that contain "Jones" in the `author` field *and* all entries that contain "Jones" in the `editor` field. However, the filter that you build up is used to test each entry *individually* whether it meets the selection criterion. An entry meets the criterion if it contains "Jones" in the `author` field *or* if it contains "Jones" in the `editor` field. Therefore, `or` is the required operator in this case. If you would use `and`, you would only get those entries that contain "Jones" in both the `author` *and* `editor` fields.
 
-To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the virtual database with all entries in the original database that match the additional criterion.
+To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the database.
 
-It is also possible to perform a logical `and` on the virtual database. Use this if you want to select those entries that contain "Jones" in the `author` field and e.g. "symbiotic hybernation" in the `keyword` field. A logical `and` operation is done with the key `&`. (Note: this is the same key that is used to create a virtual database. In fact, you can also create a virtual database with `|`: when used in a normal database, `&` and `|` are equivalent. They are only different in virtual databases.)
+It is also possible to perform a logical `and` on the filter. Use this if you want to select those entries that contain "Jones" in the `author` field and e.g. "symbiotic hibernation" in the `keyword` field. A logical `and` operation is done with the key `&`. (Note: this is the same key that is used to create the filter. In fact, you can create a filter with `|` as well: when used in an unfiltered database, `&` and `|` are equivalent. They are only different when a filter is already active.)
 
 Both the `&` and `|` commands can be used with the negative prefix argument `M--` (or `C-u -`, which is identical). In this case, the search criterion is negated. That is, the negative prefix argument performs a logical `not` operation on the search criterion.
 
-That is, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp. This prefix argument is available both in real and in virtual databases.
+That is, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp.
 
-There is another way of performing a logical `not` operation, which is only available in virtual databases: by pressing the key `~`, you invert the current filter. That is, if you have a virtual database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
+There is another way of performing a logical `not` operation, which is only available in when a filter is active: by pressing the key `~`, you invert the current filter. That is, if you have a filtered database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
 
 Although `~` and the negative prefix argument to `&` or `|` both perform logical `not` operations, they are *not* equivalent: `~` negates the entire filter built up so far, while the negative prefix argument only negates the single selection criterion you enter with it.
 
-If you want to know what the filter for the current virtual database is exactly, you can type `V`. This command displays the current filter in the minibuffer. The filter is specified as a Lisp expression, meaning that the operators appear before their operands, not in between them. That is, `x and y` is written as `(and x y)`.
+When a filter is active, the filter itself is displayed at the top of the index buffer. If the index window is too small to display the entire filter (which can easily happen if Ebib is set to split the frame vertically rather than horizontally), you can press `F v` (capital `F`, small `v`), which will display the filter in the minibuffer.
 
-With a prefix argument (any prefix argument will do), the command `V` not only displays the current filter, but also reapplies it. This can be useful when you've made changes to the source database: Ebib does not automatically update a virtual database when its source database is modified.
+To cancel the filter and return to the normal view of the database, press `F c`. For convenience, this action is also available with `c`, which normally closes a database. If a filter is active, however, it simply cancels the filter. (If you find this behaviour confusing, you can rebind the `c` key to the function `ebib-close-database`. See [Modifying Key Bindings](#modifying-key-bindings) for details.)
 
 
-### Properties of Virtual Databases ###
+### Storing and Saving Filters ###
 
-Virtual databases differ from normal databases in several ways. First, they cannot be modified: you cannot add or delete entries, and you cannot modify the contents of fields. It is also not possible to import entries to them or merge another file with them. Furthermore, it is not possible to export entries to them or from them.
+Once constructed, a filter can be stored, so that it can be used again. To store a filter, hit `F s`. Ebib will ask you for a name for the filter in order to identify it later. By default, filter names are case-insensitive, but if you prefer to use case-sensitive filter names, you can unset the option [Filters Ignore Case](#filters-ignore-case). When Ebib is closed, all stored filters are saved to a file and they're automatically reloaded when you open Ebib again. Stored filters are not associated with a particular database: once a filter is stored, it is available to all databases.
 
-A virtual database cannot be saved in the normal way with `s`, and the menu option to save all databases ignores virtual databases. If you want to save a virtual database, you can use the command `w`. This command not only saves the virtual database, it also changes it into a normal database, and detaches it from its original source database, so that you can modify it without affecting the source database.
+You can apply a stored filter with `F a`. This will ask for the name of a filter and apply it to the current database. You can extend the filter in the normal way, though the changes will not be stored automatically. Note that cancelling a filter does not delete it from the list of stored filters, it will remain available for later application. If you want to delete a filter from the list of stored filters, use `F d`. You can also delete all stored filters with `F D`. To see what filters are currently stored, use `F V`.
 
-The print bibliography command also doesn't work with virtual databases. The reason for this is that the virtual database is not associated with an actual `.bib` file, so there is no file to create a list of references from. However, it is possible to print index cards from a virtual database.
+The file that Ebib uses to store filters is `~/.emacs.d/ebib-filters`, although that can of course be customised (see [Filters Default File](#filters-default-file)). As mentioned, stored filters are saved automatically when Ebib closes, but you can also save them with `F S`. Note that if there are no stored filters when Ebib is closed, the file is deleted. If you want to save filters without risking them being overwritten, you can save them to a different file with `F w`. To load such a filter file, use `F l`. If you load filters from a file while you still have stored filters, you are asked if you want to replace them completely or if you want to add the new filters to the existing ones. In the latter case, however, filters whose name conflict with existing filters are not loaded. (Ebib will log a message about this when this happens.) Lastly, if you want to rename a stored filter, you can do so with `F R`. 
+
+
+### Properties of Filtered Databases ###
+
+When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database and saving one is also disabled. (The reasons for these limitations are historic and they may be lifted in future version). Editing existing entries is possible. If the entry doesn't match the filter anymore after the edit, it doesn't disappear from view, however. In order to reapply the filter, press `F r`.
+
+It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `; m`, then cancel the filter and perform an action on them.
+
+Although a filtered database cannot be saved, it *can* be written to a file. To do so, use `F W`. This command asks you for a filename and writes the filtered entries to it. It also writes all the `@string` definitions and the `@preamble`, so you end up with a complete `.bib` file. (Note that this is in fact the same command as the menu option "Save Database As". This command behaves differently depending on whether a filter is active. If there is, only the filtered entries are written to the new file and the original database remains open. If no filter is active, the database is renamed.)
+
+One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` and of course the special function of `F w` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
+
 
 
 ## The Multiline Edit Buffer ##
@@ -621,8 +633,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `End`
 :    go to last entry. `(ebib-goto-last-entry)`
 `Return`
-:    make the entry under the cursor current. Use after e.g. `C-s`.
-     `(ebib-select-entry)`
+:    make the entry under the cursor current. Use after e.g. `C-s`. `(ebib-select-entry)`
 `Space`
 :    equivalent to `PgDn`.
 `1-9`
@@ -630,16 +641,11 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `/`
 :    search the database. `(ebib-search)`
 `&`
-:    Create a virtual database, or perform a logical `and` on the current virtual
-     database. With negative prefix argument: apply a logical `not` to the
-     selectional criterion. `(ebib-virtual-db-and)`
+:    create a filter, or perform a logical `and` on the current filter. With negative prefix argument: apply a logical `not` to the selectional criterion. `(ebib-filter-and)`
 `|`
-:    Create a virtual database, or perform a logical `or` on the current virtual
-     database. With negative prefix argument: apply a logical `not` to the
-     selectional criterion. `(ebib-virtual-db-or)`
+:   create a filter, or perform a logical `or` on the current filter. With negative prefix argument: apply a logical `not` to the selectional criterion. `(ebib-filter-or)`
 `~`
-:    Perform a logical `not` on the current virtual database.
-     `(ebib-virtual-db-not)`
+:    perform a logical `not` on the current filter. `(ebib-filter-not)`
 `?`
 :    display Ebib info. `(ebib-info)`
 `a`
@@ -647,7 +653,9 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `b`
 :    equivalent to `Pgup`.
 `c`
-:    close the database. `(ebib-close-database)`
+:    close the database or cancel the current filter. `(ebib-index-c)`
+`C`
+:    follow `crossref` field. `(ebib-follow-crossref)`
 `d`
 :    delete the current entry. `(ebib-delete-entry)`
 `; d`
@@ -660,7 +668,39 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    extract a filename from the `file` field and send it to an appropriate viewer.
      With numeric prefix argument, extract the *n*-th filename.
 `F`
-:    follow `crossref` field. `(ebib-follow-crossref)`
+:    prefix key for filter actions.
+`F &`
+:    equivalent to `&`.
+`F |`
+:   equivalent to `|`.
+`F ~`
+:    equivalent to `~`
+`F a`
+:    apply a stored filter. `(ebib-filters-apply-filter)`
+`F c`
+:    cancel the current filter. `(ebib-filters-cancel-filter)`
+`F d`
+:    delete a stored filter. `(ebib-filters-delete-filter)`
+`F D`
+:    delete all stored filters. `(ebib-filters-delete-all-filters)`
+`F l`
+:    load filters from a file. `(ebib-filters-load-from-file)`
+`F r`
+:    reapply the current filter. `(ebib-filters-reapply-filter)`
+`F R`
+:    rename a stored filter. `(ebib-filters-rename-filter)`
+`F s`
+:    store the current filter. `(ebib-filters-store-filter)`
+`F S`
+:    save stored filters to `ebib-filters-default-file`. `(ebib-filters-save-filters)`
+`F v`
+:    display the filter in the minibuffer. `(ebib-filters-view-filter)`
+`F V`
+:    show a list of filters. `(ebib-filters-view-all-filters)`
+`F w`
+:    write the stored filters to a file. `(ebib-filters-write-to-file)`
+`F W`
+:    write the filtered entries to a file. `(ebib-write-database)`
 `g`
 :    equivalent to `Home`.
 `G`
@@ -714,9 +754,6 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 `u`
 :    extract a URL from the `url` field and send it to a browser. With numeric
      prefix argument, extract the *n*-th url.
-`V`
-:    Display the filter of the current virtual database in the minibuffer.
-     With prefix argument: reapply the filter. `(ebib-print-filter)`
 `x`
 :    export the current entry to a file, or, when used with numeric prefix
      argument, to another database. `(ebib-export-entry)`
@@ -1283,6 +1320,29 @@ The URL used to open a DOI. It must contain exactly one instance fo `%s`, which 
 **Default value**: `nil`.\
 
 \noindent If this option is set, Ebib stores the values of multiple occurrences of a single field within an entry in a single occurrence of that field, separated by semicolons (see [Multiple Identical Fields](#multiple-identical-fields)).
+
+
+### Filters Default File ###
+
+**Default value**: `"~/.emacs.d/ebib-filters"`
+
+\noindent The file used for saving stored filters.
+
+
+### Filters Display As Lisp ###
+
+**Default value**: `nil`
+
+\noindent If set, filters are displayed as Lisp expressions, i.e., in prefix notation `(contains <field> "string")`.
+
+
+
+### Filters Ignore Case ###
+
+**Default value**: `t`
+
+\noindent If set, filter names are case-insensitive.
+
 
 
 ### Entry Types ###

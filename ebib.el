@@ -61,6 +61,7 @@
     (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
+(require 'pp)
 
 ;; make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)
@@ -163,7 +164,7 @@ This is either the height of the window, or, if
                                   mode-line-modified
                                   mode-line-buffer-identification
                                   "     Entry %l"
-                                  (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))
+                                  (:eval (if (edb-filter ebib-cur-db) " (Filtered)" "")))
   "The mode line for the index window."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
@@ -383,9 +384,26 @@ For .bib files that do not have an associated keywords file,
 
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
-This file is read when Ebib is started. It can be used to define custom keys or set custimzation variables (though the latter is easier through Customize)."
+This file is read when Ebib is started. It can be used to define
+custom keys or set custimzation variables (though the latter is
+easier through Customize)."
   :group 'ebib
   :type '(file :tag "Customization file:"))
+
+(defcustom ebib-filters-display-as-lisp nil
+  "If set, display filters as Lisp expressions."
+  :group 'ebib
+  :type 'boolean)
+
+(defcustom ebib-filters-ignore-case t
+  "If set, ignore case in filter names."
+  :group 'ebib
+  :type 'boolean)
+
+(defcustom ebib-filters-default-file "~/.emacs.d/ebib-filters"
+  "File for saving filters."
+  :group 'ebib
+  :type 'file)
 
 (defcustom ebib-keywords-field-keep-sorted nil
   "Keep the keywords field sorted in alphabetical order.
@@ -524,7 +542,7 @@ entry-specific inheritances, the latter override the former."
 
 ;; general bookkeeping
 (defvar ebib-field-history nil "Minibuffer field name history.")
-(defvar ebib-filter-history nil "Minibuffer history for virtual filters.")
+(defvar ebib-filters-history nil "Minibuffer history for filters.")
 (defvar ebib-cite-command-history nil "Minibuffer history for citation commands.")
 (defvar ebib-key-history nil "Minibuffer history for entry keys.")
 (defvar ebib-keyword-history nil "Minibuffer history for keywords.")
@@ -549,6 +567,8 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (modify-syntax-entry ?\( "." ebib-syntax-table)
 (modify-syntax-entry ?\) "." ebib-syntax-table)
 (modify-syntax-entry ?\" "w" ebib-syntax-table)
+
+(defvar ebib-filters-alist nil "Alist of saved filters.")
 
 ;; keywords
 ;;
@@ -581,11 +601,12 @@ Its value can be 'strings, 'fields, or 'preamble.")
   (name nil)                                ; name of the database
   (modified nil)                            ; has this database been modified?
   (make-backup nil)                         ; do we need to make a backup of the .bib file?
-  (virtual nil))                            ; is this a virtual database?
+  (filter nil))                             ; the current filter
 
 ;; the master list and the current database
 (defvar ebib-databases nil "List of structs containing the databases.")
 (defvar ebib-cur-db nil "The database that is currently active.")
+(defvar ebib-cur-keys-list nil "Sorted list of entry keys in the current database.")
 
 ;;;;;; bookkeeping required when editing field values or @STRING definitions
 
@@ -872,8 +893,7 @@ MATCH acts just like the argument to MATCH-END, and defaults to
     "Helper function for `ebib-execute-when'."
     (cond
      ((eq env 'entries)
-      '(and ebib-cur-db
-            (edb-cur-entry ebib-cur-db)))
+      'ebib-cur-keys-list)
      ((eq env 'marked-entries)
       '(and ebib-cur-db
             (edb-marked-entries ebib-cur-db)))
@@ -881,10 +901,10 @@ MATCH acts just like the argument to MATCH-END, and defaults to
       'ebib-cur-db)
      ((eq env 'real-db)
       '(and ebib-cur-db
-            (not (edb-virtual ebib-cur-db))))
-     ((eq env 'virtual-db)
+            (not (edb-filter ebib-cur-db))))
+     ((eq env 'filtered-db)
       '(and ebib-cur-db
-            (edb-virtual ebib-cur-db)))
+            (edb-filter ebib-cur-db)))
      ((eq env 'no-database)
       '(not ebib-cur-db))
      (t t))))
@@ -901,8 +921,8 @@ entries: execute when there are entries in the database,
 marked-entries: execute when there are marked entries in the database,
 database: execute if there is a database,
 no-database: execute if there is no database,
-real-db: execute when there is a database and it is real,
-virtual-db: execute when there is a database and it is virtual,
+real-db: execute when there is a database and it is not filtered,
+filtered-db: execute when there is a database and it is filtered,
 default: execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
@@ -960,15 +980,11 @@ successful, and NIL otherwise."
        (cond
         ((not ,goal-db)
          (error "Database %d does not exist" ,num))
-        ((edb-virtual ,goal-db)
-         (error "Database %d is virtual" ,num))
+        ((edb-filter ,goal-db)
+         (error "Database %d is filtered" ,num))
         (t (when (funcall ,copy-fn ,goal-db)
              (ebib-set-modified t ,goal-db)
              (message ,message ,num)))))))
-
-(defmacro ebib-cur-entry-key ()
-  "Returns the key of the current entry in `ebib-cur-db'."
-  `(car (edb-cur-entry ebib-cur-db)))
 
 (defmacro ebib-export-to-file (prompt-string message insert-fn)
   "Exports data to a file.
@@ -1176,7 +1192,7 @@ all else fails, pop up a new frame."
           (end-of-line)
           (delete-region beg (point)))
         (insert (propertize (format "%-17s " (symbol-name ebib-current-field)) 'face 'ebib-field-face)
-                (ebib-get-field-highlighted ebib-current-field (ebib-cur-entry-key)))
+                (ebib-get-field-highlighted ebib-current-field (edb-cur-entry ebib-cur-db)))
         (ebib-set-fields-highlight)))))
 
 (defun ebib-redisplay-current-string ()
@@ -1325,6 +1341,59 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
                       fields))
           (list obl-fields opt-fields ebib-additional-fields))))
 
+(defun ebib-redisplay ()
+  "Redisplay the index and entry buffers."
+  (ebib-fill-index-buffer)
+  (ebib-fill-entry-buffer))
+
+(defun ebib-fill-index-buffer ()
+  "Fills the index buffer with the list of keys in `ebib-cur-db'.
+If `ebib-cur-db' is nil, the buffer is just erased and its name set
+to \"none\"."
+  ;; Note: this function sets `ebib-cur-keys-list'.
+  (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+    (let ((buffer-read-only nil))
+      (erase-buffer)
+      (if (not ebib-cur-db)
+          (rename-buffer " none")
+        ;; We may call this function when there are no entries in the
+        ;; database. If so, we don't need to do this:
+        (when (edb-keys-list ebib-cur-db)
+          (setq ebib-cur-keys-list
+                (if (edb-filter ebib-cur-db)
+                    (ebib-filters-run-filter ebib-cur-db)
+                  (edb-keys-list ebib-cur-db)))
+          ;; Set a header line if there is a filter.
+          (setq header-line-format (if (edb-filter ebib-cur-db)
+                                       (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
+          ;; It may be that no entry satisfies the filter.
+          (if (not ebib-cur-keys-list)
+              (message "No entries matching the filter")
+            ;; Make sure the current entry is among the visible entries.
+            (unless (member (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)
+              (setf (edb-cur-entry ebib-cur-db) (car ebib-cur-keys-list)))
+            (mapc #'(lambda (entry)
+                      (ebib-display-entry entry)
+                      (when (member entry (edb-marked-entries ebib-cur-db))
+                        (save-excursion
+                          (let ((beg (progn
+                                       (beginning-of-line)
+                                       (forward-line -1)
+                                       (point))))
+                            (skip-chars-forward "^ ")
+                            (add-text-properties beg (point) '(face ebib-marked-face))))))
+                  ebib-cur-keys-list)
+            (goto-char (point-min))
+            (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
+            (beginning-of-line)
+            (ebib-set-index-highlight))
+          ;; TODO Setting the buffer's modified flag and renaming it
+          ;; shouldn't be done here.
+          (set-buffer-modified-p (edb-modified ebib-cur-db))
+          (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                       (length (member ebib-cur-db ebib-databases)))))
+                                 (edb-name ebib-cur-db))))))))
+
 (defun ebib-fill-entry-buffer (&optional match-str)
   "Fills the entry buffer with the fields of the current entry.
 MATCH-STRING is a regexp that will be highlighted when it occurs in the
@@ -1332,14 +1401,11 @@ field contents."
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
     (with-buffer-writable
       (erase-buffer)
-      (when (and ebib-cur-db               ; do we have a database?
-                 (edb-keys-list ebib-cur-db) ; does it contain entries?
-                 (gethash (car (edb-cur-entry ebib-cur-db))
-                          (edb-database ebib-cur-db))) ; does the current entry exist?
-        (ebib-format-fields (car (edb-cur-entry ebib-cur-db))
+      (when ebib-cur-keys-list         ; are there entries being displayed?
+        (ebib-format-fields (edb-cur-entry ebib-cur-db)
                             'insert match-str)
         (setq ebib-current-field 'type*)
-        (setq ebib-cur-entry-hash (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
+        (setq ebib-cur-entry-hash (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db))
         (goto-char (point-min))
         (ebib-set-fields-highlight)))))
 
@@ -1583,7 +1649,7 @@ keywords and the third the keywords added in this session."
 
 (defun ebib-keywords-save-new-keywords (db)
   "Check if new keywords were added to DB and save them as required."
-  (unless (edb-virtual db) ; virtual databases don't get new keywords
+  (unless (edb-filter db) ; filtered databases don't get new keywords
     (let ((lst (ebib-keywords-new-p db))
           (file (ebib-keywords-get-file db)))
       (when (and (third lst)            ; if there are new keywords
@@ -1666,10 +1732,10 @@ that is to be displayed, or a file to load (which must end in
         (let ((exists? (member arg (edb-keys-list ebib-cur-db))))
           (if exists?
               (progn
-                (setf (edb-cur-entry ebib-cur-db) exists?)
+                (setf (edb-cur-entry ebib-cur-db) (car exists?))
                 (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
                   (goto-char (point-min))
-                  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+                  (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
                   (ebib-select-entry)))
             (message "No entry `%s' in current database " arg)))))))
 
@@ -1708,6 +1774,7 @@ buffers and reads the rc file."
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
                                                     (read-file-to-list ebib-keywords-file) nil)))
   (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
+  (ebib-filters-load-file ebib-filters-default-file)
   (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))
   (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
   (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
@@ -1757,6 +1824,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
             (yes-or-no-p "There are modified databases. Quit anyway? ")
           (y-or-n-p "Quit Ebib? "))
     (ebib-keywords-save-all-new)
+    (ebib-filters-update-filters-file)
     (mapc #'(lambda (buffer)
               (kill-buffer buffer))
           (mapcar #'cdr ebib-buffer-alist))
@@ -1771,7 +1839,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-window-before nil
           ebib-buffer-before nil
           ebib-keywords-files-alist nil
-          ebib-keywords-list-per-session nil)
+          ebib-keywords-list-per-session nil
+          ebib-filters-alist nil)
     (set-window-configuration ebib-saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
     (message "")))
@@ -1846,19 +1915,20 @@ keywords when Emacs is killed."
 (ebib-key index [return] ebib-select-and-popup-entry)
 (ebib-key index " " ebib-index-scroll-up)
 (ebib-key index "/" ebib-search)
-(ebib-key index "&" ebib-virtual-db-and)
-(ebib-key index "|" ebib-virtual-db-or)
-(ebib-key index "~" ebib-virtual-db-not)
+(ebib-key index "&" ebib-filters-logical-and)
+(ebib-key index "|" ebib-filters-logical-or)
+(ebib-key index "~" ebib-filters-logical-not)
 (ebib-key index ";" ebib-prefix-map)
 (ebib-key index "?" ebib-info)
 (ebib-key index "a" ebib-add-entry)
 (ebib-key index "b" ebib-index-scroll-down)
-(ebib-key index "c" ebib-close-database)
+(ebib-key index "c" ebib-index-c)
+(ebib-key index "C" ebib-follow-crossref)
 (ebib-key index "d" ebib-delete-entry t)
 (ebib-key index "e" ebib-edit-entry)
 (ebib-key index "E" ebib-edit-keyname)
 (ebib-key index "f" ebib-view-file)
-(ebib-key index "F" ebib-follow-crossref)
+(ebib-key index "F" ebib-filters-map)
 (ebib-key index "g" ebib-goto-first-entry)
 (ebib-key index "G" ebib-goto-last-entry)
 (ebib-key index "h" ebib-index-help)
@@ -1883,7 +1953,6 @@ keywords when Emacs is killed."
 (ebib-key index "s" ebib-save-current-database)
 (ebib-key index "S" ebib-edit-strings)
 (ebib-key index "u" ebib-browse-url)
-(ebib-key index "V" ebib-print-filter)
 (ebib-key index "x" ebib-export-entry t)
 (ebib-key index "\C-xb" ebib-leave-ebib-windows)
 (ebib-key index "\C-xk" ebib-quit)
@@ -1904,6 +1973,27 @@ keywords when Emacs is killed."
             'ebib-switch-to-database-nth))
       '(1 2 3 4 5 6 7 8 9))
 
+;; The filters keymap
+(eval-and-compile
+  (define-prefix-command 'ebib-filters-map)
+  (suppress-keymap 'ebib-filters-map)
+  (define-key ebib-filters-map "&" 'ebib-filters-logical-and)
+  (define-key ebib-filters-map "|" 'ebib-filters-logical-or)
+  (define-key ebib-filters-map "~" 'ebib-filters-logical-not)
+  (define-key ebib-filters-map "a" 'ebib-filters-apply-filter)
+  (define-key ebib-filters-map "c" 'ebib-filters-cancel-filter)
+  (define-key ebib-filters-map "d" 'ebib-filters-delete-filter)
+  (define-key ebib-filters-map "D" 'ebib-filters-delete-all-filters)
+  (define-key ebib-filters-map "l" 'ebib-filters-load-from-file)
+  (define-key ebib-filters-map "r" 'ebib-filters-reapply-filter)
+  (define-key ebib-filters-map "R" 'ebib-filters-rename-filter)
+  (define-key ebib-filters-map "s" 'ebib-filters-store-filter)
+  (define-key ebib-filters-map "S" 'ebib-filters-save-filters)
+  (define-key ebib-filters-map "v" 'ebib-filters-view-filter)
+  (define-key ebib-filters-map "V" 'ebib-filters-view-all-filters)
+  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file)
+  (define-key ebib-filters-map "W" 'ebib-write-database))
+
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
   "Major mode for the Ebib index buffer."
@@ -1913,7 +2003,7 @@ keywords when Emacs is killed."
 (easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
   '("Ebib"
     ["Open Database..." ebib-load-bibtex-file t]
-    ["Merge Database..." ebib-merge-bibtex-file (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+    ["Merge Database..." ebib-merge-bibtex-file (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
     ["Save Database" ebib-save-current-database (and ebib-cur-db
                                                      (edb-modified ebib-cur-db))]
     ["Save All Databases" ebib-save-all-databases (ebib-modified-p)]
@@ -1924,21 +2014,19 @@ keywords when Emacs is killed."
     ["Save All New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
     "--"
     ("Entry"
-     ["Add" ebib-add-entry (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
-     ["Edit" ebib-edit-entry (and ebib-cur-db
-                                  (edb-cur-entry ebib-cur-db)
-                                  (not (edb-virtual ebib-cur-db)))]
+     ["Add" ebib-add-entry (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
+     ["Edit" ebib-edit-entry ebib-cur-keys-list]
      ["Delete" ebib-delete-entry (and ebib-cur-db
                                       (edb-cur-entry ebib-cur-db)
-                                      (not (edb-virtual ebib-cur-db)))])
-    ["Edit Strings" ebib-edit-strings (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
-    ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+                                      (not (edb-filter ebib-cur-db)))])
+    ["Edit Strings" ebib-edit-strings (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
+    ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
     "--"
     ["Open URL" ebib-browse-url (gethash ebib-standard-url-field ebib-cur-entry-hash)]
     ["Open DOI" ebib-browse-doi (gethash ebib-standard-doi-field ebib-cur-entry-hash)]
     ["View File" ebib-view-file (gethash ebib-standard-file-field ebib-cur-entry-hash)]
     ("Print Entries"
-     ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-virtual ebib-cur-db)))]
+     ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (edb-filter ebib-cur-db)))]
      ["As Index Cards" ebib-print-entries ebib-cur-db]
      ["Print Multiline Fields" ebib-toggle-print-multiline :enable t
       :style toggle :selected ebib-print-multiline]
@@ -1964,44 +2052,6 @@ keywords when Emacs is killed."
     ["Help on Ebib" ebib-info t]))
 
 (easy-menu-add ebib-index-menu ebib-index-mode-map)
-
-(defun ebib-redisplay ()
-  "Redisplay the index and entry buffers."
-  (ebib-fill-index-buffer)
-  (ebib-fill-entry-buffer))
-
-(defun ebib-fill-index-buffer ()
-  "Fills the index buffer with the list of keys in `ebib-cur-db'.
-If `ebib-cur-db' is nil, the buffer is just erased and its name set
-to \"none\"."
-  (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-    (let ((buffer-read-only nil))
-      (erase-buffer)
-      (if ebib-cur-db
-          (progn
-            ;; we may call this function when there are no entries in the
-            ;; database. if so, we don't need to do this:
-            (when (edb-cur-entry ebib-cur-db)
-              (mapc #'(lambda (entry)
-                        (ebib-display-entry entry)
-                        (when (member entry (edb-marked-entries ebib-cur-db))
-                          (save-excursion
-                            (let ((beg (progn
-                                         (beginning-of-line)
-                                         (forward-line -1)
-                                         (point))))
-                              (skip-chars-forward "^ ")
-                              (add-text-properties beg (point) '(face ebib-marked-face))))))
-                    (edb-keys-list ebib-cur-db))
-              (goto-char (point-min))
-              (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-              (beginning-of-line)
-              (ebib-set-index-highlight))
-            (set-buffer-modified-p (edb-modified ebib-cur-db))
-            (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                         (length (member ebib-cur-db ebib-databases)))))
-                                   (edb-name ebib-cur-db))))
-        (rename-buffer " none")))))
 
 (defun ebib-customize ()
   "Switches to Ebib's customisation group."
@@ -2066,11 +2116,8 @@ This function adds a newline to the message being logged."
             (ebib-load-entries full-name ebib-cur-db)
             ;; If the user makes any changes, we'll want to create a back-up.
             (setf (edb-make-backup ebib-cur-db) t)
-            ;; Now fill the buffers. Note that filling a buffer also makes
-            ;; that buffer active. Therefore we do `ebib-fill-index-buffer'
-            ;; later.
-            (ebib-set-modified nil)
-            (ebib-fill-entry-buffer))
+            (setf (edb-cur-entry ebib-cur-db) (car (edb-keys-list ebib-cur-db)))
+            (ebib-set-modified nil))
         ;; if the file does not exist, we need to issue a message.
         (ebib-log 'message "(New file)"))
       ;; add keywords for the new database
@@ -2081,33 +2128,29 @@ This function adds a newline to the message being logged."
       ;; fill the index buffer. (this even works if there are no keys
       ;; in the database, for example when the user opened a new file
       ;; or if no BibTeX entries were found.
-      (ebib-fill-index-buffer))))
+      (ebib-redisplay))))
 
 (defun ebib-reload-current-database ()
   "Reload the current database from disk."
   (interactive)
   (ebib-execute-when
-    ((real-db)
+    ((entries)
      (when (yes-or-no-p "Reload current database from file ")
        (ebib-reload-database ebib-cur-db)
        (ebib-set-modified nil)
-       (ebib-fill-entry-buffer)
-       (ebib-fill-index-buffer)))
+       (ebib-redisplay)
+       (message "Database reloaded")))
     ((default) (beep))))
 
 (defun ebib-reload-all-databases ()
-  "Reload all databses from disk."
+  "Reload all databases from disk."
   (interactive)
-  (ebib-execute-when
-    ((real-db)
-     (when (yes-or-no-p "Reload all databases from file ")
-       (mapc #'(lambda (db)
-                 (ebib-reload-database db)
-                 (ebib-set-modified nil db))
-             ebib-databases)
-       (ebib-fill-entry-buffer)
-       (ebib-fill-index-buffer)))
-    ((default) (beep))))
+  (when (yes-or-no-p "Reload all databases from file ")
+    (mapc #'(lambda (db)
+              (ebib-reload-database db)
+              (ebib-set-modified nil db))
+          ebib-databases)
+    (ebib-redisplay)))
 
 (defun ebib-reload-database (db)
   "Reload database DB from disk."
@@ -2120,7 +2163,8 @@ This function adds a newline to the message being logged."
   (setf (edb-preamble db) nil)
   ;; then load the file
   (ebib-log 'log "%s: Reloading file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (edb-filename db))
-  (ebib-load-entries (edb-filename db) db))
+  (ebib-load-entries (edb-filename db) db)
+  (setf (edb-cur-entry db) (car (edb-keys-list db))))
 
 (defun ebib-merge-bibtex-file ()
   "Merges a BibTeX file into the current database."
@@ -2148,7 +2192,6 @@ This function adds a newline to the message being logged."
           (setf (edb-keys-list db) (sort (edb-keys-list db) 'string<)))
         (when (edb-strings-list db)
           (setf (edb-strings-list db) (sort (edb-strings-list db) 'string<)))
-        (setf (edb-cur-entry db) (edb-keys-list db))
         ;; Log the results.
         (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                   (car result)
@@ -2347,14 +2390,14 @@ buffer if Ebib is not occupying the entire frame."
   (ebib-execute-when
     ((entries)
      ;; if the current entry is the first entry,
-     (if (eq (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-         (beep)                         ; just beep.
-       (setf (edb-cur-entry ebib-cur-db) (last (edb-keys-list ebib-cur-db)
-                                               (1+ (length (edb-cur-entry ebib-cur-db)))))
-       (goto-char (ebib-highlight-start ebib-index-highlight))
-       (forward-line -1)
-       (ebib-set-index-highlight)
-       (ebib-fill-entry-buffer)))
+     (let ((prev (prev-elem (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)))
+       (if (not prev)                   ; if we're on the first entry
+           (beep)                       ; just beep
+         (setf (edb-cur-entry ebib-cur-db) prev)
+         (goto-char (ebib-highlight-start ebib-index-highlight))
+         (forward-line -1)
+         (ebib-set-index-highlight)
+         (ebib-fill-entry-buffer))))
     ((default)
      (beep))))
 
@@ -2363,14 +2406,14 @@ buffer if Ebib is not occupying the entire frame."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (if (= (length (edb-cur-entry ebib-cur-db)) 1) ; if we're on the last entry,
-         (beep)                                     ; just beep.
-       (setf (edb-cur-entry ebib-cur-db)
-             (last (edb-keys-list ebib-cur-db) (1- (length (edb-cur-entry ebib-cur-db)))))
-       (goto-char (ebib-highlight-start ebib-index-highlight))
-       (forward-line 1)
-       (ebib-set-index-highlight)
-       (ebib-fill-entry-buffer)))
+     (let ((next (next-elem (edb-cur-entry ebib-cur-db) ebib-cur-keys-list)))
+       (if (not next)                   ; if we're on the last entry,
+           (beep)                       ; just beep
+         (setf (edb-cur-entry ebib-cur-db) next)
+         (goto-char (ebib-highlight-start ebib-index-highlight))
+         (forward-line 1)
+         (ebib-set-index-highlight)
+         (ebib-fill-entry-buffer))))
     ((default)
      (beep))))
 
@@ -2398,10 +2441,12 @@ buffer if Ebib is not occupying the entire frame."
              (ebib-display-entry entry-key)
              (forward-line -1) ; move one line up to position the cursor on the new entry.
              (ebib-set-index-highlight)
-             (setf (edb-cur-entry ebib-cur-db) (member entry-key (edb-keys-list ebib-cur-db)))
+             (setf (edb-cur-entry ebib-cur-db) entry-key)
              (ebib-fill-entry-buffer)
              (ebib-edit-entry-internal)
              (ebib-set-modified t)))))
+    ((filtered-db)
+     (error "Cannot add entries to a filtered database"))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
     ((default)
@@ -2425,8 +2470,8 @@ generate the key, see that function's documentation for details."
     ((real-db entries)
      (let ((new-key
             (with-temp-buffer
-              (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db nil)
-              (let ((x-ref (ebib-get-field-value 'crossref (ebib-cur-entry-key))))
+              (ebib-format-entry (edb-cur-entry ebib-cur-db) ebib-cur-db nil)
+              (let ((x-ref (ebib-get-field-value 'crossref (edb-cur-entry ebib-cur-db))))
                 (if x-ref
                     (ebib-format-entry (to-raw (car x-ref)) ebib-cur-db nil)))
               (goto-char (point-min))
@@ -2436,6 +2481,13 @@ generate the key, see that function's documentation for details."
          (ebib-update-keyname new-key))))
     ((default)
      (beep))))
+
+(defun ebib-index-c ()
+  "Helper function for the `c' key in the index buffer."
+  (interactive)
+  (if (edb-filter ebib-cur-db)
+      (ebib-filters-cancel-filter)
+    (ebib-close-database)))
 
 (defun ebib-close-database ()
   "Closes the current BibTeX database."
@@ -2453,8 +2505,6 @@ generate the key, see that function's documentation for details."
              (progn
                (setq ebib-cur-db (or new-db
                                      (last1 ebib-databases)))
-               (unless (edb-cur-entry ebib-cur-db)
-                 (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db)))
                (ebib-redisplay))
            ;; otherwise, we have to clean up a little and empty all the buffers.
            (setq ebib-cur-db nil)
@@ -2471,7 +2521,8 @@ generate the key, see that function's documentation for details."
              (with-buffer-writable
                (erase-buffer)))
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-             (rename-buffer " none")))
+             (rename-buffer " none"))
+           (setq ebib-cur-keys-list nil))
          (message "Database closed."))))))
 
 (defun ebib-goto-first-entry ()
@@ -2479,7 +2530,7 @@ generate the key, see that function's documentation for details."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
+     (setf (edb-cur-entry ebib-cur-db) (car ebib-cur-keys-list))
      (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
        (goto-char (point-min))
        (ebib-set-index-highlight)
@@ -2492,10 +2543,10 @@ generate the key, see that function's documentation for details."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (setf (edb-cur-entry ebib-cur-db) (last (edb-keys-list ebib-cur-db)))
+     (setf (edb-cur-entry ebib-cur-db) (last1 ebib-cur-keys-list))
      (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
        (goto-char (point-min))
-       (forward-line (1- (length (edb-keys-list ebib-cur-db))))
+       (forward-line (1- (length ebib-cur-keys-list)))
        (ebib-set-index-highlight)
        (ebib-fill-entry-buffer)))
     ((default)
@@ -2505,7 +2556,7 @@ generate the key, see that function's documentation for details."
   "Edits the current BibTeX entry."
   (interactive)
   (ebib-execute-when
-    ((real-db entries)
+    ((entries)
      (ebib-edit-entry-internal))
     ((default)
      (beep))))
@@ -2520,7 +2571,7 @@ generate the key, see that function's documentation for details."
   (interactive)
   (ebib-execute-when
     ((real-db entries)
-     (let ((cur-keyname (ebib-cur-entry-key)))
+     (let ((cur-keyname (edb-cur-entry ebib-cur-db)))
        (if-str (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
                                          cur-keyname
                                          'ebib-key-history))
@@ -2534,15 +2585,15 @@ generate the key, see that function's documentation for details."
       (if ebib-uniquify-keys
           (setq new-key (ebib-uniquify-key new-key))
         (error (format "Key `%s' already exists" new-key))))
-  (let ((cur-key (ebib-cur-entry-key)))
+  (let ((cur-key (edb-cur-entry ebib-cur-db)))
     (unless (string= cur-key new-key)
       (let ((fields (ebib-retrieve-entry cur-key ebib-cur-db))
             (marked (member cur-key (edb-marked-entries ebib-cur-db))))
         (ebib-remove-entry-from-db cur-key ebib-cur-db)
         (ebib-remove-key-from-buffer cur-key)
         (ebib-insert-entry new-key fields ebib-cur-db t nil)
-        (setf (edb-cur-entry ebib-cur-db) (member new-key (edb-keys-list ebib-cur-db)))
-        (sort-in-buffer (length (edb-keys-list ebib-cur-db)) new-key)
+        (setf (edb-cur-entry ebib-cur-db) new-key)
+        (sort-in-buffer (length ebib-cur-keys-list) new-key)
         (ebib-display-entry new-key)
         (forward-line -1) ; move one line up to position the cursor on the new entry.
         (ebib-set-index-highlight)
@@ -2559,7 +2610,7 @@ generate the key, see that function's documentation for details."
          (ebib-fill-index-buffer)
          (message "All entries unmarked"))
         ((entries)
-         (setf (edb-marked-entries ebib-cur-db) (copy-sequence (edb-keys-list ebib-cur-db)))
+         (setf (edb-marked-entries ebib-cur-db) (copy-sequence ebib-cur-keys-list))
          (ebib-fill-index-buffer)
          (message "All entries marked"))
         ((default)
@@ -2568,14 +2619,14 @@ generate the key, see that function's documentation for details."
       ((entries)
        (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
          (with-buffer-writable
-           (if (member (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db))
+           (if (member (edb-cur-entry ebib-cur-db) (edb-marked-entries ebib-cur-db))
                (progn
                  (setf (edb-marked-entries ebib-cur-db)
-                       (delete (ebib-cur-entry-key) (edb-marked-entries ebib-cur-db)))
+                       (delete (edb-cur-entry ebib-cur-db) (edb-marked-entries ebib-cur-db)))
                  (remove-text-properties (ebib-highlight-start ebib-index-highlight)
                                          (ebib-highlight-end ebib-index-highlight)
                                          '(face ebib-marked-face)))
-             (setf (edb-marked-entries ebib-cur-db) (sort (cons (ebib-cur-entry-key)
+             (setf (edb-marked-entries ebib-cur-db) (sort (cons (edb-cur-entry ebib-cur-db)
                                                                 (edb-marked-entries ebib-cur-db))
                                                           'string<))
              (add-text-properties (ebib-highlight-start ebib-index-highlight)
@@ -2640,7 +2691,7 @@ in order for the sort value."
       (setq sortkey-list (cdr sortkey-list)))
     sort-string))
 
-(defun ebib-format-database (db)
+(defun ebib-format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
   ;; We define two comparison functions for `sort'. These must simply
   ;; return non-NIL if the first element is to be sorted before the second.
@@ -2690,42 +2741,35 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
     (ebib-make-backup (edb-filename db))
     (setf (edb-make-backup db) nil))
   (with-temp-buffer
-    (ebib-format-database db)
+    (ebib-format-database-as-bibtex db)
     (write-region (point-min) (point-max) (edb-filename db)))
   (ebib-set-modified nil db))
 
 (defun ebib-write-database ()
   "Writes the current database to a different file.
-Can also be used to change a virtual database into a real one."
+If the current database is filtered, only the entries that match
+the filter are saved. The original file is not deleted."
   (interactive)
   (ebib-execute-when
     ((database)
      (if-str (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
          (progn
            (with-temp-buffer
-             (ebib-format-database ebib-cur-db)
+             (ebib-format-database-as-bibtex ebib-cur-db)
              (safe-write-region (point-min) (point-max) new-filename nil nil nil t))
-           ;; if SAFE-WRITE-REGION was cancelled by the user because he
-           ;; didn't want to overwrite an already existing file with his
-           ;; new database, it throws an error, so the next lines will not
-           ;; be executed. hence we can safely set (EDB-FILENAME DB) and
-           ;; (EDB-NAME DB).
-           (setf (edb-filename ebib-cur-db) new-filename)
-           (setf (edb-name ebib-cur-db) (file-name-nondirectory new-filename))
-           (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                        (length (member ebib-cur-db ebib-databases)))))
-                                  (edb-name ebib-cur-db)))
-           (ebib-execute-when
-             ((virtual-db)
-              (setf (edb-virtual ebib-cur-db) nil)
-              (setf (edb-database ebib-cur-db)
-                    (let ((new-db (make-hash-table :test 'equal)))
-                      (mapc #'(lambda (key)
-                                (let ((entry (gethash key (edb-database ebib-cur-db))))
-                                  (when entry
-                                    (puthash key (copy-hash-table entry) new-db))))
-                            (edb-keys-list ebib-cur-db))
-                      new-db))))
+           ;; if SAFE-WRITE-REGION was cancelled by the user because he didn't
+           ;; want to overwrite an already existing file with his new database,
+           ;; it throws an error, so the next lines will not be executed. hence
+           ;; we can safely set (EDB-FILENAME DB) and (EDB-NAME DB). We only do
+           ;; that if there was no active filter, though. If there was, we just
+           ;; issue a message.
+           (if (edb-filter ebib-cur-db)
+               (message "Wrote filtered entries as new database to %s" new-filename)
+             (setf (edb-filename ebib-cur-db) new-filename)
+             (setf (edb-name ebib-cur-db) (file-name-nondirectory new-filename))
+             (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                          (length (member ebib-cur-db ebib-databases)))))
+                                    (edb-name ebib-cur-db))))
            (ebib-set-modified nil))))
     ((default)
      (beep))))
@@ -2738,8 +2782,8 @@ Can also be used to change a virtual database into a real one."
      (if (not (edb-modified ebib-cur-db))
          (message "No changes need to be saved.")
        (ebib-save-database ebib-cur-db)))
-    ((virtual-db)
-     (error "Cannot save a virtual database. Use `w' to write to a file."))))
+    ((filtered-db)
+     (error "Cannot save a filtered database. Use `w' to write to a file.")))) ; TODO this may not be necessary.
 
 (defun ebib-save-all-databases ()
   "Saves all currently open databases if they were modified."
@@ -2761,14 +2805,19 @@ If the current entry's crossref field is empty, search for the
 first entry with the current entry's key in its crossref field."
   (interactive)
   (let ((new-cur-entry (to-raw (gethash 'crossref
-                                        (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+                                        (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db)))))
     (if new-cur-entry
-        (progn
-          (setf (edb-cur-entry ebib-cur-db)
-                (or (member new-cur-entry (edb-keys-list ebib-cur-db))
-                    (edb-cur-entry ebib-cur-db)))
+        ;; If there is a cross-reference, see if we can find it.
+        (cond
+         ((member new-cur-entry ebib-cur-keys-list)
+          (setf (edb-cur-entry ebib-cur-db) new-cur-entry)
           (ebib-redisplay))
-      (setq ebib-search-string (ebib-cur-entry-key))
+         ((member new-cur-entry (edb-keys-list ebib-cur-db))
+          (error "Crossreference `%s' not visible due to active filter" new-cur-entry))
+         (t (error "Entry `%s' does not exist" new-cur-entry)))
+      ;; Otherwise, we assume the user wants to search for entries
+      ;; cross-referencing the current one.
+      (setq ebib-search-string (edb-cur-entry ebib-cur-db))
       (ebib-search-next))))
 
 (defun ebib-toggle-hidden ()
@@ -2819,7 +2868,7 @@ first entry with the current entry's key in its crossref field."
         ((real-db marked-entries)
          (when (y-or-n-p "Delete all marked entries? ")
            (mapc #'(lambda (entry)
-                     (ebib-remove-entry-from-db entry ebib-cur-db (not (string= entry (ebib-cur-entry-key)))))
+                     (ebib-remove-entry-from-db entry ebib-cur-db (not (string= entry (edb-cur-entry ebib-cur-db)))))
                  (edb-marked-entries ebib-cur-db))
            (message "Marked entries deleted.")
            (ebib-set-modified t)
@@ -2828,7 +2877,7 @@ first entry with the current entry's key in its crossref field."
          (beep)))
     (ebib-execute-when
       ((real-db entries)
-       (let ((cur-entry (ebib-cur-entry-key)))
+       (let ((cur-entry (edb-cur-entry ebib-cur-db)))
          (when (y-or-n-p (format "Delete %s? " cur-entry))
            (ebib-remove-entry-from-db cur-entry ebib-cur-db)
            (ebib-remove-key-from-buffer cur-entry)
@@ -2845,15 +2894,17 @@ to become the new current entry. It it is NIL, the entry after
 the deleted one becomes the new current entry. If it is T, the
 current entry is not changed."
   (remhash entry-key (edb-database db))
+  ;; Find the new current entry.
   (cond
-   ((null new-cur-entry) (setq new-cur-entry (cadr (edb-cur-entry db))))
+   ((null new-cur-entry) (setq new-cur-entry (next-elem (edb-cur-entry db) (edb-keys-list db))))
    ((stringp new-cur-entry) t)
-   (t (setq new-cur-entry (ebib-cur-entry-key))))
+   (t (setq new-cur-entry (edb-cur-entry ebib-cur-db))))
+  ;; Remove the deleted entry from our bookkeeping lists.
   (setf (edb-keys-list db) (delete entry-key (edb-keys-list db)))
+  (setf ebib-cur-keys-list (delete entry-key ebib-cur-keys-list))
   (setf (edb-marked-entries db) (delete entry-key (edb-marked-entries db)))
-  (setf (edb-cur-entry db) (member new-cur-entry (edb-keys-list db)))
-  (unless (edb-cur-entry db) ; if (edb-cur-entry db) is nil, we deleted the last entry.
-    (setf (edb-cur-entry db) (last (edb-keys-list db)))))
+  ;; if new-cur-entry is NIL, the last entry was deleted.
+  (setf (edb-cur-entry db) (or new-cur-entry (last1 (edb-keys-list db)))))
 
 (defun ebib-remove-key-from-buffer (entry-key)
   "Removes ENTRY-KEY from the index buffer and highlights the current entry."
@@ -2863,7 +2914,7 @@ current entry is not changed."
       (delete-region beg (point))))
   (ebib-execute-when
     ((entries)
-     (ebib-search-key-in-buffer (ebib-cur-entry-key))
+     (ebib-search-key-in-buffer (edb-cur-entry ebib-cur-db))
      (ebib-set-index-highlight))))
 
 (defun ebib-select-and-popup-entry ()
@@ -2886,14 +2937,12 @@ buffer and switch to it."
   "Make the entry at point current."
   (beginning-of-line)
   (let ((beg (point)))
-    (let* ((key (save-excursion
-                  (skip-chars-forward "^ ")
-                  (buffer-substring-no-properties beg (point))))
-           (new-cur-entry (member key (edb-keys-list ebib-cur-db))))
-      (when new-cur-entry
-        (setf (edb-cur-entry ebib-cur-db) new-cur-entry)
-        (ebib-set-index-highlight)
-        (ebib-fill-entry-buffer)))))
+    (let ((key (save-excursion
+                 (skip-chars-forward "^ ")
+                 (buffer-substring-no-properties beg (point)))))
+      (setf (edb-cur-entry ebib-cur-db) key)
+      (ebib-set-index-highlight)
+      (ebib-fill-entry-buffer))))
 
 ;; the exporting functions will have to be redesigned completely. for now (1 Feb
 ;; 2012) we just define a new function ebib-export-entries. in the long run,
@@ -2935,9 +2984,9 @@ a filename is asked to which the entry is appended."
   (ebib-execute-when
     ((real-db entries)
      (if num
-         (ebib-export-to-db num (format "Entry `%s' copied to database %%d." (ebib-cur-entry-key))
+         (ebib-export-to-db num (format "Entry `%s' copied to database %%d." (edb-cur-entry ebib-cur-db))
                             #'(lambda (db)
-                                (let ((entry-key (ebib-cur-entry-key)))
+                                (let ((entry-key (edb-cur-entry ebib-cur-db)))
                                   (if (member entry-key (edb-keys-list db))
                                       (error "Entry key `%s' already exists in database %d" entry-key num)
                                     (ebib-insert-entry entry-key
@@ -2947,13 +2996,13 @@ a filename is asked to which the entry is appended."
                                     ;; if this is the first entry in the target DB,
                                     ;; its CUR-ENTRY must be set!
                                     (when (null (edb-cur-entry db))
-                                      (setf (edb-cur-entry db) (edb-keys-list db)))
+                                      (setf (edb-cur-entry db) (car (edb-keys-list db))))
                                     t)))) ; we must return T, WHEN does not always do this.
-       (ebib-export-to-file (format "Export `%s' to file: " (ebib-cur-entry-key))
-                            (format "Entry `%s' exported to %%s." (ebib-cur-entry-key))
+       (ebib-export-to-file (format "Export `%s' to file: " (edb-cur-entry ebib-cur-db))
+                            (format "Entry `%s' exported to %%s." (edb-cur-entry ebib-cur-db))
                             #'(lambda ()
                                 (insert "\n")
-                                (ebib-format-entry (ebib-cur-entry-key) ebib-cur-db t)))))
+                                (ebib-format-entry (edb-cur-entry ebib-cur-db) ebib-cur-db t)))))
     ((default)
      (beep))))
 
@@ -2977,7 +3026,7 @@ a filename is asked to which the entry is appended."
                     (edb-marked-entries ebib-cur-db))
               ;; if the target DB was empty before, its CUR-ENTRY must be set!
               (when (null (edb-cur-entry db))
-                (setf (edb-cur-entry db) (edb-keys-list db)))
+                (setf (edb-cur-entry db) (car (edb-keys-list db))))
               t))         ; we must return T, WHEN does not always do this.
        (ebib-export-to-file "Export to file: " "Entries exported to %s."
                             #'(lambda ()
@@ -2991,7 +3040,8 @@ a filename is asked to which the entry is appended."
 (defun ebib-search ()
   "Search the current Ebib database.
 The search is conducted with STRING-MATCH and can therefore be a
-regexp. Searching starts with the current entry."
+regexp. Searching starts with the current entry. In a filtered
+database, only the visible entries are searched."
   (interactive)
   (ebib-execute-when
     ((entries)
@@ -3000,7 +3050,7 @@ regexp. Searching starts with the current entry."
            (setq ebib-search-string search-str)
            ;; first we search the current entry
            (if (ebib-search-in-entry ebib-search-string
-                                     (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db))
+                                     (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db))
                (ebib-fill-entry-buffer ebib-search-string)
              ;; if the search string wasn't found in the current entry, we continue searching.
              (ebib-search-next)))))
@@ -3011,13 +3061,14 @@ regexp. Searching starts with the current entry."
   "Searches the next occurrence of `ebib-search-string'.
 Searching starts at the entry following the current entry. If a
 match is found, the matching entry is shown and becomes the new
-current entry."
+current entry. If a filter is active, only the visible entries
+are searched."
   (interactive)
   (ebib-execute-when
     ((entries)
      (if (null ebib-search-string)
          (message "No search string")
-       (let ((cur-search-entry (cdr (edb-cur-entry ebib-cur-db))))
+       (let ((cur-search-entry (cdr (member (edb-cur-entry ebib-cur-db) ebib-cur-keys-list))))
          (while (and cur-search-entry
                      (null (ebib-search-in-entry ebib-search-string
                                                  (gethash (car cur-search-entry)
@@ -3025,10 +3076,10 @@ current entry."
            (setq cur-search-entry (cdr cur-search-entry)))
          (if (null cur-search-entry)
              (message (format "`%s' not found" ebib-search-string))
-           (setf (edb-cur-entry ebib-cur-db) cur-search-entry)
+           (setf (edb-cur-entry ebib-cur-db) (car cur-search-entry))
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
              (goto-char (point-min))
-             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+             (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
              (beginning-of-line)
              (ebib-set-index-highlight)
              (ebib-fill-entry-buffer ebib-search-string))))))
@@ -3237,7 +3288,7 @@ argument."
   (ebib-execute-when
     ((entries)
      (let ((urls (to-raw (gethash ebib-standard-url-field
-                                  (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+                                  (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db)))))
        (if urls
            (ebib-call-browser urls num)
          (error "Field `%s' is empty" ebib-standard-url-field))))
@@ -3255,7 +3306,7 @@ sent to the browser."
   (ebib-execute-when
    ((entries)
     (let ((doi (to-raw (gethash ebib-standard-doi-field
-                                (ebib-retrieve-entry (ebib-cur-entry-key) ebib-cur-db)))))
+                                (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db)))))
       (if doi
           (ebib-call-browser (format ebib-doi-url doi))
         (error "No DOI found in field `%s'" ebib-standard-doi-field))))
@@ -3296,7 +3347,7 @@ argument can be used to specify which file to choose."
   (ebib-execute-when
     ((entries)
      (let ((filename (to-raw (car (ebib-get-field-value ebib-standard-file-field
-                                                        (ebib-cur-entry-key))))))
+                                                        (edb-cur-entry ebib-cur-db))))))
        (if filename
            (ebib-call-file-viewer filename num)
          (error "Field `%s' is empty" ebib-standard-file-field))))
@@ -3333,49 +3384,182 @@ opened. If N is NIL, the user is asked to enter a number."
               (find-file file-full-path)))
         (error "File not found: `%s'" file-full-path)))))
 
-(defun ebib-virtual-db-and (not)
-  "Filters entries into a virtual database.
-If the current database is a virtual database already, perform a
-logical AND on the entries."
+(defun ebib-filters-logical-and (not)
+  "Filter the current database.
+If the current database is filtered already, perform a logical
+AND on the entries."
   (interactive "p")
   (ebib-execute-when
     ((entries)
-     (ebib-filter-to-virtual-db 'and not))
-    ((default)
-     (beep))))
-
-(defun ebib-virtual-db-or (not)
-  "Filters entries into a virtual database.
-If the current database is a virtual database already, perform a
-logical OR with the entries in the original database."
-  (interactive "p")
-  (ebib-execute-when
-    ((entries)
-     (ebib-filter-to-virtual-db 'or not))
-    ((default)
-     (beep))))
-
-(defun ebib-virtual-db-not ()
-  "Negates the current virtual database."
-  (interactive)
-  (ebib-execute-when
-    ((virtual-db)
-     (setf (edb-virtual ebib-cur-db)
-           (if (eq (car (edb-virtual ebib-cur-db)) 'not)
-               (cadr (edb-virtual ebib-cur-db))
-             `(not ,(edb-virtual ebib-cur-db))))
-     (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
+     (ebib-filters-create-filter 'and not)
      (ebib-redisplay))
     ((default)
      (beep))))
 
-(defun ebib-filter-to-virtual-db (bool not)
-  "Filters the current database to a virtual database.
+(defun ebib-filters-logical-or (not)
+  "Filter the current database.
+If the current database is filtered already, perform a logical OR
+on the entries."
+  (interactive "p")
+  (ebib-execute-when
+    ((entries)
+     (ebib-filters-create-filter 'or not)
+     (ebib-redisplay))
+    ((default)
+     (beep))))
+
+(defun ebib-filters-logical-not ()
+  "Negate the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (setf (edb-filter ebib-cur-db)
+           (if (eq (car (edb-filter ebib-cur-db)) 'not)
+               (cadr (edb-filter ebib-cur-db))
+             `(not ,(edb-filter ebib-cur-db))))
+     (ebib-redisplay))
+    ((default)
+     (beep))))
+
+(defun ebib-filters-view-filter ()
+  "Display the currently active filter in the minibuffer."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (message (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
+    ((default)
+     (error "No filter is active"))))
+
+(defun ebib-filters-view-all-filters ()
+  "Display all filters in a *Help* buffer."
+  (interactive)
+  (with-help-window (help-buffer)
+    (let ((print-length nil)
+          (print-level nil)
+          (print-circle nil))
+      (princ "Currently stored filters:\n\n")
+      (if ebib-filters-alist
+          (pp ebib-filters-alist)
+        (princ "None.")))))
+
+(defun ebib-filters-reapply-filter ()
+  "Reapply the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (ebib-redisplay))
+    ((default)
+     (error "No filter is active"))))
+
+(defun ebib-filters-cancel-filter ()
+  "Cancel the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (setf (edb-filter ebib-cur-db) nil)
+     (ebib-redisplay)
+     (message "Filter cancelled"))
+    ((default)
+     (beep))))
+
+(defun ebib-filters-select-filter (prompt)
+  "Select a filter from the saved filters.
+Return the filter as a list (NAME FILTER)."
+  (if (not ebib-filters-alist)
+      (error "No stored filters")
+    (let* ((completing-ignore-case ebib-filters-ignore-case)
+           (name (completing-read prompt
+                                  (sort (copy-alist ebib-filters-alist)
+                                        #'(lambda (x y) (string-lessp (car x) (car y))))
+                                  nil t)))
+      (ebib-filters-get-filter name))))
+
+(defun ebib-filters-rename-filter ()
+  "Rename a filter."
+  (interactive)
+  (let ((filter (ebib-filters-select-filter "Rename filter: "))
+        (new-name (read-from-minibuffer "Enter new name: ")))
+    (if (ebib-filters-exists-p new-name)
+        (error (format "A filter named `%s' already exists" new-name))
+      (setcar filter new-name))))
+
+(defun ebib-filters-store-filter ()
+  "Store the current filter."
+  (interactive)
+  (ebib-execute-when
+    ((filtered-db)
+     (let ((name (read-from-minibuffer "Enter filter name: ")))
+       (when (or (not (ebib-filters-exists-p name))
+                 (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
+         (ebib-filters-add-filter name (edb-filter ebib-cur-db) 'overwrite)
+         (message "Filter stored."))))
+    ((default)
+     (beep))))
+
+(defun ebib-filters-apply-filter ()
+  "Select a filter and apply it to the current database."
+  (interactive)
+  (ebib-execute-when
+    ((real-db)
+     (let ((filter (ebib-filters-select-filter "Apply filter: ")))
+       (when filter
+           (setf (edb-filter ebib-cur-db) (cadr filter))
+           (ebib-redisplay))))
+    ((filtered-db)
+     (error "A stored filter can only be applied to a real database"))))
+
+(defun ebib-filters-delete-filter ()
+  "Delete a filter from the stored filters."
+  (interactive)
+  (let ((filter (ebib-filters-select-filter "Delete filter: ")))
+    (when filter
+        (setq ebib-filters-alist (delq filter ebib-filters-alist))
+    (message "Filter %s deleted" (car filter)))))
+
+(defun ebib-filters-delete-all-filters ()
+  "Delete all stored filters."
+  (interactive)
+  (setq ebib-filters-alist nil)
+  (message "All stored filters deleted."))
+
+(defun ebib-filters-load-from-file (file)
+  "Read filters from FILE.
+If there are stored filters, ask whether they should be
+overwritten en bloc or whether the new filters should be
+appended."
+  (interactive "fRead filters from file: ")
+  (setq file (expand-file-name file))
+  (setq ebib-log-error nil)
+  (let ((overwrite
+         (if ebib-filters-alist
+             (eq ?o (read-char-choice "There are stored filters: (o)verwrite/(a)ppend? " '(?o ?a))))))
+    (ebib-filters-load-file file overwrite))
+  (if (and ebib-log-error
+           (= ebib-log-error 0))
+      (message "No filters found in %s" file)
+    (message "Filters loaded from %s" file)))
+
+(defun ebib-filters-save-filters ()
+  "Save all filters in `ebib-filters-default-file'.
+If there are no stored filters, the filter file is deleted."
+  (interactive)
+  (ebib-filters-update-filters-file))
+
+(defun ebib-filters-write-to-file ()
+  "Write filters to FILE."
+  (interactive)
+  (if (not ebib-filters-alist)
+      (message "No stored filters")
+    (let ((file (read-file-name "Save filters to file: ")))
+      (ebib-filters-save-file file))))
+
+(defun ebib-filters-create-filter (bool not)
+  "Create a filter interactively and store it in the current database.
 BOOL is the operator to be used, either `and' or `or'. If NOT<0,
 a logical `not' is applied to the selection."
-  (let ((field (completing-read (format "Filter: %s(contains <field> <search string>)%s. Enter field: "
-                                        (if (< not 0) "(not " "")
-                                        (if (< not 0) ")" ""))
+  (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
+                                        (if (< not 0) "not " "")
+                                        (if (< not 0) "" ""))
                                 (append  (list '("any" . 0)
                                                '("type*" . 0))
                                          (mapcar #'(lambda (x)
@@ -3383,73 +3567,142 @@ a logical `not' is applied to the selection."
                                                  (append ebib-unique-field-list ebib-additional-fields)))
                                 nil t nil 'ebib-field-history)))
     (setq field (intern-soft field))
-    (let* ((prompt (format "Filter: %s(contains %s <search string>)%s. Enter %s: "
-                                       (if (< not 0) "(not " "")
+    (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
+                                       (if (< not 0) "not " "")
                                        field
-                                       (if (< not 0) ")" "")
+                                       (if (< not 0) "" "")
                                        (if (string= field "type*") "entry type" "regexp")))
-           (regexp (if (string= field "type*")
-                       (completing-read prompt ebib-entry-types nil t nil 'ebib-filter-history)
-                     (read-string prompt nil 'ebib-filter-history))))
+           (regexp (cond
+                    ((string= field "type*")
+                     (completing-read prompt ebib-entry-types nil t nil 'ebib-filters-history))
+                    ((string= field "keywords")
+                     (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keyword-history))
+                    (t
+                     (read-string prompt nil 'ebib-filters-history)))))
       (ebib-execute-when
-        ((virtual-db)
-         (setf (edb-virtual ebib-cur-db) `(,bool ,(edb-virtual ebib-cur-db)
+        ((filtered-db)
+         (setf (edb-filter ebib-cur-db) `(,bool ,(edb-filter ebib-cur-db)
                                                  ,(if (>= not 0)
                                                       `(contains ,field ,regexp)
                                                     `(not (contains ,field ,regexp))))))
         ((real-db)
-         (setq ebib-cur-db (ebib-create-virtual-db field regexp not))))
-      (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
-      (ebib-redisplay))))
-
-(defun ebib-create-virtual-db (field regexp not)
-  "Creates a virtual database based on `ebib-cur-db'."
-  ;; a virtual database is a database whose edb-virtual field contains an
-  ;; expression that selects entries. this function only sets that
-  ;; expression, it does not actually filter the entries.
-  (let ((new-db (ebib-create-new-database ebib-cur-db)))
-    (setf (edb-virtual new-db) (if (>= not 0)
+         (setf (edb-filter ebib-cur-db) (if (>= not 0)
                                    `(contains ,field ,regexp)
-                                 `(not (contains ,field ,regexp))))
-    (setf (edb-filename new-db) nil)
-    (setf (edb-name new-db) (concat "V:" (edb-name new-db)))
-    (setf (edb-modified new-db) nil)
-    (setf (edb-make-backup new-db) nil)
-    new-db))
+                                 `(not (contains ,field ,regexp)))))))))
 
-(defun ebib-run-filter (filter db)
-  "Runs FILTER on DB"
+(defun ebib-filters-run-filter (db)
+  "Run the filter of DB.
+Return a list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
-  (setq filter `(cl-macrolet ((contains (field regexp)
-                                        `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
-                  ,filter))
-  (setf (edb-keys-list db)
-        (sort (let ((result nil))
-                (maphash #'(lambda (key value)
-                             (let ((entry value))
-                               (when (eval filter)
-                                 (setq result (cons key result)))))
-                         (edb-database db))
-                result)
-              'string<))
-  (setf (edb-cur-entry db) (edb-keys-list db)))
+  (let ((filter `(cl-macrolet ((contains (field regexp)
+                                         `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
+                   ,(edb-filter db))))
+    (sort (let ((result nil))
+            (maphash #'(lambda (key value)
+                         (let ((entry value))
+                           (when (eval filter)
+                             (setq result (cons key result)))))
+                     (edb-database db))
+            result)
+          'string<)))
 
-(defun ebib-print-filter (num)
-  "Displays the filter of the current virtual database.
-With any prefix argument, reapplies the filter to the
-database. This can be useful when the source database was
-modified."
-  (interactive "P")
-  (ebib-execute-when
-    ((virtual-db)
-     (when num
-       (ebib-run-filter (edb-virtual ebib-cur-db) ebib-cur-db)
-       (ebib-redisplay))
-     (message "%S" (edb-virtual ebib-cur-db)))
-    ((default)
-     (beep))))
+(defun ebib-filters-pp-filter (filter)
+  "Convert FILTER into a string in infix notation."
+  (if ebib-filters-display-as-lisp
+      (format "%S" (edb-filter ebib-cur-db))
+    (let ((pp-filter (ebib-filters-pp-filter-helper filter)))
+      (string-match "\\`(\\(.*\\))\\'" pp-filter)
+      (match-string 1 pp-filter))))
+
+(defun ebib-filters-pp-filter-helper (filter)
+  "Helper function for `ebib-filters-pp-filter'."
+  (cond
+   ((listp filter)
+    (let ((op (first filter)))
+      (cond
+       ((eq op 'not)
+        (format "not %s" (ebib-filters-pp-filter-helper (second filter))))
+       ((member op '(and or contains))
+        (format "(%s %s %s)" (ebib-filters-pp-filter-helper (second filter)) op (ebib-filters-pp-filter-helper (third filter)))))))
+   ((stringp filter)
+    (format "\"%s\"" filter))
+   ((symbolp filter)
+    (format "%s" filter))))
+
+(defun ebib-filters-read-from-buffer ()
+  "Read a filters alist from the current buffer.
+Return the alist as a list object."
+  (goto-char (point-min))
+  (when (search-forward "(" nil t)
+    (forward-char -1)
+    (read (current-buffer))))
+
+(defun ebib-filters-load-file (file &optional overwrite)
+  "Load filters from FILE.
+If OVERWRITE in non-NIL, the existing filters are discarded.
+Otherwise the new filters are added to the existing ones, unless
+there is a name conflict."
+  (when (file-readable-p file)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (goto-char (point-min))
+      (let ((flist (ebib-filters-read-from-buffer)))
+        (if (not (listp flist))
+            (ebib-log 'warning "No filters found in %s" file)
+          (ebib-log 'log "%s: Loading filters from file %s." (format-time-string "%d %b %Y, %H:%M:%S") file)
+          (if overwrite
+              (setq ebib-filters-alist nil))
+          (mapc #'(lambda (filter)
+                    (ebib-filters-add-filter (car filter) (cadr filter)))
+                flist))))))
+
+(defun ebib-filters-save-file (file)
+  "Write `ebib-filters-alist' to FILE"
+  (with-temp-buffer
+    (let ((print-length nil)
+          (print-level nil)
+          (print-circle nil))
+      (insert ";; -*- mode: emacs-lisp -*-\n\n")
+      (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
+      (pp ebib-filters-alist (current-buffer))
+      (condition-case nil ;; TODO I should use this for the keywords file as well, so that ebib-quit doesn't terminate prematurely.
+	  (write-region (point-min) (point-max) file)
+	(file-error (message "Can't write %s" file))))))
+
+(defun ebib-filters-update-filters-file ()
+  "Update the filters file.
+If there are stored filters, they are saved to
+`ebib-filters-default-file', otherwise this file is deleted."
+  (if ebib-filters-alist
+      (ebib-filters-save-file ebib-filters-default-file)
+    (condition-case nil
+        (when (file-exists-p ebib-filters-default-file)
+          (delete-file ebib-filters-default-file delete-by-moving-to-trash)
+          (message "Filter file %s deleted." ebib-filters-default-file))
+      (file-error (message "Can't delete %s" ebib-filters-default-file)))))
+
+(defun ebib-filters-add-filter (name filter &optional overwrite)
+  "Add FILTER under NAME in `ebib-filters-alist'.
+If a filter with NAME already exists, the filter is not added."
+  (if (ebib-filters-exists-p name)
+      (if overwrite
+          (setcdr (ebib-filters-get-filter name) (list filter))
+        (ebib-log 'message "Filter name conflict: \"%s\"." name))
+    (push (list name filter) ebib-filters-alist)))
+
+(defun ebib-filters-get-filter (name &optional noerror)
+  "Return the filter record corresponding to NAME.
+Return a list (NAME FILTER) if found. If there is no
+filter named NAME, raise an error, unless NOERROR is non-NIL."
+  (or (assoc-string name ebib-filters-alist ebib-filters-ignore-case)
+      (unless noerror
+        (error "Invalid filter %s" name))))
+
+(defun ebib-filters-exists-p (name)
+  "Return non-NIL if a filter with NAME already exists."
+  (assoc-string name ebib-filters-alist ebib-filters-ignore-case))
 
 (defun ebib-show-log ()
   "Displays the contents of the log buffer."
@@ -3533,13 +3786,13 @@ The user is prompted for the buffer to push the entry into."
                                               (if separator separator (read-from-minibuffer "Separator: ")))
                                    (ebib-create-citation-command after)))
                           (t        ; otherwise just take the current entry
-                           (ebib-create-citation-command (concat before repeater after) (ebib-cur-entry-key)))))
+                           (ebib-create-citation-command (concat before repeater after) (edb-cur-entry ebib-cur-db)))))
                      (if (edb-marked-entries ebib-cur-db) ; if the user doesn't provide a command
                          (mapconcat #'(lambda (key) ; we just insert the entry key or keys
                                         key)
                                     (edb-marked-entries ebib-cur-db)
                                     (read-from-minibuffer "Separator: "))
-                       (ebib-cur-entry-key)))))
+                       (edb-cur-entry ebib-cur-db)))))
              (when citation-command
                (with-current-buffer buffer
                  (insert citation-command))
@@ -3621,7 +3874,7 @@ automatically generated using BIBTEX-GENERATE-AUTOKEY."
     (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
-  (if (equal (ebib-cur-entry-key) "<new-entry>")
+  (if (equal (edb-cur-entry ebib-cur-db) "<new-entry>")
       (ebib-generate-autokey)))
 
 (defun ebib-find-visible-field (field direction)
@@ -3874,7 +4127,7 @@ The field may contain multiple filenames, in which case the
 prefix argument can be used to specify which file is to be
 viewed."
   (interactive "P")
-  (let ((files (to-raw (car (ebib-get-field-value ebib-current-field (ebib-cur-entry-key))))))
+  (let ((files (to-raw (car (ebib-get-field-value ebib-current-field (edb-cur-entry ebib-cur-db))))))
     (if files
         (ebib-call-file-viewer files num)
       (error "Field `%s' is empty" ebib-current-field))))
@@ -3883,7 +4136,7 @@ viewed."
   "Copies the contents of the current field to the kill ring."
   (interactive)
   (unless (eq ebib-current-field 'type*)
-    (let ((contents (car (ebib-get-field-value ebib-current-field (ebib-cur-entry-key)))))
+    (let ((contents (car (ebib-get-field-value ebib-current-field (edb-cur-entry ebib-cur-db)))))
       (when (stringp contents)
         (kill-new contents)
         (message "Field contents copied.")))))
@@ -4406,31 +4659,28 @@ that was active when Ebib was lowered. Works on the whole buffer,
 or on the region if it is active."
   (interactive)
   (if (not ebib-cur-db)
-      (error "No database loaded. Use `o' to open a database")
-    (if (edb-virtual ebib-cur-db)
-        (error "Cannot import to a virtual database")
-      (with-syntax-table ebib-syntax-table
-        (save-excursion
-          (save-restriction
-            (if (region-active)
-                (narrow-to-region (region-beginning)
-                                  (region-end)))
-            (let ((buffer (current-buffer)))
-              (with-temp-buffer
-                (insert-buffer-substring buffer)
-                (let ((n (ebib-find-bibtex-entries ebib-cur-db t)))
-                  (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
-                  (when (edb-strings-list ebib-cur-db)
-                    (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<)))
-                  (setf (edb-cur-entry ebib-cur-db) (edb-keys-list ebib-cur-db))
-                  (ebib-redisplay)
-                  (ebib-set-modified t)
-                  (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
-                                   (car n)
-                                   (cadr n)
-                                   (if (caddr n)
-                                       "a"
-                                     "no"))))))))))))
+      (error "No database loaded")
+    (with-syntax-table ebib-syntax-table
+      (save-excursion
+        (save-restriction
+          (if (region-active)
+              (narrow-to-region (region-beginning)
+                                (region-end)))
+          (let ((buffer (current-buffer)))
+            (with-temp-buffer
+              (insert-buffer-substring buffer)
+              (let ((n (ebib-find-bibtex-entries ebib-cur-db t)))
+                (setf (edb-keys-list ebib-cur-db) (sort (edb-keys-list ebib-cur-db) 'string<))
+                (when (edb-strings-list ebib-cur-db)
+                  (setf (edb-strings-list ebib-cur-db) (sort (edb-strings-list ebib-cur-db) 'string<))) 
+                (ebib-redisplay)
+                (ebib-set-modified t)
+                (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
+                                 (car n)
+                                 (cadr n)
+                                 (if (caddr n)
+                                     "a"
+                                   "no")))))))))))
 
 (defun ebib-get-db-from-filename (filename)
   "Returns the database struct associated with FILENAME."
