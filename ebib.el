@@ -428,7 +428,7 @@ entry-specific inheritances, the latter override the former."
                   (cadr entry))
             (mapc #'(lambda (field)
                       (add-to-listq ebib-unique-field-list field t 'eq))
-                  (caddr entry)))
+                  (cl-caddr entry)))
         value))
 
 (defcustom ebib-entry-types
@@ -1593,7 +1593,7 @@ keywords and the third the keywords added in this session."
         (ebib-keywords-save-to-file lst)
         ;; now move the new keywords to the list of existing keywords
         (setf (cadr lst) (append (second lst) (third lst)))
-        (setf (caddr lst) nil)))))
+        (setf (cl-caddr lst) nil)))))
 
 (defun ebib-keywords-save-cur-db ()
   "Save new keywords for the current database."
@@ -2077,7 +2077,7 @@ This function adds a newline to the message being logged."
                 (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                           (car result)
                           (cadr result)
-                          (if (caddr result)
+                          (if (cl-caddr result)
                               "a"
                             "no")))))
         ;; if the file does not exist, we need to issue a message.
@@ -2117,7 +2117,7 @@ This function adds a newline to the message being logged."
               (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                         (car n)
                         (cadr n)
-                        (if (caddr n)
+                        (if (cl-caddr n)
                             "a"
                           "no"))
               (when ebib-log-error
@@ -4394,7 +4394,7 @@ or on the region if it is active."
                   (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
                                    (car n)
                                    (cadr n)
-                                   (if (caddr n)
+                                   (if (cl-caddr n)
                                        "a"
                                      "no"))))))))))))
 
