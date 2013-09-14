@@ -46,13 +46,13 @@
 ;; found at <https://github.com/joostkremers/ebib>.
 
 ;; Code:
-
 (eval-when-compile
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
         (require 'cl)
         (defalias 'cl-caddr 'caddr)
         (defalias 'cl-defstruct 'defstruct)
+        (defalias 'cl-do 'do)
         (defalias 'cl-flet 'flet)
         (defalias 'cl-loop 'loop)
         (defalias 'cl-macrolet 'macrolet)
@@ -681,7 +681,7 @@ REMOVE can be a regex."
 (defun in-string (char string)
   "Returns T if CHAR is in STRING, otherwise NIL."
   (catch 'found
-    (do ((len (length string))
+    (cl-do ((len (length string))
          (i 0 (1+ i)))
         ((= i len) nil)
       (if (eq char (aref string i))
@@ -851,7 +851,7 @@ the result."
 The return value is a list of two elements: the first is the
 modified string, the second either t or nil, indicating whether a
 match was found at all."
-  (do ((counter 0 (match-end 0)))
+  (cl-do ((counter 0 (match-end 0)))
       ((not (string-match match-str string counter)) (values string (not (= counter 0))))
     (add-text-properties (match-beginning 0) (match-end 0) '(face highlight) string)))
 
