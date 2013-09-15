@@ -550,7 +550,7 @@ entry-specific inheritances, the latter override the former."
 (defvar ebib-filters-history nil "Minibuffer history for filters.")
 (defvar ebib-cite-command-history nil "Minibuffer history for citation commands.")
 (defvar ebib-key-history nil "Minibuffer history for entry keys.")
-(defvar ebib-keyword-history nil "Minibuffer history for keywords.")
+(defvar ebib-keywords-history nil "Minibuffer history for keywords.")
 
 (defvar ebib-saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib-window-before nil "The window that was active when Ebib was called.")
@@ -3578,7 +3578,7 @@ a logical `not' is applied to the selection."
                     ((string= field "type*")
                      (completing-read prompt ebib-entry-types nil t nil 'ebib-filters-history))
                     ((string= field "keywords")
-                     (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keyword-history))
+                     (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keywords-history))
                     (t
                      (read-string prompt nil 'ebib-filters-history)))))
       (ebib-execute-when
@@ -4012,7 +4012,7 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
   ;; emacs 23.1, this function is not available.
   (let ((minibuffer-local-completion-map `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
         (collection (ebib-keywords-for-database ebib-cur-db)))
-    (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keyword-history)
+    (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keywords-history)
              until (string= keyword "")
              do (let* ((conts (to-raw (gethash 'keywords ebib-cur-entry-hash)))
                        (new-conts (if conts
