@@ -59,6 +59,7 @@
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
         (defalias 'cl-multiple-value-setq 'multiple-value-setq)
         (defalias 'cl-remove 'remove*)
+        (defalias 'cl-remove-if-not 'remove-if-not)
         (defalias 'cl-second 'second)
         (defalias 'cl-third 'third)
         (defalias 'cl-values 'values))
@@ -1683,10 +1684,7 @@ Optional argument DB specifies the database to check for."
              (lst (assoc dir ebib-keywords-files-alist)))
         (if (cl-third lst)
             lst))
-    (delq nil (mapcar #'(lambda (elt) ; this would be easier with cl-remove
-                          (if (cl-third elt)
-                              elt))
-                      ebib-keywords-files-alist))))
+    (cl-remove-if-not #'cl-third ebib-keywords-files-alist)))
 
 (defun ebib-keywords-save-all-new ()
   "Check if new keywords were added during the session and save them as required."
