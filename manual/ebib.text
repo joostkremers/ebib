@@ -974,7 +974,7 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 
 ### Keywords File ###
 
-**Default value**: `""`.\
+**Default value**: `nil`.\
 
 \noindent File to save keywords in. This can be a single file for all `.bib` files, or a separate keyword file for each directory containing `.bib` files. In the former case, provide a full filepath, in the latter case, a single filename without path.
 

@@ -352,14 +352,15 @@ Each string is added to the preamble on a separate line."
   :group 'ebib
   :type '(repeat (string :tag "Keyword")))
 
-(defcustom ebib-keywords-file ""
+(defcustom ebib-keywords-file nil
   "Single or generic file name for storing keywords.
 Keywords can be stored in a single keywords file, which is used
 for all .bib files, or in per-directory keywords files located in
 the same directories as the .bib files.  In the latter case, the
 keywords file should specify just the generic name and no path."
   :group 'ebib
-  :type '(choice (file :tag "Use single keywords file")
+  :type '(choice (const :tag "Do not use keywords file" nil)
+                 (file :tag "Use single keywords file")
                  (string :value "ebib-keywords.txt" :tag "Use per-directory keywords file")))
 
 (defcustom ebib-keywords-file-save-on-exit 'ask
@@ -1599,7 +1600,7 @@ Moves point to the first character of the key and returns point."
 
 (defun ebib-keywords-load-keywords (db)
   "Check if there is a keywords file for DB and make sure it is loaded."
-  (unless (or (string= ebib-keywords-file "")
+  (unless (or (not ebib-keywords-file)
               (file-name-directory ebib-keywords-file))
     (let ((dir (expand-file-name (file-name-directory (edb-filename db)))))
       (if dir
@@ -1612,7 +1613,7 @@ Moves point to the first character of the key and returns point."
 
 (defun ebib-keywords-add-keyword (keyword db)
   "Add KEYWORD to the list of keywords for DB."
-  (if (string= ebib-keywords-file "")        ; only the general list exists
+  (if (not ebib-keywords-file)        ; only the general list exists
       (add-to-list 'ebib-keywords-list-per-session keyword t)
     (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
                    (file-name-directory (edb-filename db)))))    ; per-directory keywords files
@@ -1622,7 +1623,7 @@ Moves point to the first character of the key and returns point."
   "Return the list of keywords for database DB.
 When the keywords come from a file, add the keywords in
 `ebib-keywords-list', unless `ebib-keywords-use-only-file' is set."
-  (if (string= ebib-keywords-file "")        ; only the general list exists
+  (if (not ebib-keywords-file)        ; only the general list exists
       ebib-keywords-list-per-session
     (let* ((dir (or (file-name-directory ebib-keywords-file)     ; a single keywords file
                     (file-name-directory (edb-filename db))))    ; per-directory keywords files
