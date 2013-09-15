@@ -46,18 +46,22 @@
 ;; found at <https://github.com/joostkremers/ebib>.
 
 ;; Code:
-
 (eval-when-compile
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
         (require 'cl)
+        (defalias 'cl-caddr 'caddr)
         (defalias 'cl-defstruct 'defstruct)
-        (defalias 'cl-remove 'remove*)
+        (defalias 'cl-do 'do)
         (defalias 'cl-flet 'flet)
         (defalias 'cl-loop 'loop)
-        (defalias 'cl-caddr 'caddr)
+        (defalias 'cl-macrolet 'macrolet)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
-        (defalias 'cl-macrolet 'macrolet))
+        (defalias 'cl-multiple-value-setq 'multiple-value-setq)
+        (defalias 'cl-remove 'remove*)
+        (defalias 'cl-second 'second)
+        (defalias 'cl-third 'third)
+        (defalias 'cl-values 'values))
     (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
@@ -446,7 +450,7 @@ entry-specific inheritances, the latter override the former."
                   (cadr entry))
             (mapc #'(lambda (field)
                       (add-to-listq ebib-unique-field-list field t 'eq))
-                  (caddr entry)))
+                  (cl-caddr entry)))
         value))
 
 (defcustom ebib-entry-types
@@ -702,7 +706,7 @@ REMOVE can be a regex."
 (defun in-string (char string)
   "Returns T if CHAR is in STRING, otherwise NIL."
   (catch 'found
-    (do ((len (length string))
+    (cl-do ((len (length string))
          (i 0 (1+ i)))
         ((= i len) nil)
       (if (eq char (aref string i))
@@ -872,8 +876,8 @@ the result."
 The return value is a list of two elements: the first is the
 modified string, the second either t or nil, indicating whether a
 match was found at all."
-  (do ((counter 0 (match-end 0)))
-      ((not (string-match match-str string counter)) (values string (not (= counter 0))))
+  (cl-do ((counter 0 (match-end 0)))
+      ((not (string-match match-str string counter)) (cl-values string (not (= counter 0))))
     (add-text-properties (match-beginning 0) (match-end 0) '(face highlight) string)))
 
 (defun looking-at-goto-end (str &optional match)
@@ -1223,9 +1227,9 @@ overlay is not moved.  FIELD must be a symbol."
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
     (if (eq field 'type*)
         (goto-char (point-min))
-      (multiple-value-bind (fn start limit) (if (>= direction 0)
-                                                (values 're-search-forward (point-min) (point-max))
-                                              (values 're-search-backward (point-max) (point-min)))
+      (cl-multiple-value-bind (fn start limit) (if (>= direction 0)
+                                                (cl-values 're-search-forward (point-min) (point-max))
+                                              (cl-values 're-search-backward (point-max) (point-min)))
         ;; make sure we can get back to our original position, if the field
         ;; cannot be found in the buffer:
         (let ((current-pos (point)))
@@ -1262,12 +1266,12 @@ If DB is nil, it defaults to the current database."
            (if (stringp val)
                (setq val (copy-sequence val)))
            (if val
-               (values val nil)))
+               (cl-values val nil)))
          (let ((xref (ebib-retrieve-entry (to-raw (gethash 'crossref entry)) db)))
            (if xref
              (let ((entry-type (gethash 'type* entry)))
-               (values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
-      (values nil nil))))
+               (cl-values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
+      (cl-values nil nil))))
 
 (defun ebib-get-xref-field (field entry-type)
   "Return the field from which FIELD inherits in ENTRY-TYPE.
@@ -1306,7 +1310,7 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
           (setq raw "*")
         (setq string (to-raw string))) ; we have to make the string look nice
       (when match-str
-        (multiple-value-setq (string matched) (match-all match-str string)))
+        (cl-multiple-value-setq (string matched) (match-all match-str string)))
       (when (multiline-p string)
         ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
         ;; multiline is local and therefore the object it refers to should
@@ -1611,7 +1615,7 @@ Moves point to the first character of the key and returns point."
       (add-to-list 'ebib-keywords-list-per-session keyword t)
     (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
                    (file-name-directory (edb-filename db)))))    ; per-directory keywords files
-      (push keyword (third (assoc dir ebib-keywords-files-alist))))))
+      (push keyword (cl-third (assoc dir ebib-keywords-files-alist))))))
 
 (defun ebib-keywords-for-database (db)
   "Return the list of keywords for database DB.
@@ -1622,7 +1626,7 @@ When the keywords come from a file, add the keywords in
     (let* ((dir (or (file-name-directory ebib-keywords-file)     ; a single keywords file
                     (file-name-directory (edb-filename db))))    ; per-directory keywords files
            (lst (assoc dir ebib-keywords-files-alist)))
-      (append (second lst) (third lst)))))
+      (append (cl-second lst) (cl-third lst)))))
 
 (defun ebib-keywords-get-file (db)
   "Return the name of the keywords file for DB."
@@ -1643,7 +1647,7 @@ keywords and the third the keywords added in this session."
         (with-temp-buffer
           (mapc #'(lambda (keyword)
                     (insert (format "%s\n" keyword)))
-                (append (second keyword-file-descr) (third keyword-file-descr)))
+                (append (cl-second keyword-file-descr) (cl-third keyword-file-descr)))
           (write-region (point-min) (point-max) file))
       (ebib-log 'warning "Could not write to keyword file `%s'" file))))
 
@@ -1652,14 +1656,14 @@ keywords and the third the keywords added in this session."
   (unless (edb-filter db) ; filtered databases don't get new keywords
     (let ((lst (ebib-keywords-new-p db))
           (file (ebib-keywords-get-file db)))
-      (when (and (third lst)            ; if there are new keywords
+      (when (and (cl-third lst)            ; if there are new keywords
                  (or (eq ebib-keywords-file-save-on-exit 'always)
                      (and (eq ebib-keywords-file-save-on-exit 'ask)
                           (y-or-n-p "New keywords have been added. Save "))))
         (ebib-keywords-save-to-file lst)
         ;; now move the new keywords to the list of existing keywords
-        (setf (cadr lst) (append (second lst) (third lst)))
-        (setf (caddr lst) nil)))))
+        (setf (cadr lst) (append (cl-second lst) (cl-third lst)))
+        (setf (cl-caddr lst) nil)))))
 
 (defun ebib-keywords-save-cur-db ()
   "Save new keywords for the current database."
@@ -1677,10 +1681,10 @@ Optional argument DB specifies the database to check for."
       (let* ((dir (or (file-name-directory ebib-keywords-file) ; a single keywords file
                       (file-name-directory (edb-filename db)))) ; per-directory keywords files
              (lst (assoc dir ebib-keywords-files-alist)))
-        (if (third lst)
+        (if (cl-third lst)
             lst))
     (delq nil (mapcar #'(lambda (elt) ; this would be easier with cl-remove
-                          (if (third elt)
+                          (if (cl-third elt)
                               elt))
                       ebib-keywords-files-alist))))
 
@@ -3754,7 +3758,7 @@ after the last instance of REPEATER."
       (setq before (match-string 1 format-string)
             repeater (match-string 2 format-string)
             after (match-string 3 format-string))))
-    (values before repeater separator after)))
+    (cl-values before repeater separator after)))
 
 (defun ebib-push-bibtex-key ()
   "Pushes the current entry to a LaTeX buffer.
@@ -3775,7 +3779,7 @@ The user is prompted for the buffer to push the entry into."
                    (if-str (format-string (cadr (assoc
                                                  (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                  format-list)))
-                       (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+                       (cl-multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                          (cond
                           ((and called-with-prefix ; if there are marked entries and the user wants to push those
                                 (edb-marked-entries ebib-cur-db))
@@ -4770,7 +4774,7 @@ completion works."
                  (if-str (format-string (cadr (assoc
                                                (completing-read "Command to use: " format-list nil nil nil 'ebib-cite-command-history)
                                                format-list)))
-                     (multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
+                     (cl-multiple-value-bind (before repeater separator after) (ebib-split-citation-string format-string)
                        (concat (ebib-create-citation-command before)
                                (ebib-create-citation-command repeater key)
                                (ebib-create-citation-command after)))
