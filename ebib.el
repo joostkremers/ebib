@@ -707,7 +707,7 @@ REMOVE can be a regex."
   "Returns T if CHAR is in STRING, otherwise NIL."
   (catch 'found
     (cl-do ((len (length string))
-         (i 0 (1+ i)))
+            (i 0 (1+ i)))
         ((= i len) nil)
       (if (eq char (aref string i))
           (throw 'found t)))))
@@ -1228,8 +1228,8 @@ overlay is not moved.  FIELD must be a symbol."
     (if (eq field 'type*)
         (goto-char (point-min))
       (cl-multiple-value-bind (fn start limit) (if (>= direction 0)
-                                                (cl-values 're-search-forward (point-min) (point-max))
-                                              (cl-values 're-search-backward (point-max) (point-min)))
+                                                   (cl-values 're-search-forward (point-min) (point-max))
+                                                 (cl-values 're-search-backward (point-max) (point-min)))
         ;; make sure we can get back to our original position, if the field
         ;; cannot be found in the buffer:
         (let ((current-pos (point)))
