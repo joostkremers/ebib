@@ -4793,7 +4793,7 @@ be found."
     ((database)
      (or ebib-local-bibtex-filenames
          (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let ((key (read-string-at-point "\"#%'(),={} \n\t\f")))
+     (let ((key (read-string-at-point "][@\"#%'(),={} \n\t\f")))
        (if (eq ebib-local-bibtex-filenames 'none)
            (if (not (member key (edb-keys-list ebib-cur-db)))
                (error "Entry `%s' is not in the current database" key))
