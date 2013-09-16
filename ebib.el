@@ -199,7 +199,7 @@ customization options."
 (defcustom ebib-citation-commands '((any
                                      (("cite" "\\cite%<[%A]%>{%K}")))
                                     (org-mode
-                                     (("ebib" "[[ebib:%K][%A]]")))
+                                     (("ebib" "[[ebib:%K][%D]]")))
                                     (markdown-mode
                                      (("text" "@%K%< [%A]%>")
                                       ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
@@ -3726,17 +3726,27 @@ surrounding it is not included in the citation command."
   (when (and (string-match "%K" format-string)
              key)
     (setq format-string (replace-match key t t format-string)))
-  (cl-loop for n = 1 then (1+ n)
-           until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A" format-string))
-           do (setq format-string
-                    (replace-match (if-str (argument (save-match-data
-                                                       (read-from-minibuffer (format "Argument %s%s: " n (if key
-                                                                                                             (concat " for " key)
-                                                                                                           "")))))
-                                       (concat "\\1" argument "\\2")
-                                     "")
-                                   t nil format-string))
-           finally return format-string))
+  (let (arg-prompt)
+    (cl-loop for n = 1 then (1+ n)
+             until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A\\|%D" format-string)) do
+             (setq arg-prompt
+                   (if (string= (match-string 0 format-string) "%D")
+                       "Description"
+                     "Argument"))
+             (setq format-string
+                   (replace-match (if-str (argument (save-match-data
+                                                      (read-from-minibuffer (format "%s%s%s: "
+                                                                                    arg-prompt
+                                                                                    (if (string= arg-prompt "Argument")
+                                                                                        (format " %s" n)
+                                                                                      "")
+                                                                                    (if key
+                                                                                        (concat " for " key)
+                                                                                      "")))))
+                                      (concat "\\1" argument "\\2")
+                                    "")
+                                  t nil format-string))
+             finally return format-string)))
 
 (defun ebib-split-citation-string (format-string)
   "Split up FORMAT-STRING.
