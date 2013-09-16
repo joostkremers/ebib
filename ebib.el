@@ -4808,8 +4808,8 @@ be found."
                            nil))) ; we must return nil if the key wasn't found anywhere
            (if (null database)
                (error "Entry `%s' not found" key)
-             (setq ebib-cur-db database)))
-         (ebib key))))
+             (setq ebib-cur-db database))))
+       (ebib key)))
     ((default)
      (error "No database(s) loaded"))))
 
