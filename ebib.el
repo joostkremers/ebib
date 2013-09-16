@@ -3385,7 +3385,7 @@ opened. If N is NIL, the user is asked to enter a number."
               (message "Opening `%s'" file-full-path)
               (ebib-lower)
               (find-file file-full-path)))
-        (error "File not found: `%s'" file-full-path)))))
+        (error "File not found: `%s'" filename)))))
 
 (defun ebib-filters-logical-and (not)
   "Filter the current database.
