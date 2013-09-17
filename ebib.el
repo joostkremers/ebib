@@ -2555,14 +2555,14 @@ generate the key, see that function's documentation for details."
 
 (defun ebib-generate-tempkey (&optional db)
   "Generate a unique temp key in DB or the current database.
-Keys are in the form: <new-entry>, <new-entry-1>, <new-entry-2>, ..."
+Keys are in the form: <new-entry1>, <new-entry2>, ..."
   (unless db
     (setq db ebib-cur-db))
   (let ((key-list (edb-keys-list db))
-        (entry-key "<new-entry>")
-        (key-count 1))
+        (entry-key "<new-entry1>")
+        (key-count 2))
     (while (member entry-key key-list)
-      (setq entry-key (format "<new-entry-%d>" key-count))
+      (setq entry-key (format "<new-entry%d>" key-count))
       (incf key-count))
     entry-key))
 
@@ -3957,8 +3957,9 @@ The user is prompted for the buffer to push the entry into."
 
 (defun ebib-quit-entry-buffer ()
   "Quits editing the entry.
-If the key of the current entry is <new-entry>, a new key is
-automatically generated using BIBTEX-GENERATE-AUTOKEY."
+If the key of the current entry matches the pattern
+<new-entry%d>, a new key is automatically generated using
+BIBTEX-GENERATE-AUTOKEY."
   (interactive)
   (cond
    ((and ebib-popup-entry-window
@@ -3968,7 +3969,7 @@ automatically generated using BIBTEX-GENERATE-AUTOKEY."
     (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
-  (if (equal (edb-cur-entry ebib-cur-db) "<new-entry>")
+  (if (string-match "<new-entry[0-9]+>" (edb-cur-entry ebib-cur-db))
       (ebib-generate-autokey)))
 
 (defun ebib-find-visible-field (field direction)
