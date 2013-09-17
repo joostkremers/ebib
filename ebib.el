@@ -2457,6 +2457,7 @@ ascending sequence."
     (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
       (sort-in-buffer (1+ (length (edb-keys-list db))) entry-key)
       (ebib-insert-entry entry-key fields db t t)
+      (setq ebib-cur-keys-list (sort (cons entry-key ebib-cur-keys-list) #'string<))
       (ebib-display-entry entry-key)
       (forward-line -1) ; move one line up to position the cursor on the new entry.
       (ebib-set-index-highlight)
