@@ -598,7 +598,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (cl-defstruct edb
   (database (make-hash-table :test 'equal)) ; hashtable containing the database itself
   (keys-list nil)                           ; sorted list of the keys in the database
-  (cur-entry nil)                           ; sublist of `keys-list' that starts with the current entry
+  (cur-entry nil)                           ; key of the current entry
   (marked-entries nil)                      ; list of marked entries
   (strings (make-hash-table :test 'equal))  ; hashtable with the @STRING definitions
   (strings-list nil)                        ; sorted list of the @STRING abbreviations
