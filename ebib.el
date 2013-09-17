@@ -2427,8 +2427,8 @@ of (FIELD . VALUE) pairs. The alist is converted into a BibTeX
 entry stub and added to DB, which defaults to the current
 database. If an entry alist doesn't contain the `type*' field,
 the entry type is set to the value of `ebib-default-type'. If
-it doesn't contain a `key' field, a key is created of the from
-\"<new-entry-%d>\", where %d is replaced with a number in
+it doesn't contain a `key*' field, a key is created of the from
+\"<new-entry%d>\", where %d is replaced with a number in
 ascending sequence."
   (interactive)
   (unless db
@@ -2438,7 +2438,7 @@ ascending sequence."
       ;;aggregate properties, some require special handling
       (cond
        ((eq (car props) 'key)
-        (setq entry-key (cdr (assoc 'key entry))))
+        (setq entry-key (cdr (assoc 'key* entry))))
        ((eq (car props) ebib-standard-file-field)
         (let ((short-file (ebib-file-relative-name (expand-file-name (cdr props)))))
           (puthash ebib-standard-file-field (from-raw short-file) fields)))
@@ -2472,7 +2472,7 @@ ascending sequence."
     ((real-db)
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
-         (add-to-list 'entry-alist (cons 'key (read-string "New entry key: " nil 'ebib-key-history))))
+         (add-to-list 'entry-alist (cons 'key* (read-string "New entry key: " nil 'ebib-key-history))))
        (ebib-add-entry-stub entry-alist ebib-cur-db)
        (ebib-fill-entry-buffer)
        (ebib-edit-entry-internal)))
@@ -3961,7 +3961,7 @@ The user is prompted for the buffer to push the entry into."
   "Quits editing the entry.
 If the key of the current entry matches the pattern
 <new-entry%d>, a new key is automatically generated using
-BIBTEX-GENERATE-AUTOKEY."
+`bibtex-generate-autokey'."
   (interactive)
   (cond
    ((and ebib-popup-entry-window
