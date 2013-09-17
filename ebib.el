@@ -1362,13 +1362,13 @@ to \"none\"."
       (erase-buffer)
       (if (not ebib-cur-db)
           (rename-buffer " none")
+        (setq ebib-cur-keys-list
+              (if (edb-filter ebib-cur-db)
+                  (ebib-filters-run-filter ebib-cur-db)
+                (edb-keys-list ebib-cur-db)))
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
         (when (edb-keys-list ebib-cur-db)
-          (setq ebib-cur-keys-list
-                (if (edb-filter ebib-cur-db)
-                    (ebib-filters-run-filter ebib-cur-db)
-                  (edb-keys-list ebib-cur-db)))
           ;; Set a header line if there is a filter.
           (setq header-line-format (if (edb-filter ebib-cur-db)
                                        (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
@@ -2481,48 +2481,49 @@ ascending sequence."
     ((default)
      (beep))))
 
-(defun ebib-add-file-entry (&optional filepath allow-duplicates-p disable-prompt-p db)
+(defun ebib-add-file-entry (&optional filepath allow-duplicates disable-prompt db)
   "Add an entry stub for an optional FILEPATH to DB. If FILEPATH
 is a list, add entries for each file contained within. If
 FILEPATH is a directory, add entries for all its contents. And
 if FILEPATH is not given, prompt the user to browse in the
 minibuffer. If a FILEPATH is already referenced by an entry in
-the DB, then it is ignored by default. If ALLOW-DUPLICATES-P is
+the DB, then it is ignored by default. If ALLOW-DUPLICATES is
 true, then add new entry stubs for each file anyway. By default,
 if FILEPATH is not given, prompt the user to browse a for file
 to add using the minibuffer. Disable this behavior by setting
-DISABLE-PROMPT-P to T."
+DISABLE-PROMPT to T."
   (interactive)
-  (let* ((all-entry-files (list))
-         (file-exists-in-db-p '(lambda (fp)
-                                 (if (member (locate-file fp ebib-file-search-dirs) all-entry-files)
-                                     t)))
-         (add-file-entry '(lambda (fp)
-                            (cond
-                             ((listp fp)
-                              (dolist (file fp) (funcall add-file-entry file)))
-                             ((file-directory-p fp)
-                              (funcall add-file-entry (directory-files fp t "^\\([^.]\\)"))) ;ignore hidden
-                             ((file-exists-p fp)
-                              (if (and (null allow-duplicates-p) (funcall file-exists-in-db-p fp))
-                                  (message "File %s already exists in db, skipping" fp)
-                                (progn
-                                  (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
-                                  (ebib-fill-entry-buffer)
-                                  (message "Adding file %s" fp))))
-                             (t
-                              (error "Invalid file %s" fp))))))
-    ;;prompt for file
-    (if (and (null filepath) (null disable-prompt-p))
-        (setq filepath (read-file-name "Add file or directory: " (file-name-as-directory (car ebib-file-search-dirs)))))
-    ;;collect all file paths from db entries into single list
-    (unless allow-duplicates-p
-      (dolist (entry-key (edb-keys-list (or db ebib-cur-db)))
-        (let ((entry-files (to-raw (car (ebib-get-field-value ebib-standard-file-field entry-key)))))
-          (if entry-files
-              (dolist (fp (split-string entry-files ebib-filename-separator))
-                (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
-    (funcall add-file-entry filepath)))
+  (let (all-entry-files)
+    (cl-labels
+        ((file-exists-in-db-p (fp)
+                              (if (member (locate-file fp ebib-file-search-dirs) all-entry-files)
+                                  t))
+         (add-file-entry (fp)
+                         (cond
+                          ((listp fp)
+                           (dolist (file fp) (add-file-entry file)))
+                          ((file-directory-p fp)
+                           (add-file-entry (directory-files fp t "^\\([^.]\\)"))) ;ignore hidden
+                          ((file-exists-p fp)
+                           (if (and (null allow-duplicates) (file-exists-in-db-p fp))
+                               (message "File %s already exists in db, skipping" fp)
+                             (progn
+                               (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
+                               (ebib-fill-entry-buffer)
+                               (message "Adding file %s" fp))))
+                          (t
+                           (error "Invalid file %s" fp)))))
+      ;;prompt for file
+      (if (and (null filepath) (null disable-prompt))
+          (setq filepath (read-file-name "Add file or directory: " (file-name-as-directory (car ebib-file-search-dirs)))))
+      ;;collect all file paths from db entries into single list
+      (unless allow-duplicates
+        (dolist (entry-key (edb-keys-list (or db ebib-cur-db)))
+          (let ((entry-files (to-raw (car (ebib-get-field-value ebib-standard-file-field entry-key)))))
+            (if entry-files
+                (dolist (fp (split-string entry-files ebib-filename-separator))
+                  (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
+      (add-file-entry filepath))))
 
 (defun ebib-uniquify-key (key)
   "Creates a unique key from KEY."
