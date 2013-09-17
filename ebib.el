@@ -2514,7 +2514,7 @@ DISABLE-PROMPT-P to T."
                               (error "Invalid file %s" fp))))))
     ;;prompt for file
     (if (and (null filepath) (null disable-prompt-p))
-        (setq filepath (read-file-name "Add file or directory: " (car ebib-file-search-dirs))))
+        (setq filepath (read-file-name "Add file or directory: " (file-name-as-directory (car ebib-file-search-dirs)))))
     ;;collect all file paths from db entries into single list
     (unless allow-duplicates-p
       (dolist (entry-key (edb-keys-list (or db ebib-cur-db)))
