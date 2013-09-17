@@ -2420,40 +2420,108 @@ buffer if Ebib is not occupying the entire frame."
     ((default)
      (beep))))
 
+(defun ebib-add-entry-stub (&optional entry db)
+  "Add ENTRY to DB in the form of a stub. Returns the database
+key of the created entry. ENTRY is an optional alist consisting
+of (FIELD . VALUE) pairs. The alist is converted into a BibTeX
+entry stub and added to DB, which defaults to the current
+database. If an entry alist doesn't contain the `type*' field,
+the entry type is set to the value of `ebib-default-type'. If
+it doesn't contain a `key' field, a key is created of the from
+\"<new-entry-%d>\", where %d is replaced with a number in
+ascending sequence."
+  (interactive)
+  (unless db
+    (setq db ebib-cur-db))
+  (let ((fields (make-hash-table)) entry-key)
+    (dolist (props entry)
+      ;;aggregate properties, some require special handling
+      (cond
+       ((eq (car props) 'key)
+        (setq entry-key (cdr (assoc 'key entry))))
+       ((eq (car props) ebib-standard-file-field)
+        (let ((short-file (ebib-file-relative-name (expand-file-name (cdr props)))))
+          (puthash ebib-standard-file-field (from-raw short-file) fields)))
+       (t
+        (puthash (car props) (cdr props) fields))))
+    ;;check for required
+    (if entry-key
+        (if (member entry-key (edb-keys-list db))
+            (if ebib-uniquify-keys
+                (setq entry-key (ebib-uniquify-key entry-key))
+              (error "Key %s already exists" entry-key)))
+      (setq entry-key (ebib-generate-tempkey db)))
+    (unless (gethash 'type* fields)
+      (puthash 'type* ebib-default-type fields))
+    ;;insert and update index display
+    (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+      (sort-in-buffer (1+ (length (edb-keys-list db))) entry-key)
+      (ebib-insert-entry entry-key fields db t t)
+      (ebib-display-entry entry-key)
+      (forward-line -1) ; move one line up to position the cursor on the new entry.
+      (ebib-set-index-highlight)
+      (setf (edb-cur-entry db) entry-key)
+      (ebib-set-modified t))
+    entry-key))
+
 (defun ebib-add-entry ()
-  "Adds a new entry to the database."
+  "Interactively adds a new entry to the database."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (if-str (entry-key (if ebib-autogenerate-keys
-                            "<new-entry>"
-                          (read-string "New entry key: " nil 'ebib-key-history)))
-         (progn
-           (if (member entry-key (edb-keys-list ebib-cur-db))
-               (if ebib-uniquify-keys
-                   (setq entry-key (ebib-uniquify-key entry-key))
-                 (error "Key already exists")))
-           (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-             (sort-in-buffer (1+ (length (edb-keys-list ebib-cur-db))) entry-key)
-             ;; we create the hash table *before* the call to
-             ;; ebib-display-entry, because that function refers to the
-             ;; hash table if ebib-index-display-fields is set.
-             (let ((fields (make-hash-table)))
-               (puthash 'type* ebib-default-type fields)
-               (ebib-insert-entry entry-key fields ebib-cur-db t t))
-             (ebib-display-entry entry-key)
-             (forward-line -1) ; move one line up to position the cursor on the new entry.
-             (ebib-set-index-highlight)
-             (setf (edb-cur-entry ebib-cur-db) entry-key)
-             (ebib-fill-entry-buffer)
-             (ebib-edit-entry-internal)
-             (ebib-set-modified t)))))
-    ((filtered-db)
-     (error "Cannot add entries to a filtered database"))
+     (let ((entry-alist (list)))
+       (unless ebib-autogenerate-keys
+         (add-to-list 'entry-alist (cons 'key (read-string "New entry key: " nil 'ebib-key-history))))
+       (ebib-add-entry-stub entry-alist ebib-cur-db)
+       (ebib-fill-entry-buffer)
+       (ebib-edit-entry-internal)))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
     ((default)
      (beep))))
+
+(defun ebib-add-file-entry (&optional filepath allow-duplicates-p disable-prompt-p db)
+  "Add an entry stub for an optional FILEPATH to DB. If FILEPATH
+is a list, add entries for each file contained within. If
+FILEPATH is a directory, add entries for all its contents. And
+if FILEPATH is not given, prompt the user to browse in the
+minibuffer. If a FILEPATH is already referenced by an entry in
+the DB, then it is ignored by default. If ALLOW-DUPLICATES-P is
+true, then add new entry stubs for each file anyway. By default,
+if FILEPATH is not given, prompt the user to browse a for file
+to add using the minibuffer. Disable this behavior by setting
+DISABLE-PROMPT-P to T."
+  (interactive)
+  (let* ((all-entry-files (list))
+         (file-exists-in-db-p '(lambda (fp)
+                                 (if (member (locate-file fp ebib-file-search-dirs) all-entry-files)
+                                     t)))
+         (add-file-entry '(lambda (fp)
+                            (cond
+                             ((listp fp)
+                              (dolist (file fp) (funcall add-file-entry file)))
+                             ((file-directory-p fp)
+                              (funcall add-file-entry (directory-files fp t "^\\([^.]\\)"))) ;ignore hidden
+                             ((file-exists-p fp)
+                              (if (and (null allow-duplicates-p) (funcall file-exists-in-db-p fp))
+                                  (message "File %s already exists in db, skipping" fp)
+                                (progn
+                                  (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
+                                  (ebib-fill-entry-buffer)
+                                  (message "Adding file %s" fp))))
+                             (t
+                              (error "Invalid file %s" fp))))))
+    ;;prompt for file
+    (if (and (null filepath) (null disable-prompt-p))
+        (setq filepath (read-file-name "Add file or directory: " (car ebib-file-search-dirs))))
+    ;;collect all file paths from db entries into single list
+    (unless allow-duplicates-p
+      (dolist (entry-key (edb-keys-list (or db ebib-cur-db)))
+        (let ((entry-files (to-raw (car (ebib-get-field-value ebib-standard-file-field entry-key)))))
+          (if entry-files
+              (dolist (fp (split-string entry-files ebib-filename-separator))
+                (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
+    (funcall add-file-entry filepath)))
 
 (defun ebib-uniquify-key (key)
   "Creates a unique key from KEY."
@@ -2484,6 +2552,19 @@ generate the key, see that function's documentation for details."
          (ebib-update-keyname new-key))))
     ((default)
      (beep))))
+
+(defun ebib-generate-tempkey (&optional db)
+  "Generate a unique temp key in DB or the current database.
+Keys are in the form: <new-entry>, <new-entry-1>, <new-entry-2>, ..."
+  (unless db
+    (setq db ebib-cur-db))
+  (let ((key-list (edb-keys-list db))
+        (entry-key "<new-entry>")
+        (key-count 1))
+    (while (member entry-key key-list)
+      (setq entry-key (format "<new-entry-%d>" key-count))
+      (incf key-count))
+    entry-key))
 
 (defun ebib-index-c ()
   "Helper function for the `c' key in the index buffer."
