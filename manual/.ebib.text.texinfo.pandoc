@@ -1,5 +1,5 @@
 # pandoc-mode settings file for ebib.text #
-# saved on 2012.03.11 18:14 #
+# saved on 2013.09.17 01:38 #
 
 table-of-contents::t
 standalone::t
@@ -7,4 +7,4 @@ read::markdown
 write::texinfo
 output::t
 output-dir::~/src/ebib/manual/texi
-include-before-body::~/src/ebib/manual/texi-before-body
+include-in-header::~/src/ebib/manual/ebib-manual-header.texi
