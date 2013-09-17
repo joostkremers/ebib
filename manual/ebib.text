@@ -193,77 +193,148 @@ A search term may of course appear more than once in the database. To search for
 The functions described here form Ebib's basic search functionality. Ebib also has a much more powerful search mechanism in the form of *filters*. These are described in [Filters](#filters).)
 
 
-## LaTeX Integration ##
+## Putting citations into text documents ##
 
-Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it trivially easy to insert BibTeX keys in your LaTeX documents. In fact, this functionality doesn't just work with LaTeX, but also with other text modes that have some form of citation commands, as discussed below.
+Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it trivially easy to insert BibTeX keys into your documents. By default, this functionality is set up for LaTeX, but also for [Orgmode](http://orgmode.org) and [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
 
-Ebib provides two functions for this. First, if you're in a LaTeX buffer, you can call the function `ebib-insert-bibtex-key`. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can type the key using TAB-completion, and after hitting `RET`, Emacs puts a BibTeX citation at the cursor position in the current buffer with the key you selected.
+In any (text mode) buffer, you can call the command `ebib-insert-bibtex-key` to insert a citation. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can use TAB-completion to enter a citation key, and after hitting `RET`, Emacs puts a citation at the cursor position in the current buffer with the key you selected. This citation includes the additional markup for the text mode in question. That is, if you call `ebib-insert-bibtex-key` from a LaTeX buffer, Ebib inserts `\<cite>{<key>}` into your buffer, substituting the citation command you select for `<cite>` and the key for `<key>`.
 
-You can also do it the other way around: if you're in the index buffer in Ebib, you can *push* an entry to a LaTeX buffer. To do this, use the command `p`. Ebib will ask you for a buffer to push the entry to, a citation command and also any optional arguments, and then insert a citation at the current cursor position in the buffer you've supplied.
+You can also do it the other way around: if you're in the index buffer in Ebib, you can push an entry to a text buffer. To do this, use the command `p`. Ebib will ask you for a buffer to push the entry to, a citation command and also any optional arguments, and then inserts a citation at the current cursor position in the buffer you've supplied.
 
-The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for have to be defined before you can use them. (By default, only the `\cite` command has been predefined for LaTeX.) For details on setting this up, see [Citation Commands](#citation-commands).
-
-Another Ebib command is available for LaTeX documents: the command `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. (One disadvantage is that cross-referenced entries aren't always in the `.bbl` file, depending on how your BibTeX style handles them. After using `ebib-create-bib-from-bbl` it may therefore be necessary to check whether you have all cross-referenced entries.)
-
-There is another function that is available outside Ebib: `ebib-entry-summary`. This command reads the key under the cursor in the current buffer and starts Ebib on that entry. This allows you to quickly check a reference in a text.
-
-Probably the easiest way to use both `ebib-insert-bibtex-key` and `ebib-entry-summary` is to bind them to a key sequence. For example, you could put the following in your `~/.emacs`:
-
-    (add-hook 'LaTeX-mode-hook #'(lambda ()
-                                   (local-set-key "\C-cb" 'ebib-insert-bibtex-key)))
-
-This binds `C-c b` to the command `ebib-insert-bibtex-key` in AUCTeX's LaTeX mode. (Note that commands of the form `C-c <letter>` are reserved for the user, and should therefore not be set by any package. For this reasons, Ebib does not set this command automatically.)
-
-
-## Orgmode and Markdown ##
-
-[Orgmode](http://orgmode.org) can handle various types of links and new link types can be created by the user. If you use orgmode to write papers and want to use bibliographic references, it is easy to set up orgmode to use Ebib. If you add the following line to `~/.emacs`:
+The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for have to be defined before you can use them. How to do this is explained below, see [Defining Citation Commands](#defining-citation-commands). For LaTeX, only the `\cite` command is set up by default, so you may want to add some commands. In Orgmode files, Ebib inserts a link of the form `[[ebib:Jones1992][Jones (1992)]]`. (Actually, you'll need to provide the `Jones (1992)` yourself, when Ebib asks for a description.) If you use this, you should add the following line to your init file:
 
     (org-add-link-type "ebib" 'ebib)
 
-you can create org links of the following form:
+This will allow Orgmode to recognise Ebib links and allow you to jump to the BibTeX entry in Ebib using `C-c C-o` (`org-open-at-point`, the normal Orgmode command for following links). Note that such org links aren't properly translated to LaTeX citation commands when you export your org file. For that, you'll need to set up a different link type for each citation command and provide functions for exporting them to LaTeX. The orgmode documentation explains how this is done. (You can, in fact, create similar functions for exporting to other formats.)
 
-    [ebib:Jones1992][Jones (1992)]
+If you use `ebib-insert-bibtex-key` in Pandoc Markdown, you can choose between three citation commands: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which omits the author and inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
 
-Orgmode will display this link simply as `Jones (1992)` in your buffer. If you click this link (or press `C-c C-o` on it), you will be taken to Ebib and shown the the entry `Jones1992` in the active database.
+### Other Ebib commands outside Ebib ###
 
-A citation string for orgmode is predefined, so you can use `ebib-insert-bibtex-key` in orgmode buffers to insert links of the type above into your orgmode documents.
+There are two other Ebib commands available outside Ebib. The first is `ebib-entry-summary`, which reads the citation key at point in the current buffer and starts Ebib on that entry. This allows you to quickly check a reference in a text. (As mentioned, in Orgmode, `C-c C-o` does the same thing if you add `ebib` as a link type.)
 
-Note that such org links aren't properly translated to LaTeX citation commands when you export your org file. For that, you'll need to set up a different link type for each citation command and provide functions for exporting them to LaTeX. The orgmode documentation explains how this is done.
-
-Another document format that provides support for automatically generating citations is [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown. Pandoc's handling of citations is more sophisticated than orgmode's, as it can automatically translate citations in Markdown text into LaTeX (specifically: `natbib` or `biblatex`) commands, but it also supports citations when converting to other document formats. In order to use Ebib with Pandoc Markdown, nothing needs to be set up: Ebib has predefined citation formats for the citations forms that Pandoc Markdown supports: `text`, `paren` and `year`. The `text` format produces citations of the form `@Abney1987 [p. 50]`, the `paren` format produces `[cf. @Abney1987, p. 50]` and the `year` format, which suppresses the author in the (LaTeX/html/what have you) output, produces `[-@Abney1987 p. 50]`. Of these three, the `paren` type can contain multiple citations (e.g., `[cf. @Abney1987, p. 50; @Dahl2004, p. 204]`), which Ebib can handle as well. See [Citation Commands](#citation-commands) for further details.
+The second command is really only useful for LaTeX users: `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. Note, however, that this command does not add cross-referenced entries to the newly created `.bib` file, nor does it add `@string` definitions and the `@preamble`. So make sure to add those after using `ebib-create-bib-from-bbl`. (Improving this functionality is on the TODO-list.)
 
 
+### Key Bindings ###
 
-## Consulting Databases from within a LaTeX File ##
+Of course, the easiest way to use the commands discussed here is to bind them to a key sequence. For example, the following binds `C-c b` to `ebib-insert-bibtex-key` in AUCTeX's LaTeX mode:
 
-The commands `ebib-insert-bibtex-key` and `ebib-entry-summary` must consult the database or databases loaded in Ebib, and Ebib tries to be smart about which database(s) to consult. Usually, a LaTeX file has a `\bibliography` command somewhere toward the end, which names the `.bib` file or files that contain the bibliography entries. If you consult a BibTeX database from within a LaTeX file, Ebib first looks for a `\bibliography` command, reads the `.bib` files from it, and then sees if those files happen to be open. If they are, Ebib uses them to let you pick an entry key (in the case of `ebib-insert-entry-key`) or to search for the entry (in the case of `ebib-entry-summary`).
+    (define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-bibtex-key)
+
+Note that commands of the form `C-c <letter>` are reserved for the user, and should therefore not be set by any package. For this reasons, Ebib does not set this command automatically.
+
+`ebib-insert-bibtex-key` recognises the major mode of the buffer it is called from and uses this information to determine which kinds of citations to insert. So you can bind the `ebib-insert-bibtex-key` to the same key sequence in every text mode in which you use citations and Ebib will do the right thing.
+
+
+### Defining Citation Commands ###
+
+As mentioned, you should probably set up some citation commands if you use Ebib with LaTeX documents. The customisation option that allows you to do this is [Citation Commands](#citation-commands).
+
+Citation commands are defined for specific major modes. You can also define commands for  all modes under the heading `any`. (By default, this option is used for LaTeX commands, since there is more than one Emacs mode for (La)TeX). Each command consists of an identifier, which you type when Ebib prompts you for a citation command, plus a format string, which is used to create the actual citation command.
+
+The identifier should be a simple string which you can type easily when Ebib asks you for a citation command (TAB completion is available, though). The format string can contain a few directives, which are used to add the citation key and any optional arguments. The following directives are recognised:
+
+`%K`
+:    the entry key to be inserted.
+`%A`
+:    an argument, for which the user is prompted.
+`%<...%>`
+:    optional material surrounding a `%A` directive.
+`%(...%<sep>)`
+:    a so-called *repeater*, which contains material that can be repeated.
+     If present, the repeater must contain the entry key directive `%K`.
+`%D`
+:   a description, for which the user is prompted. Mainly for use in Orgmode.
+
+In the simplest case, the format string contains just a `%K` directive: `\cite{%K}`. In this case, `%K` is replaced with the citation key and the result inserted. Usually, however, citation commands allow for optional arguments that are formatted as pre- or postnotes to the citation. For example, using the `natbib` package, you have citation commands available of the form:
+
+    \citet[cf.][p. 50]{Jones1992}
+
+In order to be able to insert such citations, the format string must contain `%A` directives:
+
+    \citet[%A][%A]{%K}
+
+With such a format string, Ebib asks the user to provide text for the two arguments and inserts it at the locations specified by the directives. Of course, it is possible to leave the arguments empty (by just hitting `RET`). With the format string above, this would yield the following citation in the LaTeX buffer:
+
+    \citet[][]{Jones1992}
+
+The empty brackets are completely harmless, because LaTeX will simply ignore the empty arguments. However, you may prefer for the brackets not to appear if the arguments are empty. In that case, you can wrap the brackets and the `%A` directives in a `%<...%>` pair:
+
+    \citet%<[%A]%>%<[%A]%>{%K}
+
+Now, if you leave the arguments empty, Ebib produces the following citation:
+
+    \citet{Jones1992}
+
+Note however, that in this case there is in fact one problem associated with this format string. If you fill out the first argument but not the second, Ebib produces the wrong format string:
+
+    \citet[cf.]{Jones1992}
+
+If only one optional argument is provided, `natbib` assumes that it is a postnote, while what you intended is actually a prenote. Therefore, it is best not to make the second argument optional:
+
+    \citet%<[%A]%>[%A]{%K}
+
+This way, the second pair of brackets is always inserted, regardless of whether you provide a second argument or not.
+
+`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `; p` to push them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
+
+    \citet{Jones1992,Haddock2004}
+
+It is, however, also possible to specify in the format string that a certain sequence can be repeated and how the different elements should be separated. This is done by wrapping that portion of the format string that can be repeated in a `%(...%)` pair. Normally, you'll want to provide a separator, which is done by placing it between the `%` and the closing parenthesis:
+
+    \citet[%A][%A]{%(%K%,)}
+
+This format string says that the directive `%K` can be repeated and that multiple keys must be separated with a comma. The advantage of this is that you are no longer asked to provide a separator.
+
+It is also possible to put `%A` directives in the repeating part. This is useful for the `biblatex` package. `Biblatex` has so-called *multicite* commands, which take the following form:
+
+    \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
+
+Multicite commands can take more than one citation key in braces `{}` and each of those citation keys can take two optional arguments in brackets `[]`. In order to get such citations, you can provide the following format string:
+
+    \footcites%(%<[%A]%>[%A]{%K}%)
+
+Here, the entire sequence of two optional arguments and the obligatory citation key is wrapped in `%(...%)`, so that Ebib knows it can be repeated. If you now mark multiple entries in Ebib, press `; p` and select the `footcites` command, Ebib will put all the keys in the citation, asking you for two arguments for each citation key.
+
+Of course it is also possible to combine parts that are repeated with parts that are not repeated. In fact, that already happens in the previous example, because the part `\footcites` is not repeated. But the part that is not repeated may contain `%A` directives as well:
+
+    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+
+Multicite commands in `biblatex` take two additional arguments surrounded with parentheses. These are pre- and postnotes for the entire sequence of citations. They can be accommodated as shown.
+
+Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Orgmode citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Orgmode buffer. 
+
+
+### Associating a Database with a LaTeX File ###
+
+The commands `ebib-insert-bibtex-key` and `ebib-entry-summary` must consult the database or databases loaded in Ebib, and Ebib tries to be smart about which database(s) to consult. Usually, a LaTeX file has a `\bibliography` command somewhere toward the end, which names the `.bib` file or files that contain the bibliography entries. If you consult a BibTeX database from within a LaTeX file, Ebib first looks for a `\bibliography` command, reads the names of the `.bib` file(s) from it, and then sees if those files happen to be open. If they are, Ebib uses them to let you pick an entry key (in the case of `ebib-insert-entry-key`) or to search for the entry (in the case of `ebib-entry-summary`).
 
 Of course, it may be the case that the LaTeX file is actually part of a bigger project, and that only the master file contains a `\bibliography` command. To accommodate for this, Ebib checks whether the (buffer-local) variable `TeX-master` is set to a filename. If it is, it reads that file and tries to find the `\bibliography` command there. (Note: `TeX-master` is an AUCTeX variable, which is used to keep track of multi-file projects. If you don't use AUCTeX, this functionality doesn't work, and Ebib will only check the current file for a `\bibliography` command.)
 
 Note that if one of the `.bib` files in the `\bibliography` command isn't loaded, Ebib issues a warning message about this, and continues to check for the next `.bib` file. These warning messages appear in the minibuffer, but are probably directly overwritten again by further messages or prompts Ebib produces, so check the `*Messages*` buffer if Ebib doesn't seem to be able to find an entry that you're sure is in one of your databases.
 
-Another thing to keep in mind is that Ebib only looks for a `\bibliography` command once: the first time either `ebib-insert-bibtex-entry` or `ebib-entry-summary` is called. It stores the result of this search and uses it the next time either of these commands is used. Therefore, if you make a change to the `\bibliography` command, you must reload the file (use `M-x revert-buffer`) to make sure Ebib rereads the `\bibliography` command.
+Another thing to keep in mind is that Ebib only looks for a `\bibliography` command once: the first time either `ebib-insert-bibtex-entry` or `ebib-entry-summary` is called. It stores the result of this search and uses it the next time either of these commands is used. Therefore, if you make a change to the `\bibliography` command, you must reload the file (use `M-x revert-buffer` or `C-b C-v RET`) to make sure Ebib rereads the `\bibliography` command.
 
-If no `\bibliography` command is found at all, either in the LaTeX file itself, or in the master file, Ebib simply consults the current database, i.e. the database that was active when Ebib was lowered with `z`.
+If no `\bibliography` command is found at all, either in the LaTeX file itself, or in the master file, Ebib simply consults the current database, i.e. the database that was active when Ebib was lowered with `z`. This is also what Ebib does for Orgmode or Pandoc Markdown files, since they do not have the equivalent of a bibliography command.
 
 
 ## Cross-referencing ##
 
-BibTeX has a cross-referencing facility. Suppose you have an entry `Jones1998`, which appeared in a book that is also in your database, say under `miller1998`. You can tell BibTeX that `Jones1998` is contained in `Miller1998` by putting `Miller1998` in the `crossref` field. When BibTeX finds such a cross-reference, all the fields of `Jones1998` that don't have a value inherit their values from `Miller1998`. At the very least, this saves you some typing, but more importantly, if two or more entries cross-reference the same entry, BibTeX automatically includes the cross-referenced entry in the bibliography (and puts a reduced reference in the cross-referencing entries).
+BibTeX has a cross-referencing facility. Suppose you have an entry `Jones1998`, which appeared in a book that is also in your database, say under `Miller1998`. You can tell BibTeX that `Jones1998` is contained in `Miller1998` by putting `Miller1998` in the `crossref` field. When BibTeX finds such a cross-reference, all the fields of `Jones1998` that don't have a value inherit their values from `Miller1998`. At the very least, this saves you some typing, but more importantly, if two or more entries cross-reference the same entry, BibTeX automatically includes the cross-referenced entry in the bibliography (and puts a reduced reference in the cross-referencing entries).
 
 When you fill in the `crossref` field in Ebib, Ebib displays the values of the cross-referenced entry in the entry buffer. To indicate that they are just inherited values, they are marked with `ebib-crossref-face`, which by default is red. (You can customise it, of course. See the customisation option [Crossref Face](#crossref-face).) These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).
 
 BibLaTeX has a more sophisticated cross-referencing mechanism. While cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry in BibTeX, BibLaTeX has the option to specify that, e.g., the `booktitle` field of the entry type `incollection` inherits from the `title` field of the cross-referenced entry. If you want Ebib to honour such inheritances, you can customise the variable `ebib-biblatex-inheritances`. This variable allows you to specify inheritance relations for individual entry types, or, by specifying `all` as the entry type, for all entry types. (Note that the former always override the latter.) Currently, this support for BibLaTeX is still rudimentary. It will be improved in the future, but for the moment it should help you get started if you use BibLaTeX.
 
-If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. This command will take you back to the cross-referenced entry. In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
+If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type `n`, as with a normal search.
 
 Note that if you want to use BibTeX's cross-referencing options, you need to set the option [Save Xrefs first](#save-xrefs-first). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, BibTeX's cross-referencing will not work reliably.
 
 
 ## Selecting Entries ##
 
-Commands in the index buffer generally operate on one single entry, or on all entries. For some, however, it may sometimes be useful to perform them on more than one entry, but not necessarily all of them. This can be achieved by selecting entries. You can select the entries you want to perform a command on with the key `m`. This selects (or unselects) the current entry. Selected entries are displayed in inverse video. Note that the face properties of selected entries can be customised through the customisation option [Selected Face](#selected-face).)
+Commands in the index buffer generally operate on one single entry, or on all entries. For some commands, however, it may sometimes be useful to perform them on more than one entry, but not necessarily all of them. This can be achieved by selecting entries. You can select the entries you want to perform a command on with the key `m`. This selects (or unselects) the current entry. Selected entries are highlighted. (Note that the face properties of selected entries can be customised through the customisation option [Selected Face](#selected-face).)
 
 Of the commands discussed so far, two can be used on selected entries: `d` and `p`. Note, however, that it is not enough to select the entries you want and then type any of these commands. If you do so, they will behave as if no entries were selected. To get these commands to work on the selected entries, you have to type a semicolon before them. That is, `; d` deletes all selected entries, `; p` pushes all selected entries to a LaTeX buffer. The command `m` itself can also be used with the `;` prefix. If there are any selected entries, `; m` unselects them all. Otherwise, `; m` selects all entries.
 
@@ -519,7 +590,7 @@ A filter is basically a search expression that selects entries from the current 
 
 Creating a filter is simple: press `&`, and Ebib will ask you for a field to select on, and for a regular expression to select with. So if you want to select all entries that contain "Jones" in the `author` field, you press `&` and type `author` as the field and `Jones` as the regexp to filter on. Ebib then runs this filter on the database, and only shows those entries that match the filter. To indicate that a filter is active, the active filter is displayed in a header line at the top of the index buffer. (The filter can be displayed in Lisp form, if you prefer: customise [Filters Display As Lisp](#filters-display-as-lisp) to do so.)
 
-If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp, the filter selects all entries that have a field that contains "Jones" in them.
+If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp will give you all entries that have a field that contains "Jones" in them.
 
 Note that you can also select items based on their entry type. In order to do that, you need to specify `type*` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `type*` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`. You can use TAB completion in this case, by the way.
 
@@ -528,19 +599,17 @@ If you specify the `keywords` field, the keywords associated with your database 
 
 ### Complex Filters ###
 
-Once you have a filter on your database, you can refine or extend it. For example, suppose you want to add all entries that have "Jones" in the editor field to your selection as well. I this case you need to do a logical `or` operation: you want to select an entry if it contains "Jones" in the `author` field (which you already did) *or* if it contains "Jones" in the `editor` field.
+Once you have a filter on your database, you can refine or extend it. For example, suppose you have a filter selecting all entries with "Jones" in the `author` field and want to add all entries that have "Jones" in the editor field to your selection. I this case you need to do a logical `or` operation: you want to select an entry if it contains "Jones" in the `author` field (which you already did) *or* if it contains "Jones" in the `editor` field.
 
 A short sidenote: the first impulse in a case like this might be to use `and` instead of `or`: after all, you want to select all entries that contain "Jones" in the `author` field *and* all entries that contain "Jones" in the `editor` field. However, the filter that you build up is used to test each entry *individually* whether it meets the selection criterion. An entry meets the criterion if it contains "Jones" in the `author` field *or* if it contains "Jones" in the `editor` field. Therefore, `or` is the required operator in this case. If you would use `and`, you would only get those entries that contain "Jones" in both the `author` *and* `editor` fields.
 
-To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the database.
+To perform a logical `or` operation, press the key `|`. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the index buffer.
 
 It is also possible to perform a logical `and` on the filter. Use this if you want to select those entries that contain "Jones" in the `author` field and e.g. "symbiotic hibernation" in the `keyword` field. A logical `and` operation is done with the key `&`. (Note: this is the same key that is used to create the filter. In fact, you can create a filter with `|` as well: when used in an unfiltered database, `&` and `|` are equivalent. They are only different when a filter is already active.)
 
-Both the `&` and `|` commands can be used with the negative prefix argument `M--` (or `C-u -`, which is identical). In this case, the search criterion is negated. That is, the negative prefix argument performs a logical `not` operation on the search criterion.
+Both the `&` and `|` commands can be used with the negative prefix argument `M--` (or `C-u -`, which is identical). In this case, the search criterion is negated. That is, the negative prefix argument performs a logical `not` operation on the search criterion. For example, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp.
 
-That is, if you want to select all entries from a database that do *not* contain "Jones" in the `author` field, you can do this by typing `M-- &` and then filling out the relevant field and regexp.
-
-There is another way of performing a logical `not` operation, which is only available in when a filter is active: by pressing the key `~`, you invert the current filter. That is, if you have a filtered database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
+There is another way of performing a logical `not` operation, which is only available when a filter is active: by pressing the key `~`, you invert the current filter. That is, if you have a filtered database with all the entries containing "Jones" in the `author` or in the `editor` field, and you press `~`, the selection is inverted, and now contains all entries that do *not* have "Jones" in the `author` or `editor` field.
 
 Although `~` and the negative prefix argument to `&` or `|` both perform logical `not` operations, they are *not* equivalent: `~` negates the entire filter built up so far, while the negative prefix argument only negates the single selection criterion you enter with it.
 
@@ -551,20 +620,26 @@ To cancel the filter and return to the normal view of the database, press `F c`.
 
 ### Storing and Saving Filters ###
 
-Once constructed, a filter can be stored, so that it can be used again. To store a filter, hit `F s`. Ebib will ask you for a name for the filter in order to identify it later. By default, filter names are case-insensitive, but if you prefer to use case-sensitive filter names, you can unset the option [Filters Ignore Case](#filters-ignore-case). When Ebib is closed, all stored filters are saved to a file and they're automatically reloaded when you open Ebib again. Stored filters are not associated with a particular database: once a filter is stored, it is available to all databases.
+Once constructed, a filter can be stored, so that it can be used again. To store a filter, type `F s`. Ebib will ask you for a name for the filter in order to identify it later. By default, filter names are case-insensitive, but if you prefer to use case-sensitive filter names, you can unset the option [Filters Ignore Case](#filters-ignore-case). When Ebib is closed, all stored filters are saved to a file and they're automatically reloaded when you open Ebib again. Stored filters are not associated with a particular database: once a filter is stored, it is available to all databases.
 
-You can apply a stored filter with `F a`. This will ask for the name of a filter and apply it to the current database. You can extend the filter in the normal way, though the changes will not be stored automatically. Note that cancelling a filter does not delete it from the list of stored filters, it will remain available for later application. If you want to delete a filter from the list of stored filters, use `F d`. You can also delete all stored filters with `F D`. To see what filters are currently stored, use `F V`.
+You can apply a stored filter with `F a`. This will ask for the name of a filter and apply it to the current database. You can extend the filter in the normal way, though the changes will not be stored automatically. To store it, type `F s` again. You can store the extended filter under the old name, in which case Ebib will ask you for confirmation, or under a new name, which will store it as a new filter, keeping the old one.
 
-The file that Ebib uses to store filters is `~/.emacs.d/ebib-filters`, although that can of course be customised (see [Filters Default File](#filters-default-file)). As mentioned, stored filters are saved automatically when Ebib closes, but you can also save them with `F S`. Note that if there are no stored filters when Ebib is closed, the file is deleted. If you want to save filters without risking them being overwritten, you can save them to a different file with `F w`. To load such a filter file, use `F l`. If you load filters from a file while you still have stored filters, you are asked if you want to replace them completely or if you want to add the new filters to the existing ones. In the latter case, however, filters whose name conflict with existing filters are not loaded. (Ebib will log a message about this when this happens.) Lastly, if you want to rename a stored filter, you can do so with `F R`. 
+The file that Ebib uses to store filters is `~/.emacs.d/ebib-filters`, although that can of course be customised (see [Filters Default File](#filters-default-file)). As mentioned, stored filters are saved automatically when Ebib closes, but you can also save them manually with `F S`. Note that if there are no stored filters when Ebib is closed (or when you press `F S`), the file is deleted.
+
+You can also save your filters to a different file with `F w`. Such a filter file can be reloaded later with `F l`. If you load filters from a file while you still have stored filters, you are asked if you want to replace them completely or if you want to add the new filters to the existing ones. In the latter case, however, filters whose name conflict with existing filters are not loaded. (Ebib will log a message about this when this happens.)
+
+To see what filters are currently stored, use `F V`. If you want to rename a filter, you can do so with `F R`.
+
+Note that cancelling a filter with `F c` does not delete it from the list of stored filters, it will remain available for later application. If you want to delete a filter from the list of stored filters, use `F d`. You can also delete all stored filters with `F D`. These deletion commands do not ask for confirmation, but if you delete any filters by accident, you can reload them from `~/.emacs.d/ebib-filters` with `F l`.
 
 
 ### Properties of Filtered Databases ###
 
-When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database and saving one is also disabled. (The reasons for these limitations are historic and they may be lifted in future version). Editing existing entries is possible. If the entry doesn't match the filter anymore after the edit, it doesn't disappear from view, however. In order to reapply the filter, press `F r`.
+When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database or saving a filtered database is also disabled. (The reasons for these limitations are mainly historic and they may be lifted in future version). Editing existing entries is possible, however. Note that if the entry doesn't match the filter anymore after the edit, it doesn't disappear from view. In order to reapply the filter, press `F r`.
 
 It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `; m`, then cancel the filter and perform an action on them.
 
-Although a filtered database cannot be saved, it *can* be written to a file. To do so, use `F W`. This command asks you for a filename and writes the filtered entries to it. It also writes all the `@string` definitions and the `@preamble`, so you end up with a complete `.bib` file. (Note that this is in fact the same command as the menu option "Save Database As". This command behaves differently depending on whether a filter is active. If there is, only the filtered entries are written to the new file and the original database remains open. If no filter is active, the database is renamed.)
+Although a filtered database cannot be saved, it is possible to write the filtered entries to a file. To do so, use `F W`. This command also writes all the `@string` definitions and the `@preamble`, so you end up with a complete `.bib` file. (Note that this is in fact the same command as the menu option "Save Database As". This command behaves differently depending on whether a filter is active. If there is, only the filtered entries are written to the new file and the original database remains open. If no filter is active, all the entries are written and the database in Ebib is renamed.)
 
 One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` and of course the special function of `F w` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
 
@@ -1088,81 +1163,15 @@ Ebib uses the function `bibtex-generate-autokey` to generate the key. This funct
     ((any
 	  (("cite" "\\cite%<[%A]%>{%K}")))
 	 (org-mode
-	  (("ebib" "[ebib:%K][%A]")))
+	  (("ebib" "[[ebib:%K][%D]]")))
 	 (markdown-mode
 	  (("text" "@%K%< [%A]%>")
        ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
 	   ("year" "[-@%K%< %A%>]"))))
 
-\noindent With the command `ebib-insert-bibtex-key` or with the command key `p` in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you to define the commands that are available through TAB completion when these functions ask for a citation command.
+\noindent With the command `ebib-insert-bibtex-key` or with the command key `p` in the index buffer, you can insert a BibTeX key into a LaTeX buffer. This option allows you to define the commands that are available through TAB completion when these functions ask for a citation command. See [Defining Citation Commands](#defining-citation-commands) for details.
 
-Citation commands are defined for specific major modes or for all modes (under the heading `any`). Each command consists of an identifier, which you type when Ebib prompts you for a citation command, plus a format string. This format string can contain a few directives, which are used to add the citation key and any optional arguments. This format string can contain the following directives:
-
-`%K`
-:    the entry key to be inserted.
-`%A`
-:    an argument, for which the user is prompted.
-`%<...%>`
-:    optional material surrounding a `%A` directive.
-`%(...%<sep>)`
-:    a so-called *repeater*, which contains material that can be repeated.
-     If present, the repeater must contain the entry key directive `%K`.
-
-In the simplest case, the format string contains just a `%K` directive: `\cite{%K}`. In this case, `%K` is replaced with the citation key and the result inserted. Usually, however, citation commands allow for optional arguments that are formatted as pre- or postnotes to the citation. For example, using the `natbib` package, you have citation commands available of the form:
-
-    \citet[cf.][p. 50]{Jones1992}
-
-In order to be able to insert such citations, the format string must contain `%A` directives:
-
-    \citet[%A][%A]{%K}
-
-With such a format string, Ebib asks the user to provide text for the two arguments and inserts it at the locations specified by the directives. Of course, it is possible to leave the arguments empty (by just hitting `RET`). With the format string above, this would yield the following citation in the LaTeX buffer:
-
-    \citet[][]{Jones1992}
-
-This is completely harmless, because LaTeX will simply ignore the empty arguments. However, you may prefer for the brackets not to appear if the arguments are empty. In that case, you can wrap the brackets and the `%A` directives in a `%<...%>` pair:
-
-    \citet%<[%A]%>%<[%A]%>{%K}
-
-Now, if you leave the arguments empty, Ebib produces the following citation:
-
-    \citet{Jones1992}
-
-Note however, that in this case there is in fact one problem associated with this format string. If you fill out the first argument but not the second, Ebib produces the wrong format string:
-
-    \citet[cf.]{Jones1992}
-
-If only one optional argument is provided, `natbib` assumes that it is a postnote, while what you intended is actually a prenote. Therefore, it is best not to make the second argument optional:
-
-    \citet%<[%A]%>[%A]{%K}
-
-This way, the second pair of brackets is always inserted, regardless of whether you provide a second argument or not.
-
-`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `; p` to push them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
-
-    \citet{Jones1992,Haddock2004}
-
-It is, however, also possible to specify in the format string that a certain sequence can be repeated and how the different elements should be separated. This is done by wrapping that portion of the format string that can be repeated in a `%(...%)` pair. Normally, you'll want to provide a separator, which is done by placing it between the `%` and the closing parenthesis:
-
-    \citet[%A][%A]{%(%K%,)}
-
-This format string says that the directive `%K` can be repeated and that multiple keys must be separated with a comma. The advantage of this is that you are no longer asked to provide a separator. However, this is not the only thing one can do, because it is also possible to put `%A` directives in the repeating part. This is useful for the `biblatex` package. `Biblatex` has so-called *multicite* commands, which take the following form:
-
-    \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
-
-Multicite commands can take more than one citation key in braces `{}` and each of those citation keys can take two optional arguments in brackets `[]`. In order to get such citations, you can provide the following format string:
-
-    \footcites%(%<[%A]%>[%A]{%K}%)
-
-Here, the entire sequence of two optional arguments and the obligatory citation key is wrapped in `%(...%)`, so that Ebib knows it can be repeated. If you now mark multiple entries in Ebib, press `; p` and select the `footcites` command, Ebib will put all the keys in the citation, asking you for two arguments for each citation key.
-
-Of course it is also possible to combine parts that are repeated with parts that are not repeated. In fact, that already happens in the previous example, because the part `\footcites` is not repeated. But the part that is not repeated may contain `%A` directives as well:
-
-    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
-
-Multicite commands in `biblatex` take two additional arguments surrounded with parentheses. These are pre- and postnotes for the entire sequence of citations. They can be accommodated as shown.
-
-The function `ebib-insert-bibtex-key` can of course also be called from non-LaTeX buffers. For example, [org-mode](http://orgmode.org) can use bibliographic links, and so can [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown. For those two modes, citation commands have been predefined, which may provide some additional inspiration in case you want to create your own format strings.
+You can define a different set of citation commands for each major mode. There is a catch-all option `any`, which is chosen when the major mode from which `ebib-insert-bibtex-key` is not on the list. By default, this is used for LaTeX citations, because not everybody uses AUCTeX's `LaTeX-mode`.
 
 
 ### Multiline Major Mode ###

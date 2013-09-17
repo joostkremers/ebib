@@ -1,9 +1,8 @@
-This is ebib.info, produced by makeinfo version 4.13 from
-manual/texi/ebib.texi.
+This is ebib.info, produced by makeinfo version 4.13 from ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
-* Ebib: (ebib).        A BibTeX database manager.
+* Ebib: (ebib).           A BibTeX database manager that runs in Emacs and XEmacs
 END-INFO-DIR-ENTRY
 
 
@@ -194,9 +193,7 @@ through the menu (unless you assign key shortcuts to them, of course.)
 * Editing the Database::
 * Saving a Database::
 * Searching::
-* LaTeX Integration::
-* Orgmode and Markdown::
-* Consulting Databases from within a LaTeX File::
+* Putting citations into text documents::
 * Cross-referencing::
 * Selecting Entries::
 * Printing the Database::
@@ -533,7 +530,7 @@ Emacs, so that after using it, the new `.bib' file becomes associated
 with the database.
 
 
-File: ebib.info,  Node: Searching,  Next: LaTeX Integration,  Prev: Saving a Database,  Up: Basic Usage
+File: ebib.info,  Node: Searching,  Next: Putting citations into text documents,  Prev: Saving a Database,  Up: Basic Usage
 
 2.4 Searching
 =============
@@ -577,116 +574,267 @@ Ebib also has a much more powerful search mechanism in the form of
 _filters_. These are described in *note Filters: #filters.)
 
 
-File: ebib.info,  Node: LaTeX Integration,  Next: Orgmode and Markdown,  Prev: Searching,  Up: Basic Usage
+File: ebib.info,  Node: Putting citations into text documents,  Next: Cross-referencing,  Prev: Searching,  Up: Basic Usage
 
-2.5 LaTeX Integration
-=====================
+2.5 Putting citations into text documents
+=========================================
 
 Having a BibTeX database manager running inside Emacs has an additional
-advantage: it makes it trivially easy to insert BibTeX keys in your
-LaTeX documents. In fact, this functionality doesn't just work with
-LaTeX, but also with other text modes that have some form of citation
-commands, as discussed below.
+advantage: it makes it trivially easy to insert BibTeX keys into your
+documents. By default, this functionality is set up for LaTeX, but also
+for Orgmode (http://orgmode.org) and Pandoc
+(http://johnmacfarlane.net/pandoc/) Markdown.
 
-Ebib provides two functions for this. First, if you're in a LaTeX
-buffer, you can call the function `ebib-insert-bibtex-key'. When you
-invoke this command, Emacs prompts you for a key from the database(s)
-associated with the current buffer, a citation command and any optional
-argument(s) the command allows. You can type the key using
-TAB-completion, and after hitting `RET', Emacs puts a BibTeX citation
-at the cursor position in the current buffer with the key you selected.
+In any (text mode) buffer, you can call the command
+`ebib-insert-bibtex-key' to insert a citation. When you invoke this
+command, Emacs prompts you for a key from the database(s) associated
+with the current buffer, a citation command and any optional
+argument(s) the command allows. You can use TAB-completion to enter a
+citation key, and after hitting `RET', Emacs puts a citation at the
+cursor position in the current buffer with the key you selected. This
+citation includes the additional markup for the text mode in question.
+That is, if you call `ebib-insert-bibtex-key' from a LaTeX buffer, Ebib
+inserts `\<cite>{<key>}' into your buffer, substituting the citation
+command you select for `<cite>' and the key for `<key>'.
 
 You can also do it the other way around: if you're in the index buffer
-in Ebib, you can _push_ an entry to a LaTeX buffer. To do this, use the
+in Ebib, you can push an entry to a text buffer. To do this, use the
 command `p'. Ebib will ask you for a buffer to push the entry to, a
-citation command and also any optional arguments, and then insert a
+citation command and also any optional arguments, and then inserts a
 citation at the current cursor position in the buffer you've supplied.
 
 The citation command that `ebib-insert-bibtex-key' and the command key
-`p' ask for have to be defined before you can use them. (By default,
-only the `\cite' command has been predefined for LaTeX.) For details on
-setting this up, see *note Citation Commands: #citation-commands.
-
-Another Ebib command is available for LaTeX documents: the command
-`ebib-create-bib-from-bbl' creates a `.bib' file from the `.bbl' file
-associated with the LaTeX document in the current buffer. This makes it
-easy to create a `.bib' file containing just the BibTeX entries that
-are used in the document. (One disadvantage is that cross-referenced
-entries aren't always in the `.bbl' file, depending on how your BibTeX
-style handles them. After using `ebib-create-bib-from-bbl' it may
-therefore be necessary to check whether you have all cross-referenced
-entries.)
-
-There is another function that is available outside Ebib:
-`ebib-entry-summary'. This command reads the key under the cursor in
-the current buffer and starts Ebib on that entry. This allows you to
-quickly check a reference in a text.
-
-Probably the easiest way to use both `ebib-insert-bibtex-key' and
-`ebib-entry-summary' is to bind them to a key sequence. For example,
-you could put the following in your `~/.emacs':
-
-(add-hook 'LaTeX-mode-hook #'(lambda ()
-                               (local-set-key "\C-cb" 'ebib-insert-bibtex-key)))
-
-This binds `C-c b' to the command `ebib-insert-bibtex-key' in AUCTeX's
-LaTeX mode. (Note that commands of the form `C-c <letter>' are reserved
-for the user, and should therefore not be set by any package. For this
-reasons, Ebib does not set this command automatically.)
-
-
-File: ebib.info,  Node: Orgmode and Markdown,  Next: Consulting Databases from within a LaTeX File,  Prev: LaTeX Integration,  Up: Basic Usage
-
-2.6 Orgmode and Markdown
-========================
-
-Orgmode (http://orgmode.org) can handle various types of links and new
-link types can be created by the user. If you use orgmode to write
-papers and want to use bibliographic references, it is easy to set up
-orgmode to use Ebib. If you add the following line to `~/.emacs':
+`p' ask for have to be defined before you can use them. How to do this
+is explained below, see *note Defining Citation Commands:
+#defining-citation-commands. For LaTeX, only the `\cite' command is set
+up by default, so you may want to add some commands. In Orgmode files,
+Ebib inserts a link of the form `[[ebib:Jones1992][Jones (1992)]]'.
+(Actually, you'll need to provide the `Jones (1992)' yourself, when
+Ebib asks for a description.) If you use this, you should add the
+following line to your init file:
 
 (org-add-link-type "ebib" 'ebib)
 
-you can create org links of the following form:
+This will allow Orgmode to recognise Ebib links and allow you to jump
+to the BibTeX entry in Ebib using `C-c C-o' (`org-open-at-point', the
+normal Orgmode command for following links). Note that such org links
+aren't properly translated to LaTeX citation commands when you export
+your org file. For that, you'll need to set up a different link type
+for each citation command and provide functions for exporting them to
+LaTeX. The orgmode documentation explains how this is done. (You can,
+in fact, create similar functions for exporting to other formats.)
 
-[ebib:Jones1992][Jones (1992)]
+If you use `ebib-insert-bibtex-key' in Pandoc Markdown, you can choose
+between three citation commands: `text', which inserts a citation of
+the form `@Jones1992', `paren', which inserts a citation of the form
+`[@Jones1992]' and `year', which omits the author and inserts
+`[-@Jones1992]'. Since these are the only types of citations that
+Pandoc Markdown knows, you shouldn't need to change anything.
 
-Orgmode will display this link simply as `Jones (1992)' in your buffer.
-If you click this link (or press `C-c C-o' on it), you will be taken to
-Ebib and shown the the entry `Jones1992' in the active database.
+* Menu:
 
-A citation string for orgmode is predefined, so you can use
-`ebib-insert-bibtex-key' in orgmode buffers to insert links of the type
-above into your orgmode documents.
-
-Note that such org links aren't properly translated to LaTeX citation
-commands when you export your org file. For that, you'll need to set up
-a different link type for each citation command and provide functions
-for exporting them to LaTeX. The orgmode documentation explains how
-this is done.
-
-Another document format that provides support for automatically
-generating citations is Pandoc (http://johnmacfarlane.net/pandoc/)
-Markdown. Pandoc's handling of citations is more sophisticated than
-orgmode's, as it can automatically translate citations in Markdown text
-into LaTeX (specifically: `natbib' or `biblatex') commands, but it also
-supports citations when converting to other document formats. In order
-to use Ebib with Pandoc Markdown, nothing needs to be set up: Ebib has
-predefined citation formats for the citations forms that Pandoc
-Markdown supports: `text', `paren' and `year'. The `text' format
-produces citations of the form `@Abney1987 [p. 50]', the `paren' format
-produces `[cf. @Abney1987, p. 50]' and the `year' format, which
-suppresses the author in the (LaTeX/html/what have you) output,
-produces `[-@Abney1987 p. 50]'. Of these three, the `paren' type can
-contain multiple citations (e.g., `[cf. @Abney1987, p. 50; @Dahl2004,
-p. 204]'), which Ebib can handle as well. See *note Citation Commands:
-#citation-commands. for further details.
+* Other Ebib commands outside Ebib::
+* Key Bindings::
+* Defining Citation Commands::
+* Associating a Database with a LaTeX File::
 
 
-File: ebib.info,  Node: Consulting Databases from within a LaTeX File,  Next: Cross-referencing,  Prev: Orgmode and Markdown,  Up: Basic Usage
+File: ebib.info,  Node: Other Ebib commands outside Ebib,  Next: Key Bindings,  Up: Putting citations into text documents
 
-2.7 Consulting Databases from within a LaTeX File
-=================================================
+2.5.1 Other Ebib commands outside Ebib
+--------------------------------------
+
+There are two other Ebib commands available outside Ebib. The first is
+`ebib-entry-summary', which reads the citation key at point in the
+current buffer and starts Ebib on that entry. This allows you to
+quickly check a reference in a text. (As mentioned, in Orgmode, `C-c
+C-o' does the same thing if you add `ebib' as a link type.)
+
+The second command is really only useful for LaTeX users:
+`ebib-create-bib-from-bbl' creates a `.bib' file from the `.bbl' file
+associated with the LaTeX document in the current buffer. This makes it
+easy to create a `.bib' file containing just the BibTeX entries that
+are used in the document. Note, however, that this command does not add
+cross-referenced entries to the newly created `.bib' file, nor does it
+add `@string' definitions and the `@preamble'. So make sure to add
+those after using `ebib-create-bib-from-bbl'. (Improving this
+functionality is on the TODO-list.)
+
+
+File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Other Ebib commands outside Ebib,  Up: Putting citations into text documents
+
+2.5.2 Key Bindings
+------------------
+
+Of course, the easiest way to use the commands discussed here is to
+bind them to a key sequence. For example, the following binds `C-c b'
+to `ebib-insert-bibtex-key' in AUCTeX's LaTeX mode:
+
+(define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-bibtex-key)
+
+Note that commands of the form `C-c <letter>' are reserved for the
+user, and should therefore not be set by any package. For this reasons,
+Ebib does not set this command automatically.
+
+`ebib-insert-bibtex-key' recognises the major mode of the buffer it is
+called from and uses this information to determine which kinds of
+citations to insert. So you can bind the `ebib-insert-bibtex-key' to
+the same key sequence in every text mode in which you use citations and
+Ebib will do the right thing.
+
+
+File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a LaTeX File,  Prev: Key Bindings,  Up: Putting citations into text documents
+
+2.5.3 Defining Citation Commands
+--------------------------------
+
+As mentioned, you should probably set up some citation commands if you
+use Ebib with LaTeX documents. The customisation option that allows you
+to do this is *note Citation Commands: #citation-commands.
+
+Citation commands are defined for specific major modes. You can also
+define commands for all modes under the heading `any'. (By default,
+this option is used for LaTeX commands, since there is more than one
+Emacs mode for (La)TeX). Each command consists of an identifier, which
+you type when Ebib prompts you for a citation command, plus a format
+string, which is used to create the actual citation command.
+
+The identifier should be a simple string which you can type easily when
+Ebib asks you for a citation command (TAB completion is available,
+though). The format string can contain a few directives, which are used
+to add the citation key and any optional arguments. The following
+directives are recognised:
+
+`%K'
+     the entry key to be inserted.
+
+`%A'
+     an argument, for which the user is prompted.
+
+`%<...%>'
+     optional material surrounding a `%A' directive.
+
+`%(...%<sep>)'
+     a so-called _repeater_, which contains material that can be
+     repeated. If present, the repeater must contain the entry key
+     directive `%K'.
+
+`%D'
+     a description, for which the user is prompted. Mainly for use in
+     Orgmode.
+
+In the simplest case, the format string contains just a `%K' directive:
+`\cite{%K}'. In this case, `%K' is replaced with the citation key and
+the result inserted. Usually, however, citation commands allow for
+optional arguments that are formatted as pre- or postnotes to the
+citation. For example, using the `natbib' package, you have citation
+commands available of the form:
+
+\citet[cf.][p. 50]{Jones1992}
+
+In order to be able to insert such citations, the format string must
+contain `%A' directives:
+
+\citet[%A][%A]{%K}
+
+With such a format string, Ebib asks the user to provide text for the
+two arguments and inserts it at the locations specified by the
+directives. Of course, it is possible to leave the arguments empty (by
+just hitting `RET'). With the format string above, this would yield the
+following citation in the LaTeX buffer:
+
+\citet[][]{Jones1992}
+
+The empty brackets are completely harmless, because LaTeX will simply
+ignore the empty arguments. However, you may prefer for the brackets
+not to appear if the arguments are empty. In that case, you can wrap
+the brackets and the `%A' directives in a `%<...%>' pair:
+
+\citet%<[%A]%>%<[%A]%>{%K}
+
+Now, if you leave the arguments empty, Ebib produces the following
+citation:
+
+\citet{Jones1992}
+
+Note however, that in this case there is in fact one problem associated
+with this format string. If you fill out the first argument but not the
+second, Ebib produces the wrong format string:
+
+\citet[cf.]{Jones1992}
+
+If only one optional argument is provided, `natbib' assumes that it is
+a postnote, while what you intended is actually a prenote. Therefore,
+it is best not to make the second argument optional:
+
+\citet%<[%A]%>[%A]{%K}
+
+This way, the second pair of brackets is always inserted, regardless of
+whether you provide a second argument or not.
+
+`Natbib' commands also accept multiple citation keys. When you call
+`ebib-insert-bibtex-key' from within a LaTeX buffer, you can only
+provide one key, but when you're in Ebib, you can mark multiple entry
+keys and then use `; p' to push them to a buffer. In this case, Ebib
+asks you for a separator and then inserts all keys into the position of
+`%K':
+
+\citet{Jones1992,Haddock2004}
+
+It is, however, also possible to specify in the format string that a
+certain sequence can be repeated and how the different elements should
+be separated. This is done by wrapping that portion of the format
+string that can be repeated in a `%(...%)' pair. Normally, you'll want
+to provide a separator, which is done by placing it between the `%' and
+the closing parenthesis:
+
+\citet[%A][%A]{%(%K%,)}
+
+This format string says that the directive `%K' can be repeated and
+that multiple keys must be separated with a comma. The advantage of
+this is that you are no longer asked to provide a separator.
+
+It is also possible to put `%A' directives in the repeating part. This
+is useful for the `biblatex' package. `Biblatex' has so-called
+_multicite_ commands, which take the following form:
+
+\footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
+
+Multicite commands can take more than one citation key in braces `{}'
+and each of those citation keys can take two optional arguments in
+brackets `[]'. In order to get such citations, you can provide the
+following format string:
+
+\footcites%(%<[%A]%>[%A]{%K}%)
+
+Here, the entire sequence of two optional arguments and the obligatory
+citation key is wrapped in `%(...%)', so that Ebib knows it can be
+repeated. If you now mark multiple entries in Ebib, press `; p' and
+select the `footcites' command, Ebib will put all the keys in the
+citation, asking you for two arguments for each citation key.
+
+Of course it is also possible to combine parts that are repeated with
+parts that are not repeated. In fact, that already happens in the
+previous example, because the part `\footcites' is not repeated. But
+the part that is not repeated may contain `%A' directives as well:
+
+\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+
+Multicite commands in `biblatex' take two additional arguments
+surrounded with parentheses. These are pre- and postnotes for the
+entire sequence of citations. They can be accommodated as shown.
+
+Lastly, a citation command can also contain a `%D' directive. This is
+mainly for use in Orgmode citations, which take the form
+`[[ebib:<key>][<description>]]'. The description is not an argument to
+the citation command but the string that will be displayed in the
+Orgmode buffer.
+
+
+File: ebib.info,  Node: Associating a Database with a LaTeX File,  Prev: Defining Citation Commands,  Up: Putting citations into text documents
+
+2.5.4 Associating a Database with a LaTeX File
+----------------------------------------------
 
 The commands `ebib-insert-bibtex-key' and `ebib-entry-summary' must
 consult the database or databases loaded in Ebib, and Ebib tries to be
@@ -694,10 +842,11 @@ smart about which database(s) to consult. Usually, a LaTeX file has a
 `\bibliography' command somewhere toward the end, which names the
 `.bib' file or files that contain the bibliography entries. If you
 consult a BibTeX database from within a LaTeX file, Ebib first looks
-for a `\bibliography' command, reads the `.bib' files from it, and then
-sees if those files happen to be open. If they are, Ebib uses them to
-let you pick an entry key (in the case of `ebib-insert-entry-key') or
-to search for the entry (in the case of `ebib-entry-summary').
+for a `\bibliography' command, reads the names of the `.bib' file(s)
+from it, and then sees if those files happen to be open. If they are,
+Ebib uses them to let you pick an entry key (in the case of
+`ebib-insert-entry-key') or to search for the entry (in the case of
+`ebib-entry-summary').
 
 Of course, it may be the case that the LaTeX file is actually part of a
 bigger project, and that only the master file contains a
@@ -723,22 +872,24 @@ Another thing to keep in mind is that Ebib only looks for a
 the result of this search and uses it the next time either of these
 commands is used. Therefore, if you make a change to the
 `\bibliography' command, you must reload the file (use `M-x
-revert-buffer') to make sure Ebib rereads the `\bibliography' command.
+revert-buffer' or `C-b C-v RET') to make sure Ebib rereads the
+`\bibliography' command.
 
 If no `\bibliography' command is found at all, either in the LaTeX file
 itself, or in the master file, Ebib simply consults the current
 database, i.e. the database that was active when Ebib was lowered with
-`z'.
+`z'. This is also what Ebib does for Orgmode or Pandoc Markdown files,
+since they do not have the equivalent of a bibliography command.
 
 
-File: ebib.info,  Node: Cross-referencing,  Next: Selecting Entries,  Prev: Consulting Databases from within a LaTeX File,  Up: Basic Usage
+File: ebib.info,  Node: Cross-referencing,  Next: Selecting Entries,  Prev: Putting citations into text documents,  Up: Basic Usage
 
-2.8 Cross-referencing
+2.6 Cross-referencing
 =====================
 
 BibTeX has a cross-referencing facility. Suppose you have an entry
 `Jones1998', which appeared in a book that is also in your database,
-say under `miller1998'. You can tell BibTeX that `Jones1998' is
+say under `Miller1998'. You can tell BibTeX that `Jones1998' is
 contained in `Miller1998' by putting `Miller1998' in the `crossref'
 field. When BibTeX finds such a cross-reference, all the fields of
 `Jones1998' that don't have a value inherit their values from
@@ -778,9 +929,9 @@ you type `C' on an entry that does not have a cross-reference, Ebib
 makes the key of the current entry the current search string and
 searches for its first occurrence after the current entry. Note that
 after Ebib has jumped to the first cross-referencing entry, you cannot
-type `C' again to find the next one. This command will take you back to
-the cross-referenced entry. In order to find the next cross-referencing
-entry, you have to type `n', as with a normal search.
+type `C' again to find the next one. (Instead, it would take you back
+to the cross-referenced entry.) In order to find the next
+cross-referencing entry, you have to type `n', as with a normal search.
 
 Note that if you want to use BibTeX's cross-referencing options, you
 need to set the option *note Save Xrefs first: #save-xrefs-first. This
@@ -791,18 +942,17 @@ reliably.
 
 File: ebib.info,  Node: Selecting Entries,  Next: Printing the Database,  Prev: Cross-referencing,  Up: Basic Usage
 
-2.9 Selecting Entries
+2.7 Selecting Entries
 =====================
 
 Commands in the index buffer generally operate on one single entry, or
-on all entries. For some, however, it may sometimes be useful to
-perform them on more than one entry, but not necessarily all of them.
-This can be achieved by selecting entries. You can select the entries
-you want to perform a command on with the key `m'. This selects (or
-unselects) the current entry. Selected entries are displayed in inverse
-video. Note that the face properties of selected entries can be
-customised through the customisation option *note Selected Face:
-#selected-face.)
+on all entries. For some commands, however, it may sometimes be useful
+to perform them on more than one entry, but not necessarily all of
+them. This can be achieved by selecting entries. You can select the
+entries you want to perform a command on with the key `m'. This selects
+(or unselects) the current entry. Selected entries are highlighted.
+(Note that the face properties of selected entries can be customised
+through the customisation option *note Selected Face: #selected-face.)
 
 Of the commands discussed so far, two can be used on selected entries:
 `d' and `p'. Note, however, that it is not enough to select the entries
@@ -821,8 +971,8 @@ not create a citation command for each entry separately.
 
 File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser,  Prev: Selecting Entries,  Up: Basic Usage
 
-2.10 Printing the Database
-==========================
+2.8 Printing the Database
+=========================
 
 Sometimes it may be useful to have a `.pdf' file or print-out of your
 database. Although Ebib does not actually do the printing itself, it
@@ -900,8 +1050,8 @@ chapter on customisation, see *note The Customisation Buffer:
 
 File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing the Database,  Up: Basic Usage
 
-2.11 Calling a Browser
-======================
+2.9 Calling a Browser
+=====================
 
 With more and more scientific literature becoming available on-line, it
 becomes common to store URLs and DOIs in a BibTeX database. Sometimes
@@ -944,7 +1094,7 @@ done for the DOI field.
 
 File: ebib.info,  Node: Viewing Files,  Prev: Calling a Browser,  Up: Basic Usage
 
-2.12 Viewing Files
+2.10 Viewing Files
 ==================
 
 If you have electronic versions of the papers in your database stored
@@ -1578,8 +1728,8 @@ if you prefer: customise *note Filters Display As Lisp:
 If you don't want to filter on one specific field but rather want to
 select all entries that match a certain regexp in any field, you can
 type `any' as the field to filter on. So specifying `any' as the field
-and `Jones' as the regexp, the filter selects all entries that have a
-field that contains "Jones" in them.
+and `Jones' as the regexp will give you all entries that have a field
+that contains "Jones" in them.
 
 Note that you can also select items based on their entry type. In order
 to do that, you need to specify `type*' as the field to search, which
@@ -1601,9 +1751,10 @@ File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Pre
 ----------------------
 
 Once you have a filter on your database, you can refine or extend it.
-For example, suppose you want to add all entries that have "Jones" in
-the editor field to your selection as well. I this case you need to do
-a logical `or' operation: you want to select an entry if it contains
+For example, suppose you have a filter selecting all entries with
+"Jones" in the `author' field and want to add all entries that have
+"Jones" in the editor field to your selection. I this case you need to
+do a logical `or' operation: you want to select an entry if it contains
 "Jones" in the `author' field (which you already did) _or_ if it
 contains "Jones" in the `editor' field.
 
@@ -1620,7 +1771,7 @@ the `author' _and_ `editor' fields.
 
 To perform a logical `or' operation, press the key `|'. As before, you
 will be asked which field you want to filter on, and which regexp you
-want to filter with. Ebib will then update the database.
+want to filter with. Ebib will then update the index buffer.
 
 It is also possible to perform a logical `and' on the filter. Use this
 if you want to select those entries that contain "Jones" in the
@@ -1634,14 +1785,13 @@ active.)
 Both the `&' and `|' commands can be used with the negative prefix
 argument `M--' (or `C-u -', which is identical). In this case, the
 search criterion is negated. That is, the negative prefix argument
-performs a logical `not' operation on the search criterion.
-
-That is, if you want to select all entries from a database that do
+performs a logical `not' operation on the search criterion. For
+example, if you want to select all entries from a database that do
 _not_ contain "Jones" in the `author' field, you can do this by typing
 `M-- &' and then filling out the relevant field and regexp.
 
 There is another way of performing a logical `not' operation, which is
-only available in when a filter is active: by pressing the key `~', you
+only available when a filter is active: by pressing the key `~', you
 invert the current filter. That is, if you have a filtered database
 with all the entries containing "Jones" in the `author' or in the
 `editor' field, and you press `~', the selection is inverted, and now
@@ -1674,7 +1824,7 @@ File: ebib.info,  Node: Storing and Saving Filters,  Next: Properties of Filtere
 ---------------------------------
 
 Once constructed, a filter can be stored, so that it can be used again.
-To store a filter, hit `F s'. Ebib will ask you for a name for the
+To store a filter, type `F s'. Ebib will ask you for a name for the
 filter in order to identify it later. By default, filter names are
 case-insensitive, but if you prefer to use case-sensitive filter names,
 you can unset the option *note Filters Ignore Case:
@@ -1686,26 +1836,35 @@ filter is stored, it is available to all databases.
 You can apply a stored filter with `F a'. This will ask for the name of
 a filter and apply it to the current database. You can extend the
 filter in the normal way, though the changes will not be stored
-automatically. Note that cancelling a filter does not delete it from
-the list of stored filters, it will remain available for later
-application. If you want to delete a filter from the list of stored
-filters, use `F d'. You can also delete all stored filters with `F D'.
-To see what filters are currently stored, use `F V'.
+automatically. To store it, type `F s' again. You can store the
+extended filter under the old name, in which case Ebib will ask you for
+confirmation, or under a new name, which will store it as a new filter,
+keeping the old one.
 
 The file that Ebib uses to store filters is `~/.emacs.d/ebib-filters',
 although that can of course be customised (see *note Filters Default
 File: #filters-default-file.). As mentioned, stored filters are saved
-automatically when Ebib closes, but you can also save them with `F S'.
-Note that if there are no stored filters when Ebib is closed, the file
-is deleted. If you want to save filters without risking them being
-overwritten, you can save them to a different file with `F w'. To load
-such a filter file, use `F l'. If you load filters from a file while
-you still have stored filters, you are asked if you want to replace
-them completely or if you want to add the new filters to the existing
-ones. In the latter case, however, filters whose name conflict with
-existing filters are not loaded. (Ebib will log a message about this
-when this happens.) Lastly, if you want to rename a stored filter, you
-can do so with `F R'.
+automatically when Ebib closes, but you can also save them manually
+with `F S'. Note that if there are no stored filters when Ebib is
+closed (or when you press `F S'), the file is deleted.
+
+You can also save your filters to a different file with `F w'. Such a
+filter file can be reloaded later with `F l'. If you load filters from
+a file while you still have stored filters, you are asked if you want
+to replace them completely or if you want to add the new filters to the
+existing ones. In the latter case, however, filters whose name conflict
+with existing filters are not loaded. (Ebib will log a message about
+this when this happens.)
+
+To see what filters are currently stored, use `F V'. If you want to
+rename a filter, you can do so with `F R'.
+
+Note that cancelling a filter with `F c' does not delete it from the
+list of stored filters, it will remain available for later application.
+If you want to delete a filter from the list of stored filters, use `F
+d'. You can also delete all stored filters with `F D'. These deletion
+commands do not ask for confirmation, but if you delete any filters by
+accident, you can reload them from `~/.emacs.d/ebib-filters' with `F l'.
 
 
 File: ebib.info,  Node: Properties of Filtered Databases,  Prev: Storing and Saving Filters,  Up: Filters
@@ -1716,26 +1875,27 @@ File: ebib.info,  Node: Properties of Filtered Databases,  Prev: Storing and Sav
 When a filter is active, there are a few things that are not possible
 or function differently. First, it is not possible to add or delete
 entries, either interactively or by merging or exporting. Exporting
-from a filtered database and saving one is also disabled. (The reasons
-for these limitations are historic and they may be lifted in future
-version). Editing existing entries is possible. If the entry doesn't
-match the filter anymore after the edit, it doesn't disappear from
-view, however. In order to reapply the filter, press `F r'.
+from a filtered database or saving a filtered database is also
+disabled. (The reasons for these limitations are mainly historic and
+they may be lifted in future version). Editing existing entries is
+possible, however. Note that if the entry doesn't match the filter
+anymore after the edit, it doesn't disappear from view. In order to
+reapply the filter, press `F r'.
 
 It is also possible to mark entries. Marked entries stay marked when
 you cancel the filter, so in order to do something with all the entries
 matching a filter, you can mark them all in the filter view with `; m',
 then cancel the filter and perform an action on them.
 
-Although a filtered database cannot be saved, it _can_ be written to a
-file. To do so, use `F W'. This command asks you for a filename and
-writes the filtered entries to it. It also writes all the `@string'
-definitions and the `@preamble', so you end up with a complete `.bib'
-file. (Note that this is in fact the same command as the menu option
-"Save Database As". This command behaves differently depending on
-whether a filter is active. If there is, only the filtered entries are
-written to the new file and the original database remains open. If no
-filter is active, the database is renamed.)
+Although a filtered database cannot be saved, it is possible to write
+the filtered entries to a file. To do so, use `F W'. This command also
+writes all the `@string' definitions and the `@preamble', so you end up
+with a complete `.bib' file. (Note that this is in fact the same
+command as the menu option "Save Database As". This command behaves
+differently depending on whether a filter is active. If there is, only
+the filtered entries are written to the new file and the original
+database remains open. If no filter is active, all the entries are
+written and the database in Ebib is renamed.)
 
 One final note: of all the filter-related commands, `~', `F c', `F r',
 `F s' and `F v' and of course the special function of `F w' are only
@@ -2570,141 +2730,17 @@ File: ebib.info,  Node: Citation Commands,  Next: Multiline Major Mode,  Prev: A
 ((any
   (("cite" "\\cite%<[%A]%>{%K}")))
  (org-mode
-  (("ebib" "[ebib:%K][%A]")))
+  (("ebib" "[[ebib:%K][%D]]")))
  (markdown-mode
   (("text" "@%K%< [%A]%>")
    ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
    ("year" "[-@%K%< %A%>]"))))
 
-Citation commands are defined for specific major modes or for all modes
-(under the heading `any'). Each command consists of an identifier,
-which you type when Ebib prompts you for a citation command, plus a
-format string. This format string can contain a few directives, which
-are used to add the citation key and any optional arguments. This
-format string can contain the following directives:
-
-`%K'
-     the entry key to be inserted.
-
-`%A'
-     an argument, for which the user is prompted.
-
-`%<...%>'
-     optional material surrounding a `%A' directive.
-
-`%(...%<sep>)'
-     a so-called _repeater_, which contains material that can be
-     repeated. If present, the repeater must contain the entry key
-     directive `%K'.
-
-In the simplest case, the format string contains just a `%K' directive:
-`\cite{%K}'. In this case, `%K' is replaced with the citation key and
-the result inserted. Usually, however, citation commands allow for
-optional arguments that are formatted as pre- or postnotes to the
-citation. For example, using the `natbib' package, you have citation
-commands available of the form:
-
-\citet[cf.][p. 50]{Jones1992}
-
-In order to be able to insert such citations, the format string must
-contain `%A' directives:
-
-\citet[%A][%A]{%K}
-
-With such a format string, Ebib asks the user to provide text for the
-two arguments and inserts it at the locations specified by the
-directives. Of course, it is possible to leave the arguments empty (by
-just hitting `RET'). With the format string above, this would yield the
-following citation in the LaTeX buffer:
-
-\citet[][]{Jones1992}
-
-This is completely harmless, because LaTeX will simply ignore the empty
-arguments. However, you may prefer for the brackets not to appear if
-the arguments are empty. In that case, you can wrap the brackets and
-the `%A' directives in a `%<...%>' pair:
-
-\citet%<[%A]%>%<[%A]%>{%K}
-
-Now, if you leave the arguments empty, Ebib produces the following
-citation:
-
-\citet{Jones1992}
-
-Note however, that in this case there is in fact one problem associated
-with this format string. If you fill out the first argument but not the
-second, Ebib produces the wrong format string:
-
-\citet[cf.]{Jones1992}
-
-If only one optional argument is provided, `natbib' assumes that it is
-a postnote, while what you intended is actually a prenote. Therefore,
-it is best not to make the second argument optional:
-
-\citet%<[%A]%>[%A]{%K}
-
-This way, the second pair of brackets is always inserted, regardless of
-whether you provide a second argument or not.
-
-`Natbib' commands also accept multiple citation keys. When you call
-`ebib-insert-bibtex-key' from within a LaTeX buffer, you can only
-provide one key, but when you're in Ebib, you can mark multiple entry
-keys and then use `; p' to push them to a buffer. In this case, Ebib
-asks you for a separator and then inserts all keys into the position of
-`%K':
-
-\citet{Jones1992,Haddock2004}
-
-It is, however, also possible to specify in the format string that a
-certain sequence can be repeated and how the different elements should
-be separated. This is done by wrapping that portion of the format
-string that can be repeated in a `%(...%)' pair. Normally, you'll want
-to provide a separator, which is done by placing it between the `%' and
-the closing parenthesis:
-
-\citet[%A][%A]{%(%K%,)}
-
-This format string says that the directive `%K' can be repeated and
-that multiple keys must be separated with a comma. The advantage of
-this is that you are no longer asked to provide a separator. However,
-this is not the only thing one can do, because it is also possible to
-put `%A' directives in the repeating part. This is useful for the
-`biblatex' package. `Biblatex' has so-called _multicite_ commands,
-which take the following form:
-
-\footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
-
-Multicite commands can take more than one citation key in braces `{}'
-and each of those citation keys can take two optional arguments in
-brackets `[]'. In order to get such citations, you can provide the
-following format string:
-
-\footcites%(%<[%A]%>[%A]{%K}%)
-
-Here, the entire sequence of two optional arguments and the obligatory
-citation key is wrapped in `%(...%)', so that Ebib knows it can be
-repeated. If you now mark multiple entries in Ebib, press `; p' and
-select the `footcites' command, Ebib will put all the keys in the
-citation, asking you for two arguments for each citation key.
-
-Of course it is also possible to combine parts that are repeated with
-parts that are not repeated. In fact, that already happens in the
-previous example, because the part `\footcites' is not repeated. But
-the part that is not repeated may contain `%A' directives as well:
-
-\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
-
-Multicite commands in `biblatex' take two additional arguments
-surrounded with parentheses. These are pre- and postnotes for the
-entire sequence of citations. They can be accommodated as shown.
-
-The function `ebib-insert-bibtex-key' can of course also be called from
-non-LaTeX buffers. For example, org-mode (http://orgmode.org) can use
-bibliographic links, and so can Pandoc
-(http://johnmacfarlane.net/pandoc/) Markdown. For those two modes,
-citation commands have been predefined, which may provide some
-additional inspiration in case you want to create your own format
-strings.
+You can define a different set of citation commands for each major
+mode. There is a catch-all option `any', which is chosen when the major
+mode from which `ebib-insert-bibtex-key' is not on the list. By
+default, this is used for LaTeX citations, because not everybody uses
+AUCTeX's `LaTeX-mode'.
 
 
 File: ebib.info,  Node: Multiline Major Mode,  Next: Sort Order,  Prev: Citation Commands,  Up: The Customisation Buffer
@@ -3027,201 +3063,205 @@ s' to `C-c & q', `C-c & c' and `C-c & s', respectively.
 
 
 Tag Table:
-Node: Top196
-Node: Installation1382
-Ref: #installation1495
-Node: Package manager1596
-Ref: #package-manager1727
-Node: Manual installation2270
-Ref: #manual-installation2442
-Node: Installing the info file3890
-Ref: #installing-the-info-file4070
-Node: Starting Ebib4763
-Ref: #starting-ebib4893
-Node: Basic Usage5752
-Ref: #basic-usage5877
-Node: Getting Started7413
-Ref: #getting-started7544
-Node: Opening a bib File8484
-Ref: #opening-a-.bib-file8639
-Node: Navigating a bib File10566
-Ref: #navigating-a-.bib-file10759
-Node: Starting a New bib File13783
-Ref: #starting-a-new-.bib-file13953
-Node: Editing the Database14235
-Ref: #editing-the-database14402
-Node: Adding and Deleting Entries14713
-Ref: #adding-and-deleting-entries14894
-Node: Editing Fields Values16501
-Ref: #editing-fields-values16703
-Node: Editing Multiline Values19176
-Ref: #editing-multiline-values19387
-Node: Copy Cut Paste Yank and Delete21398
-Ref: #copy-cut-paste-yank-and-delete21601
-Node: Saving a Database22553
-Ref: #saving-a-database22708
-Node: Searching23722
-Ref: #searching23858
-Node: LaTeX Integration26056
-Ref: #latex-integration26211
-Node: Orgmode and Markdown29005
-Ref: #orgmode-and-markdown29202
-Node: Consulting Databases from within a LaTeX File31331
-Ref: #consulting-databases-from-within-a-latex-file31578
-Node: Cross-referencing33932
-Ref: #cross-referencing34120
-Node: Selecting Entries37165
-Ref: #selecting-entries37329
-Node: Printing the Database38697
-Ref: #printing-the-database38871
-Node: Calling a Browser42833
-Ref: #calling-a-browser42995
-Node: Viewing Files45109
-Ref: #viewing-files45233
-Node: Advanced Features47882
-Ref: #advanced-features48023
-Node: Window Management48515
-Ref: #window-management48658
-Node: Preloading bib Files51396
-Ref: #preloading-.bib-files51580
-Node: @Preamble Definition52355
-Ref: #preamble-definition52535
-Node: @String Definitions54647
-Ref: #string-definitions54822
-Node: Managing Keywords58080
-Ref: #managing-keywords58251
-Node: Sorting the bib File63282
-Ref: #sorting-the-.bib-file63467
-Node: Merging and Importing66451
-Ref: #merging-and-importing66632
-Node: Exporting Entries67787
-Ref: #exporting-entries67950
-Node: Timestamps69982
-Ref: #timestamps70135
-Node: Multiple Identical Fields71747
-Ref: #multiple-identical-fields71922
-Node: Filters73769
-Ref: #filters73923
-Node: Simple Selection74978
-Ref: #simple-selection75109
-Node: Complex Filters76763
-Ref: #complex-filters76927
-Node: Storing and Saving Filters80596
-Ref: #storing-and-saving-filters80798
-Node: Properties of Filtered Databases82848
-Ref: #properties-of-filtered-databases83038
-Node: The Multiline Edit Buffer84713
-Ref: #the-multiline-edit-buffer84894
-Node: The Options Menu88799
-Ref: #the-options-menu88946
-Node: The Ebib Buffers89556
-Ref: #the-ebib-buffers89697
-Node: The Index Buffer90037
-Ref: #the-index-buffer90172
-Node: The Entry Buffer95687
-Ref: #the-entry-buffer95849
-Node: The Strings Buffer98108
-Ref: #the-strings-buffer98249
-Node: Customisation99937
-Ref: #customisation100046
-Node: The Customisation Buffer100330
-Ref: #the-customisation-buffer100492
-Node: Default Type101783
-Ref: #default-type101919
-Node: Preload Bib Files101947
-Ref: #preload-bib-files102125
-Node: Preload Bib Search Dirs102149
-Ref: #preload-bib-search-dirs102341
-Node: Create Backups102363
-Ref: #create-backups102533
-Node: Keywords list102555
-Ref: #keywords-list102713
-Node: Keywords File102737
-Ref: #keywords-file102907
-Node: Keywords File Save On Exit102931
-Ref: #keywords-file-save-on-exit103136
-Node: Keywords Use Only File103160
-Ref: #keywords-use-only-file103370
-Node: Keywords Field Keep Sorted103394
-Ref: #keywords-field-keep-sorted103604
-Node: Keywords Separator103628
-Ref: #keywords-separator103819
-Node: Additional Fields103844
-Ref: #additional-fields104013
-Node: Layout104098
-Ref: #layout104232
-Node: Width104257
-Ref: #width104390
-Node: Popup Entry Window104411
-Ref: #popup-entry-window104585
-Node: Window Vertical Split104607
-Ref: #window-vertical-split104799
-Node: Index Window Size104821
-Ref: #index-window-size105002
-Node: Index Mode Line105023
-Ref: #index-mode-line105199
-Node: Index Display Fields105417
-Ref: #index-display-fields105599
-Node: Uniquify Keys105623
-Ref: #uniquify-keys105793
-Node: Autogenerate Keys105817
-Ref: #autogenerate-keys105992
-Node: Citation Commands106189
-Ref: #citation-commands106371
-Node: Multiline Major Mode111886
-Ref: #multiline-major-mode112067
-Node: Sort Order112097
-Ref: #sort-order112257
-Node: Save Xrefs First112281
-Ref: #save-xrefs-first112446
-Node: Crossref Face112470
-Ref: #crossref-face112632
-Node: Selected Face112678
-Ref: #selected-face112837
-Node: Use Timestamp112881
-Ref: #use-timestamp113043
-Node: Timestamp Format113067
-Ref: #timestamp-format113240
-Node: Standard Url Field113277
-Ref: #standard-url-field113451
-Node: Url Regexp113475
-Ref: #url-regexp113632
-Node: Browser Command113693
-Ref: #browser-command113860
-Node: Standard Doi Field113978
-Ref: #standard-doi-field114148
-Node: Doi Url114172
-Ref: #doi-url114324
-Node: Standard File Field114477
-Ref: #standard-file-field114652
-Node: File Associations114677
-Ref: #file-associations114859
-Node: Filename Separator114912
-Ref: #filename-separator115093
-Node: File Search Dirs115115
-Ref: #file-search-dirs115289
-Node: Print Preamble115311
-Ref: #print-preamble115476
-Node: Print Newline115500
-Ref: #print-newline115662
-Node: Print Multiline115686
-Ref: #print-multiline115852
-Node: Latex Preamble115876
-Ref: #latex-preamble116041
-Node: Print Tempfile116087
-Ref: #print-tempfile116259
-Node: Allow Identical Fields116283
-Ref: #allow-identical-fields116477
-Node: Filters Default File116501
-Ref: #filters-default-file116700
-Node: Filters Display As Lisp116746
-Ref: #filters-display-as-lisp116948
-Node: Filters Ignore Case116972
-Ref: #filters-ignore-case117157
-Node: Entry Types117179
-Ref: #entry-types117316
-Node: Modifying Key Bindings118899
-Ref: #modifying-key-bindings119057
+Node: Top216
+Node: Installation1402
+Ref: #installation1515
+Node: Package manager1616
+Ref: #package-manager1747
+Node: Manual installation2290
+Ref: #manual-installation2462
+Node: Installing the info file3910
+Ref: #installing-the-info-file4090
+Node: Starting Ebib4783
+Ref: #starting-ebib4913
+Node: Basic Usage5772
+Ref: #basic-usage5897
+Node: Getting Started7378
+Ref: #getting-started7509
+Node: Opening a bib File8449
+Ref: #opening-a-.bib-file8604
+Node: Navigating a bib File10531
+Ref: #navigating-a-.bib-file10724
+Node: Starting a New bib File13748
+Ref: #starting-a-new-.bib-file13918
+Node: Editing the Database14200
+Ref: #editing-the-database14367
+Node: Adding and Deleting Entries14678
+Ref: #adding-and-deleting-entries14859
+Node: Editing Fields Values16466
+Ref: #editing-fields-values16668
+Node: Editing Multiline Values19141
+Ref: #editing-multiline-values19352
+Node: Copy Cut Paste Yank and Delete21363
+Ref: #copy-cut-paste-yank-and-delete21566
+Node: Saving a Database22518
+Ref: #saving-a-database22673
+Node: Searching23687
+Ref: #searching23843
+Node: Putting citations into text documents26041
+Ref: #putting-citations-into-text-documents26253
+Node: Other Ebib commands outside Ebib29346
+Ref: #other-ebib-commands-outside-ebib29550
+Node: Key Bindings30461
+Ref: #key-bindings30660
+Node: Defining Citation Commands31408
+Ref: #defining-citation-commands31643
+Node: Associating a Database with a LaTeX File37405
+Ref: #associating-a-database-with-a-latex-file37647
+Node: Cross-referencing40164
+Ref: #cross-referencing40344
+Node: Selecting Entries43391
+Ref: #selecting-entries43555
+Node: Printing the Database44918
+Ref: #printing-the-database45090
+Node: Calling a Browser49052
+Ref: #calling-a-browser49212
+Node: Viewing Files51326
+Ref: #viewing-files51450
+Node: Advanced Features54099
+Ref: #advanced-features54240
+Node: Window Management54732
+Ref: #window-management54875
+Node: Preloading bib Files57613
+Ref: #preloading-.bib-files57797
+Node: @Preamble Definition58572
+Ref: #preamble-definition58752
+Node: @String Definitions60864
+Ref: #string-definitions61039
+Node: Managing Keywords64297
+Ref: #managing-keywords64468
+Node: Sorting the bib File69499
+Ref: #sorting-the-.bib-file69684
+Node: Merging and Importing72668
+Ref: #merging-and-importing72849
+Node: Exporting Entries74004
+Ref: #exporting-entries74167
+Node: Timestamps76199
+Ref: #timestamps76352
+Node: Multiple Identical Fields77964
+Ref: #multiple-identical-fields78139
+Node: Filters79986
+Ref: #filters80140
+Node: Simple Selection81195
+Ref: #simple-selection81326
+Node: Complex Filters82974
+Ref: #complex-filters83138
+Node: Storing and Saving Filters86878
+Ref: #storing-and-saving-filters87080
+Node: Properties of Filtered Databases89497
+Ref: #properties-of-filtered-databases89687
+Node: The Multiline Edit Buffer91393
+Ref: #the-multiline-edit-buffer91574
+Node: The Options Menu95479
+Ref: #the-options-menu95626
+Node: The Ebib Buffers96236
+Ref: #the-ebib-buffers96377
+Node: The Index Buffer96717
+Ref: #the-index-buffer96852
+Node: The Entry Buffer102367
+Ref: #the-entry-buffer102529
+Node: The Strings Buffer104788
+Ref: #the-strings-buffer104929
+Node: Customisation106617
+Ref: #customisation106726
+Node: The Customisation Buffer107010
+Ref: #the-customisation-buffer107172
+Node: Default Type108463
+Ref: #default-type108599
+Node: Preload Bib Files108627
+Ref: #preload-bib-files108805
+Node: Preload Bib Search Dirs108829
+Ref: #preload-bib-search-dirs109021
+Node: Create Backups109043
+Ref: #create-backups109213
+Node: Keywords list109235
+Ref: #keywords-list109393
+Node: Keywords File109417
+Ref: #keywords-file109587
+Node: Keywords File Save On Exit109611
+Ref: #keywords-file-save-on-exit109816
+Node: Keywords Use Only File109840
+Ref: #keywords-use-only-file110050
+Node: Keywords Field Keep Sorted110074
+Ref: #keywords-field-keep-sorted110284
+Node: Keywords Separator110308
+Ref: #keywords-separator110499
+Node: Additional Fields110524
+Ref: #additional-fields110693
+Node: Layout110778
+Ref: #layout110912
+Node: Width110937
+Ref: #width111070
+Node: Popup Entry Window111091
+Ref: #popup-entry-window111265
+Node: Window Vertical Split111287
+Ref: #window-vertical-split111479
+Node: Index Window Size111501
+Ref: #index-window-size111682
+Node: Index Mode Line111703
+Ref: #index-mode-line111879
+Node: Index Display Fields112097
+Ref: #index-display-fields112279
+Node: Uniquify Keys112303
+Ref: #uniquify-keys112473
+Node: Autogenerate Keys112497
+Ref: #autogenerate-keys112672
+Node: Citation Commands112869
+Ref: #citation-commands113051
+Node: Multiline Major Mode113567
+Ref: #multiline-major-mode113748
+Node: Sort Order113778
+Ref: #sort-order113938
+Node: Save Xrefs First113962
+Ref: #save-xrefs-first114127
+Node: Crossref Face114151
+Ref: #crossref-face114313
+Node: Selected Face114359
+Ref: #selected-face114518
+Node: Use Timestamp114562
+Ref: #use-timestamp114724
+Node: Timestamp Format114748
+Ref: #timestamp-format114921
+Node: Standard Url Field114958
+Ref: #standard-url-field115132
+Node: Url Regexp115156
+Ref: #url-regexp115313
+Node: Browser Command115374
+Ref: #browser-command115541
+Node: Standard Doi Field115659
+Ref: #standard-doi-field115829
+Node: Doi Url115853
+Ref: #doi-url116005
+Node: Standard File Field116158
+Ref: #standard-file-field116333
+Node: File Associations116358
+Ref: #file-associations116540
+Node: Filename Separator116593
+Ref: #filename-separator116774
+Node: File Search Dirs116796
+Ref: #file-search-dirs116970
+Node: Print Preamble116992
+Ref: #print-preamble117157
+Node: Print Newline117181
+Ref: #print-newline117343
+Node: Print Multiline117367
+Ref: #print-multiline117533
+Node: Latex Preamble117557
+Ref: #latex-preamble117722
+Node: Print Tempfile117768
+Ref: #print-tempfile117940
+Node: Allow Identical Fields117964
+Ref: #allow-identical-fields118158
+Node: Filters Default File118182
+Ref: #filters-default-file118381
+Node: Filters Display As Lisp118427
+Ref: #filters-display-as-lisp118629
+Node: Filters Ignore Case118653
+Ref: #filters-ignore-case118838
+Node: Entry Types118860
+Ref: #entry-types118997
+Node: Modifying Key Bindings120580
+Ref: #modifying-key-bindings120738
 
 End Tag Table
 
