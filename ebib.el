@@ -1632,7 +1632,8 @@ When the keywords come from a file, add the keywords in
 
 (defun ebib-keywords-get-file (db)
   "Return the name of the keywords file for DB."
-  (if (file-name-directory ebib-keywords-file)
+  (if (and ebib-keywords-file ; TODO not sure if this function'll work correctly if ebib-keywords-file is NIL.
+           file-name-directory ebib-keywords-file)
       ebib-keywords-file
     (concat (file-name-directory (edb-filename db)) ebib-keywords-file)))
 
@@ -1773,7 +1774,8 @@ buffers and reads the rc file."
         ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
   (ebib-create-buffers)
-  (if (file-name-directory ebib-keywords-file) ; returns nil if there is no directory part
+  (if (and ebib-keywords-file
+           (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
       (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
                                                     (read-file-to-list ebib-keywords-file) nil)))
   (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
