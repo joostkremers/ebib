@@ -1633,7 +1633,7 @@ When the keywords come from a file, add the keywords in
 (defun ebib-keywords-get-file (db)
   "Return the name of the keywords file for DB."
   (if (and ebib-keywords-file ; TODO not sure if this function'll work correctly if ebib-keywords-file is NIL.
-           file-name-directory ebib-keywords-file)
+           (file-name-directory ebib-keywords-file))
       ebib-keywords-file
     (concat (file-name-directory (edb-filename db)) ebib-keywords-file)))
 
