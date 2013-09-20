@@ -620,7 +620,9 @@ To cancel the filter and return to the normal view of the database, press `F c`.
 
 ### Storing and Saving Filters ###
 
-Once constructed, a filter can be stored, so that it can be used again. To store a filter, type `F s`. Ebib will ask you for a name for the filter in order to identify it later. By default, filter names are case-insensitive, but if you prefer to use case-sensitive filter names, you can unset the option [Filters Ignore Case](#filters-ignore-case). When Ebib is closed, all stored filters are saved to a file and they're automatically reloaded when you open Ebib again. Stored filters are not associated with a particular database: once a filter is stored, it is available to all databases.
+When you cancel a filter, it is automatically stored so that it can be reapplied later. To reapply a filter, type `F L`. This will reapply the last used filter regardless of which database you're in. That is, you can use this to search more than one database without having to type the filter over and over.
+
+However, Ebib only stores one filter this way. If you want to store more filters, you have to name them. You can store the currently active filter or the last used filter with `F s`. Ebib will ask you for a name for the filter in order to identify it later. By default, filter names are case-insensitive, but if you prefer to use case-sensitive filter names, you can unset the option [Filters Ignore Case](#filters-ignore-case). When Ebib is closed, all stored filters are saved to a file and they're automatically reloaded when you open Ebib again. Stored filters are not associated with a particular database: once a filter is stored, it is available to all databases.
 
 You can apply a stored filter with `F a`. This will ask for the name of a filter and apply it to the current database. You can extend the filter in the normal way, though the changes will not be stored automatically. To store it, type `F s` again. You can store the extended filter under the old name, in which case Ebib will ask you for confirmation, or under a new name, which will store it as a new filter, keeping the old one.
 
@@ -760,6 +762,8 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    delete all stored filters. `(ebib-filters-delete-all-filters)`
 `F l`
 :    load filters from a file. `(ebib-filters-load-from-file)`
+`F L`
+:    reapply the last used filter. `(ebib-filters-reapply-last-filter)`
 `F r`
 :    reapply the current filter. `(ebib-filters-reapply-filter)`
 `F R`
