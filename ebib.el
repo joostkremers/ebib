@@ -575,6 +575,7 @@ Its value can be 'strings, 'fields, or 'preamble.")
 (modify-syntax-entry ?\" "w" ebib-syntax-table)
 
 (defvar ebib-filters-alist nil "Alist of saved filters.")
+(defvar ebib-filters-last-filter nil "The last used filter.")
 
 ;; keywords
 ;;
@@ -1990,6 +1991,7 @@ keywords when Emacs is killed."
   (define-key ebib-filters-map "d" 'ebib-filters-delete-filter)
   (define-key ebib-filters-map "D" 'ebib-filters-delete-all-filters)
   (define-key ebib-filters-map "l" 'ebib-filters-load-from-file)
+  (define-key ebib-filters-map "L" 'ebib-filters-reapply-last-filter)
   (define-key ebib-filters-map "r" 'ebib-filters-reapply-filter)
   (define-key ebib-filters-map "R" 'ebib-filters-rename-filter)
   (define-key ebib-filters-map "s" 'ebib-filters-store-filter)
@@ -3539,11 +3541,19 @@ on the entries."
     ((default)
      (error "No filter is active"))))
 
+(defun ebib-filters-reapply-last-filter ()
+  "Reapply the last used filter."
+  (interactive)
+  (setf (edb-filter ebib-cur-db) ebib-filters-last-filter)
+  (ebib-redisplay)
+  (message "Reapplied last filter"))
+
 (defun ebib-filters-cancel-filter ()
   "Cancel the current filter."
   (interactive)
   (ebib-execute-when
     ((filtered-db)
+     (setq ebib-filters-last-filter (edb-filter ebib-cur-db))
      (setf (edb-filter ebib-cur-db) nil)
      (ebib-redisplay)
      (message "Filter cancelled"))
@@ -3574,15 +3584,16 @@ Return the filter as a list (NAME FILTER)."
 (defun ebib-filters-store-filter ()
   "Store the current filter."
   (interactive)
-  (ebib-execute-when
-    ((filtered-db)
-     (let ((name (read-from-minibuffer "Enter filter name: ")))
-       (when (or (not (ebib-filters-exists-p name))
-                 (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
-         (ebib-filters-add-filter name (edb-filter ebib-cur-db) 'overwrite)
-         (message "Filter stored."))))
-    ((default)
-     (beep))))
+  (if (or ebib-filters-last-filter
+          (edb-filter ebib-cur-db))
+      (let ((name (read-from-minibuffer "Enter filter name: ")))
+        (when (or (not (ebib-filters-exists-p name))
+                  (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
+          (ebib-filters-add-filter name (or (edb-filter ebib-cur-db)
+                                            ebib-filters-last-filter)
+                                   'overwrite)
+          (message "Filter stored.")))
+    (message "No filter to store")))
 
 (defun ebib-filters-apply-filter ()
   "Select a filter and apply it to the current database."
