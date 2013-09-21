@@ -255,7 +255,7 @@ this command extracts the url."
   :group 'ebib
   :type 'symbol)
 
-(defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ '<>\"\n\t\f]+"
+(defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
   "Regular expression to extract urls from a field."
   :group 'ebib
   :type 'string)

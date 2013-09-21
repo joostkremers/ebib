@@ -1065,17 +1065,24 @@ Furthermore, in the entry buffer, you can use `u' on _any_ field. If
 you happen to have more than one URL stored in the relevant field, and
 you want to pass the second (or third, etc.) to the browser, Ebib will
 ask you which one you want to open. Alternatively, you can use a prefix
-argument. So typing `M-2 u' sends the second URL to your browser..
+argument. So typing `M-2 u' sends the second URL to your browser.
 
 It is not even necessary that the relevant field contains _only_ URLs.
 It may contain other text mixed with the URLs: Ebib simply searches the
 URLs in the field and ignores the rest of the text. Ebib considers
 every string of characters that starts with `http://' or `https://' and
-that does not contain whitespace or any of the characters `" ' <' or
-`>' as a URL. Furthermore, Ebib regards everything that is enclosed in
-a LaTeX `\url{...}' command as a URL. This behaviour is controlled by a
-regular expression that can be customised. (See *note Url Regexp:
-#url-regexp.)
+that does not contain whitespace or any of the characters `" ' ; <' or
+`>' as a URL. The semicolon is included here even though it is actually
+a valid character in URLs. This is done for consistency, because the
+semicolon (actually, semicolon+space) is the standard separator for
+files and keywords and in this way, you can use the same separator to
+distinguish multiple URLs in the `url' field. By default Ebib also
+regards everything that is enclosed in a LaTeX `\url{...}' command as a
+URL. So if you use `;' to separate URLs and then happen to run into a
+URL that contains a semicolon, you can enclose it in `\url{...}' and it
+will be recognised properly. You can, of course, customise the regular
+expression that controls this behaviour. See the option *note Url
+Regexp: #url-regexp. for details.
 
 Similarly, with the key `i' in the index buffer you can send a DOI to a
 browser. The DOI must be stored in the `doi' field. Unlike URLs, there
@@ -2814,7 +2821,11 @@ File: ebib.info,  Node: Url Regexp,  Next: Browser Command,  Prev: Standard Url 
 5.1.30 Url Regexp
 -----------------
 
-*Default value*: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+'.
+*Default value*: `\\url{\(.*\)}\|https?://[^ ';<>\"\n\t\f]+'.
+Note that the semicolon is added for consistency: it makes it possible
+to use the same separator in the `url' field as in the `file' and
+`keywords' fields.
+
 
 File: ebib.info,  Node: Browser Command,  Next: Standard Doi Field,  Prev: Url Regexp,  Up: The Customisation Buffer
 
@@ -3114,150 +3125,150 @@ Node: Printing the Database44898
 Ref: #printing-the-database45070
 Node: Calling a Browser49032
 Ref: #calling-a-browser49192
-Node: Viewing Files51275
-Ref: #viewing-files51399
-Node: Advanced Features54048
-Ref: #advanced-features54189
-Node: Window Management54681
-Ref: #window-management54824
-Node: Preloading bib Files57562
-Ref: #preloading-.bib-files57746
-Node: @Preamble Definition58521
-Ref: #preamble-definition58701
-Node: @String Definitions60813
-Ref: #string-definitions60988
-Node: Managing Keywords64246
-Ref: #managing-keywords64417
-Node: Sorting the bib File69448
-Ref: #sorting-the-.bib-file69633
-Node: Merging and Importing72617
-Ref: #merging-and-importing72798
-Node: Exporting Entries73953
-Ref: #exporting-entries74116
-Node: Timestamps76148
-Ref: #timestamps76301
-Node: Multiple Identical Fields77913
-Ref: #multiple-identical-fields78088
-Node: Filters79935
-Ref: #filters80089
-Node: Simple Selection81144
-Ref: #simple-selection81275
-Node: Complex Filters82923
-Ref: #complex-filters83087
-Node: Storing and Saving Filters86827
-Ref: #storing-and-saving-filters87029
-Node: Properties of Filtered Databases89835
-Ref: #properties-of-filtered-databases90025
-Node: The Multiline Edit Buffer91731
-Ref: #the-multiline-edit-buffer91912
-Node: The Options Menu95817
-Ref: #the-options-menu95964
-Node: The Ebib Buffers96574
-Ref: #the-ebib-buffers96715
-Node: The Index Buffer97055
-Ref: #the-index-buffer97190
-Node: The Entry Buffer102784
-Ref: #the-entry-buffer102946
-Node: The Strings Buffer105205
-Ref: #the-strings-buffer105346
-Node: Customisation107034
-Ref: #customisation107143
-Node: The Customisation Buffer107427
-Ref: #the-customisation-buffer107589
-Node: Default Type108868
-Ref: #default-type109004
-Node: Preload Bib Files109032
-Ref: #preload-bib-files109210
-Node: Preload Bib Search Dirs109234
-Ref: #preload-bib-search-dirs109426
-Node: Create Backups109448
-Ref: #create-backups109618
-Node: Keywords list109640
-Ref: #keywords-list109798
-Node: Keywords File109822
-Ref: #keywords-file109992
-Node: Keywords File Save On Exit110016
-Ref: #keywords-file-save-on-exit110221
-Node: Keywords Use Only File110245
-Ref: #keywords-use-only-file110455
-Node: Keywords Field Keep Sorted110479
-Ref: #keywords-field-keep-sorted110689
-Node: Keywords Separator110713
-Ref: #keywords-separator110904
-Node: Additional Fields110929
-Ref: #additional-fields111098
-Node: Layout111183
-Ref: #layout111317
-Node: Width111342
-Ref: #width111475
-Node: Popup Entry Window111496
-Ref: #popup-entry-window111670
-Node: Window Vertical Split111692
-Ref: #window-vertical-split111884
-Node: Index Window Size111906
-Ref: #index-window-size112087
-Node: Index Mode Line112108
-Ref: #index-mode-line112284
-Node: Index Display Fields112502
-Ref: #index-display-fields112684
-Node: Uniquify Keys112708
-Ref: #uniquify-keys112878
-Node: Autogenerate Keys112902
-Ref: #autogenerate-keys113077
-Node: Citation Commands113274
-Ref: #citation-commands113456
-Node: Multiline Major Mode113972
-Ref: #multiline-major-mode114153
-Node: Sort Order114183
-Ref: #sort-order114343
-Node: Save Xrefs First114367
-Ref: #save-xrefs-first114532
-Node: Crossref Face114556
-Ref: #crossref-face114718
-Node: Selected Face114764
-Ref: #selected-face114923
-Node: Use Timestamp114967
-Ref: #use-timestamp115129
-Node: Timestamp Format115153
-Ref: #timestamp-format115326
-Node: Standard Url Field115363
-Ref: #standard-url-field115537
-Node: Url Regexp115561
-Ref: #url-regexp115718
-Node: Browser Command115779
-Ref: #browser-command115946
-Node: Standard Doi Field116064
-Ref: #standard-doi-field116246
-Node: Standard File Field116270
-Ref: #standard-file-field116456
-Node: File Associations116481
-Ref: #file-associations116663
-Node: Filename Separator116716
-Ref: #filename-separator116897
-Node: File Search Dirs116919
-Ref: #file-search-dirs117093
-Node: Print Preamble117115
-Ref: #print-preamble117280
-Node: Print Newline117304
-Ref: #print-newline117466
-Node: Print Multiline117490
-Ref: #print-multiline117656
-Node: Latex Preamble117680
-Ref: #latex-preamble117845
-Node: Print Tempfile117891
-Ref: #print-tempfile118063
-Node: Allow Identical Fields118087
-Ref: #allow-identical-fields118281
-Node: Filters Default File118305
-Ref: #filters-default-file118504
-Node: Filters Display As Lisp118550
-Ref: #filters-display-as-lisp118752
-Node: Filters Ignore Case118776
-Ref: #filters-ignore-case118961
-Node: Entry Types118983
-Ref: #entry-types119120
-Node: Modifying Key Bindings120703
-Ref: #modifying-key-bindings120861
+Node: Viewing Files51784
+Ref: #viewing-files51908
+Node: Advanced Features54557
+Ref: #advanced-features54698
+Node: Window Management55190
+Ref: #window-management55333
+Node: Preloading bib Files58071
+Ref: #preloading-.bib-files58255
+Node: @Preamble Definition59030
+Ref: #preamble-definition59210
+Node: @String Definitions61322
+Ref: #string-definitions61497
+Node: Managing Keywords64755
+Ref: #managing-keywords64926
+Node: Sorting the bib File69957
+Ref: #sorting-the-.bib-file70142
+Node: Merging and Importing73126
+Ref: #merging-and-importing73307
+Node: Exporting Entries74462
+Ref: #exporting-entries74625
+Node: Timestamps76657
+Ref: #timestamps76810
+Node: Multiple Identical Fields78422
+Ref: #multiple-identical-fields78597
+Node: Filters80444
+Ref: #filters80598
+Node: Simple Selection81653
+Ref: #simple-selection81784
+Node: Complex Filters83432
+Ref: #complex-filters83596
+Node: Storing and Saving Filters87336
+Ref: #storing-and-saving-filters87538
+Node: Properties of Filtered Databases90344
+Ref: #properties-of-filtered-databases90534
+Node: The Multiline Edit Buffer92240
+Ref: #the-multiline-edit-buffer92421
+Node: The Options Menu96326
+Ref: #the-options-menu96473
+Node: The Ebib Buffers97083
+Ref: #the-ebib-buffers97224
+Node: The Index Buffer97564
+Ref: #the-index-buffer97699
+Node: The Entry Buffer103293
+Ref: #the-entry-buffer103455
+Node: The Strings Buffer105714
+Ref: #the-strings-buffer105855
+Node: Customisation107543
+Ref: #customisation107652
+Node: The Customisation Buffer107936
+Ref: #the-customisation-buffer108098
+Node: Default Type109377
+Ref: #default-type109513
+Node: Preload Bib Files109541
+Ref: #preload-bib-files109719
+Node: Preload Bib Search Dirs109743
+Ref: #preload-bib-search-dirs109935
+Node: Create Backups109957
+Ref: #create-backups110127
+Node: Keywords list110149
+Ref: #keywords-list110307
+Node: Keywords File110331
+Ref: #keywords-file110501
+Node: Keywords File Save On Exit110525
+Ref: #keywords-file-save-on-exit110730
+Node: Keywords Use Only File110754
+Ref: #keywords-use-only-file110964
+Node: Keywords Field Keep Sorted110988
+Ref: #keywords-field-keep-sorted111198
+Node: Keywords Separator111222
+Ref: #keywords-separator111413
+Node: Additional Fields111438
+Ref: #additional-fields111607
+Node: Layout111692
+Ref: #layout111826
+Node: Width111851
+Ref: #width111984
+Node: Popup Entry Window112005
+Ref: #popup-entry-window112179
+Node: Window Vertical Split112201
+Ref: #window-vertical-split112393
+Node: Index Window Size112415
+Ref: #index-window-size112596
+Node: Index Mode Line112617
+Ref: #index-mode-line112793
+Node: Index Display Fields113011
+Ref: #index-display-fields113193
+Node: Uniquify Keys113217
+Ref: #uniquify-keys113387
+Node: Autogenerate Keys113411
+Ref: #autogenerate-keys113586
+Node: Citation Commands113783
+Ref: #citation-commands113965
+Node: Multiline Major Mode114481
+Ref: #multiline-major-mode114662
+Node: Sort Order114692
+Ref: #sort-order114852
+Node: Save Xrefs First114876
+Ref: #save-xrefs-first115041
+Node: Crossref Face115065
+Ref: #crossref-face115227
+Node: Selected Face115273
+Ref: #selected-face115432
+Node: Use Timestamp115476
+Ref: #use-timestamp115638
+Node: Timestamp Format115662
+Ref: #timestamp-format115835
+Node: Standard Url Field115872
+Ref: #standard-url-field116046
+Node: Url Regexp116070
+Ref: #url-regexp116227
+Node: Browser Command116446
+Ref: #browser-command116613
+Node: Standard Doi Field116731
+Ref: #standard-doi-field116913
+Node: Standard File Field116937
+Ref: #standard-file-field117123
+Node: File Associations117148
+Ref: #file-associations117330
+Node: Filename Separator117383
+Ref: #filename-separator117564
+Node: File Search Dirs117586
+Ref: #file-search-dirs117760
+Node: Print Preamble117782
+Ref: #print-preamble117947
+Node: Print Newline117971
+Ref: #print-newline118133
+Node: Print Multiline118157
+Ref: #print-multiline118323
+Node: Latex Preamble118347
+Ref: #latex-preamble118512
+Node: Print Tempfile118558
+Ref: #print-tempfile118730
+Node: Allow Identical Fields118754
+Ref: #allow-identical-fields118948
+Node: Filters Default File118972
+Ref: #filters-default-file119171
+Node: Filters Display As Lisp119217
+Ref: #filters-display-as-lisp119419
+Node: Filters Ignore Case119443
+Ref: #filters-ignore-case119628
+Node: Entry Types119650
+Ref: #entry-types119787
+Node: Modifying Key Bindings121370
+Ref: #modifying-key-bindings121528
 
 End Tag Table
 

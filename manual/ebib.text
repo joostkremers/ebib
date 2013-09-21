@@ -371,9 +371,9 @@ There are two more customisation options for printing the database. These are `P
 
 With more and more scientific literature becoming available on-line, it becomes common to store URLs and DOIs in a BibTeX database. Sometimes you may want to load such a URL or a DOI in your browser. Ebib provides a convenient way for doing so.
 
-If you type `u` in the index buffer, Ebib takes the first URL stored in the `url` field of the current entry and passes it to your browser. Furthermore, in the entry buffer, you can use `u` on *any* field. If you happen to have more than one URL stored in the relevant field, and you want to pass the second (or third, etc.) to the browser, Ebib will ask you which one you want to open. Alternatively, you can use a prefix argument. So typing `M-2 u` sends the second URL to your browser..
+If you type `u` in the index buffer, Ebib takes the first URL stored in the `url` field of the current entry and passes it to your browser. Furthermore, in the entry buffer, you can use `u` on *any* field. If you happen to have more than one URL stored in the relevant field, and you want to pass the second (or third, etc.) to the browser, Ebib will ask you which one you want to open. Alternatively, you can use a prefix argument. So typing `M-2 u` sends the second URL to your browser.
 
-It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' <` or `>` as a URL. Furthermore, Ebib regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. This behaviour is controlled by a regular expression that can be customised. (See [Url Regexp](#url-regexp).)
+It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' ; <` or `>` as a URL. The semicolon is included here even though it is actually a valid character in URLs. This is done for consistency, because the semicolon (actually, semicolon+space) is the standard separator for files and keywords and in this way, you can use the same separator to distinguish multiple URLs in the `url` field. By default Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. You can, of course, customise the regular expression that controls this behaviour. See the option [Url Regexp](#url-regexp) for details.
 
 Similarly, with the key `i` in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser. Ebib adds the URL `http://dx.doi.org/` before sending the DOI to the browser, so the `doi` field should contain just the DOI itself.
 
@@ -1237,9 +1237,11 @@ You can define a different set of citation commands for each major mode. There i
 
 ### Url Regexp ###
 
-**Default value**: `\\url{\(.*\)}\|https?://[^ '<>\"\n\t\f]+`.\
+**Default value**: `\\url{\(.*\)}\|https?://[^ ';<>\"\n\t\f]+`.\
 
-\noindent This is the regular expression that Ebib uses to search for URLs in a field. With the default value, Ebib considers everything that is in a LaTeX `\url{...}` command as a URL, and furthermore every string of text that starts with `http://` or `https://` and does not contain whitespace or one of the characters `' " <` or `>`.
+\noindent This is the regular expression that Ebib uses to search for URLs in a field. With the default value, Ebib considers everything that is in a LaTeX `\url{...}` command as a URL, and furthermore every string of text that starts with `http://` or `https://` and does not contain whitespace or one of the characters `' " ; <` or `>`.
+
+Note that the semicolon is added for consistency: it makes it possible to use the same separator in the `url` field as in the `file` and `keywords` fields.
 
 
 ### Browser Command ###
