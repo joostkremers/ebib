@@ -276,12 +276,6 @@ which this command extracts the doi."
   :group 'ebib
   :type 'symbol)
 
-(defcustom ebib-doi-url "http://dx.doi.org/%s"
-  "URL for opening a doi.
-This value must contain one `%s', which will be replaced with the doi."
-  :group 'ebib
-  :type 'string)
-
 (defcustom ebib-standard-file-field 'file
   "Standard field to store filenames in.
 In the index buffer, the command ebib-view-file can be used to
@@ -3390,15 +3384,15 @@ argument."
 The stardard DOI field (see user option `ebib-standard-doi-field')
 may contain only one DOI.
 
-The DOI is combined with the value of `ebib-doi-url' before being
-sent to the browser."
+The DOI is combined with the URL \"http://dx.doi.org/\" before
+being sent to the browser."
   (interactive)
   (ebib-execute-when
    ((entries)
     (let ((doi (to-raw (gethash ebib-standard-doi-field
                                 (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db)))))
       (if doi
-          (ebib-call-browser (format ebib-doi-url doi))
+          (ebib-call-browser (concat "http://dx.doi.org/" doi))
         (error "No DOI found in field `%s'" ebib-standard-doi-field))))
    ((default)
     (beep))))

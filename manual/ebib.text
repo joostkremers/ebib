@@ -375,7 +375,7 @@ If you type `u` in the index buffer, Ebib takes the first URL stored in the `url
 
 It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' <` or `>` as a URL. Furthermore, Ebib regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. This behaviour is controlled by a regular expression that can be customised. (See [Url Regexp](#url-regexp).)
 
-Similarly, with the key `i` in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser unchanged. A DOI is normally resolved through the URL `http://dx.doi.org/`, but if you prefer a different URL, you can customise the option [Doi Url](#doi-url).
+Similarly, with the key `i` in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser. Ebib adds the URL `http://dx.doi.org/` before sending the DOI to the browser, so the `doi` field should contain just the DOI itself.
 
 Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option [Browser Command](#browser-command). You can also customise the field that Ebib takes URLs from, with the option [Standard Url Field](#standard-url-field). The same can be done for the DOI field.
 
@@ -1256,13 +1256,6 @@ For this to work, the browser that you use must be able to handle a URL on the c
 **Default value**: `doi`.\
 
 \noindent The field Ebib uses to extract the DOI if you press `i` in the index buffer.
-
-
-### Doi Url ###
-
-**Default value**: `http://dx.doi.org/%s`
-
-The URL used to open a DOI. It must contain exactly one instance fo `%s`, which will be replaced with the DOI.
 
 
 ### Standard File Field ###
