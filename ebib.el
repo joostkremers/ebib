@@ -248,15 +248,15 @@ documentation of that function for details."
   :type 'string)
 
 (defcustom ebib-standard-url-field 'url
-  "Standard field to store urls in.
-In the index buffer, the command ebib-browse-url can be used to
-send a url to a browser. This option sets the field from which
-this command extracts the url."
+  "Standard field to store URLs in.
+In the index buffer, the command \\[ebib-browse-url] can be used to
+send a URL to a browser. This option sets the field from which
+this command extracts the URL."
   :group 'ebib
   :type 'symbol)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
-  "Regular expression to extract urls from a field."
+  "Regular expression to extract URLs from a field."
   :group 'ebib
   :type 'string)
 
@@ -271,7 +271,7 @@ option is unset."
 (defcustom ebib-standard-doi-field 'doi
   "Standard field to store a DOI (digital object identifier) in.
 In the index buffer, the command ebib-browse-doi can be used to
-send a suitable url to a browser. This option sets the field from
+send a suitable URL to a browser. This option sets the field from
 which this command extracts the doi."
   :group 'ebib
   :type 'symbol)
@@ -3381,11 +3381,10 @@ argument."
 
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
-The stardard DOI field (see user option `ebib-standard-doi-field')
-may contain only one DOI.
-
-The DOI is combined with the URL \"http://dx.doi.org/\" before
-being sent to the browser."
+The stardard DOI field (see user option
+`ebib-standard-doi-field') may contain only one DOI. The DOI is
+combined with the URL \"http://dx.doi.org/\" before being sent to
+the browser."
   (interactive)
   (ebib-execute-when
    ((entries)
