@@ -378,10 +378,15 @@ For .bib files that do not have an associated keywords file,
   :type '(choice (const :tag "Use only keywords file" t)
                  (const :tag "Use keywords file and list" nil)))
 
-(defcustom ebib-keywords-separator "; "
-  "String for separating keywords in the keywords field."
+(defcustom ebib-field-separator "; "
+  "String for separating elements in a field value.
+This is primarily used for separating keywords, but can also be
+used to separate elements in other fields. Note that the `file'
+field has its own separator (although it has the same default
+value) and the `url' field uses `ebib-url-regexp' to extract
+URLs."
   :group 'ebib
-  :type '(string :tag "Keyword separator:"))
+  :type '(string :tag "Field separator:"))
 
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
@@ -2296,7 +2301,7 @@ POINT is moved back to the beginning of the line."
                   (let ((existing-contents (gethash field-type fields)))
                     (puthash field-type (if existing-contents
                                             (ebib-brace (concat (ebib-unbrace existing-contents)
-                                                                ebib-keywords-separator
+                                                                ebib-field-separator
                                                                 (ebib-unbrace field-contents)))
                                           field-contents)
                              fields))))))
@@ -4077,9 +4082,9 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
 (defun ebib-sort-keywords (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string."
   (mapconcat 'identity
-             (sort (delete-dups (split-string keywords ebib-keywords-separator t))
+             (sort (delete-dups (split-string keywords ebib-field-separator t))
                    'string<)
-             ebib-keywords-separator))
+             ebib-field-separator))
 
 (defun ebib-edit-keywords ()
   "Edit the keywords field."
@@ -4093,7 +4098,7 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
              until (string= keyword "")
              do (let* ((conts (ebib-unbrace (gethash 'keywords ebib-cur-entry-hash)))
                        (new-conts (if conts
-                                      (concat conts ebib-keywords-separator keyword)
+                                      (concat conts ebib-field-separator keyword)
                                     keyword)))
                   (puthash 'keywords (ebib-brace (if ebib-keywords-field-keep-sorted
                                                      (ebib-sort-keywords new-conts)
