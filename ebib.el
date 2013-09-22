@@ -1001,7 +1001,7 @@ display the actual filename."
 
 (defun ebib-get-all-fields (entry-type)
   "Returns all the fields of ENTRY-TYPE."
-  (cons 'type* (append (ebib-get-obl-fields entry-type)
+  (cons '=type= (append (ebib-get-obl-fields entry-type)
                        (ebib-get-opt-fields entry-type)
                        ebib-additional-fields)))
 
@@ -1207,7 +1207,7 @@ overlay is not moved.  FIELD must be a symbol."
   ;;Note: this function does NOT change the value of `ebib-current-field'!
 
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
-    (if (eq field 'type*)
+    (if (eq field '=type=)
         (goto-char (point-min))
       (cl-multiple-value-bind (fn start limit) (if (>= direction 0)
                                                    (cl-values 're-search-forward (point-min) (point-max))
@@ -1251,7 +1251,7 @@ If DB is nil, it defaults to the current database."
                (cl-values val nil)))
          (let ((xref (ebib-retrieve-entry (ebib-unbrace (gethash 'crossref entry)) db)))
            (if xref
-             (let ((entry-type (gethash 'type* entry)))
+             (let ((entry-type (gethash '=type= entry)))
                (cl-values (gethash (ebib-get-xref-field field entry-type) xref) t)))))
       (cl-values nil nil))))
 
@@ -1310,7 +1310,7 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
   (or db
       (setq db ebib-cur-db))
   (let* ((entry (ebib-retrieve-entry key db))
-         (entry-type (gethash 'type* entry))
+         (entry-type (gethash '=type= entry))
          (obl-fields (ebib-get-obl-fields entry-type))
          (opt-fields (ebib-get-opt-fields entry-type)))
     (funcall fn (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
@@ -1390,7 +1390,7 @@ field contents."
       (when ebib-cur-keys-list         ; are there entries being displayed?
         (ebib-format-fields (edb-cur-entry ebib-cur-db)
                             'insert match-str)
-        (setq ebib-current-field 'type*)
+        (setq ebib-current-field '=type=)
         (setq ebib-cur-entry-hash (ebib-retrieve-entry (edb-cur-entry ebib-cur-db) ebib-cur-db))
         (goto-char (point-min))
         (ebib-set-fields-highlight)))))
@@ -2313,13 +2313,13 @@ POINT is moved back to the beginning of the line."
         (let ((beg (point)))
           (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
             (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
-              (unless (eq field-type 'type*) ; the 'type*' key holds the entry type, so we can't use it
+              (unless (eq field-type '=type=) ; the '=type=' key holds the entry type, so we can't use it
                 (let ((field-contents (ebib-read-field-contents limit)))
                   (when field-contents
                     (funcall fn field-type field-contents fields)))))
             (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos)))))
       (when (> (hash-table-count fields) 0)
-        (puthash 'type* entry-type fields)
+        (puthash '=type= entry-type fields)
         fields))))
 
 (defun ebib-read-field-contents (limit)
@@ -2404,7 +2404,7 @@ buffer if Ebib is not occupying the entire frame."
 key of the created entry. ENTRY is an optional alist consisting
 of (FIELD . VALUE) pairs. The alist is converted into a BibTeX
 entry stub and added to DB, which defaults to the current
-database. If an entry alist doesn't contain the `type*' field,
+database. If an entry alist doesn't contain the `=type=' field,
 the entry type is set to the value of `ebib-default-type'. If
 it doesn't contain a `key*' field, a key is created of the from
 \"<new-entry%d>\", where %d is replaced with a number in
@@ -2430,8 +2430,8 @@ ascending sequence."
                 (setq entry-key (ebib-uniquify-key entry-key))
               (error "Key %s already exists" entry-key)))
       (setq entry-key (ebib-generate-tempkey db)))
-    (unless (gethash 'type* fields)
-      (puthash 'type* ebib-default-type fields))
+    (unless (gethash '=type= fields)
+      (puthash '=type= ebib-default-type fields))
     ;;insert and update index display
     (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
       (ebib-sort-in-buffer (1+ (length (edb-keys-list db))) entry-key)
@@ -2628,7 +2628,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
 
 (defun ebib-edit-entry-internal ()
   "Helper function for `ebib-edit-entry'."
-  (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
+  (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash '=type= ebib-cur-entry-hash)))
   (ebib-pop-to-buffer 'entry))
 
 (defun ebib-edit-keyname ()
@@ -2726,9 +2726,9 @@ If TIMESTAMP is T, a timestamp is added to the entry if
 `ebib-use-timestamp' is T."
   (let ((entry (ebib-retrieve-entry key db)))
     (when entry
-      (insert (format "@%s{%s,\n" (gethash 'type* entry) key))
+      (insert (format "@%s{%s,\n" (gethash '=type= entry) key))
       (maphash #'(lambda (key value)
-                   (unless (or (eq key 'type*)
+                   (unless (or (eq key '=type=)
                                (and (eq key 'timestamp) timestamp ebib-use-timestamp))
                      (insert (format "\t%s = %s,\n" key value))))
                entry)
@@ -3157,9 +3157,9 @@ Returns a list of fields in ENTRY that match the regexp
 SEARCH-STR, or NIL if no matches were found. If FIELD is given,
 only that field is searched.
 
-Normally, the `type*' field, which stores the entry type, is not
+Normally, the `=type=' field, which stores the entry type, is not
 searched, but it is possible to seach for specific entry types by
-specifying `type*' for FIELD (note the asterisk). In that case,
+specifying `=type=' for FIELD (note the asterisk). In that case,
 the search string can still be a string, but only exact matches
 will return a result."
   (let ((case-fold-search t)  ; we want to ensure a case-insensitive search
@@ -3169,10 +3169,10 @@ will return a result."
           (when (or (and (stringp value)
                          (string-match search-str value))
                     (and (symbolp value)
-                         (string= search-str (symbol-name value))))  ; the type* field has a symbol as value
+                         (string= search-str (symbol-name value))))  ; the =type= field has a symbol as value
             (setq result (list field))))
       (maphash #'(lambda (field value)
-                   (when (and (stringp value) ; the type* field has a symbol as value
+                   (when (and (stringp value) ; the =type= field has a symbol as value
                               (string-match search-str value))
                      (setq result (cons field result))))
                entry))
@@ -3250,7 +3250,7 @@ Either prints the entire database, or the marked entries."
                          (insert "\\begin{tabular}{p{0.2\\textwidth}p{0.8\\textwidth}}\n")
                          (let ((entry (ebib-retrieve-entry entry-key ebib-cur-db)))
                            (insert (format "\\multicolumn{2}{l}{\\texttt{%s (%s)}}\\\\\n"
-                                           entry-key (symbol-name (gethash 'type* entry))))
+                                           entry-key (symbol-name (gethash '=type= entry))))
                            (insert "\\hline\n")
                            (mapc #'(lambda (field)
                                      (ebib-ifstring (value (gethash field entry))
@@ -3258,7 +3258,7 @@ Either prints the entire database, or the marked entries."
                                                    ebib-print-multiline)
                                            (insert (format "%s: & %s\\\\\n"
                                                            field (ebib-unbrace value))))))
-                                 (cdr (ebib-get-all-fields (gethash 'type* entry)))))
+                                 (cdr (ebib-get-all-fields (gethash '=type= entry)))))
                          (insert "\\end{tabular}\n\n")
                          (insert (if ebib-print-newpage
                                      "\\newpage\n\n"
@@ -3634,7 +3634,7 @@ a logical `not' is applied to the selection."
                                         (if (< not 0) "not " "")
                                         (if (< not 0) "" ""))
                                 (append  (list '("any" . 0)
-                                               '("type*" . 0))
+                                               '("=type=" . 0))
                                          (mapcar #'(lambda (x)
                                                      (cons (symbol-name x) 0))
                                                  (append ebib-unique-field-list ebib-additional-fields)))
@@ -3644,9 +3644,9 @@ a logical `not' is applied to the selection."
                                        (if (< not 0) "not " "")
                                        field
                                        (if (< not 0) "" "")
-                                       (if (string= field "type*") "entry type" "regexp")))
+                                       (if (string= field "=type=") "entry type" "regexp")))
            (regexp (cond
-                    ((string= field "type*")
+                    ((string= field "=type=")
                      (completing-read prompt ebib-entry-types nil t nil 'ebib-filters-history))
                     ((string= field "keywords")
                      (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keywords-history))
@@ -4017,9 +4017,9 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
   "Moves to the next set of fields."
   (interactive)
   (cond
-   ((eq ebib-current-field 'type*) (ebib-next-field))
+   ((eq ebib-current-field '=type=) (ebib-next-field))
    ((member ebib-current-field ebib-additional-fields) (ebib-goto-last-field))
-   (t (let* ((entry-type (gethash 'type* ebib-cur-entry-hash))
+   (t (let* ((entry-type (gethash '=type= ebib-cur-entry-hash))
              (obl-fields (ebib-get-obl-fields entry-type))
              (opt-fields (ebib-get-opt-fields entry-type))
              (new-field nil))
@@ -4039,8 +4039,8 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
 (defun ebib-goto-prev-set ()
   "Moves to the previous set of fields."
   (interactive)
-  (unless (eq ebib-current-field 'type*)
-    (let* ((entry-type (gethash 'type* ebib-cur-entry-hash))
+  (unless (eq ebib-current-field '=type=)
+    (let* ((entry-type (gethash '=type= ebib-cur-entry-hash))
            (obl-fields (ebib-get-obl-fields entry-type))
            (opt-fields (ebib-get-opt-fields entry-type))
            (new-field nil))
@@ -4060,9 +4060,9 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
   "Edits the entry type."
   (ebib-ifstring (new-type (completing-read "type: " ebib-entry-types nil t))
       (progn
-        (puthash 'type* (intern-soft new-type) ebib-cur-entry-hash)
+        (puthash '=type= (intern-soft new-type) ebib-cur-entry-hash)
         (ebib-fill-entry-buffer)
-        (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash 'type* ebib-cur-entry-hash)))
+        (setq ebib-cur-entry-fields (ebib-get-all-fields (gethash '=type= ebib-cur-entry-hash)))
         (ebib-set-modified t))))
 
 (defun ebib-edit-crossref ()
@@ -4161,7 +4161,7 @@ With a prefix argument, the `keyword' field and the field in
 fields, the prefix argument has no meaning."
   (interactive "P")
   (cond
-   ((eq ebib-current-field 'type*) (ebib-edit-entry-type))
+   ((eq ebib-current-field '=type=) (ebib-edit-entry-type))
    ((eq ebib-current-field 'crossref) (ebib-edit-crossref))
    ((and (eq ebib-current-field 'keywords)
          (not pfx))
@@ -4219,7 +4219,7 @@ viewed."
 (defun ebib-copy-field-contents ()
   "Copies the contents of the current field to the kill ring."
   (interactive)
-  (unless (eq ebib-current-field 'type*)
+  (unless (eq ebib-current-field '=type=)
     (let ((contents (car (ebib-get-field-value ebib-current-field (edb-cur-entry ebib-cur-db)))))
       (when (stringp contents)
         (kill-new contents)
@@ -4228,7 +4228,7 @@ viewed."
 (defun ebib-cut-field-contents ()
   "Kills the contents of the current field. The killed text is put in the kill ring."
   (interactive)
-  (unless (eq ebib-current-field 'type*)
+  (unless (eq ebib-current-field '=type=)
     (let ((contents (gethash ebib-current-field ebib-cur-entry-hash)))
       (when (stringp contents)
         (remhash ebib-current-field ebib-cur-entry-hash)
@@ -4245,7 +4245,7 @@ then the field contents is replaced with the previous yank. That
 is, multiple uses of this command function like the combination
 of C-y/M-y. Prefix arguments also work the same as with C-y/M-y."
   (interactive "P")
-  (if (or (eq ebib-current-field 'type*) ; we cannot yank into the type* or crossref fields
+  (if (or (eq ebib-current-field '=type=) ; we cannot yank into the =type= or crossref fields
           (eq ebib-current-field 'crossref)
           (unless (eq last-command 'ebib-yank-field-contents)
             (gethash ebib-current-field ebib-cur-entry-hash))) ; nor into a field already filled
@@ -4267,7 +4267,7 @@ of C-y/M-y. Prefix arguments also work the same as with C-y/M-y."
   "Deletes the contents of the current field.
 The deleted text is not put in the kill ring."
   (interactive)
-  (if (eq ebib-current-field 'type*)
+  (if (eq ebib-current-field '=type=)
       (beep)
     (when (y-or-n-p "Delete field contents? ")
       (remhash ebib-current-field ebib-cur-entry-hash)
@@ -4278,7 +4278,7 @@ The deleted text is not put in the kill ring."
 (defun ebib-toggle-raw ()
   "Toggles the raw status of the current field contents."
   (interactive)
-  (unless (or (eq ebib-current-field 'type*)
+  (unless (or (eq ebib-current-field '=type=)
               (eq ebib-current-field 'crossref)
               (eq ebib-current-field 'keywords))
     (let ((contents (gethash ebib-current-field ebib-cur-entry-hash)))
@@ -4299,7 +4299,7 @@ The deleted text is not put in the kill ring."
 (defun ebib-edit-multiline-field ()
   "Edits the current field in multiline-mode."
   (interactive)
-  (unless (or (eq ebib-current-field 'type*)
+  (unless (or (eq ebib-current-field '=type=)
               (eq ebib-current-field 'crossref))
     (let ((text (gethash ebib-current-field ebib-cur-entry-hash)))
       (if (ebib-unbraced-p text)
