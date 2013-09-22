@@ -46,6 +46,7 @@
 ;; found at <https://github.com/joostkremers/ebib>.
 
 ;; Code:
+
 (eval-when-compile
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
@@ -781,20 +782,21 @@ the result."
 
 (defun ebib-unbraced-p (string)
   "Non-nil if STRING is not in contained in braces or quotes."
-  (when (stringp string)
-    (cond
-     ((eq (string-to-char string) ?\{)
-      ;; we remove all occurrences of `\{' and of `\}' from the string:
-      (let ((clear-str (ebib-remove-from-string (ebib-remove-from-string string "[\\][{]")
-                                           "[\\][}]")))
-        (while (string-match "{[^{]*?}" clear-str)
-          (setq clear-str (ebib-remove-from-string clear-str "{[^{]*?}")))
-        (> (length clear-str) 0)))
-     ((eq (string-to-char string) ?\")
-      (let ((clear-str (ebib-remove-from-string string "[\\][\"]"))) ; remove occurrences of `\"'
-        (setq clear-str (ebib-remove-from-string clear-str "\"[^\"]*?\""))
-        (> (length clear-str) 0)))
-     (t t))))
+  (save-match-data
+    (when (stringp string)
+      (cond
+       ((eq (string-to-char string) ?\{)
+        ;; we remove all occurrences of `\{' and of `\}' from the string:
+        (let ((clear-str (ebib-remove-from-string (ebib-remove-from-string string "[\\][{]")
+                                                  "[\\][}]")))
+          (while (string-match "{[^{]*?}" clear-str)
+            (setq clear-str (replace-match "" t t clear-str)))
+          (> (length clear-str) 0)))
+       ((eq (string-to-char string) ?\")
+        (let ((clear-str (ebib-remove-from-string string "[\\][\"]"))) ; remove occurrences of `\"'
+          (setq clear-str (ebib-remove-from-string clear-str "\"[^\"]*?\""))
+          (> (length clear-str) 0)))
+       (t t)))))
 
 (defun ebib-unbrace (string)
   "Converts a string to its unbraced counterpart."
@@ -1409,13 +1411,9 @@ Returns the first modified database, or NIL if none was modified."
       (setq db (ebib-next-elem db ebib-databases)))
     db))
 
-(defun ebib-create-new-database (&optional db)
-  "Creates a new database instance and returns it.
-If DB is set to a database, the new database is a copy of DB."
-  (let ((new-db
-         (if (edb-p db)
-             (copy-edb db)
-           (make-edb))))
+(defun ebib-create-new-database ()
+  "Creates a new database instance and returns it."
+  (let ((new-db (make-edb)))
     (setq ebib-databases (append ebib-databases (list new-db)))
     new-db))
 
