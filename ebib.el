@@ -690,7 +690,7 @@ EXT should be an extension without the dot."
       string
     (concat string "." ext)))
 
-(defmacro with-buffer-writable (&rest body)
+(defmacro with-ebib-buffer-writable (&rest body)
   "Makes the current buffer writable and executes the commands in BODY.
 After BODY is executed, the buffer modified flag is unset."
   (declare (indent defun))
@@ -699,7 +699,7 @@ After BODY is executed, the buffer modified flag is unset."
          ,@body)
      (set-buffer-modified-p nil)))
 
-(defmacro ebib-with-window-nondedicated (&rest body)
+(defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
 Restore the dedicated status after executing BODY."
   (declare (indent defun))
@@ -711,23 +711,6 @@ Restore the dedicated status after executing BODY."
        (if dedicated
            (set-window-dedicated-p (selected-window) t)))))
 
-(defmacro safe-write-region (start end filename &optional append visit lockname mustbenew)
-  "XEmacs does not have the MUSTBENEW argument, so this is a way to implement it."
-  (if (featurep 'xemacs)
-      `(if (and (file-exists-p ,filename)
-                (not (y-or-n-p (format "File %s already exists; overwrite anyway? " ,filename))))
-           (error "File %s exist" ,filename)
-         (write-region ,start ,end ,filename ,append ,visit ,lockname))
-    `(write-region ,start ,end ,filename ,append ,visit ,lockname ,mustbenew)))
-
-(defun symbol-or-string (x)
-  "Returns the symbol-name of X if X is a symbol, otherwise return X.
-Much like `symbol-name', except it does not throw an error if X is
-not a symbol."
-  (if (symbolp x)
-      (symbol-name x)
-    x))
-
 ;; XEmacs doesn't know about propertize...
 (if (not (fboundp 'propertize))
     (defun propertize (string &rest properties)
@@ -738,11 +721,6 @@ the result."
       (let ((new-string (copy-sequence string)))
         (add-text-properties 0 (length new-string) properties new-string)
         new-string)))
-
-(defun region-active ()
-  (if (featurep 'xemacs)
-      (region-active-p)
-    mark-active))
 
 ;; `ebib-unbraced-p' determines if STRING is braced. Note that we cannot do
 ;; this by simply checking whether STRING begins with { and ends with } (or
@@ -1016,7 +994,7 @@ matching entry is returned."
 
 (defun ebib-erase-buffer (buffer)
   (with-current-buffer buffer
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (erase-buffer))))
 
 (defun ebib-make-highlight (begin end buffer)
@@ -1106,7 +1084,7 @@ Note, The argument ALIST has no function."
           (setq window (get-buffer-window (car buffers))))))
     (when window
       (select-window window)
-      (ebib-with-window-nondedicated
+      (with-ebib-window-nondedicated
         (switch-to-buffer buffer nil t))
       window)))
 
@@ -1145,7 +1123,7 @@ all else fails, pop up a new frame."
 (defun ebib-display-entry (entry-key)
   "Displays ENTRY-KEY in the index buffer at POINT."
   (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (insert (format "%-30s %s\n"
                       entry-key
                       (if ebib-index-display-fields
@@ -1167,7 +1145,7 @@ all else fails, pop up a new frame."
           (setq ebib-current-field 'crossref)
           (re-search-forward "^crossref")
           (ebib-set-fields-highlight))
-      (with-buffer-writable
+      (with-ebib-buffer-writable
         (goto-char (ebib-highlight-start ebib-fields-highlight))
         (let ((beg (point)))
           (end-of-line)
@@ -1179,7 +1157,7 @@ all else fails, pop up a new frame."
 (defun ebib-redisplay-current-string ()
   "Redisplays the current string definition in the strings buffer."
   (with-current-buffer (cdr (assoc 'strings ebib-buffer-alist))
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (let ((str (ebib-unbrace (gethash ebib-current-string (edb-strings ebib-cur-db)))))
         (goto-char (ebib-highlight-start ebib-strings-highlight))
         (let ((beg (point)))
@@ -1221,7 +1199,9 @@ overlay is not moved.  FIELD must be a symbol."
 The keys of HASHTABLE must be either symbols or strings."
   (let ((result nil))
     (maphash #'(lambda (x y)
-                 (setq result (cons (cons (symbol-or-string x)
+                 (setq result (cons (cons (if (symbolp x)
+                                              (symbol-name x)
+                                            x)
                                           0)
                                     result)))
              hashtable)
@@ -1380,7 +1360,7 @@ to \"none\"."
 MATCH-STRING is a regexp that will be highlighted when it occurs in the
 field contents."
   (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (erase-buffer)
       (when ebib-cur-keys-list         ; are there entries being displayed?
         (ebib-format-fields (edb-cur-entry ebib-cur-db)
@@ -2570,7 +2550,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
            (setq ebib-cur-db nil)
            (mapc #'(lambda (buf) ; this is just to avoid typing almost the same thing three times...
                      (with-current-buffer (car buf)
-                       (with-buffer-writable
+                       (with-ebib-buffer-writable
                          (erase-buffer))
                        (ebib-delete-highlight (cadr buf))))
                  (list (list (cdr (assoc 'entry ebib-buffer-alist)) ebib-fields-highlight)
@@ -2578,7 +2558,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
                        (list (cdr (assoc 'strings ebib-buffer-alist)) ebib-strings-highlight)))
            ;; multiline edit buffer
            (with-current-buffer (cdr (assoc 'multiline ebib-buffer-alist))
-             (with-buffer-writable
+             (with-ebib-buffer-writable
                (erase-buffer)))
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
              (rename-buffer " none"))
@@ -2678,7 +2658,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
     (ebib-execute-when
       ((entries)
        (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-         (with-buffer-writable
+         (with-ebib-buffer-writable
            (if (member (edb-cur-entry ebib-cur-db) (edb-marked-entries ebib-cur-db))
                (progn
                  (setf (edb-marked-entries ebib-cur-db)
@@ -2813,16 +2793,11 @@ the filter are saved. The original file is not deleted."
   (ebib-execute-when
     ((database)
      (ebib-ifstring (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
-         (progn
+         (when (or (not (file-exists-p new-filename))
+                   (y-or-n-p (format (format "File %s already exists; overwrite " new-filename))))
            (with-temp-buffer
              (ebib-format-database-as-bibtex ebib-cur-db)
-             (safe-write-region (point-min) (point-max) new-filename nil nil nil t))
-           ;; if SAFE-WRITE-REGION was cancelled by the user because he didn't
-           ;; want to overwrite an already existing file with his new database,
-           ;; it throws an error, so the next lines will not be executed. hence
-           ;; we can safely set (EDB-FILENAME DB) and (EDB-NAME DB). We only do
-           ;; that if there was no active filter, though. If there was, we just
-           ;; issue a message.
+             (write-region (point-min) (point-max) new-filename nil nil nil))
            (if (edb-filter ebib-cur-db)
                (message "Wrote filtered entries as new database to %s" new-filename)
              (setf (edb-filename ebib-cur-db) new-filename)
@@ -2968,7 +2943,7 @@ current entry is not changed."
 
 (defun ebib-remove-key-from-buffer (entry-key)
   "Removes ENTRY-KEY from the index buffer and highlights the current entry."
-  (with-buffer-writable
+  (with-ebib-buffer-writable
     (let ((beg (ebib-search-key-in-buffer entry-key)))
       (forward-line 1)
       (delete-region beg (point))))
@@ -4378,7 +4353,7 @@ The deleted text is not put in the kill ring."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (ebib-with-window-nondedicated
+    (with-ebib-window-nondedicated
       (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index))
 
@@ -4451,7 +4426,7 @@ The deleted text is not put in the kill ring."
 (defun ebib-fill-strings-buffer ()
   "Fills the strings buffer with the @STRING definitions."
   (with-current-buffer (cdr (assoc 'strings ebib-buffer-alist))
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (erase-buffer)
       (dolist (elem (edb-strings-list ebib-cur-db))
         (let ((str (ebib-unbrace (gethash elem (edb-strings ebib-cur-db)))))
@@ -4494,7 +4469,7 @@ When the user enters an empty string, the value is not changed."
   (interactive)
   (when (y-or-n-p (format "Delete @STRING definition %s? " ebib-current-string))
     (remhash ebib-current-string (edb-strings ebib-cur-db))
-    (with-buffer-writable
+    (with-ebib-buffer-writable
       (let ((beg (progn
                    (goto-char (ebib-highlight-start ebib-strings-highlight))
                    (point))))
@@ -4521,7 +4496,7 @@ When the user enters an empty string, the value is not changed."
             (progn
               (ebib-insert-string new-abbr new-string ebib-cur-db t)
               (ebib-sort-in-buffer (length (edb-strings-list ebib-cur-db)) new-abbr)
-              (with-buffer-writable
+              (with-ebib-buffer-writable
                 (insert (format "%-19s %s\n" new-abbr new-string)))
               (forward-line -1)
               (ebib-set-strings-highlight)
@@ -4723,7 +4698,7 @@ The text being edited is stored before saving the database."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (ebib-with-window-nondedicated
+    (with-ebib-window-nondedicated
       (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index))
 
@@ -4742,7 +4717,7 @@ or on the region if it is active."
     (with-syntax-table ebib-syntax-table
       (save-excursion
         (save-restriction
-          (if (region-active)
+          (if (use-region-p)
               (narrow-to-region (region-beginning)
                                 (region-end)))
           (let ((buffer (current-buffer)))
