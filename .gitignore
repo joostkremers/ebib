@@ -1,3 +1,5 @@
 *.elc
 /webpage/index.html
 /manual/texi/ebib.texi
+/manual/html/ebib-manual.html
+/manual/html/ebib-manual.css
