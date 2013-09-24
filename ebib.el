@@ -3539,7 +3539,7 @@ on the entries."
 Return the filter as a list (NAME FILTER)."
   (if (not ebib-filters-alist)
       (error "No stored filters")
-    (let* ((completing-ignore-case ebib-filters-ignore-case)
+    (let* ((completion-ignore-case ebib-filters-ignore-case)
            (name (completing-read prompt
                                   (sort (copy-alist ebib-filters-alist)
                                         #'(lambda (x y) (string-lessp (car x) (car y))))
