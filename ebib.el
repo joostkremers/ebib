@@ -3828,7 +3828,7 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
   (ebib-ifstring (new-type (completing-read "type: " ebib-entry-types nil t))
       (progn
         (setq new-type (intern-soft new-type))
-        (ebib-db-set-field-value '=type= new-type (ebib-cur-entry-key) ebib-cur-db 'overwrite 'nobrace)
+        (ebib-db-set-field-value '=type= new-type (ebib-cur-entry-key) ebib-cur-db 'overwrite 'unbraced)
         (ebib-fill-entry-buffer)
         (setq ebib-cur-entry-fields (ebib-get-all-fields new-type))
         (ebib-set-modified t))))
@@ -3923,9 +3923,10 @@ If FILE is not in (a subdirectory of) one of the directories in
       (if (ebib-multiline-p init-contents)
           (ebib-edit-multiline-field) ; this always returns nil
         (when init-contents
-          (if (ebib-db-unbraced-p init-contents)
-              (setq brace? t)
-            (setq init-contents (ebib-db-unbrace init-contents))))
+          (setq brace? (if (ebib-db-unbraced-p init-contents)
+                            'unbraced
+                          'braced))
+          (setq init-contents (ebib-db-unbrace init-contents)))
         (ebib-ifstring (new-contents (read-string (format "%s: " (symbol-name ebib-current-field))
                                            (if init-contents
                                                (cons init-contents 0))))
@@ -4058,7 +4059,9 @@ The deleted text is not put in the kill ring."
         (ebib-edit-field)  ; the user can enter one, which we must then store unbraced.
         (setq contents (ebib-db-get-field-value ebib-current-field (ebib-cur-entry-key) ebib-cur-db 'noerror)))
       (when contents ; We must check to make sure the user entered some value.
-        (ebib-db-set-field-value ebib-current-field contents (ebib-cur-entry-key) ebib-cur-db 'overwrite (not (ebib-db-unbraced-p contents)))
+        (ebib-db-set-field-value ebib-current-field contents (ebib-cur-entry-key) ebib-cur-db 'overwrite (if (ebib-db-unbraced-p contents)
+                                                                                                             'braced
+                                                                                                           'unbraced))
         (ebib-redisplay-current-field)
         (ebib-set-modified t)))))
 
@@ -4426,7 +4429,9 @@ The text being edited is stored before saving the database."
      ((eq ebib-editing 'fields)
       (if (equal text "")
           (ebib-db-remove-field-value ebib-current-field (ebib-cur-entry-key) ebib-cur-db) 
-        (ebib-db-set-field-value ebib-current-field text (ebib-cur-entry-key) ebib-cur-db 'overwrite ebib-multiline-unbraced)))))
+        (ebib-db-set-field-value ebib-current-field text (ebib-cur-entry-key) ebib-cur-db 'overwrite (if ebib-multiline-unbraced
+                                                                                                         'unbraced
+                                                                                                       'braced))))))
   (ebib-set-modified t))
 
 (defun ebib-multiline-help ()
