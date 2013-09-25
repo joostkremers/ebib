@@ -2123,8 +2123,13 @@ be added. (Whether a timestamp is actually added, also depends on
             (skip-chars-forward "^,") ; move to the comma after the entry type
             (cl-loop for field = (ebib-find-bibtex-field limit)
                      while field do
+                     ;; TODO We pass 'overwrite if
+                     ;; `ebib-allow-identical-fields' in nil in order to
+                     ;; overwrite a possible timestamp. This has to be
+                     ;; handled better, though!
                      (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
-                                                                                       ebib-field-separator)))
+                                                                                       ebib-field-separator 
+                                                                                     'overwrite)))
             entry-key))                 ; Return the entry key.
       (ebib-log 'error "Error: illegal entry key found at line %d. Skipping" (line-number-at-pos)))))
 
