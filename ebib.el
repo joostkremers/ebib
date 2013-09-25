@@ -3861,7 +3861,7 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
                        (new-conts (if conts
                                       (concat conts ebib-field-separator keyword)
                                     keyword)))
-                  (ebib-db-set-field-value 'crossref
+                  (ebib-db-set-field-value 'keywords
                                            (if ebib-keywords-field-keep-sorted
                                                (ebib-sort-keywords new-conts)
                                              new-conts)
