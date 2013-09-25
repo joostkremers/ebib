@@ -1246,13 +1246,13 @@ to \"none\"."
             (goto-char (point-min))
             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
             (beginning-of-line)
-            (ebib-set-index-highlight))
-          ;; TODO Setting the buffer's modified flag and renaming it
-          ;; shouldn't be done here.
-          (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db))
-          (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                       (length (member ebib-cur-db ebib-databases)))))
-                                 (ebib-db-get-filename ebib-cur-db 'shortened))))))))
+            (ebib-set-index-highlight)))
+        ;; TODO Setting the buffer's modified flag and renaming it
+        ;; shouldn't be done here.
+        (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db))
+        (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                     (length (member ebib-cur-db ebib-databases)))))
+                               (ebib-db-get-filename ebib-cur-db 'shortened)))))))
 
 (defun ebib-fill-entry-buffer (&optional match-str)
   "Fills the entry buffer with the fields of the current entry.
@@ -2007,6 +2007,8 @@ This function adds a newline to the message being logged."
          (setq ebib-log-error nil)      ; we haven't found any errors (yet)
          (ebib-log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib-cur-db))
          (ebib-load-entries file ebib-cur-db)
+         (unless (ebib-cur-entry-key)
+           (ebib-db-set-current-entry-key t ebib-cur-db))
          (ebib-redisplay)
          (ebib-set-modified t))))
     ((default) (beep))))
@@ -2027,7 +2029,7 @@ This function adds a newline to the message being logged."
         (when ebib-log-error
           (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))))))
 
-(defun ebib-find-bibtex-entries (db timestamp)
+(defun ebib-find-bibtex-entriest (db timestamp)
   "Find the BibTeX entries in the current buffer.
 The search is started at the beginnig of the buffer. All entries
 found are stored in DB. Return value is a three-element list: the
@@ -4485,6 +4487,8 @@ or on the region if it is active."
             (with-temp-buffer
               (insert-buffer-substring buffer)
               (let ((result (ebib-find-bibtex-entries ebib-cur-db t)))
+                (unless (ebib-cur-entry-key)
+                  (ebib-db-set-current-entry-key t ebib-cur-db))
                 (ebib-redisplay)
                 (ebib-set-modified t)
                 (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
