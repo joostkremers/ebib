@@ -2029,7 +2029,7 @@ This function adds a newline to the message being logged."
         (when ebib-log-error
           (message "%s found! Press `l' to check Ebib log buffer." (nth ebib-log-error '("Warnings" "Errors"))))))))
 
-(defun ebib-find-bibtex-entriest (db timestamp)
+(defun ebib-find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
 The search is started at the beginnig of the buffer. All entries
 found are stored in DB. Return value is a three-element list: the
