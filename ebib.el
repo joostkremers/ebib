@@ -3470,8 +3470,9 @@ return value is also NIL."
                        ((symbolp f)
                         (format "%s" f)))))
         (let ((pretty-filter (pp-filter filter)))
-          (string-match "\\`(\\(.*\\))\\'" pretty-filter)
-          (match-string 1 pretty-filter))))))
+          (if (string-match "\\`(\\(.*\\))\\'" pretty-filter)
+              (match-string 1 pretty-filter)
+            pretty-filter))))))
 
 (defun ebib-filters-load-file (file &optional overwrite)
   "Load filters from FILE.
