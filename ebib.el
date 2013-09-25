@@ -2937,8 +2937,8 @@ result."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (ebib-fill-strings-buffer)
      (setq ebib-cur-strings-list (ebib-db-list-strings ebib-cur-db))
+     (ebib-fill-strings-buffer)
      (ebib-pop-to-buffer 'strings)
      (goto-char (point-min)))
     ((default)
