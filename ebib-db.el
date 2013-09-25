@@ -215,7 +215,7 @@ Returns the new key upon succes, or NIL if nothing was updated."
       (ebib-db-remove-entry key db)
       actual-new-key)))
 
-(defun ebib-db-set-field-value (field value key db &optional if-exists brace)
+(defun ebib-db-set-field-value (field value key db &optional if-exists nobrace)
   "Set FIELD of entry KEY in database DB to VALUE.
 
 IF-EXISTS determines what to do if the field already exists. If
@@ -228,9 +228,9 @@ case, the new value is appended to the old value, separated by a
 space or by the string. Before appending, braces/double quotes
 are removed from both values.
 
-If BRACE is 'unbraced, the value is stored without braces. If it
-is 'braced, braces are added if not already present. If it is
-nil, the entry is stored as-is.
+If NOBRACE is t, the value is stored without braces. If it is
+nil, braces are added if not already present. NOBRACE may also be
+the symbol `as-is', in which case the value is stored as is.
 
 A field can be removed from the entry by passing NIL as VALUE and
 setting IF-EXISTS to 'overwrite.
@@ -257,9 +257,10 @@ Return non-NIL upon success, or NIL if the value could not be stored."
       ;; don't need to do anything, because we've already deleted the existing
       ;; field value when we retrieved the entry above.
       (when value
-        (cond
-         ((eq brace 'unbraced) (setq value (ebib-db-unbrace value)))
-         ((eq brace 'braced) (setq value (ebib-db-brace value))))
+        (if nobrace
+            (unless (eq nobrace 'as-is)
+              (setq value (ebib-db-unbrace value)))
+          (setq value (ebib-db-brace value)))
 	(push (cons field value) fields-list))
       (ebib-db-set-entry key fields-list db 'overwrite))))
 
