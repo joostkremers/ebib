@@ -280,9 +280,9 @@ that entry, if not, the second value is NIL."
   (let ((value (cdr (assoc field (ebib-db-get-entry key db noerror))))
 	(xref-key))
     (when (and (not value) xref)
-      (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
+      (setq xref-key (ebib-db-get-field-value 'crossref key db 'noerror 'unbraced))
       (when xref-key
-        (let* ((type (ebib-db-get-field-value "=type=" xref-key db 'noerror))
+        (let* ((type (ebib-db-get-field-value '=type= xref-key db 'noerror))
                (xref-field (ebib-db-get-xref-field field type)))
           (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror)))))
     (unless (or value noerror)
@@ -330,7 +330,7 @@ set IF-EXISTS to 'overwrite."
       (setf (ebib-dbstruct-strings db)
 	    (if (null value)
 		strings-list
-	      (append (cons abbr (ebib-db-brace value)) strings-list))))))
+	      (push (cons abbr (ebib-db-brace value)) strings-list))))))
 
 (defun ebib-db-remove-string (abbr db)
   "Remove @STRING definition from DB."
@@ -425,7 +425,7 @@ NIL, an existing filename triggers an error."
 If SHORTED is non-NIL, return only the filename part, otherwise
 return the full path."
   (if shortened
-      (file-name-nondirectory (ebib-dbstruct-filter db))
+      (file-name-nondirectory (ebib-dbstruct-filename db))
     (ebib-dbstruct-filename db)))
 
 (defun ebib-db-marked-entries-p (db)
