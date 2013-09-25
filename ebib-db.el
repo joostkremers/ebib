@@ -228,8 +228,8 @@ case, the new value is appended to the old value, separated by a
 space or by the string. Before appending, braces/double quotes
 are removed from both values.
 
-If NOBRACE is non-NIL, the value is stored as-is, otherwise
-braces are added if not already present.
+If NOBRACE is non-NIL, the value is stored without braces,
+otherwise braces are added if not already present.
 
 A field can be removed from the entry by passing NIL as VALUE and
 setting IF-EXISTS to 'overwrite.
@@ -256,9 +256,10 @@ Return non-NIL upon success, or NIL if the value could not be stored."
       ;; don't need to do anything, because we've already deleted the existing
       ;; field value when we retrieved the entry above.
       (when value
-        (unless nobrace
+        (if nobrace
+            (setq value (ebib-db-unbrace value))
           (setq value (ebib-db-brace value)))
-	(add-to-list 'fields-list (cons field value)))
+	(push (cons field value) fields-list))
       (ebib-db-set-entry key fields-list db 'overwrite))))
 
 (defun ebib-db-remove-field-value (field key db)
@@ -341,7 +342,7 @@ set IF-EXISTS to 'overwrite."
 If ABBR does not exist, trigger an error, unless NOERROR is
 non-NIL, in which case return NIL. If UNBRACED is non-NIL, return
 the value without braces."
-  (let ((value (car (assoc abbr (ebib-dbstruct-strings db)))))
+  (let ((value (cdr (assoc abbr (ebib-dbstruct-strings db)))))
     (unless (or value noerror)
       (error "Ebib: @STRING abbreviation `%s' does not exist" abbr))
     (if unbraced
