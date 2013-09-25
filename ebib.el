@@ -2406,7 +2406,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
   (interactive)
   (ebib-execute-when
     ((entries)
-     (ebib-db-set-current-entry-key t ebib-cur-db)
+     (ebib-db-set-current-entry-key (car ebib-cur-keys-list) ebib-cur-db)
      (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
        (goto-char (point-min))
        (ebib-set-index-highlight)
