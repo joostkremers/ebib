@@ -1546,30 +1546,33 @@ that is to be displayed, or a file to load (which must end in
   (interactive)
   (if (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
       (error "Ebib already active")
-    ;; We save the buffer from which Ebib is called.
-    (setq ebib-push-buffer (current-buffer))
-    ;; Initialize Ebib if required.
-    (unless ebib-initialized
-      (ebib-init)
-      (if ebib-preload-bib-files
-          (mapc #'(lambda (file)
-                    (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
-                ebib-preload-bib-files)))
-    ;; If Ebib is visible, we just switch to the index buffer.
-    (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
-      (if index-window
-          (select-window index-window)
-        (ebib-setup-windows)))
-    ;; Check for an optional argument.
-    (when arg
-      (if (string= (file-name-extension arg) "bib")
-          (ebib-load-bibtex-file (expand-file-name arg))
-        (if (ebib-db-set-current-entry-key arg ebib-cur-db 'noerror)
-            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-              (goto-char (point-min))
-              (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-              (ebib-select-entry)))
-        (message "No entry `%s' in current database " arg)))))
+    ;; First we check if ARG is a file and expand it, before we switch
+    ;; buffers (possibly changing the value of `default-directory').
+    (let ((file (when (and arg (string= (file-name-extension arg) "bib"))
+                  (expand-file-name arg))))
+      ;; We save the buffer from which Ebib is called.
+      (setq ebib-push-buffer (current-buffer))
+      ;; Initialize Ebib if required.
+      (unless ebib-initialized
+        (ebib-init)
+        (if ebib-preload-bib-files
+            (mapc #'(lambda (file)
+                      (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
+                  ebib-preload-bib-files)))
+      ;; If Ebib is visible, we just switch to the index buffer.
+      (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
+        (if index-window
+            (select-window index-window)
+          (ebib-setup-windows)))
+      ;; Check for an optional argument.
+      (cond
+       (file (ebib-load-bibtex-file file))
+       (arg (if (ebib-db-set-current-entry-key arg ebib-cur-db 'noerror)
+                (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+                  (goto-char (point-min))
+                  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+                  (ebib-select-entry)))
+            (message "No entry `%s' in current database " arg))))))
 
 (defun ebib-setup-windows ()
   "Creates Ebib's window configuration in the current frame."
