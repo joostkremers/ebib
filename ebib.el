@@ -1266,8 +1266,7 @@ field contents."
         (ebib-format-fields (ebib-cur-entry-key)
                             'insert match-str)
         (setq ebib-current-field '=type=)
-        (goto-char (point-min))
-        (ebib-set-fields-highlight)))))
+        (goto-char (point-min))))))
 
 (defun ebib-set-modified (mod &optional db)
   "Sets the modified flag of the database DB to MOD.
@@ -2445,7 +2444,8 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
 (defun ebib-edit-entry-internal ()
   "Helper function for `ebib-edit-entry'."
   (setq ebib-cur-entry-fields (ebib-get-all-fields (ebib-db-get-field-value '=type= (ebib-cur-entry-key) ebib-cur-db)))
-  (ebib-pop-to-buffer 'entry))
+  (ebib-pop-to-buffer 'entry)
+  (ebib-set-fields-highlight))
 
 (defun ebib-edit-keyname ()
   "Changes the key of a BibTeX entry."
@@ -3715,6 +3715,7 @@ The user is prompted for the buffer to push the entry into."
   fundamental-mode "Ebib-entry"
   "Major mode for the Ebib entry buffer."
   (setq buffer-read-only t)
+  (setq cursor-type nil)
   (setq truncate-lines t))
 
 (defun ebib-quit-entry-buffer ()
@@ -3730,6 +3731,7 @@ If the key of the current entry matches the pattern
    ((eq ebib-layout 'index-only)
     (switch-to-buffer nil t t)))
   (ebib-pop-to-buffer 'index)
+  (ebib-delete-highlight ebib-fields-highlight)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
   (if (string-match "<new-entry[0-9]+>" (ebib-cur-entry-key))
       (ebib-generate-autokey)))
@@ -4146,6 +4148,7 @@ The deleted text is not put in the kill ring."
   fundamental-mode "Ebib-strings"
   "Major mode for the Ebib strings buffer."
   (setq buffer-read-only t)
+  (setq cursor-type nil)
   (setq truncate-lines t))
 
 (defun ebib-quit-strings-buffer ()
