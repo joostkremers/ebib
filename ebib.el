@@ -686,10 +686,11 @@ EXT should be an extension without the dot."
   "Makes the current buffer writable and executes the commands in BODY.
 After BODY is executed, the buffer modified flag is unset."
   (declare (indent defun))
-  `(unwind-protect
-       (let ((buffer-read-only nil))
-         ,@body)
-     (set-buffer-modified-p nil)))
+  `(let ((modified (buffer-modified-p)))
+     (unwind-protect
+         (let ((buffer-read-only nil))
+           ,@body)
+       (set-buffer-modified-p modified))))
 
 (defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
