@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: ==VERSION==
+;; Version: 1.12
 ;; Keywords: text bibtex
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -538,7 +538,7 @@ entry-specific inheritances, the latter override the former."
 ;; constants and variables that are set only once
 (defconst ebib-bibtex-identifier "[^^\"@\\&$#%',={}() \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
 (defconst ebib-key-regexp "[^^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
-(defconst ebib-version "==VERSION==")
+(defconst ebib-version "1.12")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
 ;; buffers and highlights
