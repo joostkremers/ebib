@@ -55,6 +55,7 @@
         (defalias 'cl-defstruct 'defstruct)
         (defalias 'cl-do 'do)
         (defalias 'cl-flet 'flet)
+        (defalias 'cl-incf 'incf)
         (defalias 'cl-loop 'loop)
         (defalias 'cl-macrolet 'macrolet)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
@@ -2156,7 +2157,7 @@ This function adds a newline to the message being logged."
         (ebib-log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
                   (car result)
                   (cadr result)
-                  (if (caddr result)
+                  (if (cl-caddr result)
                       "a"
                     "no"))
         (when ebib-log-error
@@ -2522,7 +2523,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
         (key-count 2))
     (while (member entry-key key-list)
       (setq entry-key (format "<new-entry%d>" key-count))
-      (incf key-count))
+      (cl-incf key-count))
     entry-key))
 
 (defun ebib-index-c ()
@@ -3666,12 +3667,12 @@ Return a list of entry keys that match DB's filter."
   "Helper function for `ebib-filters-pp-filter'."
   (cond
    ((listp filter)
-    (let ((op (first filter)))
+    (let ((op (cl-first filter)))
       (cond
        ((eq op 'not)
-        (format "not %s" (ebib-filters-pp-filter-helper (second filter))))
+        (format "not %s" (ebib-filters-pp-filter-helper (cl-second filter))))
        ((member op '(and or contains))
-        (format "(%s %s %s)" (ebib-filters-pp-filter-helper (second filter)) op (ebib-filters-pp-filter-helper (third filter)))))))
+        (format "(%s %s %s)" (ebib-filters-pp-filter-helper (cl-second filter)) op (ebib-filters-pp-filter-helper (cl-third filter)))))))
    ((stringp filter)
     (format "\"%s\"" filter))
    ((symbolp filter)
@@ -4735,7 +4736,7 @@ or on the region if it is active."
                 (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
                                  (car n)
                                  (cadr n)
-                                 (if (caddr n)
+                                 (if (cl-caddr n)
                                      "a"
                                    "no")))))))))))
 
