@@ -512,7 +512,7 @@ entry-specific inheritances, the latter override the former."
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
-(defface ebib-crossref-face '((t (:foreground "red")))
+(defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
   "Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib-faces)
 
