@@ -1570,8 +1570,8 @@ that is to be displayed, or a file to load (which must end in
                 (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
                   (goto-char (point-min))
                   (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-                  (ebib-select-entry)))
-            (message "No entry `%s' in current database " arg))))))
+                  (ebib-select-entry))
+              (message "No entry `%s' in current database " arg)))))))
 
 (defun ebib-setup-windows ()
   "Creates Ebib's window configuration in the current frame."
