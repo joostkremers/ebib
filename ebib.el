@@ -4551,7 +4551,7 @@ is found, return the symbol `none'."
                 (let ((option (match-string 1))
                       (file (match-string 2)))
                   ;; If this isn't a remote resource, add it to the list.
-                  (unless (string-match "location=remote" option)
+                  (unless (and option (string-match "location=remote" option))
                     (push file files)))))
             (or files 'none)))))))
 
