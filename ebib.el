@@ -1275,10 +1275,10 @@ modified flag of the index buffer is also (re)set. MOD must be
 either T or NIL."
   (unless db
     (setq db ebib-cur-db))
+  (ebib-db-set-modified mod db)
   (when (eq db ebib-cur-db)
     (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-      (set-buffer-modified-p mod))
-    (ebib-db-set-modified mod db)))
+      (set-buffer-modified-p mod))))
 
 (defun ebib-modified-p ()
   "Checks if any of the databases in Ebib were modified.
