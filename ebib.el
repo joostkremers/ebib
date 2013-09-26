@@ -2108,9 +2108,9 @@ Optional argument TIMESTAMP indicates whether a timestamp is to
 be added. (Whether a timestamp is actually added, also depends on
 `ebib-use-timestamp'.)"
   (let ((limit (save-excursion
-                       (backward-char)
-                       (ebib-match-paren-forward (point-max))
-                       (point)))
+                 (backward-char)
+                 (ebib-match-paren-forward (point-max))
+                 (point)))
         (beg (progn
                (skip-chars-forward " \n\t\f") ; note the space!
                (point))))
@@ -2127,12 +2127,13 @@ be added. (Whether a timestamp is actually added, also depends on
             (cl-loop for field = (ebib-find-bibtex-field limit)
                      while field do
                      ;; TODO We pass 'overwrite if
-                     ;; `ebib-allow-identical-fields' in nil in order to
+                     ;; `ebib-allow-identical-fields' is nil in order to
                      ;; overwrite a possible timestamp. This has to be
                      ;; handled better, though!
                      (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
                                                                                        ebib-field-separator 
-                                                                                     'overwrite)))
+                                                                                     'overwrite)
+                                              'as-is))
             entry-key))                 ; Return the entry key.
       (ebib-log 'error "Error: illegal entry key found at line %d. Skipping" (line-number-at-pos)))))
 
