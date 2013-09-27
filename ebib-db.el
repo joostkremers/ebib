@@ -192,7 +192,7 @@ is suffixed, then `ab' etc."
 The list is sorted, unless NOSORT is non-nil."
   (let (keys-list)
     (maphash #'(lambda (key value)
-		 (add-to-list 'keys-list key))
+		 (push key keys-list))
 	     (ebib-dbstruct-database db))
     (if nosort
         keys-list
