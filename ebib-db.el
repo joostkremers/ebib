@@ -120,9 +120,9 @@ Return the new entry key if successful, NIL otherwise."
        (unless noerror
          (error "No entry key `%s' in the current database" entry))
        (if (eq noerror 'first)
-           (setf (ebib-dbstruct-cur-entry db) (car (ebib-db-list-keys ebib-cur-db))))))
+           (setf (ebib-dbstruct-cur-entry db) (car (ebib-db-list-keys db))))))
    ((eq entry t)
-    (setf (ebib-dbstruct-cur-entry db) (car (ebib-db-list-keys ebib-cur-db))))))
+    (setf (ebib-dbstruct-cur-entry db) (car (ebib-db-list-keys db))))))
 
 (defun ebib-db-set-entry (key data db &optional if-exists)
   "Add or modify entry KEY in database DB.
@@ -328,7 +328,7 @@ set IF-EXISTS to 'overwrite."
        ((eq if-exists 'overwrite)
 	(setq old-string nil))
        ((not (eq if-exists 'noerror))
-	(error "Ebib: @STRING abbreviation `%s' exists in database %s" abbr (ebib-db-get-filename ebib-cur-db 'short)))))
+	(error "Ebib: @STRING abbreviation `%s' exists in database %s" abbr (ebib-db-get-filename db 'short)))))
     (unless old-string
       (setf (ebib-dbstruct-strings db)
 	    (if (null value)
