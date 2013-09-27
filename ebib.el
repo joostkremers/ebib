@@ -3329,8 +3329,8 @@ Return the filter as a list (NAME FILTER)."
 (defun ebib-filters-store-filter ()
   "Store the current filter."
   (interactive)
-  (let ((filter (or ebib-filters-last-filter
-                    (ebib-db-get-filter ebib-cur-db))))
+  (let ((filter (or (ebib-db-get-filter ebib-cur-db)
+                    ebib-filters-last-filter)))
     (if filter
         (let ((name (read-from-minibuffer "Enter filter name: ")))
           (when (or (not (ebib-filters-exists-p name))
