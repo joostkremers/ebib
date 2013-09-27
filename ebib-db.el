@@ -305,7 +305,7 @@ inherit from the field `title' in the cross-referenced entry.
 
 The inheritance scheme is stored in `ebib-biblatex-inheritance'."
   (let ((inheritances (or (cadr (assoc entry-type ebib-biblatex-inheritance))
-                          (cadr (assoc "all" ebib-biblatex-inheritance)))))
+                          (cadr (assoc 'all ebib-biblatex-inheritance)))))
     (or (cadr (assoc field inheritances))
         field)))
 
