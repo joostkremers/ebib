@@ -907,23 +907,6 @@ The first element in the list is the symbol `=type='."
                        (ebib-get-opt-fields entry-type)
                        ebib-additional-fields)))
 
-(defun ebib-get-entry (entry-key databases)
-  "Return the entry stored in DATABASES under ENTRY-KEY.
-DATABASES should be a list of databases, in which case the first
-matching entry is returned, or a single database object. The
-return value is an alist containing (FIELD . VALUE) pairs. A
-special key `=type=' indicates the entry type. If ENTRY-KEY isn't
-found in DATABASES, return NIL."
-  (catch 'found
-    (mapc #'(lambda (db)
-              (let ((entry (ebib-db-get-entry entry-key db 'noerror)))
-                (when entry
-                  (throw 'found entry))))
-          (if (not (listp databases))
-              (list databases)
-            databases))
-    nil)) ; if no entry was found, we must return nil
-
 ;; This is simply to save some typing.
 (defun ebib-cur-entry-key ()
   "Get the key of the current entry."
@@ -1184,7 +1167,7 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
 (defun ebib-format-fields (key fn &optional match-str db)
   (or db
       (setq db ebib-cur-db))
-  (let* ((entry (ebib-get-entry key db))
+  (let* ((entry (ebib-db-get-entry key db))
          (entry-type (cdr (assoc '=type= entry)))
          (obl-fields (ebib-get-obl-fields entry-type))
          (opt-fields (ebib-get-opt-fields entry-type)))
@@ -1262,8 +1245,7 @@ field contents."
     (with-ebib-buffer-writable
       (erase-buffer)
       (when ebib-cur-keys-list         ; are there entries being displayed?
-        (ebib-format-fields (ebib-cur-entry-key)
-                            'insert match-str)
+        (ebib-format-fields (ebib-cur-entry-key) #'insert match-str)
         (setq ebib-current-field '=type=)
         (goto-char (point-min))))))
 
@@ -2528,7 +2510,7 @@ marked entries."
   "Write entry KEY in DB into the current buffer in BibTeX format.
 If TIMESTAMP is T and `ebib-use-timestamp' is set, a timestamp is
 added to the entry, possibly overwriting an existing timestamp."
-  (let ((entry (ebib-get-entry key db)))
+  (let ((entry (ebib-db-get-entry key db 'noerror)))
     (when entry
       (insert (format "@%s{%s,\n" (cdr (assoc '=type= entry)) key))
       (mapc #'(lambda (field)
@@ -2825,7 +2807,7 @@ a filename is asked to which the entry is appended."
                                 (let ((entry-key (ebib-cur-entry-key)))
                                   (if (member entry-key (ebib-db-list-keys db 'nosort))
                                       (error "Entry key `%s' already exists in database %d" entry-key num)
-                                    (ebib-store-entry entry-key (copy-tree (ebib-get-entry entry-key ebib-cur-db)) db t)
+                                    (ebib-store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib-cur-db)) db t)
                                     ;; if this is the first entry in the target DB,
                                     ;; its CUR-ENTRY must be set!
                                     (when (null (ebib-db-get-current-entry-key db))
@@ -2852,7 +2834,7 @@ a filename is asked to which the entry is appended."
               (mapc #'(lambda (entry-key)
                         (if (member entry-key (ebib-db-list-keys db 'nosort))
                             (error "Entry key `%s' already exists in database %d" entry-key num)
-                          (ebib-store-entry entry-key (copy-tree (ebib-get-entry entry-key ebib-cur-db)) db t)))
+                          (ebib-store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib-cur-db)) db t)))
                     (ebib-db-list-marked-entries ebib-cur-db 'nosort))
               ;; if the target DB was empty before, its CUR-ENTRY must be set!
               (when (null (ebib-db-get-current-entry-key db))
@@ -2880,7 +2862,7 @@ database, only the visible entries are searched."
            (setq ebib-search-string search-str)
            ;; first we search the current entry
            (if (ebib-search-in-entry ebib-search-string
-                                     (ebib-get-entry (ebib-cur-entry-key) ebib-cur-db))
+                                     (ebib-db-get-entry (ebib-cur-entry-key) ebib-cur-db))
                (ebib-fill-entry-buffer ebib-search-string)
              ;; if the search string wasn't found in the current entry, we continue searching.
              (ebib-search-next)))))
@@ -3013,7 +2995,7 @@ Either prints the entire database, or the marked entries."
                          ;; first create a table
                          (insert "\\begin{tabular}{p{0.2\\textwidth}p{0.8\\textwidth}}\n")
                          ;; insert the entry type
-                         (let ((entry (ebib-get-entry entry-key ebib-cur-db)))
+                         (let ((entry (ebib-db-get-entry entry-key ebib-cur-db)))
                            (insert (format "\\multicolumn{2}{l}{\\texttt{%s (%s)}}\\\\\n"
                                            entry-key (symbol-name (cdr (assoc '=type= entry)))))
                            (insert "\\hline\n")
