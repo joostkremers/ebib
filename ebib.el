@@ -47,7 +47,7 @@
 
 ;; Code:
 
-(eval-when-compile
+(eval-and-compile
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
         (require 'cl)
