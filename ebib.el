@@ -1580,8 +1580,7 @@ that is to be displayed, or a file to load (which must end in
   "Initialises Ebib.
 This function sets all variables to their initial values, creates the
 buffers and reads the rc file."
-  (setq ebib-cur-entry-hash nil
-        ebib-current-field nil
+  (setq ebib-current-field nil
         ebib-saved-window-config nil)
   (put 'timestamp 'ebib-hidden t)
   (ebib-create-buffers)
