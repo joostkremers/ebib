@@ -4529,7 +4529,7 @@ is found, return the symbol `none'."
               ;; If we didn't find a \bibliography command, search for \addbibresource commands:
               (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
                 (let ((option (match-string 1))
-                      (file (match-string 2)))
+                      (file (match-string-no-properties 2)))
                   ;; If this isn't a remote resource, add it to the list.
                   (unless (and option (string-match "location=remote" option))
                     (push file files)))))
