@@ -1639,7 +1639,8 @@ keywords.
 
 Optional argument DB specifies the database to check for."
   (if db
-      (let* ((dir (or (file-name-directory ebib-keywords-file) ; a single keywords file
+      (let* ((dir (or (and ebib-keywords-file
+                           (file-name-directory ebib-keywords-file)) ; a single keywords file
                       (file-name-directory (edb-filename db)))) ; per-directory keywords files
              (lst (assoc dir ebib-keywords-files-alist)))
         (if (cl-third lst)
