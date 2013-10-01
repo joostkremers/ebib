@@ -1,6 +1,4 @@
 % Ebib: a BibTeX database manager for Emacs
-% Joost Kremers
-% @@date
 
 
 <div id="menu">
@@ -16,13 +14,6 @@
 [Download](#download)
 
 [Mailing list](#mailing-list)
-
-<div class="bottom-dweller">
-
-Last modified: <br/>
-@@date
-
-</div>
 
 </div>
 
@@ -110,6 +101,12 @@ There is also a public [git repository](https://github.com/joostkremers/ebib.git
 ## Mailing list ##
 
 Ebib has a mailing list: [ebib-users](https://lists.sourceforge.net/lists/listinfo/ebib-users). Here, you can ask any questions regarding Ebib, send bug reports or feature requests.
+
+<div class="bottom-dweller">
+
+Joost Kremers (*last modified:* *@@date*)
+
+</div>
 
 </div>
 
