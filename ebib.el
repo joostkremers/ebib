@@ -47,15 +47,17 @@
 
 ;; Code:
 
-(eval-when-compile
-  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
+(eval-and-compile
+  (if (sting< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
       (progn
         (require 'cl)
         (defalias 'cl-caddr 'caddr)
         (defalias 'cl-defstruct 'defstruct)
         (defalias 'cl-do 'do)
+        (defalias 'cl-first 'first)
         (defalias 'cl-flet 'flet)
         (defalias 'cl-incf 'incf)
+        (defalias 'cl-labels 'labels)
         (defalias 'cl-loop 'loop)
         (defalias 'cl-macrolet 'macrolet)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
@@ -64,7 +66,11 @@
         (defalias 'cl-remove-if-not 'remove-if-not)
         (defalias 'cl-second 'second)
         (defalias 'cl-third 'third)
-        (defalias 'cl-values 'values))
+        (defalias 'cl-values 'values)
+        (unless (fboundp 'read-char-choice)
+          (defun read-char-choice (prompt chars)
+            "Emacs 23 compatability function."
+            (string-to-char (completing-read prompt chars)))))
     (require 'cl-lib)))
 (require 'easymenu)
 (require 'bibtex)
@@ -72,8 +78,8 @@
 
 ;; make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)
-(unless (< emacs-major-version 24)
-  (bibtex-set-dialect)) ; this initializes some stuff that is needed for bibtex-generate-autokey
+(if (fboundp 'bibtex-set-dialect)
+    (bibtex-set-dialect)) ; this initializes some stuff that is needed for bibtex-generate-autokey
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
@@ -1086,7 +1092,7 @@ Note, The argument ALIST has no function."
     (when window
       (select-window window)
       (with-ebib-window-nondedicated
-        (switch-to-buffer buffer nil t))
+        (switch-to-buffer buffer))
       window)))
 
 (defun ebib-display-buffer-largest-window (buffer alist)
@@ -1095,7 +1101,7 @@ The argument ALIST has no function."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
       (select-window window)
-      (switch-to-buffer buffer nil t)
+      (switch-to-buffer buffer)
       window)))
 
 (defun ebib-pop-to-buffer (buffer)
@@ -3726,7 +3732,7 @@ If there are stored filters, they are saved to
       (ebib-filters-save-file ebib-filters-default-file)
     (condition-case nil
         (when (file-exists-p ebib-filters-default-file)
-          (delete-file ebib-filters-default-file delete-by-moving-to-trash)
+          (delete-file ebib-filters-default-file) ; accepts additional arg `delete-by-moving-to-trash' in Emacs 24
           (message "Filter file %s deleted." ebib-filters-default-file))
       (file-error (message "Can't delete %s" ebib-filters-default-file)))))
 
@@ -3929,7 +3935,7 @@ If the key of the current entry matches the pattern
          (eq ebib-layout 'index-only))
     (delete-window))
    ((eq ebib-layout 'index-only)
-    (switch-to-buffer nil t t)))
+    (switch-to-buffer nil t)))
   (ebib-pop-to-buffer 'index)
   ;; (select-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist))))
   (if (string-match "<new-entry[0-9]+>" (edb-cur-entry ebib-cur-db))
@@ -4358,7 +4364,7 @@ The deleted text is not put in the kill ring."
            ebib-popup-entry-window)
       (delete-window)
     (with-ebib-window-nondedicated
-      (switch-to-buffer nil t t)))
+      (switch-to-buffer nil t)))
   (ebib-pop-to-buffer 'index))
 
 (defun ebib-prev-string ()
@@ -4626,7 +4632,7 @@ edit buffer was shown in."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (switch-to-buffer nil t t))
+    (switch-to-buffer nil t))
   (cond
    ((eq ebib-editing 'preamble)
     (ebib-pop-to-buffer 'index))
@@ -4703,7 +4709,7 @@ The text being edited is stored before saving the database."
            ebib-popup-entry-window)
       (delete-window)
     (with-ebib-window-nondedicated
-      (switch-to-buffer nil t t)))
+      (switch-to-buffer nil t)))
   (ebib-pop-to-buffer 'index))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4895,7 +4901,7 @@ created containing only these entries."
        (when (or (not (file-exists-p bib-file))
                  (y-or-n-p (format "%s already exists. Overwrite? " (file-name-nondirectory bib-file))))
          (when (file-exists-p bib-file)
-           (delete-file bib-file))
+           (delete-file bib-file)) ; accepts additional arg `delete-by-moving-to-trash' in Emacs 24
          (let ((databases
                 (delq nil (mapcar #'(lambda (file)
                                       (ebib-get-db-from-filename file))
