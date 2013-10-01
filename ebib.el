@@ -54,7 +54,7 @@
         (defalias 'cl-caddr 'caddr)
         (defalias 'cl-defstruct 'defstruct)
         (defalias 'cl-do 'do)
-        (defalias 'cl-dolist 'do)
+        (defalias 'cl-dolist 'dolist)
         (defalias 'cl-first 'first)
         (defalias 'cl-flet 'flet)
         (defalias 'cl-incf 'incf)
