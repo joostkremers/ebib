@@ -1,9 +1,9 @@
 body {
     font-family: Verdana, "Bitstream Vera Sans", sans-serif;
-    background-color: #c9c9c9;
     color: #33333A;
     line-height: 140%;
     font-size: 100%;
+    background-color: #E0E0E0;
 }
 
 a {
@@ -49,11 +49,15 @@ img {
     max-width: 45%;
     top: 140px;
     text-align: justify;
+    border-radius: 15px;
+    box-shadow: 1px 1px 4px 4px #333333;
+    padding: 2%;
+    background-color: #c9c9c9;
 }
 
 #menu {
-    border-radius: 15px;
-    box-shadow: 1px 1px 4px 4px #333333;
+    /* border-radius: 15px; */
+    /* box-shadow: 1px 1px 4px 4px #333333; */
     position: fixed;
     margin-left: 5%;
     padding: 2%;
@@ -61,6 +65,14 @@ img {
     width: 130px;
     /* background-color: #6b1d1d; */
     /* color: #c9c9c9; */
+}
+
+#TOC {
+    position: absolute;
+    /* margin-left: 75%; */
+    width: 20%;
+    padding-right: 1%;
+    font-size: 75%;
 }
 
 /* #menu { */
