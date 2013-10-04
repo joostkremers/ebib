@@ -544,7 +544,7 @@ entry-specific inheritances, the latter override the former."
 
 ;; constants and variables that are set only once
 (defconst ebib-bibtex-identifier "[^^\"@\\&$#%',={}() \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
-(defconst ebib-key-regexp "[^^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
+(defconst ebib-key-regexp "[^][^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
 ;; buffers and highlights
@@ -1526,84 +1526,116 @@ Optional argument DB specifies the database to check for."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
-(defun ebib (&optional arg)
+(defun ebib (&optional file)
   "Ebib, a BibTeX database manager.
-Optional argument ARG specifies the entry of the current database
-that is to be displayed, or a file to load (which must end in
-`.bib')."
+Optional argument FILE is a file to load (which must end in
+`.bib'). If FILE is already loaded, switch to it."
   (interactive)
-  (if (member (window-buffer) (mapcar #'cdr ebib-buffer-alist))
-      (error "Ebib already active")
-    ;; First we check if ARG is a file and expand it, before we switch
-    ;; buffers (possibly changing the value of `default-directory').
-    (let ((file (when (and arg (string= (file-name-extension arg) "bib"))
-                  (expand-file-name arg))))
-      ;; We save the buffer from which Ebib is called.
-      (setq ebib-push-buffer (current-buffer))
-      ;; Initialize Ebib if required.
-      (unless ebib-initialized
-        (ebib-init)
-        (if ebib-preload-bib-files
-            (mapc #'(lambda (file)
-                      (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
-                  ebib-preload-bib-files)))
-      ;; If Ebib is visible, we just switch to the index buffer.
-      (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
-        (if index-window
-            (select-window index-window)
-          (ebib-setup-windows)))
-      ;; Check for an optional argument.
-      (cond
-       (file (ebib-load-bibtex-file file))
-       (arg (if (ebib-db-set-current-entry-key arg ebib-cur-db 'noerror)
-                (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-                  (goto-char (point-min))
-                  (re-search-forward (format "^%s " (ebib-cur-entry-key)))
-                  (ebib-select-entry))
-              (message "No entry `%s' in current database " arg)))))))
-
-(defun ebib-setup-windows ()
-  "Creates Ebib's window configuration in the current frame."
-  ;; we save the current window configuration.
-  (setq ebib-saved-window-config (current-window-configuration))
+  ;; First do some stuff in the buffer from which Ebib was called.
+  ;; Save the buffer from which Ebib is called.
   (setq ebib-buffer-before (current-buffer))
-  (cond
-   ((eq ebib-layout 'full)
-    (delete-other-windows))
-   ((eq ebib-layout 'custom)
-    (setq ebib-window-before (selected-window))
-    (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
-      (select-window ebib-window))))
-  (let* ((index-window (selected-window))
-         (entry-window (split-window index-window ebib-index-window-size
-                                     ebib-window-vertical-split)))
-    (switch-to-buffer (cdr (assoc 'index ebib-buffer-alist)))
-    (unless (eq ebib-layout 'index-only)
-      (set-window-buffer entry-window (cdr (assoc 'entry ebib-buffer-alist))))
-    (set-window-dedicated-p index-window t)
-    (if (eq ebib-layout 'custom)
-        (set-window-dedicated-p entry-window t))))
+  ;; Set the push buffer to the current buffer.
+  (setq ebib-push-buffer (current-buffer))
+  ;; See if there are local databases.
+  (or ebib-local-bibtex-filenames
+      (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
+  (let (key)
+    ;; Expand FILE if given.
+    (if file
+        (setq file (expand-file-name file))
+      ;; Otherwise see if there's a key at point.
+      (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
+    ;; Initialize Ebib if required.
+    (ebib-init)
+    ;; Set up the windows.
+    (ebib-setup-windows)
+    ;; See if we have a file or a key.
+    (cond
+     (file (ebib-load-bibtex-file-internal file))
+     (key (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))))
+  (ebib-redisplay))
+
+(defun ebib-find-and-set-key (key files)
+  "Make KEY the current entry.
+FILES is a list of BibTeX files in which KEY is searched. If
+FILES is `none', only the current database is searched."
+  (when ebib-databases
+    (if (eq files 'none)
+        (unless (member key ebib-cur-keys-list)
+          (setq key nil))
+      (let ((database (catch 'found
+                        (mapc #'(lambda (file)
+                                  (let ((db (ebib-get-db-from-filename file)))
+                                    (if (and db (member key (ebib-db-list-keys db 'nosort)))
+                                        (throw 'found db))))
+                              files)
+                        nil))) ; We must return nil if the key wasn't found anywhere.
+        (if (null database)
+            (setq key nil)
+          (setq ebib-cur-db database))))
+    (if key 
+        (ebib-db-set-current-entry-key key ebib-cur-db))))
+
+(defun ebib-read-string-at-point (chars)
+  "Reads a string at POINT delimited by CHARS and returns it.
+CHARS is a string of characters that should not occur in the string."
+  (save-excursion
+    (skip-chars-backward (concat "^" chars))
+    (let ((beg (point)))
+      (ebib-looking-at-goto-end (concat "[^" chars "]*"))
+      (buffer-substring-no-properties beg (point)))))
 
 (defun ebib-init ()
-  "Initialises Ebib.
-This function sets all variables to their initial values, creates the
-buffers and reads the rc file."
-  (setq ebib-current-field nil
-        ebib-saved-window-config nil)
-  (put 'timestamp 'ebib-hidden t)
-  (ebib-create-buffers)
-  (if (and ebib-keywords-file
-           (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
-      (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
-                                                    (read-file-to-list ebib-keywords-file) nil)))
-  (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
-  (ebib-filters-load-file ebib-filters-default-file)
-  (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))
-  (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
-  (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
-  (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
-  (load ebib-rc-file t)
-  (setq ebib-initialized t))
+  "Initialise Ebib.
+This function sets all variables to their initial values, creates
+the buffers, reads the rc file and loads the files in
+`ebib-preload-bib-files'."
+  (unless ebib-initialized
+    (setq ebib-current-field nil
+          ebib-saved-window-config nil)
+    (put 'timestamp 'ebib-hidden t)
+    (ebib-create-buffers)
+    (if (and ebib-keywords-file
+             (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
+        (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
+                                                      (read-file-to-list ebib-keywords-file) nil)))
+    (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
+    (ebib-filters-load-file ebib-filters-default-file)
+    (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))
+    (setq ebib-fields-highlight (ebib-make-highlight 1 1 (cdr (assoc 'entry ebib-buffer-alist))))
+    (setq ebib-strings-highlight (ebib-make-highlight 1 1 (cdr (assoc 'strings ebib-buffer-alist))))
+    (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
+    (load ebib-rc-file t)
+    (if ebib-preload-bib-files
+        (mapc #'(lambda (file)
+                  (ebib-load-bibtex-file-internal (locate-file file ebib-preload-bib-search-dirs)))
+              ebib-preload-bib-files))
+    (setq ebib-initialized t)))
+
+(defun ebib-setup-windows ()
+  "Create Ebib's window configuration in the current frame."
+  ;; If the index buffer is visible, just switch to it.
+  (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
+    (if index-window
+        (select-window index-window)
+      ;; Save the current window configuration.
+      (setq ebib-saved-window-config (current-window-configuration))
+      (cond
+       ((eq ebib-layout 'full)
+        (delete-other-windows))
+       ((eq ebib-layout 'custom)
+        (setq ebib-window-before (selected-window))
+        (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
+          (select-window ebib-window))))
+      (let* ((index-window (selected-window))
+             (entry-window (split-window index-window ebib-index-window-size
+                                         ebib-window-vertical-split)))
+        (switch-to-buffer (cdr (assoc 'index ebib-buffer-alist)))
+        (unless (eq ebib-layout 'index-only)
+          (set-window-buffer entry-window (cdr (assoc 'entry ebib-buffer-alist))))
+        (set-window-dedicated-p index-window t)
+        (if (eq ebib-layout 'custom)
+            (set-window-dedicated-p entry-window t))))))
 
 (defun ebib-create-buffers ()
   "Creates the buffers for Ebib."
@@ -1661,6 +1693,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-export-filename nil
           ebib-window-before nil
           ebib-buffer-before nil
+          ebib-cur-keys-list nil
           ebib-keywords-files-alist nil
           ebib-keywords-list-per-session nil
           ebib-filters-alist nil)
@@ -1917,23 +1950,23 @@ This function adds a newline to the message being logged."
                    args))))
 
 (defun ebib-load-bibtex-file (&optional file)
-  "Loads a BibTeX file into Ebib."
+  "Open a BibTeX file."
   (interactive)
   (unless file
     (setq file (ebib-ensure-extension (read-file-name "File to open: " "~/") "bib")))
+  (ebib-load-bibtex-file-internal file)
+  (ebib-redisplay))
+
+(defun ebib-load-bibtex-file-internal (file)
+  "Helper function for `ebib-load-bibtex-file'."
   (let* ((full-name (expand-file-name file))
          (db (ebib-get-db-from-filename full-name)))
     (if db ; FILE is already open in Ebib.
-        (progn
-          (setq ebib-cur-db db)
-          (ebib-redisplay))
+        (setq ebib-cur-db db)
       (setq ebib-cur-db (ebib-create-new-database))
       (ebib-db-set-filename full-name ebib-cur-db)
       (setq ebib-log-error nil) ; we haven't found any errors
       (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") full-name)
-      ;; first, we empty the buffers
-      (ebib-erase-buffer (cdr (assoc 'index ebib-buffer-alist)))
-      (ebib-erase-buffer (cdr (assoc 'entry ebib-buffer-alist)))
       (if (file-exists-p full-name)
           (progn
             ;; load the entries in the file
@@ -1948,11 +1981,7 @@ This function adds a newline to the message being logged."
       (ebib-keywords-load-keywords ebib-cur-db)
       (if ebib-keywords-files-alist
           (ebib-log 'log "Using keywords from %s." (ebib-keywords-get-file ebib-cur-db))
-        (ebib-log 'log "Using general keyword list."))
-      ;; fill the index buffer. (this even works if there are no keys
-      ;; in the database, for example when the user opened a new file
-      ;; or if no BibTeX entries were found.
-      (ebib-redisplay))))
+        (ebib-log 'log "Using general keyword list.")))))
 
 (defun ebib-reload-current-database ()
   "Reload the current database from disk."
@@ -4513,35 +4542,38 @@ file. This function simply searches the current LaTeX file or its
 master file for a `\\bibliography' or `\\addbibresource' command
 and returns the file(s) given in its argument. If no such command
 is found, return the symbol `none'."
-  (let ((texfile-buffer (current-buffer))
-        texfile)
-    ;; if AucTeX's TeX-master is used and set to a string, we must
-    ;; search that file for a \bibliography command, as it's more
-    ;; likely to be in there than in the file we're in.
-    (and (boundp 'TeX-master)
-         (stringp TeX-master)
-         (setq texfile (ebib-ensure-extension TeX-master "tex")))
-    (with-temp-buffer
-      (if (and texfile (file-readable-p texfile))
-          (insert-file-contents texfile)
-        (insert-buffer-substring texfile-buffer))
-      (save-excursion
-        (save-match-data
-          (let (files)
-            (goto-char (point-min))
-            ;; First search for a \bibliography command:
-            (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
-                (setq files (mapcar #'(lambda (file)
-                                        (ebib-ensure-extension file "bib"))
-                                    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
-              ;; If we didn't find a \bibliography command, search for \addbibresource commands:
-              (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
-                (let ((option (match-string 1))
-                      (file (match-string-no-properties 2)))
-                  ;; If this isn't a remote resource, add it to the list.
-                  (unless (and option (string-match "location=remote" option))
-                    (push file files)))))
-            (or files 'none)))))))
+  ;; This only makes sense in LaTeX buffers
+  (if (not (eq major-mode 'latex-mode))
+      'none
+    (let ((texfile-buffer (current-buffer))
+          texfile)
+      ;; if AucTeX's TeX-master is used and set to a string, we must
+      ;; search that file for a \bibliography command, as it's more
+      ;; likely to be in there than in the file we're in.
+      (and (boundp 'TeX-master)
+           (stringp TeX-master)
+           (setq texfile (ebib-ensure-extension TeX-master "tex")))
+      (with-temp-buffer
+        (if (and texfile (file-readable-p texfile))
+            (insert-file-contents texfile)
+          (insert-buffer-substring texfile-buffer))
+        (save-excursion
+          (save-match-data
+            (let (files)
+              (goto-char (point-min))
+              ;; First search for a \bibliography command:
+              (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
+                  (setq files (mapcar #'(lambda (file)
+                                          (ebib-ensure-extension file "bib"))
+                                      (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
+                ;; If we didn't find a \bibliography command, search for \addbibresource commands:
+                (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
+                  (let ((option (match-string 1))
+                        (file (match-string-no-properties 2)))
+                    ;; If this isn't a remote resource, add it to the list.
+                    (unless (and option (string-match "location=remote" option))
+                      (push file files)))))
+              (or files 'none))))))))
 
 (defun ebib-create-collection-from-db ()
   "Create a collection of BibTeX keys.
@@ -4595,45 +4627,6 @@ completion works."
              (insert (format "%s" citation-command)))))))
     ((default)
      (error "No database loaded"))))
-
-(defun ebib-entry-summary ()
-  "Shows the fields of the key at POINT.
-The key is searched in the database associated with the LaTeX
-file, or in the current database if no \\bibliography command can
-be found."
-  (interactive)
-  (ebib-execute-when
-    ((database)
-     (or ebib-local-bibtex-filenames
-         (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-     (let ((key (ebib-read-string-at-point "][@\"#%'(),={} \n\t\f")))
-       (if (eq ebib-local-bibtex-filenames 'none)
-           (if (not (member key ebib-cur-keys-list))
-               (error "Entry `%s' is not in the current database" key))
-         (let ((database (catch 'found
-                           (mapc #'(lambda (file)
-                                     (let ((db (ebib-get-db-from-filename file)))
-                                       (if (null db)
-                                           (message "Database %s not loaded" file)
-                                         (if (member key (ebib-db-list-keys db 'nosort))
-                                             (throw 'found db)))))
-                                 ebib-local-bibtex-filenames)
-                           nil))) ; we must return nil if the key wasn't found anywhere
-           (if (null database)
-               (error "Entry `%s' not found" key)
-             (setq ebib-cur-db database))))
-       (ebib key)))
-    ((default)
-     (error "No database(s) loaded"))))
-
-(defun ebib-read-string-at-point (chars)
-  "Reads a string at POINT delimited by CHARS and returns it.
-CHARS is a string of characters that should not occur in the string."
-  (save-excursion
-    (skip-chars-backward (concat "^" chars))
-    (let ((beg (point)))
-      (ebib-looking-at-goto-end (concat "[^" chars "]*"))
-      (buffer-substring-no-properties beg (point)))))
 
 (defun ebib-create-bib-from-bbl ()
   "Create a .bib file for the current LaTeX document.

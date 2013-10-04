@@ -193,9 +193,9 @@ A search term may of course appear more than once in the database. To search for
 The functions described here form Ebib's basic search functionality. Ebib also has a much more powerful search mechanism in the form of *filters*. These are described in [Filters](#filters).)
 
 
-## Putting citations into text documents ##
+## Consulting BibTeX Databases outside Ebib ##
 
-Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it trivially easy to insert BibTeX keys into your documents. By default, this functionality is set up for LaTeX, but also for [Orgmode](http://orgmode.org) and [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
+Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it easy to consult your BibTeX databases from a text buffer. By default, this functionality is set up for LaTeX, for [Orgmode](http://orgmode.org) and for [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
 
 In any (text mode) buffer, you can call the command `ebib-insert-bibtex-key` to insert a citation. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can use TAB-completion to enter a citation key, and after hitting `RET`, Emacs puts a citation at the cursor position in the current buffer with the key you selected. This citation includes the additional markup for the text mode in question. That is, if you call `ebib-insert-bibtex-key` from a LaTeX buffer, Ebib inserts `\<cite>{<key>}` into your buffer, substituting the citation command you select for `<cite>` and the key for `<key>`.
 
@@ -207,13 +207,11 @@ The citation command that `ebib-insert-bibtex-key` and the command key `p` ask f
 
 This will allow Orgmode to recognise Ebib links and allow you to jump to the BibTeX entry in Ebib using `C-c C-o` (`org-open-at-point`, the normal Orgmode command for following links). Note that such org links aren't properly translated to LaTeX citation commands when you export your org file. For that, you'll need to set up a different link type for each citation command and provide functions for exporting them to LaTeX. The orgmode documentation explains how this is done. (You can, in fact, create similar functions for exporting to other formats.)
 
-If you use `ebib-insert-bibtex-key` in Pandoc Markdown, you can choose between three citation commands: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which omits the author and inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
+If you use `ebib-insert-bibtex-key` in Pandoc Markdown, you can choose between three citation commands: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
 
-### Other Ebib commands outside Ebib ###
+Calling Ebib from a text mode buffer has another small advantage. If point is on a BibTeX key when Ebib is called, it jumps to that entry in your database. This allows you to quickly check a reference in your text. Ebib will search the entry in the current database, or, if you're calling Ebib from a LaTeX file and there is a `\bibliography` or `\addbibresource` command in the file, in the databases in these commands, if they are opened in Ebib. See [Associating a Database with a LaTeX File](#associating-a-database-with-a-latex-file) below for details.
 
-There are two other Ebib commands available outside Ebib. The first is `ebib-entry-summary`, which reads the citation key at point in the current buffer and starts Ebib on that entry. This allows you to quickly check a reference in a text. (As mentioned, in Orgmode, `C-c C-o` does the same thing if you add `ebib` as a link type.)
-
-The second command is really only useful for LaTeX users: `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. Note, however, that this command does not add cross-referenced entries to the newly created `.bib` file, nor does it add `@string` definitions and the `@preamble`. So make sure to add those after using `ebib-create-bib-from-bbl`. (Improving this functionality is on the TODO-list.)
+There is one more command that can be useful for LaTeX users: `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. Note, however, that this command does not add cross-referenced entries to the newly created `.bib` file, nor does it add `@string` definitions and the `@preamble`. So make sure to add those after using `ebib-create-bib-from-bbl`. (Improving this functionality is on the TODO-list.)
 
 
 ### Key Bindings ###
