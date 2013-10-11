@@ -99,17 +99,17 @@
   :type 'symbol)
 
 (defcustom ebib-preload-bib-files nil
-  "List of .bib files to load automatically when Ebib starts."
+  "List of BibTeX files to load automatically when Ebib starts."
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
 (defcustom ebib-preload-bib-search-dirs '("~")
-  "List of directories to search for .bib files to be preloaded."
+  "List of directories to search for BibTeX files to be preloaded."
   :group 'ebib
-  :type '(repeat :tag "Search directories for .bib files" (string :tag "Directory")))
+  :type '(repeat :tag "Search directories for BibTeX files" (string :tag "Directory")))
 
 (defcustom ebib-create-backups t
-  "If set, create a backup file of a .bib file when it is first saved."
+  "If set, create a backup file of a BibTeX file when it is first saved."
   :group 'ebib
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
@@ -229,14 +229,14 @@ These are used with `ebib-insert-bibtex-key' and
   :type '(function :tag "Mode function"))
 
 (defcustom ebib-sort-order nil
-  "The fields on which the BibTeX entries are to be sorted in the .bib file.
+  "The fields on which the BibTeX entries are to be sorted in the BibTeX file.
 Sorting is done on different sort levels, and each sort level contains one
 or more sort keys."
   :group 'ebib
   :type '(repeat (repeat :tag "Sort level" (symbol :tag "Sort field"))))
 
 (defcustom ebib-save-xrefs-first nil
-  "If true, entries with a crossref field will be saved first in the .bib-file.
+  "If true, entries with a crossref field will be saved first in the BibTeX-file.
 Setting this option has unpredictable results for the sort order
 of entries, so it is not compatible with setting the Sort Order option."
   :group 'ebib
@@ -359,8 +359,8 @@ Each string is added to the preamble on a separate line."
 (defcustom ebib-keywords-file nil
   "Single or generic file name for storing keywords.
 Keywords can be stored in a single keywords file, which is used
-for all .bib files, or in per-directory keywords files located in
-the same directories as the .bib files.  In the latter case, the
+for all BibTeX files, or in per-directory keywords files located in
+the same directories as the BibTeX files.  In the latter case, the
 keywords file should specify just the generic name and no path."
   :group 'ebib
   :type '(choice (const :tag "Do not use keywords file" nil)
@@ -381,7 +381,7 @@ If both `ebib-keywords-list' and `ebib-keywords-file' are set,
 should the file take precedence or should both sets of keywords
 be combined?
 
-For .bib files that do not have an associated keywords file,
+For BibTeX files that do not have an associated keywords file,
 `ebib-keyword-list' is always used, regardless of this setting."
   :group 'ebib
   :type '(choice (const :tag "Use only keywords file" t)
@@ -426,6 +426,17 @@ Also automatically remove duplicates."
   :group 'ebib
   :type '(choice (const :tag "Sort keywords field" t)
                  (const :tag "Do not sort keywords field" nil)))
+
+(defcustom ebib-bibtex-extensions '(".bib" ".bibtex")
+  "List of possible filename extensions of BibTeX files.
+When provided with a BibTeX filename without extension, Ebib
+tries to find a file by adding these extensions. When creating a
+new file, the first extension is added by default, if the
+filename provided does not already have one. If you want to
+create BibTeX files without extension, add the empty string \"\"
+to this list or unset the option entirely."
+  :group 'ebib
+  :type '(repeat (string :tag "Extension")))
 
 (defcustom ebib-biblatex-inheritance nil
   "Inheritance scheme for cross-referencing.
@@ -680,13 +691,25 @@ executed. Returns the value of THEN or of ELSE."
       nil
     (ebib-last1 list (1+ (length (member elem list))))))
 
+(defun ebib-locate-bibfile (file &optional dirs)
+  "Locate and/or expand FILE to an absolute filename.
+First try to locate BibTeX file FILE with `locate-file' and with
+`ebib-bibtex-extensions' as possible suffixes. If this does not
+yield a result, expand FILE with `expand-file-name', adding the
+first extension in `ebib-bibtex-extensions' if FILE has no
+filename suffix."
+  (or (locate-file file (or dirs "/") (append '("") ebib-bibtex-extensions))
+      (expand-file-name (if (file-name-extension file)
+                            file
+                          (concat file (car ebib-bibtex-extensions))))))
+
 (defun ebib-ensure-extension (string ext)
   "Makes sure STRING has the extension EXT, by appending it if necessary.
-EXT should be an extension without the dot."
+EXT should be an extension with dot."
   (save-match-data
-    (if (string-match (concat "\\." ext "$") string)
+    (if (string-match (concat (regexp-quote ext) "$") string)
         string
-      (concat string "." ext))))
+      (concat string ext))))
 
 (defmacro with-ebib-buffer-writable (&rest body)
   "Makes the current buffer writable and executes the commands in BODY.
@@ -1528,8 +1551,8 @@ Optional argument DB specifies the database to check for."
 ;;;###autoload
 (defun ebib (&optional file)
   "Ebib, a BibTeX database manager.
-Optional argument FILE is a file to load (which must end in
-`.bib'). If FILE is already loaded, switch to it."
+Optional argument FILE is a file to load. If FILE is already
+loaded, switch to it."
   (interactive)
   ;; First do some stuff in the buffer from which Ebib was called.
   ;; Save the buffer from which Ebib is called.
@@ -1540,9 +1563,8 @@ Optional argument FILE is a file to load (which must end in
   (or ebib-local-bibtex-filenames
       (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
   (let (key)
-    ;; Expand FILE if given.
-    (if file
-        (setq file (expand-file-name file))
+    (if file ;; Expand FILE if given.
+        (setq file (ebib-locate-bibfile file ebib-preload-bib-search-dirs))
       ;; Otherwise see if there's a key at point.
       (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
     ;; Initialize Ebib if required.
@@ -1953,24 +1975,24 @@ This function adds a newline to the message being logged."
   "Open a BibTeX file."
   (interactive)
   (unless file
-    (setq file (ebib-ensure-extension (read-file-name "File to open: " "~/") "bib")))
+    (setq file (ebib-ensure-extension (read-file-name "File to open: " "~/") (car ebib-bibtex-extensions))))
   (ebib-load-bibtex-file-internal file)
   (ebib-redisplay))
 
 (defun ebib-load-bibtex-file-internal (file)
-  "Helper function for `ebib-load-bibtex-file'."
-  (let* ((full-name (expand-file-name file))
-         (db (ebib-get-db-from-filename full-name)))
-    (if db ; FILE is already open in Ebib.
+  "Helper function for `ebib-load-bibtex-file'.
+Note: it is assumed that FILE is a fully expanded filename."
+  (let ((db (ebib-get-db-from-filename file)))
+    (if db                              ; FILE is already open in Ebib.
         (setq ebib-cur-db db)
       (setq ebib-cur-db (ebib-create-new-database))
-      (ebib-db-set-filename full-name ebib-cur-db)
-      (setq ebib-log-error nil) ; we haven't found any errors
-      (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") full-name)
-      (if (file-exists-p full-name)
+      (ebib-db-set-filename file ebib-cur-db)
+      (setq ebib-log-error nil)         ; we haven't found any errors
+      (ebib-log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
+      (if (file-exists-p file)
           (progn
             ;; load the entries in the file
-            (ebib-load-entries full-name ebib-cur-db)
+            (ebib-load-entries file ebib-cur-db)
             ;; If the user makes any changes, we'll want to create a back-up.
             (ebib-db-set-backup t ebib-cur-db)
             (ebib-db-set-current-entry-key t ebib-cur-db)
@@ -4552,7 +4574,7 @@ is found, return the symbol `none'."
       ;; likely to be in there than in the file we're in.
       (and (boundp 'TeX-master)
            (stringp TeX-master)
-           (setq texfile (ebib-ensure-extension TeX-master "tex")))
+           (setq texfile (ebib-ensure-extension TeX-master ".tex")))
       (with-temp-buffer
         (if (and texfile (file-readable-p texfile))
             (insert-file-contents texfile)
@@ -4564,7 +4586,7 @@ is found, return the symbol `none'."
               ;; First search for a \bibliography command:
               (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
                   (setq files (mapcar #'(lambda (file)
-                                          (ebib-ensure-extension file "bib"))
+                                          (ebib-ensure-extension file ".bib"))
                                       (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
                 ;; If we didn't find a \bibliography command, search for \addbibresource commands:
                 (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
@@ -4640,7 +4662,7 @@ created containing only these entries."
          (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
      (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
             (bbl-file (concat filename-sans-extension ".bbl"))
-            (bib-file (concat filename-sans-extension ".bib")))
+            (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
        (unless (file-exists-p bbl-file)
          (error "No .bbl file exists. Run BibTeX first"))
        (when (or (not (file-exists-p bib-file))
