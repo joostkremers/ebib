@@ -103,8 +103,12 @@
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
-(defcustom ebib-preload-bib-search-dirs '("~")
-  "List of directories to search for BibTeX files to be preloaded."
+(defcustom ebib-bib-search-dirs '("~")
+  "List of directories to search for BibTeX files.
+A file passed to the function `ebib' is searched in these
+directories if it is not in the current directory. similarly, the
+files in `ebib-preload-bib-files' are searched in these
+directories."
   :group 'ebib
   :type '(repeat :tag "Search directories for BibTeX files" (string :tag "Directory")))
 
@@ -1564,7 +1568,7 @@ loaded, switch to it."
       (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
   (let (key)
     (if file ;; Expand FILE if given.
-        (setq file (ebib-locate-bibfile file ebib-preload-bib-search-dirs))
+        (setq file (ebib-locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
       ;; Otherwise see if there's a key at point.
       (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
     ;; Initialize Ebib if required.
@@ -1630,7 +1634,7 @@ the buffers, reads the rc file and loads the files in
     (load ebib-rc-file t)
     (if ebib-preload-bib-files
         (mapc #'(lambda (file)
-                  (ebib-load-bibtex-file-internal (locate-file file ebib-preload-bib-search-dirs)))
+                  (ebib-load-bibtex-file-internal (locate-file file ebib-bib-search-dirs)))
               ebib-preload-bib-files))
     (setq ebib-initialized t)))
 
