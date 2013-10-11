@@ -4548,17 +4548,18 @@ or on the region if it is active."
 
 (defun ebib-get-db-from-filename (filename)
   "Returns the database struct associated with FILENAME."
-  (when (file-name-absolute-p filename)
-    (setq filename (expand-file-name filename))) ; expand ~, . and ..
-  (catch 'found
-    (mapc #'(lambda (db)
-              ;; If filename is absolute, we want to compare to the
-              ;; absolute filename of the database, otherwise we should use
-              ;; only the non-directory component.
-              (if (string= filename (ebib-db-get-filename db (not (file-name-absolute-p filename))))
-                  (throw 'found db)))
-          ebib-databases)
-    nil))
+  (when filename
+    (if (file-name-absolute-p filename)
+        (setq filename (expand-file-name filename))) ; expand ~, . and ..
+    (catch 'found
+      (mapc #'(lambda (db)
+                ;; If filename is absolute, we want to compare to the
+                ;; absolute filename of the database, otherwise we should use
+                ;; only the non-directory component.
+                (if (string= filename (ebib-db-get-filename db (not (file-name-absolute-p filename))))
+                    (throw 'found db)))
+            ebib-databases)
+      nil)))
 
 (defun ebib-get-local-databases ()
   "Return a list of .bib files associated with the file in the current LaTeX buffer.
