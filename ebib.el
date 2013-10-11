@@ -404,7 +404,7 @@ URLs."
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
 This file is read when Ebib is started. It can be used to define
-custom keys or set custimzation variables (though the latter is
+custom keys or set customization variables (though the latter is
 easier through Customize)."
   :group 'ebib
   :type '(file :tag "Customization file:"))
