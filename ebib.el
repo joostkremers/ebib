@@ -433,12 +433,12 @@ Also automatically remove duplicates."
 
 (defcustom ebib-bibtex-extensions '(".bib" ".bibtex")
   "List of possible filename extensions of BibTeX files.
-When provided with a BibTeX filename without extension, Ebib
-tries to find a file by adding these extensions. When creating a
-new file, the first extension is added by default, if the
-filename provided does not already have one. If you want to
-create BibTeX files without extension, add the empty string \"\"
-to this list or unset the option entirely."
+When loading a BibTeX filename without extension, Ebib tries to
+find a file by adding these extensions. When creating a new file,
+the first extension is added if the filename provided does not
+already have an extension. If you want to create BibTeX files
+without extension, add the empty string \"\" to this list or
+unset the option entirely."
   :group 'ebib
   :type '(repeat (string :tag "Extension")))
 
