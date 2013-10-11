@@ -708,9 +708,10 @@ filename suffix."
                           (concat file (car ebib-bibtex-extensions))))))
 
 (defun ebib-ensure-extension (filename ext)
-  "Makes sure FILENAME has extension, possibly by appending EXT.
-If FILENAME has an extension, nothing is changed, otherwise EXT
-is added. Note that EXT should start with a dot."
+  "Make sure FILENAME has an extension.
+Return FILENAME if it alread has an extension, otherwise return
+FILENAME appended with EXT. Note that EXT should start with a
+dot."
   (if (file-name-extension filename)
       filename
     (concat filename ext)))
