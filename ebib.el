@@ -707,13 +707,12 @@ filename suffix."
                             file
                           (concat file (car ebib-bibtex-extensions))))))
 
-(defun ebib-ensure-extension (string ext)
-  "Makes sure STRING has the extension EXT, by appending it if necessary.
-EXT should be an extension with dot."
-  (save-match-data
-    (if (string-match (concat (regexp-quote ext) "$") string)
-        string
-      (concat string ext))))
+(defun ebib-ensure-extension (filename ext)
+  "Makes sure FILENAME has extension, possibly by appending EXT.
+If FILENAME has an extension, nothing is changed, otherwise EXT
+is added. Note that EXT should start with a dot."
+  (unless (file-name-extension filename)
+    (concat filename ext)))
 
 (defmacro with-ebib-buffer-writable (&rest body)
   "Makes the current buffer writable and executes the commands in BODY.
