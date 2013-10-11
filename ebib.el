@@ -460,22 +460,16 @@ entry-specific inheritances, the latter override the former."
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
 
-(defmacro add-to-listq (listvar element &optional append fn)
-  (if (or (featurep 'xemacs)
-          (string< emacs-version "22"))
-      `(add-to-list (quote ,listvar) ,element ,append)
-    `(add-to-list (quote ,listvar) ,element ,append ,fn)))
-
 (defun ebib-set-unique-field-list (var value)
   "Sets `ebib-unique-field-list' on the basis of `ebib-entry-types'"
   (set-default var value)
   (setq ebib-unique-field-list nil)
   (mapc #'(lambda (entry)
             (mapc #'(lambda (field)
-                      (add-to-listq ebib-unique-field-list field t 'eq))
+                      (add-to-list 'ebib-unique-field-list field t))
                   (cadr entry))
             (mapc #'(lambda (field)
-                      (add-to-listq ebib-unique-field-list field t 'eq))
+                      (add-to-list 'ebib-unique-field-list field t))
                   (cl-caddr entry)))
         value))
 
