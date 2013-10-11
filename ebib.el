@@ -711,7 +711,8 @@ filename suffix."
   "Makes sure FILENAME has extension, possibly by appending EXT.
 If FILENAME has an extension, nothing is changed, otherwise EXT
 is added. Note that EXT should start with a dot."
-  (unless (file-name-extension filename)
+  (if (file-name-extension filename)
+      filename
     (concat filename ext)))
 
 (defmacro with-ebib-buffer-writable (&rest body)
