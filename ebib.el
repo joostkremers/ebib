@@ -3028,7 +3028,7 @@ which the entry is appended."
 NUM indicates which database to copy the entry to. If it is NIL,
 a filename is asked to which the entry is appended."
   (ebib-execute-when
-    ((real-db entries)
+    ((entries)
      (if num
          (ebib-export-to-db num (format "Entry `%s' copied to database %%d." (edb-cur-entry ebib-cur-db))
                             #'(lambda (db)
@@ -3057,7 +3057,7 @@ a filename is asked to which the entry is appended."
 NUM indicates which database to copy the entry to. If it is NIL,
 a filename is asked to which the entry is appended."
   (ebib-execute-when
-    ((real-db marked-entries)
+    ((marked-entries)
      (if num
          (ebib-export-to-db
           num "Entries copied to database %d."
