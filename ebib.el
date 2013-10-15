@@ -1328,12 +1328,12 @@ to \"none\"."
               (if (edb-filter ebib-cur-db)
                   (ebib-filters-run-filter ebib-cur-db)
                 (edb-keys-list ebib-cur-db)))
+        ;; Set a header line if there is a filter.
+        (setq header-line-format (if (edb-filter ebib-cur-db)
+                                     (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
         (when (edb-keys-list ebib-cur-db)
-          ;; Set a header line if there is a filter.
-          (setq header-line-format (if (edb-filter ebib-cur-db)
-                                       (ebib-filters-pp-filter (edb-filter ebib-cur-db))))
           ;; It may be that no entry satisfies the filter.
           (if (not ebib-cur-keys-list)
               (message "No entries matching the filter")
@@ -1354,13 +1354,13 @@ to \"none\"."
             (goto-char (point-min))
             (re-search-forward (format "^%s " (edb-cur-entry ebib-cur-db)))
             (beginning-of-line)
-            (ebib-set-index-highlight))
-          ;; TODO Setting the buffer's modified flag and renaming it
-          ;; shouldn't be done here.
-          (set-buffer-modified-p (edb-modified ebib-cur-db))
-          (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
-                                                       (length (member ebib-cur-db ebib-databases)))))
-                                 (edb-name ebib-cur-db))))))))
+            (ebib-set-index-highlight)))
+        ;; TODO Setting the buffer's modified flag and renaming it
+        ;; shouldn't be done here.
+        (set-buffer-modified-p (edb-modified ebib-cur-db))
+        (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
+                                                     (length (member ebib-cur-db ebib-databases)))))
+                               (edb-name ebib-cur-db)))))))
 
 (defun ebib-fill-entry-buffer (&optional match-str)
   "Fills the entry buffer with the fields of the current entry.
