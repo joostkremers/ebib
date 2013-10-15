@@ -1233,11 +1233,11 @@ to \"none\"."
               (if (ebib-db-get-filter ebib-cur-db)
                   (ebib-filters-run-filter ebib-cur-db)
                 (ebib-db-list-keys ebib-cur-db)))
+        ;; Set a header line if there is a filter.
+        (setq header-line-format (ebib-filters-pp-filter (ebib-db-get-filter ebib-cur-db)))
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
         (when (ebib-cur-entry-key)
-          ;; Set a header line if there is a filter.
-          (setq header-line-format (ebib-filters-pp-filter (ebib-db-get-filter ebib-cur-db)))
           ;; It may be that no entry satisfies the filter.
           (if (not ebib-cur-keys-list)
               (message "No entries matching the filter")
