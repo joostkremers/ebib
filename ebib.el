@@ -1629,7 +1629,8 @@ the buffers, reads the rc file and loads the files in
     (load ebib-rc-file t)
     (if ebib-preload-bib-files
         (mapc #'(lambda (file)
-                  (ebib-load-bibtex-file-internal (locate-file file ebib-bib-search-dirs)))
+                  (ebib-load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
+                                                      file)))
               ebib-preload-bib-files))
     (setq ebib-initialized t)))
 
