@@ -1685,7 +1685,8 @@ that is to be displayed, or a file to load (which must end in
         (ebib-init)
         (if ebib-preload-bib-files
             (mapc #'(lambda (file)
-                      (ebib-load-bibtex-file (locate-file file ebib-preload-bib-search-dirs)))
+                      (ebib-load-bibtex-file (or (locate-file file ebib-preload-bib-search-dirs)
+                                                 file)))
                   ebib-preload-bib-files)))
       ;; If Ebib is visible, we just switch to the index buffer.
       (let ((index-window (get-buffer-window (cdr (assoc 'index ebib-buffer-alist)))))
