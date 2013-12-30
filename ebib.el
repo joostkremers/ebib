@@ -2183,16 +2183,17 @@ be added. (Whether a timestamp is actually added, also depends on
 Point should be either at the comma after the entry key or at the
 comma delimiting the preceding field. Return a cons (FIELD .
 VALUE), or NIL if no field was found."
-  (when (eq (char-after) ?,) ; If we're looking at a comma
+  (when (eq (char-after) ?,)            ; If we're looking at a comma
     (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
-    (let ((beg (point)))
-      (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
-          (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
-            (skip-chars-forward "#%'(),=} \n\t\f" limit) ; move to the field contents
-            (let* ((beg (point))
-                   (field-contents (buffer-substring-no-properties beg (ebib-find-end-of-field limit))))
-              (cons field-type field-contents)))
-        (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos))))))
+    (unless (>= (point) limit) ; if we haven't reached the end of the entry
+      (let ((beg (point)))
+        (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
+            (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
+              (skip-chars-forward "#%'(),=} \n\t\f" limit) ; move to the field contents
+              (let* ((beg (point))
+                     (field-contents (buffer-substring-no-properties beg (ebib-find-end-of-field limit))))
+                (cons field-type field-contents)))
+          (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos)))))))
 
 (defun ebib-find-end-of-field (limit)
   "Move POINT to the end of a field's contents and return POINT.
