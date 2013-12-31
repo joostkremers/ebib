@@ -2160,6 +2160,8 @@ be added. (Whether a timestamp is actually added, also depends on
                                           "\\)[ \t\n\f]*,")
                                   1)    ; this delimits the entry key
         (let ((entry-key (buffer-substring-no-properties beg (point))))
+          (if (string= entry-key "")
+              (setq entry-key (ebib-generate-tempkey db)))
           (setq entry-type (intern-soft entry-type))
           (if (ebib-db-get-entry entry-key db 'noerror)
               (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)
