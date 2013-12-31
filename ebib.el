@@ -2293,20 +2293,12 @@ with a number in ascending sequence."
         (push (cons (car props) (ebib-db-brace (cdr props))) fields))))
     ;;check for required
     (unless entry-key
-      (setq entry-key (ebib-generate-tempkey db))
-      (unless (assoc '=type= fields)
-        (push (cons '=type= ebib-default-type) fields))
-      ;;insert and update index display
-      (ebib-store-entry entry-key fields db t ebib-uniquify-keys)
-      (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-        (ebib-sort-in-buffer (1+ (length ebib-cur-keys-list)) entry-key)
-        (setq ebib-cur-keys-list (sort (cons entry-key ebib-cur-keys-list) #'string<))
-        (ebib-display-entry entry-key)
-        (forward-line -1) ; move one line up to position the cursor on the new entry.
-        (ebib-set-index-highlight)
-        (ebib-db-set-current-entry-key entry-key db)
-        (ebib-set-modified t))
-      entry-key)))
+      (setq entry-key (ebib-generate-tempkey db)))
+    (unless (assoc '=type= fields)
+      (push (cons '=type= ebib-default-type) fields))
+    ;; insert
+    (ebib-store-entry entry-key fields db t ebib-uniquify-keys)
+    entry-key))
 
 (defun ebib-add-entry ()
   "Interactively adds a new entry to the database."
@@ -2317,7 +2309,7 @@ with a number in ascending sequence."
        (unless ebib-autogenerate-keys
          (add-to-list 'entry-alist (cons '=key= (read-string "New entry key: " nil 'ebib-key-history))))
        (ebib-add-entry-stub entry-alist ebib-cur-db)
-       (ebib-fill-entry-buffer)
+       (ebib-redisplay)
        (ebib-edit-entry-internal)))
     ((no-database)
      (error "No database open. Use `o' to open a database first"))
@@ -2352,7 +2344,7 @@ for each file anyway."
                                (message "File %s already exists in db, skipping" fp)
                              (progn
                                (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
-                               (ebib-fill-entry-buffer)
+                               (ebib-redisplay)
                                (message "Adding file %s" fp))))
                           (t
                            (error "Invalid file %s" fp)))))
