@@ -20,6 +20,6 @@
 
 @dircategory Emacs
 @direntry
-     * Ebib: (ebib).           A BibTeX database manager that runs in Emacs and XEmacs
+     * Ebib: (ebib).           A BibTeX database manager.
 @end direntry
 

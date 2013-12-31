@@ -1,9 +1,9 @@
 body {
     font-family: Verdana, "Bitstream Vera Sans", sans-serif;
-    background-color: #c9c9c9;
     color: #33333A;
     line-height: 140%;
     font-size: 100%;
+    background-color: #E0E0E0;
 }
 
 a {
@@ -20,6 +20,7 @@ a:hover {
 h1.title {
     text-align: center;
     font-size: 2em;
+    height: 100px;
 }
 
 h2.author {
@@ -47,23 +48,32 @@ img {
 #main {
     margin: auto;
     max-width: 45%;
-    top: 140px;
+    /* top: 10px; */
     text-align: justify;
+    border-radius: 15px;
+    box-shadow: 1px 1px 4px 4px #333333;
+    padding: 2%;
+    background-color: #c9c9c9;
 }
 
 #menu {
-    -moz-border-radius: 15px;
-    border-radius: 15px;
-    -moz-box-shadow:    3px 3px 5px 6px #333333;
-    -webkit-box-shadow: 3px 3px 5px 6px #333333;
-    box-shadow:         3px 3px 5px 6px #333333;
+    /* border-radius: 15px; */
+    /* box-shadow: 1px 1px 4px 4px #333333; */
     position: fixed;
     margin-left: 5%;
     padding: 2%;
     height: 600px;
     width: 130px;
-    background-color: #6b1d1d;
-    color: #c9c9c9;
+    /* background-color: #6b1d1d; */
+    /* color: #c9c9c9; */
+}
+
+#TOC {
+    position: absolute;
+    /* margin-left: 75%; */
+    width: 20%;
+    padding-right: 1%;
+    font-size: 75%;
 }
 
 /* #menu { */
@@ -76,20 +86,21 @@ img {
 /*     font-size: 75%; */
 /* } */
 
-#menu a {
-    text-decoration: none;
-    color: #ffa71d;
-}
+/* #menu a { */
+/*     text-decoration: none; */
+/*     color: #ffa71d; */
+/* } */
 
-#menu a:hover {
-    text-decoration: none;
-    color: #ffdf20;
-}
+/* #menu a:hover { */
+/*     text-decoration: none; */
+/*     color: #ffdf20; */
+/* } */
 
 .bottom-dweller {
     width: 100%;
-    position: absolute;
     bottom: 0%;
+    font-size: 70%;
+    text-align: right;
 }
 
 .footnotes {

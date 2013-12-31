@@ -19,8 +19,8 @@
 # PREAMBLE
 
 PANDOC="manual/ebib.text"               # markdown source
-PANDOC_BBODY="manual/texi-before-body"  # texinfo headers
-TEXINFO="manual/texi/ebib.texi"         # texinfo output
+PANDOC_BBODY="manual/header.texi"       # texinfo headers
+TEXINFO="manual/ebib.texi"              # texinfo output
 INFO="ebib.info"                        # GNU info output
 
 SCRIPT=$(basename "$0")

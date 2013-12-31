@@ -28,12 +28,6 @@ echo
     else
 	echo Warning: ebib-manual.html not found!
     fi
-    if [ -f pdf/ebib-manual.pdf ] ; then
-	cp pdf/ebib-manual.pdf ../"$full_name"/doc/
-	echo "Copied pdf manual to $full_name/doc/"
-    else
-	echo Warning: ebib-manual.pdf not found!
-    fi
     if [ -f texi/ebib.info ] ; then
 	cp texi/ebib.info ../"$full_name"/info
 	echo "Copied info manual to $full_name/info"
