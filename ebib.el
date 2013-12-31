@@ -2274,7 +2274,6 @@ contain the `=type=' field, the entry type is set to the value of
 `ebib-default-type'. If it doesn't contain a `=key=' field, a key
 is created of the form \"<new-entry%d>\", where %d is replaced
 with a number in ascending sequence."
-  (interactive)
   (unless db
     (setq db ebib-cur-db))
   (let ((fields ())
