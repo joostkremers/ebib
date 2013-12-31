@@ -2265,15 +2265,15 @@ buffer if Ebib is not occupying the entire frame."
      (beep))))
 
 (defun ebib-add-entry-stub (&optional entry db)
-  "Add ENTRY to DB in the form of a stub. Returns the database
-key of the created entry. ENTRY is an optional alist consisting
-of (FIELD . VALUE) pairs. The alist is converted into a BibTeX
-entry stub and added to DB, which defaults to the current
-database. If an entry alist doesn't contain the `=type=' field,
-the entry type is set to the value of `ebib-default-type'. If
-it doesn't contain a `=key=' field, a key is created of the form
-\"<new-entry%d>\", where %d is replaced with a number in
-ascending sequence."
+  "Add ENTRY to DB in the form of a stub.
+Returns the database key of the created entry. ENTRY is an
+optional alist consisting of (FIELD . VALUE) pairs. The alist is
+converted into a BibTeX entry stub and added to DB, which
+defaults to the current database. If an entry alist doesn't
+contain the `=type=' field, the entry type is set to the value of
+`ebib-default-type'. If it doesn't contain a `=key=' field, a key
+is created of the form \"<new-entry%d>\", where %d is replaced
+with a number in ascending sequence."
   (interactive)
   (unless db
     (setq db ebib-cur-db))
@@ -2325,14 +2325,14 @@ ascending sequence."
      (beep))))
 
 (defun ebib-add-file-entry (&optional filepath allow-duplicates disable-prompt db)
-  "Add an entry stub for an optional FILEPATH to DB. If FILEPATH
-is a list, add entries for each file contained within. If
-FILEPATH is a directory, add entries for all its contents. And if
-FILEPATH is not given, prompt the user to browse in the
-minibuffer, unless DISABLE-PROMPT is T. If a FILEPATH is already
-referenced by an entry in the DB, then it is ignored by default.
-If ALLOW-DUPLICATES is true, then add new entry stubs for each
-file anyway."
+  "Add an entry stub for an optional FILEPATH to DB.
+If FILEPATH is a list, add entries for each file contained
+within. If FILEPATH is a directory, add entries for all its
+contents. And if FILEPATH is not given, prompt the user to browse
+in the minibuffer, unless DISABLE-PROMPT is T. If a FILEPATH is
+already referenced by an entry in the DB, then it is ignored by
+default. If ALLOW-DUPLICATES is true, then add new entry stubs
+for each file anyway."
   (interactive)
   (or db
       (setq db ebib-cur-db))
