@@ -1,8 +1,9 @@
-% Ebib
+% Ebib Manual
 % Joost Kremers
 % @@date
 
-<div id="main">
+
+<div class="preamble">
 
 Ebib is a program with which you can manage BibTeX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 23.1 or higher (lower versions are not supported).
 
@@ -10,8 +11,12 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.
 
+</div>
+
 
 # Installation #
+
+<div class="main">
 
 ## Package manager ##
 
@@ -66,8 +71,11 @@ You can also call Ebib from an Eshell command line. This in itself is entirely u
 
 starts Ebib and loads the file `references.bib`.
 
+</div>
 
 # Basic Usage #
+
+<div class="main">
 
 A BibTeX database is somewhat of a free-form database. A BibTeX entry consists of a set of field-value pairs. Furthermore, each entry is known by a unique key. The way that Ebib navigates this database is by having two windows, one that contains a list of all the entry keys in the database, and one that contains the fields and values of the currently highlighted entry.
 
@@ -388,8 +396,12 @@ With the option [File Search Dirs](#file-search-dirs), you can tell Ebib in whic
 
 Ebib can call different external programs depending on the file extension of the relevant file. The option [File Associations](#file-associations) allows you to specify which programs to call for which types of files. By default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`, respectively. You can specify further file types by their extensions (do not include the dot). The program is searched for in `PATH`, but you can of course specify the full path to the program. There is also the option to open files in Emacs.  Use this if you have separate text files for notes, or if you want to read pdf files in Emacs with `doc-view-mode`.
 
+</div>
+
 
 # Advanced Features #
+
+<div class="main">
 
 The features discussed in the previous chapter should be sufficient to get started using Ebib. However, Ebib has several more advanced features, which are described in this chapter.
 
@@ -682,11 +694,14 @@ In the index buffer, Ebib's menu has an Options submenu. This menu gives you qui
 
 The same is true for the printing options that are in the Print menu. When set or unset in the menu, the default values specified in the customisation buffer do not change.
 
+</div>
+
 
 # The Ebib Buffers #
 
-This chapter lists all the key commands that exist in Ebib, with a short description and the actual command that they call. The latter information is needed if you want to customise Ebib's key bindings. (See [Modifying Key Bindings](#modifying-key-bindings).)
+<div class="main">
 
+This chapter lists all the key commands that exist in Ebib, with a short description and the actual command that they call. The latter information is needed if you want to customise Ebib's key bindings. (See [Modifying Key Bindings](#modifying-key-bindings).)
 
 
 ## The Index Buffer ##
@@ -1002,8 +1017,12 @@ Functions not bound to any key:
 `C-x k`
 :    equivalent to `q`.
 
+</div>
+
 
 # Customisation #
+
+<div class="main">
 
 Ebib can be customised through Emacs' standard customisation interface. The only thing that cannot be customised in this way are the key bindings. If you wish to customise those, you have to use the file `~/.ebibrc`.
 
@@ -1128,8 +1147,15 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 
 ### Index Mode Line ###
 
-**Default value**: `("  " mode-line-modified "%20b" " Entry %l" (:eval (if (edb-virtual ebib-cur-db) " (Virtual)" "")))`
+**Default value**:
 
+    ("%e"
+     mode-line-front-space
+     mode-line-modified
+     mode-line-buffer-identification
+     (:eval (if (ebib-cur-entry-key) "     Entry %l" "     No Entries"))
+     (:eval (if (ebib-db-get-filter ebib-cur-db) " (Filtered)" "")))
+                                  
 \noindent This option lets you set the mode line of the index buffer. By default, the mode line displays whether the database has been modified, the name of the current database, the entry number and whether the current database is virtual or not.
 
 If you prefer to have the standard Emacs mode line, set this option to "Use standard mode line".
@@ -1450,6 +1476,3 @@ As a final option, `ebib-key` allows you to redefine the second key in the key b
 This piece of code changes the commands `C-c | q`, `C-c | c` and `C-c | s` to `C-c & q`, `C-c & c` and `C-c & s`, respectively.
 
 </div>
-
-<!--  LocalWords:  dirs
- -->
