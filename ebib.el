@@ -182,7 +182,7 @@ This is either the height of the window, or, if
                                   mode-line-front-space
                                   mode-line-modified
                                   mode-line-buffer-identification
-                                  "     Entry %l"
+                                  (:eval (if (ebib-cur-entry-key) "     Entry %l" "     No Entries"))
                                   (:eval (if (ebib-db-get-filter ebib-cur-db) " (Filtered)" "")))
   "The mode line for the index window."
   :group 'ebib-windows
