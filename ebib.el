@@ -1251,12 +1251,8 @@ to \"none\"."
                       (ebib-display-entry entry)
                       (when (member entry (ebib-db-list-marked-entries ebib-cur-db 'nosort))
                         (save-excursion
-                          (let ((beg (progn
-                                       (beginning-of-line)
-                                       (forward-line -1)
-                                       (point))))
-                            (skip-chars-forward "^ ")
-                            (add-text-properties beg (point) '(face ebib-marked-face))))))
+                          (forward-line -1)
+                          (ebib-display-mark t))))
                   ebib-cur-keys-list)
             (goto-char (point-min))
             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
@@ -1265,6 +1261,21 @@ to \"none\"."
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                      (length (member ebib-cur-db ebib-databases)))))
                                (ebib-db-get-filename ebib-cur-db 'shortened)))))))
+
+(defun ebib-display-mark (mark &optional beg end)
+  "Mark/unmark an entry.
+Add/remove `ebib-marked-face` to the region between BEG and END,
+or to the entry point is on if these are omitted. If MARK is t,
+`ebib-marked-face is added, if nil, it is removed. NB: if BEG and
+END are omitted, this function changes point."
+  (unless (and beg end)
+    (beginning-of-line)
+    (setq beg (point))
+    (skip-chars-forward "^ ")
+    (setq end (point)))
+  (if mark
+      (add-text-properties beg end '(face ebib-marked-face))
+    (remove-text-properties beg end '(face ebib-marked-face))))
 
 (defun ebib-fill-entry-buffer (&optional match-str)
   "Fills the entry buffer with the fields of the current entry.
@@ -2524,17 +2535,11 @@ marked entries."
     (ebib-execute-when
       ((entries)
        (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-         (with-ebib-buffer-writable
-           (cond
-            ((ebib-db-marked-p (ebib-cur-entry-key) ebib-cur-db)
-             (ebib-db-unmark-entry (ebib-cur-entry-key) ebib-cur-db)
-             (remove-text-properties (ebib-highlight-start ebib-index-highlight)
-                                     (ebib-highlight-end ebib-index-highlight)
-                                     '(face ebib-marked-face)))
-            (t (ebib-db-mark-entry (ebib-cur-entry-key) ebib-cur-db)
-               (add-text-properties (ebib-highlight-start ebib-index-highlight)
-                                    (ebib-highlight-end ebib-index-highlight)
-                                    '(face ebib-marked-face)))))))
+         (with-ebib-buffer-writable 
+           (ebib-db-toggle-mark (ebib-cur-entry-key) ebib-cur-db)
+           (ebib-display-mark (ebib-db-marked-p (ebib-cur-entry-key) ebib-cur-db)
+                              (ebib-highlight-start ebib-index-highlight)
+                              (ebib-highlight-end ebib-index-highlight)))))
       ((default)
        (beep)))))
 
