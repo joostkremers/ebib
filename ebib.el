@@ -1225,6 +1225,9 @@ If `ebib-cur-db' is nil, the buffer is just erased and its name set
 to \"none\"."
   ;; Note: this function sets `ebib-cur-keys-list'.
   (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+    ;; First set the modification flag, so that it's still correct after
+    ;; with-ebib-buffer-writable.
+    (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db))
     (with-ebib-buffer-writable
       (erase-buffer)
       (if (not ebib-cur-db)
@@ -1259,9 +1262,6 @@ to \"none\"."
             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
             (beginning-of-line)
             (ebib-set-index-highlight)))
-        ;; TODO Setting the buffer's modified flag and renaming it
-        ;; shouldn't be done here.
-        (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db))
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                      (length (member ebib-cur-db ebib-databases)))))
                                (ebib-db-get-filename ebib-cur-db 'shortened)))))))
