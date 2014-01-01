@@ -462,6 +462,12 @@ unmarked."
    ('all
     (setf (ebib-dbstruct-marked-entries db) nil))))
 
+(defun ebib-db-toggle-mark (entry db)
+  "Toggle the mark on ENTRY in DB."
+  (if (ebib-db-marked-p entry db)
+      (ebib-db-unmark-entry entry db)
+    (ebib-db-mark-entry entry db)))
+
 (defun ebib-db-list-marked-entries (db &optional nosort)
   "Return a list of entry keys of all marked entries in DB.
 The list is sorted, unless NOSORT is non-nil."
