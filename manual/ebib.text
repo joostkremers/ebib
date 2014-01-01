@@ -602,7 +602,7 @@ Creating a filter is simple: press `&`, and Ebib will ask you for a field to sel
 
 If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp will give you all entries that have a field that contains "Jones" in them.
 
-Note that you can also select items based on their entry type. In order to do that, you need to specify `type*` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `type*` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`. You can use TAB completion in this case, by the way.
+Note that you can also select items based on their entry type. In order to do that, you need to specify `=type=` as the field to search, which is the field name in which Ebib stores the entry type internally. Note that there is also a "normal" field called `type`, hence the asterisk. If you search the `=type=` field, only exact matches are returned, so if you search for `book`, only the entries that are of type `book` are returned, not those of type `inbook`. You can use TAB completion in this case, by the way.
 
 If you specify the `keywords` field, the keywords associated with your database are available for TAB completion as well. Though you can enter any search term, of course.
 
