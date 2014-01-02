@@ -2159,6 +2159,7 @@ Returns the entry key if an entry was found, NIL otherwise.
 Optional argument TIMESTAMP indicates whether a timestamp is to
 be added. (Whether a timestamp is actually added, also depends on
 `ebib-use-timestamp'.)"
+  (setq entry-type (intern-soft entry-type))
   (let ((limit (save-excursion
                  (backward-char)
                  (ebib-match-paren-forward (point-max))
@@ -2166,47 +2167,47 @@ be added. (Whether a timestamp is actually added, also depends on
         (beg (progn
                (skip-chars-forward " \n\t\f") ; note the space!
                (point))))
-    (if (ebib-looking-at-goto-end (concat "\\("
-                                          ebib-key-regexp
-                                          "\\)[ \t\n\f]*,")
-                                  1)    ; this delimits the entry key
-        (let ((entry-key (buffer-substring-no-properties beg (point))))
-          (if (string= entry-key "")
-              (setq entry-key (ebib-generate-tempkey db)))
-          (setq entry-type (intern-soft entry-type))
-          (if (ebib-db-get-entry entry-key db 'noerror)
-              (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)
-            (ebib-store-entry entry-key (list (cons '=type= entry-type)) db timestamp)
-            (skip-chars-forward "^,") ; move to the comma after the entry type
-            (cl-loop for field = (ebib-find-bibtex-field limit)
-                     while field do
-                     ;; TODO We pass 'overwrite if
-                     ;; `ebib-allow-identical-fields' is nil in order to
-                     ;; overwrite a possible timestamp. This has to be
-                     ;; handled better, though!
-                     (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
-                                                                                       ebib-field-separator 
-                                                                                     'overwrite)
-                                              'as-is))
-            entry-key))                 ; Return the entry key.
-      (ebib-log 'error "Error: illegal entry key found at line %d. Skipping" (line-number-at-pos)))))
+    (let (entry-key)
+      (if (ebib-looking-at-goto-end (concat "\\("
+                                            ebib-key-regexp
+                                            "\\)[ \t\n\f]*,")
+                                    1)  ; this delimits the entry key
+          (progn                        ; if we found an entry key
+            (setq entry-key (buffer-substring-no-properties beg (point)))
+            (when (string= entry-key "") ; to be on the safe side
+              (setq entry-key (ebib-generate-tempkey db))
+              (ebib-log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos)))
+            (skip-chars-forward "^,")) ; move to the comma after the entry key
+        ;; if there is no legal entry key, we create a temporary key and try to read the entry anyway.
+        (setq entry-key (ebib-generate-tempkey db))
+        (ebib-log 'warning "Line %d: No entry key; generating temporary key." (line-number-at-pos)))
+      (if (ebib-db-get-entry entry-key db 'noerror)
+          (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)
+        (ebib-store-entry entry-key (list (cons '=type= entry-type)) db timestamp))
+      (cl-loop for field = (ebib-find-bibtex-field limit)
+               while field do
+               ;; TODO We pass 'overwrite if `ebib-allow-identical-fields'
+               ;; is nil in order to overwrite a possible timestamp. This
+               ;; has to be handled better, though!
+               (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
+                                                                                 ebib-field-separator 
+                                                                               'overwrite)
+                                        'as-is))
+      entry-key)))                      ; Return the entry key.
 
 (defun ebib-find-bibtex-field (limit)
   "Find the field after point.
-Point should be either at the comma after the entry key or at the
-comma delimiting the preceding field. Return a cons (FIELD .
-VALUE), or NIL if no field was found."
-  (when (eq (char-after) ?,)            ; If we're looking at a comma
-    (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
-    (unless (>= (point) limit) ; if we haven't reached the end of the entry
-      (let ((beg (point)))
-        (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
-            (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
-              (skip-chars-forward "#%'(),=} \n\t\f" limit) ; move to the field contents
-              (let* ((beg (point))
-                     (field-contents (buffer-substring-no-properties beg (ebib-find-end-of-field limit))))
-                (cons field-type field-contents)))
-          (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos)))))))
+Return a cons (FIELD . VALUE), or NIL if no field was found."
+  (skip-chars-forward "\"#%'(),={} \n\t\f" limit) ; move to the first char of the field name
+  (unless (>= (point) limit)   ; if we haven't reached the end of the entry
+    (let ((beg (point)))
+      (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
+          (let ((field-type (intern (downcase (buffer-substring-no-properties beg (point))))))
+            (skip-chars-forward "#%'(),=} \n\t\f" limit) ; move to the field contents
+            (let* ((beg (point))
+                   (field-contents (buffer-substring-no-properties beg (ebib-find-end-of-field limit))))
+              (cons field-type field-contents)))
+        (ebib-log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos))))))
 
 (defun ebib-find-end-of-field (limit)
   "Move POINT to the end of a field's contents and return POINT.
