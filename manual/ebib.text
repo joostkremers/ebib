@@ -540,7 +540,9 @@ As described in the previous chapter, adding entries to a database can be done m
 
 In the index buffer, the Ebib menu has an option to merge a second .bib file into the current database. Ebib reads the entries in this file and adds them to the database. Duplicate entries (that is, entries with an entry key that already exists in the database) will not be loaded. Ebib logs a warning about each duplicate entry to its log buffer and displays a warning after loading the `.bib` file when this happens.
 
-Another way to add entries to a database is to import them from an Emacs buffer. If, for example, you find ready-formatted BibTeX entries in a text file or e.g. on the internet, you can copy & paste them to any Emacs buffer (e.g. the `*scratch*` buffer), and then execute the command `M-x ebib-import`. Ebib then goes through the buffer and loads all BibTeX entries it finds into the current database (i.e. the database that was active when you lowered Ebib). If you call `ebib-import` while the region is active, Ebib only reads the BibTeX entries in the region.
+Another way to add entries to a database is to import them from an Emacs buffer. If, for example, you find ready-formatted BibTeX entries in a text file or on the internet, you can copy & paste them to any Emacs buffer (e.g. the `*scratch*` buffer), and then execute the command `M-x ebib-import`. Ebib then goes through the buffer and loads all BibTeX entries it finds into the current database (i.e. the database that was active when you lowered Ebib). If you call `ebib-import` while the region is active, Ebib only reads the BibTeX entries in the region.
+
+If the BibTeX entries in the buffer lack an entry key (which sometimes happens with BibTeX entries found on the internet), Ebib will generate a temporary key for it of the form `<new-keyXX>`, where `XX` is a number. You can change such keys by hitting `E` in the index buffer. They will also automatically be replaced with a more sensible key when you edit them. See [Autogenerate Keys](#autogenerate-keys) for details.
 
 
 ## Exporting Entries ##
