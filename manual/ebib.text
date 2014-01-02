@@ -430,6 +430,13 @@ Chances are that you will be doing most of your work with one or a few `.bib` fi
 By default, `.bib` files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file's full path or a relative path starting from your home directory. Alternatively, you can customize the option [Preload Bib Search Dirs](#preload-bib-search-dirs) to specify one or more directories in which Ebib should search the `.bib` files.
 
 
+## Creating Entry Stubs ##
+
+If you have a directory full of (pdf) files of articles that you want to add to your database, Ebib can make the task a little bit easier by creating entry stubs for all the files. You can do this with the command `M-x ebib-add-file-entry`. This command asks you for a file or a directory and creates an entry in the current database for that file or each file in the directory. The entries only contain a file field pointing to the file, all the other information still has to be filled out by hand, but this way you can at least keep track of which files are already in your database.
+
+Note that the entry keys for the stubs are temporary keys. They will be replaced by more permanent keys automatically when you edit the entries. This behaviour is controlled by the function `bibtex-generate-autokey`, which has a number of customisation options. Check out its doc string for details. If you prefer to edit the keys by hand, you can do so in the index buffer by pressing `E`.
+
+
 ## @Preamble Definition ##
 
 Apart from database entries, BibTeX allows three more types of elements to appear in a `.bib` file. These are `@comment`, `@preamble` and `@string` definitions. Ebib provides facilities to handle the latter two. `@comment` definitions cannot be added to a `.bib` file through Ebib, and if Ebib finds one in a `.bib` file, it is simply ignored (and dropped from the file when you save it).
