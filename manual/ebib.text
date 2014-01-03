@@ -94,6 +94,13 @@ Every time Ebib reads a `.bib` file, it produces a few log messages. These are w
 Note that if Ebib detects warnings or errors, it will simply skip the offending entry and continue parsing the rest of the `.bib` file. That means that entries in which an error occurs are not read, and if you then save the file, they will not be saved. So keep an eye out for error messages after loading a `.bib` file: if there is something that Ebib cannot parse, you may lose entries. (Though Ebib will create a backup before overwriting a file.)
 
 
+### Preloading `.bib` Files ###
+
+Chances are that you will be doing most of your work with one or a few `.bib` files, and you may find yourself opening the same file or files every time you start Ebib. If so, you can tell Ebib to always load specific `.bib` files on startup. To do this, specify the files in Ebib's customisation buffer, under the option [Preload Bib Files](#preload-bib-files).
+
+By default, `.bib` files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file's full path or a relative path starting from your home directory. Alternatively, you can customize the option [Preload Bib Search Dirs](#preload-bib-search-dirs) to specify one or more directories in which Ebib should search the `.bib` files.
+
+
 ### Navigating a `.bib` File ###
 
 Once you've opened a `.bib` file, the keys of all the entries in the file are shown in alphabetical order in the index buffer in the top Ebib window. (In fact, it is possible to show more than just the entry key in this buffer. See [Index Display Fields](#index-display-fields) on how to accomplish this.) The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. `book`, `article`, etc.).
@@ -410,13 +417,6 @@ A third option to deal with windows is to set the layout to a custom width. In t
 If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option [Popup Entry Window](#popup-entry-window). Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
 
 Further relevant options are [Window Vertical Split](#window-vertical-split), which displays the index buffer to the left of the frame rather than at the top, and [Index Window Size](#index-window-size), which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
-
-
-## Preloading `.bib` Files ##
-
-Chances are that you will be doing most of your work with one or a few `.bib` files, and you may find yourself opening the same file or files every time you start Ebib. If so, you can tell Ebib to always load specific `.bib` files on startup. To do this, specify the files in Ebib's customisation buffer, under the option [Preload Bib Files](#preload-bib-files).
-
-By default, `.bib` files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file's full path or a relative path starting from your home directory. Alternatively, you can customize the option [Preload Bib Search Dirs](#preload-bib-search-dirs) to specify one or more directories in which Ebib should search the `.bib` files.
 
 
 ## Creating Entry Stubs ##

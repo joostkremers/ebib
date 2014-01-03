@@ -5,7 +5,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="author" content="Joost Kremers" />
-  <meta name="date" content="2014-01-03" />
   <title>Ebib Manual</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
@@ -27,13 +26,12 @@ code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: #06287e; }
 code > span.er { color: #ff0000; font-weight: bold; }
   </style>
-  <link rel="stylesheet" href="ebib.css" type="text/css" />
 </head>
 <body>
 <div id="header">
 <h1 class="title">Ebib Manual</h1>
 <h2 class="author">Joost Kremers</h2>
-<h3 class="date">03 Jan 2014</h3>
+<h3 class="date">@<span class="citation">@date</span></h3>
 </div>
 <div id="TOC">
 <ul>
@@ -46,6 +44,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#basic-usage">Basic Usage</a><ul>
 <li><a href="#getting-started">Getting Started</a><ul>
 <li><a href="#opening-a-.bib-file">Opening a <code>.bib</code> File</a></li>
+<li><a href="#preloading-.bib-files">Preloading <code>.bib</code> Files</a></li>
 <li><a href="#navigating-a-.bib-file">Navigating a <code>.bib</code> File</a></li>
 <li><a href="#starting-a-new-.bib-file">Starting a New <code>.bib</code> File</a></li>
 </ul></li>
@@ -70,7 +69,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li><a href="#advanced-features">Advanced Features</a><ul>
 <li><a href="#window-management">Window Management</a></li>
-<li><a href="#preloading-.bib-files">Preloading <code>.bib</code> Files</a></li>
 <li><a href="#creating-entry-stubs">Creating Entry Stubs</a></li>
 <li><a href="#preamble-definition"><span class="citation">@Preamble</span> Definition</a></li>
 <li><a href="#string-definitions"><span class="citation">@String</span> Definitions</a></li>
@@ -147,8 +145,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 </ul>
 </div>
-<article>
-
 <p>Ebib is a program with which you can manage BibTeX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 23.1 or higher (lower versions are not supported).</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <p>The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.</p>
@@ -190,6 +186,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>Loading a <code>.bib</code> file into Ebib is done with the command <code>o</code>. Ebib reads the file that you specify, and reports how many entries it found, how many <code>@string</code> definitions it found, and whether a <code>@preamble</code> was found. Note that when Ebib reads a <code>.bib</code> file, it only reads entry types (e.g. <code>book, article, phdthesis</code> etc.) that it knows about. Fields (e.g. <code>author, title, year</code> etc.) that Ebib does not know about, are loaded (and saved) but not displayed, so they cannot be edited. Therefore, you should make sure that all the entry types and fields that your databases use are defined. A sensible set has been predefined, so that anyone who's using standard BibTeX entry types should have no problem loading an existing <code>.bib</code> file into Ebib. If, however, you have custom entry types, or custom fields in your <code>.bib</code> files, you should define them. This can be done by selecting &quot;Options | Modify Entry Types&quot; from the Ebib menu. (See also the chapter on customising Ebib, esp. <a href="#entry-types">Entry Types</a>.)</p>
 <p>Every time Ebib reads a <code>.bib</code> file, it produces a few log messages. These are written into a special buffer <code>*Ebib-log*</code>. If Ebib encounters entry types in the <code>.bib</code> file that it doesn't know, it will log a warning. If Ebib finds something that it believes to be incorrect, an error will be logged. If any warnings or errors occur while loading the <code>.bib</code> file, Ebib tells you so after loading the file. To view the log file, press <code>l</code> in the index buffer.</p>
 <p>Note that if Ebib detects warnings or errors, it will simply skip the offending entry and continue parsing the rest of the <code>.bib</code> file. That means that entries in which an error occurs are not read, and if you then save the file, they will not be saved. So keep an eye out for error messages after loading a <code>.bib</code> file: if there is something that Ebib cannot parse, you may lose entries. (Though Ebib will create a backup before overwriting a file.)</p>
+<h3 id="preloading-.bib-files"><a href="#preloading-.bib-files">Preloading <code>.bib</code> Files</a></h3>
+<p>Chances are that you will be doing most of your work with one or a few <code>.bib</code> files, and you may find yourself opening the same file or files every time you start Ebib. If so, you can tell Ebib to always load specific <code>.bib</code> files on startup. To do this, specify the files in Ebib's customisation buffer, under the option <a href="#preload-bib-files">Preload Bib Files</a>.</p>
+<p>By default, <code>.bib</code> files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file's full path or a relative path starting from your home directory. Alternatively, you can customize the option <a href="#preload-bib-search-dirs">Preload Bib Search Dirs</a> to specify one or more directories in which Ebib should search the <code>.bib</code> files.</p>
 <h3 id="navigating-a-.bib-file"><a href="#navigating-a-.bib-file">Navigating a <code>.bib</code> File</a></h3>
 <p>Once you've opened a <code>.bib</code> file, the keys of all the entries in the file are shown in alphabetical order in the index buffer in the top Ebib window. (In fact, it is possible to show more than just the entry key in this buffer. See <a href="#index-display-fields">Index Display Fields</a> on how to accomplish this.) The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. <code>book</code>, <code>article</code>, etc.).</p>
 <p>Below the type field, Ebib displays (up to) three sets of fields. The first set are the so-called obligatory fields, the fields that BibTeX requires to be filled. The second group are the optional fields, which do not have to be filled but which BibTeX will normally add to the bibliography if they do have a value. The third group are the so-called additional fields. These fields are usually ignored by BibTeX (note that BibTeX normally ignores <em>all</em> fields it does not know), although there are bibliography styles that treat some of these fields as optional rather than as additional; (i.e., the <code>harvard</code> styles do typeset the <code>url</code> field, if present.)</p>
@@ -349,9 +348,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>A third option to deal with windows is to set the layout to a custom width. In this case, Ebib takes up the right part of the frame, displaying the index and entry buffers. The width of the Ebib windows can then be set with the option <a href="#width">Width</a>, which defaults to 80. Note that in this case, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it. Here, too, the key <code>z</code> switches to a non-Ebib window without hiding the Ebib windows. Use capital <code>Z</code> to hide them.</p>
 <p>If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option <a href="#popup-entry-window">Popup Entry Window</a>. Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function <code>display-buffer-popup-window</code> to create a new window (which is destroyed again when you leave the entry buffer).</p>
 <p>Further relevant options are <a href="#window-vertical-split">Window Vertical Split</a>, which displays the index buffer to the left of the frame rather than at the top, and <a href="#index-window-size">Index Window Size</a>, which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)</p>
-<h2 id="preloading-.bib-files"><a href="#preloading-.bib-files">Preloading <code>.bib</code> Files</a></h2>
-<p>Chances are that you will be doing most of your work with one or a few <code>.bib</code> files, and you may find yourself opening the same file or files every time you start Ebib. If so, you can tell Ebib to always load specific <code>.bib</code> files on startup. To do this, specify the files in Ebib's customisation buffer, under the option <a href="#preload-bib-files">Preload Bib Files</a>.</p>
-<p>By default, <code>.bib</code> files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file's full path or a relative path starting from your home directory. Alternatively, you can customize the option <a href="#preload-bib-search-dirs">Preload Bib Search Dirs</a> to specify one or more directories in which Ebib should search the <code>.bib</code> files.</p>
 <h2 id="creating-entry-stubs"><a href="#creating-entry-stubs">Creating Entry Stubs</a></h2>
 <p>If you have a directory full of (pdf) files of articles that you want to add to your database, Ebib can make the task a little bit easier by creating entry stubs for all the files. You can do this with the command <code>M-x ebib-add-file-entry</code>. This command asks you for a file or a directory and creates an entry in the current database for that file or each file in the directory. The entries only contain a file field pointing to the file, all the other information still has to be filled out by hand, but this way you can at least keep track of which files are already in your database.</p>
 <p>Note that the entry keys for the stubs are temporary keys. They will be replaced by more permanent keys automatically when you edit the entries. This behaviour is controlled by the function <code>bibtex-generate-autokey</code>, which has a number of customisation options. Check out its doc string for details. If you prefer to edit the keys by hand, you can do so in the index buffer by pressing <code>E</code>.</p>
@@ -1104,6 +1100,5 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>As a final option, <code>ebib-key</code> allows you to redefine the second key in the key bindings of the multiline edit buffer:</p>
 <pre><code>(ebib-key multiline &quot;&amp;&quot;)</code></pre>
 <p>This piece of code changes the commands <code>C-c | q</code>, <code>C-c | c</code> and <code>C-c | s</code> to <code>C-c &amp; q</code>, <code>C-c &amp; c</code> and <code>C-c &amp; s</code>, respectively.</p>
-</article>
 </body>
 </html>
