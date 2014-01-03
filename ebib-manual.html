@@ -145,6 +145,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 </ul>
 </div>
+<article>
+
 <p>Ebib is a program with which you can manage BibTeX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 23.1 or higher (lower versions are not supported).</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <p>The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.</p>
@@ -1100,5 +1102,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>As a final option, <code>ebib-key</code> allows you to redefine the second key in the key bindings of the multiline edit buffer:</p>
 <pre><code>(ebib-key multiline &quot;&amp;&quot;)</code></pre>
 <p>This piece of code changes the commands <code>C-c | q</code>, <code>C-c | c</code> and <code>C-c | s</code> to <code>C-c &amp; q</code>, <code>C-c &amp; c</code> and <code>C-c &amp; s</code>, respectively.</p>
+</article>
 </body>
 </html>

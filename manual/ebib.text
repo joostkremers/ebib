@@ -1,6 +1,7 @@
 % Ebib Manual
 % Joost Kremers
 
+<article>
 
 Ebib is a program with which you can manage BibTeX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 23.1 or higher (lower versions are not supported).
 
@@ -1467,3 +1468,4 @@ As a final option, `ebib-key` allows you to redefine the second key in the key b
 
 This piece of code changes the commands `C-c | q`, `C-c | c` and `C-c | s` to `C-c & q`, `C-c & c` and `C-c & s`, respectively.
 
+</article>
