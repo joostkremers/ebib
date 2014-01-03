@@ -18,9 +18,10 @@
 
 # PREAMBLE
 
-PANDOC="manual/ebib.text"               # markdown source
-PANDOC_BBODY="manual/header.texi"       # texinfo headers
+SOURCE="manual/ebib.text"               # markdown source
+SOURCE_BBODY="manual/header.texi"       # texinfo headers
 TEXINFO="manual/ebib.texi"              # texinfo output
+HTML="ebib-manual.html"                 # html output
 INFO="ebib.info"                        # GNU info output
 
 SCRIPT=$(basename "$0")
@@ -39,18 +40,18 @@ function confirm_file
     return 1
 }
 
-function run_pandoc
+function create_texi
 {
     local source="$1"
-    echo "$SCRIPT: running pandoc"
+    echo "$SCRIPT: running pandoc to create texinfo"
     pandoc --read=markdown \
            --write=texinfo \
            --output="$TEXINFO" \
-           --include-before-body="$PANDOC_BBODY" \
+           --include-before-body="$SOURCE_BBODY" \
            --standalone \
            --table-of-contents \
            "$1" && return 0
-    echo "$SCRIPT: pandoc run failed"
+    echo "$SCRIPT: pandoc -w texinfo failed"
     let "errors++"
     return 1
 }
@@ -61,6 +62,21 @@ function run_makeinfo
     echo "$SCRIPT: runnig makeinfo"
     makeinfo "$1" && return 0 # makeinfo puts the output file in the current dir
     echo "$SCRIPT: makeinfo run failed"
+    let "errors++"
+    return 1
+}
+
+function create_html
+{
+    local source="$1"
+    echo "$SCRIPT: running pandoc to create html"
+    pandoc --read=markdown \
+           --write=html \
+           --output="$HTML" \
+           --standalone \
+           --table-of-contents \
+           "$1" && return 0
+    echo "$SCRIPT: pandoc -w html failed"
     let "errors++"
     return 1
 }
@@ -77,13 +93,15 @@ function check_exit
 
 errors=0
 
-confirm_file "$PANDOC"
+confirm_file "$SOURCE"
 confirm_file "$INFO"
+confirm_file "$HTML"
 check_exit   "$errors"
-if [  "$INFO" -ot "$PANDOC" ] ; then
-    echo "$SCRIPT: regenerating info file"
+if [  "$INFO" -ot "$SOURCE" -o "$HTML" -ot "$SOURCE" ] ; then
+    echo "$SCRIPT: regenerating info and html files"
     git stash -q --keep-index
-    run_pandoc "$PANDOC" && run_makeinfo "$TEXINFO" && git add "$INFO"
+    create_texi "$SOURCE" && run_makeinfo "$TEXINFO" && git add "$INFO"
+    create_html "$SOURCE" && git add "$HTML"
     git stash pop -q
 fi
 check_exit   "$errors"
