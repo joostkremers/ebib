@@ -9,9 +9,9 @@
 
 [Manual](ebib-manual.html)
 
-[Download](#download)
+[Installation](#installation)
 
-[Mailing list](#mailing-list)
+[Support](#support)
 
 </div>
 
@@ -89,16 +89,16 @@ Visually, Ebib is not very spectacular. But to get an impression of what it look
 The complete user manual for Ebib is available in html format [here](ebib-manual.html).
 
 
-## Download ##
+## Installation ##
 
-Tar balls of Ebib releases can be downloaded from the [Sourceforge Project Page](http://sourceforge.net/projects/ebib). The tar ball contains the source code, and the manual in info and html format. Installation instructions can be found in the manual.
+The easiest way to install Ebib is to use the [Melpa package archive](http://melpa.milkbox.net/). This and other installation methods are described in the [manual][ebib-manual.html#installation].
 
-There is also a public [git repository](https://github.com/joostkremers/ebib.git) for Ebib. From there, you can get the latest sources.
+If you want to download the source, you can clone the [git repository](https://github.com/joostkremers/ebib.git) for Ebib, or get a tar ball from the [Github releases page](https://github.com/joostkremers/ebib/releases).
 
 
-## Mailing list ##
+## Support ##
 
-Ebib has a mailing list: [ebib-users](https://lists.sourceforge.net/lists/listinfo/ebib-users). Here, you can ask any questions regarding Ebib, send bug reports or feature requests.
+The quickest way to ask questions or report issues is to use [Github issue tracker](https://github.com/joostkremers/ebib/issues?state=open).
 
 <div class="bottom-dweller">
 
