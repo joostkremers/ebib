@@ -18,7 +18,7 @@
 </div>
 
 
-<div id="main">
+<article>
 
 Ebib is a program for managing BibTeX databases. There are already quite a few such programs, but Ebib has a special property: it runs inside Emacs. If you are used to doing everything LaTeX from within Emacs, you may appreciate that you can manage your `.bib` files in Emacs as well. One distinct advantage of Ebib is that you do not need to switch to another window and copy/paste a BibTeX key into your LaTeX file with the mouse. Ebib provides functions with which you can select a key from the database and have it inserted directly into your LaTeX text.
 
@@ -108,5 +108,5 @@ Joost Kremers (*last modified:* *@@date*)
 
 </div>
 
-</div>
+</article>
 

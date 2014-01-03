@@ -22,19 +22,20 @@
 <p><a href="#download">Download</a></p>
 <p><a href="#mailing-list">Mailing list</a></p>
 </div>
-<div id="main">
+<article>
+
 <p>Ebib is a program for managing BibTeX databases. There are already quite a few such programs, but Ebib has a special property: it runs inside Emacs. If you are used to doing everything LaTeX from within Emacs, you may appreciate that you can manage your <code>.bib</code> files in Emacs as well. One distinct advantage of Ebib is that you do not need to switch to another window and copy/paste a BibTeX key into your LaTeX file with the mouse. Ebib provides functions with which you can select a key from the database and have it inserted directly into your LaTeX text.</p>
 <p>Ebib is fully keyboard-operated. Unlike other BibTeX database managers, you do not need the mouse at all. Everything Ebib can do can be accomplished with simple one-key commands. This makes using Ebib much faster than other similar programs, which are usually mouse-operated. And because Emacs does not have to run under X, Ebib can be used without X as well.</p>
 <p>Ebib provides the standard capabilities that one would expect from a BibTeX database manager: <code>.bib</code> files can be opened, modified (adding, deleting, modifying entries), searched, and saved. Apart from the basics, Ebib has quite a few extra features that make managing your BibTeX files easier.</p>
-<h2>Features</h2>
-<h3>General</h3>
+<h2 id="features">Features</h2>
+<h3 id="general">General</h3>
 <ul>
 <li>Visual representation distinguishing obligatory, optional and additional fields.</li>
 <li>Copy/cut/paste mechanism for quickly copying field values. (This fully integrates with Emacs' kill ring.)</li>
 <li>Automatic loading of <code>.bib</code> files upon start-up.</li>
 <li>Extensive <a href="ebib-manual.html">user manual</a>.</li>
 </ul>
-<h3>BibTeX</h3>
+<h3 id="bibtex">BibTeX</h3>
 <ul>
 <li>Format of the <code>.bib</code> file is not restricted: everything that BibTeX accepts is also accepted by Ebib.</li>
 <li>Creating and editing <code>@string</code> and <code>@preamble</code> definitions is supported (<code>@comment</code>s are ignored).</li>
@@ -45,25 +46,25 @@
 <li>Alternatively, the database can be saved with all entries containing a <code>crossref</code> field at the top of the <code>.bib</code> file, allowing you to make use of BibTeX's cross-referencing facility.</li>
 <li>Crossreferencing is supported, both BibTeX and biblatex mechanisms.</li>
 </ul>
-<h3>Databases</h3>
+<h3 id="databases">Databases</h3>
 <ul>
 <li>Multiple <code>.bib</code> files can be opened at the same time.</li>
 <li>Merging of a second <code>.bib</code> file with an already loaded database.</li>
 <li>Single or multiple entries can be exported to another file, or to another open database, allowing the creation of a new specialised <code>.bib</code> file from an existing one. <code>@preamble</code> and <code>@string</code> definitions can also be exported.</li>
 </ul>
-<h3>Searching</h3>
+<h3 id="searching">Searching</h3>
 <ul>
 <li>Simple regexp searches can be performed on a database, searching the contents of all fields of each entry.</li>
 <li>Complex search queries with logical <code>and</code>, <code>or</code> and <code>not</code> operators, built up interactively, can be performed, with the possibility of searching only specific fields. Search queries can be saved for later reuse.</li>
 </ul>
-<h3>LaTeX integration</h3>
+<h3 id="latex-integration">LaTeX integration</h3>
 <ul>
 <li>From within a LaTeX document, it is possible to select (using TAB-completion) and insert a BibTeX key into the document. This can also be set up for other document formats that support automatic bibliographies: support for <a href="http://orgmode.org">Org mode</a> and <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a> Markdown is included.</li>
 <li>Inside Ebib, it is possible to push entries to a LaTeX buffer.</li>
 <li>Quick summary of entries into a <code>*Help*</code> buffer.</li>
 <li>Creating a <code>.bib</code> file from a <code>.bbl</code> file, allowing you to create a <code>.bib</code> file for a LaTeX document containing only the references in the document.</li>
 </ul>
-<h3>Miscellaneous</h3>
+<h3 id="miscellaneous">Miscellaneous</h3>
 <ul>
 <li>Entries can be imported from text buffers or from the <code>*scratch*</code> buffer (allowing copy &amp; paste of BibTeX entries, e.g. from the Internet).</li>
 <li>A URL stored in a BibTeX field can be extracted and sent to a browser.</li>
@@ -72,19 +73,19 @@
 <li>(Parts of) databases can be printed, either as a list of references typeset by BibTeX, or directly as database entries.</li>
 <li>Keywords can be stored in a file to aid in maintaining uniformity in keywords within and across <code>.bib</code> files.</li>
 </ul>
-<h2>Screenshots</h2>
+<h2 id="screenshots">Screenshots</h2>
 <p>Visually, Ebib is not very spectacular. But to get an impression of what it looks like, you can look at the following three screenshots. The first shows Ebib's standard lay-out, with the list of entry keys in the top window and the fields of the currently highlighted entry in the bottom window. (The field values displayed in a lighter colour come from the cross-referenced entry.) In the second image, the string 'Reuland' is highlighted as the result of a text search. The third screenshot shows the strings buffer, where you can edit the <code>@string</code> definitions in the database.</p>
 <p><a href="images/Main-view.png"> <img style="width:160px;height:100px" src="images/tn-Main-view.png" alt="screenshot 1" /></a> <a href="images/Search-view.png"> <img style="width:160px;height:100px" src="images/tn-Search-view.png" alt="screenshot 1" /></a> <a href="images/Strings-buffer.png"> <img style="width:160px;height:100px" src="images/tn-Strings-buffer.png" alt="screenshot 2" /></a></p>
-<h2>Manual</h2>
+<h2 id="manual">Manual</h2>
 <p>The complete user manual for Ebib is available in html format <a href="ebib-manual.html">here</a>.</p>
-<h2>Download</h2>
+<h2 id="download">Download</h2>
 <p>Tar balls of Ebib releases can be downloaded from the <a href="http://sourceforge.net/projects/ebib">Sourceforge Project Page</a>. The tar ball contains the source code, and the manual in info and html format. Installation instructions can be found in the manual.</p>
 <p>There is also a public <a href="https://github.com/joostkremers/ebib.git">git repository</a> for Ebib. From there, you can get the latest sources.</p>
-<h2>Mailing list</h2>
+<h2 id="mailing-list">Mailing list</h2>
 <p>Ebib has a mailing list: <a href="https://lists.sourceforge.net/lists/listinfo/ebib-users">ebib-users</a>. Here, you can ask any questions regarding Ebib, send bug reports or feature requests.</p>
 <div class="bottom-dweller">
 <p>Joost Kremers (<em>last modified:</em> <em>03 Jan 2014</em>)</p>
 </div>
-</div>
+</article>
 </body>
 </html>
