@@ -75,6 +75,7 @@ function create_html
            --output="$HTML" \
            --standalone \
            --table-of-contents \
+           --css=ebib.css \
            "$1" && return 0
     echo "$SCRIPT: pandoc -w html failed"
     let "errors++"
