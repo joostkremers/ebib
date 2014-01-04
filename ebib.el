@@ -1227,7 +1227,8 @@ to \"none\"."
   (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
     ;; First set the modification flag, so that it's still correct after
     ;; with-ebib-buffer-writable.
-    (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db))
+    (when ebib-cur-db
+     (set-buffer-modified-p (ebib-db-modified-p ebib-cur-db)))
     (with-ebib-buffer-writable
       (erase-buffer)
       (if (not ebib-cur-db)
