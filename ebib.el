@@ -2355,10 +2355,8 @@ for each file anyway."
                           ((file-exists-p fp)
                            (if (and (null allow-duplicates) (file-exists-in-db-p fp))
                                (message "File %s already exists in db, skipping" fp)
-                             (progn
-                               (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
-                               (ebib-redisplay)
-                               (message "Adding file %s" fp))))
+                             (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
+                             (message "Adding file %s" fp)))
                           (t
                            (error "Invalid file %s" fp)))))
       ;;prompt for file
@@ -2371,7 +2369,9 @@ for each file anyway."
             (if entry-files
                 (cl-dolist (fp (split-string entry-files ebib-filename-separator))
                   (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
-      (add-file-entry filepath))))
+      (add-file-entry filepath)
+      (ebib-db-set-current-entry-key t ebib-cur-db)
+      (ebib-redisplay))))
 
 (defun ebib-generate-autokey ()
   "Automatically generate a key for the current entry.
