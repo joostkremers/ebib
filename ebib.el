@@ -2321,7 +2321,7 @@ with a number in ascending sequence."
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
          (add-to-list 'entry-alist (cons '=key= (read-string "New entry key: " nil 'ebib-key-history))))
-       (ebib-add-entry-stub entry-alist ebib-cur-db)
+       (ebib-db-set-current-entry-key (ebib-add-entry-stub entry-alist ebib-cur-db) ebib-cur-db)
        (ebib-redisplay)
        (ebib-edit-entry-internal)))
     ((no-database)
