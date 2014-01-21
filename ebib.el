@@ -1193,24 +1193,24 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
         (add-text-properties 0 1 '(face highlight) multiline)))
     (concat raw multiline string)))
 
-(defun ebib-format-fields (key fn &optional match-str db)
+(defun ebib-format-fields (key &optional match-str db)
   (or db
       (setq db ebib-cur-db))
   (let* ((entry (ebib-db-get-entry key db))
          (entry-type (cdr (assoc '=type= entry)))
          (obl-fields (ebib-get-obl-fields entry-type))
          (opt-fields (ebib-get-opt-fields entry-type)))
-    (funcall fn (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
+    (insert (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
     (mapc #'(lambda (fields)
-              (funcall fn "\n")
+              (insert "\n")
               (mapcar #'(lambda (field)
                           (unless (and (get field 'ebib-hidden)
                                        ebib-hide-hidden-fields)
-                            (funcall fn (propertize (format "%-17s " field) 'face 'ebib-field-face))
-                            (funcall fn (or
-                                         (ebib-get-field-highlighted field key match-str)
-                                         ""))
-                            (funcall fn "\n")))
+                            (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
+                            (insert (or
+                                     (ebib-get-field-highlighted field key match-str)
+                                     ""))
+                            (insert "\n")))
                       fields))
           (list obl-fields opt-fields ebib-additional-fields))))
 
@@ -1286,7 +1286,7 @@ field contents."
     (with-ebib-buffer-writable
       (erase-buffer)
       (when ebib-cur-keys-list         ; are there entries being displayed?
-        (ebib-format-fields (ebib-cur-entry-key) #'insert match-str)
+        (ebib-format-fields (ebib-cur-entry-key) match-str)
         (setq ebib-current-field '=type=)
         (goto-char (point-min))))))
 
