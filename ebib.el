@@ -3481,15 +3481,16 @@ Return a list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
-  (let ((filter `(cl-macrolet ((contains (field regexp)
-                                         `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
-                   ,(ebib-db-get-filter db))))
-    (sort (delq nil (mapcar #'(lambda (key)
-                                (let ((entry (ebib-db-get-entry key db 'noerror)))
-                                  (when (eval filter)
-                                    key)))
-                            (ebib-db-list-keys db 'nosort)))
-          'string<)))
+  (let ((filter (ebib-db-get-filter db)))
+    (eval
+     `(cl-macrolet ((contains (field regexp)
+                              `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
+        (sort (delq nil (mapcar #'(lambda (key)
+                                    (let ((entry (ebib-db-get-entry key db 'noerror)))
+                                      (when ,filter
+                                        key)))
+                                (ebib-db-list-keys db 'nosort)))
+              'string<)))))
 
 (defun ebib-filters-pp-filter (filter)
   "Convert FILTER into a string suitable for displaying.
