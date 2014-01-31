@@ -1,6 +1,6 @@
 ;;; ebib.el --- a BibTeX database manager
 
-;; Copyright (c) 2003-2013 Joost Kremers
+;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
