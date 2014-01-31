@@ -45,7 +45,7 @@
 ;; can be found at <http://ebib.sourceforge.net>. Development sources can be
 ;; found at <https://github.com/joostkremers/ebib>.
 
-;; Code:
+;;; Code:
 
 (eval-and-compile
   (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
