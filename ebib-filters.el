@@ -427,4 +427,6 @@ filter named NAME, raise an error, unless NOERROR is non-NIL."
   "Return non-NIL if a filter with NAME already exists."
   (assoc-string name ebib-filters-alist ebib-filters-ignore-case))
 
+(provide 'ebib-filters)
+
 ;;; ebib-filters ends here

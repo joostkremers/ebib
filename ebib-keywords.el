@@ -222,4 +222,6 @@ Optional argument DB specifies the database to check for."
                 (ebib-keywords-save-to-file elt))
             new))))
 
+(provide 'ebib-keywords)
+
 ;;; ebib-keywords ends here
