@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 1.14
+;; Version: 1.15
 ;; Keywords: text bibtex
 
 ;; Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@
 ;; See the Ebib manual for usage and installation instructions.
 
 ;; The latest release version of Ebib, contact information and mailing list
-;; can be found at <http://ebib.sourceforge.net>. Development sources can be
-;; found at <https://github.com/joostkremers/ebib>.
+;; can be found at <http://joostkremers.github.io/ebib>. Development
+;; sources can be found at <https://github.com/joostkremers/ebib>.
 
 ;;; Code:
 

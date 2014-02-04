@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2014
-;; Version: 1.14
+;; Version: 1.15
 ;; Keywords: text bibtex
 
 ;; Redistribution and use in source and binary forms, with or without
