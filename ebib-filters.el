@@ -353,7 +353,9 @@ return value is also NIL."
                        ((stringp f)
                         (format "\"%s\"" f))
                        ((symbolp f)
-                        (format "%s" f)))))
+                        (if (eq f 'any)
+                            "any field"
+                          (symbol-name f))))))
         (let ((pretty-filter (pp-filter filter)))
           (if (string-match "\\`(\\(.*\\))\\'" pretty-filter)
               (match-string 1 pretty-filter)
