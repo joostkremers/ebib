@@ -61,7 +61,7 @@
         (defalias 'cl-loop 'loop)
         (defalias 'cl-multiple-value-bind 'multiple-value-bind)
         (defalias 'cl-multiple-value-setq 'multiple-value-setq)
-        (defalias 'cl-remove 'remove*)
+        (defalias 'cl-remove-if 'remove-if)
         (defalias 'cl-values 'values))
     (require 'cl-lib)))
 (require 'easymenu)
@@ -850,6 +850,16 @@ The first element in the list is the symbol `=type='."
   (cons '=type= (append (ebib-get-obl-fields entry-type)
                        (ebib-get-opt-fields entry-type)
                        ebib-additional-fields)))
+
+(defun ebib-get-extra-fields (entry)
+  "Return an alist of extra fields and values of ENTRY.
+Extra fields are those fields that are not part of the definition
+of the entry type of ENTRY and are also not defined as additional
+fields. ENTRY is an alist representing a BibTeX entry."
+  (let ((fields (ebib-get-all-fields (cdr (assq '=type= entry)))))
+    (cl-remove-if #'(lambda (elt)
+                      (memq (car elt) fields))
+                  entry)))
 
 ;; This is simply to save some typing.
 (defun ebib-cur-entry-key ()
