@@ -287,7 +287,7 @@ a logical `not' is applied to the selection."
                                          (mapcar #'(lambda (x)
                                                      (cons (symbol-name x) 0))
                                                  (append ebib-unique-field-list ebib-additional-fields)))
-                                nil t nil 'ebib-field-history)))
+                                nil nil nil 'ebib-field-history)))
     (setq field (intern-soft field))
     (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
                                        (if (< not 0) "not " "")
