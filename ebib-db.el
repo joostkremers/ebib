@@ -45,6 +45,7 @@
         (require 'cl)
         (defalias 'cl-defstruct 'defstruct))
     (require 'cl-lib)))
+(require 'ebib-macs)
 
 (defcustom ebib-biblatex-inheritance nil
   "Inheritance scheme for cross-referencing.
