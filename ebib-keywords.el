@@ -48,7 +48,7 @@
         (defalias 'cl-third 'third)
         (defalias 'cl-values 'values))
     (require 'cl-lib)))
-(require 'ebib-macs)
+(require 'ebib-utils)
 (require 'ebib-db)
 
 (defgroup ebib-keywords nil "Keyword settings for Ebib" :group 'ebib)

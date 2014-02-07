@@ -53,7 +53,7 @@
             "Emacs 23 compatability function."
             (string-to-char (completing-read prompt chars)))))
     (require 'cl-lib)))
-(require 'ebib-macs)
+(require 'ebib-utils)
 (require 'ebib-db)
 
 (defgroup ebib-filters nil "Filter settings for Ebib" :group 'ebib)

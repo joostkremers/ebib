@@ -67,7 +67,7 @@
 (require 'easymenu)
 (require 'bibtex)
 (require 'pp)
-(require 'ebib-macs)
+(require 'ebib-utils)
 (require 'ebib-db)
 (require 'ebib-filters)
 (require 'ebib-keywords)
