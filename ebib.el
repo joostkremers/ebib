@@ -452,32 +452,6 @@ keywords when Emacs is killed."
   (ebib-lower)
   (customize-variable 'ebib-entry-types))
 
-(defun ebib-log (type format-string &rest args)
-  "Writes a message to Ebib's log buffer.
-TYPE (a symbol) is the type of message. It can be LOG, which
-writes the message to the log buffer only; MESSAGE, which writes
-the message to the log buffer and outputs it with the function
-MESSAGE; WARNING, which logs the message and sets the variable
-`ebib-log-error' to 0; or ERROR, which logs the message and sets
-the variable `ebib-log-error' to 1. The latter two can be used to
-signal the user to check the log for warnings or errors.
-
-This function adds a newline to the message being logged."
-  (with-current-buffer (cdr (assoc 'log ebib-buffer-alist))
-    (cond
-     ((eq type 'warning)
-      (or ebib-log-error ; if ebib-error-log is already set to 1, we don't want to overwrite it!
-          (setq ebib-log-error 0)))
-     ((eq type 'error)
-      (setq ebib-log-error 1))
-     ((eq type 'message)
-      (apply 'message format-string args)))
-    (insert (apply 'format  (concat (if (eq type 'error)
-                                        (propertize format-string 'face 'font-lock-warning-face)
-                                      format-string)
-                                    "\n")
-                   args))))
-
 (defun ebib-load-bibtex-file (&optional file)
   "Open a BibTeX file."
   (interactive)
