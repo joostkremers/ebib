@@ -341,6 +341,6 @@ fields. ENTRY is an alist representing a BibTeX entry."
     (with-ebib-buffer-writable
       (erase-buffer))))
 
-(provide 'ebib-macs)
+(provide 'ebib-utils)
 
-;;; ebib-macs ends here
+;;; ebib-utils ends here
