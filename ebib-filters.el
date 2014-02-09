@@ -54,6 +54,7 @@
             (string-to-char (completing-read prompt chars)))))
     (require 'cl-lib)))
 (require 'ebib-utils)
+(require 'ebib-keywords)
 (require 'ebib-db)
 
 (defgroup ebib-filters nil "Filter settings for Ebib" :group 'ebib)
