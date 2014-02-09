@@ -1,4 +1,4 @@
-; ebib-db.el --- Part of Ebib, a BibTeX database manager
+;;; ebib-db.el --- Part of Ebib, a BibTeX database manager
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
