@@ -835,7 +835,8 @@ dot."
 
 (defmacro with-ebib-buffer-writable (&rest body)
   "Makes the current buffer writable and executes the commands in BODY.
-After BODY is executed, the buffer modified flag is unset."
+After BODY is executed, the buffer modified flag is restored to
+its original value."
   (declare (indent defun))
   `(let ((modified (buffer-modified-p)))
      (unwind-protect
