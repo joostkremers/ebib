@@ -534,12 +534,11 @@ entry-specific inheritances, the latter override the former."
       (defalias 'line-number-at-pos 'line-number)))
 
 (defun ebib-log (type format-string &rest args)
-  "Writes a message to Ebib's log buffer.
-TYPE (a symbol) is the type of message. It can be LOG, which
-writes the message to the log buffer only; MESSAGE, which writes
+  "Write a message to Ebib's log buffer.
+TYPE (a symbol) is the type of message: `log' writes the message to the log buffer only; `message' writes
 the message to the log buffer and outputs it with the function
-MESSAGE; WARNING, which logs the message and sets the variable
-`ebib-log-error' to 0; or ERROR, which logs the message and sets
+`message'; `warning' logs the message and sets the variable
+`ebib-log-error' to 0; or `error' logs the message and sets
 the variable `ebib-log-error' to 1. The latter two can be used to
 signal the user to check the log for warnings or errors.
 
@@ -617,10 +616,10 @@ This function adds a newline to the message being logged."
       (beginning-of-line))))
 
 (defun ebib-set-modified (mod &optional db)
-  "Sets the modified flag of the database DB to MOD.
-If DB is nil, it defaults to the current database, and the
-modified flag of the index buffer is also (re)set. MOD must be
-either T or NIL."
+  "Set the modified flag of the database DB to MOD.
+If DB is the current database, the modified flag of the index
+buffer is also (re)set. MOD must be either T or NIL; DB defaults
+to the current database."
   (unless db
     (setq db ebib-cur-db))
   (ebib-db-set-modified mod db)
@@ -629,7 +628,7 @@ either T or NIL."
       (set-buffer-modified-p mod))))
 
 (defun ebib-modified-p ()
-  "Checks if any of the databases in Ebib were modified.
+  "Check if any of the databases in Ebib were modified.
 Returns the first modified database, or NIL if none was modified."
   (let ((db (car ebib-databases)))
     (while (and db
@@ -638,20 +637,20 @@ Returns the first modified database, or NIL if none was modified."
     db))
 
 (defun ebib-create-new-database ()
-  "Creates a new database instance and returns it."
+  "Create a new database instance and return it."
   (let ((new-db (ebib-db-new-database)))
     (setq ebib-databases (append ebib-databases (list new-db)))
     new-db))
 
 (defun ebib-match-paren-forward (limit)
-  "Moves forward to the closing parenthesis matching the opening parenthesis at POINT.
-This function handles parentheses () and braces {}. Does not
-search/move beyond LIMIT. Returns T if a matching parenthesis was
-found, NIL otherwise. If point was not at an opening parenthesis
-at all, NIL is returned and point is not moved. If point was at
-an opening parenthesis but no matching closing parenthesis was
-found, an error is logged and point is moved one character
-forward to allow parsing to continue."
+  "Move forward to the closing paren matching the opening paren at POINT.
+Do not search/move beyond LIMIT. Return T if a matching
+parenthesis was found, NIL otherwise. This function handles
+parentheses () and braces {}. If point is not at an opening
+parenthesis at all, NIL is returned and point is not moved. If
+point is at an opening parenthesis but no matching closing
+parenthesis is found, an error is logged and point is moved one
+character forward to allow parsing to continue."
   (cond
    ((eq (char-after) ?\{)
     (ebib-match-brace-forward limit))
@@ -681,12 +680,12 @@ forward to allow parsing to continue."
    (t nil)))
 
 (defun ebib-match-delim-forward (limit)
-  "Moves forward to the closing delimiter matching the opening delimiter at POINT.
-This function handles braces {} and double quotes \"\". Does not
-search/move beyond LIMIT. Returns T if a matching delimiter was
-found, NIL otherwise. If point was not at an opening delimiter at
-all, NIL is returned and point is not moved. If point was at an
-opening delimiter but no matching closing delimiter was found, an
+  "Move forward to the closing delimiter matching the opening delimiter at POINT.
+Do not search/move beyond LIMIT. Return T if a matching delimiter
+was found, NIL otherwise. This function handles braces {} and
+double quotes \"\". If point is not at an opening delimiter at
+all, NIL is returned and point is not moved. If point is at an
+opening delimiter but no matching closing delimiter is found, an
 error is logged and point is moved one character forward to allow
 parsing to continue."
   (cond
@@ -697,13 +696,13 @@ parsing to continue."
    (t nil)))
 
 (defun ebib-match-brace-forward (limit)
-  "Moves forward to the closing brace matching the opening brace at POINT.
-Does not search/move beyond LIMIT. Returns T if a matching brace
-was found, NIL otherwise. If point was not at an opening brace at
-all, NIL is returned and point is not moved. If point was at an
-opening brace but no matching closing brace was found, an error
-is logged and point is moved one character forward to allow
-parsing to continue."
+  "Move forward to the closing brace matching the opening brace at POINT.
+Do not search/move beyond LIMIT. Return T if a matching brace was
+found, NIL otherwise. If point is not at an opening brace at all,
+NIL is returned and point is not moved. If point is at an opening
+brace but no matching closing brace is found, an error is logged
+and point is moved one character forward to allow parsing to
+continue."
   (when (eq (char-after) ?\{) ; make sure we're really on a brace, otherwise return nil
     (condition-case nil
         (save-restriction
@@ -720,12 +719,12 @@ parsing to continue."
                nil)))))
 
 (defun ebib-match-quote-forward (limit)
-  "Moves to the closing double quote matching the quote at POINT.
-Does not search/move beyond LIMIT. Returns T if a matching quote
-was found, NIL otherwise. If point was not at a double quote at
-all, NIL is returned and point is not moved. If point was at a
-quote but no matching closing quote was found, an error is logged
-and point is moved one character forward to allow parsing to
+  "Move to the closing double quote matching the quote at POINT.
+Do not search/move beyond LIMIT. Return T if a matching quote was
+found, NIL otherwise. If point is not at a double quote at all,
+NIL is returned and point is not moved. If point is at a quote
+but no matching closing quote was found, an error is logged and
+point is moved one character forward to allow parsing to
 continue."
   (when (eq (char-after (point)) ?\")  ; make sure we're on a double quote.
     (condition-case nil
@@ -754,8 +753,9 @@ be added to the entry. Note that for a timestamp to be added,
   (ebib-set-modified t db))
 
 (defun ebib-search-key-in-buffer (entry-key)
-  "Searches ENTRY-KEY in the index buffer.
-Moves point to the first character of the key and returns point."
+  "Search ENTRY-KEY in the index buffer.
+Point is moved to the first character of the key. Return value is
+the new value of point."
   (goto-char (point-min))
   (re-search-forward (concat "^" entry-key))
   (beginning-of-line)
@@ -770,7 +770,7 @@ Moves point to the first character of the key and returns point."
     (ebib)))
 
 (defun ebib-read-file-to-list (filename)
-  "Return a list of lines from file FILENAME."
+  "Return the contents of FILENAME as a list of lines."
   (if (and filename                               ; protect against 'filename' being 'nil'
            (file-readable-p filename))
       (with-temp-buffer
@@ -783,10 +783,12 @@ Moves point to the first character of the key and returns point."
 
 (defmacro ebib-ifstring (bindvar then &rest else)
   "Execute THEN only if STRING is nonempty.
-Format: (ebib-ifstring (var value) then-form [else-forms]) VAR is bound
-to VALUE, which is evaluated. If VAR is a nonempty string,
-THEN-FORM is executed. If VAR is either \"\" or nil, ELSE-FORM is
-executed. Returns the value of THEN or of ELSE."
+
+Format: (ebib-ifstring (var value) then-form [else-forms])
+
+VAR is bound to VALUE, which is evaluated. If VAR is a nonempty
+string, THEN-FORM is executed. If VAR is either \"\" or nil,
+ELSE-FORM is executed. Returns the value of THEN or of ELSE."
   (declare (indent 2))
   `(let ,(list bindvar)
      (if (not (or (null ,(car bindvar))
@@ -795,7 +797,7 @@ executed. Returns the value of THEN or of ELSE."
        ,@else)))
 
 (defmacro ebib-last1 (lst &optional n)
-  "Returns the last (or Nth last) element of LST."
+  "Return the last (or Nth last) element of LST."
   `(car (last ,lst ,n)))
 
 ;; we sometimes need to walk through lists.  these functions yield the
@@ -804,9 +806,13 @@ executed. Returns the value of THEN or of ELSE."
 ;; first/last element of LIST, or if it is not contained in LIST at all,
 ;; the result is nil.
 (defun ebib-next-elem (elem list)
+  "Return the element following ELEM in LIST.
+If ELEM is the last element, return nil."
   (cadr (member elem list)))
 
 (defun ebib-prev-elem (elem list)
+  "Return the element preceding ELEM in LIST.
+If ELEM is the first element, return nil."
   (if (or (equal elem (car list))
           (not (member elem list)))
       nil
@@ -825,7 +831,7 @@ filename suffix."
                           (concat file (car ebib-bibtex-extensions))))))
 
 (defun ebib-ensure-extension (filename ext)
-  "Make sure FILENAME has an extension.
+  "Ensure FILENAME has an extension.
 Return FILENAME if it alread has an extension, otherwise return
 FILENAME appended with EXT. Note that EXT should start with a
 dot."
@@ -834,9 +840,8 @@ dot."
     (concat filename ext)))
 
 (defmacro with-ebib-buffer-writable (&rest body)
-  "Makes the current buffer writable and executes the commands in BODY.
-After BODY is executed, the buffer modified flag is restored to
-its original value."
+  "Make the current buffer writable and execute BODY.
+Restore the buffer modified flag after executing BODY."
   (declare (indent defun))
   `(let ((modified (buffer-modified-p)))
      (unwind-protect
@@ -874,22 +879,24 @@ the result."
 ;;     mark-active))
 
 (defun ebib-remove-from-string (string remove)
-  "Returns a copy of STRING with all the occurrences of REMOVE taken out.
-REMOVE can be a regex."
+  "Return a copy of STRING with all the occurrences of REMOVE taken out.
+REMOVE can be a regular expression."
   (apply 'concat (split-string string remove)))
 
 (defun ebib-multiline-p (string)
-  "True if STRING is multiline."
+  "Return non-nil if STRING is multiline."
   (if (stringp string)
       (string-match "\n" string)))
 
 (defun ebib-first-line (string)
-  "Returns the first line of a multi-line string."
+  "Return the first line of a multiline string."
   (string-match "\n" string)
   (substring string 0 (match-beginning 0)))
 
 (defun ebib-sort-in-buffer (limit str)
-  "Moves POINT to the right position to insert STR in a buffer with lines sorted A-Z."
+  "Move POINT to the right position to insert STR in the current buffer.
+The buffer must contain lines that are sorted A-Z. STR is not
+actually inserted."
   (let ((upper limit)
         middle)
     (when (> limit 0)
@@ -911,7 +918,7 @@ REMOVE can be a regex."
                 (setq upper middle)))))))))
 
 (defun ebib-match-all-in-string (match-str string)
-  "Highlights all the matches of MATCH-STR in STRING.
+  "Highlight all the matches of MATCH-STR in STRING.
 The return value is a list of two elements: the first is the
 modified string, the second either t or nil, indicating whether a
 match was found at all."
@@ -983,22 +990,25 @@ conditions are AND'ed.)"
                         (cdr form)))
               forms)))
 
-;; the numeric prefix argument is 1 if the user gave no prefix argument at
-;; all. the raw prefix argument is not always a number. so we need to do
+;; The numeric prefix argument is 1 if the user gave no prefix argument at
+;; all. The raw prefix argument is not always a number. So we need to do
 ;; our own conversion.
 (defun ebib-prefix (num)
+  "Return NUM if it is a number, otherwise return nil.
+This can be used to check if the user provided a numeric prefix
+argument to a function or not."
   (when (numberp num)
     num))
 
 (defun ebib-called-with-prefix ()
-  "Returns T if the command was called with a prefix key."
+  "Return T if the calling command was called with a prefix key."
   (if (featurep 'xemacs)
       (member (character-to-event ebib-prefix-key) (append (this-command-keys) nil))
     (member (event-convert-list (list ebib-prefix-key))
             (append (this-command-keys-vector) nil))))
 
 (defmacro ebib-called-interactively-p ()
-  "Returns T if the command was called interactively.
+  "Return T if the command was called interactively.
 This is a compatibility macro for Emacs 23, in which
 called-interactively-p doesn't take an argument, while in Emacs
 24, it takes one obligatory argument."
@@ -1006,8 +1016,10 @@ called-interactively-p doesn't take an argument, while in Emacs
       '(interactive-p)
     '(called-interactively-p 'any)))
 
+;; TODO The exporting macros and functions shoudl be rewritten...
+
 (defmacro ebib-export-to-db (num message copy-fn)
-  "Exports data to another database.
+  "Export data to another database.
 NUM is the number of the database to which the data is to be copied.
 
 MESSAGE is a string displayed in the echo area if the export was
@@ -1027,7 +1039,7 @@ successful, and NIL otherwise."
            (message ,message ,num))))))
 
 (defmacro ebib-export-to-file (prompt-string message insert-fn)
-  "Exports data to a file.
+  "Export data to a file.
 PROMPT-STRING is the string that is used to ask for the filename
 to export to. INSERT-FN must insert the data to be exported into
 the current buffer: it is called within a `with-temp-buffer',
@@ -1046,15 +1058,15 @@ display the actual filename."
              (setq ebib-export-filename ,filename))))))
 
 (defun ebib-get-obl-fields (entry-type)
-  "Returns the obligatory fields of ENTRY-TYPE."
+  "Return the obligatory fields of ENTRY-TYPE."
   (nth 1 (assoc entry-type ebib-entry-types)))
 
 (defun ebib-get-opt-fields (entry-type)
-  "Returns the optional fields of ENTRY-TYPE."
+  "Return the optional fields of ENTRY-TYPE."
   (nth 2 (assoc entry-type ebib-entry-types)))
 
 (defun ebib-get-all-fields (entry-type)
-  "Returns all the fields of ENTRY-TYPE as a list.
+  "Return all the fields of ENTRY-TYPE as a list.
 The first element in the list is the symbol `=type='."
   (cons '=type= (append (ebib-get-obl-fields entry-type)
                        (ebib-get-opt-fields entry-type)
@@ -1076,6 +1088,7 @@ fields. ENTRY is an alist representing a BibTeX entry."
   (ebib-db-get-current-entry-key ebib-cur-db))
 
 (defun ebib-erase-buffer (buffer)
+  "Erase BUFFER, even if it is read-only."
   (with-current-buffer buffer
     (with-ebib-buffer-writable
       (erase-buffer))))
