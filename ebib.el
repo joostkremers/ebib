@@ -2836,17 +2836,16 @@ to append them to."
 (easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
 (defun ebib-multiline-edit (type &optional starttext)
-  "Switches to Ebib's multiline edit buffer.
+  "Switch to Ebib's multiline edit buffer.
 STARTTEXT is a string that contains the initial text of the buffer."
   ;; (setq ebib-pre-multiline-buffer (current-buffer))
   (ebib-pop-to-buffer 'multiline)
-  (set-buffer-modified-p nil)
   (erase-buffer)
   (setq ebib-editing type)
   (when starttext
     (insert starttext)
-    (goto-char (point-min))
-    (set-buffer-modified-p nil)))
+    (goto-char (point-min)))
+  (set-buffer-modified-p nil))
 
 (defun ebib-quit-multiline-edit-and-save ()
   "Quits the multiline edit buffer, saving the text."
