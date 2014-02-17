@@ -431,7 +431,7 @@ the buffers, reads the rc file and loads the files in
     (if (and ebib-keywords-file
              (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
         (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
-                                                      (read-file-to-list ebib-keywords-file) nil)))
+                                                      (ebib-read-file-to-list ebib-keywords-file) nil)))
     (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
     (ebib-filters-load-file ebib-filters-default-file)
     (setq ebib-index-highlight (ebib-make-highlight 1 1 (cdr (assoc 'index ebib-buffer-alist))))

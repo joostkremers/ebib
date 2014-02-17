@@ -769,7 +769,7 @@ Moves point to the first character of the key and returns point."
     (setq ebib-info-flag nil)
     (ebib)))
 
-(defun read-file-to-list (filename)
+(defun ebib-read-file-to-list (filename)
   "Return a list of lines from file FILENAME."
   (if (and filename                               ; protect against 'filename' being 'nil'
            (file-readable-p filename))

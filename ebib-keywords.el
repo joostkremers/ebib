@@ -117,7 +117,7 @@ Also automatically remove duplicates."
               (file-name-directory ebib-keywords-file))
     (let ((dir (expand-file-name (file-name-directory (ebib-db-get-filename db)))))
       (if dir
-          (let ((keyword-list (read-file-to-list (concat dir ebib-keywords-file))))
+          (let ((keyword-list (ebib-read-file-to-list (concat dir ebib-keywords-file))))
             ;; note: even if keyword-list is empty, we store it, because the user
             ;; may subsequently add keywords.
             (add-to-list 'ebib-keywords-files-alist    ; add the dir if not in the list yet
