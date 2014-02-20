@@ -1231,11 +1231,13 @@ use `Z' (that is a capital `Z').
 width. In this case, Ebib takes up the right part of the frame,
 displaying the index and entry buffers. The width of the Ebib windows
 can then be set with the option *note Width: #width, which defaults to
-80. Note that in this case, the multiline edit buffer is not displayed
-in the same window as the entry buffer. Rather, Ebib uses another,
-non-Ebib window to display it. Here, too, the key `z' switches to a
-non-Ebib window without hiding the Ebib windows. Use capital `Z' to
-hide them.
+80. The width can be specified as an absolute value (the number of
+columns), but also as a value relative to the current window. In that
+case, you must specify a value between 0 and 1. Here, too, the key `z'
+switches to a non-Ebib window without hiding the Ebib windows. Use
+capital `Z' to hide them. Note that if you specify a custom width, the
+multiline edit buffer is not displayed in the same window as the entry
+buffer. Rather, Ebib uses another, non-Ebib window to display it.
 
    If you set Ebib's layout to display only the index buffer on
 startup, you can additionally set the option *note Popup Entry Window:
@@ -3174,144 +3176,144 @@ Node: Advanced Features55818
 Ref: #advanced-features55959
 Node: Window Management56451
 Ref: #window-management56594
-Node: Creating Entry Stubs59350
-Ref: #creating-entry-stubs59528
-Node: @Preamble Definition60511
-Ref: #preamble-definition60691
-Node: @String Definitions62818
-Ref: #string-definitions62993
-Node: Managing Keywords66281
-Ref: #managing-keywords66452
-Node: Sorting the bib File71510
-Ref: #sorting-the-.bib-file71695
-Node: Merging and Importing74700
-Ref: #merging-and-importing74881
-Node: Exporting Entries76466
-Ref: #exporting-entries76629
-Node: Timestamps78676
-Ref: #timestamps78829
-Node: Multiple Identical Fields80450
-Ref: #multiple-identical-fields80625
-Node: Filters82481
-Ref: #filters82635
-Node: Simple Selection83693
-Ref: #simple-selection83824
-Node: Complex Filters85486
-Ref: #complex-filters85650
-Node: Storing and Saving Filters89414
-Ref: #storing-and-saving-filters89616
-Node: Properties of Filtered Databases92440
-Ref: #properties-of-filtered-databases92630
-Node: The Multiline Edit Buffer94345
-Ref: #the-multiline-edit-buffer94526
-Node: The Options Menu98509
-Ref: #the-options-menu98656
-Node: The Ebib Buffers99269
-Ref: #the-ebib-buffers99410
-Node: The Index Buffer99750
-Ref: #the-index-buffer99885
-Node: The Entry Buffer105482
-Ref: #the-entry-buffer105644
-Node: The Strings Buffer107903
-Ref: #the-strings-buffer108044
-Node: Customisation109732
-Ref: #customisation109841
-Node: The Customisation Buffer110125
-Ref: #the-customisation-buffer110287
-Node: Default Type111566
-Ref: #default-type111702
-Node: Preload Bib Files111730
-Ref: #preload-bib-files111908
-Node: Preload Bib Search Dirs111932
-Ref: #preload-bib-search-dirs112124
-Node: Create Backups112146
-Ref: #create-backups112316
-Node: Keywords list112338
-Ref: #keywords-list112496
-Node: Keywords File112520
-Ref: #keywords-file112690
-Node: Keywords File Save On Exit112714
-Ref: #keywords-file-save-on-exit112919
-Node: Keywords Use Only File112943
-Ref: #keywords-use-only-file113153
-Node: Keywords Field Keep Sorted113177
-Ref: #keywords-field-keep-sorted113387
-Node: Keywords Separator113411
-Ref: #keywords-separator113602
-Node: Additional Fields113627
-Ref: #additional-fields113796
-Node: Layout113881
-Ref: #layout114015
-Node: Width114040
-Ref: #width114173
-Node: Popup Entry Window114194
-Ref: #popup-entry-window114368
-Node: Window Vertical Split114390
-Ref: #window-vertical-split114582
-Node: Index Window Size114604
-Ref: #index-window-size114785
-Node: Index Mode Line114806
-Ref: #index-mode-line114982
-Node: Index Display Fields115318
-Ref: #index-display-fields115500
-Node: Uniquify Keys115524
-Ref: #uniquify-keys115694
-Node: Autogenerate Keys115718
-Ref: #autogenerate-keys115893
-Node: Citation Commands116090
-Ref: #citation-commands116272
-Node: Multiline Major Mode116791
-Ref: #multiline-major-mode116972
-Node: Sort Order117002
-Ref: #sort-order117162
-Node: Save Xrefs First117186
-Ref: #save-xrefs-first117351
-Node: Crossref Face117375
-Ref: #crossref-face117537
-Node: Selected Face117583
-Ref: #selected-face117742
-Node: Use Timestamp117786
-Ref: #use-timestamp117948
-Node: Timestamp Format117972
-Ref: #timestamp-format118145
-Node: Standard Url Field118182
-Ref: #standard-url-field118356
-Node: Url Regexp118380
-Ref: #url-regexp118537
-Node: Browser Command118756
-Ref: #browser-command118923
-Node: Standard Doi Field119041
-Ref: #standard-doi-field119223
-Node: Standard File Field119247
-Ref: #standard-file-field119433
-Node: File Associations119458
-Ref: #file-associations119640
-Node: Filename Separator119693
-Ref: #filename-separator119874
-Node: File Search Dirs119896
-Ref: #file-search-dirs120070
-Node: Print Preamble120092
-Ref: #print-preamble120257
-Node: Print Newline120281
-Ref: #print-newline120443
-Node: Print Multiline120467
-Ref: #print-multiline120633
-Node: Latex Preamble120657
-Ref: #latex-preamble120822
-Node: Print Tempfile120868
-Ref: #print-tempfile121040
-Node: Allow Identical Fields121064
-Ref: #allow-identical-fields121258
-Node: Filters Default File121282
-Ref: #filters-default-file121481
-Node: Filters Display As Lisp121527
-Ref: #filters-display-as-lisp121729
-Node: Filters Ignore Case121753
-Ref: #filters-ignore-case121938
-Node: Entry Types121960
-Ref: #entry-types122097
-Node: Modifying Key Bindings123683
-Ref: #modifying-key-bindings123841
+Node: Creating Entry Stubs59548
+Ref: #creating-entry-stubs59726
+Node: @Preamble Definition60709
+Ref: #preamble-definition60889
+Node: @String Definitions63016
+Ref: #string-definitions63191
+Node: Managing Keywords66479
+Ref: #managing-keywords66650
+Node: Sorting the bib File71708
+Ref: #sorting-the-.bib-file71893
+Node: Merging and Importing74898
+Ref: #merging-and-importing75079
+Node: Exporting Entries76664
+Ref: #exporting-entries76827
+Node: Timestamps78874
+Ref: #timestamps79027
+Node: Multiple Identical Fields80648
+Ref: #multiple-identical-fields80823
+Node: Filters82679
+Ref: #filters82833
+Node: Simple Selection83891
+Ref: #simple-selection84022
+Node: Complex Filters85684
+Ref: #complex-filters85848
+Node: Storing and Saving Filters89612
+Ref: #storing-and-saving-filters89814
+Node: Properties of Filtered Databases92638
+Ref: #properties-of-filtered-databases92828
+Node: The Multiline Edit Buffer94543
+Ref: #the-multiline-edit-buffer94724
+Node: The Options Menu98707
+Ref: #the-options-menu98854
+Node: The Ebib Buffers99467
+Ref: #the-ebib-buffers99608
+Node: The Index Buffer99948
+Ref: #the-index-buffer100083
+Node: The Entry Buffer105680
+Ref: #the-entry-buffer105842
+Node: The Strings Buffer108101
+Ref: #the-strings-buffer108242
+Node: Customisation109930
+Ref: #customisation110039
+Node: The Customisation Buffer110323
+Ref: #the-customisation-buffer110485
+Node: Default Type111764
+Ref: #default-type111900
+Node: Preload Bib Files111928
+Ref: #preload-bib-files112106
+Node: Preload Bib Search Dirs112130
+Ref: #preload-bib-search-dirs112322
+Node: Create Backups112344
+Ref: #create-backups112514
+Node: Keywords list112536
+Ref: #keywords-list112694
+Node: Keywords File112718
+Ref: #keywords-file112888
+Node: Keywords File Save On Exit112912
+Ref: #keywords-file-save-on-exit113117
+Node: Keywords Use Only File113141
+Ref: #keywords-use-only-file113351
+Node: Keywords Field Keep Sorted113375
+Ref: #keywords-field-keep-sorted113585
+Node: Keywords Separator113609
+Ref: #keywords-separator113800
+Node: Additional Fields113825
+Ref: #additional-fields113994
+Node: Layout114079
+Ref: #layout114213
+Node: Width114238
+Ref: #width114371
+Node: Popup Entry Window114392
+Ref: #popup-entry-window114566
+Node: Window Vertical Split114588
+Ref: #window-vertical-split114780
+Node: Index Window Size114802
+Ref: #index-window-size114983
+Node: Index Mode Line115004
+Ref: #index-mode-line115180
+Node: Index Display Fields115516
+Ref: #index-display-fields115698
+Node: Uniquify Keys115722
+Ref: #uniquify-keys115892
+Node: Autogenerate Keys115916
+Ref: #autogenerate-keys116091
+Node: Citation Commands116288
+Ref: #citation-commands116470
+Node: Multiline Major Mode116989
+Ref: #multiline-major-mode117170
+Node: Sort Order117200
+Ref: #sort-order117360
+Node: Save Xrefs First117384
+Ref: #save-xrefs-first117549
+Node: Crossref Face117573
+Ref: #crossref-face117735
+Node: Selected Face117781
+Ref: #selected-face117940
+Node: Use Timestamp117984
+Ref: #use-timestamp118146
+Node: Timestamp Format118170
+Ref: #timestamp-format118343
+Node: Standard Url Field118380
+Ref: #standard-url-field118554
+Node: Url Regexp118578
+Ref: #url-regexp118735
+Node: Browser Command118954
+Ref: #browser-command119121
+Node: Standard Doi Field119239
+Ref: #standard-doi-field119421
+Node: Standard File Field119445
+Ref: #standard-file-field119631
+Node: File Associations119656
+Ref: #file-associations119838
+Node: Filename Separator119891
+Ref: #filename-separator120072
+Node: File Search Dirs120094
+Ref: #file-search-dirs120268
+Node: Print Preamble120290
+Ref: #print-preamble120455
+Node: Print Newline120479
+Ref: #print-newline120641
+Node: Print Multiline120665
+Ref: #print-multiline120831
+Node: Latex Preamble120855
+Ref: #latex-preamble121020
+Node: Print Tempfile121066
+Ref: #print-tempfile121238
+Node: Allow Identical Fields121262
+Ref: #allow-identical-fields121456
+Node: Filters Default File121480
+Ref: #filters-default-file121679
+Node: Filters Display As Lisp121725
+Ref: #filters-display-as-lisp121927
+Node: Filters Ignore Case121951
+Ref: #filters-ignore-case122136
+Node: Entry Types122158
+Ref: #entry-types122295
+Node: Modifying Key Bindings123881
+Ref: #modifying-key-bindings124039
 
 End Tag Table
 

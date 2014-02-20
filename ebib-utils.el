@@ -128,9 +128,16 @@ If you set this option, you should probably set
 
 (defcustom ebib-width 80
   "Width of the Ebib windows.
-Only takes effect if `ebib-layout' is set to CUSTOM."
+The width can be absolute or relative; if it is absolute, it
+specifies the number of columns that the Ebib windows occupies.
+If it is relative, the with must be a value between 0 and 1
+specifying the width relative to the width of the window that is
+selected when Ebib is started.
+
+This option only takes effect if `ebib-layout' is set to `custom'."
   :group 'ebib-windows
-  :type 'integer)
+  :type '(choice (integer :label "Absolute width:")
+                 (float :label "Relative width:" :value 0.3)))
 
 (defcustom ebib-index-window-size 10
   "The size of the index buffer window.

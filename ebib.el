@@ -463,8 +463,12 @@ the buffers, reads the rc file and loads the files in
         (delete-other-windows))
        ((eq ebib-layout 'custom)
         (setq ebib-window-before (selected-window))
-        (let ((ebib-window (split-window (selected-window) (- (window-width) ebib-width) t)))
-          (select-window ebib-window))))
+        (let ((width (cond
+                      ((integerp ebib-width)
+                       (- (window-total-width) ebib-width))
+                      ((floatp ebib-width)
+                       (- (window-total-width) (truncate (* (window-total-width) ebib-width)))))))
+          (select-window (split-window (selected-window) width t)))))
       (let* ((index-window (selected-window))
              (entry-window (split-window index-window ebib-index-window-size
                                          ebib-window-vertical-split)))

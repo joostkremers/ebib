@@ -412,7 +412,7 @@ The entry buffer is also displayed if you press `RET`. When you do this, the ind
 
 When the layout option is set to not display the entry buffer, the key `z` does not hide the index window. Rather, it just selects another, non-Ebib window. In order to hide the index window, you can use `Z` (that is a capital `Z`).
 
-A third option to deal with windows is to set the layout to a custom width. In this case, Ebib takes up the right part of the frame, displaying the index and entry buffers. The width of the Ebib windows can then be set with the option [Width](#width), which defaults to 80. Note that in this case, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it. Here, too, the key `z` switches to a non-Ebib window without hiding the Ebib windows. Use capital `Z` to hide them.
+A third option to deal with windows is to set the layout to a custom width. In this case, Ebib takes up the right part of the frame, displaying the index and entry buffers. The width of the Ebib windows can then be set with the option [Width](#width), which defaults to 80. The width can be specified as an absolute value (the number of columns), but also as a value relative to the current window. In that case, you must specify a value between 0 and 1. Here, too, the key `z` switches to a non-Ebib window without hiding the Ebib windows. Use capital `Z` to hide them. Note that if you specify a custom width, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it.
 
 If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option [Popup Entry Window](#popup-entry-window). Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
 
@@ -1114,7 +1114,7 @@ Ebib's customisation group is a subgroup of the `Tex` group. It can be invoked b
 
 **Default value**: 80.\
 
-\noindent The width of the Ebib windows when `ebib-layout` is set to `custom`.
+\noindent The width of the Ebib windows when `ebib-layout` is set to `custom`. It can be an absolute value, specifying the number of columns, or a value relative to the current window, in which case the width must be set to a value between 0 and 1.
 
 
 ### Popup Entry Window ###
