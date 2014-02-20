@@ -627,6 +627,7 @@ COMMAND and PREFIXED are meaningless."
 (ebib-key index ";" ebib-prefix-map)
 (ebib-key index "?" ebib-info)
 (ebib-key index "a" ebib-add-entry)
+(ebib-key index "A" ebib-show-annotation)
 (ebib-key index "b" ebib-index-scroll-down)
 (ebib-key index "c" ebib-index-c)
 (ebib-key index "C" ebib-follow-crossref)
@@ -1049,6 +1050,17 @@ buffer if Ebib is not occupying the entire frame."
          (ebib-fill-entry-buffer))))
     ((default)
      (beep))))
+
+(defun ebib-show-annotation ()
+  "Show the contents of the `annote' field in a *Help* window."
+  (interactive)
+  (with-help-window (help-buffer)
+    (princ (propertize (format "Annotation for `%s' [%s]" (ebib-cur-entry-key) (ebib-db-get-filename ebib-cur-db 'shortened)) 'face '(:weight bold)))
+    (princ "\n\n")
+    (let ((contents (ebib-db-get-field-value 'annote (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced)))
+      (if contents
+          (princ contents)
+        (princ "[No annotation]")))))
 
 (defun ebib-add-entry-stub (&optional entry db)
   "Add ENTRY to DB in the form of a stub.
