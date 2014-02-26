@@ -89,7 +89,6 @@ For BibTeX files that do not have an associated keywords file,
   :type '(choice (const :tag "Use only keywords file" t)
                  (const :tag "Use keywords file and list" nil)))
 
-
 (defcustom ebib-keywords-field-keep-sorted nil
   "Keep the keywords field sorted in alphabetical order.
 Also automatically remove duplicates."

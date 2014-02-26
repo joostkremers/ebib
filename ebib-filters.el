@@ -287,10 +287,9 @@ a logical `not' is applied to the selection."
                                 (append  (list '("any" . 0)
                                                '("=type=" . 0))
                                          (mapcar #'(lambda (x)
-                                                     (cons (symbol-name x) 0))
+                                                     (cons x 0))
                                                  (append ebib-unique-field-list ebib-additional-fields)))
                                 nil nil nil 'ebib-field-history)))
-    (setq field (intern-soft field))
     (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
                                        (if (< not 0) "not " "")
                                        field
@@ -315,7 +314,6 @@ a logical `not' is applied to the selection."
                                  `(contains ,field ,regexp)
                                `(not (contains ,field ,regexp)))
                              ebib-cur-db))))))
-
 (defun ebib-filters-run-filter (db)
   "Run the filter of DB.
 Return a list of entry keys that match DB's filter."
@@ -325,7 +323,7 @@ Return a list of entry keys that match DB's filter."
   (let ((filter (ebib-db-get-filter db)))
     (eval
      `(cl-macrolet ((contains (field regexp)
-                              `(ebib-search-in-entry ,regexp entry ,(unless (eq field 'any) `(quote ,field)))))
+                              `(ebib-search-in-entry ,regexp entry ,(unless (string= field "any") field))))
         (sort (delq nil (mapcar #'(lambda (key)
                                     (let ((entry (ebib-db-get-entry key db 'noerror)))
                                       (when ,filter
@@ -345,21 +343,20 @@ return value is also NIL."
       (cl-labels
           ((pp-filter (f)
                       (cond
-                       ((listp f)
+                       ((listp f) ; f is either a list or a string
                         (let ((op (cl-first f)))
                           (cond
                            ((eq op 'not)
                             (format "not %s" (pp-filter (cl-second f))))
-                           ((member op '(and or contains))
+                           ((eq op 'contains)
+                            (format "(%s contains \"%s\")" (pp-filter (cl-second f)) (pp-filter (cl-third f))))
+                           ((member op '(and or))
                             (format "(%s %s %s)" (pp-filter (cl-second f)) op (pp-filter (cl-third f)))))))
-                       ((stringp f)
-                        (format "\"%s\"" f))
-                       ((symbolp f)
-                        (if (eq f 'any)
-                            "any field"
-                          (symbol-name f))))))
+                       (t (if (string= f "any") 
+                              "any field"
+                            f)))))
         (let ((pretty-filter (pp-filter filter)))
-          (if (string-match "\\`(\\(.*\\))\\'" pretty-filter)
+          (if (string-match "\\`(\\(.*\\))\\'" pretty-filter) ; remove the outer parentheses
               (match-string 1 pretty-filter)
             pretty-filter))))))
 

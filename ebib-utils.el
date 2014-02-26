@@ -54,10 +54,10 @@
 
 (defgroup ebib-windows nil "Ebib window management" :group 'ebib)
 
-(defcustom ebib-default-type 'article
+(defcustom ebib-default-type "article"
   "The default type for a newly created BibTeX entry."
   :group 'ebib
-  :type 'symbol)
+  :type 'string)
 
 (defcustom ebib-preload-bib-files nil
   "List of BibTeX files to load automatically when Ebib starts."
@@ -79,17 +79,24 @@ directories."
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
-(defcustom ebib-additional-fields '(crossref
-                                    url
-                                    annote
-                                    abstract
-                                    keywords
-                                    file
-                                    timestamp
-                                    doi)
+(defcustom ebib-additional-fields '("crossref"
+                                    "url"
+                                    "annote"
+                                    "abstract"
+                                    "keywords"
+                                    "file"
+                                    "timestamp"
+                                    "doi")
   "List of the additional fields."
   :group 'ebib
-  :type '(repeat (symbol :tag "Field")))
+  :type '(repeat (string :tag "Field")))
+
+(defcustom ebib-hidden-fields '("timestamp")
+  "List of fields that are not displayed.
+These can be made visible with the menu option \"Show Hidden
+Fields\"."
+  :group 'ebib
+  :type '(repeat (string :tag "Field")))
 
 (defcustom ebib-layout 'full
   "Ebib window layout.
@@ -160,7 +167,7 @@ This is either the height of the window, or, if
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer."
   :group 'ebib
-  :type '(repeat (symbol :tag "Index Field")))
+  :type '(repeat (string :tag "Index Field")))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
@@ -205,7 +212,7 @@ These are used with `ebib-insert-bibtex-key' and
 Sorting is done on different sort levels, and each sort level contains one
 or more sort keys."
   :group 'ebib
-  :type '(repeat (repeat :tag "Sort level" (symbol :tag "Sort field"))))
+  :type '(repeat (repeat :tag "Sort level" (string :tag "Sort field"))))
 
 (defcustom ebib-save-xrefs-first nil
   "If true, entries with a crossref field will be saved first in the BibTeX-file.
@@ -229,13 +236,13 @@ documentation of that function for details."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-standard-url-field 'url
+(defcustom ebib-standard-url-field "url"
   "Standard field to store URLs in.
 In the index buffer, the command \\[ebib-browse-url] can be used to
 send a URL to a browser. This option sets the field from which
 this command extracts the URL."
   :group 'ebib
-  :type 'symbol)
+  :type 'string)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
   "Regular expression to extract URLs from a field."
@@ -250,21 +257,21 @@ option is unset."
   :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
 
-(defcustom ebib-standard-doi-field 'doi
+(defcustom ebib-standard-doi-field "doi"
   "Standard field to store a DOI (digital object identifier) in.
 In the index buffer, the command ebib-browse-doi can be used to
 send a suitable URL to a browser. This option sets the field from
 which this command extracts the doi."
   :group 'ebib
-  :type 'symbol)
+  :type 'string)
 
-(defcustom ebib-standard-file-field 'file
+(defcustom ebib-standard-file-field "file"
   "Standard field to store filenames in.
 In the index buffer, the command ebib-view-file can be used to
 view a file externally. This option sets the field from which
 this command extracts the filename."
   :group 'ebib
-  :type 'symbol)
+  :type 'string)
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
@@ -362,10 +369,10 @@ To define inheritances for all entry types, specify `all' as the
 entry type. If you combine inheritances for `all' with
 entry-specific inheritances, the latter override the former."
   :group 'ebib
-  :type '(repeat (group (symbol :tag "Entry type")
+  :type '(repeat (group (string :tag "Entry type")
                         (repeat :tag "Inherited fields"
-                                (group (symbol :tag "Source")
-                                       (symbol :tag "Target"))))))
+                                (group (string :tag "Source")
+                                       (string :tag "Target"))))))
 
 (defvar ebib-unique-field-list nil
   "Holds a list of all field names.")
@@ -384,63 +391,63 @@ entry-specific inheritances, the latter override the former."
         value))
 
 (defcustom ebib-entry-types
-  '((article                                              ;; name of entry type
-     (author title journal year)                          ;; obligatory fields
-     (volume number pages month note))                    ;; optional fields
+  '(("article"                                   ;; name of entry type
+     ("author" "title" "journal" "year")         ;; obligatory fields
+     ("volume" "number" "pages" "month" "note")) ;; optional fields
 
-    (book
-     (author title publisher year)
-     (editor volume number series address edition month note))
+    ("book"
+     ("author" "title" "publisher" "year")
+     ("editor" "volume" "number" "series" "address" "edition" "month" "note"))
 
-    (booklet
-     (title)
-     (author howpublished address month year note))
+    ("booklet"
+     ("title")
+     ("author" "howpublished" "address" "month" "year" "note"))
 
-    (inbook
-     (author title chapter pages publisher year)
-     (editor volume series address edition month note))
+    ("inbook"
+     ("author" "title" "chapter" "pages" "publisher" "year")
+     ("editor" "volume" "series" "address" "edition" "month" "note"))
 
-    (incollection
-     (author title booktitle publisher year)
-     (editor volume number series type chapter pages address edition month note))
+    ("incollection"
+     ("author" "title" "booktitle" "publisher" "year")
+     ("editor" "volume" "number" "series" "type" "chapter" "pages" "address" "edition" "month" "note"))
 
-    (inproceedings
-     (author title booktitle year)
-     (editor pages organization publisher address month note))
+    ("inproceedings"
+     ("author" "title" "booktitle" "year")
+     ("editor" "pages" "organization" "publisher" "address" "month" "note"))
 
-    (manual
-     (title)
-     (author organization address edition month year note))
+    ("manual"
+     ("title")
+     ("author" "organization" "address" "edition" "month" "year" "note"))
 
-    (misc
+    ("misc"
      ()
-     (title author howpublished month year note))
+     ("title" "author" "howpublished" "month" "year" "note"))
 
-    (mastersthesis
-     (author title school year)
-     (address month note))
+    ("mastersthesis"
+     ("author" "title" "school" "year")
+     ("address" "month" "note"))
 
-    (phdthesis
-     (author title school year)
-     (address month note))
+    ("phdthesis"
+     ("author" "title" "school" "year")
+     ("address" "month" "note"))
 
-    (proceedings
-     (title year)
-     (editor publisher organization address month note))
+    ("proceedings"
+     ("title" "year")
+     ("editor" "publisher" "organization" "address" "month" "note"))
 
-    (techreport
-     (author title institution year)
-     (type number address month note))
+    ("techreport"
+     ("author" "title" "institution" "year")
+     ("type" "number" "address" "month" "note"))
 
-    (unpublished
-     (author title note)
-     (month year)))
+    ("unpublished"
+     ("author" "title" "note")
+     ("month" "year")))
 
   "List of entry type definitions for Ebib"
   :group 'ebib
-  :type '(repeat (list :tag "Entry type" (symbol :tag "Name")
-                       (repeat :tag "Obligatory fields" (symbol :tag "Field"))
-                       (repeat :tag "Optional fields" (symbol :tag "Field"))))
+  :type '(repeat (list :tag "Entry type" (string :tag "Name")
+                       (repeat :tag "Obligatory fields" (string :tag "Field"))
+                       (repeat :tag "Optional fields" (string :tag "Field"))))
   :set 'ebib-set-unique-field-list)
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
@@ -542,12 +549,13 @@ entry-specific inheritances, the latter override the former."
 
 (defun ebib-log (type format-string &rest args)
   "Write a message to Ebib's log buffer.
-TYPE (a symbol) is the type of message: `log' writes the message to the log buffer only; `message' writes
-the message to the log buffer and outputs it with the function
-`message'; `warning' logs the message and sets the variable
-`ebib-log-error' to 0; or `error' logs the message and sets
-the variable `ebib-log-error' to 1. The latter two can be used to
-signal the user to check the log for warnings or errors.
+TYPE (a symbol) is the type of message: `log' writes the message
+to the log buffer only; `message' writes the message to the log
+buffer and outputs it with the function `message'; `warning' logs
+the message and sets the variable `ebib-log-error' to 0; or
+`error' logs the message and sets the variable `ebib-log-error'
+to 1. The latter two can be used to signal the user to check the
+log for warnings or errors.
 
 This function adds a newline to the message being logged."
   (with-current-buffer (cdr (assoc 'log ebib-buffer-alist))
@@ -1074,8 +1082,8 @@ display the actual filename."
 
 (defun ebib-get-all-fields (entry-type)
   "Return all the fields of ENTRY-TYPE as a list.
-The first element in the list is the symbol `=type='."
-  (cons '=type= (append (ebib-get-obl-fields entry-type)
+The first element in the list is \"=type=\"."
+  (cons "=type=" (append (ebib-get-obl-fields entry-type)
                        (ebib-get-opt-fields entry-type)
                        ebib-additional-fields)))
 
@@ -1084,9 +1092,9 @@ The first element in the list is the symbol `=type='."
 Extra fields are those fields that are not part of the definition
 of the entry type of ENTRY and are also not defined as additional
 fields. ENTRY is an alist representing a BibTeX entry."
-  (let ((fields (ebib-get-all-fields (cdr (assq '=type= entry)))))
+  (let ((fields (ebib-get-all-fields (cdr (assoc "=type=" entry)))))
     (cl-remove-if #'(lambda (elt)
-                      (memq (car elt) fields))
+                      (member (car elt) fields))
                   entry)))
 
 ;; This is simply to save some typing.
