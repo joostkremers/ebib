@@ -8,6 +8,7 @@
 ;; Created: 2014
 ;; Version: 1.15
 ;; Keywords: text bibtex
+;; Package-Requires: ((dash "2.5.0") (emacs "24.3"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -38,6 +39,10 @@
 ;; contains general macros, utilities and variables.
 
 ;;; Code:
+
+(require 'cl-lib)
+(require 'dash)
+(require 'bibtex)
 
 ;; make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)

@@ -39,12 +39,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
-      (progn
-        (require 'cl)
-        (defalias 'cl-defstruct 'defstruct))
-    (require 'cl-lib)))
+(require 'cl-lib)
 (require 'ebib-utils)
 
 (defcustom ebib-biblatex-inheritance nil

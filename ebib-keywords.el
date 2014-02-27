@@ -39,15 +39,7 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
-      (progn
-        (require 'cl)
-        (defalias 'cl-remove-if-not 'remove-if-not)
-        (defalias 'cl-second 'second)
-        (defalias 'cl-third 'third)
-        (defalias 'cl-values 'values))
-    (require 'cl-lib)))
+(require 'cl-lib)
 (require 'ebib-utils)
 (require 'ebib-db)
 

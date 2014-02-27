@@ -8,6 +8,7 @@
 ;; Created: 2003
 ;; Version: 1.15
 ;; Keywords: text bibtex
+;; Package-Requires: ((dash "2.5.0") (emacs "24.3"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -47,25 +48,10 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
-      (progn
-        (require 'cl)
-        (defalias 'cl-caddr 'caddr)
-        (defalias 'cl-defstruct 'defstruct)
-        (defalias 'cl-do 'do)
-        (defalias 'cl-dolist 'dolist)
-        (defalias 'cl-flet 'flet)
-        (defalias 'cl-incf 'incf)
-        (defalias 'cl-labels 'labels)
-        (defalias 'cl-loop 'loop)
-        (defalias 'cl-multiple-value-bind 'multiple-value-bind)
-        (defalias 'cl-multiple-value-setq 'multiple-value-setq)
-        (defalias 'cl-remove-if 'remove-if)
-        (defalias 'cl-values 'values))
-    (require 'cl-lib)))
+(require 'cl-lib)
 (require 'easymenu)
 (require 'bibtex)
+(require 'dash)
 (require 'pp)
 (require 'ebib-utils)
 (require 'ebib-db)

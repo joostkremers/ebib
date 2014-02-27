@@ -39,20 +39,7 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (if (string< (format "%d.%d" emacs-major-version emacs-minor-version) "24.3")
-      (progn
-        (require 'cl)
-        (defalias 'cl-first 'first)
-        (defalias 'cl-labels 'labels)
-        (defalias 'cl-macrolet 'macrolet)
-        (defalias 'cl-second 'second)
-        (defalias 'cl-third 'third)
-        (unless (fboundp 'read-char-choice)
-          (defun read-char-choice (prompt chars)
-            "Emacs 23 compatability function."
-            (string-to-char (completing-read prompt chars)))))
-    (require 'cl-lib)))
+(require 'cl-lib)
 (require 'ebib-utils)
 (require 'ebib-keywords)
 (require 'ebib-db)
