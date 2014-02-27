@@ -271,11 +271,7 @@ a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
                                         (if (< not 0) "not " "")
                                         (if (< not 0) "" ""))
-                                (append  (list '("any" . 0)
-                                               '("=type=" . 0))
-                                         (mapcar #'(lambda (x)
-                                                     (cons x 0))
-                                                 (append ebib-unique-field-list ebib-additional-fields)))
+                                (append (list "any" "=type=") (-union (ebib-list-fields-uniquely (ebib-db-get-dialect ebib-cur-db)) ebib-additional-fields))
                                 nil nil nil 'ebib-field-history)))
     (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
                                        (if (< not 0) "not " "")
@@ -284,8 +280,8 @@ a logical `not' is applied to the selection."
                                        (if (string= field "=type=") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "=type=")
-                     (completing-read prompt ebib-entry-types nil t nil 'ebib-filters-history))
-                    ((string= field "keywords")
+                     (completing-read prompt (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) nil t nil 'ebib-filters-history))
+                    ((cl-equalp field "keywords")
                      (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keywords-history))
                     (t
                      (read-string prompt nil 'ebib-filters-history)))))
@@ -310,7 +306,7 @@ Return a list of entry keys that match DB's filter."
   (let ((filter (ebib-db-get-filter db)))
     (eval
      `(cl-macrolet ((contains (field regexp)
-                              `(ebib-search-in-entry ,regexp entry ,(unless (string= field "any") field))))
+                              `(ebib-search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
         (sort (delq nil (mapcar #'(lambda (key)
                                     (let ((entry (ebib-db-get-entry key db 'noerror)))
                                       (when ,filter

@@ -198,7 +198,7 @@ Optional argument DB specifies the database to check for."
   (let ((new (ebib-keywords-new-p)))
     (when (and new
                (or (eq ebib-keywords-file-save-on-exit 'always)
-                   (ebib-called-interactively-p)
+                   (called-interactively-p 'any)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
                         (y-or-n-p (format "New keywords were added. Save '%s'? "
                                           (file-name-nondirectory ebib-keywords-file)))))) ; strip path for succinctness

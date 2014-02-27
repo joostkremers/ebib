@@ -42,32 +42,31 @@
 (require 'cl-lib)
 (require 'ebib-utils)
 
-(defcustom ebib-biblatex-inheritance nil
-  "Inheritance scheme for cross-referencing.
-Inheritances are specified per entry type. The source is the
-field name in the cross-referencing entry, the target the field
-in the cross-referenced entry.
-
-To define inheritances for all entry types, specify `all' as the
-entry type. If you combine inheritances for `all' with
-entry-specific inheritances, the latter override the former."
-  :group 'ebib
-  :type '(repeat (group (string :tag "Entry type")
-                        (repeat :tag "Inherited fields"
-                                (group (string :tag "Source")
-                                       (string :tag "Target"))))))
-
 (defun ebib-remove-from-string (string remove)
   "Remove all the occurrences of REMOVE from STRING.
 Return value is the modified string. STRING itself is not
 changed. REMOVE can be a regex."
   (apply 'concat (split-string string remove)))
 
+;; Field aliases defined by BibLaTeX. If the first field in each pair does
+;; not have a value, the second field is checked.
+(defvar ebib-field-aliases '(("location" . "address")
+                             ("annotation" . "annote")
+                             ("eprinttype" . "archiveprefix")
+                             ("journaltitle" . "journal")
+                             ("sortkey" . "key")
+                             ("file" . "pdf")
+                             ("eprintclass" . "primaryclass")
+                             ("institution" . "school"))
+  "List of field aliases for BibLaTeX.")
+
 ;; each database is represented by a struct
 (cl-defstruct ebib-dbstruct
   (database (make-hash-table :test 'equal)) ; hashtable containing the database itself
   (strings)                                 ; alist with the @STRING definitions
   (preamble)                                ; string with the @PREAMBLE definition
+  (comments)                                ; list of @COMMENTS
+  (dialect)                                 ; the dialect of this database
   (cur-entry)                               ; the current entry
   (marked-entries)                          ; list of marked entries
   (filter)                                  ; the active filter
@@ -92,6 +91,22 @@ it is deleted."
   (setf (ebib-dbstruct-filename db) nil)
   (setf (ebib-dbstruct-modified db) nil)
   (setf (ebib-dbstruct-backup db) nil))
+
+(defun ebib-db-get-dialect (db)
+  "Return the BibTeX-dialect of DB."
+  (ebib-dbstruct-dialect db))
+
+(defun ebib-db-set-dialect (dialect db)
+  "Set the dialect of DB to DIALECT."
+  (setf (ebib-dbstruct-dialect db) dialect))
+
+(defun ebib-db-get-comments (db)
+  "Return a list of @COMMENTS for DB."
+  (ebib-dbstruct-comments db))
+
+(defun ebib-db-set-comment (comment db)
+  "Add COMMENT to the list of comments in DB."
+  (setf (ebib-dbstruct-comments db) (append (ebib-dbstruct-comments db) (list comment))))
 
 (defun ebib-db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
@@ -232,8 +247,8 @@ A field can be removed from the entry by passing NIL as VALUE and
 setting IF-EXISTS to 'overwrite.
 
 Return non-NIL upon success, or NIL if the value could not be stored."
-  (when (eq if-exists 'append)
-    (setq if-exists " "))
+  (if (eq if-exists 'append)
+      (setq if-exists " "))
   ;; we first retrieve the old value and the alist of all fields with the
   ;; relevant field removed
   (let* ((old-value (ebib-db-get-field-value field key db 'noerror))
@@ -275,13 +290,18 @@ cross-referenced entry. The return value is then a list of two
 elements. The first is the field value (or NIL if the field has
 no value), the second element indicates whether the value was
 retrieved from a cross-referenced entry. If so, it is the key of
-that entry, if not, the second value is NIL."
-  (let ((value (cdr (assoc field (ebib-db-get-entry key db noerror))))
-	(xref-key))
+that entry, if not, the second value is NIL."  
+  (let* ((entry (ebib-db-get-entry key db noerror))
+         (value (cdr (assoc-string field entry t)))
+         (xref-key))
+    (when (not value) ; check if there is a field alias
+      (let ((alias (cdr (assoc-string field ebib-field-aliases t))))
+        (if alias
+            (setq value (cdr (assoc-string alias entry t))))))
     (when (and (not value) xref)
-      (setq xref-key (ebib-db-get-field-value 'crossref key db 'noerror 'unbraced))
+      (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
       (when xref-key
-        (let* ((type (ebib-db-get-field-value '=type= xref-key db 'noerror))
+        (let* ((type (ebib-db-get-field-value "=type=" xref-key db 'noerror))
                (xref-field (ebib-db-get-xref-field field type)))
           (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror)))))
     (unless (or value noerror)
@@ -300,9 +320,9 @@ inheritance relations, so that e.g., the field `booktitle' may
 inherit from the field `title' in the cross-referenced entry.
 
 The inheritance scheme is stored in `ebib-biblatex-inheritance'."
-  (let ((inheritances (or (cadr (assoc entry-type ebib-biblatex-inheritance))
-                          (cadr (assoc 'all ebib-biblatex-inheritance)))))
-    (or (cadr (assoc field inheritances))
+  (let ((inheritances (or (cadr (assoc-string entry-type ebib-biblatex-inheritance t))
+                          (cadr (assoc-string "all" ebib-biblatex-inheritance t)))))
+    (or (cadr (assoc-string field inheritances t))
         field)))
 
 (defun ebib-db-set-string (abbr value db &optional if-exists)
@@ -340,6 +360,8 @@ set IF-EXISTS to 'overwrite."
 If ABBR does not exist, trigger an error, unless NOERROR is
 non-NIL, in which case return NIL. If UNBRACED is non-NIL, return
 the value without braces."
+  ;; I assume abbreviations should be case-sensitive, so I use assoc
+  ;; instead of assoc-string here.
   (let ((value (cdr (assoc abbr (ebib-dbstruct-strings db)))))
     (unless (or value noerror)
       (error "Ebib: @STRING abbreviation `%s' does not exist" abbr))

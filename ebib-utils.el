@@ -59,7 +59,7 @@
 
 (defgroup ebib-windows nil "Ebib window management" :group 'ebib)
 
-(defcustom ebib-default-type "article"
+(defcustom ebib-default-entry-type "Article"
   "The default type for a newly created BibTeX entry."
   :group 'ebib
   :type 'string)
@@ -96,10 +96,19 @@ directories."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
-(defcustom ebib-hidden-fields '("timestamp")
+(defcustom ebib-hidden-fields '("translator" "annotator" "commentator" "subtitle"
+                                "titleaddon" "editora" "editorb" "editorc" "journalsubtitle"
+                                "issuetitle" "issuesubtitle" "language" "origlanguage" "eid"
+                                "issue" "month" "version" "issn" "addendum" "eprint"
+                                "eprintclass" "eprinttype" "urldate" "timestamp" "location"
+                                "remark" "introduction" "foreword" "afterword" "maintitle"
+                                "mainsubtitle" "maintitleaddon" "part" "edition" "volumes"
+                                "isbn" "chapter" "pagetotal" "bookauthor" "booksubtitle"
+                                "booktitleaddon" "howpublished" "organization" "holder"
+                                "eventtitle" "eventdate" "venue" "isrn")
   "List of fields that are not displayed.
-These can be made visible with the menu option \"Show Hidden
-Fields\"."
+These can be made visible with the command \\[ebib-toggle-hidden]
+or through the menu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
@@ -379,91 +388,23 @@ entry-specific inheritances, the latter override the former."
                                 (group (string :tag "Source")
                                        (string :tag "Target"))))))
 
-(defvar ebib-unique-field-list nil
-  "Holds a list of all field names.")
-
-(defun ebib-set-unique-field-list (var value)
-  "Sets `ebib-unique-field-list' on the basis of `ebib-entry-types'"
-  (set-default var value)
-  (setq ebib-unique-field-list nil)
-  (mapc #'(lambda (entry)
-            (mapc #'(lambda (field)
-                      (add-to-list 'ebib-unique-field-list field t))
-                  (cadr entry))
-            (mapc #'(lambda (field)
-                      (add-to-list 'ebib-unique-field-list field t))
-                  (cl-caddr entry)))
-        value))
-
-(defcustom ebib-entry-types
-  '(("article"                                   ;; name of entry type
-     ("author" "title" "journal" "year")         ;; obligatory fields
-     ("volume" "number" "pages" "month" "note")) ;; optional fields
-
-    ("book"
-     ("author" "title" "publisher" "year")
-     ("editor" "volume" "number" "series" "address" "edition" "month" "note"))
-
-    ("booklet"
-     ("title")
-     ("author" "howpublished" "address" "month" "year" "note"))
-
-    ("inbook"
-     ("author" "title" "chapter" "pages" "publisher" "year")
-     ("editor" "volume" "series" "address" "edition" "month" "note"))
-
-    ("incollection"
-     ("author" "title" "booktitle" "publisher" "year")
-     ("editor" "volume" "number" "series" "type" "chapter" "pages" "address" "edition" "month" "note"))
-
-    ("inproceedings"
-     ("author" "title" "booktitle" "year")
-     ("editor" "pages" "organization" "publisher" "address" "month" "note"))
-
-    ("manual"
-     ("title")
-     ("author" "organization" "address" "edition" "month" "year" "note"))
-
-    ("misc"
-     ()
-     ("title" "author" "howpublished" "month" "year" "note"))
-
-    ("mastersthesis"
-     ("author" "title" "school" "year")
-     ("address" "month" "note"))
-
-    ("phdthesis"
-     ("author" "title" "school" "year")
-     ("address" "month" "note"))
-
-    ("proceedings"
-     ("title" "year")
-     ("editor" "publisher" "organization" "address" "month" "note"))
-
-    ("techreport"
-     ("author" "title" "institution" "year")
-     ("type" "number" "address" "month" "note"))
-
-    ("unpublished"
-     ("author" "title" "note")
-     ("month" "year")))
-
-  "List of entry type definitions for Ebib"
+(defcustom ebib-hide-cursor t
+  "Hide the cursor in the Ebib buffers."
   :group 'ebib
-  :type '(repeat (list :tag "Entry type" (string :tag "Name")
-                       (repeat :tag "Obligatory fields" (string :tag "Field"))
-                       (repeat :tag "Optional fields" (string :tag "Field"))))
-  :set 'ebib-set-unique-field-list)
+  :type '(choice (const :tag "Hide the cursor" t)
+                 (const :tag "Show the cursor" nil)))
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
+
+(defface ebib-overlay-face '((t (:inherit highlight)))
+  "Face used for the overlays."
+  :group 'ebib-faces)
 
 (defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
   "Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib-faces)
 
-(defface ebib-marked-face (if (featurep 'xemacs)
-                              '((t (:foreground "white" :background "red")))
-                            '((t (:inverse-video t))))
+(defface ebib-marked-face '((t (:inverse-video t)))
   "Face to indicate marked entries."
   :group 'ebib-faces)
 
@@ -478,11 +419,11 @@ entry-specific inheritances, the latter override the former."
 (defconst ebib-key-regexp "[^][^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
-;; buffers and highlights
+;; buffers and overlays
 (defvar ebib-buffer-alist nil "Alist of Ebib buffers.")
-(defvar ebib-index-highlight nil "Highlight to mark the current entry.")
-(defvar ebib-fields-highlight nil "Highlight to mark the current field.")
-(defvar ebib-strings-highlight nil "Highlight to mark the current string.")
+(defvar ebib-index-overlay nil "Overlay to mark the current entry.")
+(defvar ebib-fields-overlay nil "Overlay to mark the current field.")
+(defvar ebib-strings-overlay nil "Overlay to mark the current string.")
 
 ;; general bookkeeping
 (defvar ebib-field-history nil "Minibuffer field name history.")
@@ -523,11 +464,7 @@ entry-specific inheritances, the latter override the former."
 (defvar ebib-hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
 ;; these variables are set when the user enters the entry and strings buffer, respectively
-(defvar ebib-cur-entry-fields nil "The fields of the type of the current entry.")
 (defvar ebib-cur-strings-list nil "A sorted list of strings in the current database.")
-
-;; this is set by `ebib-fill-entry-buffer'
-(defvar ebib-current-field nil "The current field.")
 
 ;; and this one by `ebib-fill-strings-buffer'
 (defvar ebib-current-string nil "The current @STRING definition.")
@@ -542,15 +479,105 @@ entry-specific inheritances, the latter override the former."
 (eval-when-compile
   (defvar TeX-master))
 
-;; this is to keep XEmacs from complaining.
-(eval-when-compile
-  (if (featurep 'xemacs)
-      (defvar mark-active)))
+(defmacro with-current-ebib-buffer (buffer &rest body)
+  "Make BUFFER current and execute BODY.
+BUFFER is a symbol referring to a buffer in
+`ebib-buffer-alist'."
+  (declare (indent defun))
+  `(with-current-buffer (cdr (assq ,buffer ebib-buffer-alist))
+     ,@body))
 
-;; XEmacs has line-number, not line-number-at-pos.
+(defmacro with-ebib-buffer-writable (&rest body)
+  "Make the current buffer writable and execute BODY.
+Restore the buffer modified flag after executing BODY."
+  (declare (indent defun))
+  `(let ((modified (buffer-modified-p)))
+     (unwind-protect
+         (let ((buffer-read-only nil))
+           ,@body)
+       (set-buffer-modified-p modified))))
+
+(defmacro with-ebib-window-nondedicated (&rest body)
+  "Execute BODY with the current window non-dedicated.
+Restore the dedicated status after executing BODY."
+  (declare (indent defun))
+  `(let ((dedicated (window-dedicated-p)))
+     (unwind-protect
+         (progn
+           (set-window-dedicated-p (selected-window) nil)
+           ,@body)
+       (if dedicated
+           (set-window-dedicated-p (selected-window) t)))))
+
+(defmacro ebib-ifstring (bindvar then &rest else)
+  "Execute THEN only if STRING is nonempty.
+
+Format: (ebib-ifstring (var value) then-form [else-forms])
+
+VAR is bound to VALUE, which is evaluated. If VAR is a nonempty
+string, THEN-FORM is executed. If VAR is either \"\" or nil,
+ELSE-FORM is executed. Returns the value of THEN or of ELSE."
+  (declare (indent 2))
+  `(let ,(list bindvar)
+     (if (not (or (null ,(car bindvar))
+                  (equal ,(car bindvar) "")))
+         ,then
+       ,@else)))
+
+;; this needs to be wrapped in an eval-and-compile, to keep Emacs from
+;; complaining that ebib-execute-helper isn't defined when it compiles
+;; ebib-execute-when.
 (eval-and-compile
-  (if (featurep 'xemacs)
-      (defalias 'line-number-at-pos 'line-number)))
+  (defun ebib-execute-helper (env)
+    "Helper function for `ebib-execute-when'."
+    (cond
+     ((eq env 'entries)
+      'ebib-cur-keys-list)
+     ((eq env 'marked-entries)
+      '(and ebib-cur-db
+            (ebib-db-marked-entries-p ebib-cur-db)))
+     ((eq env 'database)
+      'ebib-cur-db)
+     ((eq env 'real-db)
+      '(and ebib-cur-db
+            (not (ebib-db-get-filter ebib-cur-db))))
+     ((eq env 'filtered-db)
+      '(and ebib-cur-db
+            (ebib-db-get-filter ebib-cur-db)))
+     ((eq env 'no-database)
+      '(not ebib-cur-db))
+     (t t))))
+
+(defmacro ebib-execute-when (&rest forms)
+  "Macro to facilitate writing Ebib functions.
+This functions essentially like a `cond' clause: the basic format
+is (ebib-execute-when FORMS ...), where each FORM is built up
+as (ENVIRONMENTS BODY). ENVIRONMENTS is a list of symbols (not
+quoted) that specify under which conditions BODY is to be
+executed. Valid symbols are:
+
+entries: execute when there are entries in the database,
+marked-entries: execute when there are marked entries in the database,
+database: execute if there is a database,
+no-database: execute if there is no database,
+real-db: execute when there is a database and it is not filtered,
+filtered-db: execute when there is a database and it is filtered,
+default: execute if all else fails.
+
+Just like with `cond', only one form is actually executed, the
+first one that matches. If ENVIRONMENT contains more than one
+condition, BODY is executed if they all match (i.e., the
+conditions are AND'ed.)"
+  (declare (indent defun))
+  `(cond
+    ,@(mapcar #'(lambda (form)
+                  (cons (if (= 1 (length (car form)))
+                            (ebib-execute-helper (caar form))
+                          `(and ,@(mapcar #'(lambda (env)
+                                              (ebib-execute-helper env))
+                                          (car form))))
+                        (cdr form)))
+              forms)))
 
 (defun ebib-log (type format-string &rest args)
   "Write a message to Ebib's log buffer.
@@ -563,7 +590,7 @@ to 1. The latter two can be used to signal the user to check the
 log for warnings or errors.
 
 This function adds a newline to the message being logged."
-  (with-current-buffer (cdr (assoc 'log ebib-buffer-alist))
+  (with-current-ebib-buffer 'log
     (cond
      ((eq type 'warning)
       (or ebib-log-error ; if ebib-error-log is already set to 1, we don't want to overwrite it!
@@ -578,62 +605,37 @@ This function adds a newline to the message being logged."
                                     "\n")
                    args))))
 
-(defun ebib-make-highlight (begin end buffer)
-  (let (highlight)
-    (if (featurep 'xemacs)
-        (progn
-          (setq highlight (make-extent begin end buffer))
-          (set-extent-face highlight 'highlight))
-      (progn
-        (setq highlight (make-overlay begin end buffer))
-        (overlay-put highlight 'face 'highlight)))
-    highlight))
+(defun ebib-make-overlay (begin end buffer)
+  (let (overlay)
+    (setq overlay (make-overlay begin end buffer))
+    (overlay-put overlay 'face 'ebib-overlay-face)
+    overlay))
 
-(defun ebib-move-highlight (highlight begin end buffer)
-  (if (featurep 'xemacs)
-      (set-extent-endpoints highlight begin end buffer)
-    (move-overlay highlight begin end buffer)))
-
-(defun ebib-highlight-start (highlight)
-  (if (featurep 'xemacs)
-      (extent-start-position highlight)
-    (overlay-start highlight)))
-
-(defun ebib-highlight-end (highlight)
-  (if (featurep 'xemacs)
-      (extent-end-position highlight)
-    (overlay-end highlight)))
-
-(defun ebib-delete-highlight (highlight)
-  (if (featurep 'xemacs)
-      (detach-extent highlight)
-    (delete-overlay highlight)))
-
-(defun ebib-set-index-highlight ()
-  (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+(defun ebib-set-index-overlay ()
+  (with-current-ebib-buffer 'index
     (beginning-of-line)
     (let ((beg (point)))
       (if ebib-index-display-fields
           (end-of-line)
         (skip-chars-forward "^ "))
-      (ebib-move-highlight ebib-index-highlight beg (point) (cdr (assoc 'index ebib-buffer-alist)))
+      (move-overlay ebib-index-overlay beg (point) (cdr (assq 'index ebib-buffer-alist)))
       (beginning-of-line))))
 
-(defun ebib-set-fields-highlight ()
-  (with-current-buffer (cdr (assoc 'entry ebib-buffer-alist))
+(defun ebib-set-fields-overlay ()
+  (with-current-ebib-buffer 'entry
     (beginning-of-line)
-    (let ((beg (point)))
-      (ebib-looking-at-goto-end "[^ \t\n\f]*")
-      (ebib-move-highlight ebib-fields-highlight beg (point) (cdr (assoc 'entry ebib-buffer-alist)))
-      (beginning-of-line))))
+    (save-excursion
+      (let ((beg (point)))
+        (ebib-looking-at-goto-end "[^ \t\n\f]*")
+        (move-overlay ebib-fields-overlay beg (point))))))
 
-(defun ebib-set-strings-highlight ()
-  (with-current-buffer (cdr (assoc 'strings ebib-buffer-alist))
+(defun ebib-set-strings-overlay ()
+  (with-current-ebib-buffer 'strings
     (beginning-of-line)
-    (let ((beg (point)))
-      (ebib-looking-at-goto-end "[^ \t\n\f]*")
-      (ebib-move-highlight ebib-strings-highlight beg (point) (cdr (assoc 'strings ebib-buffer-alist)))
-      (beginning-of-line))))
+    (save-excursion
+      (let ((beg (point)))
+        (ebib-looking-at-goto-end "[^ \t\n\f]*")
+        (move-overlay ebib-strings-overlay beg (point))))))
 
 (defun ebib-set-modified (mod &optional db)
   "Set the modified flag of the database DB to MOD.
@@ -644,7 +646,7 @@ to the current database."
     (setq db ebib-cur-db))
   (ebib-db-set-modified mod db)
   (when (eq db ebib-cur-db)
-    (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
+    (with-current-ebib-buffer 'index
       (set-buffer-modified-p mod))))
 
 (defun ebib-modified-p ()
@@ -801,25 +803,6 @@ the new value of point."
 ;; take special action (or do nothing) if that string is empty.
 ;; `ebib-ifstring' makes that easier:
 
-(defmacro ebib-ifstring (bindvar then &rest else)
-  "Execute THEN only if STRING is nonempty.
-
-Format: (ebib-ifstring (var value) then-form [else-forms])
-
-VAR is bound to VALUE, which is evaluated. If VAR is a nonempty
-string, THEN-FORM is executed. If VAR is either \"\" or nil,
-ELSE-FORM is executed. Returns the value of THEN or of ELSE."
-  (declare (indent 2))
-  `(let ,(list bindvar)
-     (if (not (or (null ,(car bindvar))
-                  (equal ,(car bindvar) "")))
-         ,then
-       ,@else)))
-
-(defmacro ebib-last1 (lst &optional n)
-  "Return the last (or Nth last) element of LST."
-  `(car (last ,lst ,n)))
-
 ;; we sometimes need to walk through lists.  these functions yield the
 ;; element directly preceding or following ELEM in LIST. in order to work
 ;; properly, ELEM must be unique in LIST, obviously. if ELEM is the
@@ -836,7 +819,7 @@ If ELEM is the first element, return nil."
   (if (or (equal elem (car list))
           (not (member elem list)))
       nil
-    (ebib-last1 list (1+ (length (member elem list))))))
+    (car (last list (1+ (length (member elem list)))))))
 
 (defun ebib-locate-bibfile (file &optional dirs)
   "Locate and/or expand FILE to an absolute filename.
@@ -858,45 +841,6 @@ dot."
   (if (file-name-extension filename)
       filename
     (concat filename ext)))
-
-(defmacro with-ebib-buffer-writable (&rest body)
-  "Make the current buffer writable and execute BODY.
-Restore the buffer modified flag after executing BODY."
-  (declare (indent defun))
-  `(let ((modified (buffer-modified-p)))
-     (unwind-protect
-         (let ((buffer-read-only nil))
-           ,@body)
-       (set-buffer-modified-p modified))))
-
-(defmacro with-ebib-window-nondedicated (&rest body)
-  "Execute BODY with the current window non-dedicated.
-Restore the dedicated status after executing BODY."
-  (declare (indent defun))
-  `(let ((dedicated (window-dedicated-p)))
-     (unwind-protect
-         (progn
-           (set-window-dedicated-p (selected-window) nil)
-           ,@body)
-       (if dedicated
-           (set-window-dedicated-p (selected-window) t)))))
-
-;; XEmacs doesn't know about propertize...
-(if (not (fboundp 'propertize))
-    (defun propertize (string &rest properties)
-      "Return a copy of STRING with text properties added.
-First argument is the string to copy.  Remaining arguments form a
-sequence of PROPERTY VALUE pairs for text properties to add to
-the result."
-      (let ((new-string (copy-sequence string)))
-        (add-text-properties 0 (length new-string) properties new-string)
-        new-string)))
-
-;; TODO decide what to do with this.
-;; (defun region-active ()
-;;   (if (featurep 'xemacs)
-;;       (region-active-p)
-;;     mark-active))
 
 (defun ebib-remove-from-string (string remove)
   "Return a copy of STRING with all the occurrences of REMOVE taken out.
@@ -955,61 +899,6 @@ MATCH acts just like the argument to MATCH-END, and defaults to
     (if (looking-at str)
         (goto-char (match-end match)))))
 
-;; this needs to be wrapped in an eval-and-compile, to keep Emacs from
-;; complaining that ebib-execute-helper isn't defined when it compiles
-;; ebib-execute-when.
-(eval-and-compile
-  (defun ebib-execute-helper (env)
-    "Helper function for `ebib-execute-when'."
-    (cond
-     ((eq env 'entries)
-      'ebib-cur-keys-list)
-     ((eq env 'marked-entries)
-      '(and ebib-cur-db
-            (ebib-db-marked-entries-p ebib-cur-db)))
-     ((eq env 'database)
-      'ebib-cur-db)
-     ((eq env 'real-db)
-      '(and ebib-cur-db
-            (not (ebib-db-get-filter ebib-cur-db))))
-     ((eq env 'filtered-db)
-      '(and ebib-cur-db
-            (ebib-db-get-filter ebib-cur-db)))
-     ((eq env 'no-database)
-      '(not ebib-cur-db))
-     (t t))))
-
-(defmacro ebib-execute-when (&rest forms)
-  "Macro to facilitate writing Ebib functions.
-This functions essentially like a `cond' clause: the basic format
-is (ebib-execute-when FORMS ...), where each FORM is built up
-as (ENVIRONMENTS BODY). ENVIRONMENTS is a list of symbols (not
-quoted) that specify under which conditions BODY is to be
-executed. Valid symbols are:
-
-entries: execute when there are entries in the database,
-marked-entries: execute when there are marked entries in the database,
-database: execute if there is a database,
-no-database: execute if there is no database,
-real-db: execute when there is a database and it is not filtered,
-filtered-db: execute when there is a database and it is filtered,
-default: execute if all else fails.
-
-Just like with `cond', only one form is actually executed, the
-first one that matches. If ENVIRONMENT contains more than one
-condition, BODY is executed if they all match (i.e., the
-conditions are AND'ed.)"
-  (declare (indent defun))
-  `(cond
-    ,@(mapcar #'(lambda (form)
-                  (cons (if (= 1 (length (car form)))
-                            (ebib-execute-helper (caar form))
-                          `(and ,@(mapcar #'(lambda (env)
-                                              (ebib-execute-helper env))
-                                          (car form))))
-                        (cdr form)))
-              forms)))
-
 ;; The numeric prefix argument is 1 if the user gave no prefix argument at
 ;; all. The raw prefix argument is not always a number. So we need to do
 ;; our own conversion.
@@ -1022,21 +911,16 @@ argument to a function or not."
 
 (defun ebib-called-with-prefix ()
   "Return T if the calling command was called with a prefix key."
-  (if (featurep 'xemacs)
-      (member (character-to-event ebib-prefix-key) (append (this-command-keys) nil))
-    (member (event-convert-list (list ebib-prefix-key))
-            (append (this-command-keys-vector) nil))))
+  (member (event-convert-list (list ebib-prefix-key))
+          (append (this-command-keys-vector) nil)))
 
-(defmacro ebib-called-interactively-p ()
-  "Return T if the command was called interactively.
-This is a compatibility macro for Emacs 23, in which
-called-interactively-p doesn't take an argument, while in Emacs
-24, it takes one obligatory argument."
-  (if (< emacs-major-version 24)
-      '(interactive-p)
-    '(called-interactively-p 'any)))
+(defun ebib-extract-bibtex-dialect (comment)
+  "Extract a BibTeX dialect definition from COMMENT.
+If no definition is found, return `nil'."
+  (if (string-match (concat "BibTeX-dialect = \\(" (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t) "\\)") comment)
+      (intern (match-string 1 comment))))
 
-;; TODO The exporting macros and functions shoudl be rewritten...
+;; TODO The exporting macros and functions should be rewritten...
 
 (defmacro ebib-export-to-db (num message copy-fn)
   "Export data to another database.
@@ -1077,30 +961,63 @@ display the actual filename."
              (append-to-file (point-min) (point-max) ,filename)
              (setq ebib-export-filename ,filename))))))
 
-(defun ebib-get-obl-fields (entry-type)
-  "Return the obligatory fields of ENTRY-TYPE."
-  (nth 1 (assoc entry-type ebib-entry-types)))
+(defun ebib-list-fields (entry-type &optional type dialect)
+  "List the fields of ENTRY-TYPE.
+TYPE specifies which fields to list. It is a symbol and can be
+one of the following: `obligatory' means to list only obligatory
+fields; `optional' means to list optional fields; `additional'
+means to list additional fields (i.e., fields defined in
+`ebib-additional-fields' and not present in ENTRY-TYPE); finally,
+`all' means to list all fields. TYPE defaults to `all'. DIALECT
+is the BibTeX dialect; possible values are listed in
+`bibtex-dialect-list'."
+  (or type (setq type 'all))
+  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (let (obligatory optional additional)
+    (when (memq type '(obligatory additional all))
+      (setq obligatory (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) t))
+                                             (nth 3 (assoc-string entry-type (bibtex-entry-alist dialect) t))))))
+    (when (memq type '(optional additional all))
+      (setq optional (mapcar #'car (append (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) t)))))) 
+    (when (memq type '(all additional))
+      (let ((fields (append obligatory optional)))
+        (setq additional (--remove (member-ignore-case it fields) ebib-additional-fields))))
+    (cond
+     ((eq type 'obligatory) obligatory)
+     ((eq type 'optional) optional)
+     ((eq type 'additional) additional)
+     ((eq type 'all) (append obligatory optional additional)))))
 
-(defun ebib-get-opt-fields (entry-type)
-  "Return the optional fields of ENTRY-TYPE."
-  (nth 2 (assoc entry-type ebib-entry-types)))
-
-(defun ebib-get-all-fields (entry-type)
-  "Return all the fields of ENTRY-TYPE as a list.
-The first element in the list is \"=type=\"."
-  (cons "=type=" (append (ebib-get-obl-fields entry-type)
-                       (ebib-get-opt-fields entry-type)
-                       ebib-additional-fields)))
-
-(defun ebib-get-extra-fields (entry)
+(defun ebib-get-extra-fields (entry) ; TODO test
   "Return an alist of extra fields and values of ENTRY.
 Extra fields are those fields that are not part of the definition
 of the entry type of ENTRY and are also not defined as additional
 fields. ENTRY is an alist representing a BibTeX entry."
-  (let ((fields (ebib-get-all-fields (cdr (assoc "=type=" entry)))))
-    (cl-remove-if #'(lambda (elt)
-                      (member (car elt) fields))
-                  entry)))
+  (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all)))
+    (--remove (member-ignore-case (car it) fields) entry)))
+
+(defun ebib-list-entry-types (&optional dialect)
+  "Return a list of entry types.
+This list depends on the value of DIALECT, which can have the
+values in `bibtex-dialect-list'. It defaults to the default value
+of `bibtex-dialect'."
+  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (mapcar #'car (bibtex-entry-alist dialect)))
+
+(defvar ebib-unique-field-alist nil
+  "Alist of BibTeX dialects and their fields.
+This variable is initialized by `ebib-list-field-uniquely'.")
+
+(defun ebib-list-fields-uniquely (&optional dialect)
+  "Return a list of all fields of BibTeX DIALECT."
+  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (or (cdr (assq dialect ebib-unique-field-alist)) 
+      (let (fields)
+        (mapc #'(lambda (entry)
+                  (setq fields (-union fields (ebib-list-fields (car entry) 'all dialect))))
+              (bibtex-entry-alist dialect))
+        (add-to-list 'ebib-unique-field-alist (cons dialect fields))
+        fields)))
 
 ;; This is simply to save some typing.
 (defun ebib-cur-entry-key ()
