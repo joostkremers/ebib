@@ -96,16 +96,17 @@ directories."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
-(defcustom ebib-hidden-fields '("translator" "annotator" "commentator" "subtitle"
-                                "titleaddon" "editora" "editorb" "editorc" "journalsubtitle"
-                                "issuetitle" "issuesubtitle" "language" "origlanguage" "eid"
-                                "issue" "month" "version" "issn" "addendum" "eprint"
-                                "eprintclass" "eprinttype" "urldate" "timestamp" "location"
-                                "remark" "introduction" "foreword" "afterword" "maintitle"
-                                "mainsubtitle" "maintitleaddon" "part" "edition" "volumes"
-                                "isbn" "chapter" "pagetotal" "bookauthor" "booksubtitle"
-                                "booktitleaddon" "howpublished" "organization" "holder"
-                                "eventtitle" "eventdate" "venue" "isrn")
+(defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
+                                "booksubtitle" "booktitleaddon" "chapter" "commentator"
+                                "edition" "editora" "editorb" "editorc" "eid" "eprint"
+                                "eprintclass" "eprinttype" "eventdate" "eventtitle"
+                                "foreword" "holder" "howpublished" "introduction" "isbn"
+                                "isrn" "issn" "issue" "issuesubtitle" "issuetitle"
+                                "journalsubtitle" "language" "location" "mainsubtitle"
+                                "maintitle" "maintitleaddon" "month" "origlanguage"
+                                "pagetotal" "part" "remark" "subtitle" "timestamp"
+                                "titleaddon" "translator" "urldate" "venue" "version"
+                                "volumes")
   "List of fields that are not displayed.
 These can be made visible with the command \\[ebib-toggle-hidden]
 or through the menu."
