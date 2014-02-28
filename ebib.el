@@ -1333,10 +1333,6 @@ well, if it is not already in a @COMMENT."
             (insert (format "@Comment{\n%s\n}\n\n" c)))
         (ebib-db-get-comments db)))
 
-(defun ebib-format-dialect (db)
-  "Write the BibTeX dialect of DB to the current buffer as an @COMMENT."
-  (insert (format "@Comment{\nBibTeX-dialect = %s\n}\n\n" (ebib-db-get-dialect db))))
-
 (defun ebib-format-strings (db)
   "Write the @STRINGs of DB into the current buffer in BibTeX format."
   (mapc #'(lambda (str)
@@ -1357,6 +1353,12 @@ in order for the sort value."
 
 (defun ebib-format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
+  (when (ebib-db-get-preamble db)
+    (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
+  (ebib-format-comments db)
+  (if (ebib-db-get-dialect db)
+      (insert (format "@Comment{\nBibTeX-dialect = %s\n}\n\n" (ebib-db-get-dialect db))))
+  (ebib-format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
   ;; return non-NIL if the first element is to be sorted before the second.
   (cl-flet
@@ -1377,12 +1379,7 @@ in order for the sort value."
                           while (cl-equalp sortstring-x sortstring-y))
                  (if (and sortstring-x sortstring-y)
                      (string< sortstring-x sortstring-y)
-                   (string< x y))))) ; compare entry keys
-    (when (ebib-db-get-preamble db)
-      (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
-    (ebib-format-comments db)
-    (ebib-format-dialect db)
-    (ebib-format-strings db)
+                   (string< x y)))))    ; compare entry keys
     ;; Only entries in `ebib-cur-keys-list' are saved, in case we're
     ;; writing a filtered db to a new file.
     (let ((sorted-list (copy-tree ebib-cur-keys-list)))
