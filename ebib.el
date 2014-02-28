@@ -610,6 +610,7 @@ COMMAND and PREFIXED are meaningless."
 (ebib-key index "s" ebib-save-current-database)
 (ebib-key index "S" ebib-edit-strings)
 (ebib-key index "u" ebib-browse-url)
+(ebib-key index "w" ebib-write-database)
 (ebib-key index "x" ebib-export-entry t)
 (ebib-key index "\C-xb" ebib-leave-ebib-windows)
 (ebib-key index "\C-xk" ebib-quit)

@@ -84,8 +84,7 @@
   (define-key ebib-filters-map "S" 'ebib-filters-save-filters)
   (define-key ebib-filters-map "v" 'ebib-filters-view-filter)
   (define-key ebib-filters-map "V" 'ebib-filters-view-all-filters)
-  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file)
-  (define-key ebib-filters-map "W" 'ebib-write-database))
+  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file))
 
 (defun ebib-filters-logical-and (not)
   "Filter the current database.
