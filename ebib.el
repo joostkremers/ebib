@@ -1333,7 +1333,7 @@ well, if it is not already in a @COMMENT."
 
 (defun ebib-format-dialect (db)
   "Write the BibTeX dialect of DB to the current buffer as an @COMMENT."
-  (insert (format "@Comment{\nBibTeX-dialect = %s}\n\n" (ebib-db-get-dialect db))))
+  (insert (format "@Comment{\nBibTeX-dialect = %s\n}\n\n" (ebib-db-get-dialect db))))
 
 (defun ebib-format-strings (db)
   "Write the @STRINGs of DB into the current buffer in BibTeX format."
