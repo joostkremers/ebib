@@ -1328,12 +1328,12 @@ added to the entry, possibly overwriting an existing timestamp."
 If DB is set to a specific dialect, write it to a @COMMENT as
 well, if it is not already in a @COMMENT."
   (mapc #'(lambda (c)
-            (insert (format "@Comment{\n%s\n}" c)))
+            (insert (format "@Comment{\n%s\n}\n\n" c)))
         (ebib-db-get-comments db)))
 
 (defun ebib-format-dialect (db)
   "Write the BibTeX dialect of DB to the current buffer as an @COMMENT."
-  (insert (format "@Comment{\nBibTeX-dialect = %s" (ebib-db-get-dialect db))))
+  (insert (format "@Comment{\nBibTeX-dialect = %s}\n\n" (ebib-db-get-dialect db))))
 
 (defun ebib-format-strings (db)
   "Write the @STRINGs of DB into the current buffer in BibTeX format."
@@ -1379,6 +1379,7 @@ in order for the sort value."
     (when (ebib-db-get-preamble db)
       (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
     (ebib-format-comments db)
+    (ebib-format-dialect db)
     (ebib-format-strings db)
     ;; Only entries in `ebib-cur-keys-list' are saved, in case we're
     ;; writing a filtered db to a new file.
