@@ -1528,7 +1528,7 @@ first entry with the current entry's key in its crossref field."
   "Set the BibTeX dialect of the current database.
 Valid values for DIALECT are listed in `bibtex-dialect-list'.
 DIALECT can also be `nil', in which case the dialect is unset."
-  (interactive)
+  (interactive "SDialect: ")
   (if (and dialect
            (not (memq dialect bibtex-dialect-list)))
       (error "Not a valid BibTeX dialect: %s" dialect)
