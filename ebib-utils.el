@@ -344,16 +344,6 @@ Each string is added to the preamble on a separate line."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-field-separator "; "
-  "String for separating elements in a field value.
-This is primarily used for separating keywords, but can also be
-used to separate elements in other fields. Note that the `file'
-field has its own separator (although it has the same default
-value) and the `url' field uses `ebib-url-regexp' to extract
-URLs."
-  :group 'ebib
-  :type '(string :tag "Field separator:"))
-
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
 This file is read when Ebib is started. It can be used to define

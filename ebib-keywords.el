@@ -45,6 +45,13 @@
 
 (defgroup ebib-keywords nil "Keyword settings for Ebib" :group 'ebib)
 
+(defcustom ebib-keywords-separator ", "
+  "String for separating keywords in the `keyword' field.
+This separator is also used to separate multiple identical
+fields, since those are most likely keyword fields."
+  :group 'ebib
+  :type '(string :tag "Keyword separator:"))
+
 (defcustom ebib-keywords-list nil
   "General list of keywords."
   :group 'ebib-keywords

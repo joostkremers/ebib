@@ -923,7 +923,7 @@ be added. (Whether a timestamp is actually added, also depends on
                ;; is nil in order to overwrite a possible timestamp. This
                ;; has to be handled better, though!
                (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
-                                                                                 ebib-field-separator
+                                                                                 ebib-keywords-separator
                                                                                'overwrite)
                                         'as-is))
       entry-key)))                      ; Return the entry key.
@@ -2310,9 +2310,9 @@ the beginning of the current line."
 (defun ebib-sort-keywords (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string."
   (mapconcat 'identity
-             (sort (delete-dups (split-string keywords ebib-field-separator t))
+             (sort (delete-dups (split-string keywords ebib-keywords-separator t))
                    'string<)
-             ebib-field-separator))
+             ebib-keywords-separator))
 
 (defun ebib-edit-keywords ()
   "Edit the keywords field."
@@ -2324,7 +2324,7 @@ the beginning of the current line."
              until (string= keyword "")
              do (let* ((conts (ebib-db-get-field-value 'keywords (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced))
                        (new-conts (if conts
-                                      (concat conts ebib-field-separator keyword)
+                                      (concat conts ebib-keywords-separator keyword)
                                     keyword)))
                   (ebib-db-set-field-value 'keywords
                                            (if ebib-keywords-field-keep-sorted
