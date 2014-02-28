@@ -656,7 +656,7 @@ number is also the argument to the function."
                                  :selected `(eq (ebib-db-get-dialect ebib-cur-db) (quote ,d))))
                      bibtex-dialect-list)
              (list ["Default" (ebib-set-dialect nil)
-                    :active t :style 'radio :selected (not (ebib-db-get-dialect ebib-cur-db))]))
+                    :active t :style radio :selected (not (ebib-db-get-dialect ebib-cur-db))]))
     "--"
     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib-keywords-new-p ebib-cur-db)]
     ["Save All New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
