@@ -647,6 +647,16 @@ number is also the argument to the function."
     ["Save Database As..." ebib-write-database ebib-cur-db]
     ["Close Database" ebib-close-database ebib-cur-db]
     "--"
+    ,(append (list "BibTeX Dialect")
+             (mapcar #'(lambda (d)
+                         (vector (format "%s" d) `(ebib-set-dialect (quote ,d))
+                                 :active t
+                                 :style 'radio
+                                 :selected `(eq (ebib-db-get-dialect ebib-cur-db) (quote ,d))))
+                     bibtex-dialect-list)
+             (list ["Default" (ebib-set-dialect nil)
+                    :active t :style 'radio :selected (not (ebib-db-get-dialect ebib-cur-db))]))
+    "--"
     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib-keywords-new-p ebib-cur-db)]
     ["Save All New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
     "--"
@@ -681,15 +691,6 @@ number is also the argument to the function."
       :style toggle :selected ebib-allow-identical-fields]
      ["Full Layout" ebib-toggle-layout :enable t
       :style toggle :selected (eq ebib-layout 'full)]
-     ,(append (list "BibTeX Dialect")
-              (mapcar #'(lambda (d)
-                          (vector (format "%s" d) `(ebib-set-dialect ,d)
-                                  :active t
-                                  :style 'radio
-                                  :selected `(eq ,d (ebib-db-get-dialect ebib-cur-db))))
-                      bibtex-dialect-list)
-              (list ["None" (ebib-db-set-dialect nil)
-                     :active t :style 'radio :selected (not (ebib-db-get-dialect ebib-cur-db))]))
      ["Customize Ebib" ebib-customize t])
     ["View Log Buffer" ebib-show-log t]
     ["Lower Ebib" ebib-lower t]
@@ -1526,10 +1527,12 @@ first entry with the current entry's key in its crossref field."
   "Set the BibTeX dialect of the current database.
 Valid values for DIALECT are listed in `bibtex-dialect-list'.
 DIALECT can also be `nil', in which case the dialect is unset."
+  (interactive)
   (if (and dialect
            (not (memq dialect bibtex-dialect-list)))
       (error "Not a valid BibTeX dialect: %s" dialect)
     (ebib-db-set-dialect dialect ebib-cur-db)
+    (ebib-set-modified t ebib-cur-db)
     (ebib-redisplay)))
 
 (defun ebib-delete-entry ()
