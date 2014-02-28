@@ -1355,9 +1355,11 @@ in order for the sort value."
   "Write database DB into the current buffer in BibTeX format."
   (when (ebib-db-get-preamble db)
     (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
-  (ebib-format-comments db)
+  ;; Save the dialect. This must happen early in the file so that when it
+  ;; is opened again, the dialect is set before entries are read.
   (if (ebib-db-get-dialect db)
-      (insert (format "@Comment{\nBibTeX-dialect = %s\n}\n\n" (ebib-db-get-dialect db))))
+      (insert (format "@Comment{\nbibtex-dialect: %s\n}\n\n" (ebib-db-get-dialect db))))
+  (ebib-format-comments db)
   (ebib-format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
   ;; return non-NIL if the first element is to be sorted before the second.

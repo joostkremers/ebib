@@ -908,7 +908,7 @@ argument to a function or not."
 (defun ebib-extract-bibtex-dialect (comment)
   "Extract a BibTeX dialect definition from COMMENT.
 If no definition is found, return `nil'."
-  (if (string-match (concat "BibTeX-dialect = \\(" (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t) "\\)") comment)
+  (if (string-match (concat "bibtex-dialect: \\(" (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t) "\\)") comment)
       (intern (match-string 1 comment))))
 
 ;; TODO The exporting macros and functions should be rewritten...
