@@ -916,9 +916,8 @@ be added. (Whether a timestamp is actually added, also depends on
         ;; if there is no legal entry key, we create a temporary key and try to read the entry anyway.
         (setq entry-key (ebib-generate-tempkey db))
         (ebib-log 'warning "Line %d: No entry key; generating temporary key." (line-number-at-pos)))
-      (if (ebib-db-get-entry entry-key db 'noerror)
-          (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)
-        (ebib-store-entry entry-key (list (cons "=type=" entry-type)) db timestamp))
+      (unless (ebib-store-entry entry-key (list (cons "=type=" entry-type)) db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
+        (ebib-log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key))
       (cl-loop for field = (ebib-find-bibtex-field limit)
                while field do
                ;; TODO We pass 'overwrite if `ebib-allow-identical-fields'
