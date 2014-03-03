@@ -331,7 +331,7 @@ loaded, switch to it. If KEY is given, jump to it."
   (ebib-setup-windows)
   ;; See if we have a file and/or a key.
   (if file
-      (ebib-load-bibtex-file-internal (ebib-locate-bibfile file (append ebib-bib-search-dirs (list (default-directory))))))
+      (ebib-load-bibtex-file-internal (ebib-locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
   (if key
       (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))
   (ebib-redisplay))
