@@ -262,7 +262,7 @@ Return non-NIL upon success, or NIL if the value could not be stored."
             (unless (eq nobrace 'as-is)
               (setq value (ebib-db-unbrace value)))
           (setq value (ebib-db-brace value)))
-	(setq fields-list (append fields-list (list (cons field value))))
+	(setq fields-list (append fields-list (list (cons field value)))))
       (ebib-db-set-entry key fields-list db 'overwrite))))
 
 (defun ebib-db-remove-field-value (field key db)
