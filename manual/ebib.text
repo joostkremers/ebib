@@ -210,7 +210,7 @@ You can also do it the other way around: if you're in the index buffer in Ebib, 
 
 The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for have to be defined before you can use them. How to do this is explained below, see [Defining Citation Commands](#defining-citation-commands). For LaTeX, only the `\cite` command is set up by default, so you may want to add some commands. In Orgmode files, Ebib inserts a link of the form `[[ebib:Jones1992][Jones (1992)]]`. (Actually, you'll need to provide the `Jones (1992)` yourself, when Ebib asks for a description.) If you use this, you should add the following line to your init file:
 
-    (org-add-link-type "ebib" 'ebib)
+    (org-add-link-type "ebib" 'ebib-open-org-link)
 
 This will allow Orgmode to recognise Ebib links and allow you to jump to the BibTeX entry in Ebib using `C-c C-o` (`org-open-at-point`, the normal Orgmode command for following links). Note that such org links aren't properly translated to LaTeX citation commands when you export your org file. For that, you'll need to set up a different link type for each citation command and provide functions for exporting them to LaTeX. The orgmode documentation explains how this is done. (You can, in fact, create similar functions for exporting to other formats.)
 
