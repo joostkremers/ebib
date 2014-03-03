@@ -262,12 +262,16 @@ Return non-NIL upon success, or NIL if the value could not be stored."
           (setq old-value nil))
          ((not (eq if-exists 'noerror))
           (error "Ebib: field `%s' exists in entry `%s'; cannot overwrite" field key)))
-      ;; Otherwise add the new field. (We use setcdr to modify the entry in place):
-      (setcdr (last entry) (list (cons field value)))
-      (setq old-value t)) ; This signals that there's nothing left to do.
-    ;; If there is (still) an old value, we do nothing.
+      ;; Otherwise add the new field. We just add the field here, the value
+      ;; is added later, so that we can put braces around it if needed.
+      ;; This also makes it easier to return `nil' when storing/changing
+      ;; the field value wasn't successful. Note: we use `setcdr' to modify
+      ;; the entry in place:
+      (setcdr (last entry) (list (list field)))
+      (setq elem (assoc-string field entry t))) ; Make sure `elem' points to the newly added field.
+    ;; If there is (still) an old value, do nothing.
     (unless old-value
-      ;; Otherwise we overwrite the existing entry. Note that to delete a
+      ;; Otherwise overwrite the existing entry. Note that to delete a
       ;; field, we set its value to `nil', rather than removing it
       ;; altogether from the database. In `ebib-format-fields', such fields
       ;; are ignored, so they're not saved.
