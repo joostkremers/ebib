@@ -364,10 +364,10 @@ in the field contents."
         (goto-char (point-min))))))
 
 ;;;###autoload
-(defun ebib (&optional file)
+(defun ebib (&optional file key)
   "Ebib, a BibTeX database manager.
 Optional argument FILE is a file to load. If FILE is already
-loaded, switch to it."
+loaded, switch to it. If KEY is given, jump to it."
   (interactive)
   ;; First do some stuff in the buffer from which Ebib was called.
   ;; Save the buffer from which Ebib is called.
@@ -377,20 +377,23 @@ loaded, switch to it."
   ;; See if there are local databases.
   (or ebib-local-bibtex-filenames
       (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-  (let (key)
-    (if file ;; Expand FILE if given.
-        (setq file (ebib-locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
-      ;; Otherwise see if there's a key at point.
-      (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
-    ;; Initialize Ebib if required.
-    (ebib-init)
-    ;; Set up the windows.
-    (ebib-setup-windows)
-    ;; See if we have a file or a key.
-    (cond
-     (file (ebib-load-bibtex-file-internal file))
-     (key (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))))
+  (or key (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f"))) ; See if there's a key at point.
+  ;; Initialize Ebib if required.
+  (ebib-init)
+  ;; Set up the windows.
+  (ebib-setup-windows)
+  ;; See if we have a file and/or a key.
+  (if file
+      (ebib-load-bibtex-file-internal (ebib-locate-bibfile file (append ebib-bib-search-dirs (list (default-directory))))))
+  (if key
+      (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))
   (ebib-redisplay))
+
+;;;###autoload
+(defun ebib-open-org-link (key)
+  "Open Ebib and jump to KEY.
+This is for use in Org-mode links."
+  (ebib nil key))
 
 (defun ebib-find-and-set-key (key files)
   "Make KEY the current entry.
