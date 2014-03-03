@@ -249,31 +249,33 @@ setting IF-EXISTS to 'overwrite.
 Return non-NIL upon success, or NIL if the value could not be stored."
   (if (eq if-exists 'append)
       (setq if-exists " "))
-  ;; we first retrieve the old value and the alist of all fields with the
-  ;; relevant field removed
-  (let* ((old-value (ebib-db-get-field-value field key db 'noerror))
-	 (fields-list (delete (cons field old-value) (ebib-db-get-entry key db))))
-    (when old-value
-      (cond
-       ((eq if-exists 'overwrite)
-	(setq old-value nil))
-       ((stringp if-exists)
-	(setq value (concat (ebib-db-unbrace old-value) if-exists (ebib-db-unbrace value)))
-	(setq old-value nil))
-       ((not (eq if-exists 'noerror))
-	(error "Ebib: field `%s' exists in entry `%s'; cannot overwrite" field key))))
-    ;; if there is an old value, we do nothing
+  (let* ((entry (ebib-db-get-entry key db))
+	 (elem (assoc-string field entry t))
+         (old-value (cdr elem)))
+    ;; If the field has a value, decide what to do:
+    (if old-value
+        (cond
+         ((eq if-exists 'overwrite)
+          (setq old-value nil))
+         ((stringp if-exists)
+          (setq value (concat (ebib-db-unbrace old-value) if-exists (ebib-db-unbrace value)))
+          (setq old-value nil))
+         ((not (eq if-exists 'noerror))
+          (error "Ebib: field `%s' exists in entry `%s'; cannot overwrite" field key)))
+      ;; Otherwise add the new field. (We use setcdr to modify the entry in place):
+      (setcdr (last entry) (list (cons field value)))
+      (setq old-value t)) ; This signals that there's nothing left to do.
+    ;; If there is (still) an old value, we do nothing.
     (unless old-value
-      ;; if there is a new value, it's added to FIELDS-LIST; if there isn't, we
-      ;; don't need to do anything, because we've already deleted the existing
-      ;; field value when we retrieved the entry above.
-      (when value
-        (if nobrace
-            (unless (eq nobrace 'as-is)
-              (setq value (ebib-db-unbrace value)))
-          (setq value (ebib-db-brace value)))
-	(push (cons field value) fields-list))
-      (ebib-db-set-entry key fields-list db 'overwrite))))
+      ;; Otherwise we overwrite the existing entry. Note that to delete a
+      ;; field, we set its value to `nil', rather than removing it
+      ;; altogether from the database. In `ebib-format-fields', such fields
+      ;; are ignored, so they're not saved.
+      (if (and value nobrace)
+          (unless (eq nobrace 'as-is)
+            (setq value (ebib-db-unbrace value)))
+        (setq value (ebib-db-brace value)))
+      (setcdr elem value))))
 
 (defun ebib-db-remove-field-value (field key db)
   "Remove FIELD from entry KEY in DB."
@@ -290,7 +292,7 @@ cross-referenced entry. The return value is then a list of two
 elements. The first is the field value (or NIL if the field has
 no value), the second element indicates whether the value was
 retrieved from a cross-referenced entry. If so, it is the key of
-that entry, if not, the second value is NIL."  
+that entry, if not, the second value is NIL."
   (let* ((entry (ebib-db-get-entry key db noerror))
          (value (cdr (assoc-string field entry t)))
          (xref-key))

@@ -1318,7 +1318,8 @@ added to the entry, possibly overwriting an existing timestamp."
     (when entry
       (insert (format "@%s{%s,\n" (cdr (assoc "=type=" entry)) key))
       (mapc #'(lambda (field)
-                (unless (or (string= (car field) "=type=")
+                (unless (or (not (cdr field)) ; Deleted fields have their value set to `nil'. See `ebib-db-set-field-value'.
+                            (string= (car field) "=type=")
                             (and (cl-equalp (car field) "timestamp") timestamp ebib-use-timestamp))
                   (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
             entry)
