@@ -264,7 +264,7 @@ The inheritance scheme is stored in `ebib-biblatex-inheritance'."
     (concat raw multiline string)))
 
 (defun ebib-format-fields (key &optional match-str db)
-  "Format the fields of entfr KEY in DB.
+  "Format the fields of entry KEY in DB.
 The fields are inserted in the current buffer with their values.
 If MATCH-STR is provided, then when it is present in the value,
 it is highlighted. DB defaults to the current database."
