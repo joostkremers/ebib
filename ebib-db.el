@@ -267,8 +267,7 @@ Return non-NIL upon success, or NIL if the value could not be stored."
       ;; This also makes it easier to return `nil' when storing/changing
       ;; the field value wasn't successful. Note: we use `setcdr' to modify
       ;; the entry in place:
-      (setcdr (last entry) (list (list field)))
-      (setq elem (assoc-string field entry t))) ; Make sure `elem' points to the newly added field.
+      (setq elem (car (setcdr (last entry) (list (cons field nil)))))) ; Make sure `elem' points to the newly added field.
     ;; If there is (still) an old value, do nothing.
     (unless old-value
       ;; Otherwise overwrite the existing entry. Note that to delete a
