@@ -871,15 +871,16 @@ DB. Return the string if one was read, NIL otherwise."
     (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
     (let ((beg (point)))
       (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[ \t\n\f]*=") 1)
-        (ebib-ifstring (abbr (buffer-substring-no-properties beg (point)))
-            (progn
-              (skip-chars-forward "^\"{" limit)
-              (let ((beg (point)))
-                (ebib-ifstring (string (if (ebib-match-delim-forward limit)
-                                     (buffer-substring-no-properties beg (1+ (point)))
-                                   nil))
-                    (unless (ebib-db-set-string abbr string db 'noerror)
-                      (ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
+          (ebib-ifstring (abbr (buffer-substring-no-properties beg (point)))
+              (progn
+                (skip-chars-forward "^\"{" limit)
+                (let ((beg (point)))
+                  (ebib-ifstring (string (if (ebib-match-delim-forward limit)
+                                             (buffer-substring-no-properties beg (1+ (point)))
+                                           nil))
+                      (if (ebib-db-set-string abbr string db 'noerror)
+                          string
+                        (ebib-log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
                                                    (line-number-at-pos) abbr)))))))
         (ebib-log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
 
