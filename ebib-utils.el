@@ -107,8 +107,8 @@ directories."
                                 "titleaddon" "translator" "urldate" "venue" "version"
                                 "volumes")
   "List of fields that are not displayed.
-These can be made visible with the command \\[ebib-toggle-hidden]
-or through the menu."
+These can be made visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]' in the index
+buffer or through the menu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
