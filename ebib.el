@@ -124,7 +124,7 @@ all else fails, pop up a new frame."
                      t)
     (error "Ebib is lowered. Use `M-x ebib' to restart")))
 
-(defun ebib-display-entry (entry-key)
+(defun ebib-display-entry-key (entry-key)
   "Display ENTRY-KEY in the index buffer at POINT."
   (with-current-ebib-buffer 'index
     (with-ebib-buffer-writable
@@ -211,8 +211,8 @@ all else fails, pop up a new frame."
         (add-text-properties 0 1 '(face highlight) multiline)))
     (concat raw multiline string)))
 
-(defun ebib-format-fields (key &optional match-str db)
-  "Format the fields of entry KEY in DB.
+(defun ebib-display-fields (key &optional match-str db)
+  "Display the fields of entry KEY in DB.
 The fields are inserted in the current buffer with their values.
 If MATCH-STR is provided, then when it is present in the value,
 it is highlighted. DB defaults to the current database."
@@ -270,7 +270,7 @@ to \"none\". This function sets `ebib-cur-keys-list'."
             (unless (member (ebib-cur-entry-key) ebib-cur-keys-list)
               (ebib-db-set-current-entry-key (car ebib-cur-keys-list) ebib-cur-db))
             (mapc #'(lambda (entry)
-                      (ebib-display-entry entry)
+                      (ebib-display-entry-key entry)
                       (when (member entry (ebib-db-list-marked-entries ebib-cur-db 'nosort))
                         (save-excursion
                           (forward-line -1)
@@ -307,7 +307,7 @@ in the field contents."
     (with-ebib-buffer-writable
       (erase-buffer)
       (when ebib-cur-keys-list         ; are there entries being displayed?
-        (ebib-format-fields (ebib-cur-entry-key) match-str)
+        (ebib-display-fields (ebib-cur-entry-key) match-str)
         (goto-char (point-min))))))
 
 ;;;###autoload

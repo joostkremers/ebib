@@ -273,8 +273,8 @@ Return non-NIL upon success, or NIL if the value could not be stored."
     (unless old-value
       ;; Otherwise overwrite the existing entry. Note that to delete a
       ;; field, we set its value to `nil', rather than removing it
-      ;; altogether from the database. In `ebib-format-fields', such fields
-      ;; are ignored, so they're not saved.
+      ;; altogether from the database. In `ebib-display-fields', such
+      ;; fields are ignored, so they're not saved.
       (if (and value nobrace)
           (unless (eq nobrace 'as-is)
             (setq value (ebib-db-unbrace value)))
