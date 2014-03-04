@@ -296,6 +296,7 @@ a logical `not' is applied to the selection."
                                  `(contains ,field ,regexp)
                                `(not (contains ,field ,regexp)))
                              ebib-cur-db))))))
+
 (defun ebib-filters-run-filter (db)
   "Run the filter of DB.
 Return a list of entry keys that match DB's filter."
