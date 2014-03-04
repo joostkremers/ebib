@@ -44,10 +44,9 @@
 (require 'dash)
 (require 'bibtex)
 
-;; make sure we can call bibtex-generate-autokey
+;; Make sure we can call bibtex-generate-autokey and set the BibTeX dialect.
 (declare-function bibtex-generate-autokey "bibtex" nil)
-(if (fboundp 'bibtex-set-dialect)
-    (bibtex-set-dialect)) ; this initializes some stuff that is needed for bibtex-generate-autokey
+(bibtex-set-dialect)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
