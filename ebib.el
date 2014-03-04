@@ -1366,7 +1366,7 @@ added to the entry, possibly overwriting an existing timestamp."
                 (unless (or (eq (car field) '=type=)
                             (and (eq (car field) 'timestamp) timestamp ebib-use-timestamp))
                   (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
-            entry)
+            (reverse entry))
       (if (and timestamp ebib-use-timestamp)
           (insert (format "\ttimestamp = {%s}" (format-time-string ebib-timestamp-format)))
         (delete-char -2))               ; the final ",\n" must be deleted
