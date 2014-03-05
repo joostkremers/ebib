@@ -59,26 +59,34 @@
 (defgroup ebib-windows nil "Ebib window management" :group 'ebib)
 
 (defcustom ebib-default-entry-type "Article"
-  "The default type for a newly created BibTeX entry."
+  "The default entry type.
+This is the entry type of a newly created entry."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-preload-bib-files nil
-  "List of BibTeX files to load automatically when Ebib starts."
+  "List of BibTeX files to load automatically when Ebib starts.
+This option allows you to specify which `.bib' file(s) Ebib
+should load automatically when it starts up. Specify one file per
+line. You can complete a partial filename with `M-TAB`."
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
 (defcustom ebib-bib-search-dirs '("~")
   "List of directories to search for BibTeX files.
-A file passed to the function `ebib' is searched in these
-directories if it is not in the current directory. similarly, the
-files in `ebib-preload-bib-files' are searched in these
-directories."
+This is a list of directories Ebib searches for `.bib' files to
+be preloaded. Note that only the directories themselves are
+searched, not their subdirectories. The directories in this list
+are also searched when the function `ebib' is passed a file
+name (e.g., from an Eshell command line)."
   :group 'ebib
   :type '(repeat :tag "Search directories for BibTeX files" (string :tag "Directory")))
 
 (defcustom ebib-create-backups t
-  "If set, create a backup file of a BibTeX file when it is first saved."
+  "Create a backup file.
+The first time a BibTeX file is saved, a backup file is created
+when it is first saved. Note that Ebib uses
+`make-backup-file-name' to create the name for the backup file."
   :group 'ebib
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
@@ -91,7 +99,14 @@ directories."
                                     "file"
                                     "timestamp"
                                     "doi")
-  "List of the additional fields."
+  "List of the additional fields.
+Additional fields are fields that are available for all entry
+types. Depending on the bibliography style, the value of these
+fields may appear in the bibliography, but you may also define
+fields that are just for personal use. Note that biblatex defines
+some of the fields here as optional fields for certain entry
+types. This is not problematic: in such cases, the filed appears
+among the optional fields, not among the additional fields."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
@@ -107,8 +122,11 @@ directories."
                                 "titleaddon" "translator" "urldate" "venue" "version"
                                 "volumes")
   "List of fields that are not displayed.
-These can be made visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]' in the index
-buffer or through the menu."
+The fields in this list are not displayed by default. Since
+BibLaTeX defines a large number of fields, it is not practical to
+display them all in the entry buffer. You can make these fields
+temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
+or through the enu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
@@ -117,35 +135,15 @@ buffer or through the menu."
 This option defines how Ebib displays the buffers its uses. By
 default, Ebib takes over the entire frame and creates two windows
 to display the index and the entry buffer. Alternatively, Ebib
-can display only the index buffer in a window of the size
-`ebib-index-window-size', displaying the entry buffer only when
-it is needed (see `ebib-popup-entry-window' as well). A third
-option uses the right part of the frame to the size of
-`ebib-width' to display both the index and the entry buffer."
+can use just the right part of the frame (the width can be
+specified with the option `ebib-width'). A third option is to
+display only the index window upon startup. The entry buffer will
+be displayed when you edit an entry of if you press
+\\[ebib-select-and-popup-entry]."
   :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
-                 (const :tag "Display only index window" index-only)
-                 (const :tag "Custom width" custom)))
-
-(defcustom ebib-popup-entry-window nil
-  "If non-NIL, create a popup window to display the entry window.
-By default, if `ebib-layout' is set to `index-only', Ebib will
-use an existing window to display the entry buffer when needed.
-If this option is set, however, Ebib will use the function
-`display-buffer-pop-up-window' to show the entry buffer,
-which (usually) means that a new window will be created.
-
-Note that setting this option has no effect unless `ebib-layout'
-is set to `index-only'."
-  :group 'ebib-windows
-  :type 'boolean)
-
-(defcustom ebib-window-vertical-split nil
-  "If non-NIL, display the index buffer at the left of the frame.
-If you set this option, you should probably set
-`ebib-index-window-size' to a larger value."
-  :group 'ebib-windows
-  :type 'boolean)
+                 (const :tag "Use right part of the frame" custom)
+                 (const :tag "Display only index window" index-only)))
 
 (defcustom ebib-width 80
   "Width of the Ebib windows.
@@ -160,10 +158,34 @@ This option only takes effect if `ebib-layout' is set to `custom'."
   :type '(choice (integer :label "Absolute width:")
                  (float :label "Relative width:" :value 0.3)))
 
+(defcustom ebib-popup-entry-window nil
+  "Create a popup window to display the entry window.
+If `ebib-layout' is set to `index-only', Ebib will use an
+existing window to display the entry buffer when needed. By
+setting this option, however, you can tell Ebib to use the
+function `display-buffer-pop-up-window' to show the entry buffer,
+which (usually) means that a new window will be created.
+
+Note that setting this option has no effect unless `ebib-layout'
+is set to `index-only'."
+  :group 'ebib-windows
+  :type 'boolean)
+
+(defcustom ebib-window-vertical-split nil
+  "Display the index buffer at the left of the frame.
+Setting this option makes Ebib display the index buffer at the
+left side of the frame rather than at the top. The width of the
+window will be `ebib-index-window-size', which you will probably
+have to set to a larger value."
+  :group 'ebib-windows
+  :type 'boolean)
+
 (defcustom ebib-index-window-size 10
   "The size of the index buffer window.
 This is either the height of the window, or, if
-`ebib-window-vertical-split' is set, the width of the window."
+`ebib-window-vertical-split' is set, the width of the window. The
+rest of the frame is used for the entry buffer, unless
+`ebib-layout' is set to `index-only'."
   :group 'ebib-windows
   :type 'integer)
 
@@ -173,29 +195,42 @@ This is either the height of the window, or, if
                                   mode-line-buffer-identification
                                   (:eval (if (ebib-cur-entry-key) "     Entry %l" "     No Entries"))
                                   (:eval (if (ebib-db-get-filter ebib-cur-db) " (Filtered)" "")))
-  "The mode line for the index window."
+  "The mode line for the index window.
+The mode line of the index window shows some Ebib-specific
+information. You can customize this information if you wish, or
+disable the Ebib-specific mode line altogether. Note that the
+entry buffer displays the standard Emacs mode line."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
 
 (defcustom ebib-index-display-fields nil
-  "List of the fields to display in the index buffer."
+  "List of the fields to display in the index buffer.
+By default, the index buffer only shows the entry key of each
+entry. If this provides too little information, you can have Ebib
+add the contents of certain fields to the index buffer."
   :group 'ebib
   :type '(repeat (string :tag "Index Field")))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
-If set, Ebib will not complain about duplicate keys but will
-instead create a unique key by adding an identifier to it.
-Identifiers are created from consecutive letters of the
-alphabet, starting with `b'."
+When adding new entries to the database, Ebib does not allow
+duplicate keys. By setting this option, you can tell Ebib to
+automatically create a unique key by adding `b', `c', etc. to it.
+This applies when Ebib automatically generates keys for new
+entries (see `ebib-autogenerate-keys'), when merging `.bib'
+files, and when changing a key."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-autogenerate-keys nil
-  "If set, Ebib generates key automatically.
-Uses the function `bibtex-generate-autokey', see there for
-customization options."
+  "Automatically generate keys for new entries.
+With this option set, Ebib does not ask for a key when you add a
+new entry. Instead, it gives the entry a temporary key and
+assigns a proper key when you finish editing the entry. This
+option uses the function `bibtex-generate-autokey', which has a
+number of user-customizable options. See that function's
+documentation for details."
   :group 'ebib
   :type 'boolean)
 
@@ -208,8 +243,20 @@ customization options."
                                       ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
                                       ("year" "[-@%K%< %A%>]"))))
   "A list of format strings to insert a citation into a buffer.
-These are used with `ebib-insert-bibtex-key' and
-`ebib-push-bibtex-key'."
+This option defines the citation commands that you can use when
+inserting a citation key into a buffer (with
+`ebib-insert-bibtex-key' or `ebib-push-bibtex-key'). The citation
+command (which can be any string, it does not have to correspond
+to an actual LaTeX macro) can be selected with TAB completion.
+You can define a different set of citation commands for each
+major mode. There is a catch-all option `any`, which is chosen
+when the major mode from which `ebib-insert-bibtex-key` is not on
+the list. By default, this is used for LaTeX citations, so as to
+cover all TeX and LaTeX modes.
+
+The format string that defines the actual citation command
+inserted in the buffer is described in the manual/info file in
+the section \"Defining Citation Commands\"."
   :group 'ebib
   :type '(repeat (list :tag "Mode" (symbol :tag "Mode name")
                        (repeat (list :tag "Citation command"
@@ -223,30 +270,44 @@ These are used with `ebib-insert-bibtex-key' and
 
 (defcustom ebib-sort-order nil
   "The fields on which the BibTeX entries are to be sorted in the BibTeX file.
-Sorting is done on different sort levels, and each sort level contains one
-or more sort keys."
+This option is described in the manual/info file in the section
+\"Sorting the .bib file\"."
   :group 'ebib
   :type '(repeat (repeat :tag "Sort level" (string :tag "Sort field"))))
 
 (defcustom ebib-save-xrefs-first nil
-  "If true, entries with a crossref field will be saved first in the BibTeX-file.
-Setting this option has unpredictable results for the sort order
-of entries, so it is not compatible with setting the Sort Order option."
+  "Save entries with a crossref field first in the BibTeX-file.
+For BibTeX's cross-referencing to work, the cross-referencing
+entries must appear in the `.bib` file before the
+cross-referenced entries. This option tells Ebib to save all
+entries with a `crossref` field first, so that BibTeX's
+crossreferencing options work as intended.
+
+Note: this option is not compatible with setting the option
+`ebib-sort-order'."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-use-timestamp nil
-  "If true, new entries will get a time stamp.
-The time stamp will be stored in a field \"timestamp\" that can
-be made visible with the command \\[ebib-toggle-hidden] in the
-index buffer."
+  "Add a timestamp to new entries.
+If this option is set, Ebib will add a `timestamp` field to every
+new entry, recording the date and time it was added to the
+database. See the section \"Timestamps\" in the manual/info file for
+details.
+
+Note that the `timestamp' field is normally hidden. You can make
+it visible with \\[ebib-toggle-hidden] in the index buffer or by
+customizing the option `ebib-hidden-fields'."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-timestamp-format "%a %b %e %T %Y"
   "Format of the time string used in the timestamp.
-The format is passed unmodified to `format-time-string', see the
-documentation of that function for details."
+This option specifies the format string that is used to create
+the timestamp. The default value produces a timestamp of the form
+\"Mon Mar 12 01:03:26 2007\". This option uses the Emacs function
+`format-time-string` to create the timestamp. See that function's
+documentation for details on customizing the format string."
   :group 'ebib
   :type 'string)
 
@@ -259,14 +320,26 @@ this command extracts the URL."
   :type 'string)
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
-  "Regular expression to extract URLs from a field."
+  "Regular expression to extract URLs from a field.
+This is the regular expression that Ebib uses to search for URLs
+in a field. With the default value, Ebib considers everything
+that is in a LaTeX `\\url{...}' command as a URL, and furthermore
+every string of text that starts with `http://' or `https://' and
+does not contain whitespace or one of the characters ' \" ; < or >.
+
+Note that the semicolon is added for consistency: it makes it
+possible to use the same separator in the `url' field as in the
+`file' field."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
-GNU/Emacs has a function call-browser, which is used if this
-option is unset."
+If this option is unset, Ebib uses the Emacs function
+`browse-url' to start a browser. If you prefer not to use this,
+you can set this option to the executable name of your preferred
+browser. For this to work, the browser that you use must be able
+to handle a URL on the command line."
   :group 'ebib
   :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
@@ -291,9 +364,11 @@ this command extracts the filename."
                                     ("ps" . "gv"))
   "List of file associations.
 Lists file extensions together with external programs to handle
-files with those extensions. If the external program is left
-blank, Ebib tries to handle the file internally in
-Emacs (e.g. with doc-view-mode)."
+files with those extensions. The program is searched for in
+`exec-path'.
+
+When you open a file for which no external program is defined,
+the file is opened in Emacs."
   :group 'ebib
   :type '(repeat (cons :tag "File association"
                        (string :tag "Extension")
@@ -303,52 +378,77 @@ Emacs (e.g. with doc-view-mode)."
 (defcustom ebib-filename-separator "; "
   "Separator for filenames in `ebib-standard-file-field'.
 The contents of the file field is split up using this separator,
-each string is assumed to be a filename."
+each chunk is assumed to be a filename.
+
+Note that the default value of this option consists of
+semicolon-space. This means you can have semicolons in your file
+names, as long as they're not followed by a space."
   :group 'ebib
   :type 'string)
 
 (defcustom ebib-file-search-dirs '("~")
-  "List of directories to search when viewing external files."
+  "List of directories to search when viewing external files.
+Note that searching is not recursive: only the files listed here
+are searched, not their subdirectories."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
-(defcustom ebib-print-preamble nil
+(defcustom ebib-print-preamble '("\\documentclass{article}")
   "Preamble used for the LaTeX file for printing the database.
-Each string is added to the preamble on a separate line."
+This option specifies the preamble that is to be added to the
+LaTeX file Ebib creates for printing the database as index cards.
+You can set your own `\\usepackage' commands, or anything else
+you may need. See the section \"Printing the Database\" in the
+manual/info file for details."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
 
 (defcustom ebib-print-newpage nil
-  "If set, each entry is printed on a separate page."
+  "Print each entry on a separate page.
+With this option set, Ebib puts every entry on a separate page
+when printing index cards. Otherwise the entries are separated by
+a small amount of whitespace only."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-print-multiline nil
-  "If set, multiline fields are included when printing the database."
+  "Include multiline field values when printing the database.
+When this options is set, Ebib includes multiline field values
+when you print index cards. Otherwise multiline values are
+excluded, which saves space."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-latex-preamble '("\\bibliographystyle{plain}")
-  "Preamble used for the LaTeX file for BibTeXing the database.
-Each string is added to the preamble on a separate line."
+(defcustom ebib-latex-preamble '("\\documentclass{article}" "\\bibliographystyle{plain}")
+  "Preamble for the LaTeX file for BibTeXing the database."
   :group 'ebib
   :type '(repeat (string :tag "Add to preamble")))
 
 (defcustom ebib-print-tempfile ""
-  "Temporary file for use with `ebib-print-database' and `ebib-latex-database'."
+  "Temporary file for printing the database.
+If set, the commands to print the database (`ebib-print-database'
+and `ebib-latex-database') write to this file. Otherwise you are
+asked for a file name."
   :group 'ebib
   :type '(file))
 
 (defcustom ebib-allow-identical-fields nil
-  "If set, Ebib handles multiple occurrences of a field gracefully."
+  "Handle multiple occurrences of a single field gracefully.
+Sometimes BibTeX entries from external sources use multiple
+identical fields for some reason (e.g., multiple `keyword'
+fields). Normally, only the last value is read by Ebib, but with
+this option set, all values are combined into a single field. See
+the section \"Multiple Identical Fields\" in the manual/info
+file."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-rc-file "~/.ebibrc"
   "Customization file for Ebib.
-This file is read when Ebib is started. It can be used to define
-custom keys or set customization variables (though the latter is
-easier through Customize)."
+This file is read when Ebib is started. It contains Lisp code,
+and can be used to define custom keys or set customization
+variables (as an alternative to the customization group), or even
+custom commands."
   :group 'ebib
   :type '(file :tag "Customization file:"))
 
@@ -482,7 +582,12 @@ BibTeX dialect is set to `BibTeX', this option is ignored."
                                              (const :tag "No inheritance" none)))))))
 
 (defcustom ebib-hide-cursor t
-  "Hide the cursor in the Ebib buffers."
+  "Hide the cursor in the Ebib buffers.
+Normally, the cursor is hidden in Ebib buffers. Instead, the
+highlight indicates which entry, field or string is active. By
+unsetting this option, you can make the cursor visible. Note that
+changing this option does not take effect until you restart
+Ebib (not Emacs)."
   :group 'ebib
   :type '(choice (const :tag "Hide the cursor" t)
                  (const :tag "Show the cursor" nil)))

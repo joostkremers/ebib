@@ -1816,7 +1816,6 @@ Either prints the entire database, or the marked entries."
                            (read-file-name "Use temp file: " "~/" nil nil)))
            (progn
              (with-temp-buffer
-               (insert "\\documentclass{article}\n\n")
                (when ebib-print-preamble
                  (mapc #'(lambda (string)
                            (insert (format "%s\n" string)))
@@ -1862,7 +1861,6 @@ Operates either on all entries or on the marked entries."
                          (read-file-name "Use temp file: " "~/" nil nil)))
          (progn
            (with-temp-buffer
-             (insert "\\documentclass{article}\n\n")
              (when ebib-latex-preamble
                (mapc #'(lambda (string)
                          (insert (format "%s\n" string)))
