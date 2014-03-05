@@ -2228,7 +2228,7 @@ The current field is simply the field that point is on. If point
 is on an empty line, return `nil'. This function leaves point at
 the beginning of the current line."
   (with-current-ebib-buffer 'entry
-      (beginning-of-line)
+    (beginning-of-line)
     (if (bobp)                   ; If we're at the beginning of the buffer,
         "=type="                 ; the current field is `=type='.
       (unless (eolp)             ; We're not on an empty line
