@@ -827,7 +827,7 @@ is set to T."
     (while (re-search-forward "^@" nil t) ; find the next entry
       (let ((beg (point)))
         (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
-          (let ((entry-type (downcase (buffer-substring-no-properties beg (point)))))
+          (let ((entry-type (buffer-substring-no-properties beg (point))))
             (ebib-looking-at-goto-end "[[:space:]]*[\(\{]")
             (cond
              ((cl-equalp entry-type "string") ; Note: cl-equalp compares strings case-insensitively.
