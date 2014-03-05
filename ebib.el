@@ -2252,9 +2252,13 @@ the beginning of the current line."
   "Move to the next field."
   (interactive)
   (if (= (forward-line) 1)
-      (beep)
-    (while (eolp)
+      (unless (called-interactively-p 'any)
+        (beep))
+    (while (and (not (eobp))
+                (eolp))
       (forward-line))
+    (if (eobp)
+        (forward-line -1)) ; make sure we're not on the line below the last entry.
     (ebib-set-fields-overlay)))
 
 (defun ebib-goto-first-field ()
