@@ -299,36 +299,47 @@ that entry, if not, the second value is NIL."
   (let* ((entry (ebib-db-get-entry key db noerror))
          (value (cdr (assoc-string field entry t)))
          (xref-key))
-    (when (not value) ; check if there is a field alias
+    (when (not value)                   ; check if there is a field alias
       (let ((alias (cdr (assoc-string field ebib-field-aliases t))))
         (if alias
             (setq value (cdr (assoc-string alias entry t))))))
     (when (and (not value) xref)
       (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
       (when xref-key
-        (let* ((type (ebib-db-get-field-value "=type=" xref-key db 'noerror))
-               (xref-field (ebib-db-get-xref-field field type)))
-          (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror)))))
+        (let* ((source-type (ebib-db-get-field-value "=type=" xref-key db 'noerror))
+               (xref-field (ebib-db-get-xref-field field (cdr (assoc "=type=" entry)) source-type (ebib-db-get-dialect db))))
+          (when xref-field
+            (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror))))))
     (unless (or value noerror)
       (error "Ebib: field `%s' does not exist in entry `%s'" field key))
     (when unbraced
-	(setq value (ebib-db-unbrace value)))
+      (setq value (ebib-db-unbrace value)))
     (if xref
 	(list value xref-key)
       value)))
 
-(defun ebib-db-get-xref-field (field entry-type)
-  "Return the field from which FIELD inherits in ENTRY-TYPE.
-For BibTeX, a field simply inherits from the same field in the
-cross-referenced entry. BibLaTeX, however, allows complex
-inheritance relations, so that e.g., the field `booktitle' may
-inherit from the field `title' in the cross-referenced entry.
-
-The inheritance scheme is stored in `ebib-biblatex-inheritance'."
-  (let ((inheritances (or (cadr (assoc-string entry-type ebib-biblatex-inheritance t))
-                          (cadr (assoc-string "all" ebib-biblatex-inheritance t)))))
-    (or (cadr (assoc-string field inheritances t))
-        field)))
+(defun ebib-db-get-xref-field (target-field target-entry source-entry &optional dialect)
+  "Return the field from which TARGET-FIELD inherits.
+SOURCE-ENTRY is the entry type of the cross-referenced
+entry, (the entry providing the value), TARGET-ENTRY the type of
+the cross-referencing entry, (the entry containing the field that
+should inherit a value). DIALECT is a BibTeX dialect and defaults
+to the default value of `bibtex-dialect'. If it is `BibTeX', the
+return value is simply TARGET-FIELD; otherwise the inheritances
+are taken from the variable `ebib-biblatex-inheritances'. If
+TARGET-FIELD cannot inherit a value, this function returns
+`nil'."
+  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (if (eq dialect 'BibTeX)
+      target-field
+    (let* ((inheritance (cl-third (cl-find-if #'(lambda (e)
+                                                  (and (string-match-p (concat "\\b" target-entry "\\b") (cl-first e))
+                                                       (string-match-p (concat "\\b" source-entry "\\b") (cl-second e))))
+                                              ebib-biblatex-inheritances)))
+           (source-field (or (cdr (assoc-string target-field inheritance t))
+                             (cdr (assoc-string target-field (cl-third (assoc-string "all" ebib-biblatex-inheritances t)) t)))))
+      (unless (eq source-field 'none)
+        (or source-field target-field)))))
 
 (defun ebib-db-set-string (abbr value db &optional if-exists)
   "Set the @string definition ABBR in database DB to VALUE.

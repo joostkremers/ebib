@@ -363,20 +363,123 @@ unset the option entirely."
   :group 'ebib
   :type '(repeat (string :tag "Extension")))
 
-(defcustom ebib-biblatex-inheritance nil
-  "Inheritance scheme for cross-referencing.
-Inheritances are specified per entry type. The source is the
-field name in the cross-referencing entry, the target the field
-in the cross-referenced entry.
+(defcustom ebib-biblatex-inheritances '(("all"
+                                         "all"
+                                         (("ids" . none)
+                                          ("crossref" . none)
+                                          ("xref" . none)
+                                          ("entryset" . none)
+                                          ("entrysubtype" . none)
+                                          ("execute" . none)
+                                          ("label" . none)
+                                          ("options" . none)
+                                          ("presort" . none)
+                                          ("related" . none)
+                                          ("relatedoptions" . none)
+                                          ("relatedstring" . none)
+                                          ("relatedtype" . none)
+                                          ("shorthand" . none)
+                                          ("shorthandintro" . none)
+                                          ("sortkey" . none)))
 
-To define inheritances for all entry types, specify `all' as the
-entry type. If you combine inheritances for `all' with
-entry-specific inheritances, the latter override the former."
+                                        ("inbook, bookinbook, suppbook"
+                                         "mvbook, book"
+                                         (("author" . "author")
+                                          ("bookauthor" . "author")))
+
+                                        ("book, inbook, bookinbook, suppbook"
+                                         "mvbook"
+                                         (("maintitle" . "title")
+                                          ("mainsubtitle" . "subtitle")
+                                          ("maintitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("collection, reference, incollection, inreference, suppcollection"
+                                         "mvcollection, mvreference"
+                                         (("maintitle" . "title")
+                                          ("mainsubtitle" . "subtitle")
+                                          ("maintitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("proceedings, inproceedings"
+                                         "mvproceedings"
+                                         (("maintitle" . "title")
+                                          ("mainsubtitle" . "subtitle")
+                                          ("maintitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("inbook, bookinbook, suppbook"
+                                         "book"
+                                         (("booktitle" . "title")
+                                          ("booksubtitle" . "subtitle")
+                                          ("booktitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("incollection, inreference, suppcollection"
+                                         "collection, reference"
+                                         (("booktitle" . "title")
+                                          ("booksubtitle" . "subtitle")
+                                          ("booktitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("inproceedings"
+                                         "proceedings"
+                                         (("booktitle" . "title")
+                                          ("booksubtitle" . "subtitle")
+                                          ("booktitleaddon" . "titleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))                                       
+                                        ("article, suppperiodical"
+                                         "periodical"
+                                         (("title" . "journaltitle")
+                                          ("subtitle" . "journalsubtitle")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none))))
+  "Inheritance scheme for cross-referencing.
+This option allows you to define inheritances for BibLaTeX.
+Inheritances are specified for pairs of target and source entry
+type, where the target is the cross-referencing entry and the
+source the cross-referenced entry. For each pair, specify the
+fields that can inherit a value (the targets) and the fields that
+they inherit from (the sources).
+
+Inheritances for all entry types can be defined by specifying
+`all' as the entry type. The entry type may also be
+a (comma-separated) list of entry types.
+
+If no inheritance rule is set up for a given entry type+field
+combination, the field inherits from the same-name field in the
+cross-referenced entry. If no inheritance should take place, set
+the source field to \"No inheritance\".
+
+Note that this option is only relevant for BibLaTeX. If the
+BibTeX dialect is set to `BibTeX', this option is ignored."
   :group 'ebib
-  :type '(repeat (group (string :tag "Entry type")
-                        (repeat :tag "Inherited fields"
-                                (group (string :tag "Source")
-                                       (string :tag "Target"))))))
+  :type '(repeat (list (string :tag "Target entry type(s)")
+                       (string :tag "Source entry type(s)")
+                       (repeat (cons :tag "Inheritance"
+                                     (string :tag "Target field")
+                                     (choice (string :tag "Source field)")
+                                             (const :tag "No inheritance" none)))))))
 
 (defcustom ebib-hide-cursor t
   "Hide the cursor in the Ebib buffers."
