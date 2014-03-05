@@ -443,7 +443,7 @@ file."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-rc-file "~/.ebibrc"
+(defcustom ebib-rc-file "~/.emacs.d/ebibrc"
   "Customization file for Ebib.
 This file is read when Ebib is started. It contains Lisp code,
 and can be used to define custom keys or set customization
