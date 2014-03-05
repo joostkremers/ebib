@@ -265,9 +265,11 @@ Return non-NIL upon success, or NIL if the value could not be stored."
       ;; Otherwise add the new field. We just add the field here, the value
       ;; is added later, so that we can put braces around it if needed.
       ;; This also makes it easier to return `nil' when storing/changing
-      ;; the field value wasn't successful. Note: we use `setcdr' to modify
-      ;; the entry in place:
-      (setq elem (car (setcdr (last entry) (list (cons field nil)))))) ; Make sure `elem' points to the newly added field.
+      ;; the field value wasn't successful. Note that if `elem' is
+      ;; non-`nil', we mustn't add the field again. Note also: we use
+      ;; `setcdr' to modify the entry in place.
+      (unless elem
+        (setq elem (car (setcdr (last entry) (list (cons field nil))))))) ; Make sure `elem' points to the newly added field.
     ;; If there is (still) an old value, do nothing.
     (unless old-value
       ;; Otherwise overwrite the existing entry. Note that to delete a
