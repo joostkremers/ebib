@@ -677,6 +677,12 @@ Ebib (not Emacs)."
 (eval-when-compile
   (defvar TeX-master))
 
+(defun ebib-buffer (buffer)
+  "Return the buffer object referred to by BUFFER.
+BUFFER is a symbol referring to a buffer in
+`ebib-buffer-alist'."
+  (cdr (assq buffer ebib-buffer-alist)))
+
 (defmacro with-current-ebib-buffer (buffer &rest body)
   "Make BUFFER current and execute BODY.
 BUFFER is a symbol referring to a buffer in

@@ -71,11 +71,11 @@ Note, The argument ALIST has no function."
   (let (window)
     (cond
      ;; the index buffer can only be displayed in its dedicated window.
-     ((eq buffer (cdr (assq 'index ebib-buffer-alist)))
+     ((eq buffer (ebib-buffer 'index))
       (setq window (get-buffer-window buffer)))
      ;; if ebib-layout isn't full, the multiline buffer should not be
      ;; displayed in an Ebib buffer.
-     ((and (eq buffer (cdr (assq 'multiline ebib-buffer-alist)))
+     ((and (eq buffer (ebib-buffer 'multiline))
            (not (eq ebib-layout 'full)))
       (setq window nil))
      (t (let ((buffers (delq nil (mapcar #'(lambda (bf)
@@ -115,7 +115,7 @@ If there is no Ebib window, use the largest non-dedicated window
 or, if `ebib-layout' is set to `popup', pop up a new window. If
 all else fails, pop up a new frame."
   (if (or (not (eq buffer 'index))
-          (get-buffer-window (cdr (assq 'index ebib-buffer-alist))))
+          (get-buffer-window (ebib-buffer 'index)))
       (pop-to-buffer (cdr (assq buffer ebib-buffer-alist))
                      '((ebib-display-buffer-reuse-window
                         ebib-display-buffer-largest-window
@@ -316,15 +316,15 @@ in the field contents."
 Optional argument FILE is a file to load. If FILE is already
 loaded, switch to it. If KEY is given, jump to it."
   (interactive)
-  ;; First do some stuff in the buffer from which Ebib was called.
   ;; Save the buffer from which Ebib is called.
   (setq ebib-buffer-before (current-buffer))
-  ;; Set the push buffer to the current buffer.
+  ;; And set it as the buffer to push entries to.
   (setq ebib-push-buffer (current-buffer))
   ;; See if there are local databases.
   (or ebib-local-bibtex-filenames
       (setq ebib-local-bibtex-filenames (ebib-get-local-databases)))
-  (or key (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f"))) ; See if there's a key at point.
+  ;; See if there's a key at point.
+  (or key (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
   ;; Initialize Ebib if required.
   (ebib-init)
   ;; Set up the windows.
@@ -386,9 +386,9 @@ the buffers, reads the rc file and loads the files in
                                                       (ebib-read-file-to-list ebib-keywords-file) nil)))
     (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
     (ebib-filters-load-file ebib-filters-default-file)
-    (setq ebib-index-overlay (ebib-make-overlay 1 1 (cdr (assq 'index ebib-buffer-alist))))
-    (setq ebib-fields-overlay (ebib-make-overlay 1 1 (cdr (assq 'entry ebib-buffer-alist))))
-    (setq ebib-strings-overlay (ebib-make-overlay 1 1 (cdr (assq 'strings ebib-buffer-alist))))
+    (setq ebib-index-overlay (ebib-make-overlay 1 1 (ebib-buffer 'index)))
+    (setq ebib-fields-overlay (ebib-make-overlay 1 1 (ebib-buffer 'entry)))
+    (setq ebib-strings-overlay (ebib-make-overlay 1 1 (ebib-buffer 'strings)))
     (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
     (load ebib-rc-file t)
     (if ebib-preload-bib-files
@@ -398,10 +398,16 @@ the buffers, reads the rc file and loads the files in
               ebib-preload-bib-files))
     (setq ebib-initialized t)))
 
+;; - `ebib-entry-types`: removed. Use `bibtex-BibTeX-entry-alist` and `bibtex-biblatex-entry-alist` instead.
+;; - `ebib-default-entry`: renamed to `ebib-default-entry-type`; type has changed to `string`.
+;; - `ebib-additional-fields`: type has changed to `list of strings`.
+;; - `ebib-standard-url-field`, `ebib-standard-file-field`: type has changed to `string`.
+;; - `ebib-biblatex-inheritance`: renamed to `ebib-biblatex-inheritances` (note the `s`); type has changed.
+
 (defun ebib-setup-windows ()
   "Create Ebib's window configuration in the current frame."
   ;; If the index buffer is visible, just switch to it.
-  (let ((index-window (get-buffer-window (cdr (assq 'index ebib-buffer-alist)))))
+  (let ((index-window (get-buffer-window (ebib-buffer 'index))))
     (if index-window
         (select-window index-window)
       ;; Save the current window configuration.
@@ -420,9 +426,9 @@ the buffers, reads the rc file and loads the files in
       (let* ((index-window (selected-window))
              (entry-window (split-window index-window ebib-index-window-size
                                          ebib-window-vertical-split)))
-        (switch-to-buffer (cdr (assq 'index ebib-buffer-alist)))
+        (switch-to-buffer (ebib-buffer 'index))
         (unless (eq ebib-layout 'index-only)
-          (set-window-buffer entry-window (cdr (assq 'entry ebib-buffer-alist))))
+          (set-window-buffer entry-window (ebib-buffer 'entry)))
         (set-window-dedicated-p index-window t)
         (if (eq ebib-layout 'custom)
             (set-window-dedicated-p entry-window t))))))
@@ -1186,9 +1192,9 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
                        (with-ebib-buffer-writable
                          (erase-buffer))
                        (delete-overlay (cadr buf))))
-                 (list (list (cdr (assq 'entry ebib-buffer-alist)) ebib-fields-overlay)
-                       (list (cdr (assq 'index ebib-buffer-alist)) ebib-index-overlay)
-                       (list (cdr (assq 'strings ebib-buffer-alist)) ebib-strings-overlay)))
+                 (list (list (ebib-buffer 'entry) ebib-fields-overlay)
+                       (list (ebib-buffer 'index) ebib-index-overlay)
+                       (list (ebib-buffer 'strings) ebib-strings-overlay)))
            ;; multiline edit buffer
            (with-current-ebib-buffer 'multiline
              (with-ebib-buffer-writable
@@ -2218,7 +2224,7 @@ If the key of the current entry matches the pattern
     (switch-to-buffer nil t)))
   (ebib-pop-to-buffer 'index)
   (delete-overlay ebib-fields-overlay)
-  ;; (select-window (get-buffer-window (cdr (assq 'index ebib-buffer-alist))))
+  ;; (select-window (get-buffer-window (ebib-buffer 'index)))
   (if (string-match "<new-entry[0-9]+>" (ebib-cur-entry-key))
       (ebib-generate-autokey)))
 
