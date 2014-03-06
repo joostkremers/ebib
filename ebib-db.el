@@ -280,7 +280,8 @@ Return non-NIL upon success, or NIL if the value could not be stored."
           (unless (eq nobrace 'as-is)
             (setq value (ebib-db-unbrace value)))
         (setq value (ebib-db-brace value)))
-      (setcdr elem value))))
+      (setcdr elem value)
+      t))) ; make sure we return non-`nil'.
 
 (defun ebib-db-remove-field-value (field key db)
   "Remove FIELD from entry KEY in DB."

@@ -222,19 +222,21 @@ it is highlighted. DB defaults to the current database."
          (entry-type (cdr (assoc "=type=" entry)))
          (obl-fields (ebib-list-fields entry-type 'obligatory))
          (opt-fields (ebib-list-fields entry-type 'optional))
-         (add-fields (ebib-list-fields entry-type 'additional)))
+         (add-fields (ebib-list-fields entry-type 'additional))
+         (extra-fields (mapcar #'car (ebib-get-extra-fields (ebib-db-get-entry key ebib-cur-db)))))
     (insert (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
     (mapc #'(lambda (fields)
-              (insert "\n")
-              (mapcar #'(lambda (field)
-                          (unless (and (member-ignore-case field ebib-hidden-fields)
-                                       ebib-hide-hidden-fields)
-                            (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
-                            (insert (or (ebib-get-field-highlighted field key match-str)
-                                        ""))
-                            (insert "\n")))
-                      fields))
-          (list obl-fields opt-fields add-fields))))
+              (when fields ; If one of the sets is empty, we don't want an extra empty line.
+                (insert "\n")
+                (mapcar #'(lambda (field)
+                            (unless (and (member-ignore-case field ebib-hidden-fields)
+                                         ebib-hide-hidden-fields)
+                              (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
+                              (insert (or (ebib-get-field-highlighted field key match-str)
+                                          ""))
+                              (insert "\n")))
+                        fields)))
+          (list obl-fields opt-fields add-fields extra-fields))))
 
 (defun ebib-redisplay ()
   "Redisplay the index and entry buffers."
@@ -2177,6 +2179,7 @@ The user is prompted for the buffer to push the entry into."
     (define-key map [end] 'ebib-goto-last-field)
     (define-key map [return] 'ebib-edit-field)
     (define-key map " " 'ebib-goto-next-set)
+    (define-key map "a" 'ebib-add-field)
     (define-key map "b" 'ebib-goto-prev-set)
     (define-key map "c" 'ebib-copy-field-contents)
     (define-key map "d" 'ebib-delete-field-contents)
@@ -2302,6 +2305,20 @@ the beginning of the current line."
       (forward-line -1))
     (forward-line -1)                   ; and move beyond it.
     (ebib-set-fields-overlay)))
+
+(defun ebib-add-field (field)
+  "Add a field to the current entry."
+  (interactive "sField: ")
+  ;; We store the field with a `nil' value and let the user edit it later.
+  (let ((type (ebib-db-get-field-value "=type=" (ebib-cur-entry-key) ebib-cur-db)))
+    (if (or (member-ignore-case field (ebib-list-fields type 'all))
+            (not (ebib-db-set-field-value field nil (ebib-cur-entry-key) ebib-cur-db 'noerror)))
+        (error "Field already exists in entry `%s'" (ebib-cur-entry-key)))
+    (ebib-fill-entry-buffer)
+    (re-search-forward (concat "^" field))
+    (ebib-set-fields-overlay)
+    (ebib-set-modified t)
+    (ebib-edit-field)))
 
 (defun ebib-edit-entry-type ()
   "Edit the entry type."
