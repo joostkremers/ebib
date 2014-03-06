@@ -326,7 +326,8 @@ loaded, switch to it. If KEY is given, jump to it."
   ;; See if there's a key at point.
   (or key (setq key (ebib-read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
   ;; Initialize Ebib if required.
-  (ebib-init)
+  (unless ebib-initialized
+    (ebib-init))
   ;; Set up the windows.
   (ebib-setup-windows)
   ;; See if we have a file and/or a key.
@@ -377,26 +378,25 @@ CHARS is a string of characters that should not occur in the string."
 This function sets all variables to their initial values, creates
 the buffers, reads the rc file and loads the files in
 `ebib-preload-bib-files'."
-  (unless ebib-initialized
-    (setq ebib-saved-window-config nil)
-    (ebib-create-buffers)
-    (if (and ebib-keywords-file
-             (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
-        (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
-                                                      (ebib-read-file-to-list ebib-keywords-file) nil)))
-    (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
-    (ebib-filters-load-file ebib-filters-default-file)
-    (setq ebib-index-overlay (ebib-make-overlay 1 1 (ebib-buffer 'index)))
-    (setq ebib-fields-overlay (ebib-make-overlay 1 1 (ebib-buffer 'entry)))
-    (setq ebib-strings-overlay (ebib-make-overlay 1 1 (ebib-buffer 'strings)))
-    (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
-    (load ebib-rc-file t)
-    (if ebib-preload-bib-files
-        (mapc #'(lambda (file)
-                  (ebib-load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
-                                                      file)))
-              ebib-preload-bib-files))
-    (setq ebib-initialized t)))
+  (setq ebib-saved-window-config nil)
+  (ebib-create-buffers)
+  (if (and ebib-keywords-file
+           (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
+      (add-to-list 'ebib-keywords-files-alist (list (file-name-directory ebib-keywords-file)
+                                                    (ebib-read-file-to-list ebib-keywords-file) nil)))
+  (setq ebib-keywords-list-per-session (copy-tree ebib-keywords-list))
+  (ebib-filters-load-file ebib-filters-default-file)
+  (setq ebib-index-overlay (ebib-make-overlay 1 1 (ebib-buffer 'index)))
+  (setq ebib-fields-overlay (ebib-make-overlay 1 1 (ebib-buffer 'entry)))
+  (setq ebib-strings-overlay (ebib-make-overlay 1 1 (ebib-buffer 'strings)))
+  (add-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
+  (load ebib-rc-file 'noerror)
+  (if ebib-preload-bib-files
+      (mapc #'(lambda (file)
+                (ebib-load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
+                                                    file)))
+            ebib-preload-bib-files))
+  (setq ebib-initialized t))
 
 ;; - `ebib-entry-types`: removed. Use `bibtex-BibTeX-entry-alist` and `bibtex-biblatex-entry-alist` instead.
 ;; - `ebib-default-entry`: renamed to `ebib-default-entry-type`; type has changed to `string`.
@@ -844,7 +844,7 @@ is set to T."
                 (setq preamble t)))
              ((cl-equalp entry-type "comment")
               (ebib-read-comment db))
-             ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) t) ; if the entry type has been defined
+             ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) ') ; if the entry type has been defined
               (if (ebib-read-entry entry-type db timestamp)
                   (setq n-entries (1+ n-entries))))
              ;; anything else we report as an unknown entry type.
