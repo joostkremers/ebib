@@ -250,7 +250,7 @@ Return non-NIL upon success, or NIL if the value could not be stored."
   (if (eq if-exists 'append)
       (setq if-exists " "))
   (let* ((entry (ebib-db-get-entry key db))
-	 (elem (assoc-string field entry t))
+	 (elem (assoc-string field entry 'case-fold))
          (old-value (cdr elem)))
     ;; If the field has a value, decide what to do:
     (if old-value
@@ -299,12 +299,12 @@ no value), the second element indicates whether the value was
 retrieved from a cross-referenced entry. If so, it is the key of
 that entry, if not, the second value is NIL."
   (let* ((entry (ebib-db-get-entry key db noerror))
-         (value (cdr (assoc-string field entry t)))
+         (value (cdr (assoc-string field entry 'case-fold)))
          (xref-key))
     (when (not value)                   ; check if there is a field alias
-      (let ((alias (cdr (assoc-string field ebib-field-aliases t))))
+      (let ((alias (cdr (assoc-string field ebib-field-aliases 'case-fold))))
         (if alias
-            (setq value (cdr (assoc-string alias entry t))))))
+            (setq value (cdr (assoc-string alias entry 'case-fold))))))
     (when (and (not value) xref)
       (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
       (when xref-key
@@ -338,8 +338,10 @@ TARGET-FIELD cannot inherit a value, this function returns
                                                   (and (string-match-p (concat "\\b" target-entry "\\b") (cl-first e))
                                                        (string-match-p (concat "\\b" source-entry "\\b") (cl-second e))))
                                               ebib-biblatex-inheritances)))
-           (source-field (or (cdr (assoc-string target-field inheritance t))
-                             (cdr (assoc-string target-field (cl-third (assoc-string "all" ebib-biblatex-inheritances t)) t)))))
+           (source-field (or (cdr (assoc-string target-field inheritance 'case-fold))
+                             (cdr (assoc-string target-field
+                                                (cl-third (assoc-string "all" ebib-biblatex-inheritances 'case-fold))
+                                                'case-fold)))))
       (unless (eq source-field 'none)
         (or source-field target-field)))))
 

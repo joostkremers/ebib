@@ -833,23 +833,24 @@ is set to T."
     (while (re-search-forward "^@" nil t) ; find the next entry
       (let ((beg (point)))
         (if (ebib-looking-at-goto-end (concat "\\(" ebib-bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
-          (let ((entry-type (buffer-substring-no-properties beg (point))))
-            (ebib-looking-at-goto-end "[[:space:]]*[\(\{]")
-            (cond
-             ((cl-equalp entry-type "string") ; Note: cl-equalp compares strings case-insensitively.
-              (if (ebib-read-string db)
-                  (setq n-strings (1+ n-strings))))
-             ((cl-equalp entry-type "preamble")
-              (when (ebib-read-preamble db)
-                (setq preamble t)))
-             ((cl-equalp entry-type "comment")
-              (ebib-read-comment db))
-             ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) ') ; if the entry type has been defined
-              (if (ebib-read-entry entry-type db timestamp)
-                  (setq n-entries (1+ n-entries))))
-             ;; anything else we report as an unknown entry type.
-             (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
-                (ebib-match-paren-forward (point-max)))))
+            (let ((entry-type (buffer-substring-no-properties beg (point))))
+              (ebib-looking-at-goto-end "[[:space:]]*[\(\{]")
+              (cond
+               ((cl-equalp entry-type "string") ; Note: cl-equalp compares strings case-insensitively.
+                (if (ebib-read-string db)
+                    (setq n-strings (1+ n-strings))))
+               ((cl-equalp entry-type "preamble")
+                (when (ebib-read-preamble db)
+                  (setq preamble t)))
+               ((cl-equalp entry-type "comment")
+                (ebib-read-comment db))
+                ;; Check if the entry type has been defined
+               ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) 'case-fold)
+                (if (ebib-read-entry entry-type db timestamp)
+                    (setq n-entries (1+ n-entries))))
+               ;; anything else we report as an unknown entry type.
+               (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
+                  (ebib-match-paren-forward (point-max)))))
           (ebib-log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos)))))
     (list n-entries n-strings preamble)))
 
@@ -1749,7 +1750,7 @@ result."
   (let ((case-fold-search t)  ; we want to ensure a case-insensitive search
         (result nil))
     (if field
-        (let ((value (cdr (assoc-string field entry t))))
+        (let ((value (cdr (assoc-string field entry 'case-fold))))
           (when (and value
                      (or (and (string= field "=type=") ; The type field requires
                               (cl-equalp search-str value)) ; an exact match.
@@ -1837,7 +1838,7 @@ Either prints the entire database, or the marked entries."
                            (insert "\\hline\n")
                            ;; Then the other fields.
                            (mapc #'(lambda (field)
-                                     (ebib-ifstring (value (cdr (assoc-string field entry t)))
+                                     (ebib-ifstring (value (cdr (assoc-string field entry 'case-fold)))
                                          (when (or (not (ebib-multiline-p value))
                                                    ebib-print-multiline)
                                            (insert (format "%s: & %s\\\\\n"
