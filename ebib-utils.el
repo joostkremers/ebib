@@ -1198,7 +1198,7 @@ Extra fields are those fields that are not part of the definition
 of the entry type of ENTRY and are also not defined as additional
 fields. ENTRY is an alist representing a BibTeX entry."
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all)))
-    (--remove (member-ignore-case (car it) fields) entry)))
+    (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
 
 (defun ebib-list-entry-types (&optional dialect)
   "Return a list of entry types.
