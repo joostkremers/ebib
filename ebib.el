@@ -2620,7 +2620,7 @@ The deleted text is not put in the kill ring."
     (define-key map "h" 'ebib-strings-help)
     (define-key map "j" 'ebib-next-string)
     (define-key map "k" 'ebib-prev-string)
-    (define-key map "l" 'ebib-edit-multiline-string)
+    (define-key map "m" 'ebib-edit-multiline-string)
     (define-key map [(control n)] 'ebib-next-string)
     (define-key map [(meta n)] 'ebib-strings-page-down)
     (define-key map [(control p)] 'ebib-prev-string)
