@@ -554,7 +554,7 @@ unset the option entirely."
                                           ("shorttitle" . none)
                                           ("sorttitle" . none)
                                           ("indextitle" . none)
-                                          ("indexsorttitle" . none)))                                       
+                                          ("indexsorttitle" . none)))
                                         ("article, suppperiodical"
                                          "periodical"
                                          (("title" . "journaltitle")
@@ -798,18 +798,20 @@ TYPE (a symbol) is the type of message: `log' writes the message
 to the log buffer only; `message' writes the message to the log
 buffer and outputs it with the function `message'; `warning' logs
 the message and sets the variable `ebib-log-error' to 0; or
-`error' logs the message and sets the variable `ebib-log-error'
-to 1. The latter two can be used to signal the user to check the
-log for warnings or errors.
+`error' logs the message, sets the variable `ebib-log-error' to
+1, and sets the current database read-only flag. The latter two
+can be used to signal the user to check the log for warnings or
+errors.
 
 This function adds a newline to the message being logged."
   (with-current-ebib-buffer 'log
     (cond
      ((eq type 'warning)
-      (or ebib-log-error ; if ebib-error-log is already set to 1, we don't want to overwrite it!
+      (or ebib-log-error ; If ebib-error-log is already set to 1, we don't want to overwrite it!
           (setq ebib-log-error 0)))
      ((eq type 'error)
-      (setq ebib-log-error 1))
+      (setq ebib-log-error 1)
+      (ebib-db-set-read-only t ebib-cur-db))
      ((eq type 'message)
       (apply 'message format-string args)))
     (insert (apply 'format  (concat (if (eq type 'error)
@@ -1190,7 +1192,7 @@ possible values are listed in `bibtex-dialect-list'."
       (setq required (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
                                            (nth 3 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
     (when (memq type '(optional extra all))
-      (setq optional (mapcar #'car (append (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))) 
+      (setq optional (mapcar #'car (append (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
     (when (memq type '(all extra))
       (let ((fields (append required optional)))
         (setq extra (--remove (member-ignore-case it fields) ebib-extra-fields))))
@@ -1224,7 +1226,7 @@ This variable is initialized by `ebib-list-field-uniquely'.")
 (defun ebib-list-fields-uniquely (&optional dialect)
   "Return a list of all fields of BibTeX DIALECT."
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
-  (or (cdr (assq dialect ebib-unique-field-alist)) 
+  (or (cdr (assq dialect ebib-unique-field-alist))
       (let (fields)
         (mapc #'(lambda (entry)
                   (setq fields (-union fields (ebib-list-fields (car entry) 'all dialect))))

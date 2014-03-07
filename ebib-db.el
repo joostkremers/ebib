@@ -72,7 +72,8 @@ changed. REMOVE can be a regex."
   (filter)                                  ; the active filter
   (filename)                                ; name of the BibTeX file that holds this database
   (modified)                                ; flag indicating whether this database has been modified
-  (backup))                                 ; flag indicating whether we need to make a backup of the .bib file
+  (backup)                                  ; flag indicating whether we need to make a backup of the .bib file
+  (read-only))                              ; flag indicating whether the file should not be saved.
 
 (defun ebib-db-new-database ()
   "Creates a new database instance and returns it."
@@ -85,12 +86,15 @@ it is deleted."
   (clrhash (ebib-dbstruct-database db))
   (setf (ebib-dbstruct-strings db) nil)
   (setf (ebib-dbstruct-preamble db) nil)
+  (setf (ebib-dbstruct-comments db) nil)
+  (setf (ebib-dbstruct-dialect db) nil)
   (setf (ebib-dbstruct-cur-entry db) nil)
   (setf (ebib-dbstruct-marked-entries db) nil)
   (setf (ebib-dbstruct-filter db) nil)
   (setf (ebib-dbstruct-filename db) nil)
   (setf (ebib-dbstruct-modified db) nil)
-  (setf (ebib-dbstruct-backup db) nil))
+  (setf (ebib-dbstruct-backup db) nil)
+  (setf (ebib-dbstruct-read-only db) nil))
 
 (defun ebib-db-get-dialect (db)
   "Return the BibTeX-dialect of DB."
@@ -536,6 +540,14 @@ make backup at next save)."
 (defun ebib-db-backup-p (db)
   "Return backup flag of DB."
   (ebib-dbstruct-backup db))
+
+(defun ebib-db-set-read-only (flag db)
+  "Set the read-only flag of DB."
+  (setf (ebib-dbstruct-read-only db) flag))
+
+(defun ebib-db-get-read-only (db)
+  "Return the read-only flag of DB."
+  (ebib-dbstruct-read-only db))
 
 ;; EBIB-DB-UNBRACED-P determines if STRING is enclosed in braces. Note that
 ;; we cannot do this by simply checking whether STRING begins with { and

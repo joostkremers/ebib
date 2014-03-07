@@ -845,7 +845,7 @@ is set to T."
                 (if (ebib-read-entry entry-type db timestamp)
                     (setq n-entries (1+ n-entries))))
                ;; anything else we report as an unknown entry type.
-               (t (ebib-log 'warning "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
+               (t (ebib-log 'error "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
                   (ebib-match-paren-forward (point-max)))))
           (ebib-log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos)))))
     (list n-entries n-strings preamble)))
@@ -1410,6 +1410,8 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
 
 (defun ebib-save-database (db)
   "Save the database DB."
+  (if (ebib-db-get-read-only db)
+      (error "Errors occurred when reading the file. Saving has been disabled."))
   (when (and (ebib-db-backup-p db)
              (file-exists-p (ebib-db-get-filename db)))
     (ebib-make-backup (ebib-db-get-filename db))
