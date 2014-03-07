@@ -2448,7 +2448,7 @@ prefix argument has no meaning."
            ((and (cl-equalp field ebib-file-field)
                  (not pfx))
             (ebib-edit-file-field))
-           ((cl-equalp field "annote") (ebib-edit-multiline-field))
+           ((member-ignore-case field '("annote" "annotation")) (ebib-edit-multiline-field))
            (t (ebib-edit-normal-field)))))
     ;; we move to the next field, but only if ebib-edit-field was
     ;; called interactively, otherwise we get a strange bug in
