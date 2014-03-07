@@ -1025,7 +1025,7 @@ buffer if Ebib is not occupying the entire frame."
   (with-help-window (help-buffer)
     (princ (propertize (format "Annotation for `%s' [%s]" (ebib-cur-entry-key) (ebib-db-get-filename ebib-cur-db 'shortened)) 'face '(:weight bold)))
     (princ "\n\n")
-    (let ((contents (ebib-db-get-field-value "annote" (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced)))
+    (let ((contents (ebib-db-get-field-value "annotation" (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced nil 'alias)))
       (if contents
           (princ contents)
         (princ "[No annotation]")))))
