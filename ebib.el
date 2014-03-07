@@ -1424,7 +1424,8 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
 (defun ebib-write-database ()
   "Write the current database to a different file.
 If the current database is filtered, only the entries that match
-the filter are saved. The original file is not deleted."
+the filter are saved. The original file is not deleted.
+Furthermore, the current database's `read-only' flag is unset."
   (interactive)
   (ebib-execute-when
     ((database)
@@ -1441,7 +1442,8 @@ the filter are saved. The original file is not deleted."
              (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                           (length (member ebib-cur-db ebib-databases)))))
                                     (file-name-nondirectory new-filename)))
-             (ebib-set-modified nil)))))
+             (ebib-set-modified nil)
+             (ebib-db-set-read-only nil ebib-cur-db)))))
     ((default)
      (beep))))
 
