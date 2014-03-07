@@ -220,10 +220,10 @@ it is highlighted. DB defaults to the current database."
       (setq db ebib-cur-db))
   (let* ((entry (ebib-db-get-entry key db))
          (entry-type (cdr (assoc "=type=" entry)))
-         (obl-fields (ebib-list-fields entry-type 'obligatory))
+         (req-fields (ebib-list-fields entry-type 'required))
          (opt-fields (ebib-list-fields entry-type 'optional))
-         (add-fields (ebib-list-fields entry-type 'additional))
-         (extra-fields (mapcar #'car (ebib-get-extra-fields (ebib-db-get-entry key ebib-cur-db)))))
+         (extra-fields (ebib-list-fields entry-type 'extra))
+         (undef-fields (mapcar #'car (ebib-list-undefined-fields (ebib-db-get-entry key ebib-cur-db)))))
     (insert (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
     (mapc #'(lambda (fields)
               (when fields ; If one of the sets is empty, we don't want an extra empty line.
@@ -236,7 +236,7 @@ it is highlighted. DB defaults to the current database."
                                           ""))
                               (insert "\n")))
                         fields)))
-          (list obl-fields opt-fields add-fields extra-fields))))
+          (list req-fields opt-fields extra-fields undef-fields))))
 
 (defun ebib-redisplay ()
   "Redisplay the index and entry buffers."
@@ -399,12 +399,6 @@ the buffers, reads the rc file and loads the files in
                                                     file)))
             ebib-preload-bib-files))
   (setq ebib-initialized t))
-
-;; - `ebib-entry-types`: removed. Use `bibtex-BibTeX-entry-alist` and `bibtex-biblatex-entry-alist` instead.
-;; - `ebib-default-entry`: renamed to `ebib-default-entry-type`; type has changed to `string`.
-;; - `ebib-additional-fields`: type has changed to `list of strings`.
-;; - `ebib-standard-url-field`, `ebib-standard-file-field`: type has changed to `string`.
-;; - `ebib-biblatex-inheritance`: renamed to `ebib-biblatex-inheritances` (note the `s`); type has changed.
 
 (defun ebib-setup-windows ()
   "Create Ebib's window configuration in the current frame."
@@ -681,9 +675,9 @@ number is also the argument to the function."
     ["Edit Strings" ebib-edit-strings (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     "--"
-    ["Open URL" ebib-browse-url (ebib-db-get-field-value ebib-standard-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
-    ["Open DOI" ebib-browse-doi (ebib-db-get-field-value ebib-standard-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
-    ["View File" ebib-view-file (ebib-db-get-field-value ebib-standard-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
+    ["Open URL" ebib-browse-url (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
+    ["Open DOI" ebib-browse-doi (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
+    ["View File" ebib-view-file (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
      ["As Index Cards" ebib-print-entries ebib-cur-db]
@@ -1057,9 +1051,9 @@ replaced with a number in ascending sequence."
         (setq entry-key (cdr props)))
        ((string= (car props) "=type=")   ; the =type= field should not be braced.
         (push props fields))
-       ((cl-equalp (car props) ebib-standard-file-field)
+       ((cl-equalp (car props) ebib-file-field)
         (let ((short-file (ebib-file-relative-name (expand-file-name (cdr props)))))
-          (push (cons ebib-standard-file-field (ebib-db-brace short-file)) fields)))
+          (push (cons ebib-file-field (ebib-db-brace short-file)) fields)))
        (t
         (push (cons (car props) (ebib-db-brace (cdr props))) fields))))
     ;;check for required
@@ -1113,7 +1107,7 @@ for each file anyway."
                           ((file-exists-p fp)
                            (if (and (null allow-duplicates) (file-exists-in-db-p fp))
                                (message "File %s already exists in db, skipping" fp)
-                             (ebib-add-entry-stub (list (cons ebib-standard-file-field fp)) db)
+                             (ebib-add-entry-stub (list (cons ebib-file-field fp)) db)
                              (message "Adding file %s" fp)))
                           (t
                            (error "Invalid file %s" fp)))))
@@ -1123,7 +1117,7 @@ for each file anyway."
       ;;collect all file paths from db entries into single list
       (unless allow-duplicates
         (cl-dolist (entry-key (ebib-db-list-keys db 'nosort))
-          (let ((entry-files (ebib-db-get-field-value ebib-standard-file-field entry-key db 'noerror 'unbraced)))
+          (let ((entry-files (ebib-db-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
             (if entry-files
                 (cl-dolist (fp (split-string entry-files ebib-filename-separator))
                   (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
@@ -1942,30 +1936,29 @@ argument."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((urls (ebib-db-get-field-value ebib-standard-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
+     (let ((urls (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
        (if (listp urls)
            (setq urls (car urls)))
        (if urls
            (ebib-call-browser urls num)
-         (error "Field `%s' is empty" ebib-standard-url-field))))
+         (error "Field `%s' is empty" ebib-url-field))))
     ((default)
      (beep))))
 
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
-The stardard DOI field (see user option
-`ebib-standard-doi-field') may contain only one DOI. The DOI is
-combined with the URL \"http://dx.doi.org/\" before being sent to
-the browser."
+The stardard DOI field (see user option `ebib-doi-field') may
+contain only one DOI. The DOI is combined with the URL
+\"http://dx.doi.org/\" before being sent to the browser."
   (interactive)
   (ebib-execute-when
    ((entries)
-    (let ((doi (ebib-db-get-field-value ebib-standard-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
+    (let ((doi (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
       (if (listp doi)
           (setq doi (car doi)))
       (if doi
           (ebib-call-browser (concat "http://dx.doi.org/" doi))
-        (error "No DOI found in field `%s'" ebib-standard-doi-field))))
+        (error "No DOI found in field `%s'" ebib-doi-field))))
    ((default)
     (beep))))
 
@@ -1996,18 +1989,18 @@ is NIL, the user is asked which URL to open."
 
 (defun ebib-view-file (num)
   "View a file in the standard file field.
-The standard file field (see option `ebib-standard-file-field') may
+The standard file field (see option `ebib-file-field') may
 contain more than one filename. In that case, a numeric prefix
 argument can be used to specify which file to choose."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((filename (ebib-db-get-field-value ebib-standard-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
+     (let ((filename (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
        (if (listp filename)
            (setq filename (car filename)))
        (if filename
            (ebib-call-file-viewer filename num)
-         (error "Field `%s' is empty" ebib-standard-file-field))))
+         (error "Field `%s' is empty" ebib-file-field))))
     ((default)
      (beep))))
 
@@ -2373,7 +2366,7 @@ the beginning of the current line."
              finally return (ebib-set-modified t))))
 
 (defun ebib-edit-file-field ()
-  "Edit the `ebib-standard-file-field'.
+  "Edit the `ebib-file-field'.
 Filenames are added to the standard file field separated by
 `ebib-filename-separator'. The first directory in
 `ebib-file-search-dirs' is used as the start directory."
@@ -2382,11 +2375,11 @@ Filenames are added to the standard file field separated by
              until (or (string= file "")
                        (string= file start-dir))
              do (let* ((short-file (ebib-file-relative-name (expand-file-name file)))
-                       (conts (ebib-db-get-field-value ebib-standard-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced))
+                       (conts (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-filename-separator short-file)
                                     short-file)))
-                  (ebib-db-set-field-value ebib-standard-file-field new-conts (ebib-cur-entry-key) ebib-cur-db 'overwrite)
+                  (ebib-db-set-field-value ebib-file-field new-conts (ebib-cur-entry-key) ebib-cur-db 'overwrite)
                   (ebib-redisplay-current-field))
              finally return (ebib-set-modified t))))
 
@@ -2432,14 +2425,13 @@ Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' and `crossref` fields offer
 completion, the `annote' field is edited as a multiline field,
 the `keyword' field adds keywords one by one, also allowing
-completion, and the field in `ebib-standard-file-field' uses
-filename completion and shortens filenames if they are in (a
-subdirectory of) one of the directories in
-`ebib-file-search-dirs'.
+completion, and the field in `ebib-file-field' uses filename
+completion and shortens filenames if they are in (a subdirectory
+of) one of the directories in `ebib-file-search-dirs'.
 
 With a prefix argument, the `keyword' field and the field in
-`ebib-standard-file-field' can be edited directly. For other
-fields, the prefix argument has no meaning."
+`ebib-file-field' can be edited directly. For other fields, the
+prefix argument has no meaning."
   (interactive "P")
   (let* ((field (ebib-current-field))
          (result
@@ -2449,7 +2441,7 @@ fields, the prefix argument has no meaning."
            ((and (cl-equalp field "keywords")
                  (not pfx))
             (ebib-edit-keywords))
-           ((and (cl-equalp field ebib-standard-file-field)
+           ((and (cl-equalp field ebib-file-field)
                  (not pfx))
             (ebib-edit-file-field))
            ((cl-equalp field "annote") (ebib-edit-multiline-field))

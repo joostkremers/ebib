@@ -44,6 +44,15 @@
 (require 'dash)
 (require 'bibtex)
 
+;; Make a bunch of variables obsolete.
+(make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "24.4")
+(make-obsolete-variable 'ebib-default-entry 'ebib-default-entry-type "24.4")
+(make-obsolete-variable 'ebib-additional-fields 'ebib-extra-fields "24.4")
+(make-obsolete-variable 'ebib-biblatex-inheritance 'ebib-biblatex-inheritance "24.4")
+(make-obsolete-variable 'ebib-standard-url-field 'ebib-url-field "24.4")
+(make-obsolete-variable 'ebib-standard-file-field 'ebib-file-field "24.4")
+(make-obsolete-variable 'ebib-standard-doi-field 'ebib-doi-field "24.4")
+
 ;; Make sure we can call bibtex-generate-autokey and set the BibTeX dialect.
 (declare-function bibtex-generate-autokey "bibtex" nil)
 (bibtex-set-dialect)
@@ -91,22 +100,22 @@ when it is first saved. Note that Ebib uses
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
-(defcustom ebib-additional-fields '("crossref"
-                                    "url"
-                                    "annote"
-                                    "abstract"
-                                    "keywords"
-                                    "file"
-                                    "timestamp"
-                                    "doi")
-  "List of the additional fields.
-Additional fields are fields that are available for all entry
-types. Depending on the bibliography style, the value of these
-fields may appear in the bibliography, but you may also define
-fields that are just for personal use. Note that biblatex defines
-some of the fields here as optional fields for certain entry
-types. This is not problematic: in such cases, the filed appears
-among the optional fields, not among the additional fields."
+(defcustom ebib-extra-fields '("crossref"
+                               "url"
+                               "annote"
+                               "abstract"
+                               "keywords"
+                               "file"
+                               "timestamp"
+                               "doi")
+  "List of the extra fields.
+Extra fields are fields that are available for all entry types.
+Depending on the bibliography style, the value of these fields
+may appear in the bibliography, but you may also define fields
+that are just for personal use. Note that BibLaTeX defines some
+of the fields here as optional fields for certain entry types.
+This is not problematic: in such cases, the field appears among
+the optional fields, not among the extra fields."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
@@ -311,7 +320,7 @@ documentation for details on customizing the format string."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-standard-url-field "url"
+(defcustom ebib-url-field "url"
   "Standard field to store URLs in.
 In the index buffer, the command \\[ebib-browse-url] can be used to
 send a URL to a browser. This option sets the field from which
@@ -344,7 +353,7 @@ to handle a URL on the command line."
   :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
 
-(defcustom ebib-standard-doi-field "doi"
+(defcustom ebib-doi-field "doi"
   "Standard field to store a DOI (digital object identifier) in.
 In the index buffer, the command ebib-browse-doi can be used to
 send a suitable URL to a browser. This option sets the field from
@@ -352,7 +361,7 @@ which this command extracts the doi."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-standard-file-field "file"
+(defcustom ebib-file-field "file"
   "Standard field to store filenames in.
 In the index buffer, the command ebib-view-file can be used to
 view a file externally. This option sets the field from which
@@ -376,7 +385,7 @@ the file is opened in Emacs."
                                (string :tag "Run external command")))))
 
 (defcustom ebib-filename-separator "; "
-  "Separator for filenames in `ebib-standard-file-field'.
+  "Separator for filenames in `ebib-file-field'.
 The contents of the file field is split up using this separator,
 each chunk is assumed to be a filename.
 
@@ -1168,35 +1177,35 @@ display the actual filename."
 (defun ebib-list-fields (entry-type &optional type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list. It is a symbol and can be
-one of the following: `obligatory' means to list only obligatory
-fields; `optional' means to list optional fields; `additional'
-means to list additional fields (i.e., fields defined in
-`ebib-additional-fields' and not present in ENTRY-TYPE); finally,
-`all' means to list all fields. TYPE defaults to `all'. DIALECT
-is the BibTeX dialect; possible values are listed in
-`bibtex-dialect-list'."
+one of the following: `required' means to list only required
+fields; `optional' means to list optional fields; `extra' means
+to list extra fields (i.e., fields defined in `ebib-extra-fields'
+and not present in ENTRY-TYPE); finally, `all' means to list all
+fields. TYPE defaults to `all'. DIALECT is the BibTeX dialect;
+possible values are listed in `bibtex-dialect-list'."
   (or type (setq type 'all))
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
-  (let (obligatory optional additional)
-    (when (memq type '(obligatory additional all))
-      (setq obligatory (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
-                                             (nth 3 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
-    (when (memq type '(optional additional all))
+  (let (required optional extra)
+    (when (memq type '(required extra all))
+      (setq required (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
+                                           (nth 3 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
+    (when (memq type '(optional extra all))
       (setq optional (mapcar #'car (append (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))) 
-    (when (memq type '(all additional))
-      (let ((fields (append obligatory optional)))
-        (setq additional (--remove (member-ignore-case it fields) ebib-additional-fields))))
+    (when (memq type '(all extra))
+      (let ((fields (append required optional)))
+        (setq extra (--remove (member-ignore-case it fields) ebib-extra-fields))))
     (cond
-     ((eq type 'obligatory) obligatory)
+     ((eq type 'required) required)
      ((eq type 'optional) optional)
-     ((eq type 'additional) additional)
-     ((eq type 'all) (append obligatory optional additional)))))
+     ((eq type 'extra) extra)
+     ((eq type 'all) (append required optional extra)))))
 
-(defun ebib-get-extra-fields (entry) ; TODO test
-  "Return an alist of extra fields and values of ENTRY.
-Extra fields are those fields that are not part of the definition
-of the entry type of ENTRY and are also not defined as additional
-fields. ENTRY is an alist representing a BibTeX entry."
+(defun ebib-list-undefined-fields (entry)
+  "Return an alist of fields of ENTRY that are not predefined.
+ENTRY is an alist representing a BibTeX entry. The return value
+is an alist of (field . value) pairs of those fields that are not
+part of the definition of ENTRY's type and also not part of the
+extra fields."
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all)))
     (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
 
