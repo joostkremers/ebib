@@ -298,11 +298,11 @@ is non-NIL, in which case return NIL. If UNBRACED is non-NIL,
 return the value without braces.
 
 If XREF is non-NIL, the field value may be retrieved from a
-cross-referenced entry. The return value is then a list of two
-elements. The first is the field value (or NIL if the field has
-no value), the second element indicates whether the value was
-retrieved from a cross-referenced entry. If so, it is the key of
-that entry, if not, the second value is NIL."
+cross-referenced entry. The return value is then a cons. The car
+is the field value (or NIL if the field has no value), the cdr
+indicates whether the value was retrieved from a cross-referenced
+entry. If so, it is the key of that entry, if not, the second
+value is NIL."
   (let* ((entry (ebib-db-get-entry key db noerror))
          (value (cdr (assoc-string field entry 'case-fold)))
          (xref-key))
@@ -322,7 +322,7 @@ that entry, if not, the second value is NIL."
     (when unbraced
       (setq value (ebib-db-unbrace value)))
     (if xref
-	(list value xref-key)
+	(cons value xref-key)
       value)))
 
 (defun ebib-db-get-xref-field (target-field target-entry source-entry &optional dialect)

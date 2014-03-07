@@ -1940,9 +1940,7 @@ argument."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((urls (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
-       (if (listp urls)
-           (setq urls (car urls)))
+     (let ((urls (car (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
        (if urls
            (ebib-call-browser urls num)
          (error "Field `%s' is empty" ebib-url-field))))
@@ -1957,9 +1955,7 @@ contain only one DOI. The DOI is combined with the URL
   (interactive)
   (ebib-execute-when
    ((entries)
-    (let ((doi (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
-      (if (listp doi)
-          (setq doi (car doi)))
+    (let ((doi (car (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
       (if doi
           (ebib-call-browser (concat "http://dx.doi.org/" doi))
         (error "No DOI found in field `%s'" ebib-doi-field))))
@@ -1999,9 +1995,7 @@ argument can be used to specify which file to choose."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((filename (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
-       (if (listp filename)
-           (setq filename (car filename)))
+     (let ((filename (car (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
        (if filename
            (ebib-call-file-viewer filename num)
          (error "Field `%s' is empty" ebib-file-field))))
