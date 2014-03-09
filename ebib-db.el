@@ -298,19 +298,22 @@ is non-NIL, in which case return NIL. If UNBRACED is non-NIL,
 return the value without braces.
 
 If XREF is non-NIL, the field value may be retrieved from a
-cross-referenced entry. The return value is then a cons. The car
-is the field value (or NIL if the field has no value), the cdr
-indicates whether the value was retrieved from a cross-referenced
-entry. If so, it is the key of that entry, if not, the second
-value is NIL."
+cross-referenced entry. If the result in non-NIL, the returned
+text has the text property `ebib-xref', which has as value the
+key of the entry from which the field value was retrieved.
+
+Similarly, the value can be retrieved from an alias field. (See
+the variable `ebib-field-aliases'). In this case, the returned
+string has the text property `ebib-alias' with value T."
   (let* ((entry (ebib-db-get-entry key db noerror))
          (value (cdr (assoc-string field entry 'case-fold)))
-         (xref-key))
+         (xref-key)
+         (alias))
     (when (not value)                   ; check if there is a field alias
-      (let ((alias (cdr (assoc-string field ebib-field-aliases 'case-fold))))
-        (if alias
-            (setq value (cdr (assoc-string alias entry 'case-fold))))))
-    (when (and (not value) xref)
+      (setq alias (cdr (assoc-string field ebib-field-aliases 'case-fold)))
+      (if alias
+          (setq value (cdr (assoc-string alias entry 'case-fold)))))
+    (when (and (not value) xref)      ; Check if there's a cross-reference.
       (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
       (when xref-key
         (let* ((source-type (ebib-db-get-field-value "=type=" xref-key db 'noerror))
@@ -319,11 +322,15 @@ value is NIL."
             (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror))))))
     (unless (or value noerror)
       (error "Ebib: field `%s' does not exist in entry `%s'" field key))
-    (when unbraced
-      (setq value (ebib-db-unbrace value)))
-    (if xref
-	(cons value xref-key)
-      value)))
+    (when value
+      (setq value (copy-sequence value))
+      (when unbraced
+        (setq value (ebib-db-unbrace value)))
+      (when alias
+        (add-text-properties 0 1 '(ebib-alias t) value))
+      (when xref
+        (add-text-properties 0 1 `(ebib-xref ,xref-key) value)))
+    value))
 
 (defun ebib-db-get-xref-field (target-field target-entry source-entry &optional dialect)
   "Return the field from which TARGET-FIELD inherits.

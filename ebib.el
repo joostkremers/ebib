@@ -174,42 +174,42 @@ all else fails, pop up a new frame."
 
 (defun ebib-get-field-highlighted (field key &optional match-str db)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
-  ;; Note: we need to work on a copy of the string, otherwise the highlights
-  ;; are made to the string as stored in the database. Hence copy-sequence.
+  ;; Note: we need to work on a copy of the value, otherwise the highlights
+  ;; are made to the value as stored in the database. Hence copy-sequence.
   (or db (setq db ebib-cur-db))
   (let* ((case-fold-search t)
          (value (ebib-db-get-field-value field key db 'noerror nil 'xref))
-         (string (if (car value)
-                     (copy-sequence (car value))))
-         (xref (cadr value))
          (raw " ")
          (multiline " ")
-         (matched nil))
+         (matched nil)
+         (alias ""))
     ;; we have to do a couple of things now:
-    ;; - remove {} or "" around the string, if they're there
+    ;; - remove {} or "" around the value, if they're there
     ;; - search for match-str
-    ;; - properly adjust the string if it's multiline
-    ;; but all this is not necessary if there was no string
-    (when string
-      (if xref
-          (setq string (propertize string 'face 'ebib-crossref-face 'fontified t)))
-      (if (ebib-db-unbraced-p string)
+    ;; - properly adjust the value if it's multiline
+    ;; but all this is not necessary if there was no value
+    (when value
+      (if (get-text-property 0 'ebib-alias value)
+          (setq alias (propertize "  [==> journal]" 'face 'ebib-alias-face)))
+      (if (stringp (get-text-property 0 'ebib-xref value))
+          (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
+      (if (ebib-db-unbraced-p value)
           (setq raw "*")
-        (setq string (ebib-db-unbrace string))) ; we have to make the string look nice
+        (setq value (ebib-db-unbrace value))) ; we have to make the value look nice
       (when match-str
-        (cl-multiple-value-setq (string matched) (ebib-match-all-in-string match-str string)))
-      (when (ebib-multiline-p string)
+        (cl-multiple-value-setq (value matched) (ebib-match-all-in-string match-str value)))
+      (when (ebib-multiline-p value)
         ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
         ;; multiline is local and therefore the object it refers to should
         ;; be GC'ed when the function returns. But for some reason, the
         ;; plus sign is persistent, and if it's been highlighted as the
         ;; result of a search, it stays that way.
         (setq multiline (propertize "+" 'face nil))
-        (setq string (ebib-first-line string)))
+        (setq value (ebib-first-line value)))
       (when (and matched
                  (string= multiline "+"))
         (add-text-properties 0 1 '(face highlight) multiline)))
-    (concat raw multiline string)))
+    (concat raw multiline value alias)))
 
 (defun ebib-display-fields (key &optional match-str db)
   "Display the fields of entry KEY in DB.
@@ -1025,7 +1025,7 @@ buffer if Ebib is not occupying the entire frame."
   (with-help-window (help-buffer)
     (princ (propertize (format "Annotation for `%s' [%s]" (ebib-cur-entry-key) (ebib-db-get-filename ebib-cur-db 'shortened)) 'face '(:weight bold)))
     (princ "\n\n")
-    (let ((contents (ebib-db-get-field-value "annotation" (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced nil 'alias)))
+    (let ((contents (ebib-db-get-field-value "annotation" (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced)))
       (if contents
           (princ contents)
         (princ "[No annotation]")))))
@@ -1940,7 +1940,7 @@ argument."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((urls (car (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
+     (let ((urls (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
        (if urls
            (ebib-call-browser urls num)
          (error "Field `%s' is empty" ebib-url-field))))
@@ -1955,7 +1955,7 @@ contain only one DOI. The DOI is combined with the URL
   (interactive)
   (ebib-execute-when
    ((entries)
-    (let ((doi (car (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
+    (let ((doi (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
       (if doi
           (ebib-call-browser (concat "http://dx.doi.org/" doi))
         (error "No DOI found in field `%s'" ebib-doi-field))))
@@ -1995,7 +1995,7 @@ argument can be used to specify which file to choose."
   (interactive "P")
   (ebib-execute-when
     ((entries)
-     (let ((filename (car (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
+     (let ((filename (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
        (if filename
            (ebib-call-file-viewer filename num)
          (error "Field `%s' is empty" ebib-file-field))))
@@ -2480,7 +2480,7 @@ viewed."
   (let ((field (ebib-current-field)))
     (unless (or (not field)
                 (string= field "=type="))
-    (let ((contents (car (ebib-db-get-field-value field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref))))
+    (let ((contents (ebib-db-get-field-value field (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced 'xref)))
       (when (stringp contents)
         (kill-new contents)
         (message "Field contents copied."))))))

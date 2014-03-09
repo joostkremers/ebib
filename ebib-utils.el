@@ -611,6 +611,10 @@ Ebib (not Emacs)."
   "Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib-faces)
 
+(defface ebib-alias-face '((t (:inherit warning)))
+  "Face used to indicate values inherited from crossreferenced entries."
+  :group 'ebib-faces)
+
 (defface ebib-marked-face '((t (:inverse-video t)))
   "Face to indicate marked entries."
   :group 'ebib-faces)
