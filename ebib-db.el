@@ -309,10 +309,6 @@ string has the text property `ebib-alias' with value T."
          (value (cdr (assoc-string field entry 'case-fold)))
          (xref-key)
          (alias))
-    (when (not value)                   ; check if there is a field alias
-      (setq alias (cdr (assoc-string field ebib-field-aliases 'case-fold)))
-      (if alias
-          (setq value (cdr (assoc-string alias entry 'case-fold)))))
     (when (and (not value) xref)      ; Check if there's a cross-reference.
       (setq xref-key (ebib-db-get-field-value "crossref" key db 'noerror 'unbraced))
       (when xref-key
@@ -320,6 +316,10 @@ string has the text property `ebib-alias' with value T."
                (xref-field (ebib-db-get-xref-field field (cdr (assoc "=type=" entry)) source-type (ebib-db-get-dialect db))))
           (when xref-field
             (setq value (ebib-db-get-field-value xref-field xref-key db 'noerror))))))
+    (when (not value)                   ; Check if there is a field alias
+      (setq alias (cdr (assoc-string field ebib-field-aliases 'case-fold)))
+      (if alias
+          (setq value (cdr (assoc-string alias entry 'case-fold)))))
     (unless (or value noerror)
       (error "Ebib: field `%s' does not exist in entry `%s'" field key))
     (when value
