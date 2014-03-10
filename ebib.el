@@ -224,7 +224,13 @@ it is highlighted. DB defaults to the current database."
          (opt-fields (ebib-list-fields entry-type 'optional))
          (extra-fields (ebib-list-fields entry-type 'extra))
          (undef-fields (mapcar #'car (ebib-list-undefined-fields (ebib-db-get-entry key ebib-cur-db)))))
-    (insert (format "%-19s %s\n" (propertize "type" 'face 'ebib-field-face) entry-type))
+    (insert (format "%-19s %s%s\n"
+                    (propertize "type" 'face 'ebib-field-face)
+                    entry-type
+                    (if (and (eq (ebib-db-get-dialect ebib-cur-db) 'biblatex)
+                             (assoc-string entry-type ebib-type-aliases 'case-fold))
+                        (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))) 'face 'ebib-alias-face)
+                        "")))
     (mapc #'(lambda (fields)
               (when fields ; If one of the sets is empty, we don't want an extra empty line.
                 (insert "\n")
@@ -841,7 +847,7 @@ is set to T."
                ((cl-equalp entry-type "comment")
                 (ebib-read-comment db))
                 ;; Check if the entry type has been defined
-               ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) 'case-fold)
+               ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db) t) 'case-fold)
                 (if (ebib-read-entry entry-type db timestamp)
                     (setq n-entries (1+ n-entries))))
                ;; anything else we report as an unknown entry type.

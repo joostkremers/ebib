@@ -279,7 +279,7 @@ a logical `not' is applied to the selection."
                                        (if (string= field "=type=") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "=type=")
-                     (completing-read prompt (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) nil t nil 'ebib-filters-history))
+                     (completing-read prompt (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db) t) nil t nil 'ebib-filters-history))
                     ((cl-equalp field "keywords")
                      (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keywords-history))
                     (t

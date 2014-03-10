@@ -631,7 +631,7 @@ Ebib (not Emacs)."
 (defconst ebib-key-regexp "[^][^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
-;; Field aliases defined by BibLaTeX.
+;; Entry type and field aliases defined by BibLaTeX.
 (defvar ebib-field-aliases '(("location" . "address")
                              ("annotation" . "annote")
                              ("eprinttype" . "archiveprefix")
@@ -641,6 +641,14 @@ Ebib (not Emacs)."
                              ("eprintclass" . "primaryclass")
                              ("institution" . "school"))
   "List of field aliases for BibLaTeX.")
+
+(defvar ebib-type-aliases '(("Conference" . "InProceedings")
+                            ("Electronic" . "Online")
+                            ("MastersThesis" . "Thesis")
+                            ("PhDThesis" . "Thesis")
+                            ("TechReport" . "Report")
+                            ("WWW" . "Online"))
+  "List of entry type aliases for BibLaTeX.")
 
 ;; buffers and overlays
 (defvar ebib-buffer-alist nil "Alist of Ebib buffers.")
@@ -1200,9 +1208,15 @@ fields; `optional' means to list optional fields; `extra' means
 to list extra fields (i.e., fields defined in `ebib-extra-fields'
 and not present in ENTRY-TYPE); finally, `all' means to list all
 fields. TYPE defaults to `all'. DIALECT is the BibTeX dialect;
-possible values are listed in `bibtex-dialect-list'."
+possible values are listed in `bibtex-dialect-list'.
+
+If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
+defined by BibLaTeX, return the fields of the entry type for
+which ENTRY-TYPE is an alias."
   (or type (setq type 'all))
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (setq entry-type (or (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))
+                       entry-type))
   (let (required optional extra)
     (when (memq type '(required extra all))
       (setq required (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
@@ -1227,13 +1241,16 @@ extra fields."
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all)))
     (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
 
-(defun ebib-list-entry-types (&optional dialect)
+(defun ebib-list-entry-types (&optional dialect include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
 values in `bibtex-dialect-list'. It defaults to the default value
-of `bibtex-dialect'."
+of `bibtex-dialect'. If INCLUDE-ALIASES is non-NIL, include entry
+type aliases as defined by `ebib-type-aliases'."
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
-  (mapcar #'car (bibtex-entry-alist dialect)))
+  (append (mapcar #'car (bibtex-entry-alist dialect))
+          (if (and include-aliases (eq dialect 'biblatex))
+              (mapcar #'car ebib-type-aliases))))
 
 (defvar ebib-unique-field-alist nil
   "Alist of BibTeX dialects and their fields.
