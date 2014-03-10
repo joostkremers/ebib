@@ -991,7 +991,7 @@ be added to the entry. Note that for a timestamp to be added,
 `ebib-db-set-entry'."
   (ebib-db-set-entry entry-key fields db if-exists)
   (when (and timestamp ebib-use-timestamp)
-    (ebib-db-set-field-value 'timestamp (format-time-string ebib-timestamp-format) entry-key db 'overwrite))
+    (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite))
   (ebib-set-modified t db))
 
 (defun ebib-search-key-in-buffer (entry-key)
