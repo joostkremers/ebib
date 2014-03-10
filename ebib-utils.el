@@ -1197,7 +1197,7 @@ possible values are listed in `bibtex-dialect-list'."
       (setq required (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
                                            (nth 3 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
     (when (memq type '(optional extra all))
-      (setq optional (mapcar #'car (append (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))))))
+      (setq optional (mapcar #'car (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))
     (when (memq type '(all extra))
       (let ((fields (append required optional)))
         (setq extra (--remove (member-ignore-case it fields) ebib-extra-fields))))
