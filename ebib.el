@@ -190,7 +190,7 @@ all else fails, pop up a new frame."
     ;; but all this is not necessary if there was no value
     (when value
       (if (get-text-property 0 'ebib-alias value)
-          (setq alias (propertize (format "  [==> %s]" (cdr (assoc-string field ebib-field-aliases 'case-fold))) 'face 'ebib-alias-face)))
+          (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib-field-aliases 'case-fold))) 'face 'ebib-alias-face)))
       (if (stringp (get-text-property 0 'ebib-xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
       (if (ebib-db-unbraced-p value)
