@@ -202,7 +202,7 @@ rest of the frame is used for the entry buffer, unless
                                   mode-line-front-space
                                   mode-line-modified
                                   mode-line-buffer-identification
-                                  (:eval (format "  (%s)" (or (ebib-db-get-dialect ebib-cur-db) (default-value bibtex-dialect))))
+                                  (:eval (format "  (%s)" (or (ebib-db-get-dialect ebib-cur-db) (default-value 'bibtex-dialect))))
                                   (:eval (if (ebib-cur-entry-key) "     Entry %l" "     No Entries"))
                                   (:eval (if (ebib-db-get-filter ebib-cur-db) "  (Filtered)" "")))
   "The mode line for the index window.
