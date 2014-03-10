@@ -48,18 +48,6 @@ Return value is the modified string. STRING itself is not
 changed. REMOVE can be a regex."
   (apply 'concat (split-string string remove)))
 
-;; Field aliases defined by BibLaTeX. If the first field in each pair does
-;; not have a value, the second field is checked.
-(defvar ebib-field-aliases '(("location" . "address")
-                             ("annotation" . "annote")
-                             ("eprinttype" . "archiveprefix")
-                             ("journaltitle" . "journal")
-                             ("sortkey" . "key")
-                             ("file" . "pdf")
-                             ("eprintclass" . "primaryclass")
-                             ("institution" . "school"))
-  "List of field aliases for BibLaTeX.")
-
 ;; each database is represented by a struct
 (cl-defstruct ebib-dbstruct
   (database (make-hash-table :test 'equal)) ; hashtable containing the database itself

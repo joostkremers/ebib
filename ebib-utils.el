@@ -631,6 +631,17 @@ Ebib (not Emacs)."
 (defconst ebib-key-regexp "[^][^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defvar ebib-initialized nil "T if Ebib has been initialized.")
 
+;; Field aliases defined by BibLaTeX.
+(defvar ebib-field-aliases '(("location" . "address")
+                             ("annotation" . "annote")
+                             ("eprinttype" . "archiveprefix")
+                             ("journaltitle" . "journal")
+                             ("sortkey" . "key")
+                             ("file" . "pdf")
+                             ("eprintclass" . "primaryclass")
+                             ("institution" . "school"))
+  "List of field aliases for BibLaTeX.")
+
 ;; buffers and overlays
 (defvar ebib-buffer-alist nil "Alist of Ebib buffers.")
 (defvar ebib-index-overlay nil "Overlay to mark the current entry.")
