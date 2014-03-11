@@ -2354,11 +2354,11 @@ the beginning of the current line."
         (collection (ebib-keywords-for-database ebib-cur-db)))
     (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib-keywords-history)
              until (string= keyword "")
-             do (let* ((conts (ebib-db-get-field-value 'keywords (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced))
+             do (let* ((conts (ebib-db-get-field-value "keywords" (ebib-cur-entry-key) ebib-cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-keywords-separator keyword)
                                     keyword)))
-                  (ebib-db-set-field-value 'keywords
+                  (ebib-db-set-field-value "keywords"
                                            (if ebib-keywords-field-keep-sorted
                                                (ebib-sort-keywords new-conts)
                                              new-conts)
