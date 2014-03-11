@@ -1234,8 +1234,7 @@ which ENTRY-TYPE is an alias."
     (when (memq type '(optional extra all))
       (setq optional (mapcar #'car (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))
     (when (memq type '(all extra))
-      (let ((fields (append required optional)))
-        (setq extra (--remove (member-ignore-case it fields) (cdr (assq dialect ebib-extra-fields))))))
+      (setq extra (--remove (member-ignore-case it (append required optional)) (cdr (assq dialect ebib-extra-fields)))))
     (cond
      ((eq type 'required) required)
      ((eq type 'optional) optional)
