@@ -1224,8 +1224,6 @@ in `bibtex-dialect-list'.
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
 defined by BibLaTeX, return the fields of the entry type for
 which ENTRY-TYPE is an alias."
-  (or type (setq type 'all))
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (if (eq dialect 'biblatex)
       (setq entry-type (or (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))
                            entry-type)))
@@ -1258,7 +1256,6 @@ extra fields."
 This list depends on the value of DIALECT, which can have the
 values in `bibtex-dialect-list'. If INCLUDE-ALIASES is non-NIL,
 include entry type aliases as defined by `ebib-type-aliases'."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (append (mapcar #'car (bibtex-entry-alist dialect))
           (if (and include-aliases (eq dialect 'biblatex))
               (mapcar #'car ebib-type-aliases))))
@@ -1269,7 +1266,6 @@ This variable is initialized by `ebib-list-field-uniquely'.")
 
 (defun ebib-list-fields-uniquely (dialect)
   "Return a list of all fields of BibTeX DIALECT."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (or (cdr (assq dialect ebib-unique-field-alist))
       (let (fields)
         (mapc #'(lambda (entry)
