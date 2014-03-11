@@ -1218,8 +1218,8 @@ one of the following: `required' means to list only required
 fields; `optional' means to list optional fields; `extra' means
 to list extra fields (i.e., fields defined in `ebib-extra-fields'
 and not present in ENTRY-TYPE); finally, `all' means to list all
-fields. TYPE defaults to `all'. DIALECT is the BibTeX dialect;
-possible values are listed in `bibtex-dialect-list'.
+fields. DIALECT is the BibTeX dialect; possible values are listed
+in `bibtex-dialect-list'.
 
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
 defined by BibLaTeX, return the fields of the entry type for
