@@ -654,7 +654,8 @@ number is also the argument to the function."
     ["Open Database..." ebib-load-bibtex-file t]
     ["Merge Database..." ebib-merge-bibtex-file (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     ["Save Database" ebib-save-current-database (and ebib-cur-db
-                                                     (ebib-db-modified-p ebib-cur-db))]
+                                                     (ebib-db-modified-p ebib-cur-db)
+                                                     (not (ebib-db-read-only-p ebib-cur-db))]
     ["Save All Databases" ebib-save-all-databases (ebib-modified-p)]
     ["Save Database As..." ebib-write-database ebib-cur-db]
     ["Close Database" ebib-close-database ebib-cur-db]
