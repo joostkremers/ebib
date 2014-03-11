@@ -540,7 +540,7 @@ make backup at next save)."
   "Set the read-only flag of DB."
   (setf (ebib-dbstruct-read-only db) flag))
 
-(defun ebib-db-get-read-only (db)
+(defun ebib-db-read-only-p (db)
   "Return the read-only flag of DB."
   (ebib-dbstruct-read-only db))
 

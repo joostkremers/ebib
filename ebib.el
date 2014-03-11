@@ -1416,7 +1416,7 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
 
 (defun ebib-save-database (db)
   "Save the database DB."
-  (if (ebib-db-get-read-only db)
+  (if (ebib-get-read-only-p db)
       (error "Errors occurred when reading the file. Saving has been disabled."))
   (when (and (ebib-db-backup-p db)
              (file-exists-p (ebib-db-get-filename db)))
