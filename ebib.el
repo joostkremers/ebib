@@ -218,16 +218,17 @@ If MATCH-STR is provided, then when it is present in the value,
 it is highlighted. DB defaults to the current database."
   (or db
       (setq db ebib-cur-db))
-  (let* ((entry (ebib-db-get-entry key db))
+  (let* ((dialect (ebib-db-get-dialect db))
+         (entry (ebib-db-get-entry key db))
          (entry-type (cdr (assoc "=type=" entry)))
-         (req-fields (ebib-list-fields entry-type 'required))
-         (opt-fields (ebib-list-fields entry-type 'optional))
-         (extra-fields (ebib-list-fields entry-type 'extra))
-         (undef-fields (mapcar #'car (ebib-list-undefined-fields (ebib-db-get-entry key ebib-cur-db)))))
+         (req-fields (ebib-list-fields entry-type 'required dialect))
+         (opt-fields (ebib-list-fields entry-type 'optional dialect))
+         (extra-fields (ebib-list-fields entry-type 'extra dialect))
+         (undef-fields (mapcar #'car (ebib-list-undefined-fields (ebib-db-get-entry key ebib-cur-db) dialect))))
     (insert (format "%-19s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
                     entry-type
-                    (if (and (eq (ebib-db-get-dialect ebib-cur-db) 'biblatex)
+                    (if (and (eq dialect 'biblatex)
                              (assoc-string entry-type ebib-type-aliases 'case-fold))
                         (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))) 'face 'ebib-alias-face)
                         "")))
@@ -1851,7 +1852,7 @@ Either prints the entire database, or the marked entries."
                                            (insert (format "%s: & %s\\\\\n"
                                                            field (ebib-db-unbrace value))))))
                                  ;; Note: ebib-list-fields returns a list with `=type=' as its first element.
-                                 (cdr (ebib-list-fields (cdr (assoc "=type=" entry)) 'all))))
+                                 (cdr (ebib-list-fields (cdr (assoc "=type=" entry)) 'all (ebib-db-get-dialect ebib-cur-db)))))
                          (insert "\\end{tabular}\n\n")
                          (insert (if ebib-print-newpage
                                      "\\newpage\n\n"
@@ -2309,7 +2310,7 @@ the beginning of the current line."
   (interactive "sField: ")
   ;; We store the field with a `nil' value and let the user edit it later.
   (let ((type (ebib-db-get-field-value "=type=" (ebib-cur-entry-key) ebib-cur-db)))
-    (if (or (member-ignore-case field (ebib-list-fields type 'all))
+    (if (or (member-ignore-case field (ebib-list-fields type 'all (ebib-db-get-dialect ebib-cur-db)))
             (not (ebib-db-set-field-value field nil (ebib-cur-entry-key) ebib-cur-db 'noerror)))
         (error "Field already exists in entry `%s'" (ebib-cur-entry-key)))
     (ebib-fill-entry-buffer)

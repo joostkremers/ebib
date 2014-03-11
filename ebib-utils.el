@@ -1244,13 +1244,13 @@ which ENTRY-TYPE is an alias."
      ((eq type 'extra) extra)
      ((eq type 'all) (append required optional extra)))))
 
-(defun ebib-list-undefined-fields (entry)
+(defun ebib-list-undefined-fields (entry dialect)
   "Return an alist of fields of ENTRY that are not predefined.
 ENTRY is an alist representing a BibTeX entry. The return value
 is an alist of (field . value) pairs of those fields that are not
 part of the definition of ENTRY's type and also not part of the
 extra fields."
-  (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all)))
+  (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
     (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
 
 (defun ebib-list-entry-types (&optional dialect include-aliases)
