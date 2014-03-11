@@ -1211,7 +1211,7 @@ display the actual filename."
              (append-to-file (point-min) (point-max) ,filename)
              (setq ebib-export-filename ,filename))))))
 
-(defun ebib-list-fields (entry-type &optional type dialect)
+(defun ebib-list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list. It is a symbol and can be
 one of the following: `required' means to list only required
@@ -1268,7 +1268,7 @@ type aliases as defined by `ebib-type-aliases'."
   "Alist of BibTeX dialects and their fields.
 This variable is initialized by `ebib-list-field-uniquely'.")
 
-(defun ebib-list-fields-uniquely (&optional dialect)
+(defun ebib-list-fields-uniquely (dialect)
   "Return a list of all fields of BibTeX DIALECT."
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (or (cdr (assq dialect ebib-unique-field-alist))
