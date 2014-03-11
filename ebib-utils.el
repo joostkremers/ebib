@@ -97,7 +97,7 @@ The first time a BibTeX file is saved, a backup file is created
 when it is first saved. Note that Ebib uses
 `make-backup-file-name' to create the name for the backup file."
   :group 'ebib
-   :type '(choice (const :tag "Create backups" t)
+  :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
 (defcustom ebib-extra-fields '((BibTeX "crossref"
@@ -144,7 +144,7 @@ The fields in this list are not displayed by default. Since
 BibLaTeX defines a large number of fields, it is not practical to
 display them all in the entry buffer. You can make these fields
 temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
-or through the enu."
+or through the menu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
