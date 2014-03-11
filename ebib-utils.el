@@ -1215,8 +1215,9 @@ defined by BibLaTeX, return the fields of the entry type for
 which ENTRY-TYPE is an alias."
   (or type (setq type 'all))
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
-  (setq entry-type (or (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))
-                       entry-type))
+  (if (eq dialect 'biblatex)
+      (setq entry-type (or (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))
+                           entry-type)))
   (let (required optional extra)
     (when (memq type '(required extra all))
       (setq required (mapcar #'car (append (nth 2 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold))
