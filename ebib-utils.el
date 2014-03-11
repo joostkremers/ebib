@@ -124,8 +124,10 @@ Note, before adding fields to this list, check if the field you
 want to add is among the fields that are hidden by default. See
 the option \"Hidden Fields\" (`ebib-hidden-fields') for details."
   :group 'ebib
-  :type '(repeat (cons (choice (const BibTeX)
-                               (const biblatex))
+  :type '(repeat (cons (choice :tag "Choose BibTeX dialect"
+                               (const BibTeX)
+                               (const biblatex)
+                               (symbol :tag "Other"))
                        (repeat :tag "Extra fields" (string :tag "Field")))))
 
 (defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
