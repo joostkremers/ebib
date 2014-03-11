@@ -1256,9 +1256,8 @@ extra fields."
 (defun ebib-list-entry-types (dialect &optional include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
-values in `bibtex-dialect-list'. It defaults to the default value
-of `bibtex-dialect'. If INCLUDE-ALIASES is non-NIL, include entry
-type aliases as defined by `ebib-type-aliases'."
+values in `bibtex-dialect-list'. If INCLUDE-ALIASES is non-NIL,
+include entry type aliases as defined by `ebib-type-aliases'."
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (append (mapcar #'car (bibtex-entry-alist dialect))
           (if (and include-aliases (eq dialect 'biblatex))
