@@ -1255,7 +1255,7 @@ in `bibtex-dialect-list' or NIL, in which case the default value
 of `bibtex-dialect' is used."
   (or dialect (setq dialect (default-value 'bibtex-dialect)))
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
-    (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
+    (--remove (member-ignore-case (car it) (cons "=type=" fields)) entry)))
 
 (defun ebib-list-entry-types (dialect &optional include-aliases)
   "Return a list of entry types.
