@@ -1253,7 +1253,7 @@ extra fields."
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
     (--remove (member-ignore-case (car it) (cons "=type="fields)) entry)))
 
-(defun ebib-list-entry-types (&optional dialect include-aliases)
+(defun ebib-list-entry-types (dialect &optional include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
 values in `bibtex-dialect-list'. It defaults to the default value
