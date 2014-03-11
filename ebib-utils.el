@@ -100,24 +100,33 @@ when it is first saved. Note that Ebib uses
    :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
-(defcustom ebib-extra-fields '("crossref"
-                               "url"
-                               "annote"
-                               "abstract"
-                               "keywords"
-                               "file"
-                               "timestamp"
-                               "doi")
-  "List of the extra fields.
+(defcustom ebib-extra-fields '((BibTeX "crossref"
+                                       "annote"
+                                       "abstract"
+                                       "keywords"
+                                       "file"
+                                       "timestamp"
+                                       "url"
+                                       "doi")
+                               (biblatex "crossref"
+                                         "annotation"
+                                         "abstract"
+                                         "keywords"
+                                         "file"
+                                         "timestamp"))
+  "List of the extra fields for BibTeX entries.
 Extra fields are fields that are available for all entry types.
 Depending on the bibliography style, the value of these fields
 may appear in the bibliography, but you may also define fields
-that are just for personal use. Note that BibLaTeX defines some
-of the fields here as optional fields for certain entry types.
-This is not problematic: in such cases, the field appears among
-the optional fields, not among the extra fields."
+that are just for personal use.
+
+Note, before adding fields to this list, check if the field you
+want to add is among the fields that are hidden by default. See
+the option \"Hidden Fields\" (`ebib-hidden-fields') for details."
   :group 'ebib
-  :type '(repeat (string :tag "Field")))
+  :type '(repeat (cons (choice (const BibTeX)
+                               (const biblatex))
+                       (repeat :tag "Extra fields" (string :tag "Field")))))
 
 (defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
                                 "booksubtitle" "booktitleaddon" "chapter" "commentator"
@@ -1226,7 +1235,7 @@ which ENTRY-TYPE is an alias."
       (setq optional (mapcar #'car (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))
     (when (memq type '(all extra))
       (let ((fields (append required optional)))
-        (setq extra (--remove (member-ignore-case it fields) ebib-extra-fields))))
+        (setq extra (--remove (member-ignore-case it fields) (cdr (assq dialect ebib-extra-fields))))))
     (cond
      ((eq type 'required) required)
      ((eq type 'optional) optional)
