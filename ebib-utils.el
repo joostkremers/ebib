@@ -686,12 +686,16 @@ Ebib (not Emacs)."
 (defvar ebib-local-bibtex-filenames nil
   "A buffer-local variable holding a list of the name(s) of that buffer's .bib file(s)")
 (make-variable-buffer-local 'ebib-local-bibtex-filenames)
-(defvar ebib-syntax-table (make-syntax-table) "Syntax table used for reading .bib files.")
-(modify-syntax-entry ?\[ "." ebib-syntax-table)
-(modify-syntax-entry ?\] "." ebib-syntax-table)
-(modify-syntax-entry ?\( "." ebib-syntax-table)
-(modify-syntax-entry ?\) "." ebib-syntax-table)
-(modify-syntax-entry ?\" "w" ebib-syntax-table)
+
+(defvar ebib-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\[ "." table)
+    (modify-syntax-entry ?\] "." table)
+    (modify-syntax-entry ?\( "." table)
+    (modify-syntax-entry ?\) "." table)
+    (modify-syntax-entry ?\" "w" table)
+    table)
+  "Syntax table used for reading .bib files.")
 
 ;; The databases
 
