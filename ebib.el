@@ -2869,7 +2869,6 @@ to append them to."
 (defun ebib-multiline-edit (type &optional starttext)
   "Switch to Ebib's multiline edit buffer.
 STARTTEXT is a string that contains the initial text of the buffer."
-  ;; (setq ebib-pre-multiline-buffer (current-buffer))
   (ebib-pop-to-buffer 'multiline)
   (erase-buffer)
   (setq ebib-editing type)

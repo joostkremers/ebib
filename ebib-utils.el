@@ -677,7 +677,6 @@ Ebib (not Emacs)."
 (defvar ebib-saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib-window-before nil "The window that was active when Ebib was called.")
 (defvar ebib-buffer-before nil "The buffer that was active when Ebib was called.")
-;;(defvar ebib-pre-multiline-buffer nil "The buffer in the window before switching to the multiline edit buffer.")
 (defvar ebib-export-filename nil "Filename to export entries to.")
 (defvar ebib-push-buffer nil "Buffer to push entries to.")
 (defvar ebib-search-string nil "Stores the last search string.")
