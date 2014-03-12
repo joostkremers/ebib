@@ -193,6 +193,9 @@ all else fails, pop up a new frame."
           (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib-field-aliases 'case-fold))) 'face 'ebib-alias-face)))
       (if (stringp (get-text-property 0 'ebib-xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
+      (if (and (cl-equalp field "crossref")
+               (not (member (ebib-db-unbrace value) ebib-cur-keys-list)))
+          (setq value (propertize value 'face 'error)))
       (if (ebib-db-unbraced-p value)
           (setq raw "*")
         (setq value (ebib-db-unbrace value))) ; we have to make the value look nice
