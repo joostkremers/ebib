@@ -750,8 +750,8 @@ Note: it is assumed that FILE is a fully expanded filename."
       ;; add keywords for the new database
       (ebib-keywords-load-keywords ebib-cur-db)
       (if ebib-keywords-files-alist
-          (ebib-log 'log "Using keywords from %s." (ebib-keywords-get-file ebib-cur-db))
-        (ebib-log 'log "Using general keyword list.")))))
+          (ebib-log 'log "Using keywords from %s.\n" (ebib-keywords-get-file ebib-cur-db))
+        (ebib-log 'log "Using general keyword list.\n")))))
 
 (defun ebib-reload-current-database ()
   "Reload the current database from disk."
