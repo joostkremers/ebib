@@ -2256,22 +2256,21 @@ the beginning of the current line."
   (interactive)
   (if (= (forward-line -1) -1)
       (beep) ; We're at the first field already
-    (while (eolp) ; If we're at an empty line
+    (while (eolp) ; If we're at an empty line,
       (forward-line -1)) ; move up until we're not.
     (ebib-set-fields-overlay)))
 
 (defun ebib-next-field ()
   "Move to the next field."
   (interactive)
-  (if (= (forward-line) 1)
-      (unless (called-interactively-p 'any)
+  (forward-line)
+  (when (eobp)                          ; If we ended up at the empty line below
+    (if (called-interactively-p 'any)   ; the last field, beep and adjust.
         (beep))
-    (while (and (not (eobp))
-                (eolp))
-      (forward-line))
-    (if (eobp)
-        (forward-line -1)) ; make sure we're not on the line below the last entry.
-    (ebib-set-fields-overlay)))
+    (forward-line -1))
+  (while (eolp) ; If we're at an empty line,
+    (forward-line)) ; move down until we're not.
+  (ebib-set-fields-overlay))
 
 (defun ebib-goto-first-field ()
   "Move to the first field."
