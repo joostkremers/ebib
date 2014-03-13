@@ -161,12 +161,13 @@ all else fails, pop up a new frame."
   "Redisplay the current string definition in the strings buffer."
   (with-current-ebib-buffer 'strings
     (with-ebib-buffer-writable
-      (let ((val (ebib-db-get-string ebib-current-string ebib-cur-db nil 'unbraced)))
+      (let* ((string (ebib-current-string))
+             (val (ebib-db-get-string string ebib-cur-db nil 'unbraced)))
         (goto-char (overlay-start ebib-strings-overlay))
         (let ((beg (point)))
           (end-of-line)
           (delete-region beg (point)))
-        (insert (format "%-18s %s" ebib-current-string
+        (insert (format "%-18s %s" string
                         (if (ebib-multiline-p val)
                             (concat "+" (ebib-first-line val))
                           (concat " " val))))
@@ -1779,7 +1780,6 @@ result."
   (interactive)
   (ebib-execute-when
     ((real-db)
-     (setq ebib-cur-strings-list (ebib-db-list-strings ebib-cur-db))
      (ebib-fill-strings-buffer)
      (ebib-pop-to-buffer 'strings)
      (goto-char (point-min)))
@@ -2656,38 +2656,47 @@ The deleted text is not put in the kill ring."
       (switch-to-buffer nil t)))
   (ebib-pop-to-buffer 'index))
 
+(defun ebib-current-string ()
+  "Return the currently selected string.
+The current string is simply the string that point is on. If
+point is on an empty line (e.g., when there are no @string
+definitions), return `nil'. This function leaves point at the
+beginning of the current line."
+  (with-current-ebib-buffer 'strings
+    (beginning-of-line)
+    (unless (eolp)
+      (save-excursion
+        (let ((beg (point))
+              (end (progn
+                     (skip-chars-forward "a-zA-Z" (line-end-position))
+                     (point))))
+          (buffer-substring-no-properties beg end))))))
+
 (defun ebib-prev-string ()
   "Move to the previous string."
   (interactive)
-  (if (string= ebib-current-string (car ebib-cur-strings-list))  ; if we're on the first string
-      (beep)
-    ;; go to the beginnig of the overlay and move upward one line.
-    (goto-char (overlay-start ebib-strings-overlay))
-    (forward-line -1)
-    (setq ebib-current-string (ebib-prev-elem ebib-current-string ebib-cur-strings-list))
+  (if (= (forward-line -1) -1)
+      (beep) ; We're at the first line already.
     (ebib-set-strings-overlay)))
 
 (defun ebib-next-string ()
   "Move to the next string."
   (interactive)
-  (if (string= ebib-current-string (-last-item ebib-cur-strings-list))
-      (when (called-interactively-p 'any) (beep))
-    (goto-char (overlay-start ebib-strings-overlay))
-    (forward-line 1)
-    (setq ebib-current-string (ebib-next-elem ebib-current-string ebib-cur-strings-list))
-    (ebib-set-strings-overlay)))
+  (forward-line)
+  (when (eobp) ; If we've ended up on the empty line after the last string
+    (forward-line -1) ; go back and beep
+    (beep))
+  (ebib-set-strings-overlay))
 
 (defun ebib-goto-first-string ()
   "Move to the first string."
   (interactive)
-  (setq ebib-current-string (car ebib-cur-strings-list))
   (goto-char (point-min))
   (ebib-set-strings-overlay))
 
 (defun ebib-goto-last-string ()
   "Move to the last string."
   (interactive)
-  (setq ebib-current-string (-last-item ebib-cur-strings-list))
   (goto-char (point-max))
   (forward-line -1)
   (ebib-set-strings-overlay))
@@ -2695,44 +2704,29 @@ The deleted text is not put in the kill ring."
 (defun ebib-strings-page-up ()
   "Move 10 strings up."
   (interactive)
-  (let ((number-of-strings (length ebib-cur-strings-list))
-        (remaining-number-of-strings (length (member ebib-current-string ebib-cur-strings-list))))
-    (if (<= (- number-of-strings remaining-number-of-strings) 10)
-        (ebib-goto-first-string)
-      (setq ebib-current-string (nth
-                                 (- number-of-strings remaining-number-of-strings 10)
-                                 ebib-cur-strings-list))
-      (goto-char (overlay-start ebib-strings-overlay))
-      (forward-line -10)
-      (ebib-set-strings-overlay))))
+  (forward-line -10)
+  (ebib-set-strings-overlay))
 
 (defun ebib-strings-page-down ()
   "Move 10 strings down."
   (interactive)
-  (let ((number-of-strings (length ebib-cur-strings-list))
-        (remaining-number-of-strings (length (member ebib-current-string ebib-cur-strings-list))))
-    (if (<= remaining-number-of-strings 10)
-        (ebib-goto-last-string)
-      (setq ebib-current-string (nth
-                                 (- number-of-strings remaining-number-of-strings -10)
-                                 ebib-cur-strings-list))
-      (goto-char (overlay-start ebib-strings-overlay))
-      (forward-line 10)
-      (ebib-set-strings-overlay))))
+  (forward-line 10)
+  (if (eobp)
+      (forward-line -1))
+  (ebib-set-strings-overlay))
 
 (defun ebib-fill-strings-buffer ()
   "Fill the strings buffer with the @STRING definitions."
   (with-current-ebib-buffer 'strings
     (with-ebib-buffer-writable
       (erase-buffer)
-      (cl-dolist (elem ebib-cur-strings-list)
+      (cl-dolist (elem (ebib-db-list-strings ebib-cur-db))
         (let ((str (ebib-db-get-string elem ebib-cur-db 'noerror 'unbraced)))
           (insert (format "%-18s %s\n" elem
                           (if (ebib-multiline-p str)
                               (concat "+" (ebib-first-line str))
                             (concat " " str)))))))
     (goto-char (point-min))
-    (setq ebib-current-string (car ebib-cur-strings-list))
     (ebib-set-strings-overlay)
     (set-buffer-modified-p nil)))
 
@@ -2740,13 +2734,14 @@ The deleted text is not put in the kill ring."
   "Edit the value of an @STRING definition
 When the user enters an empty string, the value is not changed."
   (interactive)
-  (let ((init-contents (ebib-db-get-string ebib-current-string ebib-cur-db 'noerror 'unbraced)))
-    (ebib-ifstring (new-contents (read-string (format "%s: " ebib-current-string)
+  (let* ((string (ebib-current-string))
+         (init-contents (ebib-db-get-string string ebib-cur-db 'noerror 'unbraced)))
+    (ebib-ifstring (new-contents (read-string (format "%s: " string)
                                               (if init-contents
                                                   (cons init-contents 0)
                                                 nil)))
         (progn
-          (ebib-db-set-string ebib-current-string new-contents ebib-cur-db 'overwrite)
+          (ebib-db-set-string string new-contents ebib-cur-db 'overwrite)
           (ebib-redisplay-current-string)
           (ebib-next-string)
           (ebib-set-modified t))
@@ -2755,48 +2750,43 @@ When the user enters an empty string, the value is not changed."
 (defun ebib-copy-string-contents ()
   "Copy the contents of the current string to the kill ring."
   (interactive)
-  (let ((contents (ebib-db-get-string ebib-current-string ebib-cur-db nil 'unbraced)))
+  (let ((contents (ebib-db-get-string (ebib-current-string) ebib-cur-db nil 'unbraced)))
     (kill-new contents)
     (message "String value copied.")))
 
 (defun ebib-delete-string ()
   "Delete the current @STRING definition from the database."
   (interactive)
-  (when (y-or-n-p (format "Delete @STRING definition %s? " ebib-current-string))
-    (ebib-db-remove-string ebib-current-string ebib-cur-db)
-    (with-ebib-buffer-writable
-      (let ((beg (progn
-                   (goto-char (overlay-start ebib-strings-overlay))
-                   (point))))
-        (forward-line 1)
-        (delete-region beg (point))))
-    (let ((new-cur-string (ebib-next-elem ebib-current-string ebib-cur-strings-list)))
-      (setq ebib-cur-strings-list (delete ebib-current-string ebib-cur-strings-list))
-      (when (null new-cur-string)       ; deleted the last string
-        (setq new-cur-string (-last-item ebib-cur-strings-list))
+  (let ((string (ebib-current-string)))
+    (when (y-or-n-p (format "Delete @STRING definition %s? " string))
+      (ebib-db-remove-string string ebib-cur-db)
+      (with-ebib-buffer-writable
+        (let ((beg (progn
+                     (goto-char (overlay-start ebib-strings-overlay))
+                     (point))))
+          (forward-line 1)
+          (delete-region beg (point))))
+      (when (eobp)                      ; deleted the last string
         (forward-line -1))
-      (setq ebib-current-string new-cur-string))
-    (ebib-set-strings-overlay)
-    (ebib-set-modified t)
-    (message "@STRING definition deleted.")))
+      (ebib-set-strings-overlay)
+      (ebib-set-modified t)
+      (message "@STRING definition deleted."))))
 
 (defun ebib-add-string ()
   "Create a new @STRING definition."
   (interactive)
   (ebib-ifstring (new-abbr (read-string "New @STRING abbreviation: " nil 'ebib-key-history))
       (progn
-        (if (member new-abbr ebib-cur-strings-list)
+        (if (member new-abbr (ebib-db-list-strings ebib-cur-db))
             (error (format "%s already exists" new-abbr)))
         (ebib-ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
             (progn
               (ebib-db-set-string new-abbr new-string ebib-cur-db)
-              (ebib-sort-in-buffer (length ebib-cur-strings-list) new-abbr)
+              (ebib-sort-in-buffer (length (ebib-db-list-strings ebib-cur-db)) new-abbr)
               (with-ebib-buffer-writable
                 (insert (format "%-19s %s\n" new-abbr new-string)))
               (forward-line -1)
               (ebib-set-strings-overlay)
-              (setq ebib-current-string new-abbr)
-              (setq ebib-cur-strings-list (ebib-db-list-strings ebib-cur-db))
               (ebib-set-modified t))))))
 
 (defun ebib-export-string (prefix)
@@ -2805,17 +2795,18 @@ The prefix argument indicates which database to copy the string
 to. If no prefix argument is present, a filename is asked to
 which the string is appended."
   (interactive "P")
-  (let ((num (ebib-prefix prefix)))
+  (let ((string (ebib-current-string))
+        (num (ebib-prefix prefix)))
     (if num
-        (ebib-export-to-db num (format "@STRING definition `%s' copied to database %%d" ebib-current-string)
+        (ebib-export-to-db num (format "@STRING definition `%s' copied to database %%d" string)
                            #'(lambda (db)
-                               (ebib-db-set-string ebib-current-string (ebib-db-get-string ebib-current-string ebib-cur-db) db)))
-      (ebib-export-to-file (format "Export @STRING definition `%s' to file: " ebib-current-string)
-                           (format "@STRING definition `%s' exported to %%s" ebib-current-string)
+                               (ebib-db-set-string string (ebib-db-get-string string ebib-cur-db) db)))
+      (ebib-export-to-file (format "Export @STRING definition `%s' to file: " string)
+                           (format "@STRING definition `%s' exported to %%s" string)
                            #'(lambda ()
                                (insert (format "\n@string{%s = %s}\n"
-                                               ebib-current-string
-                                               (ebib-db-get-string ebib-current-string ebib-cur-db))))))))
+                                               string
+                                               (ebib-db-get-string string ebib-cur-db))))))))
 
 (defun ebib-export-all-strings (prefix)
   "Export all @STRING definitions.
@@ -2823,7 +2814,7 @@ If a prefix argument is given, it is taken as the database to
 copy the definitions to. Without prefix argument, asks for a file
 to append them to."
   (interactive "P")
-  (when ebib-current-string ; there is always a current string, unless there are no strings
+  (when (ebib-current-string) ; There is always a current string, unless there are no strings.
     (let ((num (ebib-prefix prefix)))
       (if num
           (ebib-export-to-db
@@ -2831,11 +2822,11 @@ to append them to."
            #'(lambda (db)
                (mapc #'(lambda (abbr)
                          (ebib-db-set-string abbr (ebib-db-get-string abbr ebib-cur-db) db 'noerror))
-                     ebib-cur-strings-list)))
+                     (ebib-db-list-strings ebib-cur-db))))
         (ebib-export-to-file "Export all @STRING definitions to file: "
                              "All @STRING definitions exported to %s"
                              #'(lambda ()
-                                 (insert (format "\n")) ; to keep things tidy.
+                                 (insert (format "\n")) ; To keep things tidy.
                                  (ebib-format-strings ebib-cur-db)))))))
 
 (defun ebib-strings-help ()

@@ -708,12 +708,6 @@ Ebib (not Emacs)."
 
 (defvar ebib-hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
-;; these variables are set when the user enters the entry and strings buffer, respectively
-(defvar ebib-cur-strings-list nil "A sorted list of strings in the current database.")
-
-;; and this one by `ebib-fill-strings-buffer'
-(defvar ebib-current-string nil "The current @STRING definition.")
-
 ;; the prefix key and the multiline key are stored in a variable so that the
 ;; user can customise them.
 (defvar ebib-prefix-key ?\;)
