@@ -382,12 +382,15 @@ loaded, switch to it. If KEY is given, jump to it."
   (ebib-init)
   ;; Set up the windows.
   (ebib-setup-windows)
-  ;; See if we have a file and/or a key.
+  ;; See if we have a file.
   (if file
       (ebib-load-bibtex-file-internal (ebib-locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
+  ;; Fill the index buffer (which sets ebib-cur-keys-list).
+  (ebib-fill-index-buffer)
+  ;; Then check if we have a key (ebib-cur-keys-list must be set for this).
   (if key
       (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))
-  (ebib-redisplay))
+  (ebib-fill-entry-buffer))
 
 ;;;###autoload
 (defun ebib-open-org-link (key)
