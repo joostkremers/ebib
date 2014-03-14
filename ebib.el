@@ -267,10 +267,7 @@ to \"none\". This function sets `ebib-cur-keys-list'."
       (erase-buffer)
       (if (not ebib-cur-db)
           (rename-buffer " none")
-        (setq ebib-cur-keys-list
-              (if (ebib-db-get-filter ebib-cur-db)
-                  (ebib-filters-run-filter ebib-cur-db)
-                (ebib-db-list-keys ebib-cur-db)))
+        (setq ebib-cur-keys-list (ebib-list-keys))
         ;; Set a header line if there is a filter.
         (setq header-line-format (ebib-filters-pp-filter (ebib-db-get-filter ebib-cur-db)))
         ;; We may call this function when there are no entries in the
@@ -296,6 +293,14 @@ to \"none\". This function sets `ebib-cur-keys-list'."
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                      (length (member ebib-cur-db ebib-databases)))))
                                (ebib-db-get-filename ebib-cur-db 'shortened)))))))
+
+(defun ebib-list-keys ()
+  "Return a list of entry keys in the current database.
+If a filter is active, only the keys of entries that match the
+filter are returned. The returned list is sorted."
+  (if (ebib-db-get-filter ebib-cur-db)
+      (ebib-filters-run-filter ebib-cur-db)
+    (ebib-db-list-keys ebib-cur-db)))
 
 (defun ebib-display-mark (mark &optional beg end)
   "Highlight/unhighlight an entry.
@@ -346,12 +351,11 @@ loaded, switch to it. If KEY is given, jump to it."
   ;; See if we have a file.
   (if file
       (ebib-load-bibtex-file-internal (ebib-locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
-  ;; Fill the index buffer (which sets ebib-cur-keys-list).
-  (ebib-fill-index-buffer)
-  ;; Then check if we have a key (ebib-cur-keys-list must be set for this).
+  ;; See if we have a key; ebib-cur-keys-list must be set for this to work.
+  (setq ebib-cur-keys-list (ebib-list-keys))
   (if key
       (ebib-find-and-set-key key (buffer-local-value 'ebib-local-bibtex-filenames ebib-buffer-before)))
-  (ebib-fill-entry-buffer))
+  (ebib-redisplay))
 
 ;;;###autoload
 (defun ebib-open-org-link (key)
