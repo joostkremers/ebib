@@ -299,7 +299,7 @@ a logical `not' is applied to the selection."
 
 (defun ebib-filters-run-filter (db)
   "Run the filter of DB.
-Return a list of entry keys that match DB's filter."
+Return a sorted list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
