@@ -506,7 +506,8 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib-cur-keys-list nil
           ebib-keywords-files-alist nil
           ebib-keywords-list-per-session nil
-          ebib-filters-alist nil)
+          ebib-filters-alist nil
+          ebib-filters-modified nil)
     (set-window-configuration ebib-saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib-kill-emacs-query-function)
     (message "")))
