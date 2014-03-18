@@ -1223,8 +1223,8 @@ If no definition is found, return `nil'."
 DB defaults to the current database. If DB has no dialect, return
 the default dialect, as stored in `ebib-bibtex-dialect'."
   (or db (setq db ebib-cur-db))
-  (or (and db (ebib-db-get-dialect db)))
-      ebib-bibtex-dialect)
+  (or (and db (ebib-db-get-dialect db))
+      ebib-bibtex-dialect))
 
 (defun ebib-list-keys ()
   "Return a list of entry keys in the current database.
