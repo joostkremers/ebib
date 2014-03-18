@@ -294,14 +294,6 @@ to \"none\". This function sets `ebib-cur-keys-list'."
                                                      (length (member ebib-cur-db ebib-databases)))))
                                (ebib-db-get-filename ebib-cur-db 'shortened)))))))
 
-(defun ebib-list-keys ()
-  "Return a list of entry keys in the current database.
-If a filter is active, only the keys of entries that match the
-filter are returned. The returned list is sorted."
-  (if (ebib-db-get-filter ebib-cur-db)
-      (ebib-filters-run-filter ebib-cur-db)
-    (ebib-db-list-keys ebib-cur-db)))
-
 (defun ebib-display-mark (mark &optional beg end)
   "Highlight/unhighlight an entry.
 Add/remove `ebib-marked-face` to the region between BEG and END,
@@ -1553,18 +1545,6 @@ first entry with the current entry's key in its crossref field."
   "Toggle whether multiline fields are printed."
   (interactive)
   (setq ebib-print-multiline (not ebib-print-multiline)))
-
-(defun ebib-set-dialect (dialect)
-  "Set the BibTeX dialect of the current database.
-Valid values for DIALECT are listed in `bibtex-dialect-list'.
-DIALECT can also be `nil', in which case the dialect is unset."
-  (interactive "SDialect: ")
-  (if (and dialect
-           (not (memq dialect bibtex-dialect-list)))
-      (error "Not a valid BibTeX dialect: %s" dialect)
-    (ebib-db-set-dialect dialect ebib-cur-db)
-    (ebib-set-modified t ebib-cur-db)
-    (ebib-redisplay)))
 
 (defun ebib-delete-entry ()
   "Delete the current entry from the database."
