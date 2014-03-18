@@ -231,11 +231,13 @@ it is highlighted. DB defaults to the current database."
          (undef-fields (mapcar #'car (ebib-list-undefined-fields (ebib-db-get-entry key ebib-cur-db) dialect))))
     (insert (format "%-19s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
-                    entry-type
+                    (if (assoc-string entry-type (ebib-list-entry-types (ebib-get-dialect) t) 'case-fold)
+                        entry-type
+                      (propertize entry-type 'face 'error))
                     (if (and (eq dialect 'biblatex)
                              (assoc-string entry-type ebib-type-aliases 'case-fold))
                         (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))) 'face 'ebib-alias-face)
-                        "")))
+                      "")))
     (mapc #'(lambda (fields)
               (when fields ; If one of the sets is empty, we don't want an extra empty line.
                 (insert "\n")
@@ -854,13 +856,10 @@ is set to T."
                   (setq preamble t)))
                ((cl-equalp entry-type "comment")
                 (ebib-read-comment db))
-                ;; Check if the entry type has been defined
-               ((assoc-string entry-type (ebib-list-entry-types (ebib-get-dialect) t) 'case-fold)
-                (if (ebib-read-entry entry-type db timestamp)
-                    (setq n-entries (1+ n-entries))))
-               ;; anything else we report as an unknown entry type.
-               (t (ebib-log 'error "Line %d: Unknown entry type `%s'. Skipping." (line-number-at-pos) entry-type)
-                  (ebib-match-paren-forward (point-max)))))
+               (t (when (ebib-read-entry entry-type db timestamp)
+                    (setq n-entries (1+ n-entries))
+                    (unless (assoc-string entry-type (ebib-list-entry-types (ebib-get-dialect) t) 'case-fold)
+                      (ebib-log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
           (ebib-log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos)))))
     (list n-entries n-strings preamble)))
 
