@@ -67,6 +67,16 @@
 
 (defgroup ebib-windows nil "Ebib window management" :group 'ebib)
 
+(defcustom ebib-bibtex-dialect 'BibTeX
+  "The default BibTeX dialect.
+A new database automatically gets this dialect. When opening a
+`.bib' file that has no Ebib-compatible dialect setting is also
+assumed to use this dialect."
+  :group 'ebib
+  :type '(choice :tag "Dialect"
+                 (const BibTeX)
+                 (const biblatex)))
+
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
 This is the entry type of a newly created entry."
@@ -213,9 +223,9 @@ rest of the frame is used for the entry buffer, unless
                                   mode-line-front-space
                                   mode-line-modified
                                   mode-line-buffer-identification
-                                  (:eval (format "  (%s)" (or (ebib-db-get-dialect ebib-cur-db) (default-value 'bibtex-dialect))))
-                                  (:eval (if (ebib-cur-entry-key) "     Entry %l" "     No Entries"))
-                                  (:eval (if (ebib-db-get-filter ebib-cur-db) "  (Filtered)" "")))
+                                  (:eval (format "  (%s)" (ebib-get-dialect)))
+                                  (:eval (if (and ebib-cur-db (ebib-cur-entry-key)) "     Entry %l" "     No Entries"))
+                                  (:eval (if (and ebib-cur-db (ebib-db-get-filter ebib-cur-db)) "  (Filtered)" "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
 information. You can customize this information if you wish, or
@@ -1253,13 +1263,13 @@ fields; `optional' means to list optional fields; `extra' means
 to list extra fields (i.e., fields defined in `ebib-extra-fields'
 and not present in ENTRY-TYPE); finally, `all' means to list all
 fields. DIALECT is the BibTeX dialect; possible values are those
-listed in `bibtex-dialect-list' or NIL, in which case the default
-value of `bibtex-dialect' is used.
+listed in `bibtex-dialect-list' or NIL, in which case the value
+of `ebib-bibtex-dialect' is used.
 
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
 defined by BibLaTeX, return the fields of the entry type for
 which ENTRY-TYPE is an alias."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+  (or dialect (setq dialect ebib-bibtex-dialect))
   (if (eq dialect 'biblatex)
       (setq entry-type (or (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))
                            entry-type)))
@@ -1285,20 +1295,19 @@ part of the definition of ENTRY's type and also not part of the
 extra fields.
 
 DIALECT is the BibTeX dialect; possible values are those listed
-in `bibtex-dialect-list' or NIL, in which case the default value
-of `bibtex-dialect' is used."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+in `bibtex-dialect-list' or NIL, in which case the value of
+`ebib-bibtex-dialect' is used."
+  (or dialect (setq dialect ebib-bibtex-dialect))
   (let ((fields (ebib-list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
     (--remove (member-ignore-case (car it) (cons "=type=" fields)) entry)))
 
 (defun ebib-list-entry-types (dialect &optional include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
-values in `bibtex-dialect-list' or NIL, in which case the default
-value of `bibtex-dialect' is used. If INCLUDE-ALIASES is
-non-NIL, include entry type aliases as defined by
-`ebib-type-aliases'."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+values in `bibtex-dialect-list' or NIL, in which case the value
+of `ebib-bibtex-dialect' is used. If INCLUDE-ALIASES is non-NIL,
+include entry type aliases as defined by `ebib-type-aliases'."
+  (or dialect (setq dialect ebib-bibtex-dialect))
   (append (mapcar #'car (bibtex-entry-alist dialect))
           (if (and include-aliases (eq dialect 'biblatex))
               (mapcar #'car ebib-type-aliases))))
@@ -1310,9 +1319,9 @@ This variable is initialized by `ebib-list-field-uniquely'.")
 (defun ebib-list-fields-uniquely (dialect)
   "Return a list of all fields of BibTeX DIALECT.
 Possible values for DIALECT are those listed in
-`bibtex-dialect-list' or NIL, in which case the default value of
-`bibtex-dialect' is used."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))  
+`bibtex-dialect-list' or NIL, in which case the value of
+`ebib-bibtex-dialect' is used."
+  (or dialect (setq dialect ebib-bibtex-dialect))
   (or (cdr (assq dialect ebib-unique-field-alist))
       (let (fields)
         (mapc #'(lambda (entry)

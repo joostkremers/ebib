@@ -85,7 +85,7 @@ it is deleted."
   (setf (ebib-dbstruct-read-only db) nil))
 
 (defun ebib-db-get-dialect (db)
-  "Return the BibTeX-dialect of DB."
+  "Return the BibTeX dialect of DB."
   (ebib-dbstruct-dialect db))
 
 (defun ebib-db-set-dialect (dialect db)
@@ -326,12 +326,12 @@ SOURCE-ENTRY is the entry type of the cross-referenced
 entry, (the entry providing the value), TARGET-ENTRY the type of
 the cross-referencing entry, (the entry containing the field that
 should inherit a value). DIALECT is a BibTeX dialect and defaults
-to the default value of `bibtex-dialect'. If it is `BibTeX', the
-return value is simply TARGET-FIELD; otherwise the inheritances
-are taken from the variable `ebib-biblatex-inheritances'. If
-TARGET-FIELD cannot inherit a value, this function returns
-`nil'."
-  (or dialect (setq dialect (default-value 'bibtex-dialect)))
+to the default value of `ebib-bibtex-dialect'. If it is `BibTeX',
+the return value is simply TARGET-FIELD; otherwise the
+inheritances are taken from the variable
+`ebib-biblatex-inheritances'. If TARGET-FIELD cannot inherit a
+value, this function returns `nil'."
+  (or dialect (setq dialect ebib-bibtex-dialect))
   (if (eq dialect 'BibTeX)
       target-field
     (let* ((inheritance (cl-third (cl-find-if #'(lambda (e)

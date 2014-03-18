@@ -276,7 +276,7 @@ a logical `not' is applied to the selection."
   (let ((field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
                                         (if (< not 0) "not " "")
                                         (if (< not 0) "" ""))
-                                (append (list "any" "=type=") (-union (ebib-list-fields-uniquely (ebib-db-get-dialect ebib-cur-db)) ebib-extra-fields))
+                                (append (list "any" "=type=") (-union (ebib-list-fields-uniquely (ebib-get-dialect)) ebib-extra-fields))
                                 nil nil nil 'ebib-field-history)))
     (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
                                        (if (< not 0) "not " "")
@@ -285,7 +285,7 @@ a logical `not' is applied to the selection."
                                        (if (string= field "=type=") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "=type=")
-                     (completing-read prompt (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db) t) nil t nil 'ebib-filters-history))
+                     (completing-read prompt (ebib-list-entry-types (ebib-get-dialect) t) nil t nil 'ebib-filters-history))
                     ((cl-equalp field "keywords")
                      (completing-read prompt (ebib-keywords-for-database ebib-cur-db)  nil nil nil 'ebib-keywords-history))
                     (t

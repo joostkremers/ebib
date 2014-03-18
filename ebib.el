@@ -222,7 +222,7 @@ If MATCH-STR is provided, then when it is present in the value,
 it is highlighted. DB defaults to the current database."
   (or db
       (setq db ebib-cur-db))
-  (let* ((dialect (ebib-db-get-dialect db))
+  (let* ((dialect (ebib-get-dialect db))
          (entry (ebib-db-get-entry key db))
          (entry-type (cdr (assoc "=type=" entry)))
          (req-fields (ebib-list-fields entry-type 'required dialect))
@@ -670,10 +670,12 @@ number is also the argument to the function."
                          (vector (format "%s" d) `(ebib-set-dialect (quote ,d))
                                  :active t
                                  :style 'radio
-                                 :selected `(eq (ebib-db-get-dialect ebib-cur-db) (quote ,d))))
+                                 :selected `(if ebib-cur-db
+                                                (eq (ebib-db-get-dialect ebib-cur-db) (quote ,d))
+                                              (eq (ebib-get-dialect) (quote ,d)))))
                      bibtex-dialect-list)
              (list ["Default" (ebib-set-dialect nil)
-                    :active t :style radio :selected (not (ebib-db-get-dialect ebib-cur-db))]))
+                    :active ebib-cur-db :style radio :selected (and ebib-cur-db (not (ebib-db-get-dialect ebib-cur-db)))]))
     "--"
     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib-keywords-new-p ebib-cur-db)]
     ["Save All New Keywords" ebib-keywords-save-all-new (ebib-keywords-new-p)]
@@ -687,9 +689,9 @@ number is also the argument to the function."
     ["Edit Strings" ebib-edit-strings (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     "--"
-    ["Open URL" ebib-browse-url (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
-    ["Open DOI" ebib-browse-doi (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
-    ["View File" ebib-view-file (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror)]
+    ["Open URL" ebib-browse-url (and ebib-cur-db (ebib-db-get-field-value ebib-url-field (ebib-cur-entry-key) ebib-cur-db 'noerror))]
+    ["Open DOI" ebib-browse-doi (and ebib-cur-db (ebib-db-get-field-value ebib-doi-field (ebib-cur-entry-key) ebib-cur-db 'noerror))]
+    ["View File" ebib-view-file (and ebib-cur-db (ebib-db-get-field-value ebib-file-field (ebib-cur-entry-key) ebib-cur-db 'noerror))]
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
      ["As Index Cards" ebib-print-entries ebib-cur-db]
@@ -853,7 +855,7 @@ is set to T."
                ((cl-equalp entry-type "comment")
                 (ebib-read-comment db))
                 ;; Check if the entry type has been defined
-               ((assoc-string entry-type (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db) t) 'case-fold)
+               ((assoc-string entry-type (ebib-list-entry-types (ebib-get-dialect) t) 'case-fold)
                 (if (ebib-read-entry entry-type db timestamp)
                     (setq n-entries (1+ n-entries))))
                ;; anything else we report as an unknown entry type.
@@ -1151,7 +1153,8 @@ generate the key, see that function's documentation for details."
                 (if x-ref
                     (ebib-format-entry x-ref ebib-cur-db nil)))
               (goto-char (point-min))
-              (bibtex-generate-autokey))))
+              (let ((bibtex-dialect (ebib-get-dialect)))
+                (bibtex-generate-autokey)))))
        (if (string= new-key "")
            (error (format "Cannot create key"))
          (ebib-update-keyname new-key))))
@@ -1376,8 +1379,8 @@ in order for the sort value."
     (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
   ;; Save the dialect. This must happen early in the file so that when it
   ;; is opened again, the dialect is set before entries are read.
-  (if (ebib-db-get-dialect db)
-      (insert (format "@Comment{\nbibtex-dialect: %s\n}\n\n" (ebib-db-get-dialect db))))
+  (if (ebib-get-dialect db)
+      (insert (format "@Comment{\nbibtex-dialect: %s\n}\n\n" (ebib-get-dialect db))))
   (ebib-format-comments db)
   (ebib-format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
@@ -1843,7 +1846,7 @@ Either prints the entire database, or the marked entries."
                                            (insert (format "%s: & %s\\\\\n"
                                                            field (ebib-db-unbrace value))))))
                                  ;; Note: ebib-list-fields returns a list with `=type=' as its first element.
-                                 (cdr (ebib-list-fields (cdr (assoc "=type=" entry)) 'all (ebib-db-get-dialect ebib-cur-db)))))
+                                 (cdr (ebib-list-fields (cdr (assoc "=type=" entry)) 'all (ebib-get-dialect)))))
                          (insert "\\end{tabular}\n\n")
                          (insert (if ebib-print-newpage
                                      "\\newpage\n\n"
@@ -2300,7 +2303,7 @@ the beginning of the current line."
   (interactive "sField: ")
   ;; We store the field with a `nil' value and let the user edit it later.
   (let ((type (ebib-db-get-field-value "=type=" (ebib-cur-entry-key) ebib-cur-db)))
-    (if (or (member-ignore-case field (ebib-list-fields type 'all (ebib-db-get-dialect ebib-cur-db)))
+    (if (or (member-ignore-case field (ebib-list-fields type 'all (ebib-get-dialect)))
             (not (ebib-db-set-field-value field nil (ebib-cur-entry-key) ebib-cur-db 'noerror)))
         (error "Field already exists in entry `%s'" (ebib-cur-entry-key)))
     (ebib-fill-entry-buffer)
@@ -2311,7 +2314,7 @@ the beginning of the current line."
 
 (defun ebib-edit-entry-type ()
   "Edit the entry type."
-  (ebib-ifstring (new-type (completing-read "type: " (ebib-list-entry-types (ebib-db-get-dialect ebib-cur-db)) nil t))
+  (ebib-ifstring (new-type (completing-read "type: " (ebib-list-entry-types (ebib-get-dialect)) nil t))
       (progn
         (ebib-db-set-field-value "=type=" new-type (ebib-cur-entry-key) ebib-cur-db 'overwrite 'unbraced)
         (ebib-fill-entry-buffer)
