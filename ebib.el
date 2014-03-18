@@ -2034,6 +2034,26 @@ opened. If N is NIL, the user is asked to enter a number."
               (find-file file-full-path)))
         (error "File not found: `%s'" file)))))
 
+(defun ebib-set-dialect (dialect)
+  "Set the BibTeX dialect of the current database.
+If there is no current database, the default dialect is set for
+the current session. DIALECT can also be `nil' in order to unset
+the dialect (and use the default dialect). In this case there
+must be a current database."
+  (interactive (list (intern (completing-read "Dialect: " (mapcar #'symbol-name bibtex-dialect-list) nil t))))
+  (if (and dialect
+           (not (memq dialect bibtex-dialect-list)))
+      (error "Not a valid BibTeX dialect: %s" dialect))
+  (if (not ebib-cur-db)
+      ;; If no database is open, we try to set the default dialect
+      (if dialect
+          (setq ebib-bibtex-dialect dialect)
+        (error "Cannot unset default dialect"))
+    ;; Otherwise set the dialect of DB
+    (ebib-db-set-dialect dialect ebib-cur-db)
+    (ebib-set-modified t ebib-cur-db)
+    (ebib-redisplay)))
+
 (defun ebib-show-log ()
   "Display the contents of the log buffer."
   (interactive)

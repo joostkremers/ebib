@@ -1218,26 +1218,6 @@ If no definition is found, return `nil'."
   (if (string-match (concat "bibtex-dialect: \\(" (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t) "\\)") comment)
       (intern (match-string 1 comment))))
 
-(defun ebib-set-dialect (dialect)
-  "Set the BibTeX dialect of the current database.
-If there is no current database, the default dialect is set for
-the current session. DIALECT can also be `nil' in order to unset
-the dialect (and use the default dialect). In this case there
-must be a current database."
-  (interactive "SDialect: ")
-  (if (and dialect
-           (not (memq dialect bibtex-dialect-list)))
-      (error "Not a valid BibTeX dialect: %s" dialect))
-  (if (not ebib-cur-db)
-      ;; If no database is open, we try to set the default dialect
-      (if dialect
-          (setq ebib-bibtex-dialect dialect)
-        (error "Cannot unset default dialect"))
-    ;; Otherwise set the dialect of DB
-    (ebib-db-set-dialect dialect ebib-cur-db)
-    (ebib-set-modified t ebib-cur-db)
-    (ebib-redisplay)))
-
 (defun ebib-get-dialect (&optional db)
   "Get the dialect of DB.
 DB defaults to the current database. If DB has no dialect, return
