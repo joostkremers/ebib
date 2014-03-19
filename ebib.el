@@ -669,11 +669,10 @@ number is also the argument to the function."
     ,(append (list "BibTeX Dialect")
              (mapcar #'(lambda (d)
                          (vector (format "%s" d) `(ebib-set-dialect (quote ,d))
-                                 :active t
+                                 :active 'ebib-cur-db
                                  :style 'radio
-                                 :selected `(if ebib-cur-db
-                                                (eq (ebib-db-get-dialect ebib-cur-db) (quote ,d))
-                                              (eq (ebib-get-dialect) (quote ,d)))))
+                                 :selected `(and ebib-cur-db
+                                                 (eq (ebib-db-get-dialect ebib-cur-db) (quote ,d)))))
                      bibtex-dialect-list)
              (list ["Default" (ebib-set-dialect nil)
                     :active ebib-cur-db :style radio :selected (and ebib-cur-db (not (ebib-db-get-dialect ebib-cur-db)))]))
@@ -2030,23 +2029,20 @@ opened. If N is NIL, the user is asked to enter a number."
 
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
-If there is no current database, the default dialect is set for
-the current session. DIALECT can also be `nil' in order to unset
-the dialect (and use the default dialect). In this case there
-must be a current database."
+Possible values for DIALECT are those in `bibtex-dialect-list' or
+NIL, in which case the dialect is unset (and the default dialect
+is used)."
   (interactive (list (intern (completing-read "Dialect: " (mapcar #'symbol-name bibtex-dialect-list) nil t))))
-  (if (and dialect
-           (not (memq dialect bibtex-dialect-list)))
-      (error "Not a valid BibTeX dialect: %s" dialect))
-  (if (not ebib-cur-db)
-      ;; If no database is open, we try to set the default dialect
-      (if dialect
-          (setq ebib-bibtex-dialect dialect)
-        (error "Cannot unset default dialect"))
-    ;; Otherwise set the dialect of DB
-    (ebib-db-set-dialect dialect ebib-cur-db)
-    (ebib-set-modified t ebib-cur-db)
-    (ebib-redisplay)))
+  (unless (or (not dialect)
+              (memq dialect bibtex-dialect-list))
+    (error "Not a valid BibTeX dialect: %s" dialect))
+  (ebib-execute-when
+    ((database)
+     (ebib-db-set-dialect dialect ebib-cur-db)
+     (ebib-set-modified t ebib-cur-db)
+     (ebib-redisplay))
+    ((default)
+     (beep))))
 
 (defun ebib-show-log ()
   "Display the contents of the log buffer."
