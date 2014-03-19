@@ -306,7 +306,7 @@ This option is described in the manual/info file in the section
   :group 'ebib
   :type '(repeat (repeat :tag "Sort level" (string :tag "Sort field"))))
 
-(defcustom ebib-save-xrefs-first nil
+(defcustom ebib-save-xrefs-first t
   "Save entries with a crossref field first in the BibTeX-file.
 For BibTeX's cross-referencing to work, the cross-referencing
 entries must appear in the `.bib` file before the
@@ -315,7 +315,8 @@ entries with a `crossref` field first, so that BibTeX's
 crossreferencing options work as intended.
 
 Note: this option is not compatible with setting the option
-`ebib-sort-order'."
+`ebib-sort-order'. If you want to use the latter, unset this
+one."
   :group 'ebib
   :type 'boolean)
 
