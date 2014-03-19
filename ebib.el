@@ -1377,7 +1377,7 @@ in order for the sort value."
   ;; Save the dialect. This must happen early in the file so that when it
   ;; is opened again, the dialect is set before entries are read.
   (if (ebib-get-dialect db)
-      (insert (format "@Comment{\nbibtex-dialect: %s\n}\n\n" (ebib-get-dialect db))))
+      (insert (format "@Comment{\nebib-bibtex-dialect: %s\n}\n\n" (ebib-get-dialect db))))
   (ebib-format-comments db)
   (ebib-format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
