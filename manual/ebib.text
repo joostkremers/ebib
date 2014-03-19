@@ -187,9 +187,9 @@ For more details on working with the multiline edit buffer, see [The Multiline E
 
 ## Undefined Fields ##
 
-BibTeX ignores fields that it does not know, which is a property that can be exploited to add any relevant information to a BibTeX entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.
+BibTeX ignores fields that it does not know, which is a property that can be exploited to add any kind of  information to a BibTeX entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.
 
-It is even possible to add such fields to an entry by pressing `a` in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, it may be better to define the relevant fields through the user option "Extra Fields". Undefined fields may be useful, however, when reading or importing BibTeX entries from a different source that contain non-standard fields.
+It is even possible to add such fields to an entry by pressing `a` in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, it may be better to define the relevant fields through the user option "Extra Fields", but undefined fields may be useful when reading or importing BibTeX entries from a different source that contain non-standard fields.
 
 Note that if you delete the contents of an undefined field, the field itself remains in the database until you quit Ebib (or close the database). It will not be saved, however, so the next time you load the `.bib` file, the field is gone.
 
@@ -703,7 +703,7 @@ If you load this entry into Ebib with the option "Allow Identical Fields" set, y
         author = {Jones, Joan},
         year = {1998},
         ...
-        keywords = {sleep; winter; hibernation}
+        keywords = {sleep, winter, hibernation}
     }
 
 

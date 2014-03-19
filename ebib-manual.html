@@ -196,8 +196,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>By the way, the <code>e</code> key is smart about the way an entry must be edited. If you press <code>e</code> on a field that already has a multiline value, regardless of the fact whether it is the <code>annote</code> field or not, Ebib puts you in the multiline edit buffer. Therefore, you need <code>m</code> only if you want to give a field a multiline value when it doesn't have one yet.</p>
 <p>For more details on working with the multiline edit buffer, see <a href="#the-multiline-edit-buffer">The Multiline Edit Buffer</a>.</p>
 <h2 id="undefined-fields">Undefined Fields</h2>
-<p>BibTeX ignores fields that it does not know, which is a property that can be exploited to add any relevant information to a BibTeX entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.</p>
-<p>It is even possible to add such fields to an entry by pressing <code>a</code> in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, it may be better to define the relevant fields through the user option &quot;Extra Fields&quot;. Undefined fields may be useful, however, when reading or importing BibTeX entries from a different source that contain non-standard fields.</p>
+<p>BibTeX ignores fields that it does not know, which is a property that can be exploited to add any kind of information to a BibTeX entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.</p>
+<p>It is even possible to add such fields to an entry by pressing <code>a</code> in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, it may be better to define the relevant fields through the user option &quot;Extra Fields&quot;, but undefined fields may be useful when reading or importing BibTeX entries from a different source that contain non-standard fields.</p>
 <p>Note that if you delete the contents of an undefined field, the field itself remains in the database until you quit Ebib (or close the database). It will not be saved, however, so the next time you load the <code>.bib</code> file, the field is gone.</p>
 <h2 id="hidden-fields">Hidden Fields</h2>
 <p>BibLaTeX defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key <code>H</code> in the index buffer. Which fields are treated as hidden is controlled by the option &quot;Hidden Fields&quot;, which can be customised.</p>
@@ -454,7 +454,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
     author = {Jones, Joan},
     year = {1998},
     ...
-    keywords = {sleep; winter; hibernation}
+    keywords = {sleep, winter, hibernation}
 }</code></pre>
 <h1 id="the-multiline-edit-buffer">The Multiline Edit Buffer</h1>
 <p>As mentioned several times before, Ebib has a special multiline edit buffer, which is used to edit field values that contain newlines (so-called <em>multiline fields</em>), and also to edit the contents of the <code>@preamble</code> command. This section discusses the details of this buffer.</p>
