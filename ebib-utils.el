@@ -839,11 +839,10 @@ conditions are AND'ed.)"
 TYPE (a symbol) is the type of message: `log' writes the message
 to the log buffer only; `message' writes the message to the log
 buffer and outputs it with the function `message'; `warning' logs
-the message and sets the variable `ebib-log-error' to 0; or
-`error' logs the message, sets the variable `ebib-log-error' to
-1, and sets the current database read-only flag. The latter two
-can be used to signal the user to check the log for warnings or
-errors.
+the message and sets the variable `ebib-log-error' to 0; finally,
+`error' logs the message and sets the variable `ebib-log-error'
+to 1. The latter two can be used to signal the user to check the
+log for warnings or errors.
 
 This function adds a newline to the message being logged."
   (with-current-ebib-buffer 'log
@@ -852,8 +851,7 @@ This function adds a newline to the message being logged."
       (or ebib-log-error ; If ebib-error-log is already set to 1, we don't want to overwrite it!
           (setq ebib-log-error 0)))
      ((eq type 'error)
-      (setq ebib-log-error 1)
-      (ebib-db-set-read-only t ebib-cur-db))
+      (setq ebib-log-error 1))
      ((eq type 'message)
       (apply 'message format-string args)))
     (insert (apply 'format  (concat (if (eq type 'error)

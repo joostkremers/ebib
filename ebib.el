@@ -661,8 +661,7 @@ number is also the argument to the function."
     ["Open Database..." ebib-load-bibtex-file t]
     ["Merge Database..." ebib-merge-bibtex-file (and ebib-cur-db (not (ebib-db-get-filter ebib-cur-db)))]
     ["Save Database" ebib-save-current-database (and ebib-cur-db
-                                                     (ebib-db-modified-p ebib-cur-db)
-                                                     (not (ebib-db-read-only-p ebib-cur-db)))]
+                                                     (ebib-db-modified-p ebib-cur-db))]
     ["Save All Databases" ebib-save-all-databases (ebib-modified-p)]
     ["Save Database As..." ebib-write-database ebib-cur-db]
     ["Close Database" ebib-close-database ebib-cur-db]
@@ -1423,9 +1422,7 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
         (ebib-log 'error "Could not create backup file `%s'" backup-file)))))
 
 (defun ebib-save-database (db)
-  "Save the database DB."
-  (if (ebib-db-read-only-p db)
-      (error "Errors occurred when reading the file. Saving has been disabled."))
+  "Save the database DB." 
   (when (and (ebib-db-backup-p db)
              (file-exists-p (ebib-db-get-filename db)))
     (ebib-make-backup (ebib-db-get-filename db))
@@ -1438,8 +1435,7 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
 (defun ebib-write-database ()
   "Write the current database to a different file.
 If the current database is filtered, only the entries that match
-the filter are saved. The original file is not deleted.
-Furthermore, the current database's `read-only' flag is unset."
+the filter are saved. The original file is not deleted."
   (interactive)
   (ebib-execute-when
     ((database)
@@ -1456,8 +1452,7 @@ Furthermore, the current database's `read-only' flag is unset."
              (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
                                                           (length (member ebib-cur-db ebib-databases)))))
                                     (file-name-nondirectory new-filename)))
-             (ebib-set-modified nil)
-             (ebib-db-set-read-only nil ebib-cur-db)))))
+             (ebib-set-modified nil)))))
     ((default)
      (beep))))
 
