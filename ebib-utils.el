@@ -696,6 +696,7 @@ Ebib (not Emacs)."
 (defvar ebib-local-bibtex-filenames nil
   "A buffer-local variable holding a list of the name(s) of that buffer's .bib file(s)")
 (make-variable-buffer-local 'ebib-local-bibtex-filenames)
+(put 'ebib-local-bibtex-filenames 'safe-local-variable 'stringp)
 
 (defvar ebib-syntax-table
   (let ((table (make-syntax-table)))
