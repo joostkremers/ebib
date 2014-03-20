@@ -48,7 +48,7 @@
 (make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "24.4")
 (make-obsolete-variable 'ebib-default-entry 'ebib-default-entry-type "24.4")
 (make-obsolete-variable 'ebib-additional-fields 'ebib-extra-fields "24.4")
-(make-obsolete-variable 'ebib-biblatex-inheritance 'ebib-biblatex-inheritance "24.4")
+(make-obsolete-variable 'ebib-biblatex-inheritance 'ebib-biblatex-inheritances "24.4")
 (make-obsolete-variable 'ebib-standard-url-field 'ebib-url-field "24.4")
 (make-obsolete-variable 'ebib-standard-file-field 'ebib-file-field "24.4")
 (make-obsolete-variable 'ebib-standard-doi-field 'ebib-doi-field "24.4")
