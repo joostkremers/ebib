@@ -79,7 +79,7 @@ assumed to use this dialect."
 
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
-This is the entry type of a newly created entry."
+This is the entry type assigned to newly created entries."
   :group 'ebib
   :type 'string)
 
