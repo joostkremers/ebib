@@ -2433,7 +2433,7 @@ If FILE is not in (a subdirectory of) one of the directories in
 Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' and `crossref` fields offer
 completion, the `annote' field is edited as a multiline field,
-the `keyword' field adds keywords one by one, also allowing
+the `keywords' field adds keywords one by one, also allowing
 completion, and the field in `ebib-file-field' uses filename
 completion and shortens filenames if they are in (a subdirectory
 of) one of the directories in `ebib-file-search-dirs'.
