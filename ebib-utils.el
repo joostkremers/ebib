@@ -69,12 +69,13 @@
 
 (defcustom ebib-bibtex-dialect 'BibTeX
   "The default BibTeX dialect.
-A `.bib' file or database without explicit dialect setting is
-assumed to use this dialect."
+A `.bib' file/database without explicit dialect setting is
+assumed to use this dialect. Possible values are those listed in
+`bibtex-dialect-list'."
   :group 'ebib
-  :type '(choice :tag "Dialect"
-                 (const BibTeX)
-                 (const biblatex)))
+  :type `(choice :tag "BibTeX Dialect"
+                 ,@(mapcar #'(lambda (d) `(const ,d))
+                           bibtex-dialect-list)))
 
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
