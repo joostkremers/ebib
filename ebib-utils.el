@@ -69,8 +69,7 @@
 
 (defcustom ebib-bibtex-dialect 'BibTeX
   "The default BibTeX dialect.
-A new database automatically gets this dialect. When opening a
-`.bib' file that has no Ebib-compatible dialect setting is also
+A `.bib' file or database without explicit dialect setting is
 assumed to use this dialect."
   :group 'ebib
   :type '(choice :tag "Dialect"
