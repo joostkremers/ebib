@@ -1754,6 +1754,7 @@ result."
             (setq result (list field))))
       (mapc #'(lambda (f)
                 (when (and (not (string= (car f) "=type=")) ; We exlude the =type= field here.
+                           (stringp (cdr f))
                            (string-match-p search-str (cdr f)))
                   (setq result (cons (car f) result))))
             entry))
