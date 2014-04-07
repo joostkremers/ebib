@@ -1748,7 +1748,7 @@ result."
     (if field
         (let ((value (cdr (assoc-string field entry 'case-fold))))
           (when (and value
-                     (or (and (string= field "=type=") ; The type field requires
+                     (or (and (string= field "=type=") ; The =type= field requires
                               (cl-equalp search-str value)) ; an exact match.
                          (string-match-p search-str value)))
             (setq result (list field))))
