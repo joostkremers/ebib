@@ -337,9 +337,10 @@ to \"none\". This function sets `ebib-cur-keys-list'."
   "Return a list of entry keys in the current database.
 If a filter is active, only the keys of entries that match the
 filter are returned. The returned list is sorted."
-  (if (ebib-db-get-filter ebib-cur-db)
-      (ebib-filters-run-filter ebib-cur-db)
-    (ebib-db-list-keys ebib-cur-db)))
+  (when ebib-cur-db
+    (if (ebib-db-get-filter ebib-cur-db)
+        (ebib-filters-run-filter ebib-cur-db)
+      (ebib-db-list-keys ebib-cur-db))))
 
 (defun ebib-display-mark (mark &optional beg end)
   "Highlight/unhighlight an entry.
