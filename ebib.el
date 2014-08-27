@@ -326,7 +326,7 @@ to \"none\". This function sets `ebib-cur-keys-list'."
                           (ebib-display-mark t))))
                   ebib-cur-keys-list)
             (goto-char (point-min))
-            (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+            (re-search-forward (format "^%s " (regexp-quote (ebib-cur-entry-key))))
             (beginning-of-line)
             (ebib-set-index-highlight)))
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
@@ -421,7 +421,7 @@ FILES is `none', only the current database is searched."
         (if (null database)
             (setq key nil)
           (setq ebib-cur-db database))))
-    (if key 
+    (if key
         (ebib-db-set-current-entry-key key ebib-cur-db))))
 
 (defun ebib-read-string-at-point (chars)
@@ -978,7 +978,7 @@ be added. (Whether a timestamp is actually added, also depends on
                ;; is nil in order to overwrite a possible timestamp. This
                ;; has to be handled better, though!
                (ebib-db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
-                                                                                 ebib-field-separator 
+                                                                                 ebib-field-separator
                                                                                'overwrite)
                                         'as-is))
       entry-key)))                      ; Return the entry key.
@@ -1335,7 +1335,7 @@ marked entries."
     (ebib-execute-when
       ((entries)
        (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
-         (with-ebib-buffer-writable 
+         (with-ebib-buffer-writable
            (ebib-db-toggle-mark (ebib-cur-entry-key) ebib-cur-db)
            (ebib-display-mark (ebib-db-marked-p (ebib-cur-entry-key) ebib-cur-db)
                               (ebib-highlight-start ebib-index-highlight)
@@ -1747,7 +1747,7 @@ are searched."
            (ebib-db-set-current-entry-key (car cur-search-entry) ebib-cur-db)
            (with-current-buffer (cdr (assoc 'index ebib-buffer-alist))
              (goto-char (point-min))
-             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+             (re-search-forward (format "^%s " (regexp-quote (ebib-cur-entry-key))))
              (beginning-of-line)
              (ebib-set-index-highlight)
              (ebib-fill-entry-buffer ebib-search-string))))))
@@ -2395,7 +2395,7 @@ NIL. If `ebib-hide-hidden-fields' is NIL, return FIELD."
                                              new-conts)
                                            (ebib-cur-entry-key)
                                            ebib-cur-db
-                                           'overwrite) 
+                                           'overwrite)
                   (ebib-redisplay-current-field)
                   (unless (member keyword collection)
                     (ebib-keywords-add-keyword keyword ebib-cur-db)))
@@ -2415,7 +2415,7 @@ Filenames are added to the standard file field separated by
                        (new-conts (if conts
                                       (concat conts ebib-filename-separator short-file)
                                     short-file)))
-                  (ebib-db-set-field-value ebib-standard-file-field new-conts (ebib-cur-entry-key) ebib-cur-db 'overwrite) 
+                  (ebib-db-set-field-value ebib-standard-file-field new-conts (ebib-cur-entry-key) ebib-cur-db 'overwrite)
                   (ebib-redisplay-current-field))
              finally return (ebib-set-modified t))))
 
@@ -2900,7 +2900,7 @@ STARTTEXT is a string that contains the initial text of the buffer."
   "Quit the multiline edit buffer, saving the text."
   (interactive)
   (ebib-store-multiline-text)
-  (ebib-leave-multiline-edit-buffer) 
+  (ebib-leave-multiline-edit-buffer)
   (message "Text stored."))
 
 (defun ebib-cancel-multiline-edit ()
@@ -2945,7 +2945,7 @@ The text being edited is stored before saving the database."
         (ebib-db-set-preamble text ebib-cur-db 'overwrite)))
      ((eq ebib-editing 'fields)
       (if (equal text "")
-          (ebib-db-remove-field-value ebib-current-field (ebib-cur-entry-key) ebib-cur-db) 
+          (ebib-db-remove-field-value ebib-current-field (ebib-cur-entry-key) ebib-cur-db)
         (ebib-db-set-field-value ebib-current-field text (ebib-cur-entry-key) ebib-cur-db 'overwrite ebib-multiline-unbraced)))))
   (ebib-set-modified t))
 
