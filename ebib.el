@@ -289,7 +289,7 @@ to \"none\". This function sets `ebib-cur-keys-list'."
                           (ebib-display-mark t))))
                   ebib-cur-keys-list)
             (goto-char (point-min))
-            (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+            (re-search-forward (format "^%s " (regexp-quote (ebib-cur-entry-key))))
             (beginning-of-line)
             (ebib-set-index-overlay)))
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib-databases)
@@ -1724,7 +1724,7 @@ are searched."
            (ebib-db-set-current-entry-key (car cur-search-entry) ebib-cur-db)
            (with-current-ebib-buffer 'index
              (goto-char (point-min))
-             (re-search-forward (format "^%s " (ebib-cur-entry-key)))
+             (re-search-forward (format "^%s " (regexp-quote (ebib-cur-entry-key))))
              (beginning-of-line)
              (ebib-set-index-overlay)
              (ebib-fill-entry-buffer ebib-search-string))))))
