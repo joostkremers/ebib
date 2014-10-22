@@ -1025,11 +1025,17 @@ continue."
 Optional argument TIMESTAMP indicates whether a timestamp is to
 be added to the entry. Note that for a timestamp to be added,
 `ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
-`ebib-db-set-entry'."
-  (ebib-db-set-entry entry-key fields db if-exists)
-  (when (and timestamp ebib-use-timestamp)
-    (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite))
-  (ebib-set-modified t db))
+`ebib-db-set-entry'.
+
+Return ENTRY-KEY if storing the entry was succesful, nil
+otherwise. (Note that depending on the value of IF-EXISTS,
+storing an entry may also result in an error.)"
+  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
+    (when result
+      (ebib-set-modified t db)
+      (when (and timestamp ebib-use-timestamp)
+        (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
+    result))
 
 (defun ebib-search-key-in-buffer (entry-key)
   "Search ENTRY-KEY in the index buffer.
