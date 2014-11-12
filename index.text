@@ -91,7 +91,7 @@ The complete user manual for Ebib is available in html format [here](ebib-manual
 
 ## Installation ##
 
-The easiest way to install Ebib is to use the [Melpa package archive](http://melpa.milkbox.net/). This and other installation methods are described in the [manual](ebib-manual.html#installation).
+The easiest way to install Ebib is to use the [Melpa package archive](http://melpa.org/). This and other installation methods are described in the [manual](ebib-manual.html#installation).
 
 If you want to download the source, you can clone the [git repository](https://github.com/joostkremers/ebib.git) for Ebib, or get a tar ball from the [Github releases page](https://github.com/joostkremers/ebib/releases).
 
