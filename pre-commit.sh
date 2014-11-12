@@ -21,7 +21,6 @@
 SOURCE="manual/ebib.text"               # markdown source
 SOURCE_BBODY="manual/header.texi"       # texinfo headers
 TEXINFO="manual/ebib.texi"              # texinfo output
-HTML="ebib-manual.html"                 # html output
 INFO="ebib.info"                        # GNU info output
 
 SCRIPT=$(basename "$0")
@@ -66,22 +65,6 @@ function run_makeinfo
     return 1
 }
 
-function create_html
-{
-    local source="$1"
-    echo "$SCRIPT: running pandoc to create html"
-    pandoc --read=markdown \
-           --write=html \
-           --output="$HTML" \
-           --standalone \
-           --table-of-contents \
-           --css=ebib.css \
-           "$1" && return 0
-    echo "$SCRIPT: pandoc -w html failed"
-    let "errors++"
-    return 1
-}
-
 function check_exit
 {
     local errors="$1"
@@ -96,13 +79,11 @@ errors=0
 
 confirm_file "$SOURCE"
 confirm_file "$INFO"
-confirm_file "$HTML"
 check_exit   "$errors"
-if [  "$INFO" -ot "$SOURCE" -o "$HTML" -ot "$SOURCE" ] ; then
-    echo "$SCRIPT: regenerating info and html files"
+if [  "$INFO" -ot "$SOURCE" ] ; then
+    echo "$SCRIPT: regenerating info file"
     git stash -q --keep-index
     create_texi "$SOURCE" && run_makeinfo "$TEXINFO" && git add "$INFO"
-    create_html "$SOURCE" && git add "$HTML"
     git stash pop -q
 fi
 check_exit   "$errors"
