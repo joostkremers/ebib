@@ -106,7 +106,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul>
 </div>
 <article>
-
 <p>Ebib is a program with which you can manage BibTeX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <p>The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.</p>
@@ -275,18 +274,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>The identifier should be a simple string which you can type easily when Ebib asks you for a citation command (TAB completion is available, though). The format string can contain a few directives, which are used to add the citation key and any optional arguments. The following directives are recognised:</p>
 <dl>
 <dt><code>%K</code></dt>
-<dd>the entry key to be inserted.
+<dd>the entry key to be inserted. <code>%A</code>
 </dd>
-<dt><code>%A</code></dt>
-<dd>an argument, for which the user is prompted.
+<dd>an argument, for which the user is prompted. <code>%&lt;...%&gt;</code>
 </dd>
-<dt><code>%&lt;...%&gt;</code></dt>
-<dd>optional material surrounding a <code>%A</code> directive.
+<dd>optional material surrounding a <code>%A</code> directive. <code>%(...%&lt;sep&gt;)</code>
 </dd>
-<dt><code>%(...%&lt;sep&gt;)</code></dt>
-<dd>a so-called <em>repeater</em>, which contains material that can be repeated. If present, the repeater must contain the entry key directive <code>%K</code>.
+<dd>a so-called <em>repeater</em>, which contains material that can be repeated. If present, the repeater must contain the entry key directive <code>%K</code>. <code>%D</code>
 </dd>
-<dt><code>%D</code></dt>
 <dd>a description, for which the user is prompted. Mainly for use in Orgmode.
 </dd>
 </dl>
@@ -466,7 +461,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p><code>ebib-save-from-multiline-edit</code>, bound to <code>C-c | s</code>, can be used in the multiline edit buffer to save the database. This command first stores the text in the database and then saves it. Because Ebib does not do an autosave of the current database, it is advisable to save the database manually every now and then to prevent data loss in case of crashes. It would be annoying to have to leave the multiline edit buffer every time you want to do this, so this command has been provided to allow you to do this from within the buffer.</p>
 <p>Admittedly, the key combinations of the multiline edit buffer are somewhat awkward. The reason for this is that these commands are part of a minor mode, which restricts the available keys to combinations of <code>C-c</code> plus a non-alphanumeric character. However, it is possible to change the key commands, if you wish. Ebib itself provides a method to change the second key of these commands, <a href="#modifying-key-bindings">Modifying Key Bindings</a>. You could change the <code>|</code> to e.g., <code>c</code> or <code>C-c</code>, if these do not conflict with any key commands in the major mode used for the multiline edit buffer.</p>
 <p>Even more drastically, you could put something like the following in your <code>~/.emacs</code>:</p>
-<pre class="sourceCode Commonlisp"><code class="sourceCode commonlisp">(eval-after-load &#39;ebib
+<pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(eval-after-load &#39;ebib
   &#39;(<span class="kw">progn</span>
      (define-key ebib-multiline-mode-map
                  <span class="st">&quot;\C-c\C-c&quot;</span> &#39;ebib-quit-multiline-edit)
@@ -483,228 +478,154 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h2 id="the-index-buffer">The Index Buffer</h2>
 <dl>
 <dt><code>Up</code></dt>
-<dd>go to previous entry. <code>(ebib-prev-entry)</code>
+<dd>go to previous entry. <code>(ebib-prev-entry)</code> <code>Down</code>
 </dd>
-<dt><code>Down</code></dt>
-<dd>go to next entry. <code>(ebib-next-entry)</code>
+<dd>go to next entry. <code>(ebib-next-entry)</code> <code>Right</code>
 </dd>
-<dt><code>Right</code></dt>
-<dd>move to the next database. <code>(ebib-next-database)</code>
+<dd>move to the next database. <code>(ebib-next-database)</code> <code>Left</code>
 </dd>
-<dt><code>Left</code></dt>
-<dd>move to the previous database. <code>(ebib-prev-database)</code>
+<dd>move to the previous database. <code>(ebib-prev-database)</code> <code>PgUp</code>
 </dd>
-<dt><code>PgUp</code></dt>
-<dd>scroll the index buffer down. <code>(ebib-index-scroll-down)</code>
+<dd>scroll the index buffer down. <code>(ebib-index-scroll-down)</code> <code>PgDn</code>
 </dd>
-<dt><code>PgDn</code></dt>
-<dd>scroll the index buffer up. <code>(ebib-index-scroll-up)</code>
+<dd>scroll the index buffer up. <code>(ebib-index-scroll-up)</code> <code>Home</code>
 </dd>
-<dt><code>Home</code></dt>
-<dd>go to first entry. <code>(ebib-goto-first-entry)</code>
+<dd>go to first entry. <code>(ebib-goto-first-entry)</code> <code>End</code>
 </dd>
-<dt><code>End</code></dt>
-<dd>go to last entry. <code>(ebib-goto-last-entry)</code>
+<dd>go to last entry. <code>(ebib-goto-last-entry)</code> <code>Return</code>
 </dd>
-<dt><code>Return</code></dt>
-<dd>make the entry under the cursor current. Use after e.g. <code>C-s</code>. <code>(ebib-select-entry)</code>
+<dd>make the entry under the cursor current. Use after e.g. <code>C-s</code>. <code>(ebib-select-entry)</code> <code>Space</code>
 </dd>
-<dt><code>Space</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>1-9</code>
 </dd>
-<dt><code>1-9</code></dt>
-<dd>jump to the corresponding database.
+<dd>jump to the corresponding database. <code>/</code>
 </dd>
-<dt><code>/</code></dt>
-<dd>search the database. <code>(ebib-search)</code>
+<dd>search the database. <code>(ebib-search)</code> <code>&amp;</code>
 </dd>
-<dt><code>&amp;</code></dt>
-<dd>create a filter, or perform a logical <code>and</code> on the current filter. With negative prefix argument: apply a logical <code>not</code> to the selectional criterion. <code>(ebib-filter-and)</code>
+<dd>create a filter, or perform a logical <code>and</code> on the current filter. With negative prefix argument: apply a logical <code>not</code> to the selectional criterion. <code>(ebib-filter-and)</code> <code>|</code>
 </dd>
-<dt><code>|</code></dt>
-<dd>create a filter, or perform a logical <code>or</code> on the current filter. With negative prefix argument: apply a logical <code>not</code> to the selectional criterion. <code>(ebib-filter-or)</code>
+<dd>create a filter, or perform a logical <code>or</code> on the current filter. With negative prefix argument: apply a logical <code>not</code> to the selectional criterion. <code>(ebib-filter-or)</code> <code>~</code>
 </dd>
-<dt><code>~</code></dt>
-<dd>perform a logical <code>not</code> on the current filter. <code>(ebib-filter-not)</code>
+<dd>perform a logical <code>not</code> on the current filter. <code>(ebib-filter-not)</code> <code>?</code>
 </dd>
-<dt><code>?</code></dt>
-<dd>display Ebib info. <code>(ebib-info)</code>
+<dd>display Ebib info. <code>(ebib-info)</code> <code>a</code>
 </dd>
-<dt><code>a</code></dt>
-<dd>add an entry. <code>(ebib-add-entry)</code>
+<dd>add an entry. <code>(ebib-add-entry)</code> <code>b</code>
 </dd>
-<dt><code>b</code></dt>
-<dd>equivalent to <code>Pgup</code>.
+<dd>equivalent to <code>Pgup</code>. <code>c</code>
 </dd>
-<dt><code>c</code></dt>
-<dd>close the database or cancel the current filter. <code>(ebib-index-c)</code>
+<dd>close the database or cancel the current filter. <code>(ebib-index-c)</code> <code>C</code>
 </dd>
-<dt><code>C</code></dt>
-<dd>follow <code>crossref</code> field. <code>(ebib-follow-crossref)</code>
+<dd>follow <code>crossref</code> field. <code>(ebib-follow-crossref)</code> <code>d</code>
 </dd>
-<dt><code>d</code></dt>
-<dd>delete the current entry. <code>(ebib-delete-entry)</code>
+<dd>delete the current entry. <code>(ebib-delete-entry)</code> <code>; d</code>
 </dd>
-<dt><code>; d</code></dt>
-<dd>delete all selected entries.
+<dd>delete all selected entries. <code>e</code>
 </dd>
-<dt><code>e</code></dt>
-<dd>edit the current entry. <code>(ebib-edit-entry)</code>
+<dd>edit the current entry. <code>(ebib-edit-entry)</code> <code>E</code>
 </dd>
-<dt><code>E</code></dt>
-<dd>edit the key of the current entry. <code>(ebib-edit-keyname)</code>
+<dd>edit the key of the current entry. <code>(ebib-edit-keyname)</code> <code>f</code>
 </dd>
-<dt><code>f</code></dt>
-<dd>extract a filename from the <code>file</code> field and send it to an appropriate viewer. With numeric prefix argument, extract the <em>n</em>-th filename.
+<dd>extract a filename from the <code>file</code> field and send it to an appropriate viewer. With numeric prefix argument, extract the <em>n</em>-th filename. <code>F</code>
 </dd>
-<dt><code>F</code></dt>
-<dd>prefix key for filter actions.
+<dd>prefix key for filter actions. <code>F &amp;</code>
 </dd>
-<dt><code>F &amp;</code></dt>
-<dd>equivalent to <code>&amp;</code>.
+<dd>equivalent to <code>&amp;</code>. <code>F |</code>
 </dd>
-<dt><code>F |</code></dt>
-<dd>equivalent to <code>|</code>.
+<dd>equivalent to <code>|</code>. <code>F ~</code>
 </dd>
-<dt><code>F ~</code></dt>
-<dd>equivalent to <code>~</code>
+<dd>equivalent to <code>~</code> <code>F a</code>
 </dd>
-<dt><code>F a</code></dt>
-<dd>apply a stored filter. <code>(ebib-filters-apply-filter)</code>
+<dd>apply a stored filter. <code>(ebib-filters-apply-filter)</code> <code>F c</code>
 </dd>
-<dt><code>F c</code></dt>
-<dd>cancel the current filter. <code>(ebib-filters-cancel-filter)</code>
+<dd>cancel the current filter. <code>(ebib-filters-cancel-filter)</code> <code>F d</code>
 </dd>
-<dt><code>F d</code></dt>
-<dd>delete a stored filter. <code>(ebib-filters-delete-filter)</code>
+<dd>delete a stored filter. <code>(ebib-filters-delete-filter)</code> <code>F D</code>
 </dd>
-<dt><code>F D</code></dt>
-<dd>delete all stored filters. <code>(ebib-filters-delete-all-filters)</code>
+<dd>delete all stored filters. <code>(ebib-filters-delete-all-filters)</code> <code>F l</code>
 </dd>
-<dt><code>F l</code></dt>
-<dd>load filters from a file. <code>(ebib-filters-load-from-file)</code>
+<dd>load filters from a file. <code>(ebib-filters-load-from-file)</code> <code>F L</code>
 </dd>
-<dt><code>F L</code></dt>
-<dd>reapply the last used filter. <code>(ebib-filters-reapply-last-filter)</code>
+<dd>reapply the last used filter. <code>(ebib-filters-reapply-last-filter)</code> <code>F r</code>
 </dd>
-<dt><code>F r</code></dt>
-<dd>reapply the current filter. <code>(ebib-filters-reapply-filter)</code>
+<dd>reapply the current filter. <code>(ebib-filters-reapply-filter)</code> <code>F R</code>
 </dd>
-<dt><code>F R</code></dt>
-<dd>rename a stored filter. <code>(ebib-filters-rename-filter)</code>
+<dd>rename a stored filter. <code>(ebib-filters-rename-filter)</code> <code>F s</code>
 </dd>
-<dt><code>F s</code></dt>
-<dd>store the current filter. <code>(ebib-filters-store-filter)</code>
+<dd>store the current filter. <code>(ebib-filters-store-filter)</code> <code>F S</code>
 </dd>
-<dt><code>F S</code></dt>
-<dd>save stored filters to <code>ebib-filters-default-file</code>. <code>(ebib-filters-save-filters)</code>
+<dd>save stored filters to <code>ebib-filters-default-file</code>. <code>(ebib-filters-save-filters)</code> <code>F v</code>
 </dd>
-<dt><code>F v</code></dt>
-<dd>display the filter in the minibuffer. <code>(ebib-filters-view-filter)</code>
+<dd>display the filter in the minibuffer. <code>(ebib-filters-view-filter)</code> <code>F V</code>
 </dd>
-<dt><code>F V</code></dt>
-<dd>show a list of filters. <code>(ebib-filters-view-all-filters)</code>
+<dd>show a list of filters. <code>(ebib-filters-view-all-filters)</code> <code>F w</code>
 </dd>
-<dt><code>F w</code></dt>
-<dd>write the stored filters to a file. <code>(ebib-filters-write-to-file)</code>
+<dd>write the stored filters to a file. <code>(ebib-filters-write-to-file)</code> <code>g</code>
 </dd>
-<dt><code>g</code></dt>
-<dd>equivalent to <code>Home</code>.
+<dd>equivalent to <code>Home</code>. <code>G</code>
 </dd>
-<dt><code>G</code></dt>
-<dd>equivalent to <code>End</code>.
+<dd>equivalent to <code>End</code>. <code>h</code>
 </dd>
-<dt><code>h</code></dt>
-<dd>show the info node on the index buffer. (<code>ebib-index-help</code>)
+<dd>show the info node on the index buffer. (<code>ebib-index-help</code>) <code>H</code>
 </dd>
-<dt><code>H</code></dt>
-<dd>show/hide the hidden fields. (<code>ebib-toggle-hidden</code>)
+<dd>show/hide the hidden fields. (<code>ebib-toggle-hidden</code>) <code>i</code>
 </dd>
-<dt><code>i</code></dt>
-<dd>extract a DOI from the <code>doi</code> field, append it to a URL and open that in a browser (<code>ebib-browse-doi</code>)
+<dd>extract a DOI from the <code>doi</code> field, append it to a URL and open that in a browser (<code>ebib-browse-doi</code>) <code>j</code>
 </dd>
-<dt><code>j</code></dt>
-<dd>equivalent to <code>Down</code>.
+<dd>equivalent to <code>Down</code>. <code>J</code>
 </dd>
-<dt><code>J</code></dt>
-<dd>jump to another database. This accepts a numeric prefix argument, but will ask you for a database number if there is none. <code>(ebib-switch-to-database)</code>
+<dd>jump to another database. This accepts a numeric prefix argument, but will ask you for a database number if there is none. <code>(ebib-switch-to-database)</code> <code>k</code>
 </dd>
-<dt><code>k</code></dt>
-<dd>equivalent to <code>Up</code>.
+<dd>equivalent to <code>Up</code>. <code>l</code>
 </dd>
-<dt><code>l</code></dt>
-<dd>show the log buffer. (<code>ebib-show-log</code>)
+<dd>show the log buffer. (<code>ebib-show-log</code>) <code>m</code>
 </dd>
-<dt><code>m</code></dt>
-<dd>select (or unselect) the current entry. <code>(ebib-select-entry)</code>
+<dd>select (or unselect) the current entry. <code>(ebib-select-entry)</code> <code>; m</code>
 </dd>
-<dt><code>; m</code></dt>
-<dd>unselect all selected entries.
+<dd>unselect all selected entries. <code>n</code>
 </dd>
-<dt><code>n</code></dt>
-<dd>find next occurrence of the search string. <code>(ebib-search-next)</code>
+<dd>find next occurrence of the search string. <code>(ebib-search-next)</code> <code>N</code>
 </dd>
-<dt><code>N</code></dt>
-<dd>search for entries cross-referencing the current one. <code>(ebib-search-crossref)</code>
+<dd>search for entries cross-referencing the current one. <code>(ebib-search-crossref)</code> <code>C-n</code>
 </dd>
-<dt><code>C-n</code></dt>
-<dd>equivalent to <code>Down</code>.
+<dd>equivalent to <code>Down</code>. <code>M-n</code>
 </dd>
-<dt><code>M-n</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>o</code>
 </dd>
-<dt><code>o</code></dt>
-<dd>open a <code>.bib</code> file. <code>(ebib-load-bibtex-file)</code>
+<dd>open a <code>.bib</code> file. <code>(ebib-load-bibtex-file)</code> <code>p</code>
 </dd>
-<dt><code>p</code></dt>
-<dd>push an entry to a LaTeX buffer <code>(ebib-push-bibtex-key)</code>
+<dd>push an entry to a LaTeX buffer <code>(ebib-push-bibtex-key)</code> <code>; p</code>
 </dd>
-<dt><code>; p</code></dt>
-<dd>push the selected entries to a LaTeX buffer.
+<dd>push the selected entries to a LaTeX buffer. <code>C-p</code>
 </dd>
-<dt><code>C-p</code></dt>
-<dd>equivalent to <code>Up</code>.
+<dd>equivalent to <code>Up</code>. <code>M-p</code>
 </dd>
-<dt><code>M-p</code></dt>
-<dd>equivalent to <code>PgUp</code>.
+<dd>equivalent to <code>PgUp</code>. <code>P</code>
 </dd>
-<dt><code>P</code></dt>
-<dd>show and edit the <code>@preamble</code> definition in the database. <code>(ebib-edit-preamble)</code>
+<dd>show and edit the <code>@preamble</code> definition in the database. <code>(ebib-edit-preamble)</code> <code>q</code>
 </dd>
-<dt><code>q</code></dt>
-<dd>quit Ebib. This sets all variables to nil, unloads the database(s) and quits Ebib. <code>(ebib-quit)</code>
+<dd>quit Ebib. This sets all variables to nil, unloads the database(s) and quits Ebib. <code>(ebib-quit)</code> <code>s</code>
 </dd>
-<dt><code>s</code></dt>
-<dd>save the database. <code>(ebib-save-current-database)</code>
+<dd>save the database. <code>(ebib-save-current-database)</code> <code>S</code>
 </dd>
-<dt><code>S</code></dt>
-<dd>show and edit the <code>@string</code> definitions in the database. <code>(ebib-edit-strings)</code>
+<dd>show and edit the <code>@string</code> definitions in the database. <code>(ebib-edit-strings)</code> <code>u</code>
 </dd>
-<dt><code>u</code></dt>
-<dd>extract a URL from the <code>url</code> field and send it to a browser. With numeric prefix argument, extract the <em>n</em>-th url. <code>(ebib-browse-url)</code>
+<dd>extract a URL from the <code>url</code> field and send it to a browser. With numeric prefix argument, extract the <em>n</em>-th url. <code>(ebib-browse-url)</code> <code>w</code>
 </dd>
-<dt><code>w</code></dt>
-<dd>save the database under a new name. If a filter is active, save the filtered entries to a new <code>.bib</code> file. <code>(ebib-write-database)</code>
+<dd>save the database under a new name. If a filter is active, save the filtered entries to a new <code>.bib</code> file. <code>(ebib-write-database)</code> <code>x</code>
 </dd>
-<dt><code>x</code></dt>
-<dd>export the current entry to a file, or, when used with numeric prefix argument, to another database. <code>(ebib-export-entry)</code>
+<dd>export the current entry to a file, or, when used with numeric prefix argument, to another database. <code>(ebib-export-entry)</code> <code>; x</code>
 </dd>
-<dt><code>; x</code></dt>
-<dd>export the selected entries to a file, or, when used with a numeric prefix argument, to another database.
+<dd>export the selected entries to a file, or, when used with a numeric prefix argument, to another database. <code>C-x b</code>
 </dd>
-<dt><code>C-x b</code></dt>
-<dd>equivalent to <code>z</code>.
+<dd>equivalent to <code>z</code>. <code>C-x k</code>
 </dd>
-<dt><code>C-x k</code></dt>
-<dd>equivalent to <code>q</code>.
+<dd>equivalent to <code>q</code>. <code>X</code>
 </dd>
-<dt><code>X</code></dt>
-<dd>export the <code>@preamble</code> definition to a file or, when used with a numeric prefix argument, to another database. <code>(ebib-export-preamble)</code>
+<dd>export the <code>@preamble</code> definition to a file or, when used with a numeric prefix argument, to another database. <code>(ebib-export-preamble)</code> <code>z</code>
 </dd>
-<dt><code>z</code></dt>
-<dd>move focus away from the Ebib windows, or, if using the full layout, put Ebib in the background. <code>(ebib-leave-ebib-windows)</code>
+<dd>move focus away from the Ebib windows, or, if using the full layout, put Ebib in the background. <code>(ebib-leave-ebib-windows)</code> <code>Z</code>
 </dd>
-<dt><code>Z</code></dt>
 <dd>put Ebib in the background. <code>(ebib-lower)</code>
 </dd>
 </dl>
@@ -724,177 +645,122 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h2 id="the-entry-buffer">The Entry Buffer</h2>
 <dl>
 <dt><code>Up</code></dt>
-<dd>go to the previous field. <code>(ebib-prev-field)</code>
+<dd>go to the previous field. <code>(ebib-prev-field)</code> <code>Down</code>
 </dd>
-<dt><code>Down</code></dt>
-<dd>go to the next field. <code>(ebib-next-field)</code>
+<dd>go to the next field. <code>(ebib-next-field)</code> <code>PgUp</code>
 </dd>
-<dt><code>PgUp</code></dt>
-<dd>go to the previous set of fields. <code>(ebib-goto-prev-set)</code>
+<dd>go to the previous set of fields. <code>(ebib-goto-prev-set)</code> <code>PgDn</code>
 </dd>
-<dt><code>PgDn</code></dt>
-<dd>go to the next set of fields. <code>(ebib-goto-next-set)</code>
+<dd>go to the next set of fields. <code>(ebib-goto-next-set)</code> <code>Home</code>
 </dd>
-<dt><code>Home</code></dt>
-<dd>go to the first field. <code>(ebib-goto-first-field)</code>
+<dd>go to the first field. <code>(ebib-goto-first-field)</code> <code>End</code>
 </dd>
-<dt><code>End</code></dt>
-<dd>go to the last field. <code>(ebib-goto-last-field)</code>
+<dd>go to the last field. <code>(ebib-goto-last-field)</code> <code>Space</code>
 </dd>
-<dt><code>Space</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>b</code>
 </dd>
-<dt><code>b</code></dt>
-<dd>equivalent to <code>PgUp</code>.
+<dd>equivalent to <code>PgUp</code>. <code>c</code>
 </dd>
-<dt><code>c</code></dt>
-<dd>copy the contents of the current field to the kill ring. <code>(ebib-copy-field-contents)</code>
+<dd>copy the contents of the current field to the kill ring. <code>(ebib-copy-field-contents)</code> <code>d</code>
 </dd>
-<dt><code>d</code></dt>
-<dd>delete the value of the current field. The deleted contents will <em>not</em> be put in the kill ring, and is therefore irretrievably lost. <code>(ebib-delete-field-contents)</code>
+<dd>delete the value of the current field. The deleted contents will <em>not</em> be put in the kill ring, and is therefore irretrievably lost. <code>(ebib-delete-field-contents)</code> <code>e</code>
 </dd>
-<dt><code>e</code></dt>
-<dd>edit the current field. <code>(ebib-edit-fields)</code>
+<dd>edit the current field. <code>(ebib-edit-fields)</code> <code>f</code>
 </dd>
-<dt><code>f</code></dt>
-<dd>extract a filename from the current field and send it to an appropriate viewer. With numeric prefix argument, extract the <em>n</em>-th filename.
+<dd>extract a filename from the current field and send it to an appropriate viewer. With numeric prefix argument, extract the <em>n</em>-th filename. <code>g</code>
 </dd>
-<dt><code>g</code></dt>
-<dd>equivalent to <code>Home</code>.
+<dd>equivalent to <code>Home</code>. <code>G</code>
 </dd>
-<dt><code>G</code></dt>
-<dd>equivalent to <code>End</code>.
+<dd>equivalent to <code>End</code>. <code>h</code>
 </dd>
-<dt><code>h</code></dt>
-<dd>show the info node on the entry buffer. (<code>ebib-entry-help</code>)
+<dd>show the info node on the entry buffer. (<code>ebib-entry-help</code>) <code>j</code>
 </dd>
-<dt><code>j</code></dt>
-<dd>go to the next field. <code>(ebib-next-field)</code>
+<dd>go to the next field. <code>(ebib-next-field)</code> <code>k</code>
 </dd>
-<dt><code>k</code></dt>
-<dd>go to the previous field. <code>(ebib-prev-field)</code>
+<dd>go to the previous field. <code>(ebib-prev-field)</code> <code>m</code>
 </dd>
-<dt><code>m</code></dt>
-<dd>edit the current field as multiline. <code>(ebib-edit-multiline-field)</code>
+<dd>edit the current field as multiline. <code>(ebib-edit-multiline-field)</code> <code>C-n</code>
 </dd>
-<dt><code>C-n</code></dt>
-<dd>equivalent to <code>Down</code>.
+<dd>equivalent to <code>Down</code>. <code>M-n</code>
 </dd>
-<dt><code>M-n</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>C-p</code>
 </dd>
-<dt><code>C-p</code></dt>
-<dd>equivalent to <code>Up</code>.
+<dd>equivalent to <code>Up</code>. <code>M-p</code>
 </dd>
-<dt><code>M-p</code></dt>
-<dd>equivalent to <code>PgUp</code>.
+<dd>equivalent to <code>PgUp</code>. <code>q</code>
 </dd>
-<dt><code>q</code></dt>
-<dd>quit editing the current entry and return focus to the index buffer. <code>(ebib-quit-entry-buffer)</code>
+<dd>quit editing the current entry and return focus to the index buffer. <code>(ebib-quit-entry-buffer)</code> <code>r</code>
 </dd>
-<dt><code>r</code></dt>
-<dd>toggle a field's &quot;special&quot; status. <code>(ebib-toggle-raw)</code>
+<dd>toggle a field's &quot;special&quot; status. <code>(ebib-toggle-raw)</code> <code>s</code>
 </dd>
-<dt><code>s</code></dt>
-<dd>insert an abbreviation from the <code>@string</code> definitions in the database. <code>(ebib-insert-abbreviation)</code>
+<dd>insert an abbreviation from the <code>@string</code> definitions in the database. <code>(ebib-insert-abbreviation)</code> <code>u</code>
 </dd>
-<dt><code>u</code></dt>
-<dd>extract a URL from the current field and send it to a browser. With numeric prefix argument, extract the <em>n</em>-th url.
+<dd>extract a URL from the current field and send it to a browser. With numeric prefix argument, extract the <em>n</em>-th url. <code>x</code>
 </dd>
-<dt><code>x</code></dt>
-<dd>cut the contents of the current field. Like <code>c</code>, <code>x</code> puts the contents of the current field in the kill ring. <code>(ebib-cut-field-contents)</code>
+<dd>cut the contents of the current field. Like <code>c</code>, <code>x</code> puts the contents of the current field in the kill ring. <code>(ebib-cut-field-contents)</code> <code>C-x b</code>
 </dd>
-<dt><code>C-x b</code></dt>
-<dd>equivalent to <code>q</code>.
+<dd>equivalent to <code>q</code>. <code>C-x k</code>
 </dd>
-<dt><code>C-x k</code></dt>
-<dd>equivalent to <code>q</code>.
+<dd>equivalent to <code>q</code>. <code>y</code>
 </dd>
-<dt><code>y</code></dt>
 <dd>yank the last element in the kill ring to the current field. Repeated use of <code>y</code> functions like <code>C-y/M-y</code>. Note that no text will be yanked if the field already has a value. <code>(ebib-yank-field-contents)</code>
 </dd>
 </dl>
 <h2 id="the-strings-buffer">The Strings Buffer</h2>
 <dl>
 <dt><code>Up (ebib-prev-string)</code></dt>
-<dd>go to the previous string.
+<dd>go to the previous string. <code>Down</code>
 </dd>
-<dt><code>Down</code></dt>
-<dd>go to the next string. <code>(ebib-next-string)</code>
+<dd>go to the next string. <code>(ebib-next-string)</code> <code>PgUp</code>
 </dd>
-<dt><code>PgUp</code></dt>
-<dd>go ten strings up. <code>(ebib-strings-page-up)</code>
+<dd>go ten strings up. <code>(ebib-strings-page-up)</code> <code>PgDn</code>
 </dd>
-<dt><code>PgDn</code></dt>
-<dd>go ten strings down. <code>(ebib-strings-page-down)</code>
+<dd>go ten strings down. <code>(ebib-strings-page-down)</code> <code>Home</code>
 </dd>
-<dt><code>Home</code></dt>
-<dd>go to the first string. <code>(ebib-goto-first-string)</code>
+<dd>go to the first string. <code>(ebib-goto-first-string)</code> <code>End</code>
 </dd>
-<dt><code>End</code></dt>
-<dd>go to the last string. <code>(ebib-goto-last-string)</code>
+<dd>go to the last string. <code>(ebib-goto-last-string)</code> <code>Space</code>
 </dd>
-<dt><code>Space</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>a</code>
 </dd>
-<dt><code>a</code></dt>
-<dd>add a new <code>@string</code> definition. <code>(ebib-add-string)</code>
+<dd>add a new <code>@string</code> definition. <code>(ebib-add-string)</code> <code>b</code>
 </dd>
-<dt><code>b</code></dt>
-<dd>equivalent to <code>PgUp</code>.
+<dd>equivalent to <code>PgUp</code>. <code>c</code>
 </dd>
-<dt><code>c</code></dt>
-<dd>copy the text of the current string to the kill ring. <code>(ebib-copy-string-contents)</code>
+<dd>copy the text of the current string to the kill ring. <code>(ebib-copy-string-contents)</code> <code>d</code>
 </dd>
-<dt><code>d</code></dt>
-<dd>delete the current <code>@string</code> definition from the database. You will be asked for confirmation. <code>(ebib-delete-string)</code>
+<dd>delete the current <code>@string</code> definition from the database. You will be asked for confirmation. <code>(ebib-delete-string)</code> <code>e</code>
 </dd>
-<dt><code>e</code></dt>
-<dd>edit the value of the current string. <code>(ebib-edit-string)</code>
+<dd>edit the value of the current string. <code>(ebib-edit-string)</code> <code>g</code>
 </dd>
-<dt><code>g</code></dt>
-<dd>equivalent to <code>Home</code>.
+<dd>equivalent to <code>Home</code>. <code>G</code>
 </dd>
-<dt><code>G</code></dt>
-<dd>equivalent to <code>End</code>.
+<dd>equivalent to <code>End</code>. <code>h</code>
 </dd>
-<dt><code>h</code></dt>
-<dd>show the info node on the strings buffer. (<code>ebib-strings-help</code>)
+<dd>show the info node on the strings buffer. (<code>ebib-strings-help</code>) <code>j</code>
 </dd>
-<dt><code>j</code></dt>
-<dd>equivalent to <code>Down</code>.
+<dd>equivalent to <code>Down</code>. <code>k</code>
 </dd>
-<dt><code>k</code></dt>
-<dd>equivalent to <code>Up</code>.
+<dd>equivalent to <code>Up</code>. <code>l</code>
 </dd>
-<dt><code>l</code></dt>
-<dd>edit the value of the current string as multiline. <code>(ebib-edit-multiline-string)</code>
+<dd>edit the value of the current string as multiline. <code>(ebib-edit-multiline-string)</code> <code>C-n</code>
 </dd>
-<dt><code>C-n</code></dt>
-<dd>equivalent to <code>Down</code>.
+<dd>equivalent to <code>Down</code>. <code>M-n</code>
 </dd>
-<dt><code>M-n</code></dt>
-<dd>equivalent to <code>PgDn</code>.
+<dd>equivalent to <code>PgDn</code>. <code>C-p</code>
 </dd>
-<dt><code>C-p</code></dt>
-<dd>equivalent to <code>Up</code>.
+<dd>equivalent to <code>Up</code>. <code>M-p</code>
 </dd>
-<dt><code>M-p</code></dt>
-<dd>equivalent to <code>PgUp</code>.
+<dd>equivalent to <code>PgUp</code>. <code>q</code>
 </dd>
-<dt><code>q</code></dt>
-<dd>quit the strings buffer and return focus to the index buffer. <code>(ebib-quit-strings-buffer)</code>
+<dd>quit the strings buffer and return focus to the index buffer. <code>(ebib-quit-strings-buffer)</code> <code>x</code>
 </dd>
-<dt><code>x</code></dt>
-<dd>export the current <code>@string</code> definition to a file or, when used with a prefix argument, to another database. <code>(ebib-export-string)</code>
+<dd>export the current <code>@string</code> definition to a file or, when used with a prefix argument, to another database. <code>(ebib-export-string)</code> <code>X</code>
 </dd>
-<dt><code>X</code></dt>
-<dd>export all the <code>@string</code> definitions to a file or, when used with a prefix argument, to another database. <code>(ebib-export-all-strings)</code>
+<dd>export all the <code>@string</code> definitions to a file or, when used with a prefix argument, to another database. <code>(ebib-export-all-strings)</code> <code>C-x b</code>
 </dd>
-<dt><code>C-x b</code></dt>
-<dd>equivalent to <code>q</code>.
+<dd>equivalent to <code>q</code>. <code>C-x k</code>
 </dd>
-<dt><code>C-x k</code></dt>
 <dd>equivalent to <code>q</code>.
 </dd>
 </dl>
@@ -920,7 +786,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <pre><code>(ebib-key multiline &quot;&amp;&quot;)</code></pre>
 <p>This piece of code changes the commands <code>C-c | q</code>, <code>C-c | c</code> and <code>C-c | s</code> to <code>C-c &amp; q</code>, <code>C-c &amp; c</code> and <code>C-c &amp; s</code>, respectively.</p>
 <p>Alternatively, if you find these key bindings awkward, you could put something like the following code in <code>~/.emacs.d/ebibrc</code>:</p>
-<pre class="sourceCode Commonlisp"><code class="sourceCode commonlisp">(define-key ebib-multiline-mode-map
+<pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(define-key ebib-multiline-mode-map
             <span class="st">&quot;\C-c\C-c&quot;</span> &#39;ebib-quit-multiline-edit)
 (define-key ebib-multiline-mode-map
             <span class="st">&quot;\C-c\C-q&quot;</span> &#39;ebib-cancel-multiline-edit)
