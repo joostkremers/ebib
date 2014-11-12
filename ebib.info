@@ -2272,84 +2272,252 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
 =====================
 
 `Up'
-     go to previous entry. `(ebib-prev-entry)' `Down' go to next entry.
-     `(ebib-next-entry)' `Right' move to the next database.
-     `(ebib-next-database)' `Left' move to the previous database.
-     `(ebib-prev-database)' `PgUp' scroll the index buffer down.
-     `(ebib-index-scroll-down)' `PgDn' scroll the index buffer up.
-     `(ebib-index-scroll-up)' `Home' go to first entry.
-     `(ebib-goto-first-entry)' `End' go to last entry.
-     `(ebib-goto-last-entry)' `Return' make the entry under the cursor
-     current. Use after e.g. `C-s'. `(ebib-select-entry)' `Space'
-     equivalent to `PgDn'. `1-9' jump to the corresponding database. `/'
-     search the database. `(ebib-search)' `&' create a filter, or
-     perform a logical `and' on the current filter. With negative
-     prefix argument: apply a logical `not' to the selectional
-     criterion. `(ebib-filter-and)' `|' create a filter, or perform a
-     logical `or' on the current filter. With negative prefix argument:
-     apply a logical `not' to the selectional criterion.
-     `(ebib-filter-or)' `~' perform a logical `not' on the current
-     filter. `(ebib-filter-not)' `?' display Ebib info. `(ebib-info)'
-     `a' add an entry. `(ebib-add-entry)' `b' equivalent to `Pgup'. `c'
+     go to previous entry. `(ebib-prev-entry)'
+
+`Down'
+     go to next entry. `(ebib-next-entry)'
+
+`Right'
+     move to the next database. `(ebib-next-database)'
+
+`Left'
+     move to the previous database. `(ebib-prev-database)'
+
+`PgUp'
+     scroll the index buffer down. `(ebib-index-scroll-down)'
+
+`PgDn'
+     scroll the index buffer up. `(ebib-index-scroll-up)'
+
+`Home'
+     go to first entry. `(ebib-goto-first-entry)'
+
+`End'
+     go to last entry. `(ebib-goto-last-entry)'
+
+`Return'
+     make the entry under the cursor current. Use after e.g. `C-s'.
+     `(ebib-select-entry)'
+
+`Space'
+     equivalent to `PgDn'.
+
+`1-9'
+     jump to the corresponding database.
+
+`/'
+     search the database. `(ebib-search)'
+
+`&'
+     create a filter, or perform a logical `and' on the current filter.
+     With negative prefix argument: apply a logical `not' to the
+     selectional criterion. `(ebib-filter-and)'
+
+`|'
+     create a filter, or perform a logical `or' on the current filter.
+     With negative prefix argument: apply a logical `not' to the
+     selectional criterion. `(ebib-filter-or)'
+
+`~'
+     perform a logical `not' on the current filter. `(ebib-filter-not)'
+
+`?'
+     display Ebib info. `(ebib-info)'
+
+`a'
+     add an entry. `(ebib-add-entry)'
+
+`b'
+     equivalent to `Pgup'.
+
+`c'
      close the database or cancel the current filter. `(ebib-index-c)'
-     `C' follow `crossref' field. `(ebib-follow-crossref)' `d' delete
-     the current entry. `(ebib-delete-entry)' `; d' delete all selected
-     entries. `e' edit the current entry. `(ebib-edit-entry)' `E' edit
-     the key of the current entry. `(ebib-edit-keyname)' `f' extract a
-     filename from the `file' field and send it to an appropriate
-     viewer. With numeric prefix argument, extract the _n_-th filename.
-     `F' prefix key for filter actions. `F &' equivalent to `&'. `F |'
-     equivalent to `|'. `F ~' equivalent to `~' `F a' apply a stored
-     filter. `(ebib-filters-apply-filter)' `F c' cancel the current
-     filter. `(ebib-filters-cancel-filter)' `F d' delete a stored
-     filter. `(ebib-filters-delete-filter)' `F D' delete all stored
-     filters. `(ebib-filters-delete-all-filters)' `F l' load filters
-     from a file. `(ebib-filters-load-from-file)' `F L' reapply the
-     last used filter. `(ebib-filters-reapply-last-filter)' `F r'
-     reapply the current filter. `(ebib-filters-reapply-filter)' `F R'
-     rename a stored filter. `(ebib-filters-rename-filter)' `F s' store
-     the current filter. `(ebib-filters-store-filter)' `F S' save
-     stored filters to `ebib-filters-default-file'.
-     `(ebib-filters-save-filters)' `F v' display the filter in the
-     minibuffer. `(ebib-filters-view-filter)' `F V' show a list of
-     filters. `(ebib-filters-view-all-filters)' `F w' write the stored
-     filters to a file. `(ebib-filters-write-to-file)' `g' equivalent
-     to `Home'. `G' equivalent to `End'. `h' show the info node on the
-     index buffer. (`ebib-index-help') `H' show/hide the hidden fields.
-     (`ebib-toggle-hidden') `i' extract a DOI from the `doi' field,
-     append it to a URL and open that in a browser (`ebib-browse-doi')
-     `j' equivalent to `Down'. `J' jump to another database. This
-     accepts a numeric prefix argument, but will ask you for a database
-     number if there is none. `(ebib-switch-to-database)' `k'
-     equivalent to `Up'. `l' show the log buffer. (`ebib-show-log') `m'
-     select (or unselect) the current entry. `(ebib-select-entry)' `; m'
-     unselect all selected entries. `n' find next occurrence of the
-     search string. `(ebib-search-next)' `N' search for entries
-     cross-referencing the current one. `(ebib-search-crossref)' `C-n'
-     equivalent to `Down'. `M-n' equivalent to `PgDn'. `o' open a
-     `.bib' file. `(ebib-load-bibtex-file)' `p' push an entry to a
-     LaTeX buffer `(ebib-push-bibtex-key)' `; p' push the selected
-     entries to a LaTeX buffer. `C-p' equivalent to `Up'. `M-p'
-     equivalent to `PgUp'. `P' show and edit the `@preamble' definition
-     in the database. `(ebib-edit-preamble)' `q' quit Ebib. This sets
-     all variables to nil, unloads the database(s) and quits Ebib.
-     `(ebib-quit)' `s' save the database.
-     `(ebib-save-current-database)' `S' show and edit the `@string'
-     definitions in the database. `(ebib-edit-strings)' `u' extract a
-     URL from the `url' field and send it to a browser. With numeric
-     prefix argument, extract the _n_-th url. `(ebib-browse-url)' `w'
+
+`C'
+     follow `crossref' field. `(ebib-follow-crossref)'
+
+`d'
+     delete the current entry. `(ebib-delete-entry)'
+
+`; d'
+     delete all selected entries.
+
+`e'
+     edit the current entry. `(ebib-edit-entry)'
+
+`E'
+     edit the key of the current entry. `(ebib-edit-keyname)'
+
+`f'
+     extract a filename from the `file' field and send it to an
+     appropriate viewer. With numeric prefix argument, extract the
+     _n_-th filename.
+
+`F'
+     prefix key for filter actions.
+
+`F &'
+     equivalent to `&'.
+
+`F |'
+     equivalent to `|'.
+
+`F ~'
+     equivalent to `~'
+
+`F a'
+     apply a stored filter. `(ebib-filters-apply-filter)'
+
+`F c'
+     cancel the current filter. `(ebib-filters-cancel-filter)'
+
+`F d'
+     delete a stored filter. `(ebib-filters-delete-filter)'
+
+`F D'
+     delete all stored filters. `(ebib-filters-delete-all-filters)'
+
+`F l'
+     load filters from a file. `(ebib-filters-load-from-file)'
+
+`F L'
+     reapply the last used filter. `(ebib-filters-reapply-last-filter)'
+
+`F r'
+     reapply the current filter. `(ebib-filters-reapply-filter)'
+
+`F R'
+     rename a stored filter. `(ebib-filters-rename-filter)'
+
+`F s'
+     store the current filter. `(ebib-filters-store-filter)'
+
+`F S'
+     save stored filters to `ebib-filters-default-file'.
+     `(ebib-filters-save-filters)'
+
+`F v'
+     display the filter in the minibuffer. `(ebib-filters-view-filter)'
+
+`F V'
+     show a list of filters. `(ebib-filters-view-all-filters)'
+
+`F w'
+     write the stored filters to a file. `(ebib-filters-write-to-file)'
+
+`g'
+     equivalent to `Home'.
+
+`G'
+     equivalent to `End'.
+
+`h'
+     show the info node on the index buffer. (`ebib-index-help')
+
+`H'
+     show/hide the hidden fields. (`ebib-toggle-hidden')
+
+`i'
+     extract a DOI from the `doi' field, append it to a URL and open
+     that in a browser (`ebib-browse-doi')
+
+`j'
+     equivalent to `Down'.
+
+`J'
+     jump to another database. This accepts a numeric prefix argument,
+     but will ask you for a database number if there is none.
+     `(ebib-switch-to-database)'
+
+`k'
+     equivalent to `Up'.
+
+`l'
+     show the log buffer. (`ebib-show-log')
+
+`m'
+     select (or unselect) the current entry. `(ebib-select-entry)'
+
+`; m'
+     unselect all selected entries.
+
+`n'
+     find next occurrence of the search string. `(ebib-search-next)'
+
+`N'
+     search for entries cross-referencing the current one.
+     `(ebib-search-crossref)'
+
+`C-n'
+     equivalent to `Down'.
+
+`M-n'
+     equivalent to `PgDn'.
+
+`o'
+     open a `.bib' file. `(ebib-load-bibtex-file)'
+
+`p'
+     push an entry to a LaTeX buffer `(ebib-push-bibtex-key)'
+
+`; p'
+     push the selected entries to a LaTeX buffer.
+
+`C-p'
+     equivalent to `Up'.
+
+`M-p'
+     equivalent to `PgUp'.
+
+`P'
+     show and edit the `@preamble' definition in the database.
+     `(ebib-edit-preamble)'
+
+`q'
+     quit Ebib. This sets all variables to nil, unloads the database(s)
+     and quits Ebib. `(ebib-quit)'
+
+`s'
+     save the database. `(ebib-save-current-database)'
+
+`S'
+     show and edit the `@string' definitions in the database.
+     `(ebib-edit-strings)'
+
+`u'
+     extract a URL from the `url' field and send it to a browser. With
+     numeric prefix argument, extract the _n_-th url.
+     `(ebib-browse-url)'
+
+`w'
      save the database under a new name. If a filter is active, save
      the filtered entries to a new `.bib' file. `(ebib-write-database)'
-     `x' export the current entry to a file, or, when used with numeric
-     prefix argument, to another database. `(ebib-export-entry)' `; x'
+
+`x'
+     export the current entry to a file, or, when used with numeric
+     prefix argument, to another database. `(ebib-export-entry)'
+
+`; x'
      export the selected entries to a file, or, when used with a
-     numeric prefix argument, to another database. `C-x b' equivalent
-     to `z'. `C-x k' equivalent to `q'. `X' export the `@preamble'
-     definition to a file or, when used with a numeric prefix argument,
-     to another database. `(ebib-export-preamble)' `z' move focus away
-     from the Ebib windows, or, if using the full layout, put Ebib in
-     the background. `(ebib-leave-ebib-windows)' `Z' put Ebib in the
-     background. `(ebib-lower)'
+     numeric prefix argument, to another database.
+
+`C-x b'
+     equivalent to `z'.
+
+`C-x k'
+     equivalent to `q'.
+
+`X'
+     export the `@preamble' definition to a file or, when used with a
+     numeric prefix argument, to another database.
+     `(ebib-export-preamble)'
+
+`z'
+     move focus away from the Ebib windows, or, if using the full
+     layout, put Ebib in the background. `(ebib-leave-ebib-windows)'
+
+`Z'
+     put Ebib in the background. `(ebib-lower)'
 
 Functions not bound to any key:
 
@@ -2380,39 +2548,107 @@ File: ebib.info,  Node: The Entry Buffer,  Next: The Strings Buffer,  Prev: The 
 =====================
 
 `Up'
-     go to the previous field. `(ebib-prev-field)' `Down' go to the
-     next field. `(ebib-next-field)' `PgUp' go to the previous set of
-     fields. `(ebib-goto-prev-set)' `PgDn' go to the next set of
-     fields. `(ebib-goto-next-set)' `Home' go to the first field.
-     `(ebib-goto-first-field)' `End' go to the last field.
-     `(ebib-goto-last-field)' `Space' equivalent to `PgDn'. `b'
-     equivalent to `PgUp'. `c' copy the contents of the current field
-     to the kill ring. `(ebib-copy-field-contents)' `d' delete the
-     value of the current field. The deleted contents will _not_ be put
-     in the kill ring, and is therefore irretrievably lost.
-     `(ebib-delete-field-contents)' `e' edit the current field.
-     `(ebib-edit-fields)' `f' extract a filename from the current field
-     and send it to an appropriate viewer. With numeric prefix
-     argument, extract the _n_-th filename. `g' equivalent to `Home'.
-     `G' equivalent to `End'. `h' show the info node on the entry
-     buffer. (`ebib-entry-help') `j' go to the next field.
-     `(ebib-next-field)' `k' go to the previous field.
-     `(ebib-prev-field)' `m' edit the current field as multiline.
-     `(ebib-edit-multiline-field)' `C-n' equivalent to `Down'. `M-n'
-     equivalent to `PgDn'. `C-p' equivalent to `Up'. `M-p' equivalent
-     to `PgUp'. `q' quit editing the current entry and return focus to
-     the index buffer. `(ebib-quit-entry-buffer)' `r' toggle a field's
-     "special" status. `(ebib-toggle-raw)' `s' insert an abbreviation
-     from the `@string' definitions in the database.
-     `(ebib-insert-abbreviation)' `u' extract a URL from the current
-     field and send it to a browser. With numeric prefix argument,
-     extract the _n_-th url. `x' cut the contents of the current field.
-     Like `c', `x' puts the contents of the current field in the kill
-     ring. `(ebib-cut-field-contents)' `C-x b' equivalent to `q'. `C-x
-     k' equivalent to `q'. `y' yank the last element in the kill ring
-     to the current field. Repeated use of `y' functions like
-     `C-y/M-y'. Note that no text will be yanked if the field already
-     has a value. `(ebib-yank-field-contents)'
+     go to the previous field. `(ebib-prev-field)'
+
+`Down'
+     go to the next field. `(ebib-next-field)'
+
+`PgUp'
+     go to the previous set of fields. `(ebib-goto-prev-set)'
+
+`PgDn'
+     go to the next set of fields. `(ebib-goto-next-set)'
+
+`Home'
+     go to the first field. `(ebib-goto-first-field)'
+
+`End'
+     go to the last field. `(ebib-goto-last-field)'
+
+`Space'
+     equivalent to `PgDn'.
+
+`b'
+     equivalent to `PgUp'.
+
+`c'
+     copy the contents of the current field to the kill ring.
+     `(ebib-copy-field-contents)'
+
+`d'
+     delete the value of the current field. The deleted contents will
+     _not_ be put in the kill ring, and is therefore irretrievably
+     lost. `(ebib-delete-field-contents)'
+
+`e'
+     edit the current field. `(ebib-edit-fields)'
+
+`f'
+     extract a filename from the current field and send it to an
+     appropriate viewer. With numeric prefix argument, extract the
+     _n_-th filename.
+
+`g'
+     equivalent to `Home'.
+
+`G'
+     equivalent to `End'.
+
+`h'
+     show the info node on the entry buffer. (`ebib-entry-help')
+
+`j'
+     go to the next field. `(ebib-next-field)'
+
+`k'
+     go to the previous field. `(ebib-prev-field)'
+
+`m'
+     edit the current field as multiline. `(ebib-edit-multiline-field)'
+
+`C-n'
+     equivalent to `Down'.
+
+`M-n'
+     equivalent to `PgDn'.
+
+`C-p'
+     equivalent to `Up'.
+
+`M-p'
+     equivalent to `PgUp'.
+
+`q'
+     quit editing the current entry and return focus to the index
+     buffer. `(ebib-quit-entry-buffer)'
+
+`r'
+     toggle a field's "special" status. `(ebib-toggle-raw)'
+
+`s'
+     insert an abbreviation from the `@string' definitions in the
+     database. `(ebib-insert-abbreviation)'
+
+`u'
+     extract a URL from the current field and send it to a browser.
+     With numeric prefix argument, extract the _n_-th url.
+
+`x'
+     cut the contents of the current field. Like `c', `x' puts the
+     contents of the current field in the kill ring.
+     `(ebib-cut-field-contents)'
+
+`C-x b'
+     equivalent to `q'.
+
+`C-x k'
+     equivalent to `q'.
+
+`y'
+     yank the last element in the kill ring to the current field.
+     Repeated use of `y' functions like `C-y/M-y'. Note that no text
+     will be yanked if the field already has a value.
+     `(ebib-yank-field-contents)'
 
 
 File: ebib.info,  Node: The Strings Buffer,  Prev: The Entry Buffer,  Up: The Ebib Buffers
@@ -2421,30 +2657,91 @@ File: ebib.info,  Node: The Strings Buffer,  Prev: The Entry Buffer,  Up: The Eb
 =======================
 
 `Up (ebib-prev-string)'
-     go to the previous string. `Down' go to the next string.
-     `(ebib-next-string)' `PgUp' go ten strings up.
-     `(ebib-strings-page-up)' `PgDn' go ten strings down.
-     `(ebib-strings-page-down)' `Home' go to the first string.
-     `(ebib-goto-first-string)' `End' go to the last string.
-     `(ebib-goto-last-string)' `Space' equivalent to `PgDn'. `a' add a
-     new `@string' definition. `(ebib-add-string)' `b' equivalent to
-     `PgUp'. `c' copy the text of the current string to the kill ring.
-     `(ebib-copy-string-contents)' `d' delete the current `@string'
-     definition from the database. You will be asked for confirmation.
-     `(ebib-delete-string)' `e' edit the value of the current string.
-     `(ebib-edit-string)' `g' equivalent to `Home'. `G' equivalent to
-     `End'. `h' show the info node on the strings buffer.
-     (`ebib-strings-help') `j' equivalent to `Down'. `k' equivalent to
-     `Up'. `l' edit the value of the current string as multiline.
-     `(ebib-edit-multiline-string)' `C-n' equivalent to `Down'. `M-n'
-     equivalent to `PgDn'. `C-p' equivalent to `Up'. `M-p' equivalent
-     to `PgUp'. `q' quit the strings buffer and return focus to the
-     index buffer. `(ebib-quit-strings-buffer)' `x' export the current
-     `@string' definition to a file or, when used with a prefix
-     argument, to another database. `(ebib-export-string)' `X' export
-     all the `@string' definitions to a file or, when used with a
-     prefix argument, to another database. `(ebib-export-all-strings)'
-     `C-x b' equivalent to `q'. `C-x k' equivalent to `q'.
+     go to the previous string.
+
+`Down'
+     go to the next string. `(ebib-next-string)'
+
+`PgUp'
+     go ten strings up. `(ebib-strings-page-up)'
+
+`PgDn'
+     go ten strings down. `(ebib-strings-page-down)'
+
+`Home'
+     go to the first string. `(ebib-goto-first-string)'
+
+`End'
+     go to the last string. `(ebib-goto-last-string)'
+
+`Space'
+     equivalent to `PgDn'.
+
+`a'
+     add a new `@string' definition. `(ebib-add-string)'
+
+`b'
+     equivalent to `PgUp'.
+
+`c'
+     copy the text of the current string to the kill ring.
+     `(ebib-copy-string-contents)'
+
+`d'
+     delete the current `@string' definition from the database. You
+     will be asked for confirmation. `(ebib-delete-string)'
+
+`e'
+     edit the value of the current string. `(ebib-edit-string)'
+
+`g'
+     equivalent to `Home'.
+
+`G'
+     equivalent to `End'.
+
+`h'
+     show the info node on the strings buffer. (`ebib-strings-help')
+
+`j'
+     equivalent to `Down'.
+
+`k'
+     equivalent to `Up'.
+
+`l'
+     edit the value of the current string as multiline.
+     `(ebib-edit-multiline-string)'
+
+`C-n'
+     equivalent to `Down'.
+
+`M-n'
+     equivalent to `PgDn'.
+
+`C-p'
+     equivalent to `Up'.
+
+`M-p'
+     equivalent to `PgUp'.
+
+`q'
+     quit the strings buffer and return focus to the index buffer.
+     `(ebib-quit-strings-buffer)'
+
+`x'
+     export the current `@string' definition to a file or, when used
+     with a prefix argument, to another database. `(ebib-export-string)'
+
+`X'
+     export all the `@string' definitions to a file or, when used with
+     a prefix argument, to another database. `(ebib-export-all-strings)'
+
+`C-x b'
+     equivalent to `q'.
+
+`C-x k'
+     equivalent to `q'.
 
 
 File: ebib.info,  Node: Customisation,  Prev: The Ebib Buffers,  Up: Top
@@ -2663,14 +2960,14 @@ Node: The Ebib Buffers108948
 Ref: #the-ebib-buffers109090
 Node: The Index Buffer109430
 Ref: #the-index-buffer109567
-Node: The Entry Buffer115154
-Ref: #the-entry-buffer115318
-Node: The Strings Buffer117502
-Ref: #the-strings-buffer117645
-Node: Customisation119260
-Ref: #customisation119371
-Node: Modifying Key Bindings120256
-Ref: #modifying-key-bindings120383
+Node: The Entry Buffer115328
+Ref: #the-entry-buffer115492
+Node: The Strings Buffer117755
+Ref: #the-strings-buffer117898
+Node: Customisation119584
+Ref: #customisation119695
+Node: Modifying Key Bindings120580
+Ref: #modifying-key-bindings120707
 
 End Tag Table
 
