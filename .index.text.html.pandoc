@@ -1,7 +1,0 @@
-# pandoc-mode settings file for index.text #
-# saved on 2012.03.12 13:21 #
-
-read::markdown
-write::html
-output::t
-css::ebib.css
