@@ -38,7 +38,7 @@ Ebib provides the standard capabilities that one would expect from a BibTeX data
 ### BibTeX ###
 
 - Support for BibTeX and biblatex files.
-- Creating and editing `@string` and `@preamble` definitions is supported (`@comment`s are ignored).
+- Creating and editing `@string` and `@preamble` definitions is supported (`@comment`s are kept, but are not editable).
 - BibTeX / biblatex entry and field types can be customised, allowing adaptation for non-standard and personal bibliography styles.
 - Automatic creation of entry keys (using the functionality of Emacs' `bibtex-mode`).
 - Field values containing newlines are supported, allowing the creation of annotated bibliographies.
