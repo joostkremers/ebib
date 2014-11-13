@@ -626,25 +626,25 @@ Ebib (not Emacs)."
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
-(defface ebib--overlay-face '((t (:inherit highlight)))
+(defface ebib-overlay-face '((t (:inherit highlight)))
   "Face used for the overlays."
-  :group 'ebib--faces)
+  :group 'ebib-faces)
 
-(defface ebib--crossref-face '((t (:inherit font-lock-comment-face)))
+(defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
   "Face used to indicate values inherited from crossreferenced entries."
-  :group 'ebib--faces)
+  :group 'ebib-faces)
 
-(defface ebib--alias-face '((t (:inherit warning)))
+(defface ebib-alias-face '((t (:inherit warning)))
   "Face used to indicate values inherited from crossreferenced entries."
-  :group 'ebib--faces)
+  :group 'ebib-faces)
 
-(defface ebib--marked-face '((t (:inverse-video t)))
+(defface ebib-marked-face '((t (:inverse-video t)))
   "Face to indicate marked entries."
-  :group 'ebib--faces)
+  :group 'ebib-faces)
 
-(defface ebib--field-face '((t (:inherit font-lock-keyword-face)))
+(defface ebib-field-face '((t (:inherit font-lock-keyword-face)))
   "Face for field names."
-  :group 'ebib--faces)
+  :group 'ebib-faces)
 
 ;; generic for all databases
 
