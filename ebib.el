@@ -191,7 +191,7 @@ all else fails, pop up a new frame."
     ;; but all this is not necessary if there was no value
     (when value
       (if (get-text-property 0 'ebib--alias value)
-          (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib-field-aliases 'case-fold))) 'face 'ebib--alias-face)))
+          (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib--field-aliases 'case-fold))) 'face 'ebib--alias-face)))
       (if (stringp (get-text-property 0 'ebib--xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
       (if (and (cl-equalp field "crossref")
@@ -236,7 +236,7 @@ it is highlighted. DB defaults to the current database."
                       (propertize entry-type 'face 'error))
                     (if (and (eq dialect 'biblatex)
                              (assoc-string entry-type ebib--type-aliases 'case-fold))
-                        (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))) 'face 'ebib--alias-face)
+                        (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib--type-aliases 'case-fold))) 'face 'ebib--alias-face)
                       "")))
     (mapc #'(lambda (fields)
               (when fields ; If one of the sets is empty, we don't want an extra empty line.
