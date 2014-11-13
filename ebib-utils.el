@@ -783,9 +783,6 @@ ELSE-FORM is executed. Returns the value of THEN or of ELSE."
          ,then
        ,@else)))
 
-;; this needs to be wrapped in an eval-and-compile, to keep Emacs from
-;; complaining that ebib--execute-helper isn't defined when it compiles
-;; ebib--execute-when.
 (eval-and-compile
   (defun ebib--execute-helper (env)
     "Helper function for `ebib--execute-when'."
