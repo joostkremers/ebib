@@ -153,7 +153,7 @@ all else fails, pop up a new frame."
         (let ((beg (point)))
           (end-of-line)
           (delete-region beg (point)))
-        (insert (propertize (format "%-17s " field) 'face 'ebib--field-face)
+        (insert (propertize (format "%-17s " field) 'face 'ebib-field-face)
                 (ebib--get-field-highlighted field (ebib--cur-entry-key)))
         (ebib--set-fields-overlay))))))
 
@@ -191,9 +191,9 @@ all else fails, pop up a new frame."
     ;; but all this is not necessary if there was no value
     (when value
       (if (get-text-property 0 'ebib--alias value)
-          (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib--field-aliases 'case-fold))) 'face 'ebib--alias-face)))
+          (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib-field-aliases 'case-fold))) 'face 'ebib--alias-face)))
       (if (stringp (get-text-property 0 'ebib--xref value))
-          (setq value (propertize value 'face 'ebib--crossref-face 'fontified t)))
+          (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
       (if (and (cl-equalp field "crossref")
                (not (member (ebib--db-unbrace value) ebib--cur-keys-list)))
           (setq value (propertize value 'face 'error)))
@@ -230,13 +230,13 @@ it is highlighted. DB defaults to the current database."
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
          (undef-fields (mapcar #'car (ebib--list-undefined-fields (ebib--db-get-entry key ebib--cur-db) dialect))))
     (insert (format "%-19s %s%s\n"
-                    (propertize "type" 'face 'ebib--field-face)
+                    (propertize "type" 'face 'ebib-field-face)
                     (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect) t) 'case-fold)
                         entry-type
                       (propertize entry-type 'face 'error))
                     (if (and (eq dialect 'biblatex)
                              (assoc-string entry-type ebib--type-aliases 'case-fold))
-                        (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib--type-aliases 'case-fold))) 'face 'ebib--alias-face)
+                        (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib-type-aliases 'case-fold))) 'face 'ebib--alias-face)
                       "")))
     (mapc #'(lambda (fields)
               (when fields ; If one of the sets is empty, we don't want an extra empty line.
@@ -244,7 +244,7 @@ it is highlighted. DB defaults to the current database."
                 (mapcar #'(lambda (field)
                             (unless (and (member-ignore-case field ebib-hidden-fields)
                                          ebib--hide-hidden-fields)
-                              (insert (propertize (format "%-17s " field) 'face 'ebib--field-face))
+                              (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
                               (insert (or (ebib--get-field-highlighted field key match-str)
                                           ""))
                               (insert "\n")))
@@ -300,7 +300,7 @@ to \"none\". This function sets `ebib--cur-keys-list'."
   "Highlight/unhighlight an entry.
 Add/remove `ebib-marked-face` to the region between BEG and END,
 or to the entry point is on if these are omitted. If MARK is t,
-`ebib--marked-face is added, if nil, it is removed. NB: if BEG and
+`ebib-marked-face is added, if nil, it is removed. NB: if BEG and
 END are omitted, this function changes point."
   (unless (and beg end)
     (beginning-of-line)
@@ -308,8 +308,8 @@ END are omitted, this function changes point."
     (skip-chars-forward "^ ")
     (setq end (point)))
   (if mark
-      (add-text-properties beg end '(face ebib--marked-face))
-    (remove-text-properties beg end '(face ebib--marked-face))))
+      (add-text-properties beg end '(face ebib-marked-face))
+    (remove-text-properties beg end '(face ebib-marked-face))))
 
 (defun ebib--fill-entry-buffer (&optional match-str)
   "Fill the entry buffer with the fields of the current entry.

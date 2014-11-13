@@ -867,7 +867,7 @@ This function adds a newline to the message being logged."
 (defun ebib--make-overlay (begin end buffer)
   (let (overlay)
     (setq overlay (make-overlay begin end buffer))
-    (overlay-put overlay 'face 'ebib--overlay-face)
+    (overlay-put overlay 'face 'ebib-overlay-face)
     overlay))
 
 (defun ebib--set-index-overlay ()
