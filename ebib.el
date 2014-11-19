@@ -2611,7 +2611,7 @@ If FILE is not in (a subdirectory of) one of the directories in
 (defun ebib-edit-field (&optional pfx)
   "Edit a field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
-are handled specially: the `type' and `crossref` fields offer
+are handled specially: the `type' and `crossref' fields offer
 completion, the `annote' field is edited as a multiline field,
 the `keywords' field adds keywords one by one, also allowing
 completion, and the field in `ebib-file-field' uses filename
