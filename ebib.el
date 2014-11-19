@@ -349,7 +349,6 @@ Returns the first modified database, or NIL if none was modified."
     (setq ebib--databases (append ebib--databases (list new-db)))
     new-db))
 
-
 (defun ebib--store-entry (entry-key fields db &optional timestamp if-exists)
   "Store the entry defined by ENTRY-KEY and FIELDS into DB.
 Optional argument TIMESTAMP indicates whether a timestamp is to
@@ -1490,7 +1489,7 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
         (ebib--log 'error "Could not create backup file `%s'" backup-file)))))
 
 (defun ebib--save-database (db)
-  "Save the database DB." 
+  "Save the database DB."
   (when (and (ebib--db-backup-p db)
              (file-exists-p (ebib--db-get-filename db)))
     (ebib--make-backup (ebib--db-get-filename db))
