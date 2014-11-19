@@ -326,13 +326,14 @@ in the field contents."
   "Set the modified flag of the database DB to MOD.
 If DB is the current database, the modified flag of the index
 buffer is also (re)set. MOD must be either T or NIL; DB defaults
-to the current database."
+to the current database. Return value is MOD."
   (unless db
     (setq db ebib--cur-db))
   (ebib--db-set-modified mod db)
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
-      (set-buffer-modified-p mod))))
+      (set-buffer-modified-p mod)
+      mod)))
 
 (defun ebib--modified-p ()
   "Check if any of the databases in Ebib were modified.
