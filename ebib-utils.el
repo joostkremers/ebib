@@ -1,4 +1,4 @@
-;;; ebib-utils.el --- Part of Ebib, a BibTeX database manager
+;;; ebib-utils.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
@@ -1154,16 +1154,12 @@ successful, and NIL otherwise."
            (ebib--set-modified t ,goal-db)
            (message ,message ,num))))))
 
-(defmacro ebib--export-to-file (prompt-string message insert-fn)
+(defmacro ebib--export-to-file (prompt-string insert-fn)
   "Export data to a file.
 PROMPT-STRING is the string that is used to ask for the filename
 to export to. INSERT-FN must insert the data to be exported into
 the current buffer: it is called within a `with-temp-buffer',
-whose contents is appended to the file the user enters.
-
-MESSAGE is shown in the echo area when the export was
-successful. It must contain a %s directive, which is used to
-display the actual filename."
+whose contents is appended to the file the user enters."
   (let ((filename (make-symbol "filename")))
     `(let ((insert-default-directory (not ebib--export-filename)))
        (ebib--ifstring (,filename (read-file-name

@@ -1,4 +1,4 @@
-;;; ebib.el --- a BibTeX database manager
+;;; ebib.el --- a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
@@ -58,7 +58,7 @@
 (require 'ebib-filters)
 (require 'ebib-keywords)
 
-(defun ebib--display-buffer-reuse-window (buffer alist)
+(defun ebib--display-buffer-reuse-window (buffer _alist)
   "Display BUFFER in an existing Ebib buffer.
 If BUFFER is the index buffer, simply switch to the window
 displaying it. (This function should not be called if there is a
@@ -67,7 +67,7 @@ find a window displaying an Ebib buffer other than the index
 buffer, switch to that window and display BUFFER. If no window
 can be found, return NIL.
 
-Note, The argument ALIST has no function."
+Note, The argument _ALIST has no function."
   (let (window)
     (cond
      ;; the index buffer can only be displayed in its dedicated window.
@@ -92,9 +92,9 @@ Note, The argument ALIST has no function."
         (switch-to-buffer buffer))
       window)))
 
-(defun ebib--display-buffer-largest-window (buffer alist)
+(defun ebib--display-buffer-largest-window (buffer _alist)
   "Display BUFFER in the largest non-dedicated window.
-The argument ALIST has no function."
+The argument _ALIST has no function."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
       (select-window window)
@@ -1152,7 +1152,7 @@ replaced with a number in ascending sequence."
     ((real-db)
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
-         (add-to-list 'entry-alist (cons '=key= (read-string "New entry key: " nil 'ebib--key-history))))
+         (push (cons '=key= (read-string "New entry key: " nil 'ebib--key-history))  entry-alist))
        (ebib--db-set-current-entry-key (ebib--add-entry-stub entry-alist ebib--cur-db) ebib--cur-db)
        (ebib--redisplay)
        (ebib--edit-entry-internal)))
@@ -1200,7 +1200,7 @@ for each file anyway."
           (let ((entry-files (ebib--db-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
             (if entry-files
                 (cl-dolist (fp (split-string entry-files ebib-filename-separator))
-                  (add-to-list 'all-entry-files (locate-file fp ebib-file-search-dirs)))))))
+                  (push (locate-file fp ebib-file-search-dirs) all-entry-files))))))
       (add-file-entry filepath)
       (ebib--db-set-current-entry-key t ebib--cur-db)
       (ebib--redisplay))))
@@ -1455,7 +1455,7 @@ in order for the sort value."
       ;; The first one is simple: if X has a crossref field, it must be
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
       ;; field).
-      ((compare-xrefs (x y)
+      ((compare-xrefs (x _y)
                       (ebib--db-get-field-value "crossref" x db 'noerror))
        ;; This one's a bit trickier. We iterate over the lists of fields in
        ;; `ebib-sort-order'. For each level, `ebib--get-sortstring' then
@@ -1717,7 +1717,6 @@ a filename is asked to which the entry is appended."
                                       (ebib--db-set-current-entry-key t db))
                                     t)))) ; we must return T, WHEN does not always do this.
        (ebib--export-to-file (format "Export `%s' to file: " (ebib--cur-entry-key))
-                            (format "Entry `%s' exported to %%s." (ebib--cur-entry-key))
                             #'(lambda ()
                                 (insert "\n")
                                 (ebib--format-entry (ebib--cur-entry-key) ebib--cur-db t)))))
@@ -1743,7 +1742,7 @@ a filename is asked to which the entry is appended."
               (when (null (ebib--db-get-current-entry-key db))
                 (ebib--db-set-current-entry-key t db))
               t))         ; we must return T, WHEN does not always do this.
-       (ebib--export-to-file "Export to file: " "Entries exported to %s."
+       (ebib--export-to-file "Export to file: "
                             #'(lambda ()
                                 (mapc #'(lambda (entry-key)
                                           (insert "\n")
@@ -1867,7 +1866,6 @@ the preamble is appended."
                                 #'(lambda (db)
                                     (ebib--db-set-preamble (ebib--db-get-preamble ebib--cur-db) db 'append)))
            (ebib--export-to-file "Export @PREAMBLE to file: "
-                                "@PREAMBLE exported to %s"
                                 #'(lambda ()
                                     (insert (format "\n@preamble{%s}\n\n" (ebib--db-get-preamble ebib--cur-db)))))))))
     ((default)
@@ -1993,7 +1991,7 @@ recognized as URLs are discarded."
   (let ((start 0)
         (result nil))
     (while (string-match ebib-url-regexp string start)
-      (add-to-list 'result (match-string 0 string) t)
+      (push (match-string 0 string) result)
       (setq start (match-end 0)))
     result))
 
@@ -2985,7 +2983,6 @@ which the string is appended."
                            #'(lambda (db)
                                (ebib--db-set-string string (ebib--db-get-string string ebib--cur-db) db)))
       (ebib--export-to-file (format "Export @STRING definition `%s' to file: " string)
-                           (format "@STRING definition `%s' exported to %%s" string)
                            #'(lambda ()
                                (insert (format "\n@string{%s = %s}\n"
                                                string
@@ -3007,7 +3004,6 @@ to append them to."
                          (ebib--db-set-string abbr (ebib--db-get-string abbr ebib--cur-db) db 'noerror))
                      (ebib--db-list-strings ebib--cur-db))))
         (ebib--export-to-file "Export all @STRING definitions to file: "
-                             "All @STRING definitions exported to %s"
                              #'(lambda ()
                                  (insert (format "\n")) ; To keep things tidy.
                                  (ebib--format-strings ebib--cur-db)))))))
@@ -3270,7 +3266,7 @@ completion works."
                  (ebib--ifstring (format-string (cadr (assoc
                                                       (completing-read "Command to use: " format-list nil nil nil 'ebib--cite-command-history)
                                                       format-list)))
-                     (cl-multiple-value-bind (before repeater separator after) (ebib--split-citation-string format-string)
+                     (cl-multiple-value-bind (before repeater _separator after) (ebib--split-citation-string format-string)
                        (concat (ebib--create-citation-command before)
                                (ebib--create-citation-command repeater key)
                                (ebib--create-citation-command after)))
@@ -3316,7 +3312,7 @@ Note: this function only works on .bbl files created by BibTeX."
   (goto-char (point-min))
   (let (entries)
     (while (re-search-forward "\\\\bibitem\\[\\(?:.\\|\n[^\n]\\)*\\]{\\(.*?\\)}" nil t)
-      (add-to-list 'entries (match-string 1) t))
+      (push (match-string 1) entries))
     entries))
 
 (provide 'ebib)

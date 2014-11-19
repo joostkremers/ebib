@@ -1,4 +1,4 @@
-;;; ebib-keywords.el --- Part of Ebib, a BibTeX database manager
+;;; ebib-keywords.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
@@ -167,8 +167,7 @@ keywords and the third the keywords added in this session."
 
 (defun ebib--keywords-save-new-keywords (db)
   "Check if new keywords were added to DB and save them as required."
-  (let ((lst (ebib--keywords-new-p db))
-        (file (ebib--keywords-get-file db)))
+  (let ((lst (ebib--keywords-new-p db)))
     (when (and (cl-third lst)           ; if there are new keywords
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)

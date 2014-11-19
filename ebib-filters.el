@@ -1,4 +1,4 @@
-;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager
+;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
