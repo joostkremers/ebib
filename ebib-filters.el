@@ -148,9 +148,9 @@ Return the filter as a list (NAME FILTER)."
   (interactive)
   (let ((filter (ebib--filters-select-filter "Delete filter: ")))
     (when filter
-        (setq ebib--filters-alist (delq filter ebib--filters-alist))
-        (setq ebib--filters-modified t)
-        (message "Filter %s deleted" (car filter)))))
+      (setq ebib--filters-alist (delq filter ebib--filters-alist))
+      (setq ebib--filters-modified t)
+      (message "Filter %s deleted" (car filter)))))
 
 (defun ebib-filters-delete-all-filters ()
   "Delete all stored filters."

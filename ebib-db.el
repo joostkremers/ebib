@@ -108,14 +108,14 @@ ENTRY may also be T, in which case the current entry is
 unconditionally set to the alphabetically first entry in DB.
 
 Return the new entry key if successful, NIL otherwise."
-   (cond
-    ((stringp entry)
-     (if (ebib--db-get-entry entry db 'noerror)
-         (setf (ebib--db-struct-cur-entry db) entry)
-       (unless noerror
-         (error "No entry key `%s' in the current database" entry))
-       (if (eq noerror 'first)
-           (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
+  (cond
+   ((stringp entry)
+    (if (ebib--db-get-entry entry db 'noerror)
+        (setf (ebib--db-struct-cur-entry db) entry)
+      (unless noerror
+        (error "No entry key `%s' in the current database" entry))
+      (if (eq noerror 'first)
+          (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
    ((eq entry t)
     (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
 
@@ -571,7 +571,7 @@ make backup at next save)."
      ((eq (string-to-char string) ?\{)
       ;; first, remove all escaped { and } from the string:
       (setq string (ebib--remove-from-string (ebib--remove-from-string string "[\\][{]")
-				       "[\\][}]"))
+                                             "[\\][}]"))
       ;; then remove the innermost braces with their contents and continue until
       ;; no more braces are left.
       (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
@@ -582,7 +582,7 @@ make backup at next save)."
       ;; remove escaped ", then remove any occurrences of balanced quotes with
       ;; their contents and check for the length of the remaining string.
       (> (length (ebib--remove-from-string (ebib--remove-from-string string "[\\][\"]")
-				     "\"[^\"]*?\""))
+                                           "\"[^\"]*?\""))
 	 0))
      (t t))))
 

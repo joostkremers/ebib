@@ -655,21 +655,21 @@ Ebib (not Emacs)."
 
 ;; Entry type and field aliases defined by BibLaTeX.
 (defvar ebib--field-aliases '(("location" . "address")
-                             ("annotation" . "annote")
-                             ("eprinttype" . "archiveprefix")
-                             ("journaltitle" . "journal")
-                             ("sortkey" . "key")
-                             ("file" . "pdf")
-                             ("eprintclass" . "primaryclass")
-                             ("institution" . "school"))
+                              ("annotation" . "annote")
+                              ("eprinttype" . "archiveprefix")
+                              ("journaltitle" . "journal")
+                              ("sortkey" . "key")
+                              ("file" . "pdf")
+                              ("eprintclass" . "primaryclass")
+                              ("institution" . "school"))
   "List of field aliases for BibLaTeX.")
 
 (defvar ebib--type-aliases '(("Conference" . "InProceedings")
-                            ("Electronic" . "Online")
-                            ("MastersThesis" . "Thesis")
-                            ("PhDThesis" . "Thesis")
-                            ("TechReport" . "Report")
-                            ("WWW" . "Online"))
+                             ("Electronic" . "Online")
+                             ("MastersThesis" . "Thesis")
+                             ("PhDThesis" . "Thesis")
+                             ("TechReport" . "Report")
+                             ("WWW" . "Online"))
   "List of entry type aliases for BibLaTeX.")
 
 ;; buffers and overlays
@@ -1163,7 +1163,7 @@ whose contents is appended to the file the user enters."
   (let ((filename (make-symbol "filename")))
     `(let ((insert-default-directory (not ebib--export-filename)))
        (ebib--ifstring (,filename (read-file-name
-                           ,prompt-string "~/" nil nil ebib--export-filename))
+                                   ,prompt-string "~/" nil nil ebib--export-filename))
            (with-temp-buffer
              (funcall ,insert-fn)
              (append-to-file (point-min) (point-max) ,filename)
