@@ -2442,12 +2442,12 @@ the beginning of the current line."
       (forward-line -1)) ; move up until we're not.
     (ebib--set-fields-overlay)))
 
-(defun ebib-next-field ()
+(defun ebib-next-field (&optional pfx)
   "Move to the next field."
-  (interactive)
+  (interactive "p")
   (forward-line)
-  (when (eobp)                          ; If we ended up at the empty line below
-    (if (called-interactively-p 'any)   ; the last field, beep and adjust.
+  (when (eobp)                     ; If we ended up at the empty line below
+    (if pfx                        ; the last field, beep and adjust.
         (beep))
     (forward-line -1))
   (while (eolp) ; If we're at an empty line,
@@ -2622,24 +2622,21 @@ of) one of the directories in `ebib-file-search-dirs'.
 With a prefix argument, the `keyword' field and the field in
 `ebib-file-field' can be edited directly. For other fields, the
 prefix argument has no meaning."
-  (interactive "P")
+  (interactive "p")
   (let* ((field (ebib--current-field))
          (result
           (cond
            ((string= field "=type=") (ebib--edit-entry-type))
            ((cl-equalp field "crossref") (ebib--edit-crossref))
            ((and (cl-equalp field "keywords")
-                 (not pfx))
+                 (= 1 pfx))
             (ebib--edit-keywords))
            ((and (cl-equalp field ebib-file-field)
-                 (not pfx))
+                 (= 1 pfx))
             (ebib--edit-file-field))
            ((member-ignore-case field '("annote" "annotation")) (ebib-edit-multiline-field))
            (t (ebib--edit-normal-field)))))
-    ;; we move to the next field, but only if ebib-edit-field was
-    ;; called interactively, otherwise we get a strange bug in
-    ;; ebib--toggle-raw...
-    (if (and result (called-interactively-p 'any))
+    (if (and result pfx)
         (ebib-next-field))))
 
 (defun ebib-browse-url-in-field (num)
