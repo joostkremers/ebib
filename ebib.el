@@ -1127,7 +1127,7 @@ replaced with a number in ascending sequence."
     (cl-dolist (props entry)
       ;;aggregate properties, some require special handling
       (cond
-       ((string (car props) "=key=")
+       ((string= (car props) "=key=")
         (setq entry-key (cdr props)))
        ((string= (car props) "=type=")   ; the =type= field should not be braced.
         (push props fields))
