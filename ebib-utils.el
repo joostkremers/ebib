@@ -43,6 +43,7 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'bibtex)
+(require 'parsebib)
 
 ;; Make a bunch of variables obsolete.
 (make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "24.4")
@@ -649,30 +650,27 @@ Ebib (not Emacs)."
 ;; generic for all databases
 
 ;; constants and variables that are set only once
-(defconst ebib--bibtex-identifier "[^^\"@\\&$#%',={}() \t\n\f]*" "Regexp describing a licit BibTeX identifier.")
-(defconst ebib--key-regexp "[^][^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defvar ebib--initialized nil "T if Ebib has been initialized.")
 
 ;; Entry type and field aliases defined by BibLaTeX.
-(defvar ebib--field-aliases '(("location" . "address")
-                             ("annotation" . "annote")
-                             ("eprinttype" . "archiveprefix")
-                             ("journaltitle" . "journal")
-                             ("sortkey" . "key")
-                             ("file" . "pdf")
-                             ("eprintclass" . "primaryclass")
-                             ("institution" . "school"))
+(defconst ebib--field-aliases '(("location" . "address")
+                                ("annotation" . "annote")
+                                ("eprinttype" . "archiveprefix")
+                                ("journaltitle" . "journal")
+                                ("sortkey" . "key")
+                                ("file" . "pdf")
+                                ("eprintclass" . "primaryclass")
+                                ("institution" . "school"))
   "List of field aliases for BibLaTeX.")
 
-(defvar ebib--type-aliases '(("Conference" . "InProceedings")
-                            ("Electronic" . "Online")
-                            ("MastersThesis" . "Thesis")
-                            ("PhDThesis" . "Thesis")
-                            ("TechReport" . "Report")
-                            ("WWW" . "Online"))
+(defconst ebib--type-aliases '(("Conference" . "InProceedings")
+                               ("Electronic" . "Online")
+                               ("MastersThesis" . "Thesis")
+                               ("PhDThesis" . "Thesis")
+                               ("TechReport" . "Report")
+                               ("WWW" . "Online"))
   "List of entry type aliases for BibLaTeX.")
 
-;; buffers and overlays
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
 (defvar ebib--index-overlay nil "Overlay to mark the current entry.")
 (defvar ebib--fields-overlay nil "Overlay to mark the current field.")
@@ -698,16 +696,6 @@ Ebib (not Emacs)."
   "A buffer-local variable holding a list of the name(s) of that buffer's .bib file(s)")
 (make-variable-buffer-local 'ebib--local-bibtex-filenames)
 (put 'ebib--local-bibtex-filenames 'safe-local-variable #'(lambda (v) (null (--remove (stringp it) v))))
-
-(defvar ebib--syntax-table
-  (let ((table (make-syntax-table)))
-    (modify-syntax-entry ?\[ "." table)
-    (modify-syntax-entry ?\] "." table)
-    (modify-syntax-entry ?\( "." table)
-    (modify-syntax-entry ?\) "." table)
-    (modify-syntax-entry ?\" "w" table)
-    table)
-  "Syntax table used for reading .bib files.")
 
 ;; The databases
 
@@ -854,8 +842,8 @@ This function adds a newline to the message being logged."
      ((eq type 'error)
       (setq ebib--log-error 1))
      ((eq type 'message)
-      (apply 'message format-string args)))
-    (insert (apply 'format  (concat (if (eq type 'error)
+      (apply #'message format-string args)))
+    (insert (apply #'format (concat (if (eq type 'error)
                                         (propertize format-string 'face 'font-lock-warning-face)
                                       format-string)
                                     "\n")
@@ -892,105 +880,6 @@ This function adds a newline to the message being logged."
       (let ((beg (point)))
         (ebib--looking-at-goto-end "[^ \t\n\f]*")
         (move-overlay ebib--strings-overlay beg (point))))))
-
-(defun ebib--match-paren-forward (limit)
-  "Move forward to the closing paren matching the opening paren at POINT.
-Do not search/move beyond LIMIT. Return T if a matching
-parenthesis was found, NIL otherwise. This function handles
-parentheses () and braces {}. If point is not at an opening
-parenthesis at all, NIL is returned and point is not moved. If
-point is at an opening parenthesis but no matching closing
-parenthesis is found, an error is logged and point is moved one
-character forward to allow parsing to continue."
-  (cond
-   ((eq (char-after) ?\{)
-    (ebib--match-brace-forward limit))
-   ((eq (char-after) ?\()
-    ;; we wrap this in a condition-case because we need to log the error
-    ;; message outside of the save-restriction, otherwise we get the wrong
-    ;; line number.
-    (condition-case nil
-        (save-restriction
-          (narrow-to-region (point) limit)
-          ;; this is really a hack. we want to allow unbalanced parentheses in
-          ;; field values (bibtex does), so we cannot use forward-list
-          ;; here. for the same reason, looking for the matching paren by hand
-          ;; is pretty complicated. however, balanced parentheses can only be
-          ;; used to enclose entire entries (or @STRINGs or @PREAMBLEs) so we
-          ;; can be pretty sure we'll find it right before the next @ at the
-          ;; start of a line, or right before the end of the file.
-          (re-search-forward "^@" nil 0)
-          (skip-chars-backward "@ \n\t\f")
-          (forward-char -1)
-          (if (eq (char-after) ?\))
-              t
-            (goto-char (1+ (point-min)))
-            (error "")))
-      (error (ebib--log 'error "Error in line %d: Matching closing parenthesis not found!" (line-number-at-pos))
-             nil)))
-   (t nil)))
-
-(defun ebib--match-delim-forward (limit)
-  "Move forward to the closing delimiter matching the opening delimiter at POINT.
-Do not search/move beyond LIMIT. Return T if a matching delimiter
-was found, NIL otherwise. This function handles braces {} and
-double quotes \"\". If point is not at an opening delimiter at
-all, NIL is returned and point is not moved. If point is at an
-opening delimiter but no matching closing delimiter is found, an
-error is logged and point is moved one character forward to allow
-parsing to continue."
-  (cond
-   ((eq (char-after) ?\")
-    (ebib--match-quote-forward limit))
-   ((eq (char-after) ?\{)
-    (ebib--match-brace-forward limit))
-   (t nil)))
-
-(defun ebib--match-brace-forward (limit)
-  "Move forward to the closing brace matching the opening brace at POINT.
-Do not search/move beyond LIMIT. Return T if a matching brace was
-found, NIL otherwise. If point is not at an opening brace at all,
-NIL is returned and point is not moved. If point is at an opening
-brace but no matching closing brace is found, an error is logged
-and point is moved one character forward to allow parsing to
-continue."
-  (when (eq (char-after) ?\{) ; make sure we're really on a brace, otherwise return nil
-    (condition-case nil
-        (save-restriction
-          (narrow-to-region (point) limit)
-          (progn
-            (forward-list)
-            ;; all of ebib expects that point moves to the closing
-            ;; parenthesis, not right after it, so we adjust.
-            (forward-char -1)
-            t))               ; return t because a matching brace was found
-      (error (progn
-               (ebib--log 'error "Error in line %d: Matching closing brace not found!" (line-number-at-pos))
-               (forward-char 1)
-               nil)))))
-
-(defun ebib--match-quote-forward (limit)
-  "Move to the closing double quote matching the quote at POINT.
-Do not search/move beyond LIMIT. Return T if a matching quote was
-found, NIL otherwise. If point is not at a double quote at all,
-NIL is returned and point is not moved. If point is at a quote
-but no matching closing quote was found, an error is logged and
-point is moved one character forward to allow parsing to
-continue."
-  (when (eq (char-after (point)) ?\")  ; make sure we're on a double quote.
-    (condition-case nil
-        (save-restriction
-          (narrow-to-region (point) limit)
-          (while (progn
-                   (forward-char) ; move forward because we're on a double quote
-                   (skip-chars-forward "^\"") ; search the next double quote
-                   (eq (char-before) ?\\))) ; if it's preceded by a backslash, keep on searching
-          (or (eq (char-after) ?\")
-              (progn
-                (goto-char (1+ (point-min)))
-                (error ""))))
-      (error (ebib--log 'error "Error in line %d: Matching closing quote not found!" (line-number-at-pos))
-             nil))))
 
 (defun ebib--search-key-in-buffer (entry-key)
   "Search ENTRY-KEY in the index buffer.
@@ -1117,6 +1006,11 @@ MATCH acts just like the argument to MATCH-END, and defaults to
     (if (looking-at str)
         (goto-char (match-end match)))))
 
+(defun ebib--special-field-p (field)
+  "Return t if FIELD is a special field.
+Speciald fields are those whose names start and end with an equal sign."
+  (string-match-p "\\`=[[:alpha:]]*=\\'" field))
+
 ;; The numeric prefix argument is 1 if the user gave no prefix argument at
 ;; all. The raw prefix argument is not always a number. So we need to do
 ;; our own conversion.
@@ -1173,12 +1067,6 @@ display the actual filename."
              (append-to-file (point-min) (point-max) ,filename)
              (setq ebib--export-filename ,filename))))))
 
-(defun ebib--extract-bibtex-dialect (comment)
-  "Extract a BibTeX dialect definition from COMMENT.
-If no definition is found, return `nil'."
-  (if (string-match (concat "ebib--bibtex-dialect: \\(" (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t) "\\)") comment)
-      (intern (match-string 1 comment))))
-
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list. It is a symbol and can be
@@ -1188,7 +1076,7 @@ to list extra fields (i.e., fields defined in `ebib--extra-fields'
 and not present in ENTRY-TYPE); finally, `all' means to list all
 fields. DIALECT is the BibTeX dialect; possible values are those
 listed in `bibtex-dialect-list' or NIL, in which case the value
-of `ebib--bibtex-dialect' is used.
+of `ebib-bibtex-dialect' is used.
 
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
 defined by BibLaTeX, return the fields of the entry type for
@@ -1220,16 +1108,16 @@ extra fields.
 
 DIALECT is the BibTeX dialect; possible values are those listed
 in `bibtex-dialect-list' or NIL, in which case the value of
-`ebib--bibtex-dialect' is used."
+`ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (let ((fields (ebib--list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
     (--remove (member-ignore-case (car it) (cons "=type=" fields)) entry)))
 
-(defun ebib--list-entry-types (dialect &optional include-aliases)
+(defun ebib--list-entry-types (&optional dialect include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
 values in `bibtex-dialect-list' or NIL, in which case the value
-of `ebib--bibtex-dialect' is used. If INCLUDE-ALIASES is non-NIL,
+of `ebib-bibtex-dialect' is used. If INCLUDE-ALIASES is non-NIL,
 include entry type aliases as defined by `ebib--type-aliases'."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (append (mapcar #'car (bibtex-entry-alist dialect))
@@ -1244,7 +1132,7 @@ This variable is initialized by `ebib--list-field-uniquely'.")
   "Return a list of all fields of BibTeX DIALECT.
 Possible values for DIALECT are those listed in
 `bibtex-dialect-list' or NIL, in which case the value of
-`ebib--bibtex-dialect' is used."
+`ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (or (cdr (assq dialect ebib--unique-field-alist))
       (let (fields)

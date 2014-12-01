@@ -228,7 +228,7 @@ it is highlighted. DB defaults to the current database."
          (req-fields (ebib--list-fields entry-type 'required dialect))
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
-         (undef-fields (mapcar #'car (ebib--list-undefined-fields (ebib--db-get-entry key ebib--cur-db) dialect))))
+         (undef-fields (-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib--db-get-entry key ebib--cur-db) dialect)))))
     (insert (format "%-19s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
                     (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect) t) 'case-fold)
@@ -370,7 +370,7 @@ storing an entry may also result in an error.)"
 (defun ebib--get-dialect (&optional db)
   "Get the dialect of DB.
 DB defaults to the current database. If DB has no dialect, return
-the default dialect, as stored in `ebib--bibtex-dialect'."
+the default dialect, as stored in `ebib-bibtex-dialect'."
   (or db (setq db ebib--cur-db))
   (or (and db (ebib--db-get-dialect db))
       ebib-bibtex-dialect))
@@ -879,20 +879,23 @@ Note: it is assumed that FILE is a fully expanded filename."
     ((default) (beep))))
 
 (defun ebib--load-entries (file db)
-  "Load BibTeX entries from FILE into DB."
+  "Load BibTeX entries from FILE into DB.
+If FILE specifies a BibTeX dialect and no dialect is set for DB,
+also set DB's dialect."
   (with-temp-buffer
-    (with-syntax-table ebib--syntax-table
-      (insert-file-contents file)
-      (let ((result (ebib--find-bibtex-entries db nil)))
-        ;; Log the results.
-        (ebib--log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-                  (car result)
-                  (cadr result)
-                  (if (nth 2 result)
-                      "a"
-                    "no"))
-        (when ebib--log-error
-          (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors"))))))))
+    (insert-file-contents file)
+    (unless (ebib--db-get-dialect db)
+      (ebib--db-set-dialect (parsebib-find-bibtex-dialect) db))
+    (let ((result (ebib--find-bibtex-entries db nil)))
+      ;; Log the results.
+      (ebib--log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+                 (car result)
+                 (cadr result)
+                 (if (nth 2 result)
+                     "a"
+                   "no"))
+      (when ebib--log-error
+        (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors")))))))
 
 (defun ebib--find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
@@ -907,140 +910,82 @@ entry. Note that a timestamp is only added if `ebib-use-timestamp'
 is set to T."
   (let ((n-entries 0)
         (n-strings 0)
-        (preamble nil))
+        (preamble nil)
+        (entry-list (ebib--list-entry-types (ebib--get-dialect db))))
     (goto-char (point-min))
-    (while (re-search-forward "^@" nil t) ; find the next entry
-      (let ((beg (point)))
-        (if (ebib--looking-at-goto-end (concat "\\(" ebib--bibtex-identifier "\\)[[:space:]]*[\(\{]") 1)
-            (let ((entry-type (buffer-substring-no-properties beg (point))))
-              (ebib--looking-at-goto-end "[[:space:]]*[\(\{]")
-              (cond
-               ((cl-equalp entry-type "string") ; Note: cl-equalp compares strings case-insensitively.
-                (if (ebib--read-string db)
-                    (setq n-strings (1+ n-strings))))
-               ((cl-equalp entry-type "preamble")
-                (when (ebib--read-preamble db)
-                  (setq preamble t)))
-               ((cl-equalp entry-type "comment")
-                (ebib--read-comment db))
-               (t (when (ebib--read-entry entry-type db timestamp)
-                    (setq n-entries (1+ n-entries))
-                    (unless (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect) t) 'case-fold)
-                      (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
-          (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos)))))
+    (cl-loop for entry-type = (ebib--find-next-bibtex-item)
+             while entry-type do
+             (cond
+              ((cl-equalp entry-type "string") ; `cl-equalp' compares strings case-insensitively.
+               (if (ebib--read-string db)
+                   (setq n-strings (1+ n-strings))))
+              ((cl-equalp entry-type "preamble")
+               (when (ebib--read-preamble db)
+                 (setq preamble t)))
+              ((cl-equalp entry-type "comment")
+               (ebib--read-comment db))
+              ((stringp entry-type)
+               (when (ebib--read-entry entry-type db timestamp)
+                 (setq n-entries (1+ n-entries))
+                 (unless (assoc-string entry-type entry-list 'case-fold)
+                   (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type)))))) 
     (list n-entries n-strings preamble)))
 
+(defun ebib--find-next-bibtex-item ()
+  "Search for the next BibTeX item in the current buffer.
+A BibTeX item is an entry, or a @Preamble, @String or @Comment
+definition. If an item is found, point is placed right after it
+and the entry type is returned. If no item is found, point is
+left at the end of the buffer and nil is returned. If something
+is found that appears to be an entry (essentially, an `@' at the
+start of a line), but does not consist of a valid BibTeX
+identifier, an error is logged and t is returned."
+  (condition-case err
+      (parsebib-find-next-item)
+    (parsebib-entry-type-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
+                               t))) ; return t so that searching continues in ebib--find-bibtex-entries
+
 (defun ebib--read-comment (db)
-  "Read the @COMMENT beginning at the line POINT is on.
-If the @COMMENT is a BibTeX-dialect definition, DB's dialect is
-set, otherwise it is stored in DB's list of @COMMENTS."
-  (let ((beg (point)))
-    (forward-char -1)
-    (when (ebib--match-paren-forward (point-max))
-      (let* ((comment (buffer-substring-no-properties beg (point)))
-             (dialect (ebib--extract-bibtex-dialect comment)))
-        (if dialect
-            (ebib--db-set-dialect dialect db)
-          (ebib--db-set-comment comment db))))))
+  "Read an @COMMENT entry and store it in DB."
+  (let ((comment (parsebib-read-comment)))
+    (when comment 
+      (ebib--db-set-comment comment db))))
 
 (defun ebib--read-string (db)
-  "Read the @STRING definition beginning at the line POINT is on.
-If a proper abbreviation and string are found, they are stored in
-DB. Return the string if one was read, NIL otherwise."
-  (let ((limit (save-excursion       ; we find the matching end parenthesis
-                 (backward-char)
-                 (ebib--match-paren-forward (point-max))
-                 (point))))
-    (skip-chars-forward "\"#%'(),={} \n\t\f" limit)
-    (let ((beg (point)))
-      (if (ebib--looking-at-goto-end (concat "\\(" ebib--bibtex-identifier "\\)[ \t\n\f]*=") 1)
-          (ebib--ifstring (abbr (buffer-substring-no-properties beg (point)))
-              (progn
-                (skip-chars-forward "^\"{" limit)
-                (let ((beg (point)))
-                  (ebib--ifstring (string (if (ebib--match-delim-forward limit)
-                                             (buffer-substring-no-properties beg (1+ (point)))
-                                           nil))
-                      (if (ebib--db-set-string abbr string db 'noerror)
-                          string
-                        (ebib--log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
-                                                   (line-number-at-pos) abbr)))))))
-        (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
+  "Read an @STRING definition and store it in DB.
+Return value is the string if one was read, nil otherwise."
+  (let* ((def (parsebib-read-string))
+         (abbr (car def))
+         (string (cdr def)))
+    (if def
+        (if (ebib--db-set-string abbr string db 'noerror)
+            string
+          (ebib--log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
+                                      (line-number-at-pos) abbr)))
+      (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos)))))
 
 (defun ebib--read-preamble (db)
-  "Read the @PREAMBLE definition and stores it in DB.
+  "Read a @PREAMBLE definition and store it in DB.
 If there was already another @PREAMBLE definition, the new one is
 added to the existing one with a hash sign `#' between them."
-  (let ((beg (point)))
-    (forward-char -1)
-    (when (ebib--match-paren-forward (point-max))
-      (ebib--db-set-preamble (buffer-substring-no-properties beg (point)) db 'append))))
+  (let ((preamble (parsebib-read-preamble)))
+    (if preamble
+        (ebib--db-set-preamble preamble db 'append))))
 
 (defun ebib--read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry and store it in DB.
 Return the entry key if an entry was found, NIL otherwise.
 Optional argument TIMESTAMP indicates whether a timestamp is to
-be added. (Whether a timestamp is actually added, also depends on
+be added. (Whether a timestamp is actually added also depends on
 `ebib-use-timestamp'.)"
-  (let ((limit (save-excursion
-                 (backward-char)
-                 (ebib--match-paren-forward (point-max))
-                 (point)))
-        (beg (progn
-               (skip-chars-forward " \n\t\f") ; note the space!
-               (point))))
-    (let (entry-key)
-      (if (ebib--looking-at-goto-end (concat "\\("
-                                            ebib--key-regexp
-                                            "\\)[ \t\n\f]*,")
-                                    1)  ; this delimits the entry key
-          (progn                        ; if we found an entry key
-            (setq entry-key (buffer-substring-no-properties beg (point)))
-            (when (string= entry-key "") ; to be on the safe side
-              (setq entry-key (ebib--generate-tempkey db))
-              (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos)))
-            (skip-chars-forward "^,")) ; move to the comma after the entry key
-        ;; if there is no legal entry key, we create a temporary key and try to read the entry anyway.
-        (setq entry-key (ebib--generate-tempkey db))
-        (ebib--log 'warning "Line %d: No entry key; generating temporary key." (line-number-at-pos)))
-      (unless (ebib--store-entry entry-key (list (cons "=type=" entry-type)) db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-        (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key))
-      (cl-loop for field = (ebib--find-bibtex-field limit)
-               while field do
-               ;; TODO We pass 'overwrite if `ebib-allow-identical-fields'
-               ;; is nil in order to overwrite a possible timestamp. This
-               ;; has to be handled better, though!
-               (ebib--db-set-field-value (car field) (cdr field) entry-key db (if ebib-allow-identical-fields
-                                                                                 ebib-keywords-separator
-                                                                               'overwrite)
-                                        'as-is))
-      entry-key)))                      ; Return the entry key.
-
-(defun ebib--find-bibtex-field (limit)
-  "Find the field after point.
-Return a cons (FIELD . VALUE), or NIL if no field was found."
-  (skip-chars-forward "\"#%'(),={} \n\t\f" limit) ; move to the first char of the field name
-  (unless (>= (point) limit)   ; if we haven't reached the end of the entry
-    (let ((beg (point)))
-      (if (ebib--looking-at-goto-end (concat "\\(" ebib--bibtex-identifier "\\)[ \t\n\f]*=") 1)
-          (let ((field-type (buffer-substring-no-properties beg (point))))
-            (skip-chars-forward "#%'(),=} \n\t\f" limit) ; move to the field contents
-            (let* ((beg (point))
-                   (field-contents (buffer-substring-no-properties beg (ebib--find-end-of-field limit))))
-              (cons field-type field-contents)))
-        (ebib--log 'error "Error: illegal field name found at line %d. Skipping" (line-number-at-pos))))))
-
-(defun ebib--find-end-of-field (limit)
-  "Move POINT to the end of a field's contents and return POINT.
-The contents of a field is delimited by a comma or by the closing brace of
-the entry. The latter is at position LIMIT."
-  (while (and (not (eq (char-after) ?\,))
-              (< (point) limit))
-    (ebib--match-delim-forward limit) ; check if we're on a delimiter and if so, jump to the matching closing delimiter
-    (forward-char 1))
-  (if (= (point) limit)
-      (skip-chars-backward " \n\t\f"))
-  (point))
+  (let* ((entry (parsebib-read-entry entry-type))
+         (entry-key (cdr (assoc-string "=key=" entry))))
+    (when (string= entry-key "")
+      (setq entry-key (ebib--generate-tempkey db))
+      (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos)))
+    (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
+      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)) 
+    entry-key))                         ; Return the entry key.
 
 (defun ebib-leave-ebib--windows ()
   "Leave the Ebib windows, lowering them if necessary."
@@ -1330,8 +1275,8 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
     ((real-db entries)
      (let ((cur-keyname (ebib--cur-entry-key)))
        (ebib--ifstring (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
-                                         cur-keyname
-                                         'ebib--key-history))
+                                                 cur-keyname
+                                                 'ebib--key-history))
            (ebib--update-keyname new-keyname))))
     ((default)
      (beep))))
@@ -1370,8 +1315,8 @@ marked entries."
          (with-ebib-buffer-writable
            (ebib--db-toggle-mark (ebib--cur-entry-key) ebib--cur-db)
            (ebib--display-mark (ebib--db-marked-p (ebib--cur-entry-key) ebib--cur-db)
-                              (overlay-start ebib--index-overlay)
-                              (overlay-end ebib--index-overlay)))))
+                               (overlay-start ebib--index-overlay)
+                               (overlay-end ebib--index-overlay)))))
       ((default)
        (beep)))))
 
@@ -1404,7 +1349,7 @@ added to the entry, possibly overwriting an existing timestamp."
       (insert (format "@%s{%s,\n" (cdr (assoc "=type=" entry)) key))
       (mapc #'(lambda (field)
                 (unless (or (not (cdr field)) ; Deleted fields have their value set to `nil'. See `ebib--db-set-field-value'.
-                            (string= (car field) "=type=")
+                            (ebib--special-field-p (car field))
                             (and (cl-equalp (car field) "timestamp") timestamp ebib-use-timestamp))
                   (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
             (reverse entry))
@@ -1446,7 +1391,7 @@ in order for the sort value."
   ;; Save the dialect. This must happen early in the file so that when it
   ;; is opened again, the dialect is set before entries are read.
   (if (ebib--get-dialect db)
-      (insert (format "@Comment{\nebib--bibtex-dialect: %s\n}\n\n" (ebib--get-dialect db))))
+      (insert (format "@Comment{\nebib-bibtex-dialect: %s\n}\n\n" (ebib--get-dialect db))))
   (ebib--format-comments db)
   (ebib--format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
@@ -1822,7 +1767,7 @@ result."
                          (string-match-p search-str value)))
             (setq result (list field))))
       (mapc #'(lambda (f)
-                (when (and (not (string= (car f) "=type=")) ; We exlude the =type= field here.
+                (when (and (not (ebib--special-field-p (car f))) ; We exlude special fields here.
                            (stringp (cdr f))
                            (string-match-p search-str (cdr f)))
                   (setq result (cons (car f) result))))
@@ -3153,24 +3098,23 @@ or on the region if it is active."
   (interactive)
   (if (not ebib--cur-db)
       (error "No database loaded")
-    (with-syntax-table ebib--syntax-table
-      (save-excursion
-        (save-restriction
-          (if (use-region-p)
-              (narrow-to-region (region-beginning)
-                                (region-end)))
-          (let ((buffer (current-buffer)))
-            (with-temp-buffer
-              (insert-buffer-substring buffer)
-              (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
-                (unless (ebib--cur-entry-key)
-                  (ebib--db-set-current-entry-key t ebib--cur-db))
-                (ebib--redisplay)
-                (ebib--set-modified t)
-                (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
-                                 (car result)
-                                 (cadr result)
-                                 (if (nth 2 result) "a" "no")))))))))))
+    (save-excursion
+      (save-restriction
+        (if (use-region-p)
+            (narrow-to-region (region-beginning)
+                              (region-end)))
+        (let ((buffer (current-buffer)))
+          (with-temp-buffer
+            (insert-buffer-substring buffer)
+            (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
+              (unless (ebib--cur-entry-key)
+                (ebib--db-set-current-entry-key t ebib--cur-db))
+              (ebib--redisplay)
+              (ebib--set-modified t)
+              (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
+                               (car result)
+                               (cadr result)
+                               (if (nth 2 result) "a" "no"))))))))))
 
 (defun ebib--get-db-from-filename (filename)
   "Return the database struct associated with FILENAME."

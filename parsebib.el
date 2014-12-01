@@ -45,6 +45,7 @@
 (defconst parsebib-key-regexp "[^^\"@\\&$#%',={} \t\n\f]*" "Regexp describing a licit key.")
 (defconst parsebib-entry-start "^[ \t]*@" "Regexp describing the start of an entry.")
 
+(define-error 'parsebib-entry-type-error "Illegal entry type" 'error)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; matching stuff ;;
@@ -137,7 +138,8 @@ file. Return nil if no dialect is found."
     (let ((case-fold-search t))
       (when (re-search-backward (concat parsebib-entry-start "comment") (- (point-max) 3000) t)
         (let ((comment (parsebib-read-comment)))
-          (when (and (string-match-p "Local Variables:" comment)
+          (when (and comment
+                     (string-match-p "Local Variables:" comment)
                      (string-match (concat "bibtex-dialect: " (regexp-opt (mapcar #'symbol-name bibtex-dialect-list) t)) comment))
             (intern (match-string 1 comment))))))))
 
@@ -159,7 +161,7 @@ POS can be a number or a marker and defaults to point."
   (when (re-search-forward parsebib-entry-start nil 0) 
     (if (parsebib-looking-at-goto-end parsebib-bibtex-identifier)
         (match-string 0)
-      (signal 'error '("Illegal entry type" (line-number-at-pos))))))
+      (signal 'parsebib-entry-type-error (list (point))))))
 
 (defun parsebib-read-comment (&optional pos)
   "Read the @Comment beginning at the line POS is on.
