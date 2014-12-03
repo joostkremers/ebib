@@ -946,10 +946,15 @@ identifier, an error is logged and t is returned."
                                t))) ; return t so that searching continues in ebib--find-bibtex-entries
 
 (defun ebib--read-comment (db)
-  "Read an @COMMENT entry and store it in DB."
+  "Read an @Comment entry and store it in DB.
+If the @Comment is a local variable list, store it as such in
+DB."
   (let ((comment (parsebib-read-comment)))
-    (when comment 
-      (ebib--db-set-comment comment db))))
+    (when comment
+      (let ((lvars (ebib--local-vars-to-list comment)))
+        (if lvars
+            (ebib--db-set-local-vars lvars db)
+          (ebib--db-set-comment comment db))))))
 
 (defun ebib--read-string (db)
   "Read an @STRING definition and store it in DB.
@@ -978,13 +983,14 @@ Return the entry key if an entry was found, NIL otherwise.
 Optional argument TIMESTAMP indicates whether a timestamp is to
 be added. (Whether a timestamp is actually added also depends on
 `ebib-use-timestamp'.)"
-  (let* ((entry (parsebib-read-entry entry-type))
+  (let* ((beg (point)) ; save the start of the entry in case something goes wrong.
+         (entry (parsebib-read-entry entry-type))
          (entry-key (cdr (assoc-string "=key=" entry))))
     (when (string= entry-key "")
       (setq entry-key (ebib--generate-tempkey db))
-      (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos)))
+      (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
     (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos) entry-key)) 
+      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key)) 
     entry-key))                         ; Return the entry key.
 
 (defun ebib-leave-ebib--windows ()
@@ -1384,14 +1390,20 @@ in order for the sort value."
       (setq sortkey-list (cdr sortkey-list)))
     sort-string))
 
+(defun ebib--format-local-vars (db)
+  "Write the local variables of DB into the current buffer."
+  (let ((lvars (ebib--db-get-local-vars db)))
+    (when lvars 
+      (insert (concat "@Comment{\n"
+                      "Local Variables:\n"
+                      (mapconcat #'(lambda (e) (format "%s: %s\n" (car e) (cadr e))) lvars "")
+                      "End:\n"
+                      "}\n\n")))))
+
 (defun ebib--format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
   (when (ebib--db-get-preamble db)
     (insert (format "@PREAMBLE{%s}\n\n" (ebib--db-get-preamble db))))
-  ;; Save the dialect. This must happen early in the file so that when it
-  ;; is opened again, the dialect is set before entries are read.
-  (if (ebib--get-dialect db)
-      (insert (format "@Comment{\nebib-bibtex-dialect: %s\n}\n\n" (ebib--get-dialect db))))
   (ebib--format-comments db)
   (ebib--format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
@@ -1423,7 +1435,8 @@ in order for the sort value."
         (setq sorted-list (sort sorted-list #'compare-xrefs)))
        (ebib-sort-order
         (setq sorted-list (sort sorted-list #'entry<))))
-      (mapc #'(lambda (key) (ebib--format-entry key db nil)) sorted-list))))
+      (mapc #'(lambda (key) (ebib--format-entry key db nil)) sorted-list))
+    (ebib--format-local-vars db)))
 
 (defun ebib--make-backup (file)
   "Create a backup of FILE.
@@ -2054,6 +2067,11 @@ is used)."
   (ebib--execute-when
     ((database)
      (ebib--db-set-dialect dialect ebib--cur-db)
+     (let ((lvars (ebib--db-get-local-vars ebib--cur-db))) 
+       (setq lvars (if dialect
+                       (ebib--local-vars-add-dialect lvars dialect 'overwrite)
+                     (ebib--local-vars-delete-dialect lvars)))
+       (ebib--db-set-local-vars lvars ebib--cur-db))
      (ebib--set-modified t ebib--cur-db)
      (ebib--redisplay))
     ((default)

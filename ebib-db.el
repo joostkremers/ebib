@@ -48,6 +48,7 @@
   (strings)                                 ; alist with the @STRING definitions
   (preamble)                                ; string with the @PREAMBLE definition
   (comments)                                ; list of @COMMENTS
+  (local-vars)                              ; the file's local variable block
   (dialect)                                 ; the dialect of this database
   (cur-entry)                               ; the current entry
   (marked-entries)                          ; list of marked entries
@@ -68,6 +69,7 @@ it is deleted."
   (setf (ebib--db-struct-strings db) nil)
   (setf (ebib--db-struct-preamble db) nil)
   (setf (ebib--db-struct-comments db) nil)
+  (setf (ebib--db-struct-local-vars db) nil)
   (setf (ebib--db-struct-dialect db) nil)
   (setf (ebib--db-struct-cur-entry db) nil)
   (setf (ebib--db-struct-marked-entries db) nil)
@@ -92,6 +94,15 @@ it is deleted."
   "Add COMMENT to the list of comments in DB."
   (setf (ebib--db-struct-comments db) (append (ebib--db-struct-comments db) (list comment))))
 
+(defun ebib--db-set-local-vars (vars db)
+  "Store VARS as the local variable block.
+No check is performed to see if VARS is really a local variable block."
+  (setf (ebib--db-struct-local-vars db) vars))
+
+(defun  ebib--db-get-local-vars (db)
+  "Return the local variable block."
+  (ebib--db-struct-local-vars db))
+
 (defun ebib--db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
   (ebib--db-struct-cur-entry db))
@@ -108,14 +119,14 @@ ENTRY may also be T, in which case the current entry is
 unconditionally set to the alphabetically first entry in DB.
 
 Return the new entry key if successful, NIL otherwise."
-   (cond
-    ((stringp entry)
-     (if (ebib--db-get-entry entry db 'noerror)
-         (setf (ebib--db-struct-cur-entry db) entry)
-       (unless noerror
-         (error "No entry key `%s' in the current database" entry))
-       (if (eq noerror 'first)
-           (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
+  (cond
+   ((stringp entry)
+    (if (ebib--db-get-entry entry db 'noerror)
+        (setf (ebib--db-struct-cur-entry db) entry)
+      (unless noerror
+        (error "No entry key `%s' in the current database" entry))
+      (if (eq noerror 'first)
+          (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
    ((eq entry t)
     (setf (ebib--db-struct-cur-entry db) (car (ebib--db-list-keys db))))))
 

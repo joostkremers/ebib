@@ -1011,6 +1011,37 @@ MATCH acts just like the argument to MATCH-END, and defaults to
 Speciald fields are those whose names start and end with an equal sign."
   (string-match-p "\\`=[[:alpha:]]*=\\'" field))
 
+(defun ebib--local-vars-to-list (str)
+  "Convert STR to a list of local variables.
+STR must start with \"Local Variables:\" and end with \"End:\".
+The return value is a list of lists, where each sublist has the
+form (\"<variable>\" \"<value>\"). If STR is not a local variable
+block, the return value is nil."
+  (let ((vars (split-string str "[\n\t\r]+" t)))
+    (when (and (string= (car vars) "Local Variables:")
+               (string= (-last-item vars) "End:"))
+      (--map (split-string it "[: ]" t) (-slice vars 1 -1)))))
+
+(defun ebib--local-vars-add-dialect (vars dialect &optional overwrite)
+  "Add DIALECT to the local variable block VARS.
+VARS is a list as returned by `ebib--local-vars-to-list'. DIALECT
+must be a symbol, possible values are listed in
+`bibtex-dialect-list'. If OVERWRITE is non-nil, overwrite an
+existing dialect variable, otherwise do nothing. The return value
+is the (un)modified list."
+  (let ((ind (--find-index (string= (car it) "bibtex-dialect") vars)))
+    (if ind
+        (when overwrite
+          (setq vars (-replace-at ind (list "bibtex-dialect" (symbol-name dialect)) vars)))
+      (setq vars (push (list "bibtex-dialect" (symbol-name dialect)) vars)))
+    vars))
+
+(defun ebib--local-vars-delete-dialect (vars)
+  "Delete the dialect definition from VARS.
+VARS is a list as returned by `ebib--local-vars-to-list'. VARS is
+not modified, instead the new list is returned."
+  (--remove (string= (car it) "bibtex-dialect") vars))
+
 ;; The numeric prefix argument is 1 if the user gave no prefix argument at
 ;; all. The raw prefix argument is not always a number. So we need to do
 ;; our own conversion.
