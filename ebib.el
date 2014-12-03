@@ -1407,7 +1407,7 @@ added to the entry, possibly overwriting an existing timestamp."
                             (string= (car field) "=type=")
                             (and (cl-equalp (car field) "timestamp") timestamp ebib-use-timestamp))
                   (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
-            (reverse entry))
+            entry)
       (if (and timestamp ebib-use-timestamp)
           (insert (format "\ttimestamp = {%s}" (format-time-string ebib-timestamp-format)))
         (delete-char -2))               ; the final ",\n" must be deleted
