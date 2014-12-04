@@ -53,9 +53,8 @@
 (make-obsolete-variable 'ebib-standard-file-field 'ebib-file-field "24.4")
 (make-obsolete-variable 'ebib-standard-doi-field 'ebib-doi-field "24.4")
 
-;; Make sure we can call bibtex-generate-autokey and set the BibTeX dialect.
+;; Make sure we can call bibtex-generate-autokey
 (declare-function bibtex-generate-autokey "bibtex" nil)
-(bibtex-set-dialect)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;

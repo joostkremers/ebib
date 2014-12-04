@@ -1219,8 +1219,8 @@ generate the key, see that function's documentation for details."
                 (if x-ref
                     (ebib--format-entry x-ref ebib--cur-db nil)))
               (goto-char (point-min))
-              (let ((bibtex-dialect (ebib--get-dialect)))
-                (bibtex-generate-autokey)))))
+              (bibtex-set-dialect (ebib--get-dialect) 'local)
+              (bibtex-generate-autokey))))
        (if (string= new-key "")
            (error (format "Cannot create key"))
          (ebib--update-keyname new-key))))
