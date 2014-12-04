@@ -2061,7 +2061,7 @@ opened. If N is NIL, the user is asked to enter a number."
 Possible values for DIALECT are those in `bibtex-dialect-list' or
 NIL, in which case the dialect is unset (and the default dialect
 is used)."
-  (interactive (list (intern (completing-read "Dialect: " (mapcar #'symbol-name bibtex-dialect-list) nil t))))
+  (interactive (list (intern (completing-read "Dialect: " (append (mapcar #'symbol-name bibtex-dialect-list) (list "nil")) nil t))))
   (unless (or (not dialect)
               (memq dialect bibtex-dialect-list))
     (error "Not a valid BibTeX dialect: %s" dialect))
