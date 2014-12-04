@@ -53,6 +53,7 @@
 (require 'bibtex)
 (require 'dash)
 (require 'pp)
+(require 'parsebib)
 (require 'ebib-utils)
 (require 'ebib-db)
 (require 'ebib-filters)

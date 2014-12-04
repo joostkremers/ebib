@@ -43,7 +43,6 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'bibtex)
-(require 'parsebib)
 
 ;; Make a bunch of variables obsolete.
 (make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "24.4")
