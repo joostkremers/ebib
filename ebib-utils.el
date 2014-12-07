@@ -169,7 +169,7 @@ specified with the option `ebib-width'). A third option is to
 display only the index window upon startup. The entry buffer will
 be displayed when you edit an entry of if you press
 \\[ebib--select-and-popup-entry]."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
                  (const :tag "Use right part of the frame" custom)
                  (const :tag "Display only index window" index-only)))
@@ -183,7 +183,7 @@ specifying the width relative to the width of the window that is
 selected when Ebib is started.
 
 This option only takes effect if `ebib-layout' is set to `custom'."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type '(choice (integer :label "Absolute width:")
                  (float :label "Relative width:" :value 0.3)))
 
@@ -197,7 +197,7 @@ which (usually) means that a new window will be created.
 
 Note that setting this option has no effect unless `ebib-layout'
 is set to `index-only'."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type 'boolean)
 
 (defcustom ebib-window-vertical-split nil
@@ -206,7 +206,7 @@ Setting this option makes Ebib display the index buffer at the
 left side of the frame rather than at the top. The width of the
 window will be `ebib-index-window-size', which you will probably
 have to set to a larger value."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type 'boolean)
 
 (defcustom ebib-index-window-size 10
@@ -215,7 +215,7 @@ This is either the height of the window, or, if
 `ebib-window-vertical-split' is set, the width of the window. The
 rest of the frame is used for the entry buffer, unless
 `ebib-layout' is set to `index-only'."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type 'integer)
 
 (defcustom ebib-index-mode-line '("%e"
@@ -230,7 +230,7 @@ The mode line of the index window shows some Ebib--specific
 information. You can customize this information if you wish, or
 disable the Ebib--specific mode line altogether. Note that the
 entry buffer displays the standard Emacs mode line."
-  :group 'ebib--windows
+  :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
 
