@@ -197,8 +197,8 @@ is suffixed, then `ab' etc."
   "Return a list of keys in DB.
 The list is sorted, unless NOSORT is non-nil."
   (let (keys-list)
-    (maphash #'(lambda (key value)
-		 (push key keys-list))
+    (maphash (lambda (key value)
+               (push key keys-list))
 	     (ebib--db-struct-database db))
     (if nosort
         keys-list
@@ -337,9 +337,9 @@ value, this function returns `nil'."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (if (eq dialect 'BibTeX)
       target-field
-    (let* ((inheritance (cl-third (cl-find-if #'(lambda (e)
-                                                  (and (string-match-p (concat "\\b" target-entry "\\b") (cl-first e))
-                                                       (string-match-p (concat "\\b" source-entry "\\b") (cl-second e))))
+    (let* ((inheritance (cl-third (cl-find-if (lambda (e)
+                                                (and (string-match-p (concat "\\b" target-entry "\\b") (cl-first e))
+                                                     (string-match-p (concat "\\b" source-entry "\\b") (cl-second e))))
                                               ebib-biblatex-inheritances)))
            (source-field (or (cdr (assoc-string target-field inheritance 'case-fold))
                              (cdr (assoc-string target-field

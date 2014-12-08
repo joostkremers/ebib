@@ -74,7 +74,7 @@ assumed to use this dialect. Possible values are those listed in
 `bibtex-dialect-list'."
   :group 'ebib
   :type `(choice :tag "BibTeX Dialect"
-                 ,@(mapcar #'(lambda (d) `(const ,d))
+                 ,@(mapcar (lambda (d) `(const ,d))
                            bibtex-dialect-list)))
 
 (defcustom ebib-default-entry-type "Article"
@@ -694,7 +694,7 @@ Ebib (not Emacs)."
 (defvar ebib--local-bibtex-filenames nil
   "A buffer-local variable holding a list of the name(s) of that buffer's .bib file(s)")
 (make-variable-buffer-local 'ebib--local-bibtex-filenames)
-(put 'ebib--local-bibtex-filenames 'safe-local-variable #'(lambda (v) (null (--remove (stringp it) v))))
+(put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (--remove (stringp it) v))))
 
 ;; The databases
 
@@ -813,13 +813,13 @@ condition, BODY is executed if they all match (i.e., the
 conditions are AND'ed.)"
   (declare (indent defun))
   `(cond
-    ,@(mapcar #'(lambda (form)
-                  (cons (if (= 1 (length (car form)))
-                            (ebib--execute-helper (caar form))
-                          `(and ,@(mapcar #'(lambda (env)
-                                              (ebib--execute-helper env))
-                                          (car form))))
-                        (cdr form)))
+    ,@(mapcar (lambda (form)
+                (cons (if (= 1 (length (car form)))
+                          (ebib--execute-helper (caar form))
+                        `(and ,@(mapcar (lambda (env)
+                                          (ebib--execute-helper env))
+                                        (car form))))
+                      (cdr form)))
               forms)))
 
 (defun ebib--log (type format-string &rest args)
@@ -951,7 +951,7 @@ dot."
 (defun ebib--remove-from-string (string remove)
   "Return a copy of STRING with all the occurrences of REMOVE taken out.
 REMOVE can be a regular expression."
-  (apply 'concat (split-string string remove)))
+  (apply #'concat (split-string string remove)))
 
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
@@ -1166,8 +1166,8 @@ Possible values for DIALECT are those listed in
   (or dialect (setq dialect ebib-bibtex-dialect))
   (or (cdr (assq dialect ebib--unique-field-alist))
       (let (fields)
-        (mapc #'(lambda (entry)
-                  (setq fields (-union fields (ebib--list-fields (car entry) 'all dialect))))
+        (mapc (lambda (entry)
+                (setq fields (-union fields (ebib--list-fields (car entry) 'all dialect))))
               (bibtex-entry-alist dialect))
         (add-to-list 'ebib--unique-field-alist (cons dialect fields))
         fields)))

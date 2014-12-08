@@ -120,7 +120,7 @@ Also automatically remove duplicates."
             ;; may subsequently add keywords.
             (add-to-list 'ebib--keywords-files-alist    ; add the dir if not in the list yet
                          (list dir keyword-list nil)   ; the extra empty list is for new keywords
-                         t #'(lambda (x y) (equal (car x) (car y)))))))))
+                         t (lambda (x y) (equal (car x) (car y)))))))))
 
 (defun ebib--keywords-add-keyword (keyword db)
   "Add KEYWORD to the list of keywords for DB."
@@ -159,8 +159,8 @@ keywords and the third the keywords added in this session."
                 (concat (car keyword-file-descr) ebib-keywords-file))))
     (if (file-writable-p file)
         (with-temp-buffer
-          (mapc #'(lambda (keyword)
-                    (insert (format "%s\n" keyword)))
+          (mapc (lambda (keyword)
+                  (insert (format "%s\n" keyword)))
                 (append (cl-second keyword-file-descr) (cl-third keyword-file-descr)))
           (write-region (point-min) (point-max) file))
       (ebib--log 'warning "Could not write to keyword file `%s'" file))))
@@ -209,8 +209,8 @@ Optional argument DB specifies the database to check for."
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
                         (y-or-n-p (format "New keywords were added. Save '%s'? "
                                           (file-name-nondirectory ebib-keywords-file)))))) ; strip path for succinctness
-      (mapc #'(lambda (elt)
-                (ebib--keywords-save-to-file elt))
+      (mapc (lambda (elt)
+              (ebib--keywords-save-to-file elt))
             new))))
 
 (provide 'ebib-keywords)

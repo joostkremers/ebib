@@ -115,7 +115,7 @@ Return the filter as a list (NAME FILTER)."
     (let* ((completion-ignore-case ebib-filters-ignore-case)
            (name (completing-read prompt
                                   (sort (copy-alist ebib--filters-alist)
-                                        #'(lambda (x y) (string-lessp (car x) (car y))))
+                                        (lambda (x y) (string-lessp (car x) (car y))))
                                   nil t)))
       (ebib--filters-get-filter name))))
 
@@ -202,10 +202,10 @@ Return a sorted list of entry keys that match DB's filter."
     (eval
      `(cl-macrolet ((contains (field regexp)
                               `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
-        (sort (delq nil (mapcar #'(lambda (key)
-                                    (let ((entry (ebib--db-get-entry key db 'noerror)))
-                                      (when ,filter
-                                        key)))
+        (sort (delq nil (mapcar (lambda (key)
+                                  (let ((entry (ebib--db-get-entry key db 'noerror)))
+                                    (when ,filter
+                                      key)))
                                 (ebib--db-list-keys db 'nosort)))
               'string<)))))
 
@@ -255,8 +255,8 @@ there is a name conflict."
           (ebib--log 'log "%s: Loading filters from file %s.\n" (format-time-string "%d %b %Y, %H:%M:%S") file)
           (if overwrite
               (setq ebib--filters-alist nil))
-          (mapc #'(lambda (filter)
-                    (ebib--filters-add-filter (car filter) (cadr filter)))
+          (mapc (lambda (filter)
+                  (ebib--filters-add-filter (car filter) (cadr filter)))
                 flist))))))
 
 (defun ebib--filters-save-file (file)
