@@ -1042,7 +1042,7 @@ the entry. The latter is at position LIMIT."
       (skip-chars-backward " \n\t\f"))
   (point))
 
-(defun ebib-leave-ebib--windows ()
+(defun ebib-leave-ebib-windows ()
   "Leave the Ebib windows, lowering them if necessary."
   (interactive)
   (ebib-lower t))
