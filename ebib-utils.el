@@ -225,7 +225,7 @@ rest of the frame is used for the entry buffer, unless
                                   mode-line-buffer-identification
                                   (:eval (format "  (%s)" (ebib--get-dialect)))
                                   (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
-                                  (:eval (if (and ebib--cur-db (ebib--db-get-filter ebib--cur-db)) "  (Filtered)" "")))
+                                  (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) "  (Filtered)" "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib--specific
 information. You can customize this information if you wish, or
@@ -778,15 +778,15 @@ ELSE-FORM is executed. Returns the value of THEN or of ELSE."
       'ebib--cur-keys-list)
      ((eq env 'marked-entries)
       '(and ebib--cur-db
-            (ebib--db-marked-entries-p ebib--cur-db)))
+            (ebib-db-marked-entries-p ebib--cur-db)))
      ((eq env 'database)
       'ebib--cur-db)
      ((eq env 'real-db)
       '(and ebib--cur-db
-            (not (ebib--db-get-filter ebib--cur-db))))
+            (not (ebib-db-get-filter ebib--cur-db))))
      ((eq env 'filtered-db)
       '(and ebib--cur-db
-            (ebib--db-get-filter ebib--cur-db)))
+            (ebib-db-get-filter ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
      (t t))))

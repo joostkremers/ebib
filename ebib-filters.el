@@ -91,7 +91,7 @@
   (interactive)
   (ebib--execute-when
     ((filtered-db)
-     (message (ebib--filters-pp-filter (ebib--db-get-filter ebib--cur-db))))
+     (message (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))))
     ((default)
      (error "No filter is active"))))
 
@@ -132,7 +132,7 @@ Return the filter as a list (NAME FILTER)."
 (defun ebib-filters-store-filter ()
   "Store the current filter."
   (interactive)
-  (let ((filter (or (ebib--db-get-filter ebib--cur-db)
+  (let ((filter (or (ebib-db-get-filter ebib--cur-db)
                     ebib--filters-last-filter)))
     (if filter
         (let ((name (read-from-minibuffer "Enter filter name: ")))
@@ -198,15 +198,15 @@ Return a sorted list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
-  (let ((filter (ebib--db-get-filter db)))
+  (let ((filter (ebib-db-get-filter db)))
     (eval
      `(cl-macrolet ((contains (field regexp)
                               `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
         (sort (delq nil (mapcar (lambda (key)
-                                  (let ((entry (ebib--db-get-entry key db 'noerror)))
+                                  (let ((entry (ebib-db-get-entry key db 'noerror)))
                                     (when ,filter
                                       key)))
-                                (ebib--db-list-keys db 'nosort)))
+                                (ebib-db-list-keys db 'nosort)))
               'string<)))))
 
 (defun ebib--filters-pp-filter (filter)

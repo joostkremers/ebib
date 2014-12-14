@@ -113,7 +113,7 @@ Also automatically remove duplicates."
   "Check if there is a keywords file for DB and make sure it is loaded."
   (unless (or (not ebib-keywords-file)
               (file-name-directory ebib-keywords-file))
-    (let ((dir (expand-file-name (file-name-directory (ebib--db-get-filename db)))))
+    (let ((dir (expand-file-name (file-name-directory (ebib-db-get-filename db)))))
       (if dir
           (let ((keyword-list (ebib--read-file-to-list (concat dir ebib-keywords-file))))
             ;; note: even if keyword-list is empty, we store it, because the user
@@ -127,7 +127,7 @@ Also automatically remove duplicates."
   (if (not ebib-keywords-file)        ; only the general list exists
       (add-to-list 'ebib--keywords-list-per-session keyword t)
     (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
-                   (file-name-directory (ebib--db-get-filename db)))))    ; per-directory keywords files
+                   (file-name-directory (ebib-db-get-filename db)))))    ; per-directory keywords files
       (push keyword (cl-third (assoc dir ebib--keywords-files-alist))))))
 
 (defun ebib--keywords-for-database (db)
@@ -137,7 +137,7 @@ When the keywords come from a file, add the keywords in
   (if (not ebib-keywords-file)        ; only the general list exists
       ebib--keywords-list-per-session
     (let* ((dir (or (file-name-directory ebib-keywords-file)     ; a single keywords file
-                    (file-name-directory (ebib--db-get-filename db))))    ; per-directory keywords files
+                    (file-name-directory (ebib-db-get-filename db))))    ; per-directory keywords files
            (lst (assoc dir ebib--keywords-files-alist)))
       (append (cl-second lst) (cl-third lst)))))
 
@@ -146,7 +146,7 @@ When the keywords come from a file, add the keywords in
   (if (and ebib-keywords-file ; TODO not sure if this function'll work correctly if ebib--keywords-file is NIL.
            (file-name-directory ebib-keywords-file))
       ebib-keywords-file
-    (concat (file-name-directory (ebib--db-get-filename db)) ebib-keywords-file)))
+    (concat (file-name-directory (ebib-db-get-filename db)) ebib-keywords-file)))
 
 (defun ebib--keywords-save-to-file (keyword-file-descr)
   "Save all keywords in KEYWORD-FILE-DESCR to the associated file.
@@ -193,7 +193,7 @@ Optional argument DB specifies the database to check for."
   (if db
       (let* ((dir (or (and ebib-keywords-file
                            (file-name-directory ebib-keywords-file)) ; a single keywords file
-                      (file-name-directory (ebib--db-get-filename db)))) ; per-directory keywords files
+                      (file-name-directory (ebib-db-get-filename db)))) ; per-directory keywords files
              (lst (assoc dir ebib--keywords-files-alist)))
         (if (cl-third lst)
             lst))
