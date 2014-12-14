@@ -214,4 +214,4 @@ Optional argument DB specifies the database to check for."
 
 (provide 'ebib-keywords)
 
-;;; ebib-keywords ends here
+;;; ebib-keywords.el ends here

@@ -1257,4 +1257,4 @@ Possible values for DIALECT are those listed in
 
 (provide 'ebib-utils)
 
-;;; ebib-utils ends here
+;;; ebib-utils.el ends here

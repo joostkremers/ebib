@@ -3313,4 +3313,4 @@ created containing only these entries."
 
 (provide 'ebib)
 
-;;; ebib ends here
+;;; ebib.el ends here

@@ -603,4 +603,4 @@ If STRING is already braced, do nothing."
 
 (provide 'ebib-db)
 
-;;; ebib-db ends here
+;;; ebib-db.el ends here

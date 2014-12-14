@@ -309,4 +309,4 @@ filter named NAME, raise an error, unless NOERROR is non-NIL."
 
 (provide 'ebib-filters)
 
-;;; ebib-filters ends here
+;;; ebib-filters.el ends here
