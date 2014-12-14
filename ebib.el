@@ -421,7 +421,7 @@ loaded, switch to it. If KEY is given, jump to it."
   (ebib--redisplay))
 
 ;;;###autoload
-(defun ebib--open-org-link (key)
+(defun ebib-open-org-link (key)
   "Open Ebib and jump to KEY.
 This is for use in Org-mode links."
   (ebib nil key))
