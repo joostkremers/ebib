@@ -91,7 +91,7 @@
   (interactive)
   (ebib--execute-when
     ((filtered-db)
-     (message (ebib--filters-pp-filter (ebib--db-get-filter ebib--cur-db))))
+     (message (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))))
     ((default)
      (error "No filter is active"))))
 
@@ -115,7 +115,7 @@ Return the filter as a list (NAME FILTER)."
     (let* ((completion-ignore-case ebib-filters-ignore-case)
            (name (completing-read prompt
                                   (sort (copy-alist ebib--filters-alist)
-                                        #'(lambda (x y) (string-lessp (car x) (car y))))
+                                        (lambda (x y) (string-lessp (car x) (car y))))
                                   nil t)))
       (ebib--filters-get-filter name))))
 
@@ -132,7 +132,7 @@ Return the filter as a list (NAME FILTER)."
 (defun ebib-filters-store-filter ()
   "Store the current filter."
   (interactive)
-  (let ((filter (or (ebib--db-get-filter ebib--cur-db)
+  (let ((filter (or (ebib-db-get-filter ebib--cur-db)
                     ebib--filters-last-filter)))
     (if filter
         (let ((name (read-from-minibuffer "Enter filter name: ")))
@@ -198,15 +198,15 @@ Return a sorted list of entry keys that match DB's filter."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
-  (let ((filter (ebib--db-get-filter db)))
+  (let ((filter (ebib-db-get-filter db)))
     (eval
      `(cl-macrolet ((contains (field regexp)
                               `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
-        (sort (delq nil (mapcar #'(lambda (key)
-                                    (let ((entry (ebib--db-get-entry key db 'noerror)))
-                                      (when ,filter
-                                        key)))
-                                (ebib--db-list-keys db 'nosort)))
+        (sort (delq nil (mapcar (lambda (key)
+                                  (let ((entry (ebib-db-get-entry key db 'noerror)))
+                                    (when ,filter
+                                      key)))
+                                (ebib-db-list-keys db 'nosort)))
               'string<)))))
 
 (defun ebib--filters-pp-filter (filter)
@@ -255,8 +255,8 @@ there is a name conflict."
           (ebib--log 'log "%s: Loading filters from file %s.\n" (format-time-string "%d %b %Y, %H:%M:%S") file)
           (if overwrite
               (setq ebib--filters-alist nil))
-          (mapc #'(lambda (filter)
-                    (ebib--filters-add-filter (car filter) (cadr filter)))
+          (mapc (lambda (filter)
+                  (ebib--filters-add-filter (car filter) (cadr filter)))
                 flist))))))
 
 (defun ebib--filters-save-file (file)
