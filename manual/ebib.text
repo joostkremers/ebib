@@ -176,7 +176,7 @@ Apart from the `type`, `keywords`, `file` and `crossref` fields, there is anothe
 
 If you want to leave the multiline edit buffer without saving the text you have just typed, type `C-c | c`. This command cancels the edit and leaves the multiline edit buffer. The text that is stored in the field you were editing is not altered.
 
-Multiline values are not restricted to the `annote` field. Any field (except the `type` and `crossref` fields) can in fact hold a multiline value. To give a field a multiline value, use `m` instead of `e`. You will again be put in the multiline edit buffer, where you can edit the value. Note that you can use `m` even if a field already has a single line value. Ebib will just make that the first line in the multiline edit buffer.
+Multiline values are not restricted to the `annote` field. Any field (except the `type` and `crossref` fields) can in fact hold a multiline value. To give a field a multiline value, use `l` instead of `e`. You will again be put in the multiline edit buffer, where you can edit the value. Note that you can use `l` even if a field already has a single line value. Ebib will just make that the first line in the multiline edit buffer.
 
 When a field has a multiline value, only the first line is shown in the entry buffer, for space reasons. To indicate that the value is multiline, a plus sign `+` is placed in front of the value.
 
@@ -425,7 +425,7 @@ Of course it is also possible to combine parts that are repeated with parts that
 
 Multicite commands in `biblatex` take two additional arguments surrounded with parentheses. These are pre- and postnotes for the entire sequence of citations. They can be accommodated as shown.
 
-Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Orgmode citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Orgmode buffer. 
+Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Orgmode citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Orgmode buffer.
 
 
 ## Associating a Database with a LaTeX File ##
@@ -696,7 +696,7 @@ With this option set, Ebib collapses the multiple occurrences into a single occu
         keywords = {winter},
         keywords = {hibernation}
     }
-    
+
 If you load this entry into Ebib with the option "Allow Identical Fields" set, you will get the following:
 
     @book{Jones1998,
@@ -1154,7 +1154,7 @@ Functions not bound to any key:
 `C-p`
 :    equivalent to `Up`.
 
-`M-p` 
+`M-p`
 :    equivalent to `PgUp`.
 
 `q`
