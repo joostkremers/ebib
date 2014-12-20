@@ -226,10 +226,10 @@ rest of the frame is used for the entry buffer, unless
                                   (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
                                   (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) "  (Filtered)" "")))
   "The mode line for the index window.
-The mode line of the index window shows some Ebib--specific
+The mode line of the index window shows some Ebib-specific
 information. You can customize this information if you wish, or
-disable the Ebib--specific mode line altogether. Note that the
-entry buffer displays the standard Emacs mode line."
+disable the Ebib-specific mode line altogether. Note that the
+mode line of the entry buffer is not changed."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
