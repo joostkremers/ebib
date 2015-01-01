@@ -1745,18 +1745,17 @@ are searched."
        (let ((cur-search-entry (cdr (member (ebib--cur-entry-key) ebib--cur-keys-list))))
          (while (and cur-search-entry
                      (null (ebib--search-in-entry ebib--search-string
-                                                  (ebib--db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
-           (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
-     (setq cur-search-entry (cdr cur-search-entry)))
-    (if (null cur-search-entry)
-        (message (format "`%s' not found" ebib--search-string))
-      (ebib-db-set-current-entry-key (car cur-search-entry) ebib--cur-db)
-      (with-current-ebib-buffer 'index
-        (goto-char (point-min))
-        (re-search-forward (format "^%s " (regexp-quote (ebib--cur-entry-key))))
-        (beginning-of-line)
-        (ebib--set-index-overlay)
-        (ebib--fill-entry-buffer ebib--search-string))))))
+                                                  (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
+           (setq cur-search-entry (cdr cur-search-entry)))
+         (if (null cur-search-entry)
+             (message (format "`%s' not found" ebib--search-string))
+           (ebib-db-set-current-entry-key (car cur-search-entry) ebib--cur-db)
+           (with-current-ebib-buffer 'index
+             (goto-char (point-min))
+             (re-search-forward (format "^%s " (regexp-quote (ebib--cur-entry-key))))
+             (beginning-of-line)
+             (ebib--set-index-overlay)
+             (ebib--fill-entry-buffer ebib--search-string))))))
     ((default)
      (beep))))
 
