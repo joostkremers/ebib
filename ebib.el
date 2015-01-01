@@ -1413,7 +1413,7 @@ in order for the sort value."
       ;; The first one is simple: if X has a crossref field, it must be
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
       ;; field).
-      ((compare-xrefs (x y)
+      ((compare-xrefs (x _)
                       (ebib-db-get-field-value "crossref" x db 'noerror))
        ;; This one's a bit trickier. We iterate over the lists of fields in
        ;; `ebib-sort-order'. For each level, `ebib--get-sortstring' then
