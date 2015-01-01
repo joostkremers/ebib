@@ -929,7 +929,7 @@ is set to T."
                (when (ebib--read-entry entry-type db timestamp)
                  (setq n-entries (1+ n-entries))
                  (unless (assoc-string entry-type entry-list 'case-fold)
-                   (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type)))))) 
+                   (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
     (list n-entries n-strings preamble)))
 
 (defun ebib--find-next-bibtex-item ()
@@ -991,7 +991,7 @@ be added. (Whether a timestamp is actually added also depends on
       (setq entry-key (ebib--generate-tempkey db))
       (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
     (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key)) 
+      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
     entry-key))                         ; Return the entry key.
 
 (defun ebib-leave-ebib-windows ()
@@ -1394,7 +1394,7 @@ in order for the sort value."
 (defun ebib--format-local-vars (db)
   "Write the local variables of DB into the current buffer."
   (let ((lvars (ebib-db-get-local-vars db)))
-    (when lvars 
+    (when lvars
       (insert (concat "@Comment{\n"
                       "Local Variables:\n"
                       (mapconcat (lambda (e) (format "%s: %s\n" (car e) (cadr e))) lvars "")
@@ -1449,7 +1449,7 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
         (ebib--log 'error "Could not create backup file `%s'" backup-file)))))
 
 (defun ebib--save-database (db)
-  "Save the database DB." 
+  "Save the database DB."
   (when (and (ebib-db-backup-p db)
              (file-exists-p (ebib-db-get-filename db)))
     (ebib--make-backup (ebib-db-get-filename db))
@@ -2066,7 +2066,7 @@ is used)."
   (ebib--execute-when
     ((database)
      (ebib-db-set-dialect dialect ebib--cur-db)
-     (let ((lvars (ebib-db-get-local-vars ebib--cur-db))) 
+     (let ((lvars (ebib-db-get-local-vars ebib--cur-db)))
        (setq lvars (if dialect
                        (ebib--local-vars-add-dialect lvars dialect 'overwrite)
                      (ebib--local-vars-delete-dialect lvars)))
