@@ -1676,7 +1676,6 @@ a filename is asked to which the entry is appended."
                                      (ebib-db-set-current-entry-key t db))
                                    t)))) ; we must return T, WHEN does not always do this.
        (ebib--export-to-file (format "Export `%s' to file: " (ebib--cur-entry-key))
-                             (format "Entry `%s' exported to %%s." (ebib--cur-entry-key))
                              (lambda ()
                                (insert "\n")
                                (ebib--format-entry (ebib--cur-entry-key) ebib--cur-db t)))))
@@ -1702,7 +1701,7 @@ a filename is asked to which the entry is appended."
             (when (null (ebib--db-get-current-entry-key db))
               (ebib-db-set-current-entry-key t db))
             t))         ; we must return T, WHEN does not always do this.
-       (ebib--export-to-file "Export to file: " "Entries exported to %s."
+       (ebib--export-to-file "Export to file: "
                              (lambda ()
                                (mapc (lambda (entry-key)
                                        (insert "\n")
@@ -1826,7 +1825,6 @@ the preamble is appended."
                                  (lambda (db)
                                    (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
            (ebib--export-to-file "Export @PREAMBLE to file: "
-                                 "@PREAMBLE exported to %s"
                                  (lambda ()
                                    (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
     ((default)
@@ -2946,7 +2944,6 @@ which the string is appended."
                             (lambda (db)
                               (ebib-db-set-string string (ebib-db-get-string string ebib--cur-db) db)))
       (ebib--export-to-file (format "Export @STRING definition `%s' to file: " string)
-                            (format "@STRING definition `%s' exported to %%s" string)
                             (lambda ()
                               (insert (format "\n@string{%s = %s}\n"
                                               string
@@ -2968,7 +2965,6 @@ to append them to."
                      (ebib-db-set-string abbr (ebib-db-get-string abbr ebib--cur-db) db 'noerror))
                    (ebib-db-list-strings ebib--cur-db))))
         (ebib--export-to-file "Export all @STRING definitions to file: "
-                              "All @STRING definitions exported to %s"
                               (lambda ()
                                 (insert (format "\n")) ; To keep things tidy.
                                 (ebib--format-strings ebib--cur-db)))))))
