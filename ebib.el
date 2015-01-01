@@ -1104,7 +1104,7 @@ replaced with a number in ascending sequence."
     ((real-db)
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
-         (add-to-list 'entry-alist (cons '=key= (read-string "New entry key: " nil 'ebib--key-history))))
+         (push (cons '=key= (read-string "New entry key: " nil 'ebib--key-history)) entry-alist))
        (ebib-db-set-current-entry-key (ebib--add-entry-stub entry-alist ebib--cur-db) ebib--cur-db)
        (ebib--redisplay)
        (ebib--edit-entry-internal)))
