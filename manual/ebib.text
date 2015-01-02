@@ -228,7 +228,7 @@ BibLaTeX files use the same `.bib` suffix that BibTeX files use. Whether a file 
 
 The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of “Illegal entry type” errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs’ `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
 
-The option “Bibtex Dialect” sets the default dialect. It is possible to set the dialect for individual files as well. To do this, load the file and then set the dialect through the menu option «Ebib | BibTeX Dialect» or with the command `M-x ebib-set-dialect`. You only need to do this once for a file, because the setting is saved in the `.bib` file in the local variable block. (If no local variable block exists, one is created.) The setting is actually saved as a file-local value for the variable `bibtex-dialect`, which means that if you should open the file directly in `bibtex-mode`, Emacs will apply the dialect setting as well. (Note, by the way, that Ebib’s option to set the BibTeX Dialect is different from the one provided by `bibtex-mode`. Specifically, the former uses the variable `ebib-bibtex-dialect`, while the latter uses `bibtex-dialect`.) 
+The option “Bibtex Dialect” sets the default dialect. It is possible to set the dialect for individual files as well. To do this, load the file and then set the dialect through the menu option «Ebib | BibTeX Dialect» or with the command `M-x ebib-set-dialect`. You only need to do this once for a file, because the setting is saved in the `.bib` file in the local variable block. (If no local variable block exists, one is created.) The setting is actually saved as a file-local value for the variable `bibtex-dialect`, which means that if you should open the file directly in `bibtex-mode`, Emacs will apply the dialect setting as well. (Note, by the way, that Ebib’s option to set the BibTeX Dialect is different from the one provided by `bibtex-mode`. Specifically, the former uses the variable `ebib-bibtex-dialect`, while the latter uses `bibtex-dialect`.)
 
 The mode line of the index buffer shows the dialect that Ebib assumes for the current database. Note that this does not necessarily mean that the dialect is set in the `.bib` file: if the file does not have a dialect setting, the mode line shows the default setting.
 
@@ -428,7 +428,7 @@ Of course it is also possible to combine parts that are repeated with parts that
 
 Multicite commands in `biblatex` take two additional arguments surrounded with parentheses. These are pre- and postnotes for the entire sequence of citations. They can be accommodated as shown.
 
-Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Orgmode citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Orgmode buffer. 
+Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Orgmode citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Orgmode buffer.
 
 
 ## Associating a Database with a LaTeX File ##
@@ -699,7 +699,7 @@ With this option set, Ebib collapses the multiple occurrences into a single occu
         keywords = {winter},
         keywords = {hibernation}
     }
-    
+
 If you load this entry into Ebib with the option "Allow Identical Fields" set, you will get the following:
 
     @book{Jones1998,
@@ -1157,7 +1157,7 @@ Functions not bound to any key:
 `C-p`
 :    equivalent to `Up`.
 
-`M-p` 
+`M-p`
 :    equivalent to `PgUp`.
 
 `q`
