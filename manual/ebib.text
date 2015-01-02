@@ -1145,7 +1145,7 @@ Functions not bound to any key:
 `k`
 :    equivalent to `Up`.
 
-`l`
+`m`
 :    edit the value of the current string as multiline. `(ebib-edit-multiline-string)`
 
 `C-n`

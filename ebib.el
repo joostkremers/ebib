@@ -2338,7 +2338,7 @@ a logical `not' is applied to the selection."
     (define-key map "h" 'ebib-entry-help)
     (define-key map "j" 'ebib-next-field)
     (define-key map "k" 'ebib-prev-field)
-    (define-key map "l" 'ebib-edit-multiline-field)
+    (define-key map "m" 'ebib-edit-multiline-field)
     (define-key map [(control n)] 'ebib-next-field)
     (define-key map [(meta n)] 'ebib-goto-prev-set)
     (define-key map [(control p)] 'ebib-prev-field)
