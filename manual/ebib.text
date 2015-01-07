@@ -608,9 +608,11 @@ If Ebib finds a `@comment` in  a `.bib` file, it will read it and store it in th
 
 Ebib provides some special functionality for handling keywords. By default, there is a `keywords` field in the list of extra fields. Editing this field is a bit different from other fields. Instead of just entering a string and hitting ENTER to store it and return to the entry buffer, you should enter a single keyword and hit enter. The keyword will then be added to the keywords already present and you are asked to enter the next keyword. If you've added all keywords you want, just hit ENTER to finish.
 
-The advantage of doing it this way is that you can reuse keywords: once you've added a keyword to one entry, Ebib remembers it. The next time you want to use the same keyword for a different entry, you just need to type the first (few) letters, hit TAB and the keyword will be completed. That makes it easier to ensure you use the exact same keywords in different entries.
+The advantage of doing it this way is that you can reuse keywords: once you've added a keyword to one entry, Ebib remembers it. The next time you want to use the same keyword for a different entry, you just need to type the first (few) letters, hit TAB and the keyword will be completed. That makes it easier to ensure you use the exact same keywords in different entries. Note that Ebib's keyword functionality is not used to check the contents of keyword fields. It is simply a way to make it easier to stick to specific keywords, which should make it easier to categorise and search your entries.
 
-Note that Ebib's keyword functionality is not used to check the contents of keyword fields. It is simply a way to make it easier to stick to specific keywords, which should make it easier to categorise and search your entries. It is still possible to edit the `keywords` field directly. To do so, use a prefix argument: `C-u e` (or any other prefix argument) on the `keywords` field will allow you to edit the entire contents in the normal way. Use this method if you want to remove single keywords. (Blanking the entire `keywords` field is quicker with `x` or `d`.)
+It is still possible to edit the `keywords` field directly. To do so, use a prefix argument: `C-u e` (or any other prefix argument) on the `keywords` field will allow you to edit the entire contents in the normal way. Use this method if you want to remove single keywords. (Blanking the entire `keywords` field is quicker with `x` or `d`.)
+
+It is also possible to add keywords to an entry from the index buffer, using the command `y` (`ebib-add-keywords`). This works essentially the same way as when adding keywords from the entry buffer. There is one advantage, however: this command can also operate on marked entries: with `; y` you can add keywords to multiple entries in one go.
 
 Remembering keywords is practical, but it is even more useful if remembered keywords can be saved, so that they are available the next time you start Ebib. There are two ways of doing this: first, there is an option "Keywords List" that you can use to store keywords. Keywords stored in this option will be available for TAB completion to all databases in Ebib. New keywords, however, will not automatically be stored. If you find you need a keyword not on the list and want to make it permanent, you'll have to add it to "Keywords List" yourself.
 
@@ -976,6 +978,12 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 
 `X`
 :    export the `@preamble` definition to a file or, when used with a numeric prefix argument, to another database. `(ebib-export-preamble)`
+
+`y`
+:    add keywords to the current entry. `(ebib-add-keywords`)
+
+`; y`
+:    add keywords to marked entries.
 
 `z`
 :    move focus away from the Ebib windows, or, if using the full layout, put Ebib in the background. `(ebib-leave-ebib-windows)`
