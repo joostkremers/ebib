@@ -2499,7 +2499,7 @@ the beginning of the current line."
   "Edit the keywords field."
   ;; We shadow the binding of `minibuffer-local-completion-map' so that we
   ;; can unbind <SPC>, since keywords may contain spaces.
-  (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)) ; `(keymap (keymap (32)) ,@minibuffer-local-completion-map))
+  (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
         (collection (ebib--keywords-for-database ebib--cur-db)))
     (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
