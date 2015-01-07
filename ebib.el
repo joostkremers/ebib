@@ -703,6 +703,7 @@ COMMAND and PREFIXED are meaningless."
 (ebib-key index "\C-xb" ebib-leave-ebib-windows)
 (ebib-key index "\C-xk" ebib-quit)
 (ebib-key index "X" ebib-export-preamble)
+(ebib-key index "y" ebib-add-keywords t)
 (ebib-key index "z" ebib-leave-ebib-windows)
 (ebib-key index "Z" ebib-lower)
 
@@ -2198,6 +2199,60 @@ The user is prompted for the buffer to push the entry into."
   (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib)"))
+
+
+
+(defun ebib--completing-read-keywords (collection)
+  "Read keywords with completion from COLLECTION.
+Return the keywords entered as a list. Any keywords not in
+COLLECTION are added to the current database's keywords list. If
+no keywords are entered, the return value is `nil'."
+  (let ((keywords (cl-loop for keyword = (completing-read (format "Add keyword (ENTER to finish) [%s]: " (mapconcat #'identity keywords " ")) collection nil nil nil 'ebib-keyword-history)
+                           until (string= keyword "")
+                           collecting keyword into keywords
+                           finally return keywords)))
+    ;; Save any new keywords the user may have added. Note that `mapc'
+    ;; returns its SEQUENCE argument, which is exactly what we want here.
+    (mapc (lambda (keyword) (unless (member keyword collection)
+                              (ebib--keywords-add-keyword keyword ebib--cur-db)))
+          keywords)))
+
+(defun ebib-add-keywords ()
+  "Add keywords to the current entry."
+  (interactive)
+  ;; At the point where we need the prefix, we no longer have access to it,
+  ;; so we save it here.
+  (let ((prefixed (ebib--called-with-prefix)))
+    (cl-flet ((add-keywords (entry-key keywords)
+                            (let* ((conts (ebib-db-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
+                                   (new-conts (if conts
+                                                  (concat conts ebib-keywords-separator keywords)
+                                                keywords)))
+                              (ebib-db-set-field-value "keywords"
+                                                       (if ebib-keywords-field-keep-sorted
+                                                           (ebib--sort-keywords new-conts)
+                                                         new-conts)
+                                                       entry-key ebib--cur-db 'overwrite))))
+      (ebib--execute-when
+        ((entries)
+         (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
+                (collection (ebib--keywords-for-database ebib--cur-db))
+                (keywords (ebib--completing-read-keywords collection)))
+           (when keywords
+             ;; At this point, the last command invoked by the user is RET,
+             ;; so we can no longer tell if the command was called with a
+             ;; prefix.
+             (if (and prefixed (ebib-db-marked-entries-p ebib--cur-db))
+                 (when (y-or-n-p "Add keywords to all marked entries? ")
+                   (mapc (lambda (entry)
+                           (add-keywords entry (mapconcat #'identity keywords ebib-keywords-separator)))
+                         (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+                   (message "Keywords added to marked entries."))
+               (add-keywords (ebib--cur-entry-key) (mapconcat #'identity keywords ebib-keywords-separator)))
+             (ebib--set-modified t)
+             (ebib--redisplay))))
+        ((default)
+         (beep))))))
 
 ;; These filter functions use functions defined in ebib.el, so we keep them here.
 
