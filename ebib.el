@@ -1371,7 +1371,7 @@ added to the entry, possibly overwriting an existing timestamp."
 If DB is set to a specific dialect, write it to a @COMMENT as
 well, if it is not already in a @COMMENT."
   (mapc (lambda (c)
-          (insert (format "@Comment{\n%s\n}\n\n" c)))
+          (insert (format "@Comment{%s}\n\n" c)))
         (ebib-db-get-comments db)))
 
 (defun ebib--format-strings (db)
