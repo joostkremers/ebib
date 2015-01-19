@@ -563,7 +563,12 @@ edit buffer.
 
    When a field has a multiline value, only the first line is shown in
 the entry buffer, for space reasons. To indicate that the value is
-multiline, a plus sign `+' is placed in front of the value.
+multiline, a plus sign `+' is placed in front of the value. If you want
+to see the whole contents of a multiline field, you can use `v': this
+will display the contents of the current field in a `*Help*' buffer.
+This buffer can be dismissed again with `q'. This is quicker than
+entering the multiline edit buffer just to read the contents of a field
+and it has the advantage that the other fields stay visible.
 
    By the way, the `e' key is smart about the way an entry must be
 edited. If you press `e' on a field that already has a multiline value,
@@ -2904,92 +2909,92 @@ Node: Editing Fields Values20752
 Ref: #editing-fields-values20950
 Node: Editing Multiline Values23453
 Ref: #editing-multiline-values23646
-Node: Undefined Fields25709
-Ref: #undefined-fields25878
-Node: Hidden Fields26841
-Ref: #hidden-fields27010
-Node: Copy Cut Paste Yank and Delete27856
-Ref: #copy-cut-paste-yank-and-delete28044
-Node: Saving a Database28941
-Ref: #saving-a-database29089
-Node: Using BibLaTeX30020
-Ref: #using-biblatex30151
-Node: Setting the BibTeX Dialect30478
-Ref: #setting-the-bibtex-dialect30647
-Node: Alias Types and Fields32776
-Ref: #alias-types-and-fields32937
-Node: Searching34934
-Ref: #searching35078
-Node: Simple Searches35120
-Ref: #simple-searches35236
-Node: Filters37108
-Ref: #filters37208
-Node: Simple Selection38160
-Ref: #simple-selection38289
-Node: Complex Filters39912
-Ref: #complex-filters40074
-Node: Storing and Saving Filters43841
-Ref: #storing-and-saving-filters44041
-Node: Properties of Filtered Databases46822
-Ref: #properties-of-filtered-databases47010
-Node: Consulting BibTeX Databases outside Ebib48725
-Ref: #consulting-bibtex-databases-outside-ebib48934
-Node: Key Bindings53207
-Ref: #key-bindings53364
-Node: Defining Citation Commands54111
-Ref: #defining-citation-commands54345
-Node: Associating a Database with a LaTeX File60075
-Ref: #associating-a-database-with-a-latex-file60316
-Node: Cross-referencing63118
-Ref: #cross-referencing63289
-Node: Selecting Entries66456
-Ref: #selecting-entries66608
-Node: Printing the Database67957
-Ref: #printing-the-database68119
-Node: Calling a Browser71826
-Ref: #calling-a-browser71976
-Node: Viewing Files74507
-Ref: #viewing-files74645
-Node: Editing the file field76828
-Ref: #editing-the-file-field76959
-Node: Window Management78138
-Ref: #window-management78287
-Node: Creating Entry Stubs81322
-Ref: #creating-entry-stubs81484
-Node: @Preamble Definition82467
-Ref: #preamble-definition82631
-Node: @String Definitions84541
-Ref: #string-definitions84692
-Node: @Comments87989
-Ref: #comments88117
-Node: Managing Keywords88458
-Ref: #managing-keywords88603
-Node: Sorting the bib File93923
-Ref: #sorting-the-.bib-file94092
-Node: Merging and Importing97133
-Ref: #merging-and-importing97298
-Node: Exporting Entries99022
-Ref: #exporting-entries99169
-Node: Timestamps101216
-Ref: #timestamps101353
-Node: Multiple Identical Fields102969
-Ref: #multiple-identical-fields103144
-Node: The Multiline Edit Buffer105017
-Ref: #the-multiline-edit-buffer105198
-Node: The Options Menu109164
-Ref: #the-options-menu109318
-Node: The Ebib Buffers109931
-Ref: #the-ebib-buffers110073
-Node: The Index Buffer110413
-Ref: #the-index-buffer110550
-Node: The Entry Buffer116425
-Ref: #the-entry-buffer116589
-Node: The Strings Buffer118852
-Ref: #the-strings-buffer118995
-Node: Customisation120681
-Ref: #customisation120792
-Node: Modifying Key Bindings121680
-Ref: #modifying-key-bindings121807
+Node: Undefined Fields26059
+Ref: #undefined-fields26228
+Node: Hidden Fields27191
+Ref: #hidden-fields27360
+Node: Copy Cut Paste Yank and Delete28206
+Ref: #copy-cut-paste-yank-and-delete28394
+Node: Saving a Database29291
+Ref: #saving-a-database29439
+Node: Using BibLaTeX30370
+Ref: #using-biblatex30501
+Node: Setting the BibTeX Dialect30828
+Ref: #setting-the-bibtex-dialect30997
+Node: Alias Types and Fields33126
+Ref: #alias-types-and-fields33287
+Node: Searching35284
+Ref: #searching35428
+Node: Simple Searches35470
+Ref: #simple-searches35586
+Node: Filters37458
+Ref: #filters37558
+Node: Simple Selection38510
+Ref: #simple-selection38639
+Node: Complex Filters40262
+Ref: #complex-filters40424
+Node: Storing and Saving Filters44191
+Ref: #storing-and-saving-filters44391
+Node: Properties of Filtered Databases47172
+Ref: #properties-of-filtered-databases47360
+Node: Consulting BibTeX Databases outside Ebib49075
+Ref: #consulting-bibtex-databases-outside-ebib49284
+Node: Key Bindings53557
+Ref: #key-bindings53714
+Node: Defining Citation Commands54461
+Ref: #defining-citation-commands54695
+Node: Associating a Database with a LaTeX File60425
+Ref: #associating-a-database-with-a-latex-file60666
+Node: Cross-referencing63468
+Ref: #cross-referencing63639
+Node: Selecting Entries66806
+Ref: #selecting-entries66958
+Node: Printing the Database68307
+Ref: #printing-the-database68469
+Node: Calling a Browser72176
+Ref: #calling-a-browser72326
+Node: Viewing Files74857
+Ref: #viewing-files74995
+Node: Editing the file field77178
+Ref: #editing-the-file-field77309
+Node: Window Management78488
+Ref: #window-management78637
+Node: Creating Entry Stubs81672
+Ref: #creating-entry-stubs81834
+Node: @Preamble Definition82817
+Ref: #preamble-definition82981
+Node: @String Definitions84891
+Ref: #string-definitions85042
+Node: @Comments88339
+Ref: #comments88467
+Node: Managing Keywords88808
+Ref: #managing-keywords88953
+Node: Sorting the bib File94273
+Ref: #sorting-the-.bib-file94442
+Node: Merging and Importing97483
+Ref: #merging-and-importing97648
+Node: Exporting Entries99372
+Ref: #exporting-entries99519
+Node: Timestamps101566
+Ref: #timestamps101703
+Node: Multiple Identical Fields103319
+Ref: #multiple-identical-fields103494
+Node: The Multiline Edit Buffer105367
+Ref: #the-multiline-edit-buffer105548
+Node: The Options Menu109514
+Ref: #the-options-menu109668
+Node: The Ebib Buffers110281
+Ref: #the-ebib-buffers110423
+Node: The Index Buffer110763
+Ref: #the-index-buffer110900
+Node: The Entry Buffer116775
+Ref: #the-entry-buffer116939
+Node: The Strings Buffer119202
+Ref: #the-strings-buffer119345
+Node: Customisation121031
+Ref: #customisation121142
+Node: Modifying Key Bindings122030
+Ref: #modifying-key-bindings122157
 
 End Tag Table
 

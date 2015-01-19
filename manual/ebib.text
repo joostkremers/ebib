@@ -178,7 +178,7 @@ If you want to leave the multiline edit buffer without saving the text you have 
 
 Multiline values are not restricted to the `annote` field. Any field (except the `type` and `crossref` fields) can in fact hold a multiline value. To give a field a multiline value, use `m` instead of `e`. You will again be put in the multiline edit buffer, where you can edit the value. Note that you can use `m` even if a field already has a single line value. Ebib will just make that the first line in the multiline edit buffer.
 
-When a field has a multiline value, only the first line is shown in the entry buffer, for space reasons. To indicate that the value is multiline, a plus sign `+` is placed in front of the value.
+When a field has a multiline value, only the first line is shown in the entry buffer, for space reasons. To indicate that the value is multiline, a plus sign `+` is placed in front of the value. If you want to see the whole contents of a multiline field, you can use `v`: this will display the contents of the current field in a `*Help*` buffer. This buffer can be dismissed again with `q`. This is quicker than entering the multiline edit buffer just to read the contents of a field and it has the advantage that the other fields stay visible.
 
 By the way, the `e` key is smart about the way an entry must be edited. If you press `e` on a field that already has a multiline value, regardless of the fact whether it is the `annote` field or not, Ebib puts you in the multiline edit buffer. Therefore, you need `m` only if you want to give a field a multiline value when it doesn't have one yet.
 
