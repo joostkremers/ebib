@@ -133,7 +133,7 @@ all else fails, pop up a new frame."
                       entry-key
                       (if ebib-index-display-fields
                           (mapconcat (lambda (field)
-                                       (or (ebib-db-get-field-value field entry-key ebib--cur-db 'noerror 'unbraced)
+                                       (or (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db 'noerror 'unbraced))
                                            ""))
                                      ebib-index-display-fields
                                      "  ") ; separator for mapconcat
