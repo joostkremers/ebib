@@ -2438,7 +2438,7 @@ If the key of the current entry matches the pattern
       (ebib-generate-autokey)))
 
 (defun ebib--current-field ()
-  "Return the current field.
+  "Return the current field name.
 The current field is simply the field that point is on. If point
 is on an empty line, return `nil'. This function leaves point at
 the beginning of the current line."
