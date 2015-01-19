@@ -1055,13 +1055,14 @@ buffer if Ebib is not occupying the entire frame."
 (defun ebib-show-annotation ()
   "Show the contents of the `annote' field in a *Help* window."
   (interactive)
-  (with-help-window (help-buffer)
-    (princ (propertize (format "Annotation for `%s' [%s]" (ebib--cur-entry-key) (ebib-db-get-filename ebib--cur-db 'shortened)) 'face '(:weight bold)))
-    (princ "\n\n")
-    (let ((contents (ebib-db-get-field-value "annotation" (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
-      (if contents
-          (princ contents)
-        (princ "[No annotation]")))))
+  (let ((help-window-select t)) ; make sure the help window is selected
+    (with-help-window (help-buffer)
+      (princ (propertize (format "Annotation for `%s' [%s]" (ebib--cur-entry-key) (ebib-db-get-filename ebib--cur-db 'shortened)) 'face '(:weight bold)))
+      (princ "\n\n")
+      (let ((contents (ebib-db-get-field-value "annotation" (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
+        (if contents
+            (princ contents)
+          (princ "[No annotation]"))))))
 
 (defun ebib--add-entry-stub (&optional entry db)
   "Add ENTRY to DB in the form of a stub.
