@@ -2403,6 +2403,7 @@ a logical `not' is applied to the selection."
     (define-key map "r" 'ebib-toggle-raw)
     (define-key map "s" 'ebib-insert-abbreviation)
     (define-key map "u" 'ebib-browse-url-in-field)
+    (define-key map "v" 'ebib-view-field-as-help)
     (define-key map "x" 'ebib-cut-field-contents)
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
@@ -2791,6 +2792,19 @@ The deleted text is not put in the kill ring."
             ;; we can't do this earlier, because we would be writing to the index buffer...
             (ebib--redisplay-current-field)
             (ebib-next-field)))))))
+
+(defun ebib-view-field-as-help ()
+  "Show the contents of the current field in a *Help* window."
+  (interactive)
+  (let ((help-window-select t)                          ; make sure the help window is selected
+        (field (ebib--current-field)))
+    (with-help-window (help-buffer)
+      (princ (propertize (format "%s" field) 'face '(:weight bold)))
+      (princ "\n\n")
+      (let ((contents (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
+        (if contents
+            (princ contents)
+          (princ "[Empty field]"))))))
 
 (defun ebib-entry-help ()
   "Show the info node for Ebib's entry buffer."
