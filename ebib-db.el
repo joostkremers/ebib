@@ -372,6 +372,9 @@ set IF-EXISTS to 'overwrite."
       (setf (ebib--db-struct-strings db)
 	    (if (null value)
                 strings-list
+              ;; put the new string at the end of the list, to keep them in
+              ;; the order in which they appear in the .bib file. this is
+              ;; preferable for version control.
               (append strings-list (list (cons abbr (ebib-db-brace value)))))))))
 
 (defun ebib-db-remove-string (abbr db)
