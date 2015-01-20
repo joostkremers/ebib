@@ -371,8 +371,8 @@ set IF-EXISTS to 'overwrite."
     (unless old-string
       (setf (ebib--db-struct-strings db)
 	    (if (null value)
-		strings-list
-	      (push (cons abbr (ebib-db-brace value)) strings-list))))))
+                strings-list
+              (append strings-list (list (cons abbr (ebib-db-brace value)))))))))
 
 (defun ebib-db-remove-string (abbr db)
   "Remove @STRING definition from DB."
