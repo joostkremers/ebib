@@ -959,8 +959,9 @@ REMOVE can be a regular expression."
 
 (defun ebib--first-line (string)
   "Return the first line of a multiline string."
-  (string-match "\n" string)
-  (substring string 0 (match-beginning 0)))
+  (if (string-match "\n" string)
+      (substring string 0 (match-beginning 0))
+    string))
 
 (defun ebib--sort-in-buffer (limit str)
   "Move POINT to the right position to insert STR in the current buffer.
