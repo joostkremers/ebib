@@ -59,16 +59,14 @@
 (require 'ebib-filters)
 (require 'ebib-keywords)
 
-(defun ebib--display-buffer-reuse-window (buffer _alist)
+(defun ebib--display-buffer-reuse-window (buffer _)
   "Display BUFFER in an existing Ebib buffer.
 If BUFFER is the index buffer, simply switch to the window
 displaying it. (This function should not be called if there is a
 chance the index buffer is not visible.) For any other buffer,
 find a window displaying an Ebib buffer other than the index
 buffer, switch to that window and display BUFFER. If no window
-can be found, return NIL.
-
-Note, The argument _ALIST has no function."
+can be found, return NIL."
   (let (window)
     (cond
      ;; the index buffer can only be displayed in its dedicated window.
@@ -90,12 +88,11 @@ Note, The argument _ALIST has no function."
     (when window
       (select-window window)
       (with-ebib-window-nondedicated
-        (switch-to-buffer buffer))
+       (switch-to-buffer buffer))
       window)))
 
-(defun ebib--display-buffer-largest-window (buffer _alist)
-  "Display BUFFER in the largest non-dedicated window.
-The argument _ALIST has no function."
+(defun ebib--display-buffer-largest-window (buffer _)
+  "Display BUFFER in the largest non-dedicated window."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
       (select-window window)
@@ -3286,25 +3283,25 @@ the current database if there is no \\bibliography command. Tab
 completion works."
   (interactive)
   (ebib--execute-when
-    ((database)
-     (let ((collection (ebib--create-collection-from-db)))
-       (when collection
-         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
-                (format-list (or (cadr (assq (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
-                                 (cadr (assq 'any ebib-citation-commands))))
-                (citation-command
-                 (ebib--ifstring (format-string (cadr (assoc
-                                                       (completing-read "Command to use: " format-list nil nil nil 'ebib--cite-command-history)
-                                                       format-list)))
-                     (cl-multiple-value-bind (before repeater _separator after) (ebib--split-citation-string format-string)
-                       (concat (ebib--create-citation-command before)
-                               (ebib--create-citation-command repeater key)
-                               (ebib--create-citation-command after)))
-                   key))) ; if the user didn't provide a command, we insert just the entry key
-           (when citation-command
-             (insert (format "%s" citation-command)))))))
-    ((default)
-     (error "No database loaded"))))
+   ((database)
+    (let ((collection (ebib--create-collection-from-db)))
+      (when collection
+        (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
+               (format-list (or (cadr (assq (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
+                                (cadr (assq 'any ebib-citation-commands))))
+               (citation-command
+                (ebib--ifstring (format-string (cadr (assoc
+                                                      (completing-read "Command to use: " format-list nil nil nil 'ebib--cite-command-history)
+                                                      format-list)))
+                                (cl-multiple-value-bind (before repeater _ after) (ebib--split-citation-string format-string)
+                                  (concat (ebib--create-citation-command before)
+                                          (ebib--create-citation-command repeater key)
+                                          (ebib--create-citation-command after)))
+                                key))) ; if the user didn't provide a command, we insert just the entry key
+          (when citation-command
+            (insert (format "%s" citation-command)))))))
+   ((default)
+    (error "No database loaded"))))
 
 (defun ebib-create-bib-from-bbl ()
   "Create a .bib file for the current LaTeX document.
