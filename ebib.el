@@ -201,12 +201,7 @@ all else fails, pop up a new frame."
       (when match-str
         (cl-multiple-value-setq (value matched) (ebib--match-all-in-string match-str value)))
       (when (ebib--multiline-p value)
-        ;; IIUC PROPERTIZE shouldn't be necessary here, as the variable
-        ;; multiline is local and therefore the object it refers to should
-        ;; be GC'ed when the function returns. But for some reason, the
-        ;; plus sign is persistent, and if it's been highlighted as the
-        ;; result of a search, it stays that way.
-        (setq multiline (propertize "+" 'face nil))
+        (setq multiline (propertize "+" 'face nil)) ; sometimes the face property persists
         (setq value (ebib--first-line value)))
       (when (and matched
                  (string= multiline "+"))
