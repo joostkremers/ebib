@@ -2632,7 +2632,7 @@ completion, and the field in `ebib-file-field' uses filename
 completion and shortens filenames if they are in (a subdirectory
 of) one of the directories in `ebib-file-search-dirs'.
 
-With a prefix argument, the `keyword' field and the field in
+With a prefix argument, the `keywords' field and the field in
 `ebib-file-field' can be edited directly. For other fields, the
 prefix argument has no meaning."
   (interactive "p")
