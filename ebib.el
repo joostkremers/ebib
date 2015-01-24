@@ -2174,8 +2174,6 @@ The user is prompted for the buffer to push the entry into."
   (ebib-lower)
   (info "(ebib)"))
 
-
-
 (defun ebib--completing-read-keywords (collection)
   "Read keywords with completion from COLLECTION.
 Return the keywords entered as a list. Any keywords not in
