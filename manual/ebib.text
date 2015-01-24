@@ -311,7 +311,7 @@ Note that cancelling a filter with `F c` does not delete it from the list of sto
 
 When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database or saving a filtered database is also disabled. (The reasons for these limitations are mainly historic and they may be lifted in future version). Editing existing entries is possible, however. Note that if the entry doesn't match the filter anymore after the edit, it doesn't disappear from view. In order to reapply the filter, press `F r`.
 
-It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `; m`, then cancel the filter and perform an action on them.
+It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `M`, then cancel the filter and perform an action on them.
 
 Although a filtered database cannot be saved, it is possible to write the filtered entries to a file. To do so, use `F W`. This command also writes all the `@string` definitions and the `@preamble`, so you end up with a complete `.bib` file. (Note that this is in fact the same command as the menu option "Save Database As". This command behaves differently depending on whether a filter is active. If there is, only the filtered entries are written to the new file and the original database remains open. If no filter is active, all the entries are written and the database in Ebib is renamed.)
 
@@ -402,7 +402,7 @@ If only one optional argument is provided, `natbib` assumes that it is a postnot
 
 This way, the second pair of brackets is always inserted, regardless of whether you provide a second argument or not.
 
-`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `; p` to push them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
+`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `p` to push them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
 
     \citet{Jones1992,Haddock2004}
 
@@ -420,7 +420,7 @@ Multicite commands can take more than one citation key in braces `{}` and each o
 
     \footcites%(%<[%A]%>[%A]{%K}%)
 
-Here, the entire sequence of two optional arguments and the obligatory citation key is wrapped in `%(...%)`, so that Ebib knows it can be repeated. If you now mark multiple entries in Ebib, press `; p` and select the `footcites` command, Ebib will put all the keys in the citation, asking you for two arguments for each citation key.
+Here, the entire sequence of two optional arguments and the obligatory citation key is wrapped in `%(...%)`, so that Ebib knows it can be repeated. If you now mark multiple entries in Ebib, press `p` and select the `footcites` command, Ebib will put all the keys in the citation, asking you for two arguments for each citation key.
 
 Of course it is also possible to combine parts that are repeated with parts that are not repeated. In fact, that already happens in the previous example, because the part `\footcites` is not repeated. But the part that is not repeated may contain `%A` directives as well:
 
@@ -461,9 +461,9 @@ Note that if you want to use Bib(La)TeX's cross-referencing options, the option 
 
 Commands in the index buffer generally operate on one single entry, or on all entries. For some commands, however, it may sometimes be useful to perform them on more than one entry, but not necessarily all of them. This can be achieved by selecting entries. You can select the entries you want to perform a command on with the key `m`. This selects (or unselects) the current entry. Selected entries are highlighted. (Note that the face properties of selected entries can be customised through the customisation option "Selected Face".)
 
-Of the commands discussed so far, two can be used on selected entries: `d` and `p`. Note, however, that it is not enough to select the entries you want and then type any of these commands. If you do so, they will behave as if no entries were selected. To get these commands to work on the selected entries, you have to type a semicolon before them. That is, `; d` deletes all selected entries, `; p` pushes all selected entries to a LaTeX buffer. The command `m` itself can also be used with the `;` prefix. If there are any selected entries, `; m` unselects them all. Otherwise, `; m` selects all entries.
+Commands for which it makes sense automatically operate on all marked entries if there are any. Of the commands discussed so far, these are `d` to delete entries and `p` to push entries to a LaTeX buffer. (Note that Ebib creates a single citation command with commas separating the entry keys.)
 
-When using `; p` to push all selected entries to a LaTeX buffer, they are put in a single citation command, separated by commas. Ebib does not create a citation command for each entry separately.
+The command `M` unmarks all entries or, if there are no marked entries, marks all entries in the current database.
 
 
 # Printing the Database #
@@ -612,7 +612,7 @@ The advantage of doing it this way is that you can reuse keywords: once you've a
 
 It is still possible to edit the `keywords` field directly. To do so, use a prefix argument: `C-u e` (or any other prefix argument) on the `keywords` field will allow you to edit the entire contents in the normal way. Use this method if you want to remove single keywords. (Blanking the entire `keywords` field is quicker with `x` or `d`.)
 
-It is also possible to add keywords to an entry from the index buffer, using the command `y` (`ebib-add-keywords`). This works essentially the same way as when adding keywords from the entry buffer. There is one advantage, however: this command can also operate on marked entries: with `; y` you can add keywords to multiple entries in one go.
+It is also possible to add keywords to an entry from the index buffer, using the command `y` (`ebib-add-keywords`). This works essentially the same way as when adding keywords from the entry buffer. There is one advantage, however: this command can also operate on marked entries, so that you can add keywords to multiple entries in one go.
 
 Remembering keywords is practical, but it is even more useful if remembered keywords can be saved, so that they are available the next time you start Ebib. There are two ways of doing this: first, there is an option "Keywords List" that you can use to store keywords. Keywords stored in this option will be available for TAB completion to all databases in Ebib. New keywords, however, will not automatically be stored. If you find you need a keyword not on the list and want to make it permanent, you'll have to add it to "Keywords List" yourself.
 
@@ -661,15 +661,11 @@ If a BibTeX entry in the buffer lack an entry key (which sometimes happens with 
 
 # Exporting Entries #
 
-Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to a `.bib` file, use the command `x`. Ebib will ask you for a filename to export the entry to. (If you have already exported an entry before, Ebib will present the filename you used as default, but you can of course change it.)
+Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to a `.bib` file, use the command `x`. This command operates on a single entry or on all marked entries.
 
-For obvious reasons, Ebib appends the entry to the file that you enter if it already exists, it does not overwrite the file. If this is not what you want, delete the file first, as Ebib provides no way to do this.
+When you export one or more entries, Ebib will ask you for a filename to export them to. If you have already exported an entry before, Ebib will present the filename you used as default, but you can of course change it. For obvious reasons, Ebib appends the entry to the file that you enter if it already exists, it does not overwrite the file. If this is not what you want, delete the file first, as Ebib provides no way to do this.
 
-If you have more than one database open in Ebib, it is also possible to copy entries from one database to another. To do this, use the `x` command with a numeric prefix argument. E.g., if the database you want to export an entry to is the second database, type `M-2 x` to export the current entry to it. The number of the database is given in the modeline of the index buffer.
-
-If the database you're copying an entry to already contains an entry with the same entry key, Ebib won't copy the entry, and issues an appropriate warning message.
-
-Note that the command `x` can operate on selected entries. So to export several entries in one go select them and type `; x`. You can use a prefix argument in the normal way: `M-2 ; x` exports the selected entries to database 2.
+If you have more than one database open in Ebib, it is also possible to copy entries from one database to another. To do this, use the `x` command with a numeric prefix argument. E.g., if the database you want to export an entry to is the second database, type `M-2 x` to export the current entry to it. The number of the database is given in the modeline of the index buffer. If the database you're copying an entry to already contains an entry with the same entry key, Ebib won't copy the entry, and issues an appropriate warning message.
 
 Apart from entries, it is also possible to export the `@preamble` and `@string` definitions. The `@preamble` definition is exported with the command `X` in the index buffer. `@string` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@string` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for a filename, and then append the relevent data to that file. With a numeric prefix argument, they copy the relevant data to the corresponding open database.
 
@@ -821,10 +817,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    follow `crossref` field. `(ebib-follow-crossref)`
 
 `d`
-:    delete the current entry. `(ebib-delete-entry)`
-
-`; d`
-:    delete all selected entries.
+:    delete the current entry or marked entries. `(ebib-delete-entry)`
 
 `e`
 :    edit the current entry. `(ebib-edit-entry)`
@@ -914,10 +907,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    show the log buffer. (`ebib-show-log`)
 
 `m`
-:    select (or unselect) the current entry. `(ebib-select-entry)`
-
-`; m`
-:    unselect all selected entries.
+:    mark or unmark the current entry. `(ebib-mark-entry)`
 
 `n`
 :    find next occurrence of the search string. `(ebib-search-next)`
@@ -935,10 +925,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    open a `.bib` file. `(ebib-load-bibtex-file)`
 
 `p`
-:    push an entry to a LaTeX buffer `(ebib-push-bibtex-key)`
-
-`; p`
-:    push the selected entries to a LaTeX buffer.
+:    push a single entry or the marked entries to a LaTeX buffer `(ebib-push-bibtex-key)`
 
 `C-p`
 :    equivalent to `Up`.
@@ -965,10 +952,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    save the database under a new name. If a filter is active, save the filtered entries to a new `.bib` file. `(ebib-write-database)`
 
 `x`
-:    export the current entry to a file, or, when used with numeric prefix argument, to another database. `(ebib-export-entry)`
-
-`; x`
-:    export the selected entries to a file, or, when used with a numeric prefix argument, to another database.
+:    export the current entry or the marked entries to a file, or, when used with numeric prefix argument, to another database. `(ebib-export-entry)`
 
 `C-x b`
 :    equivalent to `z`.
@@ -980,10 +964,7 @@ This chapter lists all the key commands that exist in Ebib, with a short descrip
 :    export the `@preamble` definition to a file or, when used with a numeric prefix argument, to another database. `(ebib-export-preamble)`
 
 `y`
-:    add keywords to the current entry. `(ebib-add-keywords`)
-
-`; y`
-:    add keywords to marked entries.
+:    add keywords to the current entry or to the marked entries. `(ebib-add-keywords`)
 
 `z`
 :    move focus away from the Ebib windows, or, if using the full layout, put Ebib in the background. `(ebib-leave-ebib-windows)`
@@ -1212,17 +1193,7 @@ If you want to unbind a key, you can simply leave out `<command>`. So if you wan
 
 The first line binds `D` to the command `ebib-delete-entry`. The second line unbinds `d`.
 
-If a command can be called with a prefix key (as for example `ebib-delete-entry` can), `ebib-key` will automatically rebind the prefixed version as well. So in the example above, the first line not only binds `D`, it also binds `; D`. Similarly, the second line not only unbinds `d`, but also `; d`.
-
-Note that if you bind the print commands to a key (`ebib-print-entries` and `ebib-latex-entries`) they are automatically set up to accept the prefix key as well.
-
-It is also possible to redefine the prefix key itself. To do this, you must specify `select-prefix` for `<buffer>`. The value of `<command>` is irrelevant here, so it can be left out:
-
-    (ebib-key select-prefix ":")
-
-This sets up `:` as the new prefix key. Doing this automatically unbinds the existing prefix key.
-
-As a final option, `ebib-key` allows you to redefine the second key in the key bindings of the multiline edit buffer:
+`ebib-key` allows you to redefine the second key in the key bindings of the multiline edit buffer:
 
     (ebib-key multiline "&")
 

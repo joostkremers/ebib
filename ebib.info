@@ -1024,7 +1024,7 @@ reapply the filter, press `F r'.
 
    It is also possible to mark entries. Marked entries stay marked when
 you cancel the filter, so in order to do something with all the entries
-matching a filter, you can mark them all in the filter view with `; m',
+matching a filter, you can mark them all in the filter view with `M',
 then cancel the filter and perform an action on them.
 
    Although a filtered database cannot be saved, it is possible to
@@ -1233,9 +1233,8 @@ of whether you provide a second argument or not.
    `Natbib' commands also accept multiple citation keys. When you call
 `ebib-insert-bibtex-key' from within a LaTeX buffer, you can only
 provide one key, but when you're in Ebib, you can mark multiple entry
-keys and then use `; p' to push them to a buffer. In this case, Ebib
-asks you for a separator and then inserts all keys into the position of
-`%K':
+keys and then use `p' to push them to a buffer. In this case, Ebib asks
+you for a separator and then inserts all keys into the position of `%K':
 
 \citet{Jones1992,Haddock2004}
 
@@ -1267,7 +1266,7 @@ following format string:
 
    Here, the entire sequence of two optional arguments and the
 obligatory citation key is wrapped in `%(...%)', so that Ebib knows it
-can be repeated. If you now mark multiple entries in Ebib, press `; p'
+can be repeated. If you now mark multiple entries in Ebib, press `p'
 and select the `footcites' command, Ebib will put all the keys in the
 citation, asking you for two arguments for each citation key.
 
@@ -1416,19 +1415,14 @@ entries you want to perform a command on with the key `m'. This selects
 (Note that the face properties of selected entries can be customised
 through the customisation option "Selected Face".)
 
-   Of the commands discussed so far, two can be used on selected
-entries: `d' and `p'. Note, however, that it is not enough to select
-the entries you want and then type any of these commands. If you do so,
-they will behave as if no entries were selected. To get these commands
-to work on the selected entries, you have to type a semicolon before
-them. That is, `; d' deletes all selected entries, `; p' pushes all
-selected entries to a LaTeX buffer. The command `m' itself can also be
-used with the `;' prefix. If there are any selected entries, `; m'
-unselects them all. Otherwise, `; m' selects all entries.
+   Commands for which it makes sense automatically operate on all
+marked entries if there are any. Of the commands discussed so far,
+these are `d' to delete entries and `p' to push entries to a LaTeX
+buffer. (Note that Ebib creates a single citation command with commas
+separating the entry keys.)
 
-   When using `; p' to push all selected entries to a LaTeX buffer,
-they are put in a single citation command, separated by commas. Ebib
-does not create a citation command for each entry separately.
+   The command `M' unmarks all entries or, if there are no marked
+entries, marks all entries in the current database.
 
 
 File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser,  Prev: Selecting Entries,  Up: Top
@@ -1874,8 +1868,8 @@ normal way. Use this method if you want to remove single keywords.
 buffer, using the command `y' (`ebib-add-keywords'). This works
 essentially the same way as when adding keywords from the entry buffer.
 There is one advantage, however: this command can also operate on
-marked entries: with `; y' you can add keywords to multiple entries in
-one go.
+marked entries, so that you can add keywords to multiple entries in one
+go.
 
    Remembering keywords is practical, but it is even more useful if
 remembered keywords can be saved, so that they are available the next
@@ -2047,30 +2041,24 @@ Sometimes it can be useful to copy entries from one database to
 another, or to create a new `.bib' file with several entries from an
 existing database. For this purpose, Ebib provides exporting
 facilities. To export an entry to a `.bib' file, use the command `x'.
-Ebib will ask you for a filename to export the entry to. (If you have
-already exported an entry before, Ebib will present the filename you
-used as default, but you can of course change it.)
+This command operates on a single entry or on all marked entries.
 
-   For obvious reasons, Ebib appends the entry to the file that you
-enter if it already exists, it does not overwrite the file. If this is
-not what you want, delete the file first, as Ebib provides no way to do
-this.
+   When you export one or more entries, Ebib will ask you for a
+filename to export them to. If you have already exported an entry
+before, Ebib will present the filename you used as default, but you can
+of course change it. For obvious reasons, Ebib appends the entry to the
+file that you enter if it already exists, it does not overwrite the
+file. If this is not what you want, delete the file first, as Ebib
+provides no way to do this.
 
    If you have more than one database open in Ebib, it is also possible
 to copy entries from one database to another. To do this, use the `x'
 command with a numeric prefix argument. E.g., if the database you want
 to export an entry to is the second database, type `M-2 x' to export
 the current entry to it. The number of the database is given in the
-modeline of the index buffer.
-
-   If the database you're copying an entry to already contains an entry
-with the same entry key, Ebib won't copy the entry, and issues an
-appropriate warning message.
-
-   Note that the command `x' can operate on selected entries. So to
-export several entries in one go select them and type `; x'. You can
-use a prefix argument in the normal way: `M-2 ; x' exports the selected
-entries to database 2.
+modeline of the index buffer. If the database you're copying an entry
+to already contains an entry with the same entry key, Ebib won't copy
+the entry, and issues an appropriate warning message.
 
    Apart from entries, it is also possible to export the `@preamble'
 and `@string' definitions. The `@preamble' definition is exported with
@@ -2358,10 +2346,7 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      follow `crossref' field. `(ebib-follow-crossref)'
 
 `d'
-     delete the current entry. `(ebib-delete-entry)'
-
-`; d'
-     delete all selected entries.
+     delete the current entry or marked entries. `(ebib-delete-entry)'
 
 `e'
      edit the current entry. `(ebib-edit-entry)'
@@ -2457,10 +2442,7 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      show the log buffer. (`ebib-show-log')
 
 `m'
-     select (or unselect) the current entry. `(ebib-select-entry)'
-
-`; m'
-     unselect all selected entries.
+     mark or unmark the current entry. `(ebib-mark-entry)'
 
 `n'
      find next occurrence of the search string. `(ebib-search-next)'
@@ -2479,10 +2461,8 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      open a `.bib' file. `(ebib-load-bibtex-file)'
 
 `p'
-     push an entry to a LaTeX buffer `(ebib-push-bibtex-key)'
-
-`; p'
-     push the selected entries to a LaTeX buffer.
+     push a single entry or the marked entries to a LaTeX buffer
+     `(ebib-push-bibtex-key)'
 
 `C-p'
      equivalent to `Up'.
@@ -2515,12 +2495,9 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      the filtered entries to a new `.bib' file. `(ebib-write-database)'
 
 `x'
-     export the current entry to a file, or, when used with numeric
-     prefix argument, to another database. `(ebib-export-entry)'
-
-`; x'
-     export the selected entries to a file, or, when used with a
-     numeric prefix argument, to another database.
+     export the current entry or the marked entries to a file, or, when
+     used with numeric prefix argument, to another database.
+     `(ebib-export-entry)'
 
 `C-x b'
      equivalent to `z'.
@@ -2534,10 +2511,8 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
      `(ebib-export-preamble)'
 
 `y'
-     add keywords to the current entry. `(ebib-add-keywords')
-
-`; y'
-     add keywords to marked entries.
+     add keywords to the current entry or to the marked entries.
+     `(ebib-add-keywords')
 
 `z'
      move focus away from the Ebib windows, or, if using the full
@@ -2834,27 +2809,8 @@ than `d', you need to put the following in `~/.emacs.d/ebibrc':
    The first line binds `D' to the command `ebib-delete-entry'. The
 second line unbinds `d'.
 
-   If a command can be called with a prefix key (as for example
-`ebib-delete-entry' can), `ebib-key' will automatically rebind the
-prefixed version as well. So in the example above, the first line not
-only binds `D', it also binds `; D'. Similarly, the second line not
-only unbinds `d', but also `; d'.
-
-   Note that if you bind the print commands to a key
-(`ebib-print-entries' and `ebib-latex-entries') they are automatically
-set up to accept the prefix key as well.
-
-   It is also possible to redefine the prefix key itself. To do this,
-you must specify `select-prefix' for `<buffer>'. The value of
-`<command>' is irrelevant here, so it can be left out:
-
-(ebib-key select-prefix ":")
-
-   This sets up `:' as the new prefix key. Doing this automatically
-unbinds the existing prefix key.
-
-   As a final option, `ebib-key' allows you to redefine the second key
-in the key bindings of the multiline edit buffer:
+   `ebib-key' allows you to redefine the second key in the key bindings
+of the multiline edit buffer:
 
 (ebib-key multiline "&")
 
@@ -2937,64 +2893,64 @@ Node: Storing and Saving Filters44191
 Ref: #storing-and-saving-filters44391
 Node: Properties of Filtered Databases47172
 Ref: #properties-of-filtered-databases47360
-Node: Consulting BibTeX Databases outside Ebib49075
-Ref: #consulting-bibtex-databases-outside-ebib49284
-Node: Key Bindings53557
-Ref: #key-bindings53714
-Node: Defining Citation Commands54461
-Ref: #defining-citation-commands54695
-Node: Associating a Database with a LaTeX File60425
-Ref: #associating-a-database-with-a-latex-file60666
-Node: Cross-referencing63468
-Ref: #cross-referencing63639
-Node: Selecting Entries66806
-Ref: #selecting-entries66958
-Node: Printing the Database68307
-Ref: #printing-the-database68469
-Node: Calling a Browser72176
-Ref: #calling-a-browser72326
-Node: Viewing Files74857
-Ref: #viewing-files74995
-Node: Editing the file field77178
-Ref: #editing-the-file-field77309
-Node: Window Management78488
-Ref: #window-management78637
-Node: Creating Entry Stubs81672
-Ref: #creating-entry-stubs81834
-Node: @Preamble Definition82817
-Ref: #preamble-definition82981
-Node: @String Definitions84891
-Ref: #string-definitions85042
-Node: @Comments88339
-Ref: #comments88467
-Node: Managing Keywords88808
-Ref: #managing-keywords88953
-Node: Sorting the bib File94273
-Ref: #sorting-the-.bib-file94442
-Node: Merging and Importing97483
-Ref: #merging-and-importing97648
-Node: Exporting Entries99372
-Ref: #exporting-entries99519
-Node: Timestamps101566
-Ref: #timestamps101703
-Node: Multiple Identical Fields103319
-Ref: #multiple-identical-fields103494
-Node: The Multiline Edit Buffer105367
-Ref: #the-multiline-edit-buffer105548
-Node: The Options Menu109514
-Ref: #the-options-menu109668
-Node: The Ebib Buffers110281
-Ref: #the-ebib-buffers110423
-Node: The Index Buffer110763
-Ref: #the-index-buffer110900
-Node: The Entry Buffer116775
-Ref: #the-entry-buffer116939
-Node: The Strings Buffer119202
-Ref: #the-strings-buffer119345
-Node: Customisation121031
-Ref: #customisation121142
-Node: Modifying Key Bindings122030
-Ref: #modifying-key-bindings122157
+Node: Consulting BibTeX Databases outside Ebib49073
+Ref: #consulting-bibtex-databases-outside-ebib49282
+Node: Key Bindings53555
+Ref: #key-bindings53712
+Node: Defining Citation Commands54459
+Ref: #defining-citation-commands54693
+Node: Associating a Database with a LaTeX File60419
+Ref: #associating-a-database-with-a-latex-file60660
+Node: Cross-referencing63462
+Ref: #cross-referencing63633
+Node: Selecting Entries66800
+Ref: #selecting-entries66952
+Node: Printing the Database67908
+Ref: #printing-the-database68070
+Node: Calling a Browser71777
+Ref: #calling-a-browser71927
+Node: Viewing Files74458
+Ref: #viewing-files74596
+Node: Editing the file field76779
+Ref: #editing-the-file-field76910
+Node: Window Management78089
+Ref: #window-management78238
+Node: Creating Entry Stubs81273
+Ref: #creating-entry-stubs81435
+Node: @Preamble Definition82418
+Ref: #preamble-definition82582
+Node: @String Definitions84492
+Ref: #string-definitions84643
+Node: @Comments87940
+Ref: #comments88068
+Node: Managing Keywords88409
+Ref: #managing-keywords88554
+Node: Sorting the bib File93871
+Ref: #sorting-the-.bib-file94040
+Node: Merging and Importing97081
+Ref: #merging-and-importing97246
+Node: Exporting Entries98970
+Ref: #exporting-entries99117
+Node: Timestamps101023
+Ref: #timestamps101160
+Node: Multiple Identical Fields102776
+Ref: #multiple-identical-fields102951
+Node: The Multiline Edit Buffer104824
+Ref: #the-multiline-edit-buffer105005
+Node: The Options Menu108971
+Ref: #the-options-menu109125
+Node: The Ebib Buffers109738
+Ref: #the-ebib-buffers109880
+Node: The Index Buffer110220
+Ref: #the-index-buffer110357
+Node: The Entry Buffer116024
+Ref: #the-entry-buffer116188
+Node: The Strings Buffer118451
+Ref: #the-strings-buffer118594
+Node: Customisation120280
+Ref: #customisation120391
+Node: Modifying Key Bindings121279
+Ref: #modifying-key-bindings121406
 
 End Tag Table
 
