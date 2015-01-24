@@ -1051,11 +1051,6 @@ argument to a function or not."
   (when (numberp num)
     num))
 
-(defun ebib--called-with-prefix ()
-  "Return T if the calling command was called with a prefix key."
-  (member (event-convert-list (list ebib--prefix-key))
-          (append (this-command-keys-vector) nil)))
-
 ;; TODO The exporting macros and functions should be rewritten...
 
 (defmacro ebib--export-to-db (num message copy-fn)
