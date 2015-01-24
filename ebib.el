@@ -3097,11 +3097,13 @@ edit buffer was shown in."
    ((eq (car ebib--multiline-info) 'preamble)
     (ebib--pop-to-buffer 'index))
    ((eq (car ebib--multiline-info) 'fields)
-    ;; make sure we display the correct entry
+    ;; make sure we display the correct entry & field
     (setq ebib--cur-db (cl-second ebib--multiline-info))
     (ebib-db-set-current-entry-key (cl-third ebib--multiline-info) ebib--cur-db 'first)
     (ebib--redisplay)
-    (ebib--pop-to-buffer 'entry))))
+    (ebib--pop-to-buffer 'entry)
+    (re-search-forward (concat "^" (regexp-quote (cl-fourth ebib--multiline-info))) nil t)
+    (ebib--set-fields-overlay))))
 
 (defun ebib-save-from-multiline-edit ()
   "Save the database from within the multiline edit buffer.
@@ -3122,7 +3124,7 @@ The text being edited is stored before saving the database."
           (ebib-db-remove-preamble db)
         (ebib-db-set-preamble text db 'overwrite)))
      ((eq type 'fields)
-      (let ((entry (cl-third ebib--multiline-info))
+      (let ((key (cl-third ebib--multiline-info))
             (field (cl-fourth ebib--multiline-info)))
         (if (string= text "")
             (ebib-db-remove-field-value field key db)
