@@ -1797,7 +1797,7 @@ result."
   (interactive)
   (ebib--execute-when
     ((real-db)
-     (ebib--multiline-edit 'preamble (ebib-db-get-preamble ebib--cur-db)))
+     (ebib--multiline-edit (list 'preamble ebib--cur-db) (ebib-db-get-preamble ebib--cur-db)))
     ((default)
      (beep))))
 
@@ -2763,7 +2763,7 @@ The deleted text is not put in the kill ring."
             (setq ebib--multiline-unbraced t)
           (setq text (ebib-db-unbrace text))
           (setq ebib--multiline-unbraced nil))
-        (ebib--multiline-edit 'fields text)))))
+        (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field) text)))))
 
 (defun ebib-insert-abbreviation ()
   "Insert an abbreviation from the ones defined in the database."
@@ -3059,12 +3059,12 @@ to append them to."
 
 (easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
-(defun ebib--multiline-edit (type &optional starttext)
+(defun ebib--multiline-edit (info &optional starttext)
   "Switch to Ebib's multiline edit buffer.
 STARTTEXT is a string that contains the initial text of the buffer."
   (ebib--pop-to-buffer 'multiline)
   (erase-buffer)
-  (setq ebib--editing type)
+  (setq ebib--multiline-info info)
   (when starttext
     (insert starttext)
     (goto-char (point-min)))
@@ -3095,11 +3095,14 @@ edit buffer was shown in."
       (delete-window)
     (switch-to-buffer nil t))
   (cond
-   ((eq ebib--editing 'preamble)
+   ((eq (car ebib--multiline-info) 'preamble)
     (ebib--pop-to-buffer 'index))
-   ((eq ebib--editing 'fields)
-    (ebib--pop-to-buffer 'entry)
-    (ebib--redisplay-current-field))))
+   ((eq (car ebib--multiline-info) 'fields)
+    ;; make sure we display the correct entry
+    (setq ebib--cur-db (cl-second ebib--multiline-info))
+    (ebib-db-set-current-entry-key (cl-third ebib--multiline-info) ebib--cur-db 'first)
+    (ebib--redisplay)
+    (ebib--pop-to-buffer 'entry))))
 
 (defun ebib-save-from-multiline-edit ()
   "Save the database from within the multiline edit buffer.
@@ -3112,16 +3115,19 @@ The text being edited is stored before saving the database."
 (defun ebib--store-multiline-text ()
   "Store the text being edited in the multiline edit buffer."
   (let ((text (buffer-substring-no-properties (point-min) (point-max)))
-        (field (ebib--current-field)))
+        (type (cl-first ebib--multiline-info))
+        (db (cl-second ebib--multiline-info)))
     (cond
-     ((eq ebib--editing 'preamble)
+     ((eq type 'preamble)
       (if (string= text "")
-          (ebib-db-remove-preamble ebib--cur-db)
-        (ebib-db-set-preamble text ebib--cur-db 'overwrite)))
-     ((eq ebib--editing 'fields)
-      (if (string= text "")
-          (ebib-db-remove-field-value field (ebib--cur-entry-key) ebib--cur-db)
-        (ebib-db-set-field-value field text (ebib--cur-entry-key) ebib--cur-db 'overwrite ebib--multiline-unbraced)))))
+          (ebib-db-remove-preamble db)
+        (ebib-db-set-preamble text db 'overwrite)))
+     ((eq type 'fields)
+      (let ((entry (cl-third ebib--multiline-info))
+            (field (cl-fourth ebib--multiline-info)))
+        (if (string= text "")
+            (ebib-db-remove-field-value field key db)
+          (ebib-db-set-field-value field text key db 'overwrite ebib--multiline-unbraced))))))
   (ebib--set-modified t))
 
 (defun ebib-multiline-help ()

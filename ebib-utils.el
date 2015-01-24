@@ -687,7 +687,7 @@ Ebib (not Emacs)."
 (defvar ebib--export-filename nil "Filename to export entries to.")
 (defvar ebib--push-buffer nil "Buffer to push entries to.")
 (defvar ebib--search-string nil "Stores the last search string.")
-(defvar ebib--editing nil "Indicates what the user is editing, either 'fields or 'preamble.")
+(defvar ebib--multiline-info nil "Stores the entry and field being edited.")
 (defvar ebib--multiline-unbraced nil "Indicates whether the multiline text being edited is braced.")
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
 (defvar ebib--local-bibtex-filenames nil
