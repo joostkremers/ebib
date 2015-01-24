@@ -515,9 +515,10 @@ unmarked."
 (defun ebib-db-list-marked-entries (db &optional nosort)
   "Return a list of entry keys of all marked entries in DB.
 The list is sorted, unless NOSORT is non-nil."
-  (if nosort
-      (sort (ebib--db-struct-marked-entries db) #'string<)
-    (ebib--db-struct-marked-entries db)))
+  (let ((entries (copy-sequence (ebib--db-struct-marked-entries db))))
+    (if nosort
+        (sort entries  #'string<)
+      entries)))
 
 (defun ebib-db-filtered-p (db)
   "Return T if a filter exists for DB."
