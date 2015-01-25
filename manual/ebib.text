@@ -457,7 +457,7 @@ If you're viewing an entry that has a cross-reference and you want to go to the 
 Note that if you want to use Bib(La)TeX's cross-referencing options, the option "Save Xrefs first" needs to be set (which it is by default). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, cross-referencing will not work reliably.
 
 
-# Selecting Entries #
+# Marking Entries #
 
 Commands in the index buffer generally operate on one single entry, or on all entries. For some commands, however, it may sometimes be useful to perform them on more than one entry, but not necessarily all of them. This can be achieved by selecting entries. You can select the entries you want to perform a command on with the key `m`. This selects (or unselects) the current entry. Selected entries are highlighted. (Note that the face properties of selected entries can be customised through the customisation option "Selected Face".)
 
