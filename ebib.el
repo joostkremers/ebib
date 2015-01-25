@@ -1140,7 +1140,7 @@ for each file anyway."
         (cl-dolist (entry-key (ebib-db-list-keys db 'nosort))
           (let ((entry-files (ebib-db-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
             (if entry-files
-                (cl-dolist (fp (split-string entry-files ebib-filename-separator))
+                (cl-dolist (fp (split-string entry-files (regexp-quote ebib-filename-separator)))
                   (push (locate-file fp ebib-file-search-dirs) all-entry-files))))))
       (add-file-entry filepath)
       (ebib-db-set-current-entry-key t ebib--cur-db)
@@ -2020,7 +2020,7 @@ argument can be used to specify which file to choose."
 FILENAME can also be a string of filenames separated by
 `ebib-filename-separator', in which case the Nth file is
 opened. If N is NIL, the user is asked to enter a number."
-  (let ((files (split-string filename ebib-filename-separator t)))
+  (let ((files (split-string filename (regexp-quote ebib-filename-separator) t)))
     (cond
      ((null (cdr files))                ; there's only one file
       (setq n 1))
