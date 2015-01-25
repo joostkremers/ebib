@@ -2195,7 +2195,8 @@ The user is prompted for the buffer to push the entry into."
   (define-prefix-command 'ebib-keywords-map)
   (suppress-keymap 'ebib-keywords-map 'no-digits)
   (define-key ebib-keywords-map "a" #'ebib-keywords-add)
-  (define-key ebib-keywords-map "s" #'ebib-keywords-save-from-entry))
+  (define-key ebib-keywords-map "s" #'ebib-keywords-save-from-entry)
+  (define-key ebib-keywords-map "S" #'ebib-keywords-save-cur-db))
 
 (defun ebib--completing-read-keywords (collection)
   "Read keywords with completion from COLLECTION.
