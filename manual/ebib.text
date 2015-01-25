@@ -39,7 +39,7 @@ It is recommended to byte-compile the source, Ebib runs quite a lot faster when 
 
     emacs -batch -f batch-byte-compile ebib.el
 
-This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`
+This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`. Do this for every `.el` file in the source.
 
 
 ## Installing the info file ##

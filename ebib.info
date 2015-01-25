@@ -132,7 +132,7 @@ by going into the directory where you put `ebib.el' and typing:
 emacs -batch -f batch-byte-compile ebib.el
 
    This will create a file `ebib.elc', which Emacs will load instead of
-`ebib.el'
+`ebib.el'. Do this for every `.el' file in the source.
 
 
 File: ebib.info,  Node: Installing the info file,  Next: Starting Ebib,  Prev: Manual installation,  Up: Installation
@@ -2855,116 +2855,116 @@ Node: Package manager2286
 Ref: #package-manager2417
 Node: Manual installation2760
 Ref: #manual-installation2932
-Node: Installing the info file4398
-Ref: #installing-the-info-file4578
-Node: Starting Ebib5274
-Ref: #starting-ebib5435
-Node: Upgrading from Ebib 1x6312
-Ref: #upgrading-from-ebib-1.x6460
-Node: Getting Started9416
-Ref: #getting-started9556
-Node: Opening a bib File11772
-Ref: #opening-a-.bib-file11922
-Node: Preloading bib Files13569
-Ref: #preloading-.bib-files13753
-Node: Navigating a bib File14468
-Ref: #navigating-a-.bib-file14659
-Node: Starting a New bib File17906
-Ref: #starting-a-new-.bib-file18072
-Node: Editing the Database18354
-Ref: #editing-the-database18509
-Node: Adding and Deleting Entries18859
-Ref: #adding-and-deleting-entries19036
-Node: Editing Fields Values20750
-Ref: #editing-fields-values20948
-Node: Editing Multiline Values23451
-Ref: #editing-multiline-values23644
-Node: Undefined Fields26057
-Ref: #undefined-fields26226
-Node: Hidden Fields27189
-Ref: #hidden-fields27358
-Node: Copy Cut Paste Yank and Delete28204
-Ref: #copy-cut-paste-yank-and-delete28392
-Node: Saving a Database29289
-Ref: #saving-a-database29437
-Node: Using BibLaTeX30368
-Ref: #using-biblatex30499
-Node: Setting the BibTeX Dialect30826
-Ref: #setting-the-bibtex-dialect30995
-Node: Alias Types and Fields33124
-Ref: #alias-types-and-fields33285
-Node: Searching35282
-Ref: #searching35426
-Node: Simple Searches35468
-Ref: #simple-searches35584
-Node: Filters37456
-Ref: #filters37556
-Node: Simple Selection38508
-Ref: #simple-selection38637
-Node: Complex Filters40260
-Ref: #complex-filters40422
-Node: Storing and Saving Filters44189
-Ref: #storing-and-saving-filters44389
-Node: Properties of Filtered Databases47170
-Ref: #properties-of-filtered-databases47358
-Node: Consulting BibTeX Databases outside Ebib49071
-Ref: #consulting-bibtex-databases-outside-ebib49280
-Node: Key Bindings53553
-Ref: #key-bindings53710
-Node: Defining Citation Commands54457
-Ref: #defining-citation-commands54691
-Node: Associating a Database with a LaTeX File60417
-Ref: #associating-a-database-with-a-latex-file60658
-Node: Cross-referencing63460
-Ref: #cross-referencing63629
-Node: Marking Entries66796
-Ref: #marking-entries66942
-Node: Printing the Database67898
-Ref: #printing-the-database68058
-Node: Calling a Browser71765
-Ref: #calling-a-browser71915
-Node: Viewing Files74446
-Ref: #viewing-files74584
-Node: Editing the file field76767
-Ref: #editing-the-file-field76898
-Node: Window Management78077
-Ref: #window-management78226
-Node: Creating Entry Stubs81261
-Ref: #creating-entry-stubs81423
-Node: @Preamble Definition82406
-Ref: #preamble-definition82570
-Node: @String Definitions84480
-Ref: #string-definitions84631
-Node: @Comments87928
-Ref: #comments88056
-Node: Managing Keywords88397
-Ref: #managing-keywords88542
-Node: Sorting the bib File94306
-Ref: #sorting-the-.bib-file94475
-Node: Merging and Importing97516
-Ref: #merging-and-importing97681
-Node: Exporting Entries99405
-Ref: #exporting-entries99552
-Node: Timestamps101458
-Ref: #timestamps101595
-Node: Multiple Identical Fields103211
-Ref: #multiple-identical-fields103386
-Node: The Multiline Edit Buffer105259
-Ref: #the-multiline-edit-buffer105440
-Node: The Options Menu109406
-Ref: #the-options-menu109560
-Node: The Ebib Buffers110173
-Ref: #the-ebib-buffers110315
-Node: The Index Buffer110655
-Ref: #the-index-buffer110792
-Node: The Entry Buffer116677
-Ref: #the-entry-buffer116841
-Node: The Strings Buffer119104
-Ref: #the-strings-buffer119247
-Node: Customisation120836
-Ref: #customisation120947
-Node: Modifying Key Bindings121835
-Ref: #modifying-key-bindings121962
+Node: Installing the info file4443
+Ref: #installing-the-info-file4623
+Node: Starting Ebib5319
+Ref: #starting-ebib5480
+Node: Upgrading from Ebib 1x6357
+Ref: #upgrading-from-ebib-1.x6505
+Node: Getting Started9461
+Ref: #getting-started9601
+Node: Opening a bib File11817
+Ref: #opening-a-.bib-file11967
+Node: Preloading bib Files13614
+Ref: #preloading-.bib-files13798
+Node: Navigating a bib File14513
+Ref: #navigating-a-.bib-file14704
+Node: Starting a New bib File17951
+Ref: #starting-a-new-.bib-file18117
+Node: Editing the Database18399
+Ref: #editing-the-database18554
+Node: Adding and Deleting Entries18904
+Ref: #adding-and-deleting-entries19081
+Node: Editing Fields Values20795
+Ref: #editing-fields-values20993
+Node: Editing Multiline Values23496
+Ref: #editing-multiline-values23689
+Node: Undefined Fields26102
+Ref: #undefined-fields26271
+Node: Hidden Fields27234
+Ref: #hidden-fields27403
+Node: Copy Cut Paste Yank and Delete28249
+Ref: #copy-cut-paste-yank-and-delete28437
+Node: Saving a Database29334
+Ref: #saving-a-database29482
+Node: Using BibLaTeX30413
+Ref: #using-biblatex30544
+Node: Setting the BibTeX Dialect30871
+Ref: #setting-the-bibtex-dialect31040
+Node: Alias Types and Fields33169
+Ref: #alias-types-and-fields33330
+Node: Searching35327
+Ref: #searching35471
+Node: Simple Searches35513
+Ref: #simple-searches35629
+Node: Filters37501
+Ref: #filters37601
+Node: Simple Selection38553
+Ref: #simple-selection38682
+Node: Complex Filters40305
+Ref: #complex-filters40467
+Node: Storing and Saving Filters44234
+Ref: #storing-and-saving-filters44434
+Node: Properties of Filtered Databases47215
+Ref: #properties-of-filtered-databases47403
+Node: Consulting BibTeX Databases outside Ebib49116
+Ref: #consulting-bibtex-databases-outside-ebib49325
+Node: Key Bindings53598
+Ref: #key-bindings53755
+Node: Defining Citation Commands54502
+Ref: #defining-citation-commands54736
+Node: Associating a Database with a LaTeX File60462
+Ref: #associating-a-database-with-a-latex-file60703
+Node: Cross-referencing63505
+Ref: #cross-referencing63674
+Node: Marking Entries66841
+Ref: #marking-entries66987
+Node: Printing the Database67943
+Ref: #printing-the-database68103
+Node: Calling a Browser71810
+Ref: #calling-a-browser71960
+Node: Viewing Files74491
+Ref: #viewing-files74629
+Node: Editing the file field76812
+Ref: #editing-the-file-field76943
+Node: Window Management78122
+Ref: #window-management78271
+Node: Creating Entry Stubs81306
+Ref: #creating-entry-stubs81468
+Node: @Preamble Definition82451
+Ref: #preamble-definition82615
+Node: @String Definitions84525
+Ref: #string-definitions84676
+Node: @Comments87973
+Ref: #comments88101
+Node: Managing Keywords88442
+Ref: #managing-keywords88587
+Node: Sorting the bib File94351
+Ref: #sorting-the-.bib-file94520
+Node: Merging and Importing97561
+Ref: #merging-and-importing97726
+Node: Exporting Entries99450
+Ref: #exporting-entries99597
+Node: Timestamps101503
+Ref: #timestamps101640
+Node: Multiple Identical Fields103256
+Ref: #multiple-identical-fields103431
+Node: The Multiline Edit Buffer105304
+Ref: #the-multiline-edit-buffer105485
+Node: The Options Menu109451
+Ref: #the-options-menu109605
+Node: The Ebib Buffers110218
+Ref: #the-ebib-buffers110360
+Node: The Index Buffer110700
+Ref: #the-index-buffer110837
+Node: The Entry Buffer116722
+Ref: #the-entry-buffer116886
+Node: The Strings Buffer119149
+Ref: #the-strings-buffer119292
+Node: Customisation120881
+Ref: #customisation120992
+Node: Modifying Key Bindings121880
+Ref: #modifying-key-bindings122007
 
 End Tag Table
 
