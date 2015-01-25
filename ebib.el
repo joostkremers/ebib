@@ -195,6 +195,19 @@ all else fails, pop up a new frame."
       (if (and (cl-equalp field "crossref")
                (not (member (ebib-db-unbrace value) ebib--cur-keys-list)))
           (setq value (propertize value 'face 'error)))
+      (if (cl-equalp field "keywords")
+          (let* ((unbraced (ebib-db-unbraced-p value))
+                 (keywords (ebib--keywords-to-list value))
+                 (new-keywords (ebib--keywords-remove-existing keywords ebib--cur-db))
+                 (new-value (mapconcat (lambda (keyword)
+                                         (if (member-ignore-case keyword new-keywords)
+                                             (propertize keyword 'face 'ebib-nonpermanent-keyword-face)
+                                           keyword))
+                                       keywords
+                                       ebib-keywords-separator)))
+            (setq value (if unbraced
+                            new-value
+                          (ebib-db-brace new-value)))))
       (if (ebib-db-unbraced-p value)
           (setq raw "*")
         (setq value (ebib-db-unbrace value))) ; we have to make the value look nice
@@ -633,6 +646,7 @@ KEY. In this case, COMMAND is meaningless."
     (define-key map "~" #'ebib-filters-logical-not)
     (define-key map ";" #'ebib-warn-prefix)
     (define-key map "?" #'ebib-info)
+    (define-key map "!" #'ebib-generate-autokey)
     (define-key map "a" #'ebib-add-entry)
     (define-key map "A" #'ebib-show-annotation)
     (define-key map "b" #'ebib-index-scroll-down)
@@ -642,7 +656,7 @@ KEY. In this case, COMMAND is meaningless."
     (define-key map "e" #'ebib-edit-entry)
     (define-key map "E" #'ebib-edit-keyname)
     (define-key map "f" #'ebib-view-file)
-    (define-key map "F" #'ebib-filters-map)
+    (define-key map "F" 'ebib-filters-map)
     (define-key map "g" #'ebib-goto-first-entry)
     (define-key map "G" #'ebib-goto-last-entry)
     (define-key map "h" #'ebib-index-help)
@@ -651,7 +665,7 @@ KEY. In this case, COMMAND is meaningless."
     (define-key map "j" #'ebib-next-entry)
     (define-key map "J" #'ebib-switch-to-database)
     (define-key map "k" #'ebib-prev-entry)
-    (define-key map "K" #'ebib-generate-autokey)
+    (define-key map "K" 'ebib-keywords-map)
     (define-key map "l" #'ebib-show-log)
     (define-key map "m" #'ebib-mark-entry) ; prefix
     (define-key map "M" #'ebib-mark-all-entries)
@@ -674,7 +688,7 @@ KEY. In this case, COMMAND is meaningless."
     (define-key map "\C-xb" #'ebib-leave-ebib-windows)
     (define-key map "\C-xk" #'ebib-quit)
     (define-key map "X" #'ebib-export-preamble)
-    (define-key map "y" #'ebib-add-keywords) ; prefix
+    (define-key map "y" #'ebib-keywords-add) ; prefix
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
     map)
@@ -2174,6 +2188,15 @@ The user is prompted for the buffer to push the entry into."
   (ebib-lower)
   (info "(ebib)"))
 
+;; TODO These keyword functions use functions from ebib.el, so we keep them here.
+
+;; The filters keymap
+(eval-and-compile
+  (define-prefix-command 'ebib-keywords-map)
+  (suppress-keymap 'ebib-keywords-map 'no-digits)
+  (define-key ebib-keywords-map "a" #'ebib-keywords-add)
+  (define-key ebib-keywords-map "s" #'ebib-keywords-save-from-entry))
+
 (defun ebib--completing-read-keywords (collection)
   "Read keywords with completion from COLLECTION.
 Return the keywords entered as a list. Any keywords not in
@@ -2189,7 +2212,7 @@ no keywords are entered, the return value is `nil'."
                               (ebib--keywords-add-keyword keyword ebib--cur-db)))
           keywords)))
 
-(defun ebib-add-keywords ()
+(defun ebib-keywords-add ()
   "Add keywords to the current entry."
   (interactive)
   (cl-flet ((add-keywords (entry-key keywords)
@@ -2199,33 +2222,44 @@ no keywords are entered, the return value is `nil'."
                                               keywords)))
                             (ebib-db-set-field-value "keywords"
                                                      (if ebib-keywords-field-keep-sorted
-                                                         (ebib--sort-keywords new-conts)
+                                                         (ebib--keywords-sort new-conts)
                                                        new-conts)
                                                      entry-key ebib--cur-db 'overwrite))))
-    (ebib--execute-when
-      ((entries)
-       (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-              (collection (ebib--keywords-for-database ebib--cur-db))
-              (keywords (ebib--completing-read-keywords collection)))
-         (when keywords
-           (if (ebib-db-marked-entries-p ebib--cur-db)
-               (when (y-or-n-p "Add keywords to all marked entries? ")
-                 (mapc (lambda (entry)
-                         (add-keywords entry (mapconcat #'identity keywords ebib-keywords-separator)))
-                       (ebib-db-list-marked-entries ebib--cur-db 'nosort))
-                 (message "Keywords added to marked entries."))
-             (add-keywords (ebib--cur-entry-key) (mapconcat #'identity keywords ebib-keywords-separator)))
-           (ebib--set-modified t)
-           (ebib--redisplay))))
-      ((default)
-       (beep)))))
+    (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
+           (collection (ebib--keywords-for-database ebib--cur-db))
+           (keywords (ebib--completing-read-keywords collection)))
+      (when keywords
+        (ebib--execute-when
+          ((marked-entries)
+           (when (y-or-n-p "Add keywords to all marked entries? ")
+             (mapc (lambda (entry)
+                     (add-keywords entry (mapconcat #'identity keywords ebib-keywords-separator)))
+                   (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+             (message "Keywords added to marked entries.")
+             (ebib--set-modified t)))
+          ((entries)
+           (add-keywords (ebib--cur-entry-key) (mapconcat #'identity keywords ebib-keywords-separator))
+           (ebib--set-modified t)))
+        (ebib--redisplay)))))
+
+(defun ebib-keywords-save-from-entry ()
+  "Save the keywords in the current entry.
+Check the keywords of the current entry and save those that have
+not been saved yet."
+  (interactive)
+  (let* ((keywords (ebib-db-get-field-value "keywords" (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced))
+         (new-keywords (ebib--keywords-remove-existing (ebib--keywords-to-list keywords) ebib--cur-db)))
+    (mapc (lambda (k)
+            (ebib--keywords-add-keyword k ebib--cur-db))
+          new-keywords))
+  (ebib--redisplay))
 
 (defun ebib-warn-prefix ()
   "Warn that the prefix key is no longer valid."
   (interactive)
   (error "Prefix key `;' is no longer necessary. Cf. Ebib manual."))
 
-;; These filter functions use functions defined in ebib.el, so we keep them here.
+;; TODO These filter functions use functions defined in ebib.el, so we keep them here.
 
 (defun ebib-filters-logical-and (not)
   "Filter the current database.
@@ -2516,14 +2550,7 @@ the beginning of the current line."
         (ebib--set-fields-overlay)
         (ebib--set-modified t))))
 
-(defun ebib--sort-keywords (keywords)
-  "Sort the KEYWORDS string, remove duplicates, and return it as a string."
-  (mapconcat 'identity
-             (sort (delete-dups (split-string keywords ebib-keywords-separator t))
-                   'string<)
-             ebib-keywords-separator))
-
-(defun ebib--edit-keywords ()
+(defun ebib--edit-keywords-field ()
   "Edit the keywords field."
   ;; We shadow the binding of `minibuffer-local-completion-map' so that we
   ;; can unbind <SPC>, since keywords may contain spaces.
@@ -2537,7 +2564,7 @@ the beginning of the current line."
                                     keyword)))
                   (ebib-db-set-field-value "keywords"
                                            (if ebib-keywords-field-keep-sorted
-                                               (ebib--sort-keywords new-conts)
+                                               (ebib--keywords-sort new-conts)
                                              new-conts)
                                            (ebib--cur-entry-key)
                                            ebib--cur-db
@@ -2616,18 +2643,19 @@ With a prefix argument, the `keywords' field and the field in
 prefix argument has no meaning."
   (interactive "p")
   (let* ((field (ebib--current-field))
-         (result
-          (cond
-           ((string= field "=type=") (ebib--edit-entry-type))
-           ((cl-equalp field "crossref") (ebib--edit-crossref))
-           ((and (cl-equalp field "keywords")
-                 (= 1 pfx))
-            (ebib--edit-keywords))
-           ((and (cl-equalp field ebib-file-field)
-                 (= 1 pfx))
-            (ebib--edit-file-field))
-           ((member-ignore-case field '("annote" "annotation")) (ebib-edit-multiline-field))
-           (t (ebib--edit-normal-field)))))
+         (result (cond
+                  ((string= field "=type=") (ebib--edit-entry-type))
+                  ((cl-equalp field "crossref") (ebib--edit-crossref))
+                  ((and (cl-equalp field "keywords")
+                        (= 1 pfx))
+                   (ebib--edit-keywords-field))
+                  ((and (cl-equalp field ebib-file-field)
+                        (= 1 pfx))
+                   (ebib--edit-file-field))
+                  ((member-ignore-case field '("annote" "annotation")) (ebib-edit-multiline-field))
+                  (t (ebib--edit-normal-field)))))
+    ;; move to the next field, but only if if the edit wasn't aborted and
+    ;; the function was called interactively (hence pfx):
     (if (and result pfx)
         (ebib-next-field))))
 

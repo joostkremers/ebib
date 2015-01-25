@@ -645,6 +645,12 @@ Ebib (not Emacs)."
   "Face for field names."
   :group 'ebib-faces)
 
+(defface ebib-nonpermanent-keyword-face '((t (:inherit error)))
+  "Face for keywords that have not been made permanent.
+Keywords can be made permanent by storing them in
+`ebib-keywords-list' or by saving them in a file."
+  :group 'ebib-faces)
+
 ;; generic for all databases
 
 ;; constants and variables that are set only once
