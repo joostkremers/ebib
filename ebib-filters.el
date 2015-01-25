@@ -68,7 +68,7 @@
 ;; The filters keymap
 (eval-and-compile
   (define-prefix-command 'ebib-filters-map)
-  (suppress-keymap 'ebib-filters-map)
+  (suppress-keymap 'ebib-filters-map 'no-digits)
   (define-key ebib-filters-map "&" 'ebib-filters-logical-and)
   (define-key ebib-filters-map "|" 'ebib-filters-logical-or)
   (define-key ebib-filters-map "~" 'ebib-filters-logical-not)
