@@ -135,7 +135,7 @@ Also automatically remove duplicates."
   "Convert STR to a list of keywords.
 STR should be a string containing keywords separated by
 `ebib-keywords-separator'."
-  (split-string str (regexp-opt (list ebib-keywords-separator "{" "}")) t "[[:space:]]"))
+  (split-string str (regexp-quote ebib-keywords-separator) t))
 
 (defun ebib--keywords-sort (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string.
