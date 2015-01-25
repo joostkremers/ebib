@@ -2711,10 +2711,6 @@ File: ebib.info,  Node: The Strings Buffer,  Prev: The Entry Buffer,  Up: The Eb
 `k'
      equivalent to `Up'.
 
-`m'
-     edit the value of the current string as multiline.
-     `(ebib-edit-multiline-string)'
-
 `C-n'
      equivalent to `Down'.
 
@@ -2947,10 +2943,10 @@ Node: The Entry Buffer116024
 Ref: #the-entry-buffer116188
 Node: The Strings Buffer118451
 Ref: #the-strings-buffer118594
-Node: Customisation120280
-Ref: #customisation120391
-Node: Modifying Key Bindings121279
-Ref: #modifying-key-bindings121406
+Node: Customisation120183
+Ref: #customisation120294
+Node: Modifying Key Bindings121182
+Ref: #modifying-key-bindings121309
 
 End Tag Table
 

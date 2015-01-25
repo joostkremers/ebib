@@ -1134,9 +1134,6 @@ Functions not bound to any key:
 `k`
 :    equivalent to `Up`.
 
-`m`
-:    edit the value of the current string as multiline. `(ebib-edit-multiline-string)`
-
 `C-n`
 :    equivalent to `Down`.
 
