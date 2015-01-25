@@ -138,7 +138,8 @@ STR should be a string containing keywords separated by
   (split-string str (regexp-opt (list ebib-keywords-separator "{" "}")) t "[[:space:]]"))
 
 (defun ebib--keywords-sort (keywords)
-  "Sort the KEYWORDS string, remove duplicates, and return it as a string."
+  "Sort the KEYWORDS string, remove duplicates, and return it as a string.
+Note: KEYWORDS should be unbraced."
   (mapconcat 'identity
              (sort (delete-dups (ebib--keywords-to-list keywords))
                    'string<)
