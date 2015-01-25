@@ -1150,12 +1150,10 @@ Functions not bound to any key:
 :    quit the strings buffer and return focus to the index buffer. `(ebib-quit-strings-buffer)`
 
 `x`
-:    export the current `@string` definition to a file or, when used with a prefix argument, to another
-database. `(ebib-export-string)`
+:    export the current `@string` definition to a file or, when used with a prefix argument, to another database. `(ebib-export-string)`
 
 `X`
-:    export all the `@string` definitions to a file or, when used with a prefix argument, to another
-database. `(ebib-export-all-strings)`
+:    export all the `@string` definitions to a file or, when used with a prefix argument, to another database. `(ebib-export-all-strings)`
 
 `C-x b`
 :    equivalent to `q`.
