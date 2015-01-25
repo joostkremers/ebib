@@ -197,7 +197,7 @@ all else fails, pop up a new frame."
           (setq value (propertize value 'face 'error)))
       (if (cl-equalp field "keywords")
           (let* ((unbraced (ebib-db-unbraced-p value))
-                 (keywords (ebib--keywords-to-list value))
+                 (keywords (ebib--keywords-to-list (ebib-db-unbrace value)))
                  (new-keywords (ebib--keywords-remove-existing keywords ebib--cur-db))
                  (new-value (mapconcat (lambda (keyword)
                                          (if (member-ignore-case keyword new-keywords)
