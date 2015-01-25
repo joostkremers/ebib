@@ -2455,7 +2455,8 @@ the beginning of the current line."
   "Move to the last field."
   (interactive)
   (goto-char (point-max))
-  (forward-line -1)                ; The entry buffer's last line is empty.
+  (while (eolp)                 ; move up as long as we're at an empty line
+    (forward-line -1))
   (ebib--set-fields-overlay))
 
 (defun ebib-goto-next-set ()
