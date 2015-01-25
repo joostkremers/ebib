@@ -2,7 +2,7 @@
 
 @c %**start of header
 @setfilename ebib.info
-@settitle Ebib manual v1.12.0
+@settitle Ebib manual
 @c %** end of header
 
 @documentencoding utf-8
