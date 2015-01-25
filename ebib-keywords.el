@@ -135,6 +135,10 @@ Also automatically remove duplicates."
   "Convert STR to a list of keywords.
 STR should be a string containing keywords separated by
 `ebib-keywords-separator'."
+  ;; TODO The strings should really be trimmed. In Emacs 24.4,
+  ;; `split-string' has an additional argument that does this, but that's
+  ;; not available in 24.3. An alternative would be `s-trim' from the `s'
+  ;; library.
   (split-string str (regexp-quote ebib-keywords-separator) t))
 
 (defun ebib--keywords-sort (keywords)
