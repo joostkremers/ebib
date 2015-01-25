@@ -2258,7 +2258,7 @@ not been saved yet."
 (defun ebib-warn-prefix ()
   "Warn that the prefix key is no longer valid."
   (interactive)
-  (error "Prefix key `;' is no longer necessary. Cf. Ebib manual."))
+  (error "Prefix key `;' is no longer necessary. See the Ebib manual, section \"Marking Entries\"."))
 
 ;; TODO These filter functions use functions defined in ebib.el, so we keep them here.
 
