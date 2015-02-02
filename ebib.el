@@ -88,7 +88,7 @@ can be found, return NIL."
     (when window
       (select-window window)
       (with-ebib-window-nondedicated
-       (switch-to-buffer buffer))
+        (switch-to-buffer buffer))
       window)))
 
 (defun ebib--display-buffer-largest-window (buffer _)
