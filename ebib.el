@@ -60,7 +60,7 @@
 (require 'ebib-keywords)
 
 (defun ebib--display-buffer-reuse-window (buffer _)
-  "Display BUFFER in an existing Ebib buffer.
+  "Display BUFFER in an existing Ebib window.
 If BUFFER is the index buffer, simply switch to the window
 displaying it. (This function should not be called if there is a
 chance the index buffer is not visible.) For any other buffer,
