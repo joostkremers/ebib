@@ -2748,26 +2748,30 @@ The deleted text is not put in the kill ring."
         (message "Field contents deleted.")))))
 
 (defun ebib-toggle-raw ()
-  "Toggle the raw status of the current field contents."
+  "Toggle the \"special\" status of the current field contents."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref" "keywords"))
       (let ((contents (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
-        (unless contents                ; If there is no value,
-          (ebib-edit-field) ; the user can enter one, which we must then store unbraced.
-          (setq contents (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
-        (when contents ; We must check to make sure the user entered some value.
-          (ebib-db-set-field-value field contents (ebib--cur-entry-key) ebib--cur-db 'overwrite (not (ebib-db-unbraced-p contents)))
-          (ebib--redisplay-current-field)
-          (ebib--set-modified t))))))
+        (if (ebib--multiline-p contents) ; multiline fields cannot be special
+            (beep)
+          (unless contents              ; If there is no value,
+            (ebib-edit-field) ; the user can enter one, which we must then store unbraced.
+            (setq contents (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
+          (when contents ; We must check to make sure the user entered some value.
+            (ebib-db-set-field-value field contents (ebib--cur-entry-key) ebib--cur-db 'overwrite (not (ebib-db-unbraced-p contents)))
+            (ebib--redisplay-current-field)
+            (ebib--set-modified t)))))))
 
 (defun ebib-edit-multiline-field ()
   "Edit the current field in multiline-mode."
   (interactive)
   (let ((field (ebib--current-field)))
-    (unless (member-ignore-case field '("=type=" "crossref"))
-      (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field)
-                            (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))))
+    (unless (ebib-db-unbraced-p text)
+      (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
+        (if (ebib-db-unbraced-p text) ; unbraced fields cannot be multiline
+            (beep)
+          (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field) text))))))
 
 (defun ebib-insert-abbreviation ()
   "Insert an abbreviation from the ones defined in the database."
