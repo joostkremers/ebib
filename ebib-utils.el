@@ -695,9 +695,7 @@ Keywords can be made permanent by storing them in
 (defvar ebib--search-string nil "Stores the last search string.")
 (defvar ebib--multiline-info nil "Stores the entry and field being edited.")
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
-(defvar ebib--local-bibtex-filenames nil
-  "A buffer-local variable holding a list of the name(s) of that buffer's .bib file(s)")
-(make-variable-buffer-local 'ebib--local-bibtex-filenames)
+(defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
 (put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (--remove (stringp it) v))))
 
 ;; The databases
