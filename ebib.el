@@ -2767,7 +2767,7 @@ The deleted text is not put in the kill ring."
   "Edit the current field in multiline-mode."
   (interactive)
   (let ((field (ebib--current-field)))
-    (unless (ebib-db-unbraced-p text)
+    (unless (member-ignore-case field '("=type=" "crossref"))
       (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
         (if (ebib-db-unbraced-p text) ; unbraced fields cannot be multiline
             (beep)
