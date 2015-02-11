@@ -2766,12 +2766,8 @@ The deleted text is not put in the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref"))
-      (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
-        (if (ebib-db-unbraced-p text)
-            (setq ebib--multiline-unbraced t)
-          (setq text (ebib-db-unbrace text))
-          (setq ebib--multiline-unbraced nil))
-        (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field) text)))))
+      (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field)
+                            (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))))
 
 (defun ebib-insert-abbreviation ()
   "Insert an abbreviation from the ones defined in the database."
@@ -3137,7 +3133,7 @@ The text being edited is stored before saving the database."
             (field (cl-fourth ebib--multiline-info)))
         (if (string= text "")
             (ebib-db-remove-field-value field key db)
-          (ebib-db-set-field-value field text key db 'overwrite ebib--multiline-unbraced))))))
+          (ebib-db-set-field-value field text key db 'overwrite))))))
   (ebib--set-modified t))
 
 (defun ebib-multiline-help ()
