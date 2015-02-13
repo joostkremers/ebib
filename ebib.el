@@ -3060,10 +3060,10 @@ to append them to."
 
 (easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu"
   '("Ebib"
-    ["Store Text and Exit" ebib--quit-multiline-edit-and-save t]
-    ["Cancel Edit" ebib--cancel-multiline-edit t]
-    ["Save Text" ebib--save-from-multiline-edit t]
-    ["Help" ebib--multiline-help t]))
+    ["Store Text and Exit" ebib-quit-multiline-edit-and-save t]
+    ["Cancel Edit" ebib-cancel-multiline-edit t]
+    ["Save Text" ebib-save-from-multiline-edit t]
+    ["Help" ebib-multiline-help t]))
 
 (easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
