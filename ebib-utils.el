@@ -168,7 +168,7 @@ can use just the right part of the frame (the width can be
 specified with the option `ebib-width'). A third option is to
 display only the index window upon startup. The entry buffer will
 be displayed when you edit an entry of if you press
-\\[ebib--select-and-popup-entry]."
+\\[ebib-select-and-popup-entry]."
   :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
                  (const :tag "Use right part of the frame" custom)
