@@ -74,21 +74,18 @@ can be found, return NIL."
       (setq window (get-buffer-window buffer)))
      ;; if ebib-layout isn't full, the multiline buffer should not be
      ;; displayed in an Ebib buffer.
-     ((and (eq buffer (ebib--buffer 'multiline))
+     ((and (memq buffer ebib--multiline-buffer-list)
            (not (eq ebib-layout 'full)))
       (setq window nil))
-     (t (let ((buffers (delq nil (mapcar (lambda (bf)
-                                           (unless (eq (car bf) 'index)
-                                             (cdr bf)))
-                                         ebib--buffer-alist))))
-          (while (and buffers
-                      (not (get-buffer-window (car buffers))))
-            (setq buffers (cdr buffers)))
-          (setq window (get-buffer-window (car buffers))))))
+     ;; find a buffer other than the index buffer that's being displayed
+     (t (setq window (let ((b (cdr (--find (and (not (eq (car it) 'index))
+                                                (get-buffer-window (cdr it)))
+                                           ebib--buffer-alist))))
+                       (if b (get-buffer-window b))))))
     (when window
       (select-window window)
       (with-ebib-window-nondedicated
-        (switch-to-buffer buffer))
+        (switch-to-buffer buffer t))
       window)))
 
 (defun ebib--display-buffer-largest-window (buffer _)
@@ -101,26 +98,21 @@ can be found, return NIL."
 
 (defun ebib--pop-to-buffer (buffer)
   "Select or create a window to display BUFFER and display it.
-BUFFER is a symbol indicating the buffer to switch to. It can be
-'index, 'entry, 'strings, 'log or 'multiline.
-
-If BUFFER is 'index, switch to the index window or signal an
-error if there is no window displaying the index buffer.
-
-For any other buffer, if there is a visible Ebib buffer other
-than the index buffer, switch to its window and display BUFFER.
-If there is no Ebib window, use the largest non-dedicated window
-or, if `ebib-layout' is set to `popup', pop up a new window. If
-all else fails, pop up a new frame."
-  (if (or (not (eq buffer 'index))
-          (get-buffer-window (ebib--buffer 'index)))
-      (pop-to-buffer (cdr (assq buffer ebib--buffer-alist))
-                     '((ebib--display-buffer-reuse-window
-                        ebib--display-buffer-largest-window
-                        display-buffer-pop-up-window
-                        display-buffer-pop-up-frame))
-                     t)
-    (error "Ebib is lowered. Use `M-x ebib' to restart")))
+If the index buffer isn't visible, this function does nothing.
+Otherwise, if BUFFER is the index buffer, simply switch to its
+window. For any other buffer, if there is a visible Ebib buffer
+other than the index buffer, switch to its window and display
+BUFFER. If there is no Ebib window, use the largest non-dedicated
+window or, if `ebib-layout' is set to `index-only', pop up a new
+window. If all else fails, pop up a new frame."
+  ;; if the index buffer isn't visible, do nothing.
+  (unless (not (get-buffer-window (ebib--buffer 'index)))
+    (pop-to-buffer buffer
+                   '((ebib--display-buffer-reuse-window
+                      ebib--display-buffer-largest-window
+                      display-buffer-pop-up-window
+                      display-buffer-pop-up-frame))
+                   t)))
 
 (defun ebib--display-entry-key (entry-key)
   "Display ENTRY-KEY in the index buffer at POINT."
@@ -479,6 +471,7 @@ the buffers, reads the rc file and loads the files in
   (setq ebib--fields-overlay (ebib--make-overlay 1 1 (ebib--buffer 'entry)))
   (setq ebib--strings-overlay (ebib--make-overlay 1 1 (ebib--buffer 'strings)))
   (add-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
+  (add-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
   (load ebib-rc-file 'noerror)
   (if ebib-preload-bib-files
       (mapc (lambda (file)
@@ -518,14 +511,7 @@ the buffers, reads the rc file and loads the files in
 
 (defun ebib--create-buffers ()
   "Create the buffers for Ebib."
-  ;; First we create a buffer for multiline editing. This one does *not*
-  ;; have a name beginning with a space, because undo-info is normally
-  ;; present in an edit buffer.
-  (add-to-list 'ebib--buffer-alist (cons 'multiline (get-buffer-create "*Ebib-edit*")))
-  (with-current-ebib-buffer 'multiline
-    (funcall ebib-multiline-major-mode)
-    (ebib-multiline-mode t))
-  ;; Then we create a buffer to hold the fields of the current entry.
+  ;; First we create a buffer to hold the fields of the current entry.
   (add-to-list 'ebib--buffer-alist (cons 'entry (get-buffer-create "*Ebib-entry*")))
   (with-current-ebib-buffer 'entry
     (ebib-entry-mode)
@@ -554,17 +540,21 @@ the buffers, reads the rc file and loads the files in
   "Quit Ebib.
 The Ebib buffers are killed, all variables except the keymaps are set to nil."
   (interactive)
+  ;; kill any multiline buffers first. this will ask for confirmation if
+  ;; any of them haven't been saved yet.
+  (mapc #'kill-buffer ebib--multiline-buffer-list)
   (when (if (ebib--modified-p)
             (yes-or-no-p "There are modified databases. Quit anyway? ")
           (y-or-n-p "Quit Ebib? "))
     (ebib-keywords-save-all-new)
     (ebib--filters-update-filters-file)
-    (mapc (lambda (buffer)
-            (kill-buffer buffer))
-          (mapcar #'cdr ebib--buffer-alist))
+    (mapc (lambda (x)
+            (kill-buffer (cdr x)))
+          ebib--buffer-alist)
     (setq ebib--databases nil
           ebib--cur-db nil
           ebib--buffer-alist nil
+          ebib--multiline-buffer-list nil
           ebib--initialized nil
           ebib--index-overlay nil
           ebib--fields-overlay nil
@@ -579,6 +569,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
           ebib--filters-modified nil)
     (set-window-configuration ebib--saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
+    (remove-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
     (message "")))
 
 (defun ebib--kill-emacs-query-function ()
@@ -592,6 +583,13 @@ keywords before Emacs is killed."
                   t)
               (yes-or-no-p "Ebib holds modified databases. Kill anyway? ")))
     (ebib-keywords-save-all-new)
+    t))
+
+(defun ebib--kill-multiline-query-function ()
+  "Function to call when killing a multiline edit buffer."
+  (if (and ebib-multiline-mode
+           (buffer-modified-p))
+      (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway " (buffer-name)))
     t))
 
 ;;;;;;;;;;;;;;;;
@@ -622,9 +620,9 @@ KEY. In this case, COMMAND is meaningless."
        (define-key ebib-multiline-mode-map "\C-c" nil)
        (mapc (lambda (command)
                (define-key ebib-multiline-mode-map (format "\C-c%s%c" ,key (car command)) (cdr command)))
-             '((?q . ebib-quit-multiline-edit-and-save)
-               (?c . ebib-cancel-multiline-edit)
-               (?s . ebib-save-from-multiline-edit)))
+             '((?q . ebib-quit-multiline-buffer-and-save)
+               (?c . ebib-cancel-multiline-buffer)
+               (?s . ebib-save-from-multiline-buffer)))
        (setq ebib--multiline-key (string-to-char ,key))))))
 
 (defvar ebib-index-mode-map
@@ -1214,10 +1212,6 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
                  (list (list (ebib--buffer 'entry) ebib--fields-overlay)
                        (list (ebib--buffer 'index) ebib--index-overlay)
                        (list (ebib--buffer 'strings) ebib--strings-overlay)))
-           ;; multiline edit buffer
-           (with-current-ebib-buffer 'multiline
-             (with-ebib-buffer-writable
-               (erase-buffer)))
            (with-current-ebib-buffer 'index
              (rename-buffer " none"))
            (setq ebib--cur-keys-list nil))
@@ -1260,8 +1254,8 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
      (beep))))
 
 (defun ebib--edit-entry-internal ()
-  "Helper function for `ebib--edit-entry'."
-  (ebib--pop-to-buffer 'entry)
+  "Helper function for `ebib-edit-entry'."
+  (ebib--pop-to-buffer (ebib--buffer 'entry))
   (ebib--set-fields-overlay))
 
 (defun ebib-edit-keyname ()
@@ -1600,8 +1594,8 @@ buffer and switch to it."
      (when (eq ebib-layout 'index-only)
        ;; this makes the entry buffer visible but then switches to the
        ;; index buffer again.
-       (ebib--pop-to-buffer 'entry)
-       (ebib--pop-to-buffer 'index)))
+       (ebib--pop-to-buffer (ebib--buffer 'entry))
+       (ebib--pop-to-buffer (ebib--buffer 'index))))
     ((default)
      (beep))))
 
@@ -1788,7 +1782,7 @@ result."
   (ebib--execute-when
     ((real-db)
      (ebib--fill-strings-buffer)
-     (ebib--pop-to-buffer 'strings)
+     (ebib--pop-to-buffer (ebib--buffer 'strings))
      (goto-char (point-min)))
     ((default)
      (beep))))
@@ -1798,7 +1792,7 @@ result."
   (interactive)
   (ebib--execute-when
     ((real-db)
-     (ebib--multiline-edit (list 'preamble ebib--cur-db) (ebib-db-get-preamble ebib--cur-db)))
+     (ebib--multiline-edit (list 'preamble (ebib-db-get-filename ebib--cur-db)) (ebib-db-get-preamble ebib--cur-db)))
     ((default)
      (beep))))
 
@@ -2070,7 +2064,7 @@ is used)."
 (defun ebib-show-log ()
   "Display the contents of the log buffer."
   (interactive)
-  (ebib--pop-to-buffer 'log))
+  (ebib--pop-to-buffer (ebib--buffer 'log)))
 
 (defun ebib--create-citation-command (format-string &optional key)
   "Create a citation command using FORMAT-STRING.
@@ -2436,7 +2430,7 @@ If the key of the current entry matches the pattern
     (delete-window))
    ((eq ebib-layout 'index-only)
     (switch-to-buffer nil t)))
-  (ebib--pop-to-buffer 'index)
+  (ebib--pop-to-buffer (ebib--buffer 'index))
   (delete-overlay ebib--fields-overlay)
   ;; (select-window (get-buffer-window (ebib--buffer 'index)))
   (if (string-match "<new-entry[0-9]+>" (ebib--cur-entry-key))
@@ -2644,6 +2638,8 @@ With a prefix argument, the `keywords' field and the field in
 prefix argument has no meaning."
   (interactive "p")
   (let* ((field (ebib--current-field))
+         ;; we save the result of editing the field, so we can move to the
+         ;; next field if necessary.
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
                   ((cl-equalp field "crossref") (ebib--edit-crossref))
@@ -2653,7 +2649,15 @@ prefix argument has no meaning."
                   ((and (cl-equalp field ebib-file-field)
                         (= 1 pfx))
                    (ebib--edit-file-field))
-                  ((member-ignore-case field '("annote" "annotation")) (ebib-edit-multiline-field))
+                  ((member-ignore-case field '("annote" "annotation"))
+                   ;; a multiline edit differs from the other ones, because
+                   ;; the edit isn't done when `ebib-edit-multiline-field'
+                   ;; returns. this means we cannot move to the next field.
+                   ;; (in fact, the entry buffer isn't even displayed at
+                   ;; this point.) for this reason, we return `nil', so
+                   ;; `ebib-next-field' below isn't called.
+                   (ebib-edit-multiline-field)
+                   nil)
                   (t (ebib--edit-normal-field)))))
     ;; move to the next field, but only if if the edit wasn't aborted and
     ;; the function was called interactively (hence pfx):
@@ -2768,10 +2772,10 @@ The deleted text is not put in the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref"))
-      (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
+      (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
         (if (ebib-db-unbraced-p text) ; unbraced fields cannot be multiline
             (beep)
-          (ebib--multiline-edit (list 'fields ebib--cur-db (ebib--cur-entry-key) field) text))))))
+          (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--cur-entry-key) field) (ebib-db-unbrace text)))))))
 
 (defun ebib-insert-abbreviation ()
   "Insert an abbreviation from the ones defined in the database."
@@ -2836,8 +2840,7 @@ The deleted text is not put in the kill ring."
     (define-key map "G" 'ebib-goto-last-string)
     (define-key map "h" 'ebib-strings-help)
     (define-key map "j" 'ebib-next-string)
-    (define-key map "k" 'ebib-prev-string)
-    (define-key map "m" 'ebib-edit-multiline-string)
+    (define-key map "k" 'ebib-prev-string) 
     (define-key map [(control n)] 'ebib-next-string)
     (define-key map [(meta n)] 'ebib-strings-page-down)
     (define-key map [(control p)] 'ebib-prev-string)
@@ -2866,7 +2869,7 @@ The deleted text is not put in the kill ring."
       (delete-window)
     (with-ebib-window-nondedicated
       (switch-to-buffer nil t)))
-  (ebib--pop-to-buffer 'index))
+  (ebib--pop-to-buffer (ebib--buffer 'index)))
 
 (defun ebib--current-string ()
   "Return the currently selected string.
@@ -3052,92 +3055,139 @@ to append them to."
 
 (define-minor-mode ebib-multiline-mode
   "Minor mode for Ebib's multiline edit buffer."
-  :init-value nil :lighter nil :global nil
-  :keymap '(("\C-c|q" . ebib-quit-multiline-edit-and-save)
-            ("\C-c|c" . ebib-cancel-multiline-edit)
-            ("\C-c|s" . ebib-save-from-multiline-edit)
+  :init-value nil :lighter " Ebib/M" :global nil
+  :keymap '(("\C-c|q" . ebib-quit-multiline-buffer-and-save)
+            ("\C-c|c" . ebib-cancel-multiline-buffer)
+            ("\C-c|s" . ebib-save-from-multiline-buffer)
             ("\C-c|h" . ebib-multiline-help)))
 
 (easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu"
   '("Ebib"
-    ["Store Text and Exit" ebib-quit-multiline-edit-and-save t]
-    ["Cancel Edit" ebib-cancel-multiline-edit t]
-    ["Save Text" ebib-save-from-multiline-edit t]
+    ["Store Text and Exit" ebib-quit-multiline-buffer-and-save t]
+    ["Cancel Edit" ebib-cancel-multiline-buffer t]
+    ["Save Text" ebib-save-from-multiline-buffer t]
     ["Help" ebib-multiline-help t]))
 
 (easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
 (defun ebib--multiline-edit (info &optional starttext)
-  "Switch to Ebib's multiline edit buffer.
-STARTTEXT is a string that contains the initial text of the buffer."
-  (ebib--pop-to-buffer 'multiline)
-  (erase-buffer)
-  (setq ebib--multiline-info info)
-  (when starttext
-    (insert starttext)
-    (goto-char (point-min)))
-  (set-buffer-modified-p nil))
+  "Edit a multiline text.
+STARTTEXT is a string that contains the initial text of the
+buffer. INFO contains information about the text being edited. It
+is a list, the first element of which indicates the type of text,
+either `preamble' or `field', and the second element the
+database. If the text being edited is a field value, the third
+element is the entry key and the fourth the field name of the
+field being edited.
 
-(defun ebib-quit-multiline-edit-and-save ()
+If the preamble or field value pointed to by INFO already has a
+multiline edit buffer associated with it, switch to that buffer.
+Otherwise, create a new buffer and add it to
+`ebib--multiline-buffer-list'."
+  (ebib--pop-to-buffer (or (ebib--get-multiline-buffer info)
+                           (ebib--create-multiline-buffer info starttext))))
+
+(defun ebib--get-multiline-buffer (info)
+  "Return the multiline edit buffer associated with INFO."
+  (car (cl-member info ebib--multiline-buffer-list
+                  :test (lambda (buffer)
+                          (cl-equalp (buffer-local-value 'ebib--multiline-info buffer) info)))))
+
+(defun ebib--create-multiline-buffer (info starttext)
+  "Create a new multiline edit buffer.
+INFO indicates what value will be edited and is stored in the
+buffer-local value of `ebib--multiline-info'. STARTTEXT is
+inserted as initial text."
+  (let* ((name (if (eq (car info) 'preamble)
+                   "Preamble"
+                 (format "%s-->%s" (cl-third info) (cl-fourth info))))
+         (buffer (generate-new-buffer name)))
+    (if buffer
+        (with-current-buffer buffer
+          (funcall ebib-multiline-major-mode)
+          (ebib-multiline-mode t)
+          (setq ebib--multiline-info info)
+          (when starttext
+            (insert starttext))
+          (set-buffer-modified-p nil)
+          (goto-char (point-min))
+          (push buffer ebib--multiline-buffer-list)
+          buffer)
+      (error "Unable to create a new multiline edit buffer"))))
+
+(defun ebib-quit-multiline-buffer-and-save ()
   "Quit the multiline edit buffer, saving the text."
   (interactive)
-  (ebib--store-multiline-text)
-  (ebib--leave-multiline-edit-buffer)
+  (ebib--store-multiline-text (current-buffer))
+  (ebib--kill-multiline-edit-buffer (current-buffer))
   (message "Text stored."))
 
-(defun ebib-cancel-multiline-edit ()
-  "Quit the multiline edit buffer and discards the changes."
+(defun ebib-cancel-multiline-buffer ()
+  "Quit the multiline edit buffer and discard the changes.
+If the buffer has been modified, ask for confirmation."
   (interactive)
   (catch 'no-cancel
     (when (buffer-modified-p)
       (unless (y-or-n-p "Text has been modified. Abandon changes? ")
         (throw 'no-cancel nil)))
-    (ebib--leave-multiline-edit-buffer)))
+    (ebib--kill-multiline-edit-buffer (current-buffer))
+    (message "Text not stored.")))
 
-(defun ebib--leave-multiline-edit-buffer ()
-  "Leave the multiline edit buffer.
-Restores the previous buffer in the window that the multiline
-edit buffer was shown in."
-  (if (and (eq ebib-layout 'index-only)
-           ebib-popup-entry-window)
-      (delete-window)
-    (switch-to-buffer nil t))
-  (cond
-   ((eq (car ebib--multiline-info) 'preamble)
-    (ebib--pop-to-buffer 'index))
-   ((eq (car ebib--multiline-info) 'fields)
-    ;; make sure we display the correct entry & field
-    (setq ebib--cur-db (cl-second ebib--multiline-info))
-    (ebib-db-set-current-entry-key (cl-third ebib--multiline-info) ebib--cur-db 'first)
-    (ebib--redisplay)
-    (ebib--pop-to-buffer 'entry)
-    (re-search-forward (concat "^" (regexp-quote (cl-fourth ebib--multiline-info))) nil t)
-    (ebib--set-fields-overlay))))
+(defun ebib--kill-multiline-edit-buffer (buffer)
+  "Kill multiline edit buffer BUFFER.
+Also return focus to the index or entry buffer."
+  (with-current-buffer buffer
+    (setq ebib--multiline-buffer-list (delq buffer ebib--multiline-buffer-list))
+    (let ((info (buffer-local-value 'ebib--multiline-info buffer)))
+      ;; put the buffer out of sight
+      (if (and (eq ebib-layout 'index-only)
+               ebib-popup-entry-window)
+          (delete-window)
+        (switch-to-buffer nil t))
+      ;; return to the index or entry window
+      (cond
+       ((eq (car info) 'preamble)
+        (ebib--pop-to-buffer (ebib--buffer 'index)))
+       ((eq (car info) 'field)
+        ;; make sure we display the correct entry & field
+        (setq ebib--cur-db (ebib--get-db-from-filename (cl-second info)))
+        (ebib-db-set-current-entry-key (cl-third info) ebib--cur-db 'first)
+        (ebib--redisplay)
+        (ebib--pop-to-buffer (ebib--buffer 'entry))
+        (re-search-forward (concat "^" (regexp-quote (cl-fourth info))) nil t)
+        (ebib--set-fields-overlay))))
+    ;; finally, kill the buffer. this calls the functions in
+    ;; `kill-buffer-query-functions', so we must mark the buffer unmodified
+    ;; in case the user wants to abandon any changes.
+    (set-buffer-modified-p nil))
+  (kill-buffer buffer))
 
-(defun ebib-save-from-multiline-edit ()
+(defun ebib-save-from-multiline-buffer ()
   "Save the database from within the multiline edit buffer.
 The text being edited is stored before saving the database."
   (interactive)
-  (ebib--store-multiline-text)
+  (ebib--store-multiline-text (current-buffer))
   (ebib--save-database ebib--cur-db)
   (set-buffer-modified-p nil))
 
-(defun ebib--store-multiline-text ()
-  "Store the text being edited in the multiline edit buffer."
-  (let ((text (buffer-substring-no-properties (point-min) (point-max)))
-        (type (cl-first ebib--multiline-info))
-        (db (cl-second ebib--multiline-info)))
-    (cond
-     ((eq type 'preamble)
-      (if (string= text "")
-          (ebib-db-remove-preamble db)
-        (ebib-db-set-preamble text db 'overwrite)))
-     ((eq type 'fields)
-      (let ((key (cl-third ebib--multiline-info))
-            (field (cl-fourth ebib--multiline-info)))
+(defun ebib--store-multiline-text (buffer)
+  "Store the text being edited in multiline edit buffer BUFFER."
+  (with-current-buffer buffer
+    (let ((text (buffer-substring-no-properties (point-min) (point-max)))
+          (type (cl-first ebib--multiline-info))
+          (db (ebib--get-db-from-filename (cl-second ebib--multiline-info))))
+      (cond
+       ((eq type 'preamble)
         (if (string= text "")
-            (ebib-db-remove-field-value field key db)
-          (ebib-db-set-field-value field text key db 'overwrite))))))
+            (ebib-db-remove-preamble db)
+          (ebib-db-set-preamble text db 'overwrite)))
+       ((eq type 'field)
+        (let ((key (cl-third ebib--multiline-info))
+              (field (cl-fourth ebib--multiline-info)))
+          (if (string= text "")
+              (ebib-db-remove-field-value field key db)
+            (ebib-db-set-field-value field text key db 'overwrite)))))
+      (set-buffer-modified-p nil)))
   (ebib--set-modified t))
 
 (defun ebib-multiline-help ()
@@ -3174,7 +3224,7 @@ The text being edited is stored before saving the database."
       (delete-window)
     (with-ebib-window-nondedicated
       (switch-to-buffer nil t)))
-  (ebib--pop-to-buffer 'index))
+  (ebib--pop-to-buffer (ebib--buffer 'index)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functions for non-Ebib buffers ;;
@@ -3294,25 +3344,25 @@ the current database if there is no \\bibliography command. Tab
 completion works."
   (interactive)
   (ebib--execute-when
-   ((database)
-    (let ((collection (ebib--create-collection-from-db)))
-      (when collection
-        (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
-               (format-list (or (cadr (assq (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
-                                (cadr (assq 'any ebib-citation-commands))))
-               (citation-command
-                (ebib--ifstring (format-string (cadr (assoc
-                                                      (completing-read "Command to use: " format-list nil nil nil 'ebib--cite-command-history)
-                                                      format-list)))
-                                (cl-multiple-value-bind (before repeater _ after) (ebib--split-citation-string format-string)
-                                  (concat (ebib--create-citation-command before)
-                                          (ebib--create-citation-command repeater key)
-                                          (ebib--create-citation-command after)))
-                                key))) ; if the user didn't provide a command, we insert just the entry key
-          (when citation-command
-            (insert (format "%s" citation-command)))))))
-   ((default)
-    (error "No database loaded"))))
+    ((database)
+     (let ((collection (ebib--create-collection-from-db)))
+       (when collection
+         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
+                (format-list (or (cadr (assq (buffer-local-value 'major-mode (current-buffer)) ebib-citation-commands))
+                                 (cadr (assq 'any ebib-citation-commands))))
+                (citation-command
+                 (ebib--ifstring (format-string (cadr (assoc
+                                                       (completing-read "Command to use: " format-list nil nil nil 'ebib--cite-command-history)
+                                                       format-list)))
+                     (cl-multiple-value-bind (before repeater _ after) (ebib--split-citation-string format-string)
+                       (concat (ebib--create-citation-command before)
+                               (ebib--create-citation-command repeater key)
+                               (ebib--create-citation-command after)))
+                   key))) ; if the user didn't provide a command, we insert just the entry key
+           (when citation-command
+             (insert (format "%s" citation-command)))))))
+    ((default)
+     (error "No database loaded"))))
 
 (defun ebib-create-bib-from-bbl ()
   "Create a .bib file for the current LaTeX document.

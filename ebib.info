@@ -2205,13 +2205,13 @@ can also be deleted by hitting `x' or `d' on them in the entry buffer.)
 If you were editing a `@string' value, Ebib will just complain, because
 string definitions cannot be empty.
 
-   `ebib-cancel-multiline-edit', bound to `C-c | c', also leaves the
+   `ebib-cancel-multiline-buffer', bound to `C-c | c', also leaves the
 multiline edit buffer, but it does so without storing the text. The
 original value of the field, string or preamble will be retained. If
 the text was modified, Ebib will ask for a confirmation before leaving
 the buffer.
 
-   `ebib-save-from-multiline-edit', bound to `C-c | s', can be used in
+   `ebib-save-from-multiline-buffer', bound to `C-c | s', can be used in
 the multiline edit buffer to save the database. This command first
 stores the text in the database and then saves it. Because Ebib does
 not do an autosave of the current database, it is advisable to save the
@@ -2238,9 +2238,9 @@ your `~/.emacs':
      (define-key ebib-multiline-mode-map
                  "\C-c\C-c" 'ebib-quit-multiline-edit)
      (define-key ebib-multiline-mode-map
-                 "\C-c\C-q" 'ebib-cancel-multiline-edit)
+                 "\C-c\C-q" 'ebib-cancel-multiline-buffer)
      (define-key ebib-multiline-mode-map
-                 "\C-c\C-s" 'ebib-save-from-multiline-edit)))
+                 "\C-c\C-s" 'ebib-save-from-multiline-buffer)))
 
    This sets up `C-c C-c', `C-c C-q' and `C-c C-s' for use in the
 multiline edit buffer. Since such key combinations are restricted for
@@ -2835,11 +2835,11 @@ of the multiline edit buffer:
 something like the following code in `~/.emacs.d/ebibrc':
 
 (define-key ebib-multiline-mode-map
-            "\C-c\C-c" 'ebib-quit-multiline-edit)
+            "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
 (define-key ebib-multiline-mode-map
-            "\C-c\C-q" 'ebib-cancel-multiline-edit)
+            "\C-c\C-q" 'ebib-cancel-multiline-buffer)
 (define-key ebib-multiline-mode-map
-            "\C-c\C-s" 'ebib-save-from-multiline-edit)
+            "\C-c\C-s" 'ebib-save-from-multiline-buffer)
 
    This will bind the relevant commands to `C-c C-c', `C-c C-q' and C-c
 C-s`, which are of course more convenient than the standard key
