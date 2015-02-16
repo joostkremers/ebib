@@ -590,7 +590,7 @@ keywords before Emacs is killed."
   "Function to call when killing a multiline edit buffer."
   (if (and ebib-multiline-mode
            (buffer-modified-p))
-      (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway " (buffer-name)))
+      (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
     t))
 
 ;;;;;;;;;;;;;;;;
@@ -821,7 +821,7 @@ Note: it is assumed that FILE is a fully expanded filename."
   (interactive)
   (ebib--execute-when
     ((entries)
-     (when (yes-or-no-p "Reload current database from file ")
+     (when (yes-or-no-p "Reload current database from file? ")
        (ebib--reload-database ebib--cur-db)
        (ebib--set-modified nil)
        (ebib--redisplay)
@@ -831,7 +831,7 @@ Note: it is assumed that FILE is a fully expanded filename."
 (defun ebib-reload-all-databases ()
   "Reload all databases from disk."
   (interactive)
-  (when (yes-or-no-p "Reload all databases from file ")
+  (when (yes-or-no-p "Reload all databases from file? ")
     (mapc (lambda (db)
             (ebib--reload-database db)
             (ebib--set-modified nil db))
@@ -1455,7 +1455,7 @@ the filter are saved. The original file is not deleted."
     ((database)
      (ebib--ifstring (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
          (when (or (not (file-exists-p new-filename))
-                   (y-or-n-p (format (format "File %s already exists; overwrite " new-filename))))
+                   (y-or-n-p (format (format "File %s already exists; overwrite? " new-filename))))
            (with-temp-buffer
              (ebib--format-database-as-bibtex ebib--cur-db)
              (write-region (point-min) (point-max) new-filename nil nil nil))
@@ -2841,7 +2841,7 @@ The deleted text is not put in the kill ring."
     (define-key map "G" 'ebib-goto-last-string)
     (define-key map "h" 'ebib-strings-help)
     (define-key map "j" 'ebib-next-string)
-    (define-key map "k" 'ebib-prev-string) 
+    (define-key map "k" 'ebib-prev-string)
     (define-key map [(control n)] 'ebib-next-string)
     (define-key map [(meta n)] 'ebib-strings-page-down)
     (define-key map [(control p)] 'ebib-prev-string)
