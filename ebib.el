@@ -574,7 +574,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
     (message "")))
 
 (defun ebib--kill-emacs-query-function ()
-  "Funktion to run if Emacs is killed.
+  "Function to run if Emacs is killed.
 Ask if the user wants to save any modified databases and added
 keywords before Emacs is killed."
   (when (or (not (ebib--modified-p))
