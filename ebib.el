@@ -1192,30 +1192,30 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
   (interactive)
   (ebib--execute-when
     ((database)
-     (when (if (ebib-db-modified-p ebib--cur-db)
-               (yes-or-no-p "Database modified. Close it anyway? ")
-             (y-or-n-p "Close database? "))
+     (catch 'return
+       (unless (if (ebib-db-modified-p ebib--cur-db)
+                   (yes-or-no-p "Database modified. Close it anyway? ")
+                 (y-or-n-p "Close database? "))
+         (throw 'return nil))
+
+       ;; kill associated multiline edit buffers. this asks for
+       ;; confirmation if there are unsaved modifications.
+       (mapc (lambda (buffer)
+               (unless (kill-buffer buffer)
+                 (throw 'return nil)))
+             (--filter (string= (ebib-db-get-filename ebib--cur-db) (cl-second (buffer-local-value 'ebib--multiline-info it)))
+                       ebib--multiline-buffer-list))
+
+       ;; save keywords
        (ebib--keywords-save-new-keywords ebib--cur-db)
-       (let ((to-be-deleted ebib--cur-db)
-             (new-db (ebib--next-elem ebib--cur-db ebib--databases)))
-         (setq ebib--databases (delq to-be-deleted ebib--databases))
-         (if ebib--databases     ; do we still have another database loaded?
-             (progn
-               (setq ebib--cur-db (or new-db (-last-item ebib--databases)))
-               (ebib--redisplay))
-           ;; otherwise, we have to clean up a little and empty all the buffers.
-           (setq ebib--cur-db nil)
-           (mapc (lambda (buf) ; this is just to avoid typing almost the same thing three times...
-                   (with-current-buffer (car buf)
-                     (with-ebib-buffer-writable
-                       (erase-buffer))
-                     (delete-overlay (cadr buf))))
-                 (list (list (ebib--buffer 'entry) ebib--fields-overlay)
-                       (list (ebib--buffer 'index) ebib--index-overlay)
-                       (list (ebib--buffer 'strings) ebib--strings-overlay)))
-           (with-current-ebib-buffer 'index
-             (rename-buffer " none"))
-           (setq ebib--cur-keys-list nil))
+
+       ;; remove the database from `ebib--databases' and redisplay
+       (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases)))
+         (setq ebib--databases (delq ebib--cur-db ebib--databases))
+         (setq ebib--cur-db (if ebib--databases   ; do we still have another database loaded?
+                                (or new-db (-last-item ebib--databases))
+                              nil))
+         (ebib--redisplay)
          (message "Database closed."))))))
 
 (defun ebib-goto-first-entry ()
