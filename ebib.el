@@ -3091,8 +3091,8 @@ Otherwise, create a new buffer and add it to
 (defun ebib--get-multiline-buffer (info)
   "Return the multiline edit buffer associated with INFO."
   (car (cl-member info ebib--multiline-buffer-list
-                  :test (lambda (buffer)
-                          (cl-equalp (buffer-local-value 'ebib--multiline-info buffer) info)))))
+                  :test (lambda (elem buffer)
+                          (cl-equalp (buffer-local-value 'ebib--multiline-info buffer) elem)))))
 
 (defun ebib--create-multiline-buffer (info starttext)
   "Create a new multiline edit buffer.
