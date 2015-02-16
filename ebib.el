@@ -266,7 +266,8 @@ to \"none\". This function sets `ebib--cur-keys-list'."
     (with-ebib-buffer-writable
       (erase-buffer)
       (if (not ebib--cur-db)
-          (rename-buffer " none")
+          (progn (rename-buffer " none")
+                 (setq ebib--cur-keys-list nil))
         (setq ebib--cur-keys-list (ebib--list-keys))
         ;; Set a header line if there is a filter.
         (setq header-line-format (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db)))
