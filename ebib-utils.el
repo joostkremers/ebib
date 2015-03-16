@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2014
-;; Version: 2.2
+;; Version: 2.3
 ;; Keywords: text bibtex
 ;; Package-Requires: ((dash "2.5.0") (emacs "24.3"))
 
