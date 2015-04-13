@@ -2450,7 +2450,7 @@ the beginning of the current line."
         (save-excursion
           (let ((beg (point))
                 (end (progn
-                       (skip-chars-forward "a-zA-Z" (line-end-position))
+                       (skip-chars-forward "^[:space:]" (line-end-position))
                        (point))))
             (buffer-substring-no-properties beg end)))))))
 
