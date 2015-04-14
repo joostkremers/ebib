@@ -2195,15 +2195,15 @@ the multiline edit buffer, which are bound to key sequences in the
 minor mode `ebib-multiline-edit-mode', which is activated automatically
 in the multiline edit buffer.
 
-   `ebib-quit-multiline-edit', bound to `C-c | q', leaves the multiline
-edit buffer and stores the text in the database. If you invoke this
-command when you've deleted all contents of the buffer (including the
-final newline!) and you were editing a field value or the `@preamble',
-the field value or preamble is deleted. (This is in fact the _only_ way
-to delete the `@preamble' definition. Field values on the other hand
-can also be deleted by hitting `x' or `d' on them in the entry buffer.)
-If you were editing a `@string' value, Ebib will just complain, because
-string definitions cannot be empty.
+   `ebib-quit-multiline-buffer-and-save', bound to `C-c | q', leaves
+the multiline edit buffer and stores the text in the database. If you
+invoke this command when you've deleted all contents of the buffer
+(including the final newline!) and you were editing a field value or
+the `@preamble', the field value or preamble is deleted. (This is in
+fact the _only_ way to delete the `@preamble' definition. Field values
+on the other hand can also be deleted by hitting `x' or `d' on them in
+the entry buffer.) If you were editing a `@string' value, Ebib will
+just complain, because string definitions cannot be empty.
 
    `ebib-cancel-multiline-buffer', bound to `C-c | c', also leaves the
 multiline edit buffer, but it does so without storing the text. The
@@ -2211,8 +2211,8 @@ original value of the field, string or preamble will be retained. If
 the text was modified, Ebib will ask for a confirmation before leaving
 the buffer.
 
-   `ebib-save-from-multiline-buffer', bound to `C-c | s', can be used in
-the multiline edit buffer to save the database. This command first
+   `ebib-save-from-multiline-buffer', bound to `C-c | s', can be used
+in the multiline edit buffer to save the database. This command first
 stores the text in the database and then saves it. Because Ebib does
 not do an autosave of the current database, it is advisable to save the
 database manually every now and then to prevent data loss in case of
@@ -2236,7 +2236,7 @@ your `~/.emacs':
 (eval-after-load 'ebib
   '(progn
      (define-key ebib-multiline-mode-map
-                 "\C-c\C-c" 'ebib-quit-multiline-edit)
+                 "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
      (define-key ebib-multiline-mode-map
                  "\C-c\C-q" 'ebib-cancel-multiline-buffer)
      (define-key ebib-multiline-mode-map
@@ -2560,6 +2560,8 @@ File: ebib.info,  Node: The Index Buffer,  Next: The Entry Buffer,  Up: The Ebib
    * `ebib-toggle-print-multiline'
 
    * `ebib-toggle-layout'
+
+   * `ebib-force-quit'
 
 
 File: ebib.info,  Node: The Entry Buffer,  Next: The Strings Buffer,  Prev: The Index Buffer,  Up: The Ebib Buffers
@@ -2951,20 +2953,20 @@ Node: Multiple Identical Fields103256
 Ref: #multiple-identical-fields103431
 Node: The Multiline Edit Buffer105304
 Ref: #the-multiline-edit-buffer105485
-Node: The Options Menu109451
-Ref: #the-options-menu109605
-Node: The Ebib Buffers110218
-Ref: #the-ebib-buffers110360
-Node: The Index Buffer110700
-Ref: #the-index-buffer110837
-Node: The Entry Buffer116722
-Ref: #the-entry-buffer116886
-Node: The Strings Buffer119149
-Ref: #the-strings-buffer119292
-Node: Customisation120881
-Ref: #customisation120992
-Node: Modifying Key Bindings121880
-Ref: #modifying-key-bindings122007
+Node: The Options Menu109481
+Ref: #the-options-menu109635
+Node: The Ebib Buffers110248
+Ref: #the-ebib-buffers110390
+Node: The Index Buffer110730
+Ref: #the-index-buffer110867
+Node: The Entry Buffer116776
+Ref: #the-entry-buffer116940
+Node: The Strings Buffer119203
+Ref: #the-strings-buffer119346
+Node: Customisation120935
+Ref: #customisation121046
+Node: Modifying Key Bindings121934
+Ref: #modifying-key-bindings122061
 
 End Tag Table
 

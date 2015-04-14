@@ -995,6 +995,7 @@ Functions not bound to any key:
  * `ebib-toggle-identical-fields`
  * `ebib-toggle-print-multiline`
  * `ebib-toggle-layout`
+* `ebib-force-quit`
 
 
 ## The Entry Buffer ##
