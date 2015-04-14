@@ -537,7 +537,12 @@ the buffers, reads the rc file and loads the files in
     (if ebib-index-mode-line
         (setq mode-line-format ebib-index-mode-line))))
 
-(defun ebib-quit ()
+(defun ebib-force-quit ()
+  "Force quit Ebib by call `ebib-quit'."
+  (interactive)
+  (ebib-quit t))
+
+(defun ebib-quit (&optional force-quit)
   "Quit Ebib.
 The Ebib buffers are killed, all variables except the keymaps are set to nil."
   (interactive)
@@ -546,7 +551,7 @@ The Ebib buffers are killed, all variables except the keymaps are set to nil."
   (mapc #'kill-buffer ebib--multiline-buffer-list)
   (when (if (ebib--modified-p)
             (yes-or-no-p "There are modified databases. Quit anyway? ")
-          (y-or-n-p "Quit Ebib? "))
+          (or force-quit (y-or-n-p "Quit Ebib? ")))
     (ebib-keywords-save-all-new)
     (ebib--filters-update-filters-file)
     (mapc (lambda (x)
