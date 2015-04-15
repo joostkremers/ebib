@@ -2437,6 +2437,7 @@ If the key of the current entry matches the pattern
    ((eq ebib-layout 'index-only)
     (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index))
+  (goto-char (overlay-start ebib--index-overlay))
   (delete-overlay ebib--fields-overlay)
   ;; (select-window (get-buffer-window (ebib--buffer 'index)))
   (if (string-match "<new-entry[0-9]+>" (ebib--cur-entry-key))
