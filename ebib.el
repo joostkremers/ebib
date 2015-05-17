@@ -2011,7 +2011,7 @@ argument can be used to specify which file to choose."
      (let ((filename (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
        (if filename
            (ebib--call-file-viewer filename num)
-         (error "Field `%s' is empty" ebib-file-field))))
+         (ebib--call-file-viewer (concat (ebib--cur-entry-key) ".pdf") nil))))
     ((default)
      (beep))))
 
@@ -2693,7 +2693,7 @@ viewed."
          (files (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
     (if files
         (ebib--call-file-viewer files num)
-      (error "Field `%s' is empty" field))))
+      (ebib--call-file-viewer (concat (ebib--cur-entry-key) ".pdf")))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring."
