@@ -2518,18 +2518,21 @@ the beginning of the current line."
     (ebib--set-fields-overlay)))
 
 (defun ebib-add-field (field)
-  "Add a field to the current entry."
+  "Add FIELD to the current entry."
   (interactive "sField: ")
   ;; We store the field with a `nil' value and let the user edit it later.
   (let ((type (ebib-db-get-field-value "=type=" (ebib--cur-entry-key) ebib--cur-db)))
     (if (or (member-ignore-case field (ebib--list-fields type 'all (ebib--get-dialect)))
             (not (ebib-db-set-field-value field nil (ebib--cur-entry-key) ebib--cur-db 'noerror)))
-        (error "Field already exists in entry `%s'" (ebib--cur-entry-key)))
-    (ebib--fill-entry-buffer)
-    (re-search-forward (concat "^" field))
-    (ebib--set-fields-overlay)
-    (ebib--set-modified t)
-    (ebib-edit-field)))
+        (message "Field `%s' already exists in entry `%s'%s" field (ebib--cur-entry-key)
+                 (if (member-ignore-case field ebib-hidden-fields)
+                     " but is hidden"
+                   ""))
+      (ebib--fill-entry-buffer)
+      (re-search-forward (concat "^" field))
+      (ebib--set-fields-overlay)
+      (ebib--set-modified t)
+      (ebib-edit-field))))
 
 (defun ebib--edit-entry-type ()
   "Edit the entry type."
