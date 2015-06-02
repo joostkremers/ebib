@@ -285,8 +285,9 @@ Return non-NIL upon success, or NIL if the value could not be stored."
 (defun ebib-db-get-field-value (field key db &optional noerror unbraced xref)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
-is non-NIL, in which case return NIL. If UNBRACED is non-NIL,
-return the value without braces.
+is non-NIL. In this case, if NOERROR is a string, return NOERROR,
+otherwise return `nil'. If UNBRACED is non-NIL, return the value
+without braces.
 
 If XREF is non-NIL, the field value may be retrieved from a
 cross-referenced entry. If the result in non-NIL, the returned
@@ -321,6 +322,9 @@ string has the text property `ebib--alias' with value T."
         (add-text-properties 0 1 '(ebib--alias t) value))
       (when xref
         (add-text-properties 0 1 `(ebib--xref ,xref-key) value)))
+    (when (and (not value)
+               (stringp noerror))
+      (setq value noerror))
     value))
 
 (defun ebib--db-get-xref-field (target-field target-entry source-entry &optional dialect)
