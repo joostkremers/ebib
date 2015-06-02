@@ -206,7 +206,7 @@ Return a sorted list of entry keys that match DB's filter."
                                   (let ((entry (ebib-db-get-entry key db 'noerror)))
                                     (when ,filter
                                       key)))
-                                (ebib-db-list-keys db 'nosort)))
+                                (ebib-db-list-keys db)))
               'string<)))))
 
 (defun ebib--filters-pp-filter (filter)

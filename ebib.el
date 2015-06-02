@@ -118,12 +118,14 @@ window. If all else fails, pop up a new frame."
   "Display ENTRY-KEY in the index buffer at POINT."
   (with-current-ebib-buffer 'index
     (with-ebib-buffer-writable
-      (insert (format "%-30s %s\n"
+      (insert (format "%-30s %s %s\n"
                       entry-key
+                      (if (ebib-db-custom-sorted-p ebib--cur-db)
+                          (ebib--first-line (ebib-db-get-field-value (ebib-db-get-sort-field ebib--cur-db) entry-key ebib--cur-db "" 'unbraced))
+                        "")
                       (if ebib-index-display-fields
                           (mapconcat (lambda (field)
-                                       (ebib--first-line (or (ebib-db-get-field-value field entry-key ebib--cur-db 'noerror 'unbraced)
-                                                             "")))
+                                       (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db "" 'unbraced)))
                                      ebib-index-display-fields
                                      "  ") ; separator for mapconcat
                         ""))))))
@@ -282,7 +284,7 @@ to \"none\". This function sets `ebib--cur-keys-list'."
               (ebib-db-set-current-entry-key (car ebib--cur-keys-list) ebib--cur-db))
             (mapc (lambda (entry)
                     (ebib--display-entry-key entry)
-                    (when (member entry (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+                    (when (member entry (ebib-db-list-marked-entries ebib--cur-db))
                       (save-excursion
                         (forward-line -1)
                         (ebib--display-mark t))))
@@ -381,7 +383,7 @@ filter are returned. The returned list is sorted."
   (when ebib--cur-db
     (if (ebib-db-get-filter ebib--cur-db)
         (ebib--filters-run-filter ebib--cur-db)
-      (ebib-db-list-keys ebib--cur-db))))
+      (ebib-db-list-keys ebib--cur-db 'sort))))
 
 ;; This is simply to save some typing.
 (defun ebib--cur-entry-key ()
@@ -436,7 +438,7 @@ FILES is `none', only the current database is searched."
       (let ((database (catch 'found
                         (mapc (lambda (file)
                                 (let ((db (ebib--get-db-from-filename file)))
-                                  (if (and db (member key (ebib-db-list-keys db 'nosort)))
+                                  (if (and db (member key (ebib-db-list-keys db)))
                                       (throw 'found db))))
                               files)
                         nil))) ; We must return nil if the key wasn't found anywhere.
@@ -651,6 +653,9 @@ KEY. In this case, COMMAND is meaningless."
     (define-key map ";" #'ebib-warn-prefix)
     (define-key map "?" #'ebib-info)
     (define-key map "!" #'ebib-generate-autokey)
+    (define-key map "<" #'ebib-index-sort-descending)
+    (define-key map ">" #'ebib-index-sort-ascending)
+    (define-key map "=" #'ebib-index-default-sort)
     (define-key map "a" #'ebib-add-entry)
     (define-key map "A" #'ebib-show-annotation)
     (define-key map "b" #'ebib-index-scroll-down)
@@ -1141,7 +1146,7 @@ for each file anyway."
           (setq filepath (read-file-name "Add file or directory: " (file-name-as-directory (car ebib-file-search-dirs)))))
       ;;collect all file paths from db entries into single list
       (unless allow-duplicates
-        (cl-dolist (entry-key (ebib-db-list-keys db 'nosort))
+        (cl-dolist (entry-key (ebib-db-list-keys db))
           (let ((entry-files (ebib-db-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
             (if entry-files
                 (cl-dolist (fp (split-string entry-files (regexp-quote ebib-filename-separator)))
@@ -1177,7 +1182,7 @@ generate the key, see that function's documentation for details."
 Keys are in the form: <new-entry1>, <new-entry2>, ..."
   (unless db
     (setq db ebib--cur-db))
-  (let ((key-list (ebib-db-list-keys db 'nosort))
+  (let ((key-list (ebib-db-list-keys db))
         (entry-key "<new-entry1>")
         (key-count 2))
     (while (member entry-key key-list)
@@ -1222,6 +1227,26 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
                               nil))
          (ebib--redisplay)
          (message "Database closed."))))))
+
+(defun ebib-index-sort-ascending (field)
+  "Sort the entries in the index according to the contents of FIELD."
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil ebib--field-history)))
+  (unless (string= field "")
+    (ebib-db-set-sortinfo (cons field 'ascend) ebib--cur-db)
+    (ebib--redisplay)))
+
+(defun ebib-index-sort-descending (field)
+  "Sort the entries in the index according to the contents of FIELD."
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil ebib--field-history)))
+  (unless (string= field "")
+    (ebib-db-set-sortinfo (cons field 'descend) ebib--cur-db)
+    (ebib--redisplay)))
+
+(defun ebib-index-default-sort ()
+  "Sort index buffer on citation key."
+  (interactive)
+  (ebib-db-set-sortinfo nil ebib--cur-db)
+  (ebib--redisplay))
 
 (defun ebib-goto-first-entry ()
   "Move to the first BibTeX entry in the database."
@@ -1514,7 +1539,7 @@ first entry with the current entry's key in its crossref field."
          ((member new-cur-entry ebib--cur-keys-list)
           (ebib-db-set-current-entry-key new-cur-entry ebib--cur-db)
           (ebib--redisplay))
-         ((member new-cur-entry (ebib-db-list-keys ebib--cur-db 'nosort))
+         ((member new-cur-entry (ebib-db-list-keys ebib--cur-db))
           (error "Crossreference `%s' not visible due to active filter" new-cur-entry))
          (t (error "Entry `%s' does not exist" new-cur-entry)))
       ;; Otherwise, we assume the user wants to search for entries
@@ -1576,7 +1601,7 @@ first entry with the current entry's key in its crossref field."
     (ebib--execute-when
       ((marked-entries)
        (when (y-or-n-p "Delete all marked entries? ")
-         (mapc #'remove-entry (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+         (mapc #'remove-entry (ebib-db-list-marked-entries ebib--cur-db))
          (message "Marked entries deleted.")
          (ebib--set-modified t)
          (ebib--redisplay)))
@@ -1662,7 +1687,7 @@ a filename is asked to which the entry is appended."
          (ebib--export-to-db num (format "Entry `%s' copied to database %%d." (ebib--cur-entry-key))
                              (lambda (db)
                                (let ((entry-key (ebib--cur-entry-key)))
-                                 (if (member entry-key (ebib-db-list-keys db 'nosort))
+                                 (if (member entry-key (ebib-db-list-keys db))
                                      (error "Entry key `%s' already exists in database %d" entry-key num)
                                    (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
                                    ;; if this is the first entry in the target DB,
@@ -1688,10 +1713,10 @@ a filename is asked to which the entry is appended."
           num "Entries copied to database %d."
           (lambda (db)
             (mapc (lambda (entry-key)
-                    (if (member entry-key (ebib-db-list-keys db 'nosort))
+                    (if (member entry-key (ebib-db-list-keys db))
                         (error "Entry key `%s' already exists in database %d" entry-key num)
                       (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)))
-                  (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+                  (ebib-db-list-marked-entries ebib--cur-db))
             ;; if the target DB was empty before, its CUR-ENTRY must be set!
             (when (null (ebib--db-get-current-entry-key db))
               (ebib-db-set-current-entry-key t db))
@@ -1701,7 +1726,7 @@ a filename is asked to which the entry is appended."
                                (mapc (lambda (entry-key)
                                        (insert "\n")
                                        (ebib--format-entry entry-key ebib--cur-db t))
-                                     (ebib-db-list-marked-entries ebib--cur-db 'nosort))))))
+                                     (ebib-db-list-marked-entries ebib--cur-db))))))
     ((default)
      (beep))))
 
@@ -1831,8 +1856,8 @@ Either prints the entire database, or the marked entries."
   (interactive)
   (ebib--execute-when
     ((entries)
-     (let ((entries (or (ebib-db-list-marked-entries ebib--cur-db)
-                        (ebib-db-list-keys ebib--cur-db))))
+     (let ((entries (or (ebib-db-list-marked-entries ebib--cur-db 'sort)
+                        (ebib-db-list-keys ebib--cur-db 'sort))))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                      ebib-print-tempfile
                                    (read-file-name "Use temp file: " "~/" nil nil)))
@@ -1891,7 +1916,7 @@ Operates either on all entries or on the marked entries."
              (if (ebib-db-marked-entries-p ebib--cur-db)
                  (mapc (lambda (entry)
                          (insert (format "\\nocite{%s}\n" entry)))
-                       (ebib-db-list-marked-entries ebib--cur-db))
+                       (ebib-db-list-marked-entries ebib--cur-db 'sort))
                (insert "\\nocite{*}\n"))
              (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))
              (insert "\\end{document}\n")
@@ -2155,7 +2180,7 @@ The user is prompted for the buffer to push the entry into."
                          (concat (ebib--create-citation-command before)
                                  (mapconcat (lambda (key) ; then deal with the entries one by one
                                               (ebib--create-citation-command repeater key))
-                                            (ebib-db-list-marked-entries ebib--cur-db)
+                                            (ebib-db-list-marked-entries ebib--cur-db 'sort)
                                             (if separator separator (read-from-minibuffer "Separator: ")))
                                  (ebib--create-citation-command after)))
                         (t        ; otherwise just take the current entry
@@ -2164,7 +2189,7 @@ The user is prompted for the buffer to push the entry into."
                    (if (ebib-db-marked-entries-p ebib--cur-db)
                        (mapconcat (lambda (key)
                                     key)
-                                  (ebib-db-list-marked-entries ebib--cur-db)
+                                  (ebib-db-list-marked-entries ebib--cur-db 'sort)
                                   (read-from-minibuffer "Separator: "))
                      (ebib--cur-entry-key)))))
            (when citation-command
@@ -2235,7 +2260,7 @@ no keywords are entered, the return value is `nil'."
            (when (y-or-n-p "Add keywords to all marked entries? ")
              (mapc (lambda (entry)
                      (add-keywords entry (mapconcat #'identity keywords ebib-keywords-separator)))
-                   (ebib-db-list-marked-entries ebib--cur-db 'nosort))
+                   (ebib-db-list-marked-entries ebib--cur-db))
              (message "Keywords added to marked entries.")
              (ebib--set-modified t)))
           ((entries)
@@ -2544,7 +2569,7 @@ the beginning of the current line."
 
 (defun ebib--edit-crossref ()
   "Edit the crossref field."
-  (ebib--ifstring (key (completing-read "Key to insert in `crossref': " (ebib-db-list-keys ebib--cur-db 'nosort) nil t nil 'ebib--key-history))
+  (ebib--ifstring (key (completing-read "Key to insert in `crossref': " (ebib-db-list-keys ebib--cur-db) nil t nil 'ebib--key-history))
       (progn
         (ebib-db-set-field-value "crossref" key (ebib--cur-entry-key) ebib--cur-db 'overwrite)
         ;; We now redisplay the entire entry buffer, so that the crossref'ed
@@ -2793,7 +2818,7 @@ The deleted text is not put in the kill ring."
   (let ((field (ebib--current-field)))
     (if (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)
         (beep)
-      (let ((strings (ebib-db-list-strings ebib--cur-db 'nosort)))
+      (let ((strings (ebib-db-list-strings ebib--cur-db)))
         (when strings
           (unwind-protect
               (progn
@@ -2945,7 +2970,7 @@ beginning of the current line."
   (with-current-ebib-buffer 'strings
     (with-ebib-buffer-writable
       (erase-buffer)
-      (cl-dolist (elem (ebib-db-list-strings ebib--cur-db))
+      (cl-dolist (elem (ebib-db-list-strings ebib--cur-db 'sort))
         (let ((str (ebib-db-get-string elem ebib--cur-db 'noerror 'unbraced)))
           (insert (format "%-18s %s\n" elem
                           (if (ebib--multiline-p str)
@@ -3341,7 +3366,7 @@ Ebib)."
                   (message "Database %s not loaded" file))
                  ((null (ebib--db-get-current-entry-key db))
                   (message "No entries in database %s" file))
-                 (t (setq collection (append (ebib-db-list-keys db 'nosort)
+                 (t (setq collection (append (ebib-db-list-keys db)
                                              collection))))))
             ebib--local-bibtex-filenames))
     collection))
