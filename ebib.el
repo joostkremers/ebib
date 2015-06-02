@@ -1388,9 +1388,9 @@ in order for the sort value."
   (let ((lvars (ebib-db-get-local-vars db)))
     (when lvars
       (insert (concat "@Comment{\n"
-                      "Local Variables:\n"
-                      (mapconcat (lambda (e) (format "%s: %s\n" (car e) (cadr e))) lvars "")
-                      "End:\n"
+                      ebib-local-variable-indentation "Local Variables:\n"
+                      (mapconcat (lambda (e) (format "%s%s: %s\n" ebib-local-variable-indentation (car e) (cadr e))) lvars "")
+                      ebib-local-variable-indentation "End:\n"
                       "}\n\n")))))
 
 (defun ebib--format-database-as-bibtex (db)

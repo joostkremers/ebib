@@ -424,6 +424,11 @@ are searched, not their subdirectories."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
+(defcustom ebib-local-variable-indentation "  "
+  "Indentation of the local variable block."
+  :group 'ebib
+  :type '(string :tag "Indentation"))
+
 (defcustom ebib-print-preamble '("\\documentclass{article}")
   "Preamble used for the LaTeX file for printing the database.
 This option specifies the preamble that is to be added to the
@@ -1020,7 +1025,7 @@ STR must start with \"Local Variables:\" and end with \"End:\".
 The return value is a list of lists, where each sublist has the
 form (\"<variable>\" \"<value>\"). If STR is not a local variable
 block, the return value is nil."
-  (let ((vars (split-string str "[\n\t\r]+" t)))
+  (let ((vars (split-string str "[\n]+" t "[ \t\r]+")))
     (when (and (string= (car vars) "Local Variables:")
                (string= (-last-item vars) "End:"))
       (--map (split-string it "[: ]" t) (-slice vars 1 -1)))))
