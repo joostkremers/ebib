@@ -424,7 +424,7 @@ are searched, not their subdirectories."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
-(defcustom ebib-local-variable-indentation "  "
+(defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
   :group 'ebib
   :type '(string :tag "Indentation"))
