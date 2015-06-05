@@ -203,7 +203,7 @@ If SORT is non-`nil', the list is sorted."
 		 (push key keys))
 	     (ebib--db-struct-database db))
     (if sort
-        (ebib--db-sort-keys-list keys db)
+        (ebib-db-sort-keys-list keys db)
       keys)))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
@@ -523,7 +523,7 @@ unmarked."
 If SORT is non-`nil', the list is sorted."
   (let ((entries (copy-sequence (ebib--db-struct-marked-entries db))))
     (if sort
-        (ebib--db-sort-keys-list entries db)
+        (ebib-db-sort-keys-list entries db)
       entries)))
 
 (defun ebib-db-filtered-p (db)
@@ -557,7 +557,7 @@ any existing sortinfo."
   "Return the sort order of DB, or nil if there is none."
   (cdr (ebib--db-struct-sortinfo db)))
 
-(defun ebib--db-sort-keys-list (keys db)
+(defun ebib-db-sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB."
   ;; first sort the keys themselves
   (setq keys (sort keys #'string<))
