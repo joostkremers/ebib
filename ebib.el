@@ -387,7 +387,7 @@ If a filter is active, only the keys of entries that match the
 filter are returned. The returned list is sorted."
   (when ebib--cur-db
     (if (ebib-db-get-filter ebib--cur-db)
-        (ebib--filters-run-filter ebib--cur-db)
+        (ebib--filters-run-filter ebib--cur-db 'sort)
       (ebib-db-list-keys ebib--cur-db 'sort))))
 
 ;; This is simply to save some typing.
