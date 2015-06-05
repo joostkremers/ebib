@@ -130,7 +130,7 @@ window. If all else fails, pop up a new frame."
                         entry-key
                         (if ebib-index-display-fields
                             (mapconcat (lambda (field)
-                                         (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db "" 'unbraced)))
+                                         (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db "" 'unbraced 'xref)))
                                        ebib-index-display-fields
                                        "  ") ; separator for mapconcat
                           "")))))))
