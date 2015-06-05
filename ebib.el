@@ -126,7 +126,7 @@ window. If all else fails, pop up a new frame."
                                           (cons sortfield ebib-index-display-fields)
                                         ebib-index-display-fields)))
       (with-ebib-buffer-writable
-        (insert (format "%-30s %s\n"
+        (insert (format "%-40s %s\n"
                         entry-key
                         (if ebib-index-display-fields
                             (mapconcat (lambda (field)
