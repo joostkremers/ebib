@@ -192,22 +192,24 @@ If there are no stored filters, the filter file is deleted."
     (let ((file (read-file-name "Save filters to file: ")))
       (ebib--filters-save-file file))))
 
-(defun ebib--filters-run-filter (db)
-  "Run the filter of DB.
-Return a sorted list of entry keys that match DB's filter."
+(defun ebib--filters-run-filter (db &optional sort)
+  "Run the filter of DB and return a list of matching keys.
+If SORT is non-nil, sort the list according to DB's sort info."
   ;; The filter uses a macro `contains', which we locally define here. This
   ;; macro in turn uses a dynamic variable `entry', which we must set
   ;; before eval'ing the filter.
-  (let ((filter (ebib-db-get-filter db)))
-    (eval
-     `(cl-macrolet ((contains (field regexp)
-                              `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
-        (sort (delq nil (mapcar (lambda (key)
-                                  (let ((entry (ebib-db-get-entry key db 'noerror)))
-                                    (when ,filter
-                                      key)))
-                                (ebib-db-list-keys db)))
-              'string<)))))
+  (let* ((filter (ebib-db-get-filter db))
+         (matches (eval
+                   `(cl-macrolet ((contains (field regexp)
+                                            `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
+                      (delq nil (mapcar (lambda (key)
+                                          (let ((entry (ebib-db-get-entry key db 'noerror)))
+                                            (when ,filter
+                                              key)))
+                                        (ebib-db-list-keys db)))))))
+    (if sort
+        (ebib-db-sort-keys-list matches db)
+      matches)))
 
 (defun ebib--filters-pp-filter (filter)
   "Convert FILTER into a string suitable for displaying.
