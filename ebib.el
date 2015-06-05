@@ -117,18 +117,23 @@ window. If all else fails, pop up a new frame."
 (defun ebib--display-entry-key (entry-key)
   "Display ENTRY-KEY in the index buffer at POINT."
   (with-current-ebib-buffer 'index
-    (with-ebib-buffer-writable
-      (insert (format "%-30s %s %s\n"
-                      entry-key
-                      (if (ebib-db-custom-sorted-p ebib--cur-db)
-                          (ebib--first-line (ebib-db-get-field-value (ebib-db-get-sort-field ebib--cur-db) entry-key ebib--cur-db "" 'unbraced))
-                        "")
-                      (if ebib-index-display-fields
-                          (mapconcat (lambda (field)
-                                       (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db "" 'unbraced)))
-                                     ebib-index-display-fields
-                                     "  ") ; separator for mapconcat
-                        ""))))))
+    ;; if the database has a custom sorting, add the sort field to
+    ;; ebib-index-display-fields if it's not there yet
+    (let* ((sortfield (when (ebib-db-custom-sorted-p ebib--cur-db)
+                        (ebib-db-get-sort-field ebib--cur-db)))
+           (ebib-index-display-fields (if (and sortfield
+                                               (not (member-ignore-case sortfield ebib-index-display-fields)))
+                                          (cons sortfield ebib-index-display-fields)
+                                        ebib-index-display-fields)))
+      (with-ebib-buffer-writable
+        (insert (format "%-30s %s\n"
+                        entry-key
+                        (if ebib-index-display-fields
+                            (mapconcat (lambda (field)
+                                         (ebib--first-line (ebib-db-get-field-value field entry-key ebib--cur-db "" 'unbraced)))
+                                       ebib-index-display-fields
+                                       "  ") ; separator for mapconcat
+                          "")))))))
 
 (defun ebib--redisplay-current-field ()
   "Redisplay the contents of the current field in the entry buffer."
