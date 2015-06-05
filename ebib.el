@@ -1230,14 +1230,14 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
 
 (defun ebib-index-sort-ascending (field)
   "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil ebib--field-history)))
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil 'ebib--field-history)))
   (unless (string= field "")
     (ebib-db-set-sortinfo (cons field 'ascend) ebib--cur-db)
     (ebib--redisplay)))
 
 (defun ebib-index-sort-descending (field)
   "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil ebib--field-history)))
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil 'ebib--field-history)))
   (unless (string= field "")
     (ebib-db-set-sortinfo (cons field 'descend) ebib--cur-db)
     (ebib--redisplay)))
