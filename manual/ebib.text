@@ -260,7 +260,7 @@ Ebib also has a much more sophisticated search mechanism that makes use of *filt
 
 ### Simple Selection ###
 
-Creating a filter is simple: press `&`, and Ebib will ask you for a field to select on, and for a regular expression to select with. So if you want to select all entries that contain "Jones" in the `author` field, you press `&` and type `author` as the field and `Jones` as the regexp to filter on. Ebib then runs this filter on the database, and only shows those entries that match the filter. To indicate that a filter is active, the active filter is displayed in a header line at the top of the index buffer. (The filter can be displayed in Lisp form, if you prefer: customise "Filters Display As Lisp" to do so.)
+Creating a filter is simple: press `&`, and Ebib will ask you for a field to select on, and for a regular expression to select with. So if you want to select all entries that contain "Jones" in the `author` field, you press `&` and type `author` as the field and `Jones` as the regexp to filter on. Ebib then runs this filter on the database, and only shows those entries that match the filter. To indicate that a filter is active, the active filter is displayed in the mode line of index buffer. (The filter can be displayed in Lisp form, if you prefer: customise "Filters Display As Lisp" to do so.)
 
 If you don't want to filter on one specific field but rather want to select all entries that match a certain regexp in any field, you can type `any` as the field to filter on. So specifying `any` as the field and `Jones` as the regexp will give you all entries that have a field that contains "Jones" in them.
 

@@ -276,8 +276,6 @@ to \"none\". This function sets `ebib--cur-keys-list'."
           (progn (rename-buffer " none")
                  (setq ebib--cur-keys-list nil))
         (setq ebib--cur-keys-list (ebib--list-keys))
-        ;; Set a header line if there is a filter.
-        (setq header-line-format (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db)))
         ;; We may call this function when there are no entries in the
         ;; database. If so, we don't need to do this:
         (when (ebib--cur-entry-key)
