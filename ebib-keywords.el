@@ -152,7 +152,7 @@ Note: KEYWORDS should be unbraced."
 
 (defun ebib--keywords-remove-existing (keywords db)
   "Remove keywords from KEYWORDS that already exist in DB.
-KEYWORDS is a list of keywords. The return value is a list of
+KEYWORDS is a list of keywords.  The return value is a list of
 keywords that do not exist in DB."
   (let ((all-keywords (ebib--keywords-for-database db)))
     (--remove (member-ignore-case it all-keywords) keywords)))
@@ -198,7 +198,7 @@ keywords and the third the keywords added in this session."
     (when (and (cl-third lst)           ; if there are new keywords
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p "New keywords have been added. Save "))))
+                        (y-or-n-p "New keywords have been added. Save? "))))
       (ebib--keywords-save-to-file lst)
       ;; now move the new keywords to the list of existing keywords
       (setf (cl-second lst) (append (cl-second lst) (cl-third lst)))

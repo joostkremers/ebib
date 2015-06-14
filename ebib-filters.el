@@ -109,7 +109,8 @@
 
 (defun ebib--filters-select-filter (prompt)
   "Select a filter from the saved filters.
-Return the filter as a list (NAME FILTER)."
+PROMPT is the prompt string to be shown when asking the user for
+a filter.  Return the filter as a list (NAME FILTER)."
   (if (not ebib--filters-alist)
       (error "No stored filters")
     (let* ((completion-ignore-case ebib-filters-ignore-case)
@@ -138,7 +139,7 @@ Return the filter as a list (NAME FILTER)."
         (let ((name (read-from-minibuffer "Enter filter name: ")))
           (when (or (not (ebib--filters-exists-p name))
                     (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
-            (ebib--filters-add-filter name filter 'overwrite)
+            (ebib--filters-add-filter filter name 'overwrite)
             (setq ebib--filters-modified t)
             (message "Filter stored.")))
       (message "No filter to store"))))
@@ -215,8 +216,8 @@ If SORT is non-nil, sort the list according to DB's sort info."
   "Convert FILTER into a string suitable for displaying.
 If `ebib--filters-display-as-lisp' is set, this simply converts
 FILTER into a string representation of the Lisp expression.
-Otherwise, it is converted into infix notation. If FILTER is NIL,
-return value is also NIL."
+Otherwise, it is converted into infix notation.  If FILTER is nil,
+return value is also nil."
   (when filter
     (if ebib-filters-display-as-lisp
         (format "%S" filter)
@@ -258,11 +259,11 @@ there is a name conflict."
           (if overwrite
               (setq ebib--filters-alist nil))
           (mapc (lambda (filter)
-                  (ebib--filters-add-filter (car filter) (cadr filter)))
+                  (ebib--filters-add-filter (cadr filter) (car filter)))
                 flist))))))
 
 (defun ebib--filters-save-file (file)
-  "Write `ebib--filters-alist' to FILE"
+  "Write `ebib--filters-alist' to FILE."
   (with-temp-buffer
     (let ((print-length nil)
           (print-level nil)
@@ -276,8 +277,9 @@ there is a name conflict."
 
 (defun ebib--filters-update-filters-file ()
   "Update the filters file.
-If changes have been made to the stored filters there are stored filters, they are saved to
-`ebib-filters-default-file', otherwise this file is deleted."
+If changes have been made to the stored filters there are stored
+filters, they are saved to `ebib-filters-default-file', otherwise
+this file is deleted."
   (when ebib--filters-modified
     (if ebib--filters-alist
         (ebib--filters-save-file ebib-filters-default-file)
@@ -287,7 +289,7 @@ If changes have been made to the stored filters there are stored filters, they a
             (message "Filter file %s deleted." ebib-filters-default-file))
         (file-error (message "Can't delete %s" ebib-filters-default-file))))))
 
-(defun ebib--filters-add-filter (name filter &optional overwrite)
+(defun ebib--filters-add-filter (filter name &optional overwrite)
   "Add FILTER under NAME in `ebib--filters-alist'.
 If a filter with NAME already exists, the filter is not added,
 unless OVERWRITE is non-NIL."
@@ -299,7 +301,7 @@ unless OVERWRITE is non-NIL."
 
 (defun ebib--filters-get-filter (name &optional noerror)
   "Return the filter record corresponding to NAME.
-Return a list (NAME FILTER) if found. If there is no
+Return a list (NAME FILTER) if found.  If there is no
 filter named NAME, raise an error, unless NOERROR is non-NIL."
   (or (assoc-string name ebib--filters-alist ebib-filters-ignore-case)
       (unless noerror
