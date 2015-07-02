@@ -1169,10 +1169,14 @@ generate the key, see that function's documentation for details."
     ((real-db entries)
      (let ((new-key
             (with-temp-buffer
-              (ebib--format-entry (ebib--cur-entry-key) ebib--cur-db nil)
+              ;; We sort the entry fields when formatting, because if both
+              ;; `author' and `editor' fields are present,
+              ;; `bibtex-generate-autokey' will simply use the first one it
+              ;; finds. By sorting we make sure it's always the author.
+              (ebib--format-entry (ebib--cur-entry-key) ebib--cur-db nil 'sort)
               (let ((x-ref (ebib-db-get-field-value "crossref" (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
                 (if x-ref
-                    (ebib--format-entry x-ref ebib--cur-db nil)))
+                    (ebib--format-entry x-ref ebib--cur-db nil 'sort)))
               (goto-char (point-min))
               (bibtex-set-dialect (ebib--get-dialect) 'local)
               (bibtex-generate-autokey))))
@@ -1369,11 +1373,15 @@ all entries are marked."
     ((default)
      (beep))))
 
-(defun ebib--format-entry (key db timestamp)
+(defun ebib--format-entry (key db timestamp &optional sort)
   "Write entry KEY in DB into the current buffer in BibTeX format.
-If TIMESTAMP is T and `ebib-use-timestamp' is set, a timestamp is
-added to the entry, possibly overwriting an existing timestamp."
+If TIMESTAMP is non-nil and `ebib-use-timestamp' is set, a
+timestamp is added to the entry, possibly overwriting an existing
+timestamp.  If SORT is non-nil, the fields are sorted before
+formatting the entry."
   (let ((entry (ebib-db-get-entry key db 'noerror)))
+    (when sort
+      (setq entry (cl-sort (copy-sequence entry) #'string< :key #'car)))
     (when entry
       (insert (format "@%s{%s,\n" (cdr (assoc "=type=" entry)) key))
       (mapc (lambda (field)
