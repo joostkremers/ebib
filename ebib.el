@@ -1380,8 +1380,12 @@ timestamp is added to the entry, possibly overwriting an existing
 timestamp.  If SORT is non-nil, the fields are sorted before
 formatting the entry."
   (let ((entry (ebib-db-get-entry key db 'noerror)))
-    (when sort
-      (setq entry (cl-sort (copy-sequence entry) #'string< :key #'car)))
+    (setq entry (if sort
+                    (cl-sort (copy-sequence entry) #'string< :key #'car)
+                  ;; When reading, fields are stored with `push', so if we don't
+                  ;; sort, we need to reverse them to get the original order
+                  ;; back. See github issues #42, #55, #62.
+                  (reverse entry)))
     (when entry
       (insert (format "@%s{%s,\n" (cdr (assoc "=type=" entry)) key))
       (mapc (lambda (field)
@@ -1389,7 +1393,7 @@ formatting the entry."
                           (ebib--special-field-p (car field))
                           (and (cl-equalp (car field) "timestamp") timestamp ebib-use-timestamp))
                 (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
-            (reverse entry))
+            entry)
       (if (and timestamp ebib-use-timestamp)
           (insert (format "\ttimestamp = {%s}" (format-time-string ebib-timestamp-format)))
         (delete-char -2))               ; the final ",\n" must be deleted
