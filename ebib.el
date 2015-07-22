@@ -3316,18 +3316,21 @@ or on the region if it is active."
                                (cadr result)
                                (if (nth 2 result) "a" "no"))))))))))
 
-(defun ebib--get-db-from-filename (filename)
-  "Return the database struct associated with FILENAME."
-  (when filename
-    (if (file-name-absolute-p filename)
-        (setq filename (expand-file-name filename))) ; expand ~, . and ..
+(defun ebib--get-db-from-filename (search-filename)
+  "Return the database struct associated with SEARCH-FILENAME."
+  (when search-filename
+    (if (file-name-absolute-p search-filename)
+        (setq search-filename (expand-file-name search-filename))) ; expand ~, . and ..
     (catch 'found
       (mapc (lambda (db)
-              ;; If filename is absolute, we want to compare to the
-              ;; absolute filename of the database, otherwise we should use
-              ;; only the non-directory component.
-              (if (string= filename (ebib-db-get-filename db (not (file-name-absolute-p filename))))
-                  (throw 'found db)))
+              ;; If `search-filename' is an absolute file name, we want to compare to the
+              ;; absolute file name of the database, otherwise we should use only
+              ;; the non-directory component.
+              (let ((db-filename (ebib-db-get-filename db (not (file-name-absolute-p search-filename)))))
+                (if (file-name-absolute-p db-filename)
+                    (setq db-filename (expand-file-name db-filename)))
+                (if (string= search-filename db-filename)
+                    (throw 'found db))))
             ebib--databases)
       nil)))
 
