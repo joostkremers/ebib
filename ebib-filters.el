@@ -233,7 +233,7 @@ return value is also nil."
                             (format "(%s contains \"%s\")" (pp-filter (cl-second f)) (pp-filter (cl-third f))))
                            ((member op '(and or))
                             (format "(%s %s %s)" (pp-filter (cl-second f)) op (pp-filter (cl-third f)))))))
-                       (t (if (string= f "any") 
+                       (t (if (string= f "any")
                               "any field"
                             f)))))
         (let ((pretty-filter (pp-filter filter)))
