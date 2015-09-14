@@ -1890,11 +1890,11 @@ name in each directory. The default name is `ebib-keywords.txt', but
 you can change that if you like, of course.
 
    Keywords that have not been made permanent are marked as such in the
-entry buffer in `ebib-nonpermanent-keyword-face', (usually a red
-foreground colour, but this can be customised). If you run into such
-keywords and want to make them permanent, use the command `K s'.  This
-will take the keywords in the `keywords' field of the current entry and
-store all keywords that are not permanent yet.
+entry buffer in `ebib-warning-face', (usually a red foreground colour,
+but this can be customised). If you run into such keywords and want to
+make them permanent, use the command `K s'. This will take the keywords
+in the `keywords' field of the current entry and store all keywords
+that are not permanent yet.
 
    Keyword files have a very simple format: they are text files with one
 keyword per line. So you can easily create or edit keyword files by
@@ -2935,32 +2935,32 @@ Node: @Comments87974
 Ref: #comments88102
 Node: Managing Keywords88443
 Ref: #managing-keywords88588
-Node: Sorting the bib File94356
-Ref: #sorting-the-.bib-file94525
-Node: Merging and Importing97568
-Ref: #merging-and-importing97733
-Node: Exporting Entries99457
-Ref: #exporting-entries99604
-Node: Timestamps101511
-Ref: #timestamps101648
-Node: Multiple Identical Fields103264
-Ref: #multiple-identical-fields103439
-Node: The Multiline Edit Buffer105312
-Ref: #the-multiline-edit-buffer105493
-Node: The Options Menu109492
-Ref: #the-options-menu109646
-Node: The Ebib Buffers110259
-Ref: #the-ebib-buffers110401
-Node: The Index Buffer110741
-Ref: #the-index-buffer110878
-Node: The Entry Buffer116788
-Ref: #the-entry-buffer116952
-Node: The Strings Buffer119216
-Ref: #the-strings-buffer119359
-Node: Customisation120948
-Ref: #customisation121059
-Node: Modifying Key Bindings121947
-Ref: #modifying-key-bindings122074
+Node: Sorting the bib File94342
+Ref: #sorting-the-.bib-file94511
+Node: Merging and Importing97554
+Ref: #merging-and-importing97719
+Node: Exporting Entries99443
+Ref: #exporting-entries99590
+Node: Timestamps101497
+Ref: #timestamps101634
+Node: Multiple Identical Fields103250
+Ref: #multiple-identical-fields103425
+Node: The Multiline Edit Buffer105298
+Ref: #the-multiline-edit-buffer105479
+Node: The Options Menu109478
+Ref: #the-options-menu109632
+Node: The Ebib Buffers110245
+Ref: #the-ebib-buffers110387
+Node: The Index Buffer110727
+Ref: #the-index-buffer110864
+Node: The Entry Buffer116774
+Ref: #the-entry-buffer116938
+Node: The Strings Buffer119202
+Ref: #the-strings-buffer119345
+Node: Customisation120934
+Ref: #customisation121045
+Node: Modifying Key Bindings121933
+Ref: #modifying-key-bindings122060
 
 End Tag Table
 
