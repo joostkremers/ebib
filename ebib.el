@@ -1751,9 +1751,9 @@ a filename is asked to which the entry is appended."
 
 (defun ebib-search ()
   "Search the current Ebib database.
-The search is conducted with STRING-MATCH and can therefore be a
-regexp.  Searching starts with the current entry.  In a filtered
-database, only the visible entries are searched."
+The search is conducted with STRING-MATCH-P and can therefore be
+a regexp.  Searching starts with the current entry.  In a
+filtered database, only the visible entries are searched."
   (interactive)
   (ebib--execute-when
     ((entries)
@@ -2487,7 +2487,7 @@ If the key of the current entry matches the pattern
   (goto-char (overlay-start ebib--index-overlay))
   (delete-overlay ebib--fields-overlay)
   ;; (select-window (get-buffer-window (ebib--buffer 'index)))
-  (if (string-match "<new-entry[0-9]+>" (ebib--cur-entry-key))
+  (if (string-match-p "<new-entry[0-9]+>" (ebib--cur-entry-key))
       (ebib-generate-autokey)))
 
 (defun ebib--current-field ()
@@ -3371,7 +3371,7 @@ is found, return the symbol `none'."
                   (let ((option (match-string 1))
                         (file (match-string-no-properties 2)))
                     ;; If this isn't a remote resource, add it to the list.
-                    (unless (and option (string-match "location=remote" option))
+                    (unless (and option (string-match-p "location=remote" option))
                       (push file files)))))
               (or files 'none))))))))
 

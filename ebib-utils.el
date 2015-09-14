@@ -971,7 +971,7 @@ REMOVE can be a regular expression."
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
   (if (stringp string)
-      (string-match "\n" string)))
+      (string-match-p "\n" string)))
 
 (defun ebib--first-line (string)
   "Return the first line of a multiline STRING."
