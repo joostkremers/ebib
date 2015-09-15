@@ -766,13 +766,14 @@ Restore the dedicated status after executing BODY."
            (set-window-dedicated-p (selected-window) t)))))
 
 (defmacro ebib--ifstring (bindvar then &rest else)
-  "Bind the string in BINDVAR and execute THEN only if is nonempty.
+  "Create a string and test its value.
 
-Format: (ebib--ifstring (var value) then-form [else-forms])
-
-VAR is bound to VALUE, which is evaluated.  If VAR is a nonempty
-string, THEN-FORM is executed.  If VAR is either \"\" or nil, the
-ELSE-FORMS are executed.  Return the value of THEN or of ELSE."
+BINDVAR should be of the form (<var> <value>), where <var> is a
+variable name (unquoted symbol) which will be let-bound to the
+result of evaluating <value>.  If VALUE is a nonempty string,
+THEN (a single sexpr) is executed and its return value returned.
+If VALUE is either \"\" or nil, the forms in ELSE are executed
+and the return value of its last form is returned."
   (declare (indent 2))
   `(let ,(list bindvar)
      (if (not (or (null ,(car bindvar))
