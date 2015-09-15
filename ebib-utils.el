@@ -110,19 +110,19 @@ when it is first saved.  Note that Ebib uses
                  (const :tag "Do not create backups" nil)))
 
 (defcustom ebib-extra-fields '((BibTeX "crossref"
-                                       "annote"
-                                       "abstract"
-                                       "keywords"
-                                       "file"
-                                       "timestamp"
-                                       "url"
-                                       "doi")
-                               (biblatex "crossref"
-                                         "annotation"
-                                         "abstract"
-                                         "keywords"
-                                         "file"
-                                         "timestamp"))
+                                   "annote"
+                                   "abstract"
+                                   "keywords"
+                                   "file"
+                                   "timestamp"
+                                   "url"
+                                   "doi")
+                           (biblatex "crossref"
+                                     "annotation"
+                                     "abstract"
+                                     "keywords"
+                                     "file"
+                                     "timestamp"))
   "List of the extra fields for BibTeX entries.
 Extra fields are fields that are available for all entry types.
 Depending on the bibliography style, the value of these fields
@@ -140,16 +140,16 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                        (repeat :tag "Extra fields" (string :tag "Field")))))
 
 (defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
-                                "booksubtitle" "booktitleaddon" "chapter" "commentator"
-                                "edition" "editora" "editorb" "editorc" "eid" "eprint"
-                                "eprintclass" "eprinttype" "eventdate" "eventtitle"
-                                "foreword" "holder" "howpublished" "introduction" "isbn"
-                                "isrn" "issn" "issue" "issuesubtitle" "issuetitle"
-                                "journalsubtitle" "language" "location" "mainsubtitle"
-                                "maintitle" "maintitleaddon" "month" "origlanguage"
-                                "pagetotal" "part" "remark" "subtitle" "timestamp"
-                                "titleaddon" "translator" "urldate" "venue" "version"
-                                "volumes")
+                            "booksubtitle" "booktitleaddon" "chapter" "commentator"
+                            "edition" "editora" "editorb" "editorc" "eid" "eprint"
+                            "eprintclass" "eprinttype" "eventdate" "eventtitle"
+                            "foreword" "holder" "howpublished" "introduction" "isbn"
+                            "isrn" "issn" "issue" "issuesubtitle" "issuetitle"
+                            "journalsubtitle" "language" "location" "mainsubtitle"
+                            "maintitle" "maintitleaddon" "month" "origlanguage"
+                            "pagetotal" "part" "remark" "subtitle" "timestamp"
+                            "titleaddon" "translator" "urldate" "venue" "version"
+                            "volumes")
   "List of fields that are not displayed.
 The fields in this list are not displayed by default.  Since
 BibLaTeX defines a large number of fields, it is not practical to
@@ -219,12 +219,12 @@ The rest of the frame is used for the entry buffer, unless
   :type 'integer)
 
 (defcustom ebib-index-mode-line '("%e"
-                                  mode-line-front-space
-                                  mode-line-modified
-                                  mode-line-buffer-identification
-                                  (:eval (format "  (%s)" (ebib--get-dialect)))
-                                  (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
-                                  (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|"(ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
+                              mode-line-front-space
+                              mode-line-modified
+                              mode-line-buffer-identification
+                              (:eval (format "  (%s)" (ebib--get-dialect)))
+                              (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
+                              (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|"(ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
 information.  You can customize this information if you wish, or
@@ -265,13 +265,13 @@ documentation for details."
   :type 'boolean)
 
 (defcustom ebib-citation-commands '((any
-                                     (("cite" "\\cite%<[%A]%>{%K}")))
-                                    (org-mode
-                                     (("ebib" "[[ebib:%K][%D]]")))
-                                    (markdown-mode
-                                     (("text" "@%K%< [%A]%>")
-                                      ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
-                                      ("year" "[-@%K%< %A%>]"))))
+                                 (("cite" "\\cite%<[%A]%>{%K}")))
+                                (org-mode
+                                 (("ebib" "[[ebib:%K][%D]]")))
+                                (markdown-mode
+                                 (("text" "@%K%< [%A]%>")
+                                  ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
+                                  ("year" "[-@%K%< %A%>]"))))
   "A list of format strings to insert a citation into a buffer.
 This option defines the citation commands that you can use when
 inserting a citation key into a buffer (with
@@ -392,7 +392,7 @@ this command extracts the filename."
   :type 'string)
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
-                                    ("ps" . "gv"))
+                                ("ps" . "gv"))
   "List of file associations.
 Lists file extensions together with external programs to handle
 files with those extensions.  The program is searched for in
@@ -500,96 +500,96 @@ unset the option entirely."
   :type '(repeat (string :tag "Extension")))
 
 (defcustom ebib-biblatex-inheritances '(("all"
-                                         "all"
-                                         (("ids" . none)
-                                          ("crossref" . none)
-                                          ("xref" . none)
-                                          ("entryset" . none)
-                                          ("entrysubtype" . none)
-                                          ("execute" . none)
-                                          ("label" . none)
-                                          ("options" . none)
-                                          ("presort" . none)
-                                          ("related" . none)
-                                          ("relatedoptions" . none)
-                                          ("relatedstring" . none)
-                                          ("relatedtype" . none)
-                                          ("shorthand" . none)
-                                          ("shorthandintro" . none)
-                                          ("sortkey" . none)))
+                                     "all"
+                                     (("ids" . none)
+                                      ("crossref" . none)
+                                      ("xref" . none)
+                                      ("entryset" . none)
+                                      ("entrysubtype" . none)
+                                      ("execute" . none)
+                                      ("label" . none)
+                                      ("options" . none)
+                                      ("presort" . none)
+                                      ("related" . none)
+                                      ("relatedoptions" . none)
+                                      ("relatedstring" . none)
+                                      ("relatedtype" . none)
+                                      ("shorthand" . none)
+                                      ("shorthandintro" . none)
+                                      ("sortkey" . none)))
 
-                                        ("inbook, bookinbook, suppbook"
-                                         "mvbook, book"
-                                         (("author" . "author")
-                                          ("bookauthor" . "author")))
+                                    ("inbook, bookinbook, suppbook"
+                                     "mvbook, book"
+                                     (("author" . "author")
+                                      ("bookauthor" . "author")))
 
-                                        ("book, inbook, bookinbook, suppbook"
-                                         "mvbook"
-                                         (("maintitle" . "title")
-                                          ("mainsubtitle" . "subtitle")
-                                          ("maintitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("book, inbook, bookinbook, suppbook"
+                                     "mvbook"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("collection, reference, incollection, inreference, suppcollection"
-                                         "mvcollection, mvreference"
-                                         (("maintitle" . "title")
-                                          ("mainsubtitle" . "subtitle")
-                                          ("maintitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("collection, reference, incollection, inreference, suppcollection"
+                                     "mvcollection, mvreference"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("proceedings, inproceedings"
-                                         "mvproceedings"
-                                         (("maintitle" . "title")
-                                          ("mainsubtitle" . "subtitle")
-                                          ("maintitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("proceedings, inproceedings"
+                                     "mvproceedings"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("inbook, bookinbook, suppbook"
-                                         "book"
-                                         (("booktitle" . "title")
-                                          ("booksubtitle" . "subtitle")
-                                          ("booktitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("inbook, bookinbook, suppbook"
+                                     "book"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("incollection, inreference, suppcollection"
-                                         "collection, reference"
-                                         (("booktitle" . "title")
-                                          ("booksubtitle" . "subtitle")
-                                          ("booktitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("incollection, inreference, suppcollection"
+                                     "collection, reference"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("inproceedings"
-                                         "proceedings"
-                                         (("booktitle" . "title")
-                                          ("booksubtitle" . "subtitle")
-                                          ("booktitleaddon" . "titleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
-                                        ("article, suppperiodical"
-                                         "periodical"
-                                         (("title" . "journaltitle")
-                                          ("subtitle" . "journalsubtitle")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none))))
+                                    ("inproceedings"
+                                     "proceedings"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+                                    ("article, suppperiodical"
+                                     "periodical"
+                                     (("title" . "journaltitle")
+                                      ("subtitle" . "journalsubtitle")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none))))
   "Inheritance scheme for cross-referencing.
 This option allows you to define inheritances for BibLaTeX.
 Inheritances are specified for pairs of target and source entry
