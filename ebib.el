@@ -1615,9 +1615,9 @@ their contents into a single field."
                           (ebib-db-remove-entry key ebib--cur-db)
                           (ebib-db-unmark-entry key ebib--cur-db) ; This is harmless if key isn't marked.
                           (ebib-db-set-current-entry-key (or (ebib--next-elem key ebib--cur-keys-list)
-                                                             (-last-item ebib--cur-keys-list))
-                                                         ebib--cur-db
-                                                         'first)
+                                                         (-last-item ebib--cur-keys-list))
+                                                     ebib--cur-db
+                                                     'first)
                           (setq ebib--cur-keys-list (delete key ebib--cur-keys-list))))
     (ebib--execute-when
       ((marked-entries)
