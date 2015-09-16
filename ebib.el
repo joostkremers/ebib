@@ -420,8 +420,9 @@ loaded, switch to it.  If KEY is given, jump to it."
       (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
   ;; See if we have a key; ebib--cur-keys-list must be set for this to work.
   (or ebib--cur-keys-list (setq ebib--cur-keys-list (ebib--list-keys)))
-  (if key
-      (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
+  (unless (and key
+               (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
+    (message "Key `%s' not found" key))
   (ebib--redisplay))
 
 ;;;###autoload
