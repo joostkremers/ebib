@@ -421,9 +421,9 @@ loaded, switch to it.  If KEY is given, jump to it."
   ;; See if we have a key; ebib--cur-keys-list must be set for this to work.
   (or ebib--cur-keys-list (setq ebib--cur-keys-list (ebib--list-keys)))
   (unless (and key
-               (not (string-blank-p key))
                (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
-    (message "Key `%s' not found" key))
+    (unless (string-blank-p key)
+      (message "Key `%s' not found" key)))
   (ebib--redisplay))
 
 ;;;###autoload
