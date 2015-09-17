@@ -2615,12 +2615,12 @@ was called interactively."
                                       (concat conts ebib-keywords-separator keyword)
                                     keyword)))
                   (ebib-db-set-field-value "keywords"
-                                           (if ebib-keywords-field-keep-sorted
-                                               (ebib--keywords-sort new-conts)
-                                             new-conts)
-                                           (ebib--cur-entry-key)
-                                           ebib--cur-db
-                                           'overwrite)
+                                       (if ebib-keywords-field-keep-sorted
+                                           (ebib--keywords-sort new-conts)
+                                         new-conts)
+                                       (ebib--cur-entry-key)
+                                       ebib--cur-db
+                                       'overwrite)
                   (ebib--redisplay-current-field)
                   (unless (member keyword collection)
                     (ebib--keywords-add-keyword keyword ebib--cur-db)))
@@ -2673,8 +2673,8 @@ If FILE is not in (a subdirectory of) one of the directories in
         (setq braced? (ebib-db-unbraced-p init-contents))
         (setq init-contents (ebib-db-unbrace init-contents)))
       (ebib--ifstring (new-contents (read-string (format "%s: " cur-field)
-                                                 (if init-contents
-                                                     (cons init-contents 0))))
+                                             (if init-contents
+                                                 (cons init-contents 0))))
           (ebib-db-set-field-value cur-field new-contents (ebib--cur-entry-key) ebib--cur-db 'overwrite braced?)
         (ebib-db-remove-field-value cur-field (ebib--cur-entry-key) ebib--cur-db))
       (ebib--redisplay-current-field)
