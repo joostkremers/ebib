@@ -191,7 +191,7 @@ window.  If all else fails, pop up a new frame."
           (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib--field-aliases 'case-fold))) 'face 'ebib-alias-face)))
       (if (stringp (get-text-property 0 'ebib--xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
-      (if (and (cl-equalp field "crossref")
+      (if (and (member-ignore-case field '("crossref" "xref" "related"))
                (not (member (ebib-db-unbrace value) ebib--cur-keys-list)))
           (setq value (propertize value 'face 'ebib-warning-face)))
       (if (cl-equalp field "keywords")
@@ -2594,17 +2594,12 @@ was called interactively."
         (ebib--fill-entry-buffer)
         (ebib--set-modified t))))
 
-(defun ebib--edit-crossref ()
-  "Edit the crossref field."
-  (ebib--ifstring (key (completing-read "Key to insert in `crossref': " (ebib-db-list-keys ebib--cur-db) nil t nil 'ebib--key-history))
+(defun ebib--edit-crossref (field)
+  "Edit cross-referencing FIELD."
+  (ebib--ifstring (key (completing-read (format "Key to insert in `%s': " field) (ebib-db-list-keys ebib--cur-db) nil t nil 'ebib--key-history))
       (progn
-        (ebib-db-set-field-value "crossref" key (ebib--cur-entry-key) ebib--cur-db 'overwrite)
-        ;; We now redisplay the entire entry buffer, so that the crossref'ed
-        ;; fields show up. This also puts the cursor back on the =type= field,
-        ;; though, so we need to readjust.
-        (ebib--fill-entry-buffer)
-        (re-search-forward "^crossref")
-        (ebib--set-fields-overlay)
+        (ebib-db-set-field-value field key (ebib--cur-entry-key) ebib--cur-db 'overwrite)
+        (ebib--redisplay-current-field)
         (ebib--set-modified t))))
 
 (defun ebib--edit-keywords-field ()
@@ -2685,15 +2680,21 @@ If FILE is not in (a subdirectory of) one of the directories in
       (ebib--redisplay-current-field)
       (ebib--set-modified t))))
 
+;; `ebib-edit-field' relegates the actual editing to a number of helper
+;; functions. These functions should return non-nil if editing was successful
+;; and they should ensure that the field being edited is redisplayed and that
+;; database's modified flag is set.
+
 (defun ebib-edit-field (&optional pfx)
   "Edit a field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
-are handled specially: the `type' and `crossref' fields offer
-completion, the `annote' field is edited as a multiline field,
-the `keywords' field adds keywords one by one, also allowing
-completion, and the field in `ebib-file-field' uses filename
-completion and shortens filenames if they are in (a subdirectory
-of) one of the directories in `ebib-file-search-dirs'.
+are handled specially: the `type' `crossref', `xref' and
+`related' fields offer completion, the `annote' field is edited
+as a multiline field, the `keywords' field adds keywords one by
+one, also allowing completion, and the field in `ebib-file-field'
+uses filename completion and shortens filenames if they are in (a
+subdirectory of) one of the directories in
+`ebib-file-search-dirs'.
 
 With a prefix argument PFX, the `keywords' field and the field in
 `ebib-file-field' can be edited directly.  For other fields, the
@@ -2704,7 +2705,7 @@ prefix argument has no meaning."
          ;; next field if necessary.
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
-                  ((cl-equalp field "crossref") (ebib--edit-crossref))
+                  ((member-ignore-case field '("crossref" "xref" "related")) (ebib--edit-crossref field))
                   ((and (cl-equalp field "keywords")
                         (= 1 pfx))
                    (ebib--edit-keywords-field))
@@ -2817,7 +2818,7 @@ The deleted text is not put in the kill ring."
   "Toggle the \"special\" status of the current field contents."
   (interactive)
   (let ((field (ebib--current-field)))
-    (unless (member-ignore-case field '("=type=" "crossref" "keywords"))
+    (unless (member-ignore-case field '("=type=" "crossref" "xref" "related" "keywords"))
       (let ((contents (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
         (if (ebib--multiline-p contents) ; multiline fields cannot be special
             (beep)
@@ -2833,7 +2834,7 @@ The deleted text is not put in the kill ring."
   "Edit the current field in multiline-mode."
   (interactive)
   (let ((field (ebib--current-field)))
-    (unless (member-ignore-case field '("=type=" "crossref"))
+    (unless (member-ignore-case field '("=type=" "crossref" "xref" "related"))
       (let ((text (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror)))
         (if (ebib-db-unbraced-p text) ; unbraced fields cannot be multiline
             (beep)
