@@ -422,7 +422,7 @@ loaded, switch to it.  If KEY is given, jump to it."
   (or ebib--cur-keys-list (setq ebib--cur-keys-list (ebib--list-keys)))
   (unless (and key
                (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
-    (unless (string-blank-p key)
+    (unless (string-match-p "\\`[ \t\n\r]*\\'" key)
       (message "Key `%s' not found" key)))
   (ebib--redisplay))
 
