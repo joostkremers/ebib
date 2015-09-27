@@ -1178,7 +1178,7 @@ Possible values for DIALECT are those listed in
         (mapc (lambda (entry)
                 (setq fields (-union fields (ebib--list-fields (car entry) 'all dialect))))
               (bibtex-entry-alist dialect))
-        (add-to-list 'ebib--unique-field-alist (cons dialect fields))
+        (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
 (defun ebib--erase-buffer (buffer)

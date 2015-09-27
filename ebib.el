@@ -471,8 +471,9 @@ the buffers, reads the rc file and loads the files in
   (ebib--create-buffers)
   (if (and ebib-keywords-file
            (file-name-directory ebib-keywords-file)) ; returns nil if there is no directory part
-      (add-to-list 'ebib--keywords-files-alist (list (file-name-directory ebib-keywords-file)
-                                                     (ebib--read-file-to-list ebib-keywords-file) nil)))
+      (push (list (file-name-directory ebib-keywords-file)
+                  (ebib--read-file-to-list ebib-keywords-file) nil)
+            ebib--keywords-files-alist))
   (setq ebib--keywords-list-per-session (copy-tree ebib-keywords-list))
   (ebib--filters-load-file ebib-filters-default-file)
   (setq ebib--index-overlay (ebib--make-overlay 1 1 (ebib--buffer 'index)))
@@ -520,24 +521,24 @@ the buffers, reads the rc file and loads the files in
 (defun ebib--create-buffers ()
   "Create the buffers for Ebib."
   ;; First we create a buffer to hold the fields of the current entry.
-  (add-to-list 'ebib--buffer-alist (cons 'entry (get-buffer-create "*Ebib-entry*")))
+  (push (cons 'entry (get-buffer-create "*Ebib-entry*")) ebib--buffer-alist)
   (with-current-ebib-buffer 'entry
     (ebib-entry-mode)
     (buffer-disable-undo))
   ;; Then we create a buffer to hold the @STRING definitions.
-  (add-to-list 'ebib--buffer-alist (cons 'strings (get-buffer-create "*Ebib-strings*")))
+  (push (cons 'strings (get-buffer-create "*Ebib-strings*")) ebib--buffer-alist)
   (with-current-ebib-buffer 'strings
     (ebib-strings-mode)
     (buffer-disable-undo))
   ;; The log buffer.
-  (add-to-list 'ebib--buffer-alist (cons 'log (get-buffer-create "*Ebib-log*")))
+  (push (cons 'log (get-buffer-create "*Ebib-log*")) ebib--buffer-alist)
   (with-current-ebib-buffer 'log
     (erase-buffer)
     (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
     (ebib-log-mode)
     (buffer-disable-undo))
   ;; And lastly we create a buffer for the entry keys.
-  (add-to-list 'ebib--buffer-alist (cons 'index (get-buffer-create " none")))
+  (push (cons 'index (get-buffer-create " none")) ebib--buffer-alist)
   (with-current-ebib-buffer 'index
     (ebib-index-mode)
     (buffer-disable-undo)

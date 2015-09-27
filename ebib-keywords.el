@@ -119,14 +119,14 @@ Also automatically remove duplicates."
           (let ((keyword-list (ebib--read-file-to-list (concat dir ebib-keywords-file))))
             ;; note: even if keyword-list is empty, we store it, because the user
             ;; may subsequently add keywords.
-            (add-to-list 'ebib--keywords-files-alist    ; add the dir if not in the list yet
-                         (list dir keyword-list nil)   ; the extra empty list is for new keywords
-                         t (lambda (x y) (equal (car x) (car y)))))))))
+            (cl-pushnew (list dir keyword-list nil)   ; the extra empty list is for new keywords
+                        ebib--keywords-files-alist
+                        :test (lambda (x y) (equal (car x) (car y)))))))))
 
 (defun ebib--keywords-add-keyword (keyword db)
   "Add KEYWORD to the list of keywords for DB."
   (if (not ebib-keywords-file)        ; only the general list exists
-      (add-to-list 'ebib--keywords-list-per-session keyword t)
+      (push keyword ebib--keywords-list-per-session)
     (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
                    (file-name-directory (ebib-db-get-filename db)))))    ; per-directory keywords files
       (push keyword (cl-third (assoc dir ebib--keywords-files-alist))))))

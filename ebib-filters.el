@@ -297,7 +297,7 @@ unless OVERWRITE is non-NIL."
       (if overwrite
           (setcdr (ebib--filters-get-filter name) (list filter))
         (ebib--log 'message "Filter name conflict: \"%s\".\n" name))
-    (add-to-list 'ebib--filters-alist (list name filter) 'append)))
+    (push (list name filter) ebib--filters-alist)))
 
 (defun ebib--filters-get-filter (name &optional noerror)
   "Return the filter record corresponding to NAME.
