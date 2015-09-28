@@ -693,6 +693,7 @@ Currently, the following problems are marked:
 (defvar ebib--cite-command-history nil "Minibuffer history for citation commands.")
 (defvar ebib--key-history nil "Minibuffer history for entry keys.")
 (defvar ebib--keywords-history nil "Minibuffer history for keywords.")
+(defvar ebib--info-flag nil "Non-nil means Info was called from Ebib.")
 
 (defvar ebib--saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib--window-before nil "The window that was active when Ebib was called.")
@@ -905,10 +906,8 @@ is the new value of point."
   (beginning-of-line)
   (point))
 
-(defvar ebib--info-flag nil "Non-nil means Info was called from Ebib.")
-
-(defadvice Info-exit (after ebib--info-exit activate)
-  "Quit info and return to Ebib, if Info was called from there."
+(defun ebib--info-exit ()
+  "Return to Ebib after quitting Info, if Info was called from there."
   (when ebib--info-flag
     (setq ebib--info-flag nil)
     (ebib)))

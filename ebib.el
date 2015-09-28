@@ -487,6 +487,7 @@ the buffers, reads the rc file and loads the files in
               (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
                                                file)))
             ebib-preload-bib-files))
+  (advice-add 'Info-exit :after #'ebib--info-exit)
   (setq ebib--initialized t))
 
 (defun ebib--setup-windows ()
@@ -586,6 +587,7 @@ ask for confirmation."
     (set-window-configuration ebib--saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
     (remove-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
+    (advice-remove 'Info-exit #'ebib--info-exit)
     (message "")))
 
 (defun ebib--kill-emacs-query-function ()
