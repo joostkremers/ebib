@@ -1,4 +1,4 @@
-;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager
+;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: nil -*-
 
 ;; Copyright (c) 2003-2014 Joost Kremers
 ;; All rights reserved.
@@ -36,6 +36,9 @@
 
 ;; This file is part of Ebib, a BibTeX database manager for Emacs. It
 ;; contains the filter code.
+;;
+;; Note: this file must be compiled with `lexical-binding' set to nil, due to
+;; the local macro definition `contains' in `ebib--filters-run-filter'.
 
 ;;; Code:
 
