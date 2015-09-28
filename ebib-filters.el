@@ -141,7 +141,7 @@ a filter.  Return the filter as a list (NAME FILTER)."
     (if filter
         (let ((name (read-from-minibuffer "Enter filter name: ")))
           (when (or (not (ebib--filters-exists-p name))
-                    (y-or-n-p (format "Filter `%s' already exists. Overwrite " name)))
+                    (y-or-n-p (format "Filter `%s' already exists.  Overwrite? " name)))
             (ebib--filters-add-filter filter name 'overwrite)
             (setq ebib--filters-modified t)
             (message "Filter stored.")))

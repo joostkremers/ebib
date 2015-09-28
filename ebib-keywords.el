@@ -198,7 +198,7 @@ keywords and the third the keywords added in this session."
     (when (and (cl-third lst)           ; if there are new keywords
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p "New keywords have been added. Save? "))))
+                        (y-or-n-p "New keywords have been added.  Save? "))))
       (ebib--keywords-save-to-file lst)
       ;; now move the new keywords to the list of existing keywords
       (setf (cl-second lst) (append (cl-second lst) (cl-third lst)))
@@ -233,7 +233,7 @@ Optional argument DB specifies the database to check for."
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (called-interactively-p 'any)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
-                        (y-or-n-p (format "New keywords were added. Save '%s'? "
+                        (y-or-n-p (format "New keywords were added.  Save '%s'? "
                                           (file-name-nondirectory ebib-keywords-file)))))) ; strip path for succinctness
       (mapc (lambda (elt)
               (ebib--keywords-save-to-file elt))
