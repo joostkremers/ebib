@@ -1042,14 +1042,17 @@ buffer if Ebib is not occupying the entire frame."
     ((default)
      (beep))))
 
-(defun ebib-next-entry ()
-  "Move to the next BibTeX entry."
-  (interactive)
+(defun ebib-next-entry (&optional pfx)
+  "Move to the next BibTeX entry.
+The argument PFX is used to determine if the command was called
+interactively."
+  (interactive "p")
   (ebib--execute-when
     ((entries)
      (let ((next (ebib--next-elem (ebib--cur-entry-key) ebib--cur-keys-list)))
-       (if (not next)                   ; if we're on the last entry,
-           (beep)                       ; just beep
+       (if (not next)              ; if we're on the last entry,
+           (when pfx               ; and called interactively
+             (beep))               ; beep
          (ebib-db-set-current-entry-key next ebib--cur-db)
          (goto-char (overlay-start ebib--index-overlay))
          (forward-line 1)
@@ -1336,8 +1339,9 @@ This function updates both the database and the buffer."
        (with-ebib-buffer-writable
          (ebib-db-toggle-mark (ebib--cur-entry-key) ebib--cur-db)
          (ebib--display-mark (ebib-db-marked-p (ebib--cur-entry-key) ebib--cur-db)
-                             (overlay-start ebib--index-overlay)
-                             (overlay-end ebib--index-overlay)))))
+                         (overlay-start ebib--index-overlay)
+                         (overlay-end ebib--index-overlay)))
+       (ebib-next-entry)))
     ((default)
      (beep))))
 
