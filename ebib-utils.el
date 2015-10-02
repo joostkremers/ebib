@@ -424,6 +424,21 @@ are searched, not their subdirectories."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
+(defcustom ebib-name-transform-function 'identity
+  "Function for transforming keys into file names.
+When `ebib-view-file' is called but no filename is listed in the
+file field, the entry key is converted to a filename using this
+function."
+  :group 'ebib
+  :type '(choice (const :tag "Do not apply any function" identity)
+                 (function :tag "Apply function")))
+
+(defcustom ebib-notes-file-extension "org"
+  "Extension used for notes files.
+The extension should be specified without a dot."
+  :group 'ebib
+  :type '(string :tag "Extension"))
+
 (defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
   :group 'ebib

@@ -689,6 +689,7 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "m" #'ebib-mark-entry) ; prefix
     (define-key map "M" #'ebib-mark-all-entries)
     (define-key map "n" #'ebib-search-next)
+    (define-key map "N" #'ebib-open-notes-file)
     (define-key map [(control n)] #'ebib-next-entry)
     (define-key map [(meta n)] #'ebib-index-scroll-up)
     (define-key map "o" #'ebib-load-bibtex-file)
@@ -1072,6 +1073,26 @@ interactively."
         (if contents
             (princ contents)
           (princ "[No annotation]"))))))
+
+(defun ebib-open-notes-file ()
+  "Open or create a notes file for the current entry.
+The file name is created from the entry key after applying the
+function `ebib-name-transform-function' and adding
+`ebib-notes-file-extension' to it."
+  (interactive)
+  (ebib--execute-when
+    ((entries)
+     (let ((filename (concat (car ebib-file-search-dirs)
+                             "/" ; to be on the safe side
+                             (funcall ebib-name-transform-function (ebib--cur-entry-key))
+                             "."
+                             ebib-notes-file-extension)))
+       (if (not (file-writable-p (expand-file-name filename)))
+           (error "Could not create file `%s' " filename)
+         (ebib-lower)
+         (find-file filename))))
+    ((default)
+     (beep))))
 
 (defun ebib--add-entry-stub (&optional entry db)
   "Add ENTRY to DB in the form of a stub.
@@ -2062,12 +2083,16 @@ argument NUM can be used to specify which file to choose."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (let ((filename (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (if filename
-           (ebib--call-file-viewer filename num)
-         (ebib--call-file-viewer (concat (ebib--cur-entry-key) ".pdf") nil))))
+     (ebib--view-file-internal num ebib-file-field))
     ((default)
      (beep))))
+
+(defun ebib--view-file-internal (num field)
+  "View the NUMth file in FIELD."
+  (let ((filename (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
+    (if filename
+        (ebib--call-file-viewer filename num)
+      (ebib--call-file-viewer (concat (funcall ebib-name-transform-function (ebib--cur-entry-key)) ".pdf") nil))))
 
 (defun ebib--call-file-viewer (filename &optional n)
   "Open FILENAME with an external viewer.
@@ -2752,11 +2777,7 @@ The field may contain multiple filenames, in which case the
 prefix argument NUM can be used to specify which file is to be
 viewed."
   (interactive "P")
-  (let* ((field (ebib--current-field))
-         (files (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
-    (if files
-        (ebib--call-file-viewer files num)
-      (ebib--call-file-viewer (concat (ebib--cur-entry-key) ".pdf")))))
+  (ebib--view-file-internal num (ebib--current-field)))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring."
