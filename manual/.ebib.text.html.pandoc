@@ -133,7 +133,7 @@
  (data-dir)
  (output-dir . "/home/joost/src/ebib/")
  (template)
- (css . "ebib.css")
+ (css . ("ebib.css"))
  (reference-odt)
  (reference-docx)
  (epub-metadata)
