@@ -439,6 +439,14 @@ The extension should be specified without a dot."
   :group 'ebib
   :type '(string :tag "Extension"))
 
+(defcustom ebib-notes-file-symbol "[N]"
+  "Symbol (or string) used to indicate the existence of a notes file.
+If there is a notes file for the current entry, this symbol is
+displayed in the mode line of the entry buffer after the entry
+key."
+  :group 'ebib
+  :type '(string :tag "Notes file symbol"))
+
 (defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
   :group 'ebib

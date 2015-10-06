@@ -1072,6 +1072,14 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
+(defun ebib--create-notes-file-name (key)
+  "Create a notes filename for KEY."
+  (concat (car ebib-file-search-dirs)
+          "/" ; to be on the safe side
+          (funcall ebib-name-transform-function key)
+          "."
+          ebib-notes-file-extension))
+
 (defun ebib-open-notes-file ()
   "Open or create a notes file for the current entry.
 The file name is created from the entry key after applying the
@@ -1080,11 +1088,7 @@ function `ebib-name-transform-function' and adding
   (interactive)
   (ebib--execute-when
     ((entries)
-     (let ((filename (concat (car ebib-file-search-dirs)
-                             "/" ; to be on the safe side
-                             (funcall ebib-name-transform-function (ebib--cur-entry-key))
-                             "."
-                             ebib-notes-file-extension)))
+     (let ((filename (ebib--create-notes-file-name (ebib--cur-entry-key))))
        (if (not (file-writable-p (expand-file-name filename)))
            (error "Could not create file `%s' " filename)
          (ebib-lower)
@@ -2497,12 +2501,22 @@ a logical `not' is applied to the selection."
   "Keymap for the Ebib entry buffer.")
 
 (define-derived-mode ebib-entry-mode
-  fundamental-mode "Ebib-entry"
+  fundamental-mode "Ebib"
   "Major mode for the Ebib entry buffer."
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
-  (setq truncate-lines t))
+  (setq truncate-lines t)
+  (ebib-entry-minor-mode 1))
+
+(define-minor-mode ebib-entry-minor-mode
+  "Ebib entry minor mode.
+Primarily used to add some info to the entry buffer mode line."
+  :init-value nil :lighter (:eval (concat " «" (ebib--cur-entry-key) "» "
+                                          (if (file-readable-p (ebib--create-notes-file-name (ebib--cur-entry-key)))
+                                              ebib-notes-file-symbol
+                                            "")))
+  :global nil)
 
 (defun ebib-quit-entry-buffer ()
   "Quit editing the entry.
