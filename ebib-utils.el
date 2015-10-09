@@ -152,7 +152,7 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                             "volumes")
   "List of fields that are not displayed.
 The fields in this list are not displayed by default.  Since
-BibLaTeX defines a large number of fields, it is not practical to
+Biblatex defines a large number of fields, it is not practical to
 display them all in the entry buffer.  You can make these fields
 temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
 or through the menu."
@@ -614,7 +614,7 @@ unset the option entirely."
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none))))
   "Inheritance scheme for cross-referencing.
-This option allows you to define inheritances for BibLaTeX.
+This option allows you to define inheritances for Biblatex.
 Inheritances are specified for pairs of target and source entry
 type, where the target is the cross-referencing entry and the
 source the cross-referenced entry.  For each pair, specify the
@@ -630,7 +630,7 @@ combination, the field inherits from the same-name field in the
 cross-referenced entry.  If no inheritance should take place, set
 the source field to \"No inheritance\".
 
-Note that this option is only relevant for BibLaTeX.  If the
+Note that this option is only relevant for Biblatex.  If the
 BibTeX dialect is set to `BibTeX', this option is ignored."
   :group 'ebib
   :type '(repeat (list (string :tag "Target entry type(s)")
@@ -686,7 +686,7 @@ Currently, the following problems are marked:
 ;; constants and variables that are set only once
 (defvar ebib--initialized nil "T if Ebib has been initialized.")
 
-;; Entry type and field aliases defined by BibLaTeX.
+;; Entry type and field aliases defined by Biblatex.
 (defconst ebib--field-aliases '(("location" . "address")
                                 ("annotation" . "annote")
                                 ("eprinttype" . "archiveprefix")
@@ -695,7 +695,7 @@ Currently, the following problems are marked:
                                 ("file" . "pdf")
                                 ("eprintclass" . "primaryclass")
                                 ("institution" . "school"))
-  "List of field aliases for BibLaTeX.")
+  "List of field aliases for Biblatex.")
 
 (defconst ebib--type-aliases '(("Conference" . "InProceedings")
                                ("Electronic" . "Online")
@@ -703,7 +703,7 @@ Currently, the following problems are marked:
                                ("PhDThesis" . "Thesis")
                                ("TechReport" . "Report")
                                ("WWW" . "Online"))
-  "List of entry type aliases for BibLaTeX.")
+  "List of entry type aliases for Biblatex.")
 
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
 (defvar ebib--index-overlay nil "Overlay to mark the current entry.")
@@ -1140,7 +1140,7 @@ listed in `bibtex-dialect-list' or NIL, in which case the value
 of `ebib-bibtex-dialect' is used.
 
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
-defined by BibLaTeX, return the fields of the entry type for
+defined by Biblatex, return the fields of the entry type for
 which ENTRY-TYPE is an alias."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (if (eq dialect 'biblatex)
