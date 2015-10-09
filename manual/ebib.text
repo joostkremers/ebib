@@ -81,11 +81,11 @@ Secondly, a few user options have been renamed because their types have changed.
 - `ebib-standard-doi-field`: renamed to `ebib-doi-field`.
 - `ebib-biblatex-inheritance`: renamed to `ebib-biblatex-inheritances` (note the `s`).
 
-Note that even if you customised `ebib-biblatex-inheritance`, there is most likely no need to customise its replacement `ebib-biblatex-inheritances`, because the latter is set up with the default inheritance rules that BibLaTeX defines.
+Note that even if you customised `ebib-biblatex-inheritance`, there is most likely no need to customise its replacement `ebib-biblatex-inheritances`, because the latter is set up with the default inheritance rules that Biblatex defines.
 
 Another thing to note is that four user options have a new default value. First, the default location of the rc file has moved to `~/.emacs.d/ebibrc`, in line with the recommendation to keep all Emacs-related files in `~/.emacs.d`. If you kept an `.ebibrc` file in your home directory, move it to `~/.emacs.d`. Second, a `\documentclass` definition has been added to the user options "Latex Preamble" (`ebib-latex-preamble`) and "Print Preamble" (`ebib-print-preamble`). If you customised one of these, you should add a document class specification, otherwise the LaTeX file won't compile. Third, the option `ebib-save-xrefs-first` now defaults to `t`.
 
-Lastly, if you use BibLaTeX, make sure to read the section on using Ebib with BibLaTeX files.
+Lastly, if you use Biblatex, make sure to read the section on using Ebib with Biblatex files.
 
 
 # Getting Started #
@@ -109,7 +109,7 @@ Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the fil
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged. If Ebib finds something that it cannot parse, it will log an error. If warnings and/or errors occurred during loading, Ebib will issue a message when it finishes loading the `.bib` and direct you to the log buffer.
 
-If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this will happen is when you load a BibLaTeX file without letting Ebib know the file is BibLaTeX-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use BibLaTeX files, make sure to read the section on BibLateX ([Using BibLaTeX][#using-biblatex]).
+If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this will happen is when you load a Biblatex file without letting Ebib know the file is Biblatex-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use Biblatex files, make sure to read the section on Biblatex ([Using Biblatex][#using-biblatex]).
 
 
 ## Preloading `.bib` Files ##
@@ -125,7 +125,7 @@ Once you've opened a `.bib` file, the keys of all the entries in the file are sh
 
 Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that Bib(La)TeX requires to be filled. The second group are the optional fields, which do not have to be filled but which Bib(La)TeX will normally add to the bibliography if they do have a value. The third group are the so-called extra fields. These fields are usually ignored by Bib(La)TeX (note that Bib(La)TeX normally ignores *all* fields it does not know), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are defined in the user option "Extra Fields". Lastly, the fourth set of fields shown in the entry buffer are fields that exist in the entry but are not defined as part of the entry type nor as extra fields.
 
-The first two groups of fields are different for each entry type, while the third group are common to all entry types. You can use the extra fields, for example, to add personal comments to the works in your database. Ebib by default defines the following extra fields: `crossref`, `url` (BibTeX only), `annote` (`annotation` for BibLaTeX), `abstract`, `keywords`, `file`, `timestamp`, and `doi` (BibTeX only). `url` and `doi` are defined only for BibTeX, since BibLaTeX defines them as optional fields for most entry types. If these are not sufficient for you, you can customise the option "Extra Fields".
+The first two groups of fields are different for each entry type, while the third group are common to all entry types. You can use the extra fields, for example, to add personal comments to the works in your database. Ebib by default defines the following extra fields: `crossref`, `url` (BibTeX only), `annote` (`annotation` for Biblatex), `abstract`, `keywords`, `file`, `timestamp`, and `doi` (BibTeX only). `url` and `doi` are defined only for BibTeX, since Biblatex defines them as optional fields for most entry types. If these are not sufficient for you, you can customise the option "Extra Fields".
 
 To move around in the index buffer, you can use the `up` and `down` cursor keys, `C-p` and `C-n`, or for those more used to mutt's key bindings, `k` and `j`. Furthermore, `Space` and `PgDn` move a screenful of entries down, while `b` and `PgUp` move in the other direction. Lastly, `g` and `Home` move to the first entry, while `G` and `End` move to the last one.
 
@@ -172,7 +172,7 @@ If you're done editing the fields of the entry, type `q` to move focus back to t
 
 ## Editing Multiline Values ##
 
-Apart from the `type`, `keywords`, `file` and `crossref` fields, there is another field that Ebib handles in a special way when you edit its value. This is the `annote` field (`annotation` in BibLaTeX). Most field values normally consist of a single line of text. However, because the `annote` field is meant for creating annotated bibliographies, it would not be very useful if you could only write one line of text in this field. Therefore, when you edit the `annote` field, Ebib puts you in the so-called *multiline edit buffer*. This is essentially a text mode buffer that allows you to enter as much text as you like. To store the text and leave the multiline edit buffer, type `C-c | q`.
+Apart from the `type`, `keywords`, `file` and `crossref` fields, there is another field that Ebib handles in a special way when you edit its value. This is the `annote` field (`annotation` in Biblatex). Most field values normally consist of a single line of text. However, because the `annote` field is meant for creating annotated bibliographies, it would not be very useful if you could only write one line of text in this field. Therefore, when you edit the `annote` field, Ebib puts you in the so-called *multiline edit buffer*. This is essentially a text mode buffer that allows you to enter as much text as you like. To store the text and leave the multiline edit buffer, type `C-c | q`.
 
 If you want to leave the multiline edit buffer without saving the text you have just typed, type `C-c | c`. This command cancels the edit and leaves the multiline edit buffer. The text that is stored in the field you were editing is not altered.
 
@@ -196,9 +196,9 @@ Note that if you delete the contents of an undefined field, the field itself rem
 
 ## Hidden Fields ##
 
-BibLaTeX defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key `H` in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields", which can be customised.
+Biblatex defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key `H` in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields", which can be customised.
 
-Most of the fields defined as hidden are BibLaTeX-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option "Hidden Fields".
+Most of the fields defined as hidden are Biblatex-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option "Hidden Fields".
 
 
 ## Copy, Cut, Paste (Yank), and Delete ##
@@ -217,14 +217,14 @@ When you have undertaken any kind of editing action on a database, it is marked 
 If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`.
 
 
-# Using BibLaTeX #
+# Using Biblatex #
 
-Compared to BibTeX, BibLaTeX has a greatly expanded number of fields, a somewhat different set of entry types and a much more complex system of field value inheritances. Ebib can handle both kinds of files, provided it is set up for the right “dialect”.
+Compared to BibTeX, Biblatex has a greatly expanded number of fields, a somewhat different set of entry types and a much more complex system of field value inheritances. Ebib can handle both kinds of files, provided it is set up for the right “dialect”.
 
 
 ## Setting the BibTeX Dialect ##
 
-BibLaTeX files use the same `.bib` suffix that BibTeX files use. Whether a file is interpreted as a BibTeX or a BibLaTeX is determined by the user option “Bibtex Dialect” (i.e., the variable  `ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`. (These values are taken from the variable `bibtex-dialect-list`.) The default value of this option is `BibTeX`. If you wish to read  or create BibLaTeX files in Ebib, you’ll need to change the value of `ebib-bibtex-dialect`.
+Biblatex files use the same `.bib` suffix that BibTeX files use. Whether a file is interpreted as a BibTeX or a Biblatex is determined by the user option “Bibtex Dialect” (i.e., the variable  `ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`. (These values are taken from the variable `bibtex-dialect-list`.) The default value of this option is `BibTeX`. If you wish to read  or create Biblatex files in Ebib, you’ll need to change the value of `ebib-bibtex-dialect`.
 
 The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of “Illegal entry type” errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs’ `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
 
@@ -235,9 +235,9 @@ The mode line of the index buffer shows the dialect that Ebib assumes for the cu
 
 ## Alias Types and Fields ##
 
-The set of entry types defined by BibLaTeX differs from the set used by BibTeX. Mostly, BibLaTeX adds new entry types, but there are a few BibTeX entry types that have been dropped. For legacy reasons, BibLaTeX still recognises these entry types, but it treats them as aliases for some of its own types. The relevant entry types are `@conference` (treated as an alias for `@inproceedings`), `@electronic` (alias for `@online`), `@mastersthesis` (alias for `@thesis` with the `type` field set to 'Master's thesis'), `@phdthesis` (alias for `@thesis` with the `type` field set to 'PhD thesis'), `@techreport` (alias for `@report` with the `type` field set to 'technical report') and `@www` (alias for `@online`). If an entry has such an alias as entry type, Ebib displays the entry type that BibLaTeX treats it as in the entry buffer. (For example, the entry type alias `phdthesis` is shown as  `phdthesis [==> Thesis]`.)
+The set of entry types defined by Biblatex differs from the set used by BibTeX. Mostly, Biblatex adds new entry types, but there are a few BibTeX entry types that have been dropped. For legacy reasons, Biblatex still recognises these entry types, but it treats them as aliases for some of its own types. The relevant entry types are `@conference` (treated as an alias for `@inproceedings`), `@electronic` (alias for `@online`), `@mastersthesis` (alias for `@thesis` with the `type` field set to 'Master's thesis'), `@phdthesis` (alias for `@thesis` with the `type` field set to 'PhD thesis'), `@techreport` (alias for `@report` with the `type` field set to 'technical report') and `@www` (alias for `@online`). If an entry has such an alias as entry type, Ebib displays the entry type that Biblatex treats it as in the entry buffer. (For example, the entry type alias `phdthesis` is shown as  `phdthesis [==> Thesis]`.)
 
-Similarly, a number of fields are deprecated but still accepted as aliases. These are `address` (alias for `location`), `annote` (alias for `annotation`), `archiveprefix` (for `eprinttype`), `journal` (for `journaltitle`), `key` (for `sortkey`), `pdf` (for `file`), `primaryclass` (for `eprintclass`), and `school` (for `institution`). These aliases are also indicated in the entry buffer, albeit in a slightly different way. For example, if an entry has a `journal` field, its value is shown as the value of the `journaltitle` field; a tag `[<== journal]` is placed after the field value, indicating that the value is actually contained in the journal field. The `journal` field itself is shown as an undefined field (i.e., after all other fields). That is, in such cases, the value is shown twice: once as the `journaltitle` field (among the obligatory fields), and once as the `journal` field. This is done so that you can easily copy the value of the `journal` field to the `journaltitle` field, if you wish to bring your entries into line with BibLaTeX's conventions.
+Similarly, a number of fields are deprecated but still accepted as aliases. These are `address` (alias for `location`), `annote` (alias for `annotation`), `archiveprefix` (for `eprinttype`), `journal` (for `journaltitle`), `key` (for `sortkey`), `pdf` (for `file`), `primaryclass` (for `eprintclass`), and `school` (for `institution`). These aliases are also indicated in the entry buffer, albeit in a slightly different way. For example, if an entry has a `journal` field, its value is shown as the value of the `journaltitle` field; a tag `[<== journal]` is placed after the field value, indicating that the value is actually contained in the journal field. The `journal` field itself is shown as an undefined field (i.e., after all other fields). That is, in such cases, the value is shown twice: once as the `journaltitle` field (among the obligatory fields), and once as the `journal` field. This is done so that you can easily copy the value of the `journal` field to the `journaltitle` field, if you wish to bring your entries into line with Biblatex's conventions.
 
 
 # Searching #
@@ -446,11 +446,11 @@ If no `\bibliography` or `\addbibresource` command is found at all, either in th
 
 # Cross-referencing #
 
-Both BibTeX and BibLaTeX have a cross-referencing facility. Suppose you have an entry `Jones1998`, which appeared in a book that is also in your database, say under `Miller1998`. You can tell Bib(La)TeX that `Jones1998` is contained in `Miller1998` by putting `Miller1998` in the `crossref` field. When Bib(La)TeX finds such a cross-reference, all the fields of `Jones1998` that don't have a value inherit their values from `Miller1998`. At the very least, this saves you some typing, but more importantly, if two or more entries cross-reference the same entry, Bib(La)TeX automatically includes the cross-referenced entry in the bibliography (and puts a reduced reference in the cross-referencing entries).
+Both BibTeX and Biblatex have a cross-referencing facility. Suppose you have an entry `Jones1998`, which appeared in a book that is also in your database, say under `Miller1998`. You can tell Bib(La)TeX that `Jones1998` is contained in `Miller1998` by putting `Miller1998` in the `crossref` field. When Bib(La)TeX finds such a cross-reference, all the fields of `Jones1998` that don't have a value inherit their values from `Miller1998`. At the very least, this saves you some typing, but more importantly, if two or more entries cross-reference the same entry, Bib(La)TeX automatically includes the cross-referenced entry in the bibliography (and puts a reduced reference in the cross-referencing entries).
 
 When you fill in the `crossref` field in Ebib, Ebib displays the values of the cross-referenced entry in the entry buffer. To indicate that they are just inherited values, they are marked with `ebib-crossref-face`, which by default inherits from `font-lock-comment-face`. (You can customise it, of course. See the customisation option "Crossref Face".) These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).
 
-BibTeX inheritance mechanism is rather crude: cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry. BibLaTeX's mechanism is more sophisticated. BibLaTeX inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `inbook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `mvbook`, and a `booktitle` field if the cross-referenced entry is of type `book`. The inheritance scheme for BibLateX is defined by the option "Biblatex Inheritances", which is set up with the default inheritance relations defined by BibLaTeX, but which can be customised if needed.
+BibTeX inheritance mechanism is rather crude: cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry. Biblatex's mechanism is more sophisticated. Biblatex inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `inbook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `mvbook`, and a `booktitle` field if the cross-referenced entry is of type `book`. The inheritance scheme for Biblatex is defined by the option "Biblatex Inheritances", which is set up with the default inheritance relations defined by Biblatex, but which can be customised if needed.
 
 If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type `n`, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type `g` and then `n`.)
 
@@ -494,7 +494,7 @@ There are two more customisation options for printing the database. These are "P
 
 # Calling a Browser #
 
-With most scientific literature nowadays being available on-line, it is common to store URLs and DOIs in a BibTeX database. (BibLaTeX of course has standardised fields for this information.) Sometimes you may want to load such a URL or a DOI in your browser. Ebib provides a convenient way for doing so.
+With most scientific literature nowadays being available on-line, it is common to store URLs and DOIs in a BibTeX database. (Biblatex of course has standardised fields for this information.) Sometimes you may want to load such a URL or a DOI in your browser. Ebib provides a convenient way for doing so.
 
 If you type `u` in the index buffer, Ebib takes the URL stored in the `url` field of the current entry and passes it to your browser. Furthermore, in the entry buffer, you can use `u` on *any* field. If you happen to have more than one URL stored in the relevant field, Ebib will ask you which one you want to open. Alternatively, you can use a prefix argument: typing `M-2 u` sends the second URL to your browser.
 
@@ -647,7 +647,7 @@ The option "Keywords Use Only File" controls whether Ebib uses only the keyword 
 
 It is also possible to tell Ebib to sort the keywords in the `keywords` field in alphabetical order. Set the option "Keywords Field Keep Sorted" if you want to do this. Note that setting this option also automatically removes duplicates.
 
-Lastly, you can configure the separator used between keywords in the keyword field. By default, it is set to `", "`, i.e., comma-space. (The separator is a comma because that is what BibLaTeX expects in the `keywords` field.) If you change it, keep in mind that Ebib does not add a space between keywords, so if you want a space, make sure to add it to the separator.
+Lastly, you can configure the separator used between keywords in the keyword field. By default, it is set to `", "`, i.e., comma-space. (The separator is a comma because that is what Biblatex expects in the `keywords` field.) If you change it, keep in mind that Ebib does not add a space between keywords, so if you want a space, make sure to add it to the separator.
 
 
 # Sorting the `.bib` File #

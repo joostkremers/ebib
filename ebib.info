@@ -37,7 +37,7 @@ X-based) BibTeX database managers.
 * Getting Started::
 * Editing the Database::
 * Saving a Database::
-* Using BibLaTeX::
+* Using Biblatex::
 * Searching::
 * Consulting BibTeX Databases outside Ebib::
 * Cross-referencing::
@@ -223,7 +223,7 @@ preferably remove the old ones from your init file):
    Note that even if you customised ‘ebib-biblatex-inheritance’, there
 is most likely no need to customise its replacement
 ‘ebib-biblatex-inheritances’, because the latter is set up with the
-default inheritance rules that BibLaTeX defines.
+default inheritance rules that Biblatex defines.
 
    Another thing to note is that four user options have a new default
 value.  First, the default location of the rc file has moved to
@@ -236,8 +236,8 @@ Preamble" (‘ebib-latex-preamble’) and "Print Preamble"
 a document class specification, otherwise the LaTeX file won’t compile.
 Third, the option ‘ebib-save-xrefs-first’ now defaults to ‘t’.
 
-   Lastly, if you use BibLaTeX, make sure to read the section on using
-Ebib with BibLaTeX files.
+   Lastly, if you use Biblatex, make sure to read the section on using
+Ebib with Biblatex files.
 
 
 File: ebib.info,  Node: Getting Started,  Next: Editing the Database,  Prev: Installation,  Up: Top
@@ -318,11 +318,11 @@ and direct you to the log buffer.
    If Ebib finds entry types in a ‘.bib’ file that are not defined,
 those entries will still be loaded, but their entry type is displayed
 using Emacs’ ‘error’ face.  The most likely case in which this will
-happen is when you load a BibLaTeX file without letting Ebib know the
-file is BibLaTeX-specific.  By default, Ebib assumes that a ‘.bib’ file
-it loads is a BibTeX file.  If you intend to use BibLaTeX files, make
-sure to read the section on BibLateX ([Using
-BibLaTeX][#using-biblatex]).
+happen is when you load a Biblatex file without letting Ebib know the
+file is Biblatex-specific.  By default, Ebib assumes that a ‘.bib’ file
+it loads is a BibTeX file.  If you intend to use Biblatex files, make
+sure to read the section on Biblatex ([Using
+Biblatex][#using-biblatex]).
 
 
 File: ebib.info,  Node: Preloading bib Files,  Next: Navigating a bib File,  Prev: Opening a bib File,  Up: Getting Started
@@ -376,9 +376,9 @@ part of the entry type nor as extra fields.
 while the third group are common to all entry types.  You can use the
 extra fields, for example, to add personal comments to the works in your
 database.  Ebib by default defines the following extra fields:
-‘crossref’, ‘url’ (BibTeX only), ‘annote’ (‘annotation’ for BibLaTeX),
+‘crossref’, ‘url’ (BibTeX only), ‘annote’ (‘annotation’ for Biblatex),
 ‘abstract’, ‘keywords’, ‘file’, ‘timestamp’, and ‘doi’ (BibTeX only).
-‘url’ and ‘doi’ are defined only for BibTeX, since BibLaTeX defines them
+‘url’ and ‘doi’ are defined only for BibTeX, since Biblatex defines them
 as optional fields for most entry types.  If these are not sufficient
 for you, you can customise the option "Extra Fields".
 
@@ -530,7 +530,7 @@ File: ebib.info,  Node: Editing Multiline Values,  Next: Undefined Fields,  Prev
 
 Apart from the ‘type’, ‘keywords’, ‘file’ and ‘crossref’ fields, there
 is another field that Ebib handles in a special way when you edit its
-value.  This is the ‘annote’ field (‘annotation’ in BibLaTeX). Most
+value.  This is the ‘annote’ field (‘annotation’ in Biblatex).  Most
 field values normally consist of a single line of text.  However,
 because the ‘annote’ field is meant for creating annotated
 bibliographies, it would not be very useful if you could only write one
@@ -601,7 +601,7 @@ File: ebib.info,  Node: Hidden Fields,  Next: Copy Cut Paste Yank and Delete,  P
 3.5 Hidden Fields
 =================
 
-BibLaTeX defines a large number of fields, many of which are optional
+Biblatex defines a large number of fields, many of which are optional
 for most entry types.  Displaying all these fields in the entry buffer
 would not be very practical, because you are most likely interested in
 only a few of them.  For this reason, Ebib defines a (fairly large)
@@ -610,7 +610,7 @@ entry buffer.  You can make these fields visible with the key ‘H’ in the
 index buffer.  Which fields are treated as hidden is controlled by the
 option "Hidden Fields", which can be customised.
 
-   Most of the fields defined as hidden are BibLaTeX-specific, because
+   Most of the fields defined as hidden are Biblatex-specific, because
 BibTeX recognises a much smaller number of fields and there isn’t much
 of a need to hide the lesser used ones.  However, the functionality is
 available: if you wish to use it, just add the relevant fields to the
@@ -640,7 +640,7 @@ value.  If you do want to yank text into a field that already has a
 value, simply hit ‘d’ first to delete the text.
 
 
-File: ebib.info,  Node: Saving a Database,  Next: Using BibLaTeX,  Prev: Editing the Database,  Up: Top
+File: ebib.info,  Node: Saving a Database,  Next: Using Biblatex,  Prev: Editing the Database,  Up: Top
 
 4 Saving a Database
 *******************
@@ -662,12 +662,12 @@ the new ‘.bib’ file becomes associated with the database.  The command
 for this is ‘w’.
 
 
-File: ebib.info,  Node: Using BibLaTeX,  Next: Searching,  Prev: Saving a Database,  Up: Top
+File: ebib.info,  Node: Using Biblatex,  Next: Searching,  Prev: Saving a Database,  Up: Top
 
-5 Using BibLaTeX
+5 Using Biblatex
 ****************
 
-Compared to BibTeX, BibLaTeX has a greatly expanded number of fields, a
+Compared to BibTeX, Biblatex has a greatly expanded number of fields, a
 somewhat different set of entry types and a much more complex system of
 field value inheritances.  Ebib can handle both kinds of files, provided
 it is set up for the right “dialect”.
@@ -677,18 +677,18 @@ it is set up for the right “dialect”.
 * Alias Types and Fields::
 
 
-File: ebib.info,  Node: Setting the BibTeX Dialect,  Next: Alias Types and Fields,  Up: Using BibLaTeX
+File: ebib.info,  Node: Setting the BibTeX Dialect,  Next: Alias Types and Fields,  Up: Using Biblatex
 
 5.1 Setting the BibTeX Dialect
 ==============================
 
-BibLaTeX files use the same ‘.bib’ suffix that BibTeX files use.
-Whether a file is interpreted as a BibTeX or a BibLaTeX is determined by
+Biblatex files use the same ‘.bib’ suffix that BibTeX files use.
+Whether a file is interpreted as a BibTeX or a Biblatex is determined by
 the user option “Bibtex Dialect” (i.e., the variable
 ‘ebib-bibtex-dialect’).  Possible values for this option are ‘BibTeX’
 and ‘biblatex’.  (These values are taken from the variable
 ‘bibtex-dialect-list’.)  The default value of this option is ‘BibTeX’.
-If you wish to read or create BibLaTeX files in Ebib, you’ll need to
+If you wish to read or create Biblatex files in Ebib, you’ll need to
 change the value of ‘ebib-bibtex-dialect’.
 
    The dialect specified determines which entry types Ebib recognises
@@ -719,14 +719,14 @@ the dialect is set in the ‘.bib’ file: if the file does not have a
 dialect setting, the mode line shows the default setting.
 
 
-File: ebib.info,  Node: Alias Types and Fields,  Prev: Setting the BibTeX Dialect,  Up: Using BibLaTeX
+File: ebib.info,  Node: Alias Types and Fields,  Prev: Setting the BibTeX Dialect,  Up: Using Biblatex
 
 5.2 Alias Types and Fields
 ==========================
 
-The set of entry types defined by BibLaTeX differs from the set used by
-BibTeX. Mostly, BibLaTeX adds new entry types, but there are a few
-BibTeX entry types that have been dropped.  For legacy reasons, BibLaTeX
+The set of entry types defined by Biblatex differs from the set used by
+BibTeX. Mostly, Biblatex adds new entry types, but there are a few
+BibTeX entry types that have been dropped.  For legacy reasons, Biblatex
 still recognises these entry types, but it treats them as aliases for
 some of its own types.  The relevant entry types are ‘@conference’
 (treated as an alias for ‘@inproceedings’), ‘@electronic’ (alias for
@@ -735,7 +735,7 @@ set to ’Master’s thesis’), ‘@phdthesis’ (alias for ‘@thesis’ with 
 ‘type’ field set to ’PhD thesis’), ‘@techreport’ (alias for ‘@report’
 with the ‘type’ field set to ’technical report’) and ‘@www’ (alias for
 ‘@online’).  If an entry has such an alias as entry type, Ebib displays
-the entry type that BibLaTeX treats it as in the entry buffer.  (For
+the entry type that Biblatex treats it as in the entry buffer.  (For
 example, the entry type alias ‘phdthesis’ is shown as ‘phdthesis [==>
 Thesis]’.)
 
@@ -754,10 +754,10 @@ such cases, the value is shown twice: once as the ‘journaltitle’ field
 (among the obligatory fields), and once as the ‘journal’ field.  This is
 done so that you can easily copy the value of the ‘journal’ field to the
 ‘journaltitle’ field, if you wish to bring your entries into line with
-BibLaTeX’s conventions.
+Biblatex’s conventions.
 
 
-File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Ebib,  Prev: Using BibLaTeX,  Up: Top
+File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Ebib,  Prev: Using Biblatex,  Up: Top
 
 6 Searching
 ***********
@@ -1333,7 +1333,7 @@ File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Consul
 8 Cross-referencing
 *******************
 
-Both BibTeX and BibLaTeX have a cross-referencing facility.  Suppose you
+Both BibTeX and Biblatex have a cross-referencing facility.  Suppose you
 have an entry ‘Jones1998’, which appeared in a book that is also in your
 database, say under ‘Miller1998’.  You can tell Bib(La)TeX that
 ‘Jones1998’ is contained in ‘Miller1998’ by putting ‘Miller1998’ in the
@@ -1356,15 +1356,15 @@ however).
 
    BibTeX inheritance mechanism is rather crude: cross-referencing
 entries simply inherit the fields of the same name from the
-cross-referenced entry.  BibLaTeX’s mechanism is more sophisticated.
-BibLaTeX inheritance rules depend on the field and on the types of the
+cross-referenced entry.  Biblatex’s mechanism is more sophisticated.
+Biblatex inheritance rules depend on the field and on the types of the
 cross-referencing _and_ the cross-referenced entry.  Thus it is possible
 to specify that the ‘inbook’ entry type can inherit a ‘maintitle’ field
 from the ‘title’ field if the cross-referenced entry is of type
 ‘mvbook’, and a ‘booktitle’ field if the cross-referenced entry is of
-type ‘book’.  The inheritance scheme for BibLateX is defined by the
+type ‘book’.  The inheritance scheme for Biblatex is defined by the
 option "Biblatex Inheritances", which is set up with the default
-inheritance relations defined by BibLaTeX, but which can be customised
+inheritance relations defined by Biblatex, but which can be customised
 if needed.
 
    If you’re viewing an entry that has a cross-reference and you want to
@@ -1492,7 +1492,7 @@ File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing
 ********************
 
 With most scientific literature nowadays being available on-line, it is
-common to store URLs and DOIs in a BibTeX database.  (BibLaTeX of course
+common to store URLs and DOIs in a BibTeX database.  (Biblatex of course
 has standardised fields for this information.)  Sometimes you may want
 to load such a URL or a DOI in your browser.  Ebib provides a convenient
 way for doing so.
@@ -1971,7 +1971,7 @@ automatically removes duplicates.
 
    Lastly, you can configure the separator used between keywords in the
 keyword field.  By default, it is set to ‘", "’, i.e., comma-space.
-(The separator is a comma because that is what BibLaTeX expects in the
+(The separator is a comma because that is what Biblatex expects in the
 ‘keywords’ field.)  If you change it, keep in mind that Ebib does not
 add a space between keywords, so if you want a space, make sure to add
 it to the separator.
@@ -2908,94 +2908,94 @@ Node: Editing Fields Values21536
 Ref: #editing-fields-values21734
 Node: Editing Multiline Values24396
 Ref: #editing-multiline-values24589
-Node: Undefined Fields27117
-Ref: #undefined-fields27286
-Node: Hidden Fields28262
-Ref: #hidden-fields28431
-Node: Copy Cut Paste Yank and Delete29292
-Ref: #copy-cut-paste-yank-and-delete29480
-Node: Saving a Database30432
-Ref: #saving-a-database30580
-Node: Using BibLaTeX31544
-Ref: #using-biblatex31675
-Node: Setting the BibTeX Dialect32002
-Ref: #setting-the-bibtex-dialect32171
-Node: Alias Types and Fields34382
-Ref: #alias-types-and-fields34543
-Node: Searching36729
-Ref: #searching36873
-Node: Simple Searches36915
-Ref: #simple-searches37031
-Node: Filters38967
-Ref: #filters39067
-Node: Simple Selection40055
-Ref: #simple-selection40184
-Node: Complex Filters41862
-Ref: #complex-filters42024
-Node: Storing and Saving Filters46011
-Ref: #storing-and-saving-filters46211
-Node: Properties of Filtered Databases49082
-Ref: #properties-of-filtered-databases49270
-Node: Consulting BibTeX Databases outside Ebib51048
-Ref: #consulting-bibtex-databases-outside-ebib51257
-Node: Key Bindings55692
-Ref: #key-bindings55849
-Node: Defining Citation Commands56621
-Ref: #defining-citation-commands56855
-Node: Associating a Database with a LaTeX File62762
-Ref: #associating-a-database-with-a-latex-file63003
-Node: Cross-referencing65948
-Ref: #cross-referencing66117
-Node: Marking Entries69418
-Ref: #marking-entries69564
-Node: Printing the Database70543
-Ref: #printing-the-database70703
-Node: Calling a Browser74491
-Ref: #calling-a-browser74641
-Node: Viewing Files77261
-Ref: #viewing-files77393
-Node: Editing the file field80226
-Ref: #editing-the-file-field80361
-Node: Notes files81564
-Ref: #notes-files81692
-Node: Window Management83738
-Ref: #window-management83885
-Node: Creating Entry Stubs86969
-Ref: #creating-entry-stubs87131
-Node: @Preamble Definition88132
-Ref: #preamble-definition88296
-Node: @String Definitions90291
-Ref: #string-definitions90442
-Node: @Comments93951
-Ref: #comments94079
-Node: Managing Keywords94444
-Ref: #managing-keywords94589
-Node: Sorting the bib File100474
-Ref: #sorting-the-.bib-file100647
-Node: Merging and Importing103774
-Ref: #merging-and-importing103939
-Node: Exporting Entries105713
-Ref: #exporting-entries105860
-Node: Timestamps107835
-Ref: #timestamps107972
-Node: Multiple Identical Fields109635
-Ref: #multiple-identical-fields109810
-Node: The Multiline Edit Buffer111703
-Ref: #the-multiline-edit-buffer111884
-Node: The Options Menu116014
-Ref: #the-options-menu116168
-Node: The Ebib Buffers116789
-Ref: #the-ebib-buffers116931
-Node: The Index Buffer117273
-Ref: #the-index-buffer117410
-Node: The Entry Buffer124070
-Ref: #the-entry-buffer124234
-Node: The Strings Buffer126770
-Ref: #the-strings-buffer126913
-Node: Customisation128739
-Ref: #customisation128850
-Node: Modifying Key Bindings129775
-Ref: #modifying-key-bindings129902
+Node: Undefined Fields27118
+Ref: #undefined-fields27287
+Node: Hidden Fields28263
+Ref: #hidden-fields28432
+Node: Copy Cut Paste Yank and Delete29293
+Ref: #copy-cut-paste-yank-and-delete29481
+Node: Saving a Database30433
+Ref: #saving-a-database30581
+Node: Using Biblatex31545
+Ref: #using-biblatex31676
+Node: Setting the BibTeX Dialect32003
+Ref: #setting-the-bibtex-dialect32172
+Node: Alias Types and Fields34383
+Ref: #alias-types-and-fields34544
+Node: Searching36730
+Ref: #searching36874
+Node: Simple Searches36916
+Ref: #simple-searches37032
+Node: Filters38968
+Ref: #filters39068
+Node: Simple Selection40056
+Ref: #simple-selection40185
+Node: Complex Filters41863
+Ref: #complex-filters42025
+Node: Storing and Saving Filters46012
+Ref: #storing-and-saving-filters46212
+Node: Properties of Filtered Databases49083
+Ref: #properties-of-filtered-databases49271
+Node: Consulting BibTeX Databases outside Ebib51049
+Ref: #consulting-bibtex-databases-outside-ebib51258
+Node: Key Bindings55693
+Ref: #key-bindings55850
+Node: Defining Citation Commands56622
+Ref: #defining-citation-commands56856
+Node: Associating a Database with a LaTeX File62763
+Ref: #associating-a-database-with-a-latex-file63004
+Node: Cross-referencing65949
+Ref: #cross-referencing66118
+Node: Marking Entries69419
+Ref: #marking-entries69565
+Node: Printing the Database70544
+Ref: #printing-the-database70704
+Node: Calling a Browser74492
+Ref: #calling-a-browser74642
+Node: Viewing Files77262
+Ref: #viewing-files77394
+Node: Editing the file field80227
+Ref: #editing-the-file-field80362
+Node: Notes files81565
+Ref: #notes-files81693
+Node: Window Management83739
+Ref: #window-management83886
+Node: Creating Entry Stubs86970
+Ref: #creating-entry-stubs87132
+Node: @Preamble Definition88133
+Ref: #preamble-definition88297
+Node: @String Definitions90292
+Ref: #string-definitions90443
+Node: @Comments93952
+Ref: #comments94080
+Node: Managing Keywords94445
+Ref: #managing-keywords94590
+Node: Sorting the bib File100475
+Ref: #sorting-the-.bib-file100648
+Node: Merging and Importing103775
+Ref: #merging-and-importing103940
+Node: Exporting Entries105714
+Ref: #exporting-entries105861
+Node: Timestamps107836
+Ref: #timestamps107973
+Node: Multiple Identical Fields109636
+Ref: #multiple-identical-fields109811
+Node: The Multiline Edit Buffer111704
+Ref: #the-multiline-edit-buffer111885
+Node: The Options Menu116015
+Ref: #the-options-menu116169
+Node: The Ebib Buffers116790
+Ref: #the-ebib-buffers116932
+Node: The Index Buffer117274
+Ref: #the-index-buffer117411
+Node: The Entry Buffer124071
+Ref: #the-entry-buffer124235
+Node: The Strings Buffer126771
+Ref: #the-strings-buffer126914
+Node: Customisation128740
+Ref: #customisation128851
+Node: Modifying Key Bindings129776
+Ref: #modifying-key-bindings129903
 
 End Tag Table
 
