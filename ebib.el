@@ -1073,12 +1073,14 @@ interactively."
           (princ "[No annotation]"))))))
 
 (defun ebib--create-notes-file-name (key)
-  "Create a notes filename for KEY."
+  "Create a notes filename for KEY.
+KEY is transformed as per `ebib-name-transform-function' and
+`ebib-notes-file-extension' is added to the file name.
+Additionally, the file name is fully qualified by prepending the
+first element in `ebib-file-search-dirs' to it."
   (concat (car ebib-file-search-dirs)
           "/" ; to be on the safe side
-          (funcall ebib-name-transform-function key)
-          "."
-          ebib-notes-file-extension))
+          (ebib--create-file-name-from-key key ebib-notes-file-extension)))
 
 (defun ebib-open-notes-file ()
   "Open or create a notes file for the current entry.
@@ -2094,7 +2096,7 @@ argument NUM can be used to specify which file to choose."
   (let ((filename (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
     (if filename
         (ebib--call-file-viewer filename num)
-      (ebib--call-file-viewer (concat (funcall ebib-name-transform-function (ebib--cur-entry-key)) ".pdf") nil))))
+      (ebib--call-file-viewer (ebib--create-file-name-from-key (ebib--cur-entry-key) "pdf") nil))))
 
 (defun ebib--call-file-viewer (filename &optional n)
   "Open FILENAME with an external viewer.

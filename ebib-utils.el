@@ -986,6 +986,14 @@ dot."
       filename
     (concat filename ext)))
 
+(defun ebib--create-file-name-from-key (key ext)
+  "Create a filename from KEY and EXT.
+KEY is modified as per `ebib-name-transform-function'.  EXT is
+the extension and should not contain a dot."
+  (concat (funcall ebib-name-transform-function key)
+          "."
+          ext))
+
 (defun ebib--remove-from-string (string remove)
   "Return a copy of STRING with all the occurrences of REMOVE taken out.
 REMOVE can be a regular expression."
