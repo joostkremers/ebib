@@ -485,7 +485,8 @@ the buffers, reads the rc file and loads the files in
               (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
                                                file)))
             ebib-preload-bib-files))
-  (advice-add 'Info-exit :after #'ebib--info-exit)
+  (if (fboundp 'advice-add)
+      (advice-add 'Info-exit :after #'ebib--info-exit))
   (setq ebib--initialized t))
 
 (defun ebib--setup-windows ()
