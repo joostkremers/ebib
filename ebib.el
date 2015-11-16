@@ -2285,7 +2285,7 @@ The user is prompted for the buffer to push the entry into."
 
 ;; TODO These keyword functions use functions from ebib.el, so we keep them here.
 
-;; The filters keymap
+;; The keywords keymap
 (eval-and-compile
   (define-prefix-command 'ebib-keywords-map)
   (suppress-keymap 'ebib-keywords-map 'no-digits)
