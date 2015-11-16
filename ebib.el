@@ -586,7 +586,8 @@ ask for confirmation."
     (set-window-configuration ebib--saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
     (remove-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
-    (advice-remove 'Info-exit #'ebib--info-exit)
+    (if (fboundp 'advice-remove)
+        (advice-remove 'Info-exit #'ebib--info-exit))
     (message "")))
 
 (defun ebib--kill-emacs-query-function ()
