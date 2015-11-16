@@ -841,7 +841,9 @@ FILE must be a fully expanded filename."
   (interactive)
   (ebib--execute-when
     ((entries)
-     (when (yes-or-no-p "Reload current database from file? ")
+     (when (or (and (ebib-db-modified-p ebib--cur-db)
+                    (yes-or-no-p "Database modified. Really reload from file? "))
+               (y-or-n-p "Reload current database from file? "))
        (ebib--reload-database ebib--cur-db)
        (ebib--set-modified nil)
        (ebib--redisplay)
@@ -851,10 +853,12 @@ FILE must be a fully expanded filename."
 (defun ebib-reload-all-databases ()
   "Reload all databases from disk."
   (interactive)
-  (when (yes-or-no-p "Reload all databases from file? ")
+  (when (y-or-n-p "Reload all databases from file? ")
     (mapc (lambda (db)
-            (ebib--reload-database db)
-            (ebib--set-modified nil db))
+            (when (or (not (ebib-db-modified-p db))
+                      (yes-or-no-p (format "Database `%s' modified. Really reload from file? " (ebib-db-get-filename db))))
+              (ebib--reload-database db)
+              (ebib--set-modified nil db)))
           ebib--databases)
     (ebib--redisplay)))
 
