@@ -822,6 +822,8 @@ FILE must be a fully expanded filename."
       (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
       (if (file-exists-p file)
           (progn
+            ;; store the last modtime
+            (ebib-db-set-modtime (ebib--get-file-modtime file) ebib--cur-db)
             ;; load the entries in the file
             (ebib--load-entries file ebib--cur-db)
             ;; If the user makes any changes, we'll want to create a back-up.
@@ -1559,7 +1561,11 @@ the filter are saved.  The original file is not deleted."
     ((real-db)
      (if (not (ebib-db-modified-p ebib--cur-db))
          (message "No changes need to be saved.")
-       (ebib--save-database ebib--cur-db)))
+       (when (time-less-p (ebib-db-get-modtime ebib--cur-db) (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)))
+         (unless (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db)))
+           (error "File not saved")))
+       (ebib--save-database ebib--cur-db)
+       (ebib-db-set-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)) ebib--cur-db)))
     ((filtered-db)
      ;; Saving a filtered db would result in saving only the entries that
      ;; match the filter.

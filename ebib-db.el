@@ -55,6 +55,7 @@
   (filter)                                  ; the active filter
   (sortinfo)                                ; custom sorting
   (filename)                                ; name of the BibTeX file that holds this database
+  (modtime)                                 ; modification time of the .bib file
   (modified)                                ; flag indicating whether this database has been modified
   (backup))                                 ; flag indicating whether we need to make a backup of the .bib file
 
@@ -480,6 +481,14 @@ return the full path."
   (if shortened
       (file-name-nondirectory (ebib--db-struct-filename db))
     (ebib--db-struct-filename db)))
+
+(defun ebib-db-get-modtime (db)
+  "Return the mod time stored for DB."
+  (ebib--db-struct-modtime db))
+
+(defun ebib-db-set-modtime (modtime db)
+  "Set MODTIME of DB."
+  (setf (ebib--db-struct-modtime db) modtime))
 
 (defun ebib-db-marked-entries-p (db)
   "Return T if there are marked enries in DB."

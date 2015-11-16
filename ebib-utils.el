@@ -977,6 +977,12 @@ filename suffix."
                             file
                           (concat file (car ebib-bibtex-extensions))))))
 
+(defun ebib--get-file-modtime (file)
+  "Return the modification time of FILE.
+If FILE cannot be read, return nil."
+  (if (file-readable-p file)
+      (nth 5 (file-attributes file))))
+
 (defun ebib--ensure-extension (filename ext)
   "Ensure FILENAME has an extension.
 Return FILENAME if it alread has an extension, otherwise return
