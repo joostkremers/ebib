@@ -1099,9 +1099,7 @@ argument to a function or not."
   (when (numberp num)
     num))
 
-;; TODO The exporting macros and functions should be rewritten...
-
-(defmacro ebib--export-to-db (num message copy-fn)
+(defun ebib--export-to-db (num message copy-fn)
   "Export data to another database.
 NUM is the number of the database to which the data is to be copied.
 
@@ -1113,28 +1111,26 @@ COPY-FN is the function that actually copies the relevant
 data.  It must take as argument the database to which the data is
 to be copied.  COPY-FN must return T if the copying was
 successful, and NIL otherwise."
-  (let ((goal-db (make-symbol "goal-db")))
-    `(let ((,goal-db (nth (1- ,num) ebib--databases)))
-       (if (not ,goal-db)
-           (error "Database %d does not exist" ,num)
-         (when (funcall ,copy-fn ,goal-db)
-           (ebib--set-modified t ,goal-db)
-           (message ,message ,num))))))
+  (let ((goal-db (nth (1- num) ebib--databases)))
+    (if (not goal-db)
+        (error "Database %d does not exist" num)
+      (when (funcall copy-fn goal-db)
+        (ebib--set-modified t goal-db)
+        (message message num)))))
 
-(defmacro ebib--export-to-file (prompt-string insert-fn)
+(defun ebib--export-to-file (prompt-string insert-fn)
   "Export data to a file.
 PROMPT-STRING is the string that is used to ask for the filename
 to export to.  INSERT-FN must insert the data to be exported into
 the current buffer: it is called within a `with-temp-buffer',
 whose contents is appended to the file the user enters."
-  (let ((filename (make-symbol "filename")))
-    `(let ((insert-default-directory (not ebib--export-filename)))
-       (ebib--ifstring (,filename (read-file-name
-                                   ,prompt-string "~/" nil nil ebib--export-filename))
-           (with-temp-buffer
-             (funcall ,insert-fn)
-             (append-to-file (point-min) (point-max) ,filename)
-             (setq ebib--export-filename ,filename))))))
+  (let ((insert-default-directory (not ebib--export-filename)))
+    (ebib--ifstring (filename (read-file-name
+                           prompt-string "~/" nil nil ebib--export-filename))
+        (with-temp-buffer
+          (funcall insert-fn)
+          (append-to-file (point-min) (point-max) filename)
+          (setq ebib--export-filename filename)))))
 
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
