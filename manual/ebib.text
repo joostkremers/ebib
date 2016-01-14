@@ -194,7 +194,7 @@ It is even possible to add such fields to an entry by pressing `a` in the entry 
 Note that if you delete the contents of an undefined field, the field itself remains in the database until you quit Ebib (or close the database). It will not be saved, however, so the next time you load the `.bib` file, the field is gone.
 
 
-# Timestamps #
+## Timestamps ##
 
 Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
 
