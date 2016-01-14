@@ -2471,6 +2471,30 @@ a logical `not' is applied to the selection."
     ((filtered-db)
      (error "A stored filter can only be applied to a real database"))))
 
+;; Special filters
+
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let* ((date (time-subtract (current-time) (days-to-time days)))
+         (filter `(ebib--newer-than (quote ,date))))
+    (ebib-db-set-filter filter ebib--cur-db)
+    (ebib--redisplay)))
+
+(defun ebib--newer-than (date)
+  "Function for use in filters.
+Return t if the entry being tested is newer than DATE.  DATE must
+be a list of the format returned by `current-time' and is
+compared to the timestamp of the entry being tested.  If the
+entry has no timestamp, or a timestamp that cannot be converted
+into a date representation, return nil."
+  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+    (when (and timestamp
+               (setq timestamp (ignore-errors (date-to-time timestamp))))
+      (time-less-p date timestamp))))
+
 ;;;;;;;;;;;;;;;;
 ;; entry-mode ;;
 ;;;;;;;;;;;;;;;;

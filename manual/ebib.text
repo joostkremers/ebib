@@ -194,6 +194,19 @@ It is even possible to add such fields to an entry by pressing `a` in the entry 
 Note that if you delete the contents of an undefined field, the field itself remains in the database until you quit Ebib (or close the database). It will not be saved, however, so the next time you load the `.bib` file, the field is gone.
 
 
+# Timestamps #
+
+Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
+
+You can tell Ebib to create timestamps by setting the option `Use Timestamp` in Ebib's customisation buffer. With this option set, a timestamp is included in entries added to the database with `a`. Ebib will also add a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps will be overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
+
+Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under “Options”.
+
+Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%a %b` `%e %T %Y"`, which produces a timestamp of the form `"Mon Mar 12 01:03:26 2007"`. This string is not directly suitable for sorting, so if you want to be able to sort on timestamps, you'll need to customise the format string. See the documentation for `format-time-string` on the options that are available. (Alternatively, the default time stamp format can be converted into a sortable time format using `date-to-time`, but currently Ebib is not able to do this automatically.)
+
+Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then.
+
+
 ## Hidden Fields ##
 
 Biblatex defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key `H` in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields", which can be customised.
@@ -305,6 +318,63 @@ You can also save your filters to a different file with `F w`. Such a filter fil
 To see what filters are currently stored, use `F V`. If you want to rename a filter, you can do so with `F R`.
 
 Note that cancelling a filter with `F c` does not delete it from the list of stored filters, it will remain available for later application. If you want to delete a filter from the list of stored filters, use `F d`. You can also delete all stored filters with `F D`. These deletion commands do not ask for confirmation, but if you delete any filters by accident, you can reload them from `~/.emacs.d/ebib-filters` with `F l`.
+
+
+### Special Filters ###
+
+Filters are essentially Lisp expressions that consist of the functions `and`, `or`, and `not`, together with a special macro `contains`. However, filters are not limited to these forms. They can essentially contain any Lisp expression. It is not possible to create such special filters interactively, but it is possible to write such filters and put them in a filter file, or to write a function that creates a special filter.
+
+A filter is a Lisp expression that should return either `t` or `nil`, indicating whether the entry being tested matches the filter or not. The contents of the entry is available in a variable `entry`. This variable is given a value by the function that runs the filter, but it is not passed as an argument. Rather, it is a local dynamic variable, which means that the file that defines the filter function should have the variable `lexical-binding` set to `nil`.
+
+The value of `entry` is an alist of fields and their values. These include the fields `=key=` and `=type=` for the entry key and type:
+
+```
+(("author" . "{Noam Chomsky}")
+ ("title" . "{Syntactic Structures}")
+ ("publisher" . "{The Hague: Mouton}")
+ ("year" . "{1957}")
+ ("remark" . "{copy}")
+ ("timestamp" . "{2007-12-30}")
+ ("file" . "{c/Chomsky1957.pdf}")
+ ("=type=" . "book")
+ ("=key=" . "Chomsky1957"))
+```
+
+### An Example: Listing Recent Additions ###
+
+One special filter is included with Ebib. It filters recent additions to the database. The command that creates the filter is `ebib-list-recent`:
+
+``` lisp
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let* ((date (time-subtract (current-time) (days-to-time days)))
+         (filter `(ebib--newer-than (quote ,date))))
+    (ebib-db-set-filter filter ebib--cur-db)
+    (ebib--redisplay)))
+```
+
+First, this function saves the current filter if there is one. It then creates a date in Emacs’ internal time format by subtracting the number of days provided by the user from the current date and uses this date to create a Lisp expression which is then installed as the filter for the current database. A call to `ebib--redisplay` then updates the display, taking the filter into account.
+
+The function `ebib--newer-than` is defined as follows:
+
+``` lisp
+(defun ebib--newer-than (date)
+  "Function for use in filters.
+Return t if the entry being tested is newer than DATE.  DATE must
+be a list of the format returned by `current-time' and is
+compared to the timestamp of the entry being tested.  If the
+entry has no timestamp, or a timestamp that cannot be converted
+into a date representation, return nil."
+  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+    (when (and timestamp
+               (setq timestamp (ignore-errors (date-to-time timestamp))))
+      (time-less-p date timestamp))))
+```
+
+This function obtains the time stamp of the entry being tested from the variable `entry` and then tries to convert it to Emacs’ time format. If successful, it compares this time to the date passed as an argument and returns `t` if the latter precedes the former.
 
 
 ### Properties of Filtered Databases ###
@@ -689,17 +759,6 @@ When you export one or more entries, Ebib will ask you for a filename to export 
 If you have more than one database open in Ebib, it is also possible to copy entries from one database to another. To do this, use the `x` command with a numeric prefix argument. E.g., if the database you want to export an entry to is the second database, type `M-2 x` to export the current entry to it. The number of the database is given in the modeline of the index buffer. If the database you're copying an entry to already contains an entry with the same entry key, Ebib won't copy the entry, and issues an appropriate warning message.
 
 Apart from entries, it is also possible to export the `@preamble` and `@string` definitions. The `@preamble` definition is exported with the command `X` in the index buffer. `@string` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@string` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for a filename, and then append the relevent data to that file. With a numeric prefix argument, they copy the relevant data to the corresponding open database.
-
-
-# Timestamps #
-
-Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`. (By default, this field is not shown, but you can make it visible by checking the option "Show Hidden Fields" in the Options menu.)
-
-You can tell Ebib to create timestamps by setting the option `Use Timestamp` in Ebib's customisation buffer. With this option set, a timestamp is included in entries added to the database with `a`. Ebib will also add a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps will be overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
-
-Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option.
-
-Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised in Ebib's customisation buffer. The default string is `"%a %b` `%e %T %Y"`, which produces a timestamp of the form `"Mon Mar 12 01:03:26 2007"`. Obviously, this string is not suited for sorting, so if you want to be able to sort on timestamps, you'll need to customise the format string. See the documentation for `format-time-string` on the options that are available.
 
 
 # Multiple Identical Fields #

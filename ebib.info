@@ -36,6 +36,7 @@ X-based) BibTeX database managers.
 * Installation::
 * Getting Started::
 * Editing the Database::
+* Timestamps::
 * Saving a Database::
 * Using Biblatex::
 * Searching::
@@ -55,7 +56,6 @@ X-based) BibTeX database managers.
 * Sorting the bib File::
 * Merging and Importing::
 * Exporting Entries::
-* Timestamps::
 * Multiple Identical Fields::
 * The Multiline Edit Buffer::
 * The Options Menu::
@@ -417,7 +417,7 @@ start a new database, type ‘o’ first, and give the new file a name.
 Once you have done this, you can start adding entries to the database.
 
 
-File: ebib.info,  Node: Editing the Database,  Next: Saving a Database,  Prev: Getting Started,  Up: Top
+File: ebib.info,  Node: Editing the Database,  Next: Timestamps,  Prev: Getting Started,  Up: Top
 
 3 Editing the Database
 **********************
@@ -431,8 +431,6 @@ editing facilities are discussed here.
 * Editing Fields Values::
 * Editing Multiline Values::
 * Undefined Fields::
-* Hidden Fields::
-* Copy Cut Paste Yank and Delete::
 
 
 File: ebib.info,  Node: Adding and Deleting Entries,  Next: Editing Fields Values,  Up: Editing the Database
@@ -572,7 +570,7 @@ you want to give a field a multiline value when it doesn’t have one yet.
 The Multiline Edit Buffer: #the-multiline-edit-buffer.
 
 
-File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Editing Multiline Values,  Up: Editing the Database
+File: ebib.info,  Node: Undefined Fields,  Prev: Editing Multiline Values,  Up: Editing the Database
 
 3.4 Undefined Fields
 ====================
@@ -596,9 +594,55 @@ database).  It will not be saved, however, so the next time you load the
 ‘.bib’ file, the field is gone.
 
 
-File: ebib.info,  Node: Hidden Fields,  Next: Copy Cut Paste Yank and Delete,  Prev: Undefined Fields,  Up: Editing the Database
+File: ebib.info,  Node: Timestamps,  Next: Saving a Database,  Prev: Editing the Database,  Up: Top
 
-3.5 Hidden Fields
+4 Timestamps
+************
+
+Ebib provides the possibility to add a timestamp to every new entry,
+recording the time it was added to the database.  The timestamp is
+recorded in the (extra) field ‘timestamp’, which is hidden by default.
+
+   You can tell Ebib to create timestamps by setting the option ‘Use
+Timestamp’ in Ebib’s customisation buffer.  With this option set, a
+timestamp is included in entries added to the database with ‘a’.  Ebib
+will also add a timestamp to entries imported from a buffer or merged
+from a file, and to entries exported to another database or to a file.
+When importing or exporting entries, existing timestamps will be
+overwritten.  The logic behind this is that the timestamp records the
+date and time when the entry was added to the database, not when it was
+first created.
+
+   Note that if this option is unset, the timestamp of an entry is
+retained when it’s imported or exported.  Therefore, if you record
+timestamps and want to im-/export entries without changing their
+timestamps, temporarily unset this option, which can be done in the menu
+under “Options”.
+
+   Ebib uses the function ‘format-time-string’ to create the timestamp.
+The format string that Ebib uses can be customised.  The default string
+is ‘"%a %b’ ‘%e %T %Y"’, which produces a timestamp of the form ‘"Mon
+Mar 12 01:03:26 2007"’.  This string is not directly suitable for
+sorting, so if you want to be able to sort on timestamps, you’ll need to
+customise the format string.  See the documentation for
+‘format-time-string’ on the options that are available.  (Alternatively,
+the default time stamp format can be converted into a sortable time
+format using ‘date-to-time’, but currently Ebib is not able to do this
+automatically.)
+
+   Adding timestamps in a format that ‘date-to-time’ can parse makes it
+possible to list the most recent additions to the database.  Ebib
+provides a function to do this: ‘ebib-list-recent’, which asks for a
+number of days and lists the entries that were added since then.
+* Menu:
+
+* Hidden Fields::
+* Copy Cut Paste Yank and Delete::
+
+
+File: ebib.info,  Node: Hidden Fields,  Next: Copy Cut Paste Yank and Delete,  Up: Timestamps
+
+4.1 Hidden Fields
 =================
 
 Biblatex defines a large number of fields, many of which are optional
@@ -617,9 +661,9 @@ available: if you wish to use it, just add the relevant fields to the
 option "Hidden Fields".
 
 
-File: ebib.info,  Node: Copy Cut Paste Yank and Delete,  Prev: Hidden Fields,  Up: Editing the Database
+File: ebib.info,  Node: Copy Cut Paste Yank and Delete,  Prev: Hidden Fields,  Up: Timestamps
 
-3.6 Copy, Cut, Paste (Yank), and Delete
+4.2 Copy, Cut, Paste (Yank), and Delete
 =======================================
 
 A few more commands are available when you’re in the entry buffer
@@ -640,9 +684,9 @@ value.  If you do want to yank text into a field that already has a
 value, simply hit ‘d’ first to delete the text.
 
 
-File: ebib.info,  Node: Saving a Database,  Next: Using Biblatex,  Prev: Editing the Database,  Up: Top
+File: ebib.info,  Node: Saving a Database,  Next: Using Biblatex,  Prev: Timestamps,  Up: Top
 
-4 Saving a Database
+5 Saving a Database
 *******************
 
 When you have undertaken any kind of editing action on a database, it is
@@ -664,7 +708,7 @@ for this is ‘w’.
 
 File: ebib.info,  Node: Using Biblatex,  Next: Searching,  Prev: Saving a Database,  Up: Top
 
-5 Using Biblatex
+6 Using Biblatex
 ****************
 
 Compared to BibTeX, Biblatex has a greatly expanded number of fields, a
@@ -679,7 +723,7 @@ it is set up for the right “dialect”.
 
 File: ebib.info,  Node: Setting the BibTeX Dialect,  Next: Alias Types and Fields,  Up: Using Biblatex
 
-5.1 Setting the BibTeX Dialect
+6.1 Setting the BibTeX Dialect
 ==============================
 
 Biblatex files use the same ‘.bib’ suffix that BibTeX files use.
@@ -721,7 +765,7 @@ dialect setting, the mode line shows the default setting.
 
 File: ebib.info,  Node: Alias Types and Fields,  Prev: Setting the BibTeX Dialect,  Up: Using Biblatex
 
-5.2 Alias Types and Fields
+6.2 Alias Types and Fields
 ==========================
 
 The set of entry types defined by Biblatex differs from the set used by
@@ -759,7 +803,7 @@ Biblatex’s conventions.
 
 File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Ebib,  Prev: Using Biblatex,  Up: Top
 
-6 Searching
+7 Searching
 ***********
 
 * Menu:
@@ -770,7 +814,7 @@ File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Eb
 
 File: ebib.info,  Node: Simple Searches,  Next: Filters,  Up: Searching
 
-6.1 Simple Searches
+7.1 Simple Searches
 ===================
 
 Ebib provides several search methods.  The simplest method is to type
@@ -809,7 +853,7 @@ so.
 
 File: ebib.info,  Node: Filters,  Prev: Simple Searches,  Up: Searching
 
-6.2 Filters
+7.2 Filters
 ===========
 
 Ebib also has a much more sophisticated search mechanism that makes use
@@ -829,12 +873,14 @@ criteria combined with the logical operators ‘and, or’ and ‘not’.
 * Simple Selection::
 * Complex Filters::
 * Storing and Saving Filters::
+* Special Filters::
+* An Example Listing Recent Additions::
 * Properties of Filtered Databases::
 
 
 File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
 
-6.2.1 Simple Selection
+7.2.1 Simple Selection
 ----------------------
 
 Creating a filter is simple: press ‘&’, and Ebib will ask you for a
@@ -869,7 +915,7 @@ enter any search term, of course.
 
 File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Prev: Simple Selection,  Up: Filters
 
-6.2.2 Complex Filters
+7.2.2 Complex Filters
 ---------------------
 
 Once you have a filter on your database, you can refine or extend it.
@@ -939,9 +985,9 @@ can rebind the ‘c’ key to the function ‘ebib-close-database’.  See *note
 Modifying Key Bindings: #modifying-key-bindings. for details.)
 
 
-File: ebib.info,  Node: Storing and Saving Filters,  Next: Properties of Filtered Databases,  Prev: Complex Filters,  Up: Filters
+File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
 
-6.2.3 Storing and Saving Filters
+7.2.3 Storing and Saving Filters
 --------------------------------
 
 When you cancel a filter, it is automatically stored so that it can be
@@ -995,9 +1041,90 @@ commands do not ask for confirmation, but if you delete any filters by
 accident, you can reload them from ‘~/.emacs.d/ebib-filters’ with ‘F l’.
 
 
-File: ebib.info,  Node: Properties of Filtered Databases,  Prev: Storing and Saving Filters,  Up: Filters
+File: ebib.info,  Node: Special Filters,  Next: An Example Listing Recent Additions,  Prev: Storing and Saving Filters,  Up: Filters
 
-6.2.4 Properties of Filtered Databases
+7.2.4 Special Filters
+---------------------
+
+Filters are essentially Lisp expressions that consist of the functions
+‘and’, ‘or’, and ‘not’, together with a special macro ‘contains’.
+However, filters are not limited to these forms.  They can essentially
+contain any Lisp expression.  It is not possible to create such special
+filters interactively, but it is possible to write such filters and put
+them in a filter file, or to write a function that creates a special
+filter.
+
+   A filter is a Lisp expression that should return either ‘t’ or ‘nil’,
+indicating whether the entry being tested matches the filter or not.
+The contents of the entry is available in a variable ‘entry’.  This
+variable is given a value by the function that runs the filter, but it
+is not passed as an argument.  Rather, it is a local dynamic variable,
+which means that the file that defines the filter function should have
+the variable ‘lexical-binding’ set to ‘nil’.
+
+   The value of ‘entry’ is an alist of fields and their values.  These
+include the fields ‘=key=’ and ‘=type=’ for the entry key and type:
+
+(("author" . "{Noam Chomsky}")
+ ("title" . "{Syntactic Structures}")
+ ("publisher" . "{The Hague: Mouton}")
+ ("year" . "{1957}")
+ ("remark" . "{copy}")
+ ("timestamp" . "{2007-12-30}")
+ ("file" . "{c/Chomsky1957.pdf}")
+ ("=type=" . "book")
+ ("=key=" . "Chomsky1957"))
+
+
+File: ebib.info,  Node: An Example Listing Recent Additions,  Next: Properties of Filtered Databases,  Prev: Special Filters,  Up: Filters
+
+7.2.5 An Example: Listing Recent Additions
+------------------------------------------
+
+One special filter is included with Ebib.  It filters recent additions
+to the database.  The command that creates the filter is
+‘ebib-list-recent’:
+
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let* ((date (time-subtract (current-time) (days-to-time days)))
+         (filter `(ebib--newer-than (quote ,date))))
+    (ebib-db-set-filter filter ebib--cur-db)
+    (ebib--redisplay)))
+
+   First, this function saves the current filter if there is one.  It
+then creates a date in Emacs’ internal time format by subtracting the
+number of days provided by the user from the current date and uses this
+date to create a Lisp expression which is then installed as the filter
+for the current database.  A call to ‘ebib--redisplay’ then updates the
+display, taking the filter into account.
+
+   The function ‘ebib--newer-than’ is defined as follows:
+
+(defun ebib--newer-than (date)
+  "Function for use in filters.
+Return t if the entry being tested is newer than DATE.  DATE must
+be a list of the format returned by `current-time' and is
+compared to the timestamp of the entry being tested.  If the
+entry has no timestamp, or a timestamp that cannot be converted
+into a date representation, return nil."
+  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+    (when (and timestamp
+               (setq timestamp (ignore-errors (date-to-time timestamp))))
+      (time-less-p date timestamp))))
+
+   This function obtains the time stamp of the entry being tested from
+the variable ‘entry’ and then tries to convert it to Emacs’ time format.
+If successful, it compares this time to the date passed as an argument
+and returns ‘t’ if the latter precedes the former.
+
+
+File: ebib.info,  Node: Properties of Filtered Databases,  Prev: An Example Listing Recent Additions,  Up: Filters
+
+7.2.6 Properties of Filtered Databases
 --------------------------------------
 
 When a filter is active, there are a few things that are not possible or
@@ -1033,7 +1160,7 @@ stored filters and can be used when no filter is active.
 
 File: ebib.info,  Node: Consulting BibTeX Databases outside Ebib,  Next: Cross-referencing,  Prev: Searching,  Up: Top
 
-7 Consulting BibTeX Databases outside Ebib
+8 Consulting BibTeX Databases outside Ebib
 ******************************************
 
 Having a BibTeX database manager running inside Emacs has an additional
@@ -1117,7 +1244,7 @@ those after using ‘ebib-create-bib-from-bbl’.
 
 File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Up: Consulting BibTeX Databases outside Ebib
 
-7.1 Key Bindings
+8.1 Key Bindings
 ================
 
 Of course, the easiest way to use the commands discussed here is to bind
@@ -1139,7 +1266,7 @@ Ebib will do the right thing.
 
 File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a LaTeX File,  Prev: Key Bindings,  Up: Consulting BibTeX Databases outside Ebib
 
-7.2 Defining Citation Commands
+8.2 Defining Citation Commands
 ==============================
 
 As mentioned, you should probably set up some citation commands if you
@@ -1277,7 +1404,7 @@ Orgmode buffer.
 
 File: ebib.info,  Node: Associating a Database with a LaTeX File,  Prev: Defining Citation Commands,  Up: Consulting BibTeX Databases outside Ebib
 
-7.3 Associating a Database with a LaTeX File
+8.3 Associating a Database with a LaTeX File
 ============================================
 
 The commands ‘ebib-insert-bibtex-key’ and ‘ebib-entry-summary’ must
@@ -1330,7 +1457,7 @@ file-local variable section of a file.)
 
 File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Consulting BibTeX Databases outside Ebib,  Up: Top
 
-8 Cross-referencing
+9 Cross-referencing
 *******************
 
 Both BibTeX and Biblatex have a cross-referencing facility.  Suppose you
@@ -1390,8 +1517,8 @@ This tells Ebib to save all entries with a ‘crossref’ field first in the
 
 File: ebib.info,  Node: Marking Entries,  Next: Printing the Database,  Prev: Cross-referencing,  Up: Top
 
-9 Marking Entries
-*****************
+10 Marking Entries
+******************
 
 Commands in the index buffer generally operate on one single entry, or
 on all entries.  For some commands, however, it may sometimes be useful
@@ -1414,7 +1541,7 @@ entries, marks all entries in the current database.
 
 File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser,  Prev: Marking Entries,  Up: Top
 
-10 Printing the Database
+11 Printing the Database
 ************************
 
 Sometimes it may be useful to have a ‘.pdf’ file or print-out of your
@@ -1488,7 +1615,7 @@ Preamble" you can set your preferred bibliography style.
 
 File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing the Database,  Up: Top
 
-11 Calling a Browser
+12 Calling a Browser
 ********************
 
 With most scientific literature nowadays being available on-line, it is
@@ -1537,7 +1664,7 @@ Field".  The same can be done for the DOI field.
 
 File: ebib.info,  Node: Viewing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
 
-12 Viewing Files
+13 Viewing Files
 ****************
 
 If you have electronic versions of the papers in your database stored on
@@ -1591,7 +1718,7 @@ files for notes, or if you want to read pdf files in Emacs with
 
 File: ebib.info,  Node: Editing the file field,  Up: Viewing Files
 
-12.1 Editing the ‘file’ field
+13.1 Editing the ‘file’ field
 =============================
 
 As mentioned above, editing the ‘file’ field is a bit different from
@@ -1617,7 +1744,7 @@ part of the file name to turn it into a relative path.
 
 File: ebib.info,  Node: Notes files,  Next: Window Management,  Prev: Viewing Files,  Up: Top
 
-13 Notes files
+14 Notes files
 **************
 
 Ebib supports the ‘annote’ (or ‘annotation’) field, but if you prefer to
@@ -1661,7 +1788,7 @@ defined for the purpose.
 
 File: ebib.info,  Node: Window Management,  Next: Creating Entry Stubs,  Prev: Notes files,  Up: Top
 
-14 Window Management
+15 Window Management
 ********************
 
 By default, Ebib takes over the entire Emacs frame it is started in,
@@ -1721,7 +1848,7 @@ is displayed at the top or on the left of the frame.)
 
 File: ebib.info,  Node: Creating Entry Stubs,  Next: @Preamble Definition,  Prev: Window Management,  Up: Top
 
-15 Creating Entry Stubs
+16 Creating Entry Stubs
 ***********************
 
 If you have a directory full of (pdf) files of articles that you want to
@@ -1744,7 +1871,7 @@ hand, you can do so by pressing ‘E’ in the index buffer.
 
 File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Creating Entry Stubs,  Up: Top
 
-16 @Preamble Definition
+17 @Preamble Definition
 ***********************
 
 Apart from database entries, BibTeX allows three more types of elements
@@ -1790,7 +1917,7 @@ manner just described and saves them in one ‘@preamble’ definition.
 
 File: ebib.info,  Node: @String Definitions,  Next: @Comments,  Prev: @Preamble Definition,  Up: Top
 
-17 @String Definitions
+18 @String Definitions
 **********************
 
 If you press (uppercase) ‘S’ in the index buffer, Ebib hides the entry
@@ -1862,7 +1989,7 @@ completion to complete a partial string.
 
 File: ebib.info,  Node: @Comments,  Next: Managing Keywords,  Prev: @String Definitions,  Up: Top
 
-18 @Comments
+19 @Comments
 ************
 
 If Ebib finds a ‘@comment’ in a ‘.bib’ file, it will read it and store
@@ -1874,7 +2001,7 @@ where in the ‘.bib’ file a comment is placed, but they won’t be lost.
 
 File: ebib.info,  Node: Managing Keywords,  Next: Sorting the bib File,  Prev: @Comments,  Up: Top
 
-19 Managing Keywords
+20 Managing Keywords
 ********************
 
 Ebib provides some special functionality for handling keywords.  By
@@ -1979,7 +2106,7 @@ it to the separator.
 
 File: ebib.info,  Node: Sorting the bib File,  Next: Merging and Importing,  Prev: Managing Keywords,  Up: Top
 
-20 Sorting the ‘.bib’ File
+21 Sorting the ‘.bib’ File
 **************************
 
 By default, the entries in the database are saved to the ‘.bib’ file in
@@ -2040,7 +2167,7 @@ set by default, you need to unset if you set "Sort Order".
 
 File: ebib.info,  Node: Merging and Importing,  Next: Exporting Entries,  Prev: Sorting the bib File,  Up: Top
 
-21 Merging and Importing
+22 Merging and Importing
 ************************
 
 As described in the previous chapter, adding entries to a database can
@@ -2075,9 +2202,9 @@ also automatically be replaced with a more sensible key when you edit
 them.  See the option "Autogenerate Keys" for details.
 
 
-File: ebib.info,  Node: Exporting Entries,  Next: Timestamps,  Prev: Merging and Importing,  Up: Top
+File: ebib.info,  Node: Exporting Entries,  Next: Multiple Identical Fields,  Prev: Merging and Importing,  Up: Top
 
-22 Exporting Entries
+23 Exporting Entries
 ********************
 
 Sometimes it can be useful to copy entries from one database to another,
@@ -2114,43 +2241,7 @@ With a numeric prefix argument, they copy the relevant data to the
 corresponding open database.
 
 
-File: ebib.info,  Node: Timestamps,  Next: Multiple Identical Fields,  Prev: Exporting Entries,  Up: Top
-
-23 Timestamps
-*************
-
-Ebib provides the possibility to add a timestamp to every new entry,
-recording the time it was added to the database.  The timestamp is
-recorded in the (extra) field ‘timestamp’.  (By default, this field is
-not shown, but you can make it visible by checking the option "Show
-Hidden Fields" in the Options menu.)
-
-   You can tell Ebib to create timestamps by setting the option ‘Use
-Timestamp’ in Ebib’s customisation buffer.  With this option set, a
-timestamp is included in entries added to the database with ‘a’.  Ebib
-will also add a timestamp to entries imported from a buffer or merged
-from a file, and to entries exported to another database or to a file.
-When importing or exporting entries, existing timestamps will be
-overwritten.  The logic behind this is that the timestamp records the
-date and time when the entry was added to the database, not when it was
-first created.
-
-   Note that if this option is unset, the timestamp of an entry is
-retained when it’s imported or exported.  Therefore, if you record
-timestamps and want to im-/export entries without changing their
-timestamps, temporarily unset this option.
-
-   Ebib uses the function ‘format-time-string’ to create the timestamp.
-The format string that Ebib uses can be customised in Ebib’s
-customisation buffer.  The default string is ‘"%a %b’ ‘%e %T %Y"’, which
-produces a timestamp of the form ‘"Mon Mar 12 01:03:26 2007"’.
-Obviously, this string is not suited for sorting, so if you want to be
-able to sort on timestamps, you’ll need to customise the format string.
-See the documentation for ‘format-time-string’ on the options that are
-available.
-
-
-File: ebib.info,  Node: Multiple Identical Fields,  Next: The Multiline Edit Buffer,  Prev: Timestamps,  Up: Top
+File: ebib.info,  Node: Multiple Identical Fields,  Next: The Multiline Edit Buffer,  Prev: Exporting Entries,  Up: Top
 
 24 Multiple Identical Fields
 ****************************
@@ -2901,101 +2992,105 @@ Ref: #navigating-a-.bib-file15182
 Node: Starting a New bib File18595
 Ref: #starting-a-new-.bib-file18765
 Node: Editing the Database19057
-Ref: #editing-the-database19212
-Node: Adding and Deleting Entries19569
-Ref: #adding-and-deleting-entries19746
-Node: Editing Fields Values21536
-Ref: #editing-fields-values21734
-Node: Editing Multiline Values24396
-Ref: #editing-multiline-values24589
-Node: Undefined Fields27118
-Ref: #undefined-fields27287
-Node: Hidden Fields28263
-Ref: #hidden-fields28432
-Node: Copy Cut Paste Yank and Delete29293
-Ref: #copy-cut-paste-yank-and-delete29481
-Node: Saving a Database30433
-Ref: #saving-a-database30581
-Node: Using Biblatex31545
-Ref: #using-biblatex31676
-Node: Setting the BibTeX Dialect32003
-Ref: #setting-the-bibtex-dialect32172
-Node: Alias Types and Fields34383
-Ref: #alias-types-and-fields34544
-Node: Searching36730
-Ref: #searching36874
-Node: Simple Searches36916
-Ref: #simple-searches37032
-Node: Filters38968
-Ref: #filters39068
-Node: Simple Selection40056
-Ref: #simple-selection40185
-Node: Complex Filters41863
-Ref: #complex-filters42025
-Node: Storing and Saving Filters46012
-Ref: #storing-and-saving-filters46212
-Node: Properties of Filtered Databases49083
-Ref: #properties-of-filtered-databases49271
-Node: Consulting BibTeX Databases outside Ebib51049
-Ref: #consulting-bibtex-databases-outside-ebib51258
-Node: Key Bindings55693
-Ref: #key-bindings55850
-Node: Defining Citation Commands56622
-Ref: #defining-citation-commands56856
-Node: Associating a Database with a LaTeX File62763
-Ref: #associating-a-database-with-a-latex-file63004
-Node: Cross-referencing65949
-Ref: #cross-referencing66118
-Node: Marking Entries69419
-Ref: #marking-entries69565
-Node: Printing the Database70544
-Ref: #printing-the-database70704
-Node: Calling a Browser74492
-Ref: #calling-a-browser74642
-Node: Viewing Files77262
-Ref: #viewing-files77394
-Node: Editing the file field80227
-Ref: #editing-the-file-field80362
-Node: Notes files81565
-Ref: #notes-files81693
-Node: Window Management83739
-Ref: #window-management83886
-Node: Creating Entry Stubs86970
-Ref: #creating-entry-stubs87132
-Node: @Preamble Definition88133
-Ref: #preamble-definition88297
-Node: @String Definitions90292
-Ref: #string-definitions90443
-Node: @Comments93952
-Ref: #comments94080
-Node: Managing Keywords94445
-Ref: #managing-keywords94590
-Node: Sorting the bib File100475
-Ref: #sorting-the-.bib-file100648
-Node: Merging and Importing103775
-Ref: #merging-and-importing103940
-Node: Exporting Entries105714
-Ref: #exporting-entries105861
-Node: Timestamps107836
-Ref: #timestamps107973
-Node: Multiple Identical Fields109636
-Ref: #multiple-identical-fields109811
-Node: The Multiline Edit Buffer111704
-Ref: #the-multiline-edit-buffer111885
-Node: The Options Menu116015
-Ref: #the-options-menu116169
-Node: The Ebib Buffers116790
-Ref: #the-ebib-buffers116932
-Node: The Index Buffer117274
-Ref: #the-index-buffer117411
-Node: The Entry Buffer124071
-Ref: #the-entry-buffer124235
-Node: The Strings Buffer126771
-Ref: #the-strings-buffer126914
-Node: Customisation128740
-Ref: #customisation128851
-Node: Modifying Key Bindings129776
-Ref: #modifying-key-bindings129903
+Ref: #editing-the-database19205
+Node: Adding and Deleting Entries19509
+Ref: #adding-and-deleting-entries19686
+Node: Editing Fields Values21476
+Ref: #editing-fields-values21674
+Node: Editing Multiline Values24336
+Ref: #editing-multiline-values24529
+Node: Undefined Fields27058
+Ref: #undefined-fields27205
+Node: Timestamps28181
+Ref: #timestamps28311
+Node: Hidden Fields30408
+Ref: #hidden-fields30542
+Node: Copy Cut Paste Yank and Delete31403
+Ref: #copy-cut-paste-yank-and-delete31581
+Node: Saving a Database32533
+Ref: #saving-a-database32671
+Node: Using Biblatex33635
+Ref: #using-biblatex33766
+Node: Setting the BibTeX Dialect34093
+Ref: #setting-the-bibtex-dialect34262
+Node: Alias Types and Fields36473
+Ref: #alias-types-and-fields36634
+Node: Searching38820
+Ref: #searching38964
+Node: Simple Searches39006
+Ref: #simple-searches39122
+Node: Filters41058
+Ref: #filters41158
+Node: Simple Selection42206
+Ref: #simple-selection42335
+Node: Complex Filters44013
+Ref: #complex-filters44175
+Node: Storing and Saving Filters48162
+Ref: #storing-and-saving-filters48345
+Node: Special Filters51216
+Ref: #special-filters51397
+Node: An Example Listing Recent Additions52752
+Ref: #an-example-listing-recent-additions52981
+Node: Properties of Filtered Databases54844
+Ref: #properties-of-filtered-databases55041
+Node: Consulting BibTeX Databases outside Ebib56819
+Ref: #consulting-bibtex-databases-outside-ebib57028
+Node: Key Bindings61463
+Ref: #key-bindings61620
+Node: Defining Citation Commands62392
+Ref: #defining-citation-commands62626
+Node: Associating a Database with a LaTeX File68533
+Ref: #associating-a-database-with-a-latex-file68774
+Node: Cross-referencing71719
+Ref: #cross-referencing71888
+Node: Marking Entries75189
+Ref: #marking-entries75337
+Node: Printing the Database76316
+Ref: #printing-the-database76476
+Node: Calling a Browser80264
+Ref: #calling-a-browser80414
+Node: Viewing Files83034
+Ref: #viewing-files83166
+Node: Editing the file field85999
+Ref: #editing-the-file-field86134
+Node: Notes files87337
+Ref: #notes-files87465
+Node: Window Management89511
+Ref: #window-management89658
+Node: Creating Entry Stubs92742
+Ref: #creating-entry-stubs92904
+Node: @Preamble Definition93905
+Ref: #preamble-definition94069
+Node: @String Definitions96064
+Ref: #string-definitions96215
+Node: @Comments99724
+Ref: #comments99852
+Node: Managing Keywords100217
+Ref: #managing-keywords100362
+Node: Sorting the bib File106247
+Ref: #sorting-the-.bib-file106420
+Node: Merging and Importing109547
+Ref: #merging-and-importing109712
+Node: Exporting Entries111486
+Ref: #exporting-entries111648
+Node: Multiple Identical Fields113623
+Ref: #multiple-identical-fields113805
+Node: The Multiline Edit Buffer115698
+Ref: #the-multiline-edit-buffer115879
+Node: The Options Menu120009
+Ref: #the-options-menu120163
+Node: The Ebib Buffers120784
+Ref: #the-ebib-buffers120926
+Node: The Index Buffer121268
+Ref: #the-index-buffer121405
+Node: The Entry Buffer128065
+Ref: #the-entry-buffer128229
+Node: The Strings Buffer130765
+Ref: #the-strings-buffer130908
+Node: Customisation132734
+Ref: #customisation132845
+Node: Modifying Key Bindings133770
+Ref: #modifying-key-bindings133897
 
 End Tag Table
 
