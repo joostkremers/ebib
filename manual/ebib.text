@@ -194,6 +194,13 @@ It is even possible to add such fields to an entry by pressing `a` in the entry 
 Note that if you delete the contents of an undefined field, the field itself remains in the database until you quit Ebib (or close the database). It will not be saved, however, so the next time you load the `.bib` file, the field is gone.
 
 
+## Hidden Fields ##
+
+Biblatex defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key `H` in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields", which can be customised.
+
+Most of the fields defined as hidden are Biblatex-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option "Hidden Fields".
+
+
 ## Timestamps ##
 
 Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
@@ -205,13 +212,6 @@ Note that if this option is unset, the timestamp of an entry is retained when it
 Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%a %b` `%e %T %Y"`, which produces a timestamp of the form `"Mon Mar 12 01:03:26 2007"`. This string is not directly suitable for sorting, so if you want to be able to sort on timestamps, you'll need to customise the format string. See the documentation for `format-time-string` on the options that are available. (Alternatively, the default time stamp format can be converted into a sortable time format using `date-to-time`, but currently Ebib is not able to do this automatically.)
 
 Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then.
-
-
-## Hidden Fields ##
-
-Biblatex defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key `H` in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields", which can be customised.
-
-Most of the fields defined as hidden are Biblatex-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option "Hidden Fields".
 
 
 ## Copy, Cut, Paste (Yank), and Delete ##

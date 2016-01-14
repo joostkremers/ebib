@@ -430,8 +430,8 @@ editing facilities are discussed here.
 * Editing Fields Values::
 * Editing Multiline Values::
 * Undefined Fields::
-* Timestamps::
 * Hidden Fields::
+* Timestamps::
 * Copy Cut Paste Yank and Delete::
 
 
@@ -572,7 +572,7 @@ you want to give a field a multiline value when it doesn’t have one yet.
 The Multiline Edit Buffer: #the-multiline-edit-buffer.
 
 
-File: ebib.info,  Node: Undefined Fields,  Next: Timestamps,  Prev: Editing Multiline Values,  Up: Editing the Database
+File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Editing Multiline Values,  Up: Editing the Database
 
 3.4 Undefined Fields
 ====================
@@ -596,9 +596,30 @@ database).  It will not be saved, however, so the next time you load the
 ‘.bib’ file, the field is gone.
 
 
-File: ebib.info,  Node: Timestamps,  Next: Hidden Fields,  Prev: Undefined Fields,  Up: Editing the Database
+File: ebib.info,  Node: Hidden Fields,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
 
-3.5 Timestamps
+3.5 Hidden Fields
+=================
+
+Biblatex defines a large number of fields, many of which are optional
+for most entry types.  Displaying all these fields in the entry buffer
+would not be very practical, because you are most likely interested in
+only a few of them.  For this reason, Ebib defines a (fairly large)
+number of fields as ’hidden’, meaning that they are not shown in the
+entry buffer.  You can make these fields visible with the key ‘H’ in the
+index buffer.  Which fields are treated as hidden is controlled by the
+option "Hidden Fields", which can be customised.
+
+   Most of the fields defined as hidden are Biblatex-specific, because
+BibTeX recognises a much smaller number of fields and there isn’t much
+of a need to hide the lesser used ones.  However, the functionality is
+available: if you wish to use it, just add the relevant fields to the
+option "Hidden Fields".
+
+
+File: ebib.info,  Node: Timestamps,  Next: Copy Cut Paste Yank and Delete,  Prev: Hidden Fields,  Up: Editing the Database
+
+3.6 Timestamps
 ==============
 
 Ebib provides the possibility to add a timestamp to every new entry,
@@ -638,28 +659,7 @@ provides a function to do this: ‘ebib-list-recent’, which asks for a
 number of days and lists the entries that were added since then.
 
 
-File: ebib.info,  Node: Hidden Fields,  Next: Copy Cut Paste Yank and Delete,  Prev: Timestamps,  Up: Editing the Database
-
-3.6 Hidden Fields
-=================
-
-Biblatex defines a large number of fields, many of which are optional
-for most entry types.  Displaying all these fields in the entry buffer
-would not be very practical, because you are most likely interested in
-only a few of them.  For this reason, Ebib defines a (fairly large)
-number of fields as ’hidden’, meaning that they are not shown in the
-entry buffer.  You can make these fields visible with the key ‘H’ in the
-index buffer.  Which fields are treated as hidden is controlled by the
-option "Hidden Fields", which can be customised.
-
-   Most of the fields defined as hidden are Biblatex-specific, because
-BibTeX recognises a much smaller number of fields and there isn’t much
-of a need to hide the lesser used ones.  However, the functionality is
-available: if you wish to use it, just add the relevant fields to the
-option "Hidden Fields".
-
-
-File: ebib.info,  Node: Copy Cut Paste Yank and Delete,  Prev: Hidden Fields,  Up: Editing the Database
+File: ebib.info,  Node: Copy Cut Paste Yank and Delete,  Prev: Timestamps,  Up: Editing the Database
 
 3.7 Copy, Cut, Paste (Yank), and Delete
 =======================================
@@ -2998,12 +2998,12 @@ Ref: #editing-fields-values21734
 Node: Editing Multiline Values24396
 Ref: #editing-multiline-values24589
 Node: Undefined Fields27118
-Ref: #undefined-fields27284
-Node: Timestamps28260
-Ref: #timestamps28403
-Node: Hidden Fields30438
-Ref: #hidden-fields30601
-Node: Copy Cut Paste Yank and Delete31462
+Ref: #undefined-fields27287
+Node: Hidden Fields28263
+Ref: #hidden-fields28412
+Node: Timestamps29273
+Ref: #timestamps29430
+Node: Copy Cut Paste Yank and Delete31465
 Ref: #copy-cut-paste-yank-and-delete31650
 Node: Saving a Database32602
 Ref: #saving-a-database32750
