@@ -240,9 +240,11 @@ return value is also nil."
                               "any field"
                             f)))))
         (let ((pretty-filter (pp-filter filter)))
-          (if (string-match "\\`(\\(.*\\))\\'" pretty-filter) ; remove the outer parentheses
-              (match-string 1 pretty-filter)
-            pretty-filter))))))
+          (if (not pretty-filter)
+              "Filtered"
+            (if (string-match "\\`(\\(.*\\))\\'" pretty-filter) ; remove the outer parentheses
+                (match-string 1 pretty-filter)
+              pretty-filter)))))))
 
 (defun ebib--filters-load-file (file &optional overwrite)
   "Load filters from FILE.
