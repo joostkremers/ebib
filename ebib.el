@@ -1082,19 +1082,22 @@ interactively."
 
 (defun ebib--create-notes-file-name (key)
   "Create a notes filename for KEY.
-KEY is transformed as per `ebib-name-transform-function' and
-`ebib-notes-file-extension' is added to the file name.
-Additionally, the file name is fully qualified by prepending the
-first element in `ebib-file-search-dirs' to it."
-  (concat (car ebib-file-search-dirs)
+First, `ebib-notes-name-transform-function' is applied to KEY,
+and `ebib-notes-file-extension' is added to it.  Then, the file
+name is fully qualified by prepending the directory in
+`ebib-notes-directory'."
+  (concat (or ebib-notes-directory (car ebib-file-search-dirs))
           "/" ; to be on the safe side
-          (ebib--create-file-name-from-key key ebib-notes-file-extension)))
+          (funcall (or ebib-notes-name-transform-function
+                       ebib-name-transform-function)
+                   key)
+          "."
+          ebib-notes-file-extension))
 
 (defun ebib-open-notes-file ()
   "Open or create a notes file for the current entry.
-The file name is created from the entry key after applying the
-function `ebib-name-transform-function' and adding
-`ebib-notes-file-extension' to it."
+The file name is created from the entry key by the function
+`ebib--create-notes-file-name.'"
   (interactive)
   (ebib--execute-when
     ((entries)

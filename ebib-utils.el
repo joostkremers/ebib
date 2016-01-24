@@ -447,6 +447,22 @@ key."
   :group 'ebib
   :type '(string :tag "Notes file symbol"))
 
+(defcustom ebib-notes-directory nil
+  "Directory to save notes files to.
+If this is nil, the first directory in `ebib-file-search-dirs' is
+used."
+  :group 'ebib
+  :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
+                 (directory :tag "Specify directory")))
+
+(defcustom ebib-notes-name-transform-function nil
+  "Function for transforming keys into notes file names.
+If this is nil, the function `ebib-name-transform-function' is
+used instead."
+  :group 'ebib
+  :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
+                 (function :tag "Apply function")))
+
 (defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
   :group 'ebib
