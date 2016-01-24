@@ -316,6 +316,30 @@ filter named NAME, raise an error, unless NOERROR is non-NIL."
   "Return non-NIL if a filter with NAME already exists."
   (assoc-string name ebib--filters-alist ebib-filters-ignore-case))
 
+;; Special filters
+
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let* ((date (time-subtract (current-time) (days-to-time days)))
+         (filter `(ebib--newer-than (quote ,date))))
+    (ebib-db-set-filter filter ebib--cur-db)
+    (ebib--redisplay)))
+
+(defun ebib--newer-than (date)
+  "Function for use in filters.
+Return t if the entry being tested is newer than DATE.  DATE must
+be a list of the format returned by `current-time' and is
+compared to the timestamp of the entry being tested.  If the
+entry has no timestamp, or a timestamp that cannot be converted
+into a date representation, return nil."
+  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+    (when (and timestamp
+               (setq timestamp (ignore-errors (date-to-time timestamp))))
+      (time-less-p date timestamp))))
+
 (provide 'ebib-filters)
 
 ;;; ebib-filters.el ends here
