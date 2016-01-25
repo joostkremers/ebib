@@ -1690,15 +1690,6 @@ directories listed in the option "File Search Dirs".  As an extra
 service, Ebib also searches for the base filename, i.e., ‘Abney1987’ in
 this particular case.
 
-   Furthermore, if the ‘file’ field is empty, Ebib will search for a
-file name based on the entry key.  By default, Ebib just appends ‘.pdf’
-to the entry key and tries to find a file by the name thus created.  If
-you want, you can modify the file name that Ebib searches for by setting
-the option ‘ebib-name-transform-function’ to a function that performs
-the transformation.  This function takes the key of the current entry as
-its argument (as a string), and should return the file name to use
-(without ‘.pdf’, which is added automatically).
-
    Ebib can call different external programs depending on the file
 extension of the relevant file.  The option "File Associations" allows
 you to specify which programs to call for which types of files.  By
@@ -1709,6 +1700,36 @@ you can of course specify the full path to the program.  There is also
 the option to open files in Emacs.  Use this if you have separate text
 files for notes, or if you want to read pdf files in Emacs with
 ‘doc-view-mode’.
+
+   If the ‘file’ field is empty, Ebib will search for a pdf file with a
+name based on the entry key.  By default, Ebib just appends ‘.pdf’ to
+the entry key and tries to find a file by the name thus created.  If you
+want, you can modify the file name that Ebib searches for by setting the
+option ‘ebib-name-transform-function’ to a function that performs the
+transformation.  This function takes the key of the current entry as its
+argument (as a string), and should return the file name to use (without
+‘.pdf’, which is added automatically).
+
+   For example, if your entry keys separate authors with colons (i.e.,
+you have keys of the form ‘Hauser:Chomsky:Fitch2002’), but your pdf
+files have underscores (i.e., ‘Hauser_Chomsky_Fitch2002.pdf’), then you
+can set ‘ebib-name-transform-function’ to:
+
+(lambda (key) (replace-regexp-in-string ":" "_" key))
+
+   Note that you can also use ‘ebib-name-transform-function’ to add a
+subdirectory to the file name.  For example, if you store the pdf files
+in subdirectories ‘A/’ to ‘Z/’ corresponding to the first letter of the
+file name, you can use the following function:
+
+(lambda (key) (format "%c/%s" (aref key 0) key))
+
+   For the entry key ‘Chomsky1995’, this produces ‘C/Chomsky1995’, which
+is then appended with the extension ‘.pdf’.
+
+   Of course, the function in ‘ebib-name-transform-function’ does not
+have to be a lambda.  It can also be the name of a function that you’ve
+defined for the purpose.
 * Menu:
 
 * Editing the file field::
@@ -1751,37 +1772,21 @@ well.  When you hit ‘N’ on an entry in the index buffer, Ebib opens the
 notes file for the current entry or, if no such file exists yet, creates
 one.  The file name of the notes file is derived from the key of the
 entry by adding the extension ‘.org’ to it (which means that it is an
-‘orgmode’ file).  The file is saved in the first directory listed in
-‘ebib-file-search-dirs’.
+‘orgmode’ file).  The file is saved in the directory in
+‘ebib-notes-directory’, or, if that is ‘nil’ (the default value), to the
+first directory listed in ‘ebib-file-search-dirs’.
 
    The extension (and with that, the major mode) of the file can be
 changed with the user option ‘ebib-notes-file-extension’.  Furthermore,
-the function in ‘ebib-name-transform-function’ can be used to customise
-the file name itself.  For example, if your entry keys separate authors
-with colons (i.e., you have keys of the form
-‘Hauser:Chomsky:Fitch2002’), but you want your notes files to have
-underscores (i.e., ‘Hauser_Chomsky_Fitch2002’), then you can set
-‘ebib-name-transform-function’ to:
-
-(lambda (key) (replace-regexp-in-string ":" "_" key))
-
-   The notes files will all be placed in the same directory, the first
-directory listed in ‘ebib-file-search-dirs’.  This cannot be changed,
-but it is possible to use ‘ebib-name-transform-function’ to add a
-subdirectory to the name.  For example, if you want to store the notes
-files in subdirectories ‘A/’ to ‘Z/’ corresponding to the first letter
-of the file name, you can use the following function:
-
-(lambda (key) (format "%c/%s" (aref key 0) key))
-
-   For the entry key ‘Chomsky1995’, this produces ‘C/Chomsky1995’, which
-is then appended with the extension specified in
-‘ebib-notes-file-extension’.  Ebib then saves the file to a subdirectory
-‘C/’ of the first directory listed in ‘ebib-file-search-dirs’.
-
-   Of course, the function in ‘ebib-name-transform-function’ does not
-have to be a lambda.  It can also be the name of a function that you’ve
-defined for the purpose.
+the function in ‘ebib-notes-name-transform-function’ can be used to
+customise the file name itself in the same way that
+‘ebib-name-transform-function’ does for pdf files.  See *note Viewing
+Files: #viewing-files. for some examples.  Note that if
+‘ebib-notes-name-transform-function’ is ‘nil’, which is the default, the
+function in ‘ebib-name-transform-function’ is applied to the key to
+create the filename for the notes file.  If you do no want this to
+happen but also do not want to change the key for the notes filename,
+you can set to ‘ebib-notes-name-transform-function’ to ‘identity’.
 
 
 File: ebib.info,  Node: Window Management,  Next: Creating Entry Stubs,  Prev: Notes files,  Up: Top
@@ -3049,46 +3054,46 @@ Node: Calling a Browser80341
 Ref: #calling-a-browser80491
 Node: Viewing Files83111
 Ref: #viewing-files83243
-Node: Editing the file field86076
-Ref: #editing-the-file-field86211
-Node: Notes files87414
-Ref: #notes-files87542
-Node: Window Management89588
-Ref: #window-management89735
-Node: Creating Entry Stubs92819
-Ref: #creating-entry-stubs92981
-Node: @Preamble Definition93982
-Ref: #preamble-definition94146
-Node: @String Definitions96141
-Ref: #string-definitions96292
-Node: @Comments99801
-Ref: #comments99929
-Node: Managing Keywords100294
-Ref: #managing-keywords100439
-Node: Sorting the bib File106324
-Ref: #sorting-the-.bib-file106497
-Node: Merging and Importing109624
-Ref: #merging-and-importing109789
-Node: Exporting Entries111563
-Ref: #exporting-entries111725
-Node: Multiple Identical Fields113700
-Ref: #multiple-identical-fields113882
-Node: The Multiline Edit Buffer115775
-Ref: #the-multiline-edit-buffer115956
-Node: The Options Menu120086
-Ref: #the-options-menu120240
-Node: The Ebib Buffers120861
-Ref: #the-ebib-buffers121003
-Node: The Index Buffer121345
-Ref: #the-index-buffer121482
-Node: The Entry Buffer128142
-Ref: #the-entry-buffer128306
-Node: The Strings Buffer130842
-Ref: #the-strings-buffer130985
-Node: Customisation132811
-Ref: #customisation132922
-Node: Modifying Key Bindings133847
-Ref: #modifying-key-bindings133974
+Node: Editing the file field87024
+Ref: #editing-the-file-field87159
+Node: Notes files88362
+Ref: #notes-files88490
+Node: Window Management89899
+Ref: #window-management90046
+Node: Creating Entry Stubs93130
+Ref: #creating-entry-stubs93292
+Node: @Preamble Definition94293
+Ref: #preamble-definition94457
+Node: @String Definitions96452
+Ref: #string-definitions96603
+Node: @Comments100112
+Ref: #comments100240
+Node: Managing Keywords100605
+Ref: #managing-keywords100750
+Node: Sorting the bib File106635
+Ref: #sorting-the-.bib-file106808
+Node: Merging and Importing109935
+Ref: #merging-and-importing110100
+Node: Exporting Entries111874
+Ref: #exporting-entries112036
+Node: Multiple Identical Fields114011
+Ref: #multiple-identical-fields114193
+Node: The Multiline Edit Buffer116086
+Ref: #the-multiline-edit-buffer116267
+Node: The Options Menu120397
+Ref: #the-options-menu120551
+Node: The Ebib Buffers121172
+Ref: #the-ebib-buffers121314
+Node: The Index Buffer121656
+Ref: #the-index-buffer121793
+Node: The Entry Buffer128453
+Ref: #the-entry-buffer128617
+Node: The Strings Buffer131153
+Ref: #the-strings-buffer131296
+Node: Customisation133122
+Ref: #customisation133233
+Node: Modifying Key Bindings134158
+Ref: #modifying-key-bindings134285
 
 End Tag Table
 

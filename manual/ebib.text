@@ -581,9 +581,21 @@ If you have electronic versions of the papers in your database stored on your co
 
 The file names in the `file` field do not have to have full paths. You can set the option "File Search Dirs" to a list of directories that Ebib should search when opening a file from the `file` field. Note that Ebib searches only the directories in this list, not their subdirectories. However, you can specify a relative path in the `file` field: if you put something like `a/Abney1987.pdf` in the `file` field, Ebib searches for the relevant file in a subdirectory `a/` of the directories listed in the option "File Search Dirs". As an extra service, Ebib also searches for the base filename, i.e., `Abney1987` in this particular case.
 
-Furthermore, if the `file` field is empty, Ebib will search for a file name based on the entry key. By default, Ebib just appends `.pdf` to the entry key and tries to find a file by the name thus created. If you want, you can modify the file name that Ebib searches for by setting the option `ebib-name-transform-function` to a function that performs the transformation. This function takes the key of the current entry as its argument (as a string), and should return the file name to use (without `.pdf`, which is added automatically).
-
 Ebib can call different external programs depending on the file extension of the relevant file. The option "File Associations" allows you to specify which programs to call for which types of files. By default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`, respectively. You can specify further file types by their extensions (do not include the dot). The program is searched for in `PATH`, but you can of course specify the full path to the program. There is also the option to open files in Emacs.  Use this if you have separate text files for notes, or if you want to read pdf files in Emacs with `doc-view-mode`.
+
+If the `file` field is empty, Ebib will search for a pdf file with a name based on the entry key. By default, Ebib just appends `.pdf` to the entry key and tries to find a file by the name thus created. If you want, you can modify the file name that Ebib searches for by setting the option `ebib-name-transform-function` to a function that performs the transformation. This function takes the key of the current entry as its argument (as a string), and should return the file name to use (without `.pdf`, which is added automatically).
+
+For example, if your entry keys separate authors with colons (i.e., you have keys of the form `Hauser:Chomsky:Fitch2002`), but your pdf files have underscores (i.e., `Hauser_Chomsky_Fitch2002.pdf`), then you can set `ebib-name-transform-function` to:
+
+    (lambda (key) (replace-regexp-in-string ":" "_" key))
+
+Note that you can also use `ebib-name-transform-function` to add a subdirectory to the file name. For example, if you store the pdf files in subdirectories `A/` to `Z/` corresponding to the first letter of the file name, you can use the following function:
+
+    (lambda (key) (format "%c/%s" (aref key 0) key))
+
+For the entry key `Chomsky1995`, this produces `C/Chomsky1995`, which is then appended with the extension `.pdf`.
+
+Of course, the function in `ebib-name-transform-function` does not have to be a lambda. It can also be the name of a function that you’ve defined for the purpose.
 
 
 ## Editing the `file` field ##
@@ -595,19 +607,9 @@ The first directory in the option "File Search Dirs" is used as the starting dir
 
 # Notes files #
 
-Ebib supports the `annote` (or `annotation`) field, but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib opens the notes file for the current entry or, if no such file exists yet, creates one. The file name of the notes file is derived from the key of the entry by adding the extension `.org` to it (which means that it is an `orgmode` file). The file is saved in the first directory listed in `ebib-file-search-dirs`.
+Ebib supports the `annote` (or `annotation`) field, but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib opens the notes file for the current entry or, if no such file exists yet, creates one. The file name of the notes file is derived from the key of the entry by adding the extension `.org` to it (which means that it is an `orgmode` file). The file is saved in the directory in `ebib-notes-directory`, or, if that is `nil` (the default value), to the first directory listed in `ebib-file-search-dirs`.
 
-The extension (and with that, the major mode) of the file can be changed with the user option `ebib-notes-file-extension`. Furthermore, the function in `ebib-name-transform-function` can be used to customise the file name itself. For example, if your entry keys separate authors with colons (i.e., you have keys of the form `Hauser:Chomsky:Fitch2002`), but you want your notes files to have underscores (i.e., `Hauser_Chomsky_Fitch2002`), then you can set `ebib-name-transform-function` to:
-
-    (lambda (key) (replace-regexp-in-string ":" "_" key))
-
-The notes files will all be placed in the same directory, the first directory listed in `ebib-file-search-dirs`. This cannot be changed, but it is possible to use `ebib-name-transform-function` to add a subdirectory to the name. For example, if you want to store the notes files in subdirectories `A/` to `Z/` corresponding to the first letter of the file name, you can use the following function:
-
-    (lambda (key) (format "%c/%s" (aref key 0) key))
-
-For the entry key `Chomsky1995`, this produces `C/Chomsky1995`, which is then appended with the extension specified in `ebib-notes-file-extension`. Ebib then saves the file to a subdirectory `C/` of the first directory listed in `ebib-file-search-dirs`.
-
-Of course, the function in `ebib-name-transform-function` does not have to be a lambda. It can also be the name of a function that you’ve defined for the purpose.
+The extension (and with that, the major mode) of the file can be changed with the user option `ebib-notes-file-extension`. Furthermore, the function in `ebib-notes-name-transform-function` can be used to customise the file name itself in the same way that `ebib-name-transform-function` does for pdf files. See [Viewing Files](#viewing-files) for some examples. Note that if `ebib-notes-name-transform-function` is `nil`, which is the default, the function in `ebib-name-transform-function` is applied to the key to create the filename for the notes file. If you do no want this to happen but also do not want to change the key for the notes filename, you can set to `ebib-notes-name-transform-function` to `identity`.
 
 
 # Window Management #
