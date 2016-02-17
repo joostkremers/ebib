@@ -318,16 +318,6 @@ filter named NAME, raise an error, unless NOERROR is non-NIL."
 
 ;; Special filters
 
-(defun ebib-list-recent (days)
-  "List entries created in the last DAYS days."
-  (interactive "nNumber of days: ")
-  (let ((filter (ebib-db-get-filter ebib--cur-db)))
-    (when filter (setq ebib--filters-last-filter filter)))
-  (let* ((date (time-subtract (current-time) (days-to-time days)))
-         (filter `(ebib--newer-than (quote ,date))))
-    (ebib-db-set-filter filter ebib--cur-db)
-    (ebib--redisplay)))
-
 (defun ebib--newer-than (date)
   "Function for use in filters.
 Return t if the entry being tested is newer than DATE.  DATE must

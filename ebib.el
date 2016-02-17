@@ -1719,6 +1719,39 @@ buffer and switch to it."
 ;; this should be the general exporting function, calling other functions as the
 ;; need arises.
 
+(defun ebib--export-to-db (num message copy-fn)
+  "Export data to another database.
+NUM is the number of the database to which the data is to be copied.
+
+MESSAGE is a string displayed in the echo area if the export was
+succesful.  It must contain a %d directive, which is used to
+display the database number to which the entry was exported.
+
+COPY-FN is the function that actually copies the relevant
+data.  It must take as argument the database to which the data is
+to be copied.  COPY-FN must return T if the copying was
+successful, and NIL otherwise."
+  (let ((goal-db (nth (1- num) ebib--databases)))
+    (if (not goal-db)
+        (error "Database %d does not exist" num)
+      (when (funcall copy-fn goal-db)
+        (ebib--set-modified t goal-db)
+        (message message num)))))
+
+(defun ebib--export-to-file (prompt-string insert-fn)
+  "Export data to a file.
+PROMPT-STRING is the string that is used to ask for the filename
+to export to.  INSERT-FN must insert the data to be exported into
+the current buffer: it is called within a `with-temp-buffer',
+whose contents is appended to the file the user enters."
+  (let ((insert-default-directory (not ebib--export-filename)))
+    (ebib--ifstring (filename (read-file-name
+                           prompt-string "~/" nil nil ebib--export-filename))
+        (with-temp-buffer
+          (funcall insert-fn)
+          (append-to-file (point-min) (point-max) filename)
+          (setq ebib--export-filename filename)))))
+
 (defun ebib--export-entries (entries &optional source-db filename)
   "Export ENTRIES from SOURCE-DB to FILENAME.
 ENTRIES is a list of entry keys.  SOURCE-DB defaults to the
@@ -2477,6 +2510,16 @@ a logical `not' is applied to the selection."
          (ebib--redisplay))))
     ((filtered-db)
      (error "A stored filter can only be applied to a real database"))))
+
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let* ((date (time-subtract (current-time) (days-to-time days)))
+         (filter `(ebib--newer-than (quote ,date))))
+    (ebib-db-set-filter filter ebib--cur-db)
+    (ebib--redisplay)))
 
 ;;;;;;;;;;;;;;;;
 ;; entry-mode ;;
