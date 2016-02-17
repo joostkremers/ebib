@@ -3160,7 +3160,7 @@ When the user enters an empty string, the value is not changed."
         (ebib--ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
             (progn
               (ebib-db-set-string new-abbr new-string ebib--cur-db)
-              (ebib--sort-in-buffer (length (ebib-db-list-strings ebib--cur-db)) new-abbr)
+              (ebib--sort-in-buffer new-abbr (length (ebib-db-list-strings ebib--cur-db)))
               (with-ebib-buffer-writable
                 (insert (format "%-19s %s\n" new-abbr new-string)))
               (forward-line -1)
