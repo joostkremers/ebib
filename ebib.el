@@ -1569,9 +1569,13 @@ the filter are saved.  The original file is not deleted."
     ((real-db)
      (if (not (ebib-db-modified-p ebib--cur-db))
          (message "No changes need to be saved.")
-       (when (time-less-p (ebib-db-get-modtime ebib--cur-db) (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)))
-         (unless (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db)))
-           (error "File not saved")))
+       (let ((db-modtime (ebib-db-get-modtime ebib--cur-db))
+             (file-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db))))
+         ;; if the file to be saved has been newly created, both modtimes are nil
+         (when (and db-modtime file-modtime
+                    (time-less-p db-modtime file-modtime))
+           (unless (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db)))
+             (error "File not saved"))))
        (ebib--save-database ebib--cur-db)
        (ebib-db-set-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)) ebib--cur-db)))
     ((filtered-db)
