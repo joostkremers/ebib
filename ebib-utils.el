@@ -185,8 +185,8 @@ selected when Ebib is started.
 
 This option only takes effect if `ebib-layout' is set to `custom'."
   :group 'ebib-windows
-  :type '(choice (integer :label "Absolute width:")
-                 (float :label "Relative width:" :value 0.3)))
+  :type '(choice (integer :tag "Absolute width")
+                 (float :tag "Relative width" :value 0.3)))
 
 (defcustom ebib-popup-entry-window nil
   "Create a popup window to display the entry window.
