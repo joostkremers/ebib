@@ -504,6 +504,7 @@ the buffers, reads the rc file and loads the files in
         (delete-other-windows))
        ((eq ebib-layout 'custom)
         (setq ebib--window-before (selected-window))
+        (delete-other-windows)
         (let ((width (cond
                       ((integerp ebib-width)
                        (- (window-total-width) ebib-width))
