@@ -2313,14 +2313,12 @@ The user is prompted for the buffer to push the entry into."
 (defun ebib-index-help ()
   "Show the info node of Ebib's index buffer."
   (interactive)
-  (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib) The Index Buffer"))
 
 (defun ebib-info ()
   "Show Ebib's info node."
   (interactive)
-  (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib)"))
 
@@ -2981,7 +2979,6 @@ The deleted text is not put in the kill ring."
 (defun ebib-entry-help ()
   "Show the info node for Ebib's entry buffer."
   (interactive)
-  (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib) The Entry Buffer"))
 
@@ -3213,7 +3210,6 @@ to append them to."
 (defun ebib-strings-help ()
   "Show the info node on Ebib's strings buffer."
   (interactive)
-  (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib) The Strings Buffer"))
 
@@ -3363,7 +3359,6 @@ The text being edited is stored before saving the database."
 (defun ebib-multiline-help ()
   "Show the info node on Ebib's multiline edit buffer."
   (interactive)
-  (setq ebib--info-flag t)
   (ebib-lower)
   (info "(ebib) The Multiline Edit Buffer"))
 
