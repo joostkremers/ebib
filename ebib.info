@@ -1799,25 +1799,25 @@ displaying the index window at the top and the entry window below it.
 There are a few options to change this behaviour, however.  They are all
 part of the customisation group ‘ebib-windows’, and allow you to specify
 two alternative ways to deal with Ebib windows.  The main layout option
-is simply called "Layout" and has three options: use the full frame (the
-default), use the right part of the frame, or display only the index
-window.
+is simply called "Layout" and has four options: use the full frame (the
+default), use the current window, use the right part of the frame, or
+display only the index window.
 
    If you set the layout to use only the right part of the frame, the
 Ebib buffers are displayed on the right of the frame, with the (usually
-larger) left part of the frame displaying some other buffer.  The width
-of the Ebib windows can be set with the option "Width", which defaults
-to 80, and which can be specified as an absolute value (the number of
-columns), but also as a value relative to the current window.  In that
-case, you must specify a value between 0 and 1.  Note that when this
-option is used, the key ‘z’ does not hide the Ebib buffers, it simply
-switches to a non-Ebib window in the same frame.  You can use
-(uppercase) ‘Z’ to hide the Ebib buffers.  Furthermore, with this
-option, the multiline edit buffer is not displayed in the same window as
-the entry buffer.  Rather, Ebib uses another, non-Ebib window to display
-it.
+larger) left part of the frame displaying some other buffer, normally
+the buffer from which you called Ebib.  The width of the Ebib windows
+can be set with the option "Width", which defaults to 80, and which can
+be specified as an absolute value (the number of columns), but also as a
+value relative to the current window.  In that case, you must specify a
+value between 0 and 1.  Note that when this option is used, the key ‘z’
+does not hide the Ebib buffers, it simply switches to a non-Ebib window
+in the same frame.  You can use (uppercase) ‘Z’ to hide the Ebib
+buffers.  Furthermore, with this option, the multiline edit buffer is
+not displayed in the same window as the entry buffer.  Rather, Ebib uses
+another, non-Ebib window to display it.
 
-   The third option that Ebib provides is to only show the index buffer
+   The fourth option that Ebib provides is to only show the index buffer
 on start-up.  In this case, Ebib does not display the entry buffer when
 it is started.  Instead, only the index buffer is displayed, which can
 be navigated in the usual manner.  The entry buffer is only displayed
@@ -3060,40 +3060,40 @@ Node: Notes files88362
 Ref: #notes-files88490
 Node: Window Management89899
 Ref: #window-management90046
-Node: Creating Entry Stubs93130
-Ref: #creating-entry-stubs93292
-Node: @Preamble Definition94293
-Ref: #preamble-definition94457
-Node: @String Definitions96452
-Ref: #string-definitions96603
-Node: @Comments100112
-Ref: #comments100240
-Node: Managing Keywords100605
-Ref: #managing-keywords100750
-Node: Sorting the bib File106635
-Ref: #sorting-the-.bib-file106808
-Node: Merging and Importing109935
-Ref: #merging-and-importing110100
-Node: Exporting Entries111874
-Ref: #exporting-entries112036
-Node: Multiple Identical Fields114011
-Ref: #multiple-identical-fields114193
-Node: The Multiline Edit Buffer116086
-Ref: #the-multiline-edit-buffer116267
-Node: The Options Menu120397
-Ref: #the-options-menu120551
-Node: The Ebib Buffers121172
-Ref: #the-ebib-buffers121314
-Node: The Index Buffer121656
-Ref: #the-index-buffer121793
-Node: The Entry Buffer128453
-Ref: #the-entry-buffer128617
-Node: The Strings Buffer131153
-Ref: #the-strings-buffer131296
-Node: Customisation133122
-Ref: #customisation133233
-Node: Modifying Key Bindings134158
-Ref: #modifying-key-bindings134285
+Node: Creating Entry Stubs93202
+Ref: #creating-entry-stubs93364
+Node: @Preamble Definition94365
+Ref: #preamble-definition94529
+Node: @String Definitions96524
+Ref: #string-definitions96675
+Node: @Comments100184
+Ref: #comments100312
+Node: Managing Keywords100677
+Ref: #managing-keywords100822
+Node: Sorting the bib File106707
+Ref: #sorting-the-.bib-file106880
+Node: Merging and Importing110007
+Ref: #merging-and-importing110172
+Node: Exporting Entries111946
+Ref: #exporting-entries112108
+Node: Multiple Identical Fields114083
+Ref: #multiple-identical-fields114265
+Node: The Multiline Edit Buffer116158
+Ref: #the-multiline-edit-buffer116339
+Node: The Options Menu120469
+Ref: #the-options-menu120623
+Node: The Ebib Buffers121244
+Ref: #the-ebib-buffers121386
+Node: The Index Buffer121728
+Ref: #the-index-buffer121865
+Node: The Entry Buffer128525
+Ref: #the-entry-buffer128689
+Node: The Strings Buffer131225
+Ref: #the-strings-buffer131368
+Node: Customisation133194
+Ref: #customisation133305
+Node: Modifying Key Bindings134230
+Ref: #modifying-key-bindings134357
 
 End Tag Table
 
