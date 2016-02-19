@@ -109,7 +109,7 @@ Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the fil
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged. If Ebib finds something that it cannot parse, it will log an error. If warnings and/or errors occurred during loading, Ebib will issue a message when it finishes loading the `.bib` and direct you to the log buffer.
 
-If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this will happen is when you load a Biblatex file without letting Ebib know the file is Biblatex-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use Biblatex files, make sure to read the section on Biblatex ([Using Biblatex][#using-biblatex]).
+If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this will happen is when you load a Biblatex file without letting Ebib know the file is Biblatex-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use Biblatex files, make sure to read the section on Biblatex ([Using Biblatex](#using-biblatex)).
 
 
 ## Preloading `.bib` Files ##
