@@ -1286,12 +1286,22 @@ directives are recognised:
 
 ‘%K’
 
-     the entry key to be inserted.  ‘%A’ an argument, for which the user
-     is prompted.  ‘%<...%>’ optional material surrounding a ‘%A’
-     directive.  ‘%(...%<sep>)’ a so-called _repeater_, which contains
-     material that can be repeated.  If present, the repeater must
-     contain the entry key directive ‘%K’.  ‘%D’ a description, for
-     which the user is prompted.  Mainly for use in Orgmode.
+     the entry key to be inserted.
+‘%A’
+
+     an argument, for which the user is prompted.
+‘%<...%>’
+
+     optional material surrounding a ‘%A’ directive.
+‘%(...%<sep>)’
+
+     a so-called _repeater_, which contains material that can be
+     repeated.  If present, the repeater must contain the entry key
+     directive ‘%K’.
+‘%D’
+
+     a description, for which the user is prompted.  Mainly for use in
+     Orgmode.
 
    In the simplest case, the format string contains just a ‘%K’
 directive: ‘\cite{%K}’.  In this case, ‘%K’ is replaced with the
@@ -3042,58 +3052,58 @@ Node: Key Bindings61547
 Ref: #key-bindings61704
 Node: Defining Citation Commands62476
 Ref: #defining-citation-commands62710
-Node: Associating a Database with a LaTeX File68617
-Ref: #associating-a-database-with-a-latex-file68858
-Node: Cross-referencing71803
-Ref: #cross-referencing71972
-Node: Marking Entries75273
-Ref: #marking-entries75419
-Node: Printing the Database76398
-Ref: #printing-the-database76558
-Node: Calling a Browser80346
-Ref: #calling-a-browser80496
-Node: Viewing Files83116
-Ref: #viewing-files83248
-Node: Editing the file field87029
-Ref: #editing-the-file-field87164
-Node: Notes files88367
-Ref: #notes-files88495
-Node: Window Management89904
-Ref: #window-management90051
-Node: Creating Entry Stubs93207
-Ref: #creating-entry-stubs93369
-Node: @Preamble Definition94370
-Ref: #preamble-definition94534
-Node: @String Definitions96529
-Ref: #string-definitions96680
-Node: @Comments100189
-Ref: #comments100317
-Node: Managing Keywords100682
-Ref: #managing-keywords100827
-Node: Sorting the bib File106712
-Ref: #sorting-the-.bib-file106885
-Node: Merging and Importing110012
-Ref: #merging-and-importing110177
-Node: Exporting Entries111951
-Ref: #exporting-entries112113
-Node: Multiple Identical Fields114088
-Ref: #multiple-identical-fields114270
-Node: The Multiline Edit Buffer116163
-Ref: #the-multiline-edit-buffer116344
-Node: The Options Menu120474
-Ref: #the-options-menu120628
-Node: The Ebib Buffers121249
-Ref: #the-ebib-buffers121391
-Node: The Index Buffer121733
-Ref: #the-index-buffer121870
-Node: The Entry Buffer128530
-Ref: #the-entry-buffer128694
-Node: The Strings Buffer131230
-Ref: #the-strings-buffer131373
-Node: Customisation133199
-Ref: #customisation133310
-Node: Modifying Key Bindings134235
-Ref: #modifying-key-bindings134362
+Node: Associating a Database with a LaTeX File68627
+Ref: #associating-a-database-with-a-latex-file68868
+Node: Cross-referencing71813
+Ref: #cross-referencing71982
+Node: Marking Entries75283
+Ref: #marking-entries75429
+Node: Printing the Database76408
+Ref: #printing-the-database76568
+Node: Calling a Browser80356
+Ref: #calling-a-browser80506
+Node: Viewing Files83126
+Ref: #viewing-files83258
+Node: Editing the file field87039
+Ref: #editing-the-file-field87174
+Node: Notes files88377
+Ref: #notes-files88505
+Node: Window Management89914
+Ref: #window-management90061
+Node: Creating Entry Stubs93217
+Ref: #creating-entry-stubs93379
+Node: @Preamble Definition94380
+Ref: #preamble-definition94544
+Node: @String Definitions96539
+Ref: #string-definitions96690
+Node: @Comments100199
+Ref: #comments100327
+Node: Managing Keywords100692
+Ref: #managing-keywords100837
+Node: Sorting the bib File106722
+Ref: #sorting-the-.bib-file106895
+Node: Merging and Importing110022
+Ref: #merging-and-importing110187
+Node: Exporting Entries111961
+Ref: #exporting-entries112123
+Node: Multiple Identical Fields114098
+Ref: #multiple-identical-fields114280
+Node: The Multiline Edit Buffer116173
+Ref: #the-multiline-edit-buffer116354
+Node: The Options Menu120484
+Ref: #the-options-menu120638
+Node: The Ebib Buffers121259
+Ref: #the-ebib-buffers121401
+Node: The Index Buffer121743
+Ref: #the-index-buffer121880
+Node: The Entry Buffer128540
+Ref: #the-entry-buffer128704
+Node: The Strings Buffer131240
+Ref: #the-strings-buffer131383
+Node: Customisation133209
+Ref: #customisation133320
+Node: Modifying Key Bindings134245
+Ref: #modifying-key-bindings134372
 
 End Tag Table
 

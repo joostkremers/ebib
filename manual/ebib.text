@@ -432,13 +432,17 @@ The identifier should be a simple string which you can type easily when Ebib ask
 
 `%K`
 :    the entry key to be inserted.
+
 `%A`
 :    an argument, for which the user is prompted.
+
 `%<...%>`
 :    optional material surrounding a `%A` directive.
+
 `%(...%<sep>)`
 :    a so-called *repeater*, which contains material that can be repeated.
      If present, the repeater must contain the entry key directive `%K`.
+
 `%D`
 :   a description, for which the user is prompted. Mainly for use in Orgmode.
 
