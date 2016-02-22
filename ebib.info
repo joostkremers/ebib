@@ -696,6 +696,15 @@ first time after loading it, Ebib creates a backup file.  (Ebib honours
 ‘backup-directory-alist’ when saving backups.  Note that you can also
 disable backups altogether with the option "Create Backups".)
 
+   If you want to force-save a database that has not been modified, you
+can use a prefix argument: ‘C-u s’.  In either case, however, Ebib
+checks whether the underlying file was modified and warns you if it was.
+(Ebib does this by storing the ‘.bib’ file’s modification time when
+reading the file and comparing this time with the modification time when
+requested to save the file.)  If you also want to forego this check, use
+a double prefix argument: ‘C-u C-u s’.  This saves the file
+unconditionally.
+
    If you have multiple databases open, have made changes in more than
 one of them, and want to save all of them without going through each
 yourself, you can save all databases at once through the menu.  You can
@@ -3022,88 +3031,88 @@ Node: Copy Cut Paste Yank and Delete31470
 Ref: #copy-cut-paste-yank-and-delete31655
 Node: Saving a Database32607
 Ref: #saving-a-database32755
-Node: Using Biblatex33719
-Ref: #using-biblatex33850
-Node: Setting the BibTeX Dialect34177
-Ref: #setting-the-bibtex-dialect34346
-Node: Alias Types and Fields36557
-Ref: #alias-types-and-fields36718
-Node: Searching38904
-Ref: #searching39048
-Node: Simple Searches39090
-Ref: #simple-searches39206
-Node: Filters41142
-Ref: #filters41242
-Node: Simple Selection42290
-Ref: #simple-selection42419
-Node: Complex Filters44097
-Ref: #complex-filters44259
-Node: Storing and Saving Filters48246
-Ref: #storing-and-saving-filters48429
-Node: Special Filters51300
-Ref: #special-filters51481
-Node: An Example Listing Recent Additions52836
-Ref: #an-example-listing-recent-additions53065
-Node: Properties of Filtered Databases54928
-Ref: #properties-of-filtered-databases55125
-Node: Consulting BibTeX Databases outside Ebib56903
-Ref: #consulting-bibtex-databases-outside-ebib57112
-Node: Key Bindings61547
-Ref: #key-bindings61704
-Node: Defining Citation Commands62476
-Ref: #defining-citation-commands62710
-Node: Associating a Database with a LaTeX File68627
-Ref: #associating-a-database-with-a-latex-file68868
-Node: Cross-referencing71813
-Ref: #cross-referencing71982
-Node: Marking Entries75283
-Ref: #marking-entries75429
-Node: Printing the Database76408
-Ref: #printing-the-database76568
-Node: Calling a Browser80356
-Ref: #calling-a-browser80506
-Node: Viewing Files83126
-Ref: #viewing-files83258
-Node: Editing the file field87039
-Ref: #editing-the-file-field87174
-Node: Notes files88377
-Ref: #notes-files88505
-Node: Window Management89914
-Ref: #window-management90061
-Node: Creating Entry Stubs93217
-Ref: #creating-entry-stubs93379
-Node: @Preamble Definition94380
-Ref: #preamble-definition94544
-Node: @String Definitions96539
-Ref: #string-definitions96690
-Node: @Comments100199
-Ref: #comments100327
-Node: Managing Keywords100692
-Ref: #managing-keywords100837
-Node: Sorting the bib File106722
-Ref: #sorting-the-.bib-file106895
-Node: Merging and Importing110022
-Ref: #merging-and-importing110187
-Node: Exporting Entries111961
-Ref: #exporting-entries112123
-Node: Multiple Identical Fields114098
-Ref: #multiple-identical-fields114280
-Node: The Multiline Edit Buffer116173
-Ref: #the-multiline-edit-buffer116354
-Node: The Options Menu120484
-Ref: #the-options-menu120638
-Node: The Ebib Buffers121259
-Ref: #the-ebib-buffers121401
-Node: The Index Buffer121743
-Ref: #the-index-buffer121880
-Node: The Entry Buffer128540
-Ref: #the-entry-buffer128704
-Node: The Strings Buffer131240
-Ref: #the-strings-buffer131383
-Node: Customisation133209
-Ref: #customisation133320
-Node: Modifying Key Bindings134245
-Ref: #modifying-key-bindings134372
+Node: Using Biblatex34237
+Ref: #using-biblatex34368
+Node: Setting the BibTeX Dialect34695
+Ref: #setting-the-bibtex-dialect34864
+Node: Alias Types and Fields37075
+Ref: #alias-types-and-fields37236
+Node: Searching39422
+Ref: #searching39566
+Node: Simple Searches39608
+Ref: #simple-searches39724
+Node: Filters41660
+Ref: #filters41760
+Node: Simple Selection42808
+Ref: #simple-selection42937
+Node: Complex Filters44615
+Ref: #complex-filters44777
+Node: Storing and Saving Filters48764
+Ref: #storing-and-saving-filters48947
+Node: Special Filters51818
+Ref: #special-filters51999
+Node: An Example Listing Recent Additions53354
+Ref: #an-example-listing-recent-additions53583
+Node: Properties of Filtered Databases55446
+Ref: #properties-of-filtered-databases55643
+Node: Consulting BibTeX Databases outside Ebib57421
+Ref: #consulting-bibtex-databases-outside-ebib57630
+Node: Key Bindings62065
+Ref: #key-bindings62222
+Node: Defining Citation Commands62994
+Ref: #defining-citation-commands63228
+Node: Associating a Database with a LaTeX File69145
+Ref: #associating-a-database-with-a-latex-file69386
+Node: Cross-referencing72331
+Ref: #cross-referencing72500
+Node: Marking Entries75801
+Ref: #marking-entries75947
+Node: Printing the Database76926
+Ref: #printing-the-database77086
+Node: Calling a Browser80874
+Ref: #calling-a-browser81024
+Node: Viewing Files83644
+Ref: #viewing-files83776
+Node: Editing the file field87557
+Ref: #editing-the-file-field87692
+Node: Notes files88895
+Ref: #notes-files89023
+Node: Window Management90432
+Ref: #window-management90579
+Node: Creating Entry Stubs93735
+Ref: #creating-entry-stubs93897
+Node: @Preamble Definition94898
+Ref: #preamble-definition95062
+Node: @String Definitions97057
+Ref: #string-definitions97208
+Node: @Comments100717
+Ref: #comments100845
+Node: Managing Keywords101210
+Ref: #managing-keywords101355
+Node: Sorting the bib File107240
+Ref: #sorting-the-.bib-file107413
+Node: Merging and Importing110540
+Ref: #merging-and-importing110705
+Node: Exporting Entries112479
+Ref: #exporting-entries112641
+Node: Multiple Identical Fields114616
+Ref: #multiple-identical-fields114798
+Node: The Multiline Edit Buffer116691
+Ref: #the-multiline-edit-buffer116872
+Node: The Options Menu121002
+Ref: #the-options-menu121156
+Node: The Ebib Buffers121777
+Ref: #the-ebib-buffers121919
+Node: The Index Buffer122261
+Ref: #the-index-buffer122398
+Node: The Entry Buffer129058
+Ref: #the-entry-buffer129222
+Node: The Strings Buffer131758
+Ref: #the-strings-buffer131901
+Node: Customisation133727
+Ref: #customisation133838
+Node: Modifying Key Bindings134763
+Ref: #modifying-key-bindings134890
 
 End Tag Table
 

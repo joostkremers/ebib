@@ -1563,19 +1563,27 @@ the filter are saved.  The original file is not deleted."
     ((default)
      (beep))))
 
-(defun ebib-save-current-database ()
-  "Save the current database."
-  (interactive)
+(defun ebib-save-current-database (force)
+  "Save the current database.
+FORCE, as a prefix argument, can indicate different levels of
+force. If called with C-u, save the database even if there were
+no modifications, but ask for confirmation if the file was
+modified. If called with C-u C-u, save the database even if the
+file was modified."
+  (interactive "P")
   (ebib--execute-when
     ((real-db)
-     (if (not (ebib-db-modified-p ebib--cur-db))
+     (if (and (not force)
+              (not (ebib-db-modified-p ebib--cur-db)))
          (message "No changes need to be saved.")
        (let ((db-modtime (ebib-db-get-modtime ebib--cur-db))
              (file-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db))))
          ;; if the file to be saved has been newly created, both modtimes are nil
          (when (and db-modtime file-modtime
                     (time-less-p db-modtime file-modtime))
-           (unless (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db)))
+           (unless (or (and (listp force)
+                            (= 16 (car force)))
+                       (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db))))
              (error "File not saved"))))
        (ebib--save-database ebib--cur-db)
        (ebib-db-set-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)) ebib--cur-db)))

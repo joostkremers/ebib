@@ -227,6 +227,8 @@ Note that `y` only works when the current field does not have a value yet. This 
 
 When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing `s`. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to `C-x C-s` in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option "Create Backups".)
 
+If you want to force-save a database that has not been modified, you can use a prefix argument: `C-u s`. In either case, however, Ebib checks whether the underlying file was modified and warns you if it was. (Ebib does this by storing the `.bib` file’s modification time when reading the file and comparing this time with the modification time when requested to save the file.) If you also want to forego this check, use a double prefix argument: `C-u C-u s`. This saves the file unconditionally.
+
 If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`.
 
 
