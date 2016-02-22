@@ -229,7 +229,7 @@ When you have undertaken any kind of editing action on a database, it is marked 
 
 If you want to force-save a database that has not been modified, you can use a prefix argument: `C-u s`. In either case, however, Ebib checks whether the underlying file was modified and warns you if it was. (Ebib does this by storing the `.bib` file’s modification time when reading the file and comparing this time with the modification time when requested to save the file.) If you also want to forego this check, use a double prefix argument: `C-u C-u s`. This saves the file unconditionally.
 
-If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`.
+If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`. This command can also be prefixed with `C-u C-u` in order to overwrite any existing file without asking for confirmation. (A single prefix argument `C-u` does nothing with `w`.)
 
 
 # Using Biblatex #

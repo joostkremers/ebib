@@ -1539,15 +1539,21 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
     (write-region (point-min) (point-max) (ebib-db-get-filename db)))
   (ebib--set-modified nil db))
 
-(defun ebib-write-database ()
+(defun ebib-write-database (force)
   "Write the current database to a different file.
 If the current database is filtered, only the entries that match
-the filter are saved.  The original file is not deleted."
-  (interactive)
+the filter are saved.  The original file is not deleted.
+
+FORCE is a prefix argument. If called with `C-u C-u', the
+database is written unconditionally, even if the new file already
+exists. (Note that this uses a double prefix argument in order to
+maintain compatibility with \\[ebib-save-current-database]."
+  (interactive "P")
   (ebib--execute-when
     ((database)
      (ebib--ifstring (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
-         (when (or (not (file-exists-p new-filename))
+         (when (or force
+                   (not (file-exists-p new-filename))
                    (y-or-n-p (format (format "File %s already exists; overwrite? " new-filename))))
            (with-temp-buffer
              (ebib--format-database-as-bibtex ebib--cur-db)
