@@ -1572,9 +1572,9 @@ maintain compatibility with \\[ebib-save-current-database]."
 (defun ebib-save-current-database (force)
   "Save the current database.
 FORCE, as a prefix argument, can indicate different levels of
-force. If called with C-u, save the database even if there were
+force.  If called with \\[universal-argument], save the database even if there were
 no modifications, but ask for confirmation if the file was
-modified. If called with C-u C-u, save the database even if the
+modified.  If called with \\[universal-argument] \\[universal-argument], save the database even if the
 file was modified."
   (interactive "P")
   (ebib--execute-when
