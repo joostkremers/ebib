@@ -1588,7 +1588,7 @@ file was modified."
          (when (and db-modtime file-modtime
                     (time-less-p db-modtime file-modtime))
            (unless (or (and (listp force)
-                            (= 16 (car force)))
+                            (eq 16 (car force)))
                        (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db))))
              (error "File not saved"))))
        (ebib--save-database ebib--cur-db)
