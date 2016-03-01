@@ -874,7 +874,11 @@ FILE must be a fully expanded filename."
     ;; then load the file
     (ebib--log 'log "%s: Reloading file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") file)
     (ebib-db-set-filename file db)
+    ;; store the last modtime
+    (ebib-db-set-modtime (ebib--get-file-modtime file) ebib--cur-db)
     (ebib--load-entries file db)
+    ;; If the user makes any changes, we'll want to create a back-up.
+    (ebib-db-set-backup t ebib--cur-db)
     (ebib-db-set-current-entry-key t db)))
 
 (defun ebib-merge-bibtex-file ()
