@@ -3468,7 +3468,8 @@ is found, return the symbol `none'."
   (if (not (eq major-mode 'latex-mode))
       'none
     (let ((texfile-buffer (current-buffer))
-          texfile)
+          texfile
+          files)
       ;; if AucTeX's TeX-master is used and set to a string, we must
       ;; search that file for a \bibliography command, as it's more
       ;; likely to be in there than in the file we're in.
@@ -3480,22 +3481,29 @@ is found, return the symbol `none'."
             (insert-file-contents texfile)
           (insert-buffer-substring texfile-buffer))
         (save-match-data
-          (let (files)
-            (goto-char (point-min))
-            ;; First search for a \bibliography command:
-            (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
-                (setq files (mapcar (lambda (file)
-                                      (ebib--ensure-extension file ".bib"))
-                                    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
-              ;; If we didn't find a \bibliography command, search for \addbibresource commands:
-              (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
-                (let ((option (match-string 1))
-                      (file (match-string-no-properties 2)))
-                  ;; If this isn't a remote resource, add it to the list.
-                  (unless (and option (string-match-p "location=remote" option))
-                    (push file files)))))
-            (or files
-                'none)))))))
+          (goto-char (point-min))
+          ;; First search for a \bibliography command:
+          (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
+              (setq files (mapcar (lambda (file)
+                                    (ebib--ensure-extension file ".bib"))
+                                  (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
+            ;; If we didn't find a \bibliography command, search for \addbibresource commands:
+            (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
+              (let ((option (match-string 1))
+                    (file (match-string-no-properties 2)))
+                ;; If this isn't a remote resource, add it to the list.
+                (unless (and option (string-match-p "location=remote" option))
+                  (push file files)))))))
+      (if files
+          (mapcar (lambda (file)
+                    ;; If a file has a directory part, we expand it, so
+                    ;; `ebib--get-db-from-filename' can match it up with a
+                    ;; database's file path.
+                    (if (file-name-directory file)
+                        (expand-file-name file)
+                      file))
+                  files)
+        'none))))
 
 (defun ebib--create-collection-from-db ()
   "Create a collection of BibTeX keys.
