@@ -3479,23 +3479,23 @@ is found, return the symbol `none'."
         (if (and texfile (file-readable-p texfile))
             (insert-file-contents texfile)
           (insert-buffer-substring texfile-buffer))
-        (save-excursion
-          (save-match-data
-            (let (files)
-              (goto-char (point-min))
-              ;; First search for a \bibliography command:
-              (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
-                  (setq files (mapcar (lambda (file)
-                                        (ebib--ensure-extension file ".bib"))
-                                      (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
-                ;; If we didn't find a \bibliography command, search for \addbibresource commands:
-                (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
-                  (let ((option (match-string 1))
-                        (file (match-string-no-properties 2)))
-                    ;; If this isn't a remote resource, add it to the list.
-                    (unless (and option (string-match-p "location=remote" option))
-                      (push file files)))))
-              (or files 'none))))))))
+        (save-match-data
+          (let (files)
+            (goto-char (point-min))
+            ;; First search for a \bibliography command:
+            (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
+                (setq files (mapcar (lambda (file)
+                                      (ebib--ensure-extension file ".bib"))
+                                    (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
+              ;; If we didn't find a \bibliography command, search for \addbibresource commands:
+              (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
+                (let ((option (match-string 1))
+                      (file (match-string-no-properties 2)))
+                  ;; If this isn't a remote resource, add it to the list.
+                  (unless (and option (string-match-p "location=remote" option))
+                    (push file files)))))
+            (or files
+                'none)))))))
 
 (defun ebib--create-collection-from-db ()
   "Create a collection of BibTeX keys.
