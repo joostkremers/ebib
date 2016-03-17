@@ -11,11 +11,6 @@
 @finalout
 @end iftex
 
-@titlepage
-@title Ebib manual
-@author Joost Kremers
-@end titlepage
-
 
 
 @dircategory Emacs
