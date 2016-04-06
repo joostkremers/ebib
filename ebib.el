@@ -266,10 +266,6 @@ it is highlighted.  DB defaults to the current database."
 If `ebib--cur-db' is nil, the buffer is just erased and its name set
 to \"none\". This function sets `ebib--cur-keys-list'."
   (with-current-ebib-buffer 'index
-    ;; First set the modification flag, so that it's still correct after
-    ;; with-ebib-buffer-writable.
-    (when ebib--cur-db
-      (set-buffer-modified-p (ebib-db-modified-p ebib--cur-db)))
     (with-ebib-buffer-writable
       (erase-buffer)
       (if (not ebib--cur-db)
@@ -329,15 +325,16 @@ the field contents."
 (defun ebib--set-modified (mod &optional db)
   "Set the modified flag MOD on database DB.
 MOD must be either t or nil; DB defaults to the current database.
-If DB is the current database, the modified flag of the index
-buffer is also (re)set.  Return value is MOD."
+If DB is the current database, the mode line is redisplayed, in
+order to correctly reflect the database's modified status.  The
+return value is MOD."
   (unless db
     (setq db ebib--cur-db))
   (ebib-db-set-modified mod db)
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
-      (set-buffer-modified-p mod)
-      mod)))
+      (force-mode-line-update)))
+  mod)
 
 (defun ebib--modified-p ()
   "Check if any of the databases in Ebib were modified.

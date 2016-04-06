@@ -221,7 +221,7 @@ The rest of the frame is used for the entry buffer, unless
 
 (defcustom ebib-index-mode-line '("%e"
                               mode-line-front-space
-                              mode-line-modified
+                              ebib--mode-line-modified
                               mode-line-buffer-identification
                               (:eval (format "  (%s)" (ebib--get-dialect)))
                               (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
@@ -234,6 +234,26 @@ mode line of the entry buffer is not changed."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
+
+(defvar ebib--mode-line-modified '(:eval (ebib--mode-line-modified-p))
+  "Mode line construct for database's modified status.")
+(put 'ebib--mode-line-modified 'risky-local-variable t)
+
+(defcustom ebib-modified-char "M"
+  "Character indicating the modified status in the mode line."
+  :group 'ebib-windows
+  :type 'string)
+
+(defun ebib--mode-line-modified-p (&optional db)
+  "Return a string describing the modified status of DB.
+DB defaults to the current database."
+  (or db (setq db ebib--cur-db))
+  (if (not (ebib-db-modified-p db))
+      " "
+    (propertize ebib-modified-char
+                'face 'ebib-modified-face
+                'help-echo "Database modified\nmouse-1: Save database"
+                'local-map '(keymap (mode-line keymap (mouse-1 . ebib-save-current-database))))))
 
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer.
@@ -686,6 +706,10 @@ Ebib (not Emacs)."
   "Face to indicate marked entries."
   :group 'ebib-faces)
 
+(defface ebib-modified-face '((t (:inherit error)))
+  "Face indicating modified status."
+  :group 'ebib-faces)
+
 (defface ebib-field-face '((t (:inherit font-lock-keyword-face)))
   "Face for field names."
   :group 'ebib-faces)
@@ -784,14 +808,11 @@ BUFFER is a symbol referring to a buffer in
      ,@body))
 
 (defmacro with-ebib-buffer-writable (&rest body)
-  "Make the current buffer writable and execute BODY.
-Restore the buffer modified flag after executing BODY."
+  "Make the current buffer writable and execute BODY."
   (declare (indent defun))
-  `(let ((modified (buffer-modified-p)))
-     (unwind-protect
-         (let ((buffer-read-only nil))
-           ,@body)
-       (set-buffer-modified-p modified))))
+  `(unwind-protect
+       (let ((buffer-read-only nil))
+         ,@body)))
 
 (defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
