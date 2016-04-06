@@ -3,3 +3,4 @@
 
 ((emacs-lisp-mode
   (nameless-current-name . "ebib")))
+
