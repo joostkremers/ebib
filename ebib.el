@@ -1678,30 +1678,36 @@ their contents into a single field."
 (defun ebib-delete-entry ()
   "Delete the current entry from the database."
   (interactive)
-  (cl-flet ((remove-entry (key)
-                          (ebib-db-remove-entry key ebib--cur-db)
-                          (ebib-db-unmark-entry key ebib--cur-db) ; This is harmless if key isn't marked.
-                          (ebib-db-set-current-entry-key (or (ebib--next-elem key ebib--cur-keys-list)
-                                                         (-last-item ebib--cur-keys-list))
-                                                     ebib--cur-db
-                                                     'first)
-                          (setq ebib--cur-keys-list (delete key ebib--cur-keys-list))))
-    (ebib--execute-when
-      ((marked-entries)
-       (when (y-or-n-p "Delete all marked entries? ")
-         (mapc #'remove-entry (ebib-db-list-marked-entries ebib--cur-db))
-         (message "Marked entries deleted.")
+  (ebib--execute-when
+    ((marked-entries)
+     (when (y-or-n-p "Delete all marked entries? ")
+       (let ((new-cur-key (ebib--cur-entry-key)))
+         (dolist (key (ebib-db-list-marked-entries ebib--cur-db))
+           (ebib-db-remove-entry key ebib--cur-db)
+           (if (string= key new-cur-key)
+               (setq new-cur-key (ebib--next-elem key ebib--cur-keys-list))))
+         (ebib-db-unmark-entry 'all ebib--cur-db)  ; This works despite the fact that all marked keys have been removed.
+         (unless new-cur-key  ; If nil, the last entry was active and we deleted it.
+           (setq new-cur-key (-last-item (ebib-db-list-keys ebib--cur-db 'sort))))
+         (ebib-db-set-current-entry-key new-cur-key ebib--cur-db 'first))
+       (message "Marked entries deleted.")
+       (ebib--set-modified t)
+       (ebib--redisplay)))
+    ((entries)
+     (let ((key (ebib--cur-entry-key)))
+       (when (y-or-n-p (format "Delete %s? " key))
+         (ebib-db-remove-entry key ebib--cur-db)
+         (let ((new-cur-key (ebib--next-elem key ebib--cur-keys-list)))
+           (setq ebib--cur-keys-list (delete key ebib--cur-keys-list))
+           (ebib-db-set-current-entry-key (or new-cur-key  ; If new-cur-key is nil, we've deleted the last entry.
+                                          (-last-item ebib--cur-keys-list))
+                                      ebib--cur-db
+                                      'first))
+         (message (format "Entry `%s' deleted." key))
          (ebib--set-modified t)
-         (ebib--redisplay)))
-      ((entries)
-       (let ((key (ebib--cur-entry-key)))
-         (when (y-or-n-p (format "Delete %s? " key))
-           (remove-entry key)
-           (message (format "Entry `%s' deleted." key))
-           (ebib--set-modified t)
-           (ebib--redisplay))))
-      ((default)
-       (beep)))))
+         (ebib--redisplay))))
+    ((default)
+     (beep))))
 
 (defun ebib-select-and-popup-entry ()
   "Make the entry at point current and display it.
