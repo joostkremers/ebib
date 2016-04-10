@@ -883,7 +883,8 @@ Just like with `cond', only one form is actually executed, the
 first one that matches.  If ENVIRONMENT contains more than one
 condition, BODY is executed if they all match (i.e., the
 conditions are AND'ed.)"
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug (&rest (sexp form))))
   `(cond
     ,@(mapcar (lambda (form)
                 (cons (if (= 1 (length (car form)))
