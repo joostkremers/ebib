@@ -865,7 +865,8 @@ FILE must be a fully expanded filename."
 
 (defun ebib--reload-database (db)
   "Reload database DB from disk."
-  (let ((file (ebib-db-get-filename db)))
+  (let ((file (ebib-db-get-filename db))
+        (cur-key (ebib--db-get-current-entry-key db)))
     ;; first clear out some variables
     (ebib-db-clear-database db)
     ;; then load the file
@@ -876,7 +877,7 @@ FILE must be a fully expanded filename."
     (ebib--load-entries file db)
     ;; If the user makes any changes, we'll want to create a back-up.
     (ebib-db-set-backup t ebib--cur-db)
-    (ebib-db-set-current-entry-key t db)))
+    (ebib-db-set-current-entry-key cur-key db 'first)))
 
 (defun ebib-merge-bibtex-file ()
   "Merge a BibTeX file into the current database."
