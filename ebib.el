@@ -1688,7 +1688,7 @@ their contents into a single field."
                (setq new-cur-key (ebib--next-elem key ebib--cur-keys-list))))
          (ebib-db-unmark-entry 'all ebib--cur-db)  ; This works despite the fact that all marked keys have been removed.
          (unless new-cur-key  ; If nil, the last entry was active and we deleted it.
-           (setq new-cur-key (-last-item (ebib-db-list-keys ebib--cur-db 'sort))))
+           (setq new-cur-key (-last-item (ebib--list-keys))))
          (ebib-db-set-current-entry-key new-cur-key ebib--cur-db 'first))
        (message "Marked entries deleted.")
        (ebib--set-modified t)
