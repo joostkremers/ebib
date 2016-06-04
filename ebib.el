@@ -2973,17 +2973,13 @@ The deleted text is not put in the kill ring."
         (beep)
       (let ((strings (ebib-db-list-strings ebib--cur-db)))
         (when strings
-          (unwind-protect
-              (progn
-                (other-window 1)
-                (let ((string (completing-read "Abbreviation to insert: " strings nil t)))
-                  (when string
-                    (ebib-db-set-field-value field string (ebib--cur-entry-key) ebib--cur-db 'overwrite 'unbraced)
-                    (ebib--set-modified t))))
-            (other-window 1)
-            ;; we can't do this earlier, because we would be writing to the index buffer...
-            (ebib--redisplay-current-field)
-            (ebib-next-field)))))))
+          (with-selected-window (get-buffer-window (ebib--buffer 'index))
+            (let ((string (completing-read "Abbreviation to insert: " strings nil t)))
+              (when string
+                (ebib-db-set-field-value field string (ebib--cur-entry-key) ebib--cur-db 'overwrite 'unbraced)
+                (ebib--set-modified t))))
+          (ebib--redisplay-current-field)
+          (ebib-next-field))))))
 
 (defun ebib-view-field-as-help ()
   "Show the contents of the current field in a *Help* window."
