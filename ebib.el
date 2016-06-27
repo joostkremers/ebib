@@ -2087,17 +2087,6 @@ Operates either on all entries or on the marked entries."
        (setq ebib--cur-db new-db)
        (ebib--redisplay)))))
 
-(defun ebib--extract-urls (string)
-  "Extract URLs from STRING.
-What counts as a URL is defined by `ebib-url-regexp'.  Return the
-URLs as a list of strings.  Parts of the string that are not
-recognized as URLs are discarded."
-  (let ((start 0)
-        (result nil))
-    (while (string-match ebib-url-regexp string start)
-      (push (match-string 0 string) result)
-      (setq start (match-end 0)))
-    result))
 
 (defun ebib-browse-url (num)
   "Browse the URL in the standard URL field.
@@ -2108,11 +2097,36 @@ argument NUM."
   (ebib--execute-when
     ((entries)
      (let ((urls (ebib-db-get-field-value ebib-url-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (if urls
-           (ebib--call-browser urls num)
-         (error "Field `%s' is empty" ebib-url-field))))
+       (unless urls
+         (error "Field `%s' is empty" ebib-url-field))
+       (ebib--browse-url-1 urls num)))
     ((default)
      (beep))))
+
+(defun ebib--browse-url-1 (urls num)
+  "Helper function for `ebib-browse-url'.
+URLS is a string containing one or more URLs.  NUM is used as in
+`ebib-browse-url'."
+  ;; First convert the string to a list of URLs.
+  (setq urls (let ((start 0)
+                   (result nil))
+               (while (string-match ebib-url-regexp urls start)
+                 (push (match-string 0 urls) result)
+                 (setq start (match-end 0)))
+               (nreverse result)))
+  (unless urls
+    (error "No valid URLs found"))
+  (if (= (length urls) 1)
+      (setq num 1))
+  (if (not (integerp num)) ; the user didn't provide a numeric prefix argument
+      (setq num (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls))))))
+  (unless (<= 1 num (length urls))
+    (error "No URL No. %d" num))
+  (let ((url (nth (1- num) urls)))
+    (when url
+      (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
+          (setq url (match-string 1 url))))
+    (ebib--call-browser url)))
 
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
@@ -2129,30 +2143,14 @@ contain only one DOI.  The DOI is combined with the URL
     ((default)
      (beep))))
 
-(defun ebib--call-browser (string &optional n)
-  "Call a browser with the URL in STRING.
-STRING is a string containing one or more URLs.  If there is more
-than one, N specifies which one to pass to the browser.  If N
-is nil, the user is asked which URL to open."
-  (let ((urls (ebib--extract-urls string)))
-    (cond
-     ((null (cdr urls))                 ; there's only one URL
-      (setq n 1))
-     ((not (integerp n)) ; the user didn't provide a numeric prefix argument
-      (setq n (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls)))))))
-    (if (or (< n 1)             ; if the user provide a number out of range
-            (> n (length urls)))
-        (setq n 1))
-    (let ((url (nth (1- n) urls)))
-      (when url
-        (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
-            (setq url (match-string 1 url)))
-        (if ebib-browser-command
-            (progn
-              (message "Executing `%s %s'" ebib-browser-command url)
-              (start-process "Ebib--browser" nil ebib-browser-command url))
-          (message "Opening `%s'" url)
-          (browse-url url))))))
+(defun ebib--call-browser (url)
+  "Send URL to a browser."
+  (if ebib-browser-command
+      (progn
+        (message "Executing `%s %s'" ebib-browser-command url)
+        (start-process "Ebib--browser" nil ebib-browser-command url))
+    (message "Opening `%s'" url)
+    (browse-url url)))
 
 (defun ebib-view-file (num)
   "View a file in the standard file field.
@@ -2864,9 +2862,9 @@ Altertanively, a numeric prefix argument NUM can be passed."
   (interactive "P")
   (let* ((field (ebib--current-field))
          (urls (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
-    (if urls
-        (ebib--call-browser urls num)
-      (error "Field `%s' is empty" field))))
+    (unless urls
+      (error "Field `%s' is empty" field))
+    (ebib--browse-url-1 urls num)))
 
 (defun ebib-view-file-in-field (num)
   "View a file in the current field.
