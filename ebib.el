@@ -1543,10 +1543,9 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
 If the current database is filtered, only the entries that match
 the filter are saved.  The original file is not deleted.
 
-FORCE is a prefix argument.  If called with \\[universal-argument] \\[universal-argument], the
-database is written unconditionally, even if the new file already
-exists.  (Note that this uses a double prefix argument in order to
-maintain compatibility with \\[ebib-save-current-database]."
+FORCE is a prefix argument.  If called with a prefix
+argument (any argument will do), the database is written
+unconditionally, even if the new file already exists."
   (interactive "P")
   (ebib--execute-when
     ((database)
