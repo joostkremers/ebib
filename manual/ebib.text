@@ -233,7 +233,7 @@ When you have undertaken any kind of editing action on a database, it is marked 
 
 If you want to force-save a database that has not been modified, you can use a prefix argument: `C-u s`. In either case, however, Ebib checks whether the underlying file was modified and warns you if it was. (Ebib does this by storing the `.bib` file’s modification time when reading the file and comparing this time with the modification time when requested to save the file.) If you also want to forego this check, use a double prefix argument: `C-u C-u s`. This saves the file unconditionally.
 
-If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`. This command can also be prefixed with `C-u C-u` in order to overwrite any existing file without asking for confirmation. (A single prefix argument `C-u` does nothing with `w`.)
+If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to `C-x C-w` in Emacs: the new `.bib` file becomes associated with the database. The command for this is `w`. This command can also be prefixed with `C-u` (or in fact any other prefix argument) in order to overwrite any existing file without asking for confirmation.
 
 
 # Using Biblatex #
@@ -385,13 +385,13 @@ This function obtains the time stamp of the entry being tested from the variable
 
 ### Properties of Filtered Databases ###
 
-When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database or saving a filtered database is also disabled. (The reasons for these limitations are mainly historic and they may be lifted in future version). Editing existing entries is possible, however. Note that if the entry doesn't match the filter anymore after the edit, it doesn't disappear from view. In order to reapply the filter, press `F r`.
+When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database or saving a filtered database is also disabled. Editing existing entries is possible, however. Note that if the entry doesn't match the filter anymore after the edit, it doesn't disappear from view. For that, you need to reapply the filter with `F r`.
 
 It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `M`, then cancel the filter and perform an action on them.
 
-Although a filtered database cannot be saved, it is possible to write the filtered entries to a file. To do so, use `F W`. This command also writes all the `@string` definitions and the `@preamble`, so you end up with a complete `.bib` file. (Note that this is in fact the same command as the menu option "Save Database As". This command behaves differently depending on whether a filter is active. If there is, only the filtered entries are written to the new file and the original database remains open. If no filter is active, all the entries are written and the database in Ebib is renamed.)
+If a database has an active filter, the save command is disabled, because it would not be clear whether you want to save the entire database or just the filtered entries. If you want to save only the filtered entries to a file, you can use the command `w` (or the menu option "Save Database As"). This also saves the `@string`, `@preamble` and `@comments`, as well as any file-local variables, so you will have a self-contained `.bib` file with only the filtered entries. In order to save the entire database, you need to cancel the filter. After saving, you can reapply the filter with `F L`, of course.
 
-One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` and of course the special function of `F w` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
+One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
 
 
 # Consulting BibTeX Databases outside Ebib #

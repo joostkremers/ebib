@@ -720,9 +720,9 @@ one of them, and want to save all of them without going through each
 yourself, you can save all databases at once through the menu.  You can
 also save the database to another name, similar to ‘C-x C-w’ in Emacs:
 the new ‘.bib’ file becomes associated with the database.  The command
-for this is ‘w’.  This command can also be prefixed with ‘C-u C-u’ in
-order to overwrite any existing file without asking for confirmation.
-(A single prefix argument ‘C-u’ does nothing with ‘w’.)
+for this is ‘w’.  This command can also be prefixed with ‘C-u’ (or in
+fact any other prefix argument) in order to overwrite any existing file
+without asking for confirmation.
 
 
 File: ebib.info,  Node: Using Biblatex,  Next: Searching,  Prev: Saving a Database,  Up: Top
@@ -1150,31 +1150,29 @@ When a filter is active, there are a few things that are not possible or
 function differently.  First, it is not possible to add or delete
 entries, either interactively or by merging or exporting.  Exporting
 from a filtered database or saving a filtered database is also disabled.
-(The reasons for these limitations are mainly historic and they may be
-lifted in future version).  Editing existing entries is possible,
-however.  Note that if the entry doesn’t match the filter anymore after
-the edit, it doesn’t disappear from view.  In order to reapply the
-filter, press ‘F r’.
+Editing existing entries is possible, however.  Note that if the entry
+doesn’t match the filter anymore after the edit, it doesn’t disappear
+from view.  For that, you need to reapply the filter with ‘F r’.
 
    It is also possible to mark entries.  Marked entries stay marked when
 you cancel the filter, so in order to do something with all the entries
 matching a filter, you can mark them all in the filter view with ‘M’,
 then cancel the filter and perform an action on them.
 
-   Although a filtered database cannot be saved, it is possible to write
-the filtered entries to a file.  To do so, use ‘F W’.  This command also
-writes all the ‘@string’ definitions and the ‘@preamble’, so you end up
-with a complete ‘.bib’ file.  (Note that this is in fact the same
-command as the menu option "Save Database As".  This command behaves
-differently depending on whether a filter is active.  If there is, only
-the filtered entries are written to the new file and the original
-database remains open.  If no filter is active, all the entries are
-written and the database in Ebib is renamed.)
+   If a database has an active filter, the save command is disabled,
+because it would not be clear whether you want to save the entire
+database or just the filtered entries.  If you want to save only the
+filtered entries to a file, you can use the command ‘w’ (or the menu
+option "Save Database As").  This also saves the ‘@string’, ‘@preamble’
+and ‘@comments’, as well as any file-local variables, so you will have a
+self-contained ‘.bib’ file with only the filtered entries.  In order to
+save the entire database, you need to cancel the filter.  After saving,
+you can reapply the filter with ‘F L’, of course.
 
    One final note: of all the filter-related commands, ‘~’, ‘F c’, ‘F
-r’, ‘F s’ and ‘F v’ and of course the special function of ‘F w’ are only
-available when a filter is active.  The other commands operate on the
-stored filters and can be used when no filter is active.
+r’, ‘F s’ and ‘F v’ are only available when a filter is active.  The
+other commands operate on the stored filters and can be used when no
+filter is active.
 
 
 File: ebib.info,  Node: Consulting BibTeX Databases outside Ebib,  Next: Cross-referencing,  Prev: Searching,  Up: Top
@@ -3045,88 +3043,88 @@ Node: Copy Cut Paste Yank and Delete31746
 Ref: #copy-cut-paste-yank-and-delete31931
 Node: Saving a Database32883
 Ref: #saving-a-database33031
-Node: Using Biblatex34704
-Ref: #using-biblatex34835
-Node: Setting the BibTeX Dialect35162
-Ref: #setting-the-bibtex-dialect35331
-Node: Alias Types and Fields37542
-Ref: #alias-types-and-fields37703
-Node: Searching39889
-Ref: #searching40033
-Node: Simple Searches40075
-Ref: #simple-searches40191
-Node: Filters42127
-Ref: #filters42227
-Node: Simple Selection43275
-Ref: #simple-selection43404
-Node: Complex Filters45082
-Ref: #complex-filters45244
-Node: Storing and Saving Filters49231
-Ref: #storing-and-saving-filters49414
-Node: Special Filters52285
-Ref: #special-filters52466
-Node: An Example Listing Recent Additions53821
-Ref: #an-example-listing-recent-additions54050
-Node: Properties of Filtered Databases55913
-Ref: #properties-of-filtered-databases56110
-Node: Consulting BibTeX Databases outside Ebib57888
-Ref: #consulting-bibtex-databases-outside-ebib58097
-Node: Key Bindings62532
-Ref: #key-bindings62689
-Node: Defining Citation Commands63461
-Ref: #defining-citation-commands63695
-Node: Associating a Database with a LaTeX File69612
-Ref: #associating-a-database-with-a-latex-file69853
-Node: Cross-referencing72798
-Ref: #cross-referencing72967
-Node: Marking Entries76268
-Ref: #marking-entries76414
-Node: Printing the Database77393
-Ref: #printing-the-database77553
-Node: Calling a Browser81341
-Ref: #calling-a-browser81491
-Node: Viewing Files84111
-Ref: #viewing-files84243
-Node: Editing the file field88024
-Ref: #editing-the-file-field88159
-Node: Notes files89362
-Ref: #notes-files89490
-Node: Window Management90899
-Ref: #window-management91046
-Node: Creating Entry Stubs94202
-Ref: #creating-entry-stubs94364
-Node: @Preamble Definition95365
-Ref: #preamble-definition95529
-Node: @String Definitions97524
-Ref: #string-definitions97675
-Node: @Comments101184
-Ref: #comments101312
-Node: Managing Keywords101677
-Ref: #managing-keywords101822
-Node: Sorting the bib File107707
-Ref: #sorting-the-.bib-file107880
-Node: Merging and Importing111007
-Ref: #merging-and-importing111172
-Node: Exporting Entries112946
-Ref: #exporting-entries113108
-Node: Multiple Identical Fields115083
-Ref: #multiple-identical-fields115265
-Node: The Multiline Edit Buffer117158
-Ref: #the-multiline-edit-buffer117339
-Node: The Options Menu121469
-Ref: #the-options-menu121623
-Node: The Ebib Buffers122244
-Ref: #the-ebib-buffers122386
-Node: The Index Buffer122728
-Ref: #the-index-buffer122865
-Node: The Entry Buffer129525
-Ref: #the-entry-buffer129689
-Node: The Strings Buffer132225
-Ref: #the-strings-buffer132368
-Node: Customisation134194
-Ref: #customisation134305
-Node: Modifying Key Bindings135230
-Ref: #modifying-key-bindings135357
+Node: Using Biblatex34675
+Ref: #using-biblatex34806
+Node: Setting the BibTeX Dialect35133
+Ref: #setting-the-bibtex-dialect35302
+Node: Alias Types and Fields37513
+Ref: #alias-types-and-fields37674
+Node: Searching39860
+Ref: #searching40004
+Node: Simple Searches40046
+Ref: #simple-searches40162
+Node: Filters42098
+Ref: #filters42198
+Node: Simple Selection43246
+Ref: #simple-selection43375
+Node: Complex Filters45053
+Ref: #complex-filters45215
+Node: Storing and Saving Filters49202
+Ref: #storing-and-saving-filters49385
+Node: Special Filters52256
+Ref: #special-filters52437
+Node: An Example Listing Recent Additions53792
+Ref: #an-example-listing-recent-additions54021
+Node: Properties of Filtered Databases55884
+Ref: #properties-of-filtered-databases56081
+Node: Consulting BibTeX Databases outside Ebib57735
+Ref: #consulting-bibtex-databases-outside-ebib57944
+Node: Key Bindings62379
+Ref: #key-bindings62536
+Node: Defining Citation Commands63308
+Ref: #defining-citation-commands63542
+Node: Associating a Database with a LaTeX File69459
+Ref: #associating-a-database-with-a-latex-file69700
+Node: Cross-referencing72645
+Ref: #cross-referencing72814
+Node: Marking Entries76115
+Ref: #marking-entries76261
+Node: Printing the Database77240
+Ref: #printing-the-database77400
+Node: Calling a Browser81188
+Ref: #calling-a-browser81338
+Node: Viewing Files83958
+Ref: #viewing-files84090
+Node: Editing the file field87871
+Ref: #editing-the-file-field88006
+Node: Notes files89209
+Ref: #notes-files89337
+Node: Window Management90746
+Ref: #window-management90893
+Node: Creating Entry Stubs94049
+Ref: #creating-entry-stubs94211
+Node: @Preamble Definition95212
+Ref: #preamble-definition95376
+Node: @String Definitions97371
+Ref: #string-definitions97522
+Node: @Comments101031
+Ref: #comments101159
+Node: Managing Keywords101524
+Ref: #managing-keywords101669
+Node: Sorting the bib File107554
+Ref: #sorting-the-.bib-file107727
+Node: Merging and Importing110854
+Ref: #merging-and-importing111019
+Node: Exporting Entries112793
+Ref: #exporting-entries112955
+Node: Multiple Identical Fields114930
+Ref: #multiple-identical-fields115112
+Node: The Multiline Edit Buffer117005
+Ref: #the-multiline-edit-buffer117186
+Node: The Options Menu121316
+Ref: #the-options-menu121470
+Node: The Ebib Buffers122091
+Ref: #the-ebib-buffers122233
+Node: The Index Buffer122575
+Ref: #the-index-buffer122712
+Node: The Entry Buffer129372
+Ref: #the-entry-buffer129536
+Node: The Strings Buffer132072
+Ref: #the-strings-buffer132215
+Node: Customisation134041
+Ref: #customisation134152
+Node: Modifying Key Bindings135077
+Ref: #modifying-key-bindings135204
 
 End Tag Table
 
