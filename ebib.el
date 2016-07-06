@@ -821,11 +821,7 @@ FILE must be a fully expanded filename."
       (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
       (if (file-exists-p file)
           (progn
-            ;; store the last modtime
-            (ebib-db-set-modtime (ebib--get-file-modtime file) ebib--cur-db)
-            ;; load the entries in the file
             (ebib--load-entries file ebib--cur-db)
-            ;; If the user makes any changes, we'll want to create a back-up.
             (ebib-db-set-backup t ebib--cur-db)
             (ebib-db-set-current-entry-key t ebib--cur-db)
             (ebib--set-modified nil))
@@ -872,8 +868,6 @@ FILE must be a fully expanded filename."
     ;; then load the file
     (ebib--log 'log "%s: Reloading file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") file)
     (ebib-db-set-filename file db)
-    ;; store the last modtime
-    (ebib-db-set-modtime (ebib--get-file-modtime file) ebib--cur-db)
     (ebib--load-entries file db)
     ;; If the user makes any changes, we'll want to create a back-up.
     (ebib-db-set-backup t ebib--cur-db)
@@ -889,19 +883,22 @@ FILE must be a fully expanded filename."
            (error "No such file: %s" file)
          (setq ebib--log-error nil)      ; we haven't found any errors (yet)
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
-         (ebib--load-entries file ebib--cur-db)
+         (ebib--load-entries file ebib--cur-db 'ignore-modtime)
          (unless (ebib--cur-entry-key)
            (ebib-db-set-current-entry-key t ebib--cur-db))
          (ebib--redisplay)
          (ebib--set-modified t))))
     ((default) (beep))))
 
-(defun ebib--load-entries (file db)
+(defun ebib--load-entries (file db &optional ignore-modtime)
   "Load BibTeX entries from FILE into DB.
 If FILE specifies a BibTeX dialect and no dialect is set for DB,
-also set DB's dialect."
+also set DB's dialect.  FILE's modification time is stored in DB,
+unless IGNORE-MODTIME is non-nil."
   (with-temp-buffer
     (insert-file-contents file)
+    (unless ignore-modtime
+      (ebib-db-set-modtime (ebib--get-file-modtime file) db))
     (unless (ebib-db-get-dialect db)
       (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
     (let ((result (ebib--find-bibtex-entries db nil)))
