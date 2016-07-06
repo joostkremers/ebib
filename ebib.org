@@ -1,0 +1,8 @@
+* Procedure for generating the html manual
+- on master: run pandoc on ebib.text (through pandoc-mode)
+- move ebib-manual.html out of the way
+- checkout the gh-pages branch
+- move ebib-manual.html to the project root directory
+- commit
+
+* TODO ~save-all-databases~ should check mod times
