@@ -2753,16 +2753,21 @@ was called interactively."
   "Edit the `ebib-file-field'.
 Filenames are added to the standard file field separated by
 `ebib-filename-separator'.  The first directory in
-`ebib-file-search-dirs' is used as the start directory."
+`ebib-file-search-dirs' is used as the start directory.  If
+`ebib-truncate-file-names' is t, file names are truncated
+relative to the directories listed in `ebib-file-search-dirs',
+otherwise they are stored as absolute paths."
   (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs))))
-    (cl-loop for file = (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion)
+    (cl-loop for file = (expand-file-name (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion) start-dir)
              until (or (string= file "")
                        (string= file start-dir))
-             do (let* ((short-file (ebib--file-relative-name (expand-file-name file)))
+             do (let* ((file-name (if ebib-truncate-file-names
+                                      (ebib--file-relative-name file)
+                                    file))
                        (conts (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
-                                      (concat conts ebib-filename-separator short-file)
-                                    short-file)))
+                                      (concat conts ebib-filename-separator file-name)
+                                    file-name)))
                   (ebib-db-set-field-value ebib-file-field new-conts (ebib--cur-entry-key) ebib--cur-db 'overwrite)
                   (ebib--redisplay-current-field))
              finally return (ebib--set-modified t))))

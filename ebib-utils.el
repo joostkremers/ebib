@@ -445,6 +445,14 @@ are searched, not their subdirectories."
   :group 'ebib
   :type '(repeat :tag "Search directories" (string :tag "Directory")))
 
+(defcustom ebib-truncate-file-names t
+  "Truncate file names in the file field.
+If t, file names entered in the file field are truncated relative
+to the directories in `ebib-file-search-dirs'."
+  :group 'ebib
+  :type '(choice (const: :tag "Truncate File Names" t)
+                 (const: :tag "Do not Truncate File Names" nil)))
+
 (defcustom ebib-name-transform-function 'identity
   "Function for transforming keys into file names.
 When `ebib-view-file' is called but no filename is listed in the
