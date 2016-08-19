@@ -2182,10 +2182,13 @@ opened.  If N is NIL, the user is asked to enter a number."
             (> n (length files)))
         (setq n 1))
     (let* ((file (nth (1- n) files))
+           (unmod-file (if ebib-file-name-mod-function
+                           (funcall ebib-file-name-mod-function file nil)
+                         file))
            (file-full-path
-            (or (locate-file file ebib-file-search-dirs)
-                (locate-file (file-name-nondirectory file) ebib-file-search-dirs)
-                (expand-file-name file))))
+            (or (locate-file unmod-file ebib-file-search-dirs)
+                (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
+                (expand-file-name unmod-file))))
       (if (file-exists-p file-full-path)
           (let ((ext (file-name-extension file-full-path)))
             (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
@@ -2195,7 +2198,7 @@ opened.  If N is NIL, the user is asked to enter a number."
               (message "Opening `%s'" file-full-path)
               (ebib-lower)
               (find-file file-full-path)))
-        (error "File not found: `%s'" file)))))
+        (error "File not found: `%s'" unmod-file)))))
 
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
@@ -2761,9 +2764,7 @@ otherwise they are stored as absolute paths."
     (cl-loop for file = (expand-file-name (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion) start-dir)
              until (or (string= file "")
                        (string= file start-dir))
-             do (let* ((file-name (if ebib-truncate-file-names
-                                      (ebib--file-relative-name file)
-                                    file))
+             do (let* ((file-name (ebib--transform-file-name-for-storing file))
                        (conts (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-filename-separator file-name)
@@ -2771,6 +2772,20 @@ otherwise they are stored as absolute paths."
                   (ebib-db-set-field-value ebib-file-field new-conts (ebib--cur-entry-key) ebib--cur-db 'overwrite)
                   (ebib--redisplay-current-field))
              finally return (ebib--set-modified t))))
+
+(defun ebib--transform-file-name-for-storing (file)
+  "Return a name for FILE that can be stored in the file field.
+If `ebib-truncate-file-names' is non-nil, the name is truncated
+relative to `ebib-file-search-dirs'.  If
+`ebib-file-name-mod-function' is non-nil, it is applied to the
+name."
+  (setq file (if ebib-truncate-file-names
+                 (ebib--file-relative-name file)
+               file))
+  (setq file (if ebib-file-name-mod-function
+                 (funcall ebib-file-name-mod-function file t)
+               file))
+  file)  ; not strictly necessary but cleaner
 
 (defun ebib--file-relative-name (file)
   "Return a name for FILE relative to `ebib-file-search-dirs'.
