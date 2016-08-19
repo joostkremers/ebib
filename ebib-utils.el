@@ -450,8 +450,8 @@ are searched, not their subdirectories."
 If t, file names entered in the file field are truncated relative
 to the directories in `ebib-file-search-dirs'."
   :group 'ebib
-  :type '(choice (const: :tag "Truncate File Names" t)
-                 (const: :tag "Do not Truncate File Names" nil)))
+  :type '(choice (const :tag "Truncate File Names" t)
+                 (const :tag "Do not Truncate File Names" nil)))
 
 (defcustom ebib-name-transform-function 'identity
   "Function for transforming keys into file names.
