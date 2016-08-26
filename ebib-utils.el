@@ -698,7 +698,7 @@ BibTeX dialect is set to `BibTeX', this option is ignored."
 
 (defcustom ebib-hide-cursor t
   "Hide the cursor in the Ebib buffers.
-Normally, the cursor is hidden in Ebib buffers. with the
+Normally, the cursor is hidden in Ebib buffers, with the
 highlight indicating which entry, field or string is active.  By
 unsetting this option, you can make the cursor visible.  Note
 that changing this option does not take effect until you restart
