@@ -473,36 +473,6 @@ passed to an external viewer."
   :type '(choice (const :tag "Do not modify file names" nil)
                  (function :tag "Modification function")))
 
-(defcustom ebib-notes-file-extension "org"
-  "Extension used for notes files.
-The extension should be specified without a dot."
-  :group 'ebib
-  :type '(string :tag "Extension"))
-
-(defcustom ebib-notes-file-symbol "[N]"
-  "Symbol (or string) used to indicate the existence of a notes file.
-If there is a notes file for the current entry, this symbol is
-displayed in the mode line of the entry buffer after the entry
-key."
-  :group 'ebib
-  :type '(string :tag "Notes file symbol"))
-
-(defcustom ebib-notes-directory nil
-  "Directory to save notes files to.
-If this is nil, the first directory in `ebib-file-search-dirs' is
-used."
-  :group 'ebib
-  :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
-                 (directory :tag "Specify directory")))
-
-(defcustom ebib-notes-name-transform-function nil
-  "Function for transforming keys into notes file names.
-If this is nil, the function `ebib-name-transform-function' is
-used instead."
-  :group 'ebib
-  :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
-                 (function :tag "Apply function")))
-
 (defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
   :group 'ebib

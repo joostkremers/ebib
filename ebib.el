@@ -58,6 +58,7 @@
 (require 'ebib-db)
 (require 'ebib-filters)
 (require 'ebib-keywords)
+(require 'ebib-notes)
 
 (defun ebib--display-buffer-reuse-window (buffer _)
   "Display BUFFER in an existing Ebib window.
@@ -687,7 +688,7 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "m" #'ebib-mark-entry) ; prefix
     (define-key map "M" #'ebib-mark-all-entries)
     (define-key map "n" #'ebib-search-next)
-    (define-key map "N" #'ebib-open-notes-file)
+    (define-key map "N" #'ebib-open-note)
     (define-key map [(control n)] #'ebib-next-entry)
     (define-key map [(meta n)] #'ebib-index-scroll-up)
     (define-key map "o" #'ebib-load-bibtex-file)
@@ -1080,32 +1081,14 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
-(defun ebib--create-notes-file-name (key)
-  "Create a notes filename for KEY.
-First, `ebib-notes-name-transform-function' is applied to KEY,
-and `ebib-notes-file-extension' is added to it.  Then, the file
-name is fully qualified by prepending the directory in
-`ebib-notes-directory'."
-  (concat (or ebib-notes-directory (car ebib-file-search-dirs))
-          "/" ; to be on the safe side
-          (funcall (or ebib-notes-name-transform-function
-                       ebib-name-transform-function)
-                   key)
-          "."
-          ebib-notes-file-extension))
-
-(defun ebib-open-notes-file ()
-  "Open or create a notes file for the current entry.
-The file name is created from the entry key by the function
-`ebib--create-notes-file-name.'"
+(defun ebib-open-note ()
+  "Open or create a note for the current entry."
   (interactive)
   (ebib--execute-when
     ((entries)
-     (let ((filename (ebib--create-notes-file-name (ebib--cur-entry-key))))
-       (if (not (file-writable-p (expand-file-name filename)))
-           (error "Could not create file `%s' " filename)
-         (ebib-lower)
-         (find-file filename))))
+     (if ebib-notes-use-single-file
+         (ebib--notes-open-common-notes-file (ebib--cur-entry-key))
+       (ebib--notes-open-notes-file-for-entry (ebib--cur-entry-key))))
     ((default)
      (beep))))
 
@@ -2594,10 +2577,9 @@ a logical `not' is applied to the selection."
 (define-minor-mode ebib-entry-minor-mode
   "Ebib entry minor mode.
 Primarily used to add some info to the entry buffer mode line."
-  :init-value nil :lighter (:eval (concat " «" (ebib--cur-entry-key) "» "
-                                          (if (file-readable-p (ebib--create-notes-file-name (ebib--cur-entry-key)))
-                                              ebib-notes-file-symbol
-                                            "")))
+  :init-value nil :lighter (:eval (format " «%s» %s"
+                                          (ebib--cur-entry-key)
+                                          (if (ebib--notes-exists-note (ebib--cur-entry-key)) ebib-notes-symbol "")))
   :global nil)
 
 (defun ebib-quit-entry-buffer ()
