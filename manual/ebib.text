@@ -631,7 +631,13 @@ If you wish to store all notes in a single file, you must set the option `ebib-n
 
 Ebib assumes that the notes file is an org-mode file and creates notes using the template in `ebib-notes-template`, but the org-mode format is not enforced. If you specify a notes file with an extension different from `.org`, the corresponding format will be used, which probably requires customising the template. Note that if you do change the template, it is crucial that you include a `%K` directive in it. This directive is replaced with a unique identifier, which is used by Ebib to identify and retrieve the note. Without it, Ebib cannot determine whether an entry has a note associated with it.
 
-When opening a node, Ebib searches the notes file for the identifier and when it finds it, moves the cursor to the corresponding heading with the function `org-back-to-header`. This can be changed by customising the option `ebib-notes-beginning-of-note-function`.
+There are three hooks that can be used to change the way the notes file is displayed when a note is opened. When an existing note is displayed, the hook `ebib-notes-open-note-after-hook` is run. By default, this contains two functions: `org-back-to-header`, which puts point at the start of the note, and `org-narrow-to-subtree`, which narrows the notes buffer to just the note you're viewing.
+
+When a new note is created, the hook `ebib-notes-new-note-hook` is run. By default, this contains the function `org-narrow-to-subtree`. For a new note, the cursor is positioned after the title and the `:PROPERTIES:` block, so that you can start typing right away.
+
+Because both these hooks narrow the notes buffer, there must be a way to widen the buffer again when searching for another note. This is the purpose of `ebib-notes-search-note-before-hook`. This hook is run every time a note is searched (regardless of whether it exists or not) and by default contains the function `widen`, so that the entire buffer is searched.
+
+All three hooks are customisable. For example, if you prefer not to narrow the buffer, simply remove the corresponding functions from the hooks.
 
 
 # Window Management #
