@@ -96,7 +96,7 @@
     ((filtered-db)
      (message (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))))
     ((default)
-     (error "No filter is active"))))
+     (error "[Ebib] No filter is active"))))
 
 (defun ebib-filters-view-all-filters ()
   "Display all filters in a *Help* buffer."
@@ -115,7 +115,7 @@
 PROMPT is the prompt string to be shown when asking the user for
 a filter.  Return the filter as a list (NAME FILTER)."
   (if (not ebib--filters-alist)
-      (error "No stored filters")
+      (error "[Ebib] No stored filters")
     (let* ((completion-ignore-case ebib-filters-ignore-case)
            (name (completing-read prompt
                                   (sort (copy-alist ebib--filters-alist)
@@ -129,7 +129,7 @@ a filter.  Return the filter as a list (NAME FILTER)."
   (let ((filter (ebib--filters-select-filter "Rename filter: "))
         (new-name (read-from-minibuffer "Enter new name: ")))
     (if (ebib--filters-exists-p new-name)
-        (error (format "A filter named `%s' already exists" new-name))
+        (error (format "[Ebib] A filter named `%s' already exists" new-name))
       (setcar filter new-name)
       (setq ebib--filters-modified t))))
 
@@ -310,7 +310,7 @@ Return a list (NAME FILTER) if found.  If there is no
 filter named NAME, raise an error, unless NOERROR is non-NIL."
   (or (assoc-string name ebib--filters-alist ebib-filters-ignore-case)
       (unless noerror
-        (error "Invalid filter %s" name))))
+        (error "[Ebib] Invalid filter %s" name))))
 
 (defun ebib--filters-exists-p (name)
   "Return non-NIL if a filter with NAME already exists."

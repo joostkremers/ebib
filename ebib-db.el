@@ -127,7 +127,7 @@ Return the new entry key if successful, nil otherwise."
     (if (ebib-db-get-entry entry db 'noerror)
         (setf (ebib--db-struct-cur-entry db) entry)
       (unless noerror
-        (error "No entry key `%s' in the current database" entry))
+        (error "[Ebib] No entry key `%s' in the current database" entry))
       (if (eq noerror 'first)
           (setf (ebib--db-struct-cur-entry db) (car (ebib-db-list-keys db 'sort))))))
    ((eq entry t)
@@ -160,7 +160,7 @@ If storing/updating/deleting the entry is successful, return its key."
 	(setq exists nil))
        ;; otherwise signal an error, if so requested:
        ((not (eq if-exists 'noerror))
-	(error "Ebib: key `%s' exists in database; cannot overwrite" key))))
+	(error "[Ebib] Key `%s' exists in database; cannot overwrite" key))))
     (unless exists
       (if data
 	  (puthash key data (ebib--db-struct-database db))
@@ -177,7 +177,7 @@ The entry is returned as an alist of (FIELD . VALUE) pairs.
 Trigger an error if KEY does not exist, unless NOERROR is T."
   (let ((entry (gethash key (ebib--db-struct-database db))))
     (unless (or entry noerror)
-      (error "Ebib: entry `%s' does not exist" key))
+      (error "[Ebib] Entry `%s' does not exist" key))
     entry))
 
 (defun ebib-db-uniquify-key (key db)
@@ -259,7 +259,7 @@ Return non-nil upon success, or nil if the value could not be stored."
           (setq value (concat (ebib-db-unbrace old-value) if-exists (ebib-db-unbrace value)))
           (setq old-value nil))
          ((not (eq if-exists 'noerror))
-          (error "Ebib: field `%s' exists in entry `%s'; cannot overwrite" field key)))
+          (error "[Ebib] Field `%s' exists in entry `%s'; cannot overwrite" field key)))
       ;; Otherwise add the new field. We just add the field here, the value
       ;; is added later, so that we can put braces around it if needed.
       ;; This also makes it easier to return `nil' when storing/changing
@@ -316,7 +316,7 @@ string has the text property `ebib--alias' with value t."
       (if alias
           (setq value (cdr (assoc-string alias entry 'case-fold)))))
     (unless (or value noerror)
-      (error "Ebib: field `%s' does not exist in entry `%s'" field key))
+      (error "[Ebib] Field `%s' does not exist in entry `%s'" field key))
     (when value
       (setq value (copy-sequence value))
       (when unbraced
@@ -374,7 +374,7 @@ set IF-EXISTS to `overwrite'."
        ((eq if-exists 'overwrite)
 	(setq old-string nil))
        ((not (eq if-exists 'noerror))
-	(error "Ebib: @STRING abbreviation `%s' exists in database %s" abbr (ebib-db-get-filename db 'short)))))
+	(error "[Ebib] @STRING abbreviation `%s' exists in database %s" abbr (ebib-db-get-filename db 'short)))))
     (unless old-string
       (setf (ebib--db-struct-strings db)
 	    (if (null value)
@@ -397,7 +397,7 @@ the value without braces."
   ;; instead of assoc-string here.
   (let ((value (cdr (assoc abbr (ebib--db-struct-strings db)))))
     (unless (or value noerror)
-      (error "Ebib: @STRING abbreviation `%s' does not exist" abbr))
+      (error "[Ebib] @STRING abbreviation `%s' does not exist" abbr))
     (if unbraced
         (ebib-db-unbrace value)
       value)))
@@ -439,7 +439,7 @@ Return non-nil on success or nil if PREAMBLE could not be stored."
     (if (not existing-preamble)
 	(setf (ebib--db-struct-preamble db) preamble)
       (unless (eq if-exists 'noerror)
-	(error "Ebib: Preamble is not empty; cannot overwrite")))))
+	(error "[Ebib] Preamble is not empty; cannot overwrite")))))
 
 (defun ebib-db-remove-preamble (db)
   "Remove the @PREAMBLE definition from DB."
@@ -470,7 +470,7 @@ IF-EXISTS is nil, an existing filename triggers an error."
        ((eq if-exists 'overwrite)
 	(setq exists nil))
        ((not (eq if-exists 'noerror))
-	(error "Ebib: database has a filename; cannot overwrite"))))
+	(error "[Ebib] Database has a filename; cannot overwrite"))))
     (unless exists
       (setf (ebib--db-struct-filename db) filename))))
 
