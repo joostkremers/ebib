@@ -616,7 +616,7 @@ keywords before Emacs is killed."
 ;; macro to redefine key bindings.
 
 (defmacro ebib-key (buffer key &optional command _)
-  "Bind KEY in BUFFER to COMMAND.
+  "Create a key bind in an Ebib buffer.
 BUFFER is a symbol designating an Ebib buffer and can be `index',
 `entry', `strings'.  KEY is a standard Emacs key description as
 passed to `define-key'.  If COMMAND is nil, KEY is unbound.
@@ -1139,7 +1139,7 @@ replaced with a number in ascending sequence."
        (ebib--redisplay)
        (ebib--edit-entry-internal)))
     ((no-database)
-     (error "No database open. Use `o' to open a database first"))
+     (error "No database open.  Use `o' to open a database first"))
     ((default)
      (beep))))
 
@@ -1577,7 +1577,7 @@ file was modified."
     ((filtered-db)
      ;; Saving a filtered db would result in saving only the entries that
      ;; match the filter.
-     (error "Cannot save a filtered database. Use `w' to write to a file."))))
+     (error "Cannot save a filtered database.  Use `w' to write to a file."))))
 
 (defun ebib-save-all-databases ()
   "Save all currently open databases if they were modified."
@@ -2100,7 +2100,7 @@ URLS is a string containing one or more URLs.  NUM is used as in
   (if (not (integerp num)) ; the user didn't provide a numeric prefix argument
       (setq num (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls))))))
   (unless (<= 1 num (length urls))
-    (error "No URL No. %d" num))
+    (error "No such URL (%d)" num))
   (let ((url (nth (1- num) urls)))
     (when url
       (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
@@ -2394,7 +2394,7 @@ not been saved yet."
 (defun ebib-warn-prefix ()
   "Warn that the prefix key is no longer valid."
   (interactive)
-  (error "Prefix key `;' is no longer necessary. See the Ebib manual, section \"Marking Entries\"."))
+  (error "Prefix key `;' is no longer necessary.  See the Ebib manual, section \"Marking Entries\""))
 
 ;; TODO These filter functions use functions defined in ebib.el, so we keep them here.
 
@@ -3308,7 +3308,7 @@ If the buffer has been modified, ask for confirmation."
   (interactive)
   (catch 'no-cancel
     (when (buffer-modified-p)
-      (unless (y-or-n-p "Text has been modified. Abandon changes? ")
+      (unless (y-or-n-p "Text has been modified.  Abandon changes? ")
         (throw 'no-cancel nil)))
     (ebib--kill-multiline-edit-buffer (current-buffer))
     (message "Text not stored.")))
@@ -3568,9 +3568,9 @@ created containing only these entries."
             (bbl-file (concat filename-sans-extension ".bbl"))
             (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
        (unless (file-exists-p bbl-file)
-         (error "No .bbl file exists. Run BibTeX first"))
+         (error "No .bbl file exists.  Run BibTeX first"))
        (when (or (not (file-exists-p bib-file))
-                 (y-or-n-p (format "%s already exists. Overwrite? " (file-name-nondirectory bib-file))))
+                 (y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
          (when (file-exists-p bib-file)
            (delete-file bib-file t))
          (let ((databases

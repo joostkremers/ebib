@@ -34,8 +34,8 @@
 
 ;;; Commentary:
 
-;; This file is part of Ebib, a BibTeX database manager for Emacs. It
-;; contains the filter code.
+;; This file is part of Ebib, a BibTeX database manager for Emacs.  It contains
+;; the filter code.
 ;;
 ;; Note: this file must be compiled with `lexical-binding' set to nil, due to
 ;; the local macro definition `contains' in `ebib--filters-run-filter'.

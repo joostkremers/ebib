@@ -35,7 +35,8 @@
 
 ;;; Commentary:
 
-;; This file is part of Ebib, a BibTeX database manager for Emacs.
+;; This file is part of Ebib, a BibTeX database manager for Emacs.  It contains
+;; the code for managing notes files.
 
 ;;; Code:
 

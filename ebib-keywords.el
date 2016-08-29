@@ -34,8 +34,8 @@
 
 ;;; Commentary:
 
-;; This file is part of Ebib, a BibTeX database manager for Emacs. It
-;; contains the keywords code.
+;; This file is part of Ebib, a BibTeX database manager for Emacs.  It contains
+;; the keywords code.
 
 ;;; Code:
 

@@ -35,8 +35,8 @@
 
 ;;; Commentary:
 
-;; This file is part of Ebib, a BibTeX database manager for Emacs. It
-;; contains general macros, utilities and variables.
+;; This file is part of Ebib, a BibTeX database manager for Emacs.  It contains
+;; general macros, utilities and variables.
 
 ;;; Code:
 
