@@ -144,7 +144,7 @@ The key is prepended with the string \"Custom_id:\", so that it
 can be used in a :PROPERTIES: block."
   (format ":Custom_id: %s" key))
 
-(defcustom ebib-notes-open-note-before-hook '(widen)
+(defcustom ebib-notes-search-note-before-hook '(widen)
   "Hook run before searching for a note.
 This hook is only used when notes are stored in a common notes
 file.  It can be used to prepare the buffer for searching the
@@ -242,8 +242,8 @@ found, return its location as a buffer position, otherwise return
 nil.  The search is performed in the current buffer, so the notes
 buffer must be made active before calling this function.
 
-This function also runs `ebib-notes-open-note-before-hook'."
-  (run-hooks 'ebib-notes-open-note-before-hook)
+This function also runs `ebib-notes-search-note-before-hook'."
+  (run-hooks 'ebib-notes-search-note-before-hook)
   (save-excursion
     (goto-char (point-min))
     (search-forward (funcall ebib-notes-identifier-function key) nil t)))
