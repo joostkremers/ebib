@@ -188,10 +188,7 @@ string where point should be located."
   "Return t if a note exists for KEY."
   (if ebib-notes-use-single-file
       (with-current-buffer (ebib--notes-buffer)
-        (run-hooks 'ebib-notes-open-note-before-hook)
-        (save-excursion
-          (goto-char (point-min))
-          (search-forward (funcall ebib-notes-identifier-function key) nil t)))
+        (ebib--notes-locate-note key))
     (file-readable-p (ebib--create-notes-file-name key))))
 
 ;;; one file per note
@@ -237,20 +234,35 @@ accessible to the user."
       (error "[Ebib] Cannot read or create notes file"))
   (find-file-noselect ebib-notes-use-single-file))
 
+(defun ebib--notes-locate-note (key)
+  "Locate the note identified by KEY.
+Convert KEY into an identifier using the function in
+`ebib-notes-identifier-function' and search this identifier.  If
+found, return its location as a buffer position, otherwise return
+nil.  The search is performed in the current buffer, so the notes
+buffer must be made active before calling this function.
+
+This function also runs `ebib-notes-open-note-before-hook'."
+  (run-hooks 'ebib-notes-open-note-before-hook)
+  (save-excursion
+    (goto-char (point-min))
+    (search-forward (funcall ebib-notes-identifier-function key) nil t)))
+
 (defun ebib--notes-open-common-notes-file (key)
   "Open the notes file to entry KEY or create a new note."
   (let ((buf (ebib--notes-buffer)))
     (with-current-buffer buf
-      (run-hooks 'ebib-notes-open-note-before-hook)
-      (goto-char (point-min))
-      (if (search-forward (funcall ebib-notes-identifier-function key) nil t)
-          (run-hooks 'ebib-notes-open-note-after-hook)
-        (goto-char (point-max))
-        (let ((new-note (ebib--notes-create-new-note-from-template key))
-              (beg (point)))
-          (insert (car new-note))
-          (goto-char (+ beg (cdr new-note)))
-          (run-hooks 'ebib-notes-new-note-hook))))
+      (let ((location (ebib--notes-locate-note key)))
+        (if location
+            (progn
+              (goto-char location)
+              (run-hooks 'ebib-notes-open-note-after-hook))
+          (goto-char (point-max))
+          (let ((new-note (ebib--notes-create-new-note-from-template key))
+                (beg (point)))
+            (insert (car new-note))
+            (goto-char (+ beg (cdr new-note)))
+            (run-hooks 'ebib-notes-new-note-hook)))))
     (ebib-lower)
     (switch-to-buffer buf)))
 
