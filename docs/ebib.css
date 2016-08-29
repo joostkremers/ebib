@@ -1,0 +1,110 @@
+body {
+    font-family: Verdana, "Bitstream Vera Sans", sans-serif;
+    color: #33333A;
+    line-height: 140%;
+    font-size: 100%;
+    /* background-color: #E0E0E0; */
+    background-color: #B2D1D1;
+}
+
+a {
+    text-decoration: none;
+    color: #533333;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #cf1212;
+}
+
+h1 {
+    font-size: xx-large;
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 50px;
+}
+
+h1.title {
+    text-align: center;
+    font-size: 2em;
+    height: 100px;
+    margin: auto;
+}
+
+h2 {
+    font-size: 1.3em;
+}
+
+h2.author {
+    text-align: center;
+    font-size: smaller;
+}
+
+h3.date {
+    text-align: center;
+    font-size: smaller;
+}
+
+img {
+    border: 0;
+}
+
+article {
+    margin-left: 25%;
+    margin-right: 10%;
+    max-width: 80em;
+    text-align: justify;
+}
+
+.preamble {
+    margin: auto;
+    max-width: 60%;
+    text-align: justify;
+}
+
+#menu {
+    position: fixed;
+    margin-left: 2%;
+    padding: 2%;
+    height: 600px;
+    width: 130px;
+}
+
+#TOC {
+    position: absolute;
+    width: 20%;
+    padding-right: 1%;
+    font-size: 75%;
+    background-color: #E6F0F0;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px 4px #333333;
+    /* padding: 2%; */
+}
+
+#TOC ul li ul li ul {
+    display: none;
+}
+
+ul {
+    padding-left: 12%;
+}
+
+pre {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px 2px #333333;
+    padding: 1%;
+}
+
+.bottom-dweller {
+    width: 100%;
+    bottom: 0%;
+    font-size: 70%;
+    text-align: right;
+}
+
+.footnotes {
+    margin: auto;
+    max-width: 50%;
+}
