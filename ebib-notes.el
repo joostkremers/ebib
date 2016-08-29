@@ -144,11 +144,31 @@ The key is prepended with the string \"Custom_id:\", so that it
 can be used in a :PROPERTIES: block."
   (format ":Custom_id: %s" key))
 
-(defcustom ebib-notes-beginning-of-note-function 'org-back-to-heading
-  "Function to move point to the first position of the current note.
-If desired, this function can perform other actions as well."
+(defcustom ebib-notes-open-note-before-hook '(widen)
+  "Hook run before searching for a note.
+This hook is only used when notes are stored in a common notes
+file.  It can be used to prepare the buffer for searching the
+note.
+
+This hook is also run when a new note is being created."
+  :group 'ebib
+  :type 'hook)
+
+(defcustom ebib-notes-open-note-after-hook '(org-back-to-heading org-narrow-to-subtree)
+  "Hook run after a note is found.
+This hook is only used when notes are stored in a common notes
+file.  It can be used to position the cursor after the note has
+been found.
+
+This hook is not run when a new note is created, see
+`ebib-notes-new-note-hook'."
   :group 'ebib-notes
-  :type 'function)
+  :type 'hook)
+
+(defcustom ebib-notes-new-note-hook '(org-narrow-to-subtree)
+  "Hook run when a new note is created."
+  :group 'ebib-notes
+  :type 'hook)
 
 (defun ebib--notes-create-new-note-from-template (key)
   "Create a new note for KEY.
@@ -168,6 +188,7 @@ string where point should be located."
   "Return t if a note exists for KEY."
   (if ebib-notes-use-single-file
       (with-current-buffer (ebib--notes-buffer)
+        (run-hooks 'ebib-notes-open-note-before-hook)
         (save-excursion
           (goto-char (point-min))
           (search-forward (funcall ebib-notes-identifier-function key) nil t)))
@@ -220,14 +241,16 @@ accessible to the user."
   "Open the notes file to entry KEY or create a new note."
   (let ((buf (ebib--notes-buffer)))
     (with-current-buffer buf
+      (run-hooks 'ebib-notes-open-note-before-hook)
       (goto-char (point-min))
       (if (search-forward (funcall ebib-notes-identifier-function key) nil t)
-          (funcall ebib-notes-beginning-of-note-function)
+          (run-hooks 'ebib-notes-open-note-after-hook)
         (goto-char (point-max))
         (let ((new-note (ebib--notes-create-new-note-from-template key))
               (beg (point)))
           (insert (car new-note))
-          (goto-char (+ beg (cdr new-note))))))
+          (goto-char (+ beg (cdr new-note)))
+          (run-hooks 'ebib-notes-new-note-hook))))
     (ebib-lower)
     (switch-to-buffer buf)))
 
