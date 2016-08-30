@@ -121,7 +121,8 @@ the entry for which a title is to be created."
 (defun ebib-notes-create-org-title (key)
   "Return a title for an orgmode note for KEY.
 The title is formed from the author(s) or editor(s) of the entry,
-its year and its title."
+its year and its title.  Newlines are removed from the resulting
+string."
   (let ((author (or (ebib-db-get-field-value "author" key ebib--cur-db 'noerror 'unbraced 'xref)
                     (ebib-db-get-field-value "editor" key ebib--cur-db 'noerror 'unbraced 'xref)
                     "(No Author)"))
@@ -129,7 +130,7 @@ its year and its title."
                   "????"))
         (title (or (ebib-db-get-field-value "title" key ebib--cur-db 'noerror 'unbraced 'xref)
                    "(No Title)")))
-    (format "%s (%s): %s" author year title)))
+    (replace-regexp-in-string "\n" "" (format "%s (%s): %s" author year title))))
 
 (defcustom ebib-notes-identifier-function 'ebib-notes-create-org-identifier
   "Function to create the identifier of a note.
