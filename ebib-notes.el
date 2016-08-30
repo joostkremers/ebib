@@ -180,8 +180,8 @@ This hook is not run when a new note is created, see
 Return a cons of the new note as a string and a position in this
 string where point should be located."
   (let* ((note (format-spec ebib-notes-template
-                            `((?K . ,(funcall ebib-notes-title-function key))
-                              (?T . ,(funcall ebib-notes-identifier-function key)))))
+                            `((?K . ,(funcall ebib-notes-identifier-function key))
+                              (?T . ,(funcall ebib-notes-title-function key)))))
          (point (string-match-p ">|<" note)))
     (if point
         (setq note (replace-regexp-in-string ">|<" "" note))
