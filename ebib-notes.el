@@ -91,22 +91,25 @@ used instead."
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
 
-(defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%P\n"
+(defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n>|<\n"
   "Template for a note entry in the notes file.
-The template can contain three directives:
-%T: the title of the entry.
-%K: The unique identifier of the note.
-%P: The position of point in a newly created note.
+New notes are created on the basis of this template, which can
+contain the following directives:
+
+%T  : the title of the entry
+%K  : the unique identifier of the note
+>|< : the position of the cursor
 
 If all notes are stored in a single notes file, the %K directive
-must be present in the template, since Ebib uses it to identify the
-location of a note.  Without it, Ebib cannot determine whether an
-entry already has a note or not.  The identifier is created on
-the basis of the entry key using the function in the option
-`ebib-notes-identifier-function'.
-
-The %T directive is replaced with the title of the note, which is
-created using the function in `ebib-notes-title-function'."
+must be present in the template, since Ebib uses it to identify
+the note.  Without it, Ebib cannot determine whether an entry
+already has a note or not.  The identifier is created on the
+basis of the entry key using the function in the option
+`ebib-notes-identifier-function'.  The %T directive is replaced
+with the title of the note, which is created using the function
+in `ebib-notes-title-function'.  The sequence '>|<' is removed
+from the template and the cursor will be positioned in its
+place."
   :group 'ebib-notes
   :type '(string :tag "Note template"))
 
@@ -176,13 +179,12 @@ This hook is not run when a new note is created, see
   "Create a new note for KEY.
 Return a cons of the new note as a string and a position in this
 string where point should be located."
-  (let ((note (copy-sequence ebib-notes-template))
-        point)
-    (setq note (replace-regexp-in-string "%T" (funcall ebib-notes-title-function key) note t t))
-    (setq note (replace-regexp-in-string "%K" (funcall ebib-notes-identifier-function key) note t t))
-    (setq point (string-match-p "%P" note))
+  (let* ((note (format-spec ebib-notes-template
+                            `((?K . ,(funcall ebib-notes-title-function key))
+                              (?T . ,(funcall ebib-notes-identifier-function key)))))
+         (point (string-match-p ">|<" note)))
     (if point
-        (setq note (replace-regexp-in-string "%P" "" note))
+        (setq note (replace-regexp-in-string ">|<" "" note))
       (setq point 0))
     (cons note point)))
 
