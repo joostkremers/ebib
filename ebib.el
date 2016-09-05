@@ -237,7 +237,7 @@ it is highlighted.  DB defaults to the current database."
          (undef-fields (-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key ebib--cur-db) dialect)))))
     (insert (format "%-19s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
-                    (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect) t) 'case-fold)
+                    (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) 'case-fold)
                         entry-type
                       (propertize entry-type 'face 'error))
                     (if (and (eq dialect 'biblatex)
@@ -368,14 +368,6 @@ may also result in an error."
       (when (and timestamp ebib-use-timestamp)
         (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
     result))
-
-(defun ebib--get-dialect (&optional db)
-  "Get the dialect of DB.
-DB defaults to the current database.  If DB has no dialect, return
-the default dialect, as stored in `ebib-bibtex-dialect'."
-  (or db (setq db ebib--cur-db))
-  (or (and db (ebib-db-get-dialect db))
-      ebib-bibtex-dialect))
 
 (defun ebib--list-keys ()
   "Return a list of entry keys in the current database.
@@ -1204,7 +1196,7 @@ generate the key, see that function's documentation for details."
                 (if x-ref
                     (ebib--format-entry x-ref ebib--cur-db nil 'sort)))
               (goto-char (point-min))
-              (bibtex-set-dialect (ebib--get-dialect) 'local)
+              (bibtex-set-dialect (ebib--get-dialect ebib--cur-db) 'local)
               (bibtex-generate-autokey))))
        (if (string= new-key "")
            (error (format "[Ebib] Cannot create key"))
@@ -1265,14 +1257,14 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
 
 (defun ebib-index-sort-ascending (field)
   "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil 'ebib--field-history)))
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect ebib--cur-db)) nil t nil 'ebib--field-history)))
   (unless (string= field "")
     (ebib-db-set-sortinfo (cons field 'ascend) ebib--cur-db)
     (ebib--redisplay)))
 
 (defun ebib-index-sort-descending (field)
   "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect)) nil t nil 'ebib--field-history)))
+  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect ebib--cur-db)) nil t nil 'ebib--field-history)))
   (unless (string= field "")
     (ebib-db-set-sortinfo (cons field 'descend) ebib--cur-db)
     (ebib--redisplay)))
@@ -1991,7 +1983,7 @@ Either prints the entire database, or the marked entries."
                                        (insert (format "%s: & %s\\\\\n"
                                                        field (ebib-db-unbrace value))))))
                                ;; Note: ebib--list-fields returns a list with `=type=' as its first element.
-                               (cdr (ebib--list-fields (cdr (assoc "=type=" entry)) 'all (ebib--get-dialect)))))
+                               (cdr (ebib--list-fields (cdr (assoc "=type=" entry)) 'all (ebib--get-dialect ebib--cur-db)))))
                        (insert "\\end{tabular}\n\n")
                        (insert (if ebib-print-newpage
                                    "\\newpage\n\n"
@@ -2435,7 +2427,7 @@ the filter."
   "Create a filter interactively and store it in the current database.
 BOOL is the operator to be used, either `and' or `or'.  If NOT<0,
 a logical `not' is applied to the selection."
-  (let* ((dialect (ebib--get-dialect))
+  (let* ((dialect (ebib--get-dialect ebib--cur-db))
          (field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
                                          (if (< not 0) "not " "")
                                          (if (< not 0) "" ""))
@@ -2448,7 +2440,7 @@ a logical `not' is applied to the selection."
                            (if (string= field "=type=") "entry type" "regexp")))
            (regexp (cond
                     ((string= field "=type=")
-                     (completing-read prompt (ebib--list-entry-types (ebib--get-dialect) t) nil t nil 'ebib--filters-history))
+                     (completing-read prompt (ebib--list-entry-types dialect t) nil t nil 'ebib--filters-history))
                     ((cl-equalp field "keywords")
                      (completing-read prompt (ebib--keywords-for-database ebib--cur-db)  nil nil nil 'ebib--keywords-history))
                     (t
@@ -2676,7 +2668,7 @@ was called interactively."
   (interactive "sField: ")
   ;; We store the field with a `nil' value and let the user edit it later.
   (let ((type (ebib-db-get-field-value "=type=" (ebib--cur-entry-key) ebib--cur-db)))
-    (if (or (member-ignore-case field (ebib--list-fields type 'all (ebib--get-dialect)))
+    (if (or (member-ignore-case field (ebib--list-fields type 'all (ebib--get-dialect ebib--cur-db)))
             (not (ebib-db-set-field-value field nil (ebib--cur-entry-key) ebib--cur-db 'noerror)))
         (message "Field `%s' already exists in entry `%s'%s" field (ebib--cur-entry-key)
                  (if (member-ignore-case field ebib-hidden-fields)
@@ -2690,7 +2682,7 @@ was called interactively."
 
 (defun ebib--edit-entry-type ()
   "Edit the entry type."
-  (ebib--ifstring (new-type (completing-read "type: " (ebib--list-entry-types (ebib--get-dialect)) nil t))
+  (ebib--ifstring (new-type (completing-read "type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) nil t))
       (progn
         (ebib-db-set-field-value "=type=" new-type (ebib--cur-entry-key) ebib--cur-db 'overwrite 'unbraced)
         (ebib--fill-entry-buffer)

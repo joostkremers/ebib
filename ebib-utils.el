@@ -223,7 +223,7 @@ The rest of the frame is used for the entry buffer, unless
                               mode-line-front-space
                               ebib--mode-line-modified
                               mode-line-buffer-identification
-                              (:eval (format "  (%s)" (ebib--get-dialect)))
+                              (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
                               (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
                               (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|"(ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
   "The mode line for the index window.
@@ -1095,6 +1095,13 @@ block, the return value is nil."
     (when (and (string= (car vars) "Local Variables:")
                (string= (-last-item vars) "End:"))
       (--map (split-string it ": " t "[ \t]+") (-slice vars 1 -1)))))
+
+(defun ebib--get-dialect (db)
+  "Get the dialect of DB.
+If DB has no dialect, return the default dialect, as stored in
+`ebib-bibtex-dialect'."
+  (or (ebib-db-get-dialect db)
+      ebib-bibtex-dialect))
 
 (defun ebib--local-vars-add-dialect (vars dialect &optional overwrite)
   "Expand local variable block VARS with DIALECT.
