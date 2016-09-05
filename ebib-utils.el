@@ -244,17 +244,6 @@ mode line of the entry buffer is not changed."
   :group 'ebib-windows
   :type 'string)
 
-(defun ebib--mode-line-modified-p (&optional db)
-  "Return a string describing the modified status of DB.
-DB defaults to the current database."
-  (or db (setq db ebib--cur-db))
-  (if (not (ebib-db-modified-p db))
-      " "
-    (propertize ebib-modified-char
-                'face 'ebib-modified-face
-                'help-echo "Database modified\nmouse-1: Save database"
-                'local-map '(keymap (mode-line keymap (mouse-1 . ebib-save-current-database))))))
-
 (defcustom ebib-index-display-fields nil
   "List of the fields to display in the index buffer.
 By default, the index buffer only shows the entry key of each
@@ -883,6 +872,17 @@ conditions are AND'ed.)"
                                         (car form))))
                       (cdr form)))
               forms)))
+
+(defun ebib--mode-line-modified-p (&optional db)
+  "Return a string describing the modified status of DB.
+DB defaults to the current database."
+  (or db (setq db ebib--cur-db))
+  (if (not (ebib-db-modified-p db))
+      " "
+    (propertize ebib-modified-char
+                'face 'ebib-modified-face
+                'help-echo "Database modified\nmouse-1: Save database"
+                'local-map '(keymap (mode-line keymap (mouse-1 . ebib-save-current-database))))))
 
 (defun ebib--log (type format-string &rest args)
   "Write a message to Ebib's log buffer.
