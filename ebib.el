@@ -659,7 +659,6 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "&" #'ebib-filters-logical-and)
     (define-key map "|" #'ebib-filters-logical-or)
     (define-key map "~" #'ebib-filters-logical-not)
-    (define-key map ";" #'ebib-warn-prefix)
     (define-key map "?" #'ebib-info)
     (define-key map "!" #'ebib-generate-autokey)
     (define-key map "<" #'ebib-index-sort-ascending)
@@ -2390,11 +2389,6 @@ not been saved yet."
             (ebib--keywords-add-keyword k ebib--cur-db))
           new-keywords))
   (ebib--redisplay))
-
-(defun ebib-warn-prefix ()
-  "Warn that the prefix key is no longer valid."
-  (interactive)
-  (error "[Ebib] Prefix key `;' is no longer necessary.  See the Ebib manual, section \"Marking Entries\""))
 
 ;; TODO These filter functions use functions defined in ebib.el, so we keep them here.
 
