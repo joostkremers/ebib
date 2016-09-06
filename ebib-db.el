@@ -612,15 +612,14 @@ make backup at next save)."
 ;; ", we first take out every occurrence of backslash-escaped { and } or ",
 ;; so that the rest of the function does not get confused over them.
 
-;; Then, if the first character is {, EBIB--REMOVE-FROM-STRING takes out
-;; every occurrence of the regex "{[^{]*?}", which translates to "the
-;; smallest string that starts with { and ends with }, and does not contain
-;; another {. IOW, it takes out the innermost braces and their contents.
-;; Because braces may be embedded, we have to repeat this step until no
-;; more balanced braces are found in the string. (Note that it would be
-;; unwise to check for just the occurrence of { or }, because that would
-;; throw EBIB-DB-UNBRACED-P in an infinite loop if a string contains an
-;; unbalanced brace.)
+;; Then, if the first character is {, REMOVE-FROM-STRING takes out every
+;; occurrence of the regex "{[^{]*?}", which translates to "the smallest string
+;; that starts with { and ends with }, and does not contain another {. IOW, it
+;; takes out the innermost braces and their contents.  Because braces may be
+;; embedded, we have to repeat this step until no more balanced braces are found
+;; in the string. (Note that it would be unwise to check for just the occurrence
+;; of { or }, because that would throw EBIB-DB-UNBRACED-P in an infinite loop if
+;; a string contains an unbalanced brace.)
 
 ;; For strings beginning with " we do the same, except that it is not
 ;; necessary to repeat this in a WHILE loop, for the simple reason that
@@ -636,25 +635,27 @@ make backup at next save)."
 
 (defun ebib-db-unbraced-p (string)
   "Non-nil if STRING is not enclosed in braces or quotes."
-  (when (stringp string)
-    (cond
-     ((eq (string-to-char string) ?\{)
-      ;; first, remove all escaped { and } from the string:
-      (setq string (ebib--remove-from-string (ebib--remove-from-string string "[\\][{]")
+  (cl-flet ((remove-from-string (string remove)
+                                (apply #'concat (split-string string remove))))
+    (when (stringp string)
+      (cond
+       ((eq (string-to-char string) ?\{)
+        ;; first, remove all escaped { and } from the string:
+        (setq string (remove-from-string (remove-from-string string "[\\][{]")
                                          "[\\][}]"))
-      ;; then remove the innermost braces with their contents and continue until
-      ;; no more braces are left.
-      (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
-	(setq string (ebib--remove-from-string string "{[^{]*?}")))
-      ;; if STRING is not empty, the original string contains material not in braces
-      (> (length string) 0))
-     ((eq (string-to-char string) ?\")
-      ;; remove escaped ", then remove any occurrences of balanced quotes with
-      ;; their contents and check for the length of the remaining string.
-      (> (length (ebib--remove-from-string (ebib--remove-from-string string "[\\][\"]")
+        ;; then remove the innermost braces with their contents and continue until
+        ;; no more braces are left.
+        (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
+          (setq string (remove-from-string string "{[^{]*?}")))
+        ;; if STRING is not empty, the original string contains material not in braces
+        (> (length string) 0))
+       ((eq (string-to-char string) ?\")
+        ;; remove escaped ", then remove any occurrences of balanced quotes with
+        ;; their contents and check for the length of the remaining string.
+        (> (length (remove-from-string (remove-from-string string "[\\][\"]")
                                        "\"[^\"]*?\""))
-	 0))
-     (t t))))
+           0))
+       (t t)))))
 
 (defun ebib-db-unbrace (string)
   "Convert STRING to its unbraced counterpart.

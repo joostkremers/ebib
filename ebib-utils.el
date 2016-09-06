@@ -1021,11 +1021,6 @@ the extension and should not contain a dot."
           "."
           ext))
 
-(defun ebib--remove-from-string (string remove)
-  "Return a copy of STRING with all the occurrences of REMOVE taken out.
-REMOVE can be a regular expression."
-  (apply #'concat (split-string string remove)))
-
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
   (if (stringp string)
