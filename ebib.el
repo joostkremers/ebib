@@ -2423,41 +2423,6 @@ the filter."
     ((default)
      (beep))))
 
-(defun ebib--filters-create-filter (bool not)
-  "Create a filter interactively and store it in the current database.
-BOOL is the operator to be used, either `and' or `or'.  If NOT<0,
-a logical `not' is applied to the selection."
-  (let* ((dialect (ebib--get-dialect ebib--cur-db))
-         (field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
-                                         (if (< not 0) "not " "")
-                                         (if (< not 0) "" ""))
-                                 (append (list "any" "=type=") (-union (ebib--list-fields-uniquely dialect) (cdr (assq dialect ebib-extra-fields))))
-                                 nil nil nil 'ebib--field-history)))
-    (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
-                           (if (< not 0) "not " "")
-                           field
-                           (if (< not 0) "" "")
-                           (if (string= field "=type=") "entry type" "regexp")))
-           (regexp (cond
-                    ((string= field "=type=")
-                     (completing-read prompt (ebib--list-entry-types dialect t) nil t nil 'ebib--filters-history))
-                    ((cl-equalp field "keywords")
-                     (completing-read prompt (ebib--keywords-for-database ebib--cur-db)  nil nil nil 'ebib--keywords-history))
-                    (t
-                     (read-string prompt nil 'ebib--filters-history)))))
-      (ebib--execute-when
-        ((filtered-db)
-         (ebib-db-set-filter `(,bool ,(ebib-db-get-filter ebib--cur-db)
-                                 ,(if (>= not 0)
-                                      `(contains ,field ,regexp)
-                                    `(not (contains ,field ,regexp))))
-                         ebib--cur-db))
-        ((real-db)
-         (ebib-db-set-filter (if (>= not 0)
-                             `(contains ,field ,regexp)
-                           `(not (contains ,field ,regexp)))
-                         ebib--cur-db))))))
-
 (defun ebib-filters-reapply-filter ()
   "Reapply the current filter."
   (interactive)
