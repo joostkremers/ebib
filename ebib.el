@@ -60,6 +60,8 @@
 (require 'ebib-keywords)
 (require 'ebib-notes)
 
+;;; Helper functions
+
 (defun ebib--display-buffer-reuse-window (buffer _)
   "Display BUFFER in an existing Ebib window.
 If BUFFER is the index buffer, simply switch to the window
@@ -383,7 +385,7 @@ filter are returned.  The returned list is sorted."
   "Get the key of the current entry."
   (ebib--db-get-current-entry-key ebib--cur-db))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Main
 
 ;;;###autoload
 (defun ebib (&optional file key)
@@ -601,12 +603,6 @@ keywords before Emacs is killed."
       (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
     t))
 
-;;;;;;;;;;;;;;;;
-;; index-mode ;;
-;;;;;;;;;;;;;;;;
-
-;; macro to redefine key bindings.
-
 (defmacro ebib-key (buffer key &optional command _)
   "Create a key bind in an Ebib buffer.
 BUFFER is a symbol designating an Ebib buffer and can be `index',
@@ -633,6 +629,8 @@ KEY.  In this case, COMMAND is meaningless."
                (?c . ebib-cancel-multiline-buffer)
                (?s . ebib-save-from-multiline-buffer)))
        (setq ebib--multiline-key (string-to-char ,key))))))
+
+;;; index-mode
 
 (defvar ebib-index-mode-map
   (let ((map (make-keymap)))
@@ -2057,7 +2055,6 @@ Operates either on all entries or on the marked entries."
        (setq ebib--cur-db new-db)
        (ebib--redisplay)))))
 
-
 (defun ebib-browse-url (num)
   "Browse the URL in the standard URL field.
 If this field contains more than one URL, ask the user which one
@@ -2318,6 +2315,7 @@ The user is prompted for the buffer to push the entry into."
 ;;; Interactive keyword functions
 
 ;; The keywords keymap
+
 (eval-and-compile
   (define-prefix-command 'ebib-keywords-map)
   (suppress-keymap 'ebib-keywords-map 'no-digits)
@@ -2381,7 +2379,6 @@ not been saved yet."
             (ebib--keywords-add-keyword k ebib--cur-db))
           new-keywords))
   (ebib--redisplay))
-
 
 ;;; Interactive filter functions
 
@@ -2474,9 +2471,7 @@ the filter."
     (ebib-db-set-filter filter ebib--cur-db)
     (ebib--redisplay)))
 
-;;;;;;;;;;;;;;;;
-;; entry-mode ;;
-;;;;;;;;;;;;;;;;
+;;; entry-mode
 
 (defvar ebib-entry-mode-map
   (let ((map (make-keymap)))
@@ -2948,9 +2943,7 @@ The deleted text is not put in the kill ring."
   (ebib-lower)
   (info "(ebib) The Entry Buffer"))
 
-;;;;;;;;;;;;;;;;;;
-;; strings-mode ;;
-;;;;;;;;;;;;;;;;;;
+;;; strings-mode
 
 (defvar ebib-strings-mode-map
   (let ((map (make-keymap)))
@@ -3179,9 +3172,7 @@ to append them to."
   (ebib-lower)
   (info "(ebib) The Strings Buffer"))
 
-;;;;;;;;;;;;;;;;;;;;
-;; multiline edit ;;
-;;;;;;;;;;;;;;;;;;;;
+;;; multiline-mode
 
 (define-minor-mode ebib-multiline-mode
   "Minor mode for Ebib's multiline edit buffer."
@@ -3328,9 +3319,7 @@ The text being edited is stored before saving the database."
   (ebib-lower)
   (info "(ebib) The Multiline Edit Buffer"))
 
-;;;;;;;;;;;;;;;;;;;
-;; ebib-log-mode ;;
-;;;;;;;;;;;;;;;;;;;
+;;; log-mode
 
 (defvar ebib-log-mode-map
   (let ((map (make-keymap)))
@@ -3357,9 +3346,7 @@ The text being edited is stored before saving the database."
       (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; functions for non-Ebib buffers ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Functions for non-Ebib buffers
 
 (defun ebib-import ()
   "Search for BibTeX entries in the current buffer.
