@@ -2315,7 +2315,7 @@ The user is prompted for the buffer to push the entry into."
   (ebib-lower)
   (info "(ebib)"))
 
-;; TODO These keyword functions use functions from ebib.el, so we keep them here.
+;;; Interactive keyword functions
 
 ;; The keywords keymap
 (eval-and-compile
@@ -2382,7 +2382,8 @@ not been saved yet."
           new-keywords))
   (ebib--redisplay))
 
-;; TODO These filter functions use functions defined in ebib.el, so we keep them here.
+
+;;; Interactive filter functions
 
 (defun ebib-filters-logical-and (not)
   "Filter the current database.
