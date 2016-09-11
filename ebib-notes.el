@@ -1,4 +1,4 @@
-;;; ebib-utils.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
+;;; ebib-notes.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2016 Joost Kremers
 ;; All rights reserved.
