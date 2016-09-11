@@ -40,7 +40,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'ebib-utils)
+;; (require 'ebib-utils)
 
 ;; each database is represented by a struct
 (cl-defstruct ebib--db-struct
