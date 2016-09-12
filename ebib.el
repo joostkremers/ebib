@@ -2055,45 +2055,20 @@ Operates either on all entries or on the marked entries."
        (setq ebib--cur-db new-db)
        (ebib--redisplay)))))
 
-(defun ebib-browse-url (num)
+(defun ebib-browse-url (arg)
   "Browse the URL in the standard URL field.
 If this field contains more than one URL, ask the user which one
 to open.  Alternatively, the user can provide a numeric prefix
-argument NUM."
+argument ARG."
   (interactive "P")
   (ebib--execute-when
     ((entries)
      (let ((urls (ebib-db-get-field-value ebib-url-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
        (unless urls
          (error "[Ebib] Field `%s' is empty" ebib-url-field))
-       (ebib--browse-url-1 urls num)))
+       (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))))
     ((default)
      (beep))))
-
-(defun ebib--browse-url-1 (urls num)
-  "Helper function for `ebib-browse-url'.
-URLS is a string containing one or more URLs.  NUM is used as in
-`ebib-browse-url'."
-  ;; First convert the string to a list of URLs.
-  (setq urls (let ((start 0)
-                   (result nil))
-               (while (string-match ebib-url-regexp urls start)
-                 (push (match-string 0 urls) result)
-                 (setq start (match-end 0)))
-               (nreverse result)))
-  (unless urls
-    (error "[Ebib] No valid URLs found"))
-  (if (= (length urls) 1)
-      (setq num 1))
-  (if (not (integerp num)) ; the user didn't provide a numeric prefix argument
-      (setq num (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls))))))
-  (unless (<= 1 num (length urls))
-    (error "[Ebib] No such URL (%d)" num))
-  (let ((url (nth (1- num) urls)))
-    (when url
-      (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
-          (setq url (match-string 1 url))))
-    (ebib--call-browser url)))
 
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
@@ -2119,57 +2094,33 @@ contain only one DOI.  The DOI is combined with the URL
     (message "Opening `%s'" url)
     (browse-url url)))
 
-(defun ebib-view-file (num)
+(defun ebib-view-file (arg)
   "View a file in the standard file field.
 The standard file field (see option `ebib-file-field') may
 contain more than one filename.  In that case, a numeric prefix
-argument NUM can be used to specify which file to choose."
+argument ARG can be used to specify which file to choose."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (ebib--view-file-internal num ebib-file-field))
+     (let ((file (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
+           (num (if (numberp arg) arg nil)))
+       (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))))
     ((default)
      (beep))))
 
-(defun ebib--view-file-internal (num field)
-  "View the NUMth file in FIELD."
-  (let ((filename (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
-    (if filename
-        (ebib--call-file-viewer filename num)
-      (ebib--call-file-viewer (ebib--create-file-name-from-key (ebib--cur-entry-key) "pdf") nil))))
-
-(defun ebib--call-file-viewer (filename &optional n)
-  "Open FILENAME with an external viewer.
-FILENAME can also be a string of filenames separated by
-`ebib-filename-separator', in which case the Nth file is
-opened.  If N is NIL, the user is asked to enter a number."
-  (let ((files (split-string filename (regexp-quote ebib-filename-separator) t)))
-    (cond
-     ((null (cdr files))                ; there's only one file
-      (setq n 1))
-     ((not (integerp n))  ; the user did not pass a numeric prefix argument
-      (setq n (string-to-number (read-string (format "Select file to open [1-%d]: " (length files)))))))
-    (if (or (< n 1)    ; if the user provided a number that is out of range
-            (> n (length files)))
-        (setq n 1))
-    (let* ((file (nth (1- n) files))
-           (unmod-file (if ebib-file-name-mod-function
-                           (funcall ebib-file-name-mod-function file nil)
-                         file))
-           (file-full-path
-            (or (locate-file unmod-file ebib-file-search-dirs)
-                (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
-                (expand-file-name unmod-file))))
-      (if (file-exists-p file-full-path)
-          (let ((ext (file-name-extension file-full-path)))
-            (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
-                (progn
-                  (message "Executing `%s %s'" viewer file-full-path)
-                  (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
-              (message "Opening `%s'" file-full-path)
-              (ebib-lower)
-              (find-file file-full-path)))
-        (error "[Ebib] File not found: `%s'" unmod-file)))))
+(defun ebib--call-file-viewer (file)
+  "Open FILE with an external viewer."
+  (let ((file-full-path (ebib--expand-file-name file)))
+    (if (file-exists-p file-full-path)
+        (let ((ext (file-name-extension file-full-path)))
+          (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
+              (progn
+                (message "Executing `%s %s'" viewer file-full-path)
+                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+            (message "Opening `%s'" file-full-path)
+            (ebib-lower)
+            (find-file file-full-path)))
+      (error "[Ebib] File not found: `%s'" (funcall ebib-file-name-mod-function file)))))
 
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
@@ -2811,13 +2762,15 @@ Altertanively, a numeric prefix argument NUM can be passed."
       (error "[Ebib] Field `%s' is empty" field))
     (ebib--browse-url-1 urls num)))
 
-(defun ebib-view-file-in-field (num)
+(defun ebib-view-file-in-field (arg)
   "View a file in the current field.
 The field may contain multiple filenames, in which case the
-prefix argument NUM can be used to specify which file is to be
+prefix argument ARG can be used to specify which file is to be
 viewed."
   (interactive "P")
-  (ebib--view-file-internal num (ebib--current-field)))
+  (let ((file (ebib-db-get-field-value (ebib--current-field) (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
+        (num (if (numberp arg) arg nil)))
+    (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring."

@@ -1022,6 +1022,67 @@ the extension and should not contain a dot."
           "."
           ext))
 
+(defun ebib--expand-file-name (file)
+  "Search and expand FILE.
+FILE is a file name, possibly with a partial file path.  It is
+expanded relative to `ebib-file-search-dirs'.  If the file cannot
+be found, the non-directory part is searched for as well.  As a
+last resort, FILE is expanded relative to `default-directory'.
+If FILE is an absolute file name, return it unchanged."
+  (if (file-name-absolute-p file)
+      file
+    (let* ((unmod-file (funcall ebib-file-name-mod-function file nil)))
+      (or (locate-file unmod-file ebib-file-search-dirs)
+          (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
+          (expand-file-name unmod-file)))))
+
+(defun ebib--select-file (files n key)
+  "Split FILES into separate files and return the Nth.
+FILES should be a string of file names separated by
+`ebib-filename-separator'.  If there is only one file name in
+FILES, it is returned regardless of the value of N.  If N is nil,
+the user is asked to enter a number, unless there is only one
+file in FILES, in which case that one is chosen automatically.
+If FILES is nil, a file name is created on the basis of KEY.  See
+the function `ebib--create-file-name-from-key' for details."
+  (if (not files)
+      (ebib--create-file-name-from-key key "pdf")
+    (let ((file-list (split-string files (regexp-quote ebib-filename-separator) t)))
+      (cond
+       ((= (length file-list) 1)
+        (setq n 1))
+       ((null n)
+        (setq n (string-to-number (read-string (format "Select file [1-%d]: " (length file-list)))))))
+      (unless (<= n 1 (length file-list))  ; unless n is within range
+        (error "[Ebib] No such file (%d)" n))
+      (nth (1- n) file-list))))
+
+(defun ebib--select-url (urls n)
+  "Select a URL from URLS.
+URLS is a string containing one or more URLs.  URLS is split
+using `ebib-url-regexp' and the Nth URL is returned.  If N is
+nil, the user is asked which URL to select, unless there is only
+one."
+  (setq urls (let ((start 0)
+                   (result nil))
+               (while (string-match ebib-url-regexp urls start)
+                 (push (match-string 0 urls) result)
+                 (setq start (match-end 0)))
+               (nreverse result)))
+  (unless urls
+    (error "[Ebib] No valid URLs found"))
+  (cond
+   ((= (length urls) 1)
+    (setq n 1))
+   ((null n) ; the user didn't provide a numeric prefix argument
+    (setq n (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls)))))))
+  (unless (<= 1 n (length urls))  ; unless n is within range
+    (error "[Ebib] No such URL (%d)" n))
+  (let ((url (nth (1- n) urls)))
+    (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
+        (setq url (match-string 1 url)))
+    url))
+
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
   (if (stringp string)
