@@ -2081,7 +2081,7 @@ contain only one DOI.  The DOI is combined with the URL
      (let ((doi (ebib-db-get-field-value ebib-doi-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
        (if doi
            (ebib--call-browser (concat "http://dx.doi.org/" doi))
-         (error "[Ebib] No DOI found in field `%s'" ebib-doi-field))))
+         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))))
     ((default)
      (beep))))
 
