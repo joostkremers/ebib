@@ -948,6 +948,11 @@ function adds a newline to the message being logged."
         (ebib--looking-at-goto-end "[^ \t\n\f]*")
         (move-overlay ebib--strings-overlay beg (point))))))
 
+;; This is simply to save some typing.
+(defsubst ebib--cur-entry-key ()
+  "Get the key of the current entry."
+  (ebib--db-get-current-entry-key ebib--cur-db))
+
 (defun ebib--search-key-in-buffer (entry-key)
   "Search ENTRY-KEY in the index buffer.
 Point is moved to the first character of the key.  Return value

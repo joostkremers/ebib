@@ -380,11 +380,6 @@ filter are returned.  The returned list is sorted."
         (ebib--filters-run-filter ebib--cur-db 'sort)
       (ebib-db-list-keys ebib--cur-db 'sort))))
 
-;; This is simply to save some typing.
-(defun ebib--cur-entry-key ()
-  "Get the key of the current entry."
-  (ebib--db-get-current-entry-key ebib--cur-db))
-
 ;;; Main
 
 ;;;###autoload
