@@ -2751,17 +2751,16 @@ prefix argument has no meaning."
     (if (and result pfx)
         (ebib-next-field))))
 
-(defun ebib-browse-url-in-field (num)
+(defun ebib-browse-url-in-field (arg)
   "Browse a URL in the current field.
 If the field contains multiple URLs (as defined by
 `ebib-url-regexp'), the user is asked which one to open.
-Altertanively, a numeric prefix argument NUM can be passed."
+Altertanively, a numeric prefix argument ARG can be passed."
   (interactive "P")
-  (let* ((field (ebib--current-field))
-         (urls (ebib-db-get-field-value field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced)))
-    (unless urls
-      (error "[Ebib] Field `%s' is empty" field))
-    (ebib--browse-url-1 urls num)))
+  (let ((urls (ebib-db-get-field-value (ebib--current-field) (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
+    (if urls
+        (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
+      (error "[Ebib] `%s' field is empty" (ebib--current-field)))))
 
 (defun ebib-view-file-in-field (arg)
   "View a file in the current field.
