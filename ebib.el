@@ -2064,9 +2064,9 @@ argument ARG."
   (ebib--execute-when
     ((entries)
      (let ((urls (ebib-db-get-field-value ebib-url-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (unless urls
-         (error "[Ebib] Field `%s' is empty" ebib-url-field))
-       (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))))
+       (if urls
+           (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
+         (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
     ((default)
      (beep))))
 
@@ -2105,7 +2105,8 @@ argument ARG can be used to specify which file to choose."
      (let ((file (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
            (num (if (numberp arg) arg nil)))
        (if file
-           (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key))))))
+           (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
+         (error "[Ebib] No file found in `%s' field" ebib-file-field))))
     ((default)
      (beep))))
 
@@ -2760,7 +2761,7 @@ Altertanively, a numeric prefix argument ARG can be passed."
   (let ((urls (ebib-db-get-field-value (ebib--current-field) (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref)))
     (if urls
         (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
-      (error "[Ebib] `%s' field is empty" (ebib--current-field)))))
+      (error "[Ebib] No URL found in `%s' field" (ebib--current-field)))))
 
 (defun ebib-view-file-in-field (arg)
   "View a file in the current field.
@@ -2771,7 +2772,8 @@ viewed."
   (let ((file (ebib-db-get-field-value (ebib--current-field) (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
         (num (if (numberp arg) arg nil)))
     (if file
-        (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key))))))
+        (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
+      (error "[Ebib] No file found in `%s' field" (ebib--current-field)))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring."
