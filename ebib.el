@@ -59,6 +59,7 @@
 (require 'ebib-filters)
 (require 'ebib-keywords)
 (require 'ebib-notes)
+(require 'ebib-reading-list)
 
 ;;; Helper functions
 
@@ -682,7 +683,7 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "P" #'ebib-edit-preamble)
     (define-key map "q" #'ebib-quit)
     (define-key map "r" #'ebib-reload-current-database)
-    (define-key map "R" #'ebib-reload-all-databases)
+    (define-key map "R" 'ebib-reading-list-map)
     (define-key map "s" #'ebib-save-current-database)
     (define-key map "S" #'ebib-edit-strings)
     (define-key map "u" #'ebib-browse-url)
@@ -2419,6 +2420,64 @@ the filter."
     (ebib-db-set-filter filter ebib--cur-db)
     (ebib--redisplay)))
 
+;;; Interactive reading list functions
+
+(eval-and-compile
+  (define-prefix-command 'ebib-reading-list-map)
+  (suppress-keymap 'ebib-reading-list-map 'no-digits)
+  (define-key ebib-reading-list-map "a" #'ebib-add-reading-list-item)
+  (define-key ebib-reading-list-map "d" #'ebib-mark-reading-list-item-as-done)
+  (define-key ebib-reading-list-map "v" #'ebib-view-reading-list))
+
+(defun ebib-add-reading-list-item ()
+  "Add the current entry to the reading list.
+This function adds an entry to `ebib-reading-list-file' if it
+exists and runs `ebib-reading-list-new-item-hook'."
+  (interactive)
+  (ebib--execute-when
+    ((entries)
+     (or ebib-reading-list-file
+         ebib-reading-list-new-item-hook
+         (error "[Ebib] No reading list defined"))
+     (let ((key (ebib--cur-entry-key)))
+       (if (ebib--reading-list-item-p key)
+           (error "Entry `%s' is already on the reading list" key))
+       (if (file-writable-p ebib-reading-list-file)
+           (unless (ebib--reading-list-new-item key)
+             (error "[Ebib] Could not create reading list item for `%s'" key))
+         (error "[Ebib] Reading list file is not writable")))
+     (run-hooks 'ebib-reading-list-new-item-hook))
+    ((default)
+     (beep))))
+
+(defun ebib-mark-reading-list-item-as-done ()
+  "Mark the current entry as done on the reading list.
+The item is removed by calling the function in
+`ebib-reading-list-remove-item-function'.  After removal, the
+hook `ebib-reading-list-remove-item-hook' is run."
+  (interactive)
+  (ebib--execute-when
+    ((entries)
+     (or ebib-reading-list-file
+         ebib-reading-list-new-item-hook
+         (error "[Ebib] No reading list defined"))
+     (let ((key (ebib--cur-entry-key)))
+       (unless (file-writable-p ebib-reading-list-file)
+         (error "[Ebib] Reading list file is not writable"))
+       (if (ebib--reading-list-remove-item key)
+           (message "Reading list item for `%s' marked as done." key)
+         (error "[Ebib] Could not create reading list item for `%s'" key)))
+     (run-hooks 'ebib-reading-list-new-item-hook))
+    ((default)
+     (beep))))
+
+(defun ebib-view-reading-list ()
+  "Show the reading list."
+  (interactive)
+  (let ((buf (ebib--reading-list-buffer)))
+    (ebib-lower)
+    (switch-to-buffer buf)))
+
 ;;; entry-mode
 
 (defvar ebib-entry-mode-map
@@ -2472,10 +2531,21 @@ the filter."
 (define-minor-mode ebib-entry-minor-mode
   "Ebib entry minor mode.
 Primarily used to add some info to the entry buffer mode line."
-  :init-value nil :lighter (:eval (format " «%s» %s"
-                                          (ebib--cur-entry-key)
-                                          (if (ebib--notes-exists-note (ebib--cur-entry-key)) ebib-notes-symbol "")))
+  :init-value nil :lighter (:eval (ebib--format-entry-info))
   :global nil)
+
+(defun ebib--format-entry-info ()
+  "Format information about the current entry for display in the mode line.
+Return a string that contains the entry key, `ebib-notes-symbol'
+if the current entry has a note and `ebib-reading-list-symbol' if
+the current entry is on the reading list.  The latter two symbols
+are enclosed in braces."
+  (let* ((key (ebib--cur-entry-key))
+         (info (concat (if (ebib--notes-exists-note key) ebib-notes-symbol "")
+                       (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
+    (if (not (string= info ""))
+        (setq info (concat " [" info "] ")))
+    (format " «%s»%s" key info)))
 
 (defun ebib-quit-entry-buffer ()
   "Quit editing the entry.
