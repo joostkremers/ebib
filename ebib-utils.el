@@ -805,6 +805,10 @@ Restore the dedicated status after executing BODY."
        (if dedicated
            (set-window-dedicated-p (selected-window) t)))))
 
+;; We sometimes (often, in fact ;-) need to do something with a string, but
+;; take special action (or do nothing) if that string is empty.
+;; `ebib--ifstring' makes that easier:
+
 (defmacro ebib--ifstring (bindvar then &rest else)
   "Create a string and test its value.
 
@@ -969,10 +973,6 @@ is the new value of point."
       (with-temp-buffer
         (insert-file-contents filename)
         (split-string (buffer-string) "\n" t))))    ; 't' is omit nulls, blank lines in this case
-
-;; We sometimes (often, in fact ;-) need to do something with a string, but
-;; take special action (or do nothing) if that string is empty.
-;; `ebib--ifstring' makes that easier:
 
 ;; we sometimes need to walk through lists.  these functions yield the
 ;; element directly preceding or following ELEM in LIST. in order to work
