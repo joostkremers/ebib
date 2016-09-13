@@ -2653,16 +2653,12 @@ otherwise they are stored as absolute paths."
 (defun ebib--transform-file-name-for-storing (file)
   "Return a name for FILE that can be stored in the file field.
 If `ebib-truncate-file-names' is non-nil, the name is truncated
-relative to `ebib-file-search-dirs'.  If
-`ebib-file-name-mod-function' is non-nil, it is applied to the
-name."
+relative to `ebib-file-search-dirs'.  Subsequently,
+`ebib-file-name-mod-function' is applied to the name."
   (setq file (if ebib-truncate-file-names
                  (ebib--file-relative-name file)
                file))
-  (setq file (if ebib-file-name-mod-function
-                 (funcall ebib-file-name-mod-function file t)
-               file))
-  file)  ; not strictly necessary but cleaner
+  (funcall ebib-file-name-mod-function file t))
 
 (defun ebib--file-relative-name (file)
   "Return a name for FILE relative to `ebib-file-search-dirs'.
