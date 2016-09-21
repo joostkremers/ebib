@@ -135,6 +135,17 @@ string."
                    "(No Title)")))
     (replace-regexp-in-string "\n" "" (format "%s (%s): %s" author year title))))
 
+(defcustom ebib-notes-url-function 'ebib-notes-create-org-url
+  "Function to create a URL for a notes entry.
+This function is used to fill the %U directive in
+`ebib-notes-template'.  It should take one argument, the key of
+the entry for which a URL is to be created."
+  :group 'ebib-notes
+  :type 'function)
+
+(defun ebib-notes-create-org-url (key)
+  (ebib-db-get-field-value "url" key ebib--cur-db 'noerror 'unbraced 'xref))
+
 (defcustom ebib-notes-identifier-function 'ebib-notes-create-org-identifier
   "Function to create the identifier of a note.
 This function should take the key of the entry as argument and
@@ -181,7 +192,8 @@ Return a cons of the new note as a string and a position in this
 string where point should be located."
   (let* ((note (format-spec ebib-notes-template
                             `((?K . ,(funcall ebib-notes-identifier-function key))
-                              (?T . ,(funcall ebib-notes-title-function key)))))
+                              (?T . ,(funcall ebib-notes-title-function key))
+			       (?U . ,(funcall ebib-notes-url-function key)))))
          (point (string-match-p ">|<" note)))
     (if point
         (setq note (replace-regexp-in-string ">|<" "" note))
