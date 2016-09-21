@@ -135,6 +135,53 @@ string."
                    "(No Title)")))
     (replace-regexp-in-string "\n" "" (format "%s (%s): %s" author year title))))
 
+(defcustom ebib-notes-url-function 'ebib-notes-create-org-url
+  "Function to create a URL for a notes entry.
+This function is used to fill the %U directive in
+`ebib-notes-template'.  It should take one argument, the key of
+the entry for which a URL is to be created."
+  :group 'ebib-notes
+  :type 'function)
+
+(defun ebib-notes-create-org-url (key)
+  (ebib-db-get-field-value "url" key ebib--cur-db 'noerror 'unbraced 'xref))
+
+(defcustom ebib-notes-label-function 'ebib-notes-create-org-label
+  "Function to create a LABEL for a notes entry.
+This function is used to fill the %L directive in
+`ebib-notes-template'.  It should take one argument, the key of
+the entry for which a LABEL is to be created.
+By default, the label for KEY is read from
+a .bbl file in the directory where the current
+bibtex db resides."
+  :group 'ebib-notes
+  :type 'function)
+
+(defun ebib-notes-create-org-label (key)
+  "Return bibtex LABEL for an orgmode note for KEY."
+  (let* ((bbl-dir (file-name-directory (ebib-db-get-filename ebib--cur-db)))
+	 (bbl-files (directory-files bbl-dir nil ".*[.]bbl"))
+	 (bbl-file (car bbl-files)))
+    (message "cmj: found bbl dir '%s'" bbl-dir)
+    (message "cmj: found bbl files %s" bbl-files)
+    (message "cmj: found bbl file '%s'" bbl-file)
+    (cond
+     ((= 0 (length bbl-files))
+      (error "no .bbl file found in '%s' dir; maybe run bibtex?" bbld-ir))
+     ((= 1 (length bbl-files))
+      ; all's well
+      t)
+     (t (error "too many .bbl files, can't determine which of %s to use" bbl-files)))
+    (with-temp-buffer
+      (insert-file-contents (concat bbl-dir bbl-file))
+      (or (re-search-forward (format "\\entry{%s}" key) nil t)
+	  (error "can't find entry [%s] in '%s'" key bbl-file))
+      (or (re-search-forward (format "\\field{labelalpha}{\\([^}]*\\)}") nil t)
+	  (error "can't find label for bib entry [%s]; rerun bibtex? or rerurn latex, then bibtex?" key))
+      (let ((label (match-string 1)))
+	(message "cmj: label for key [%s] is '%s'" key label)
+	label))))
+
 (defcustom ebib-notes-identifier-function 'ebib-notes-create-org-identifier
   "Function to create the identifier of a note.
 This function should take the key of the entry as argument and
@@ -181,7 +228,9 @@ Return a cons of the new note as a string and a position in this
 string where point should be located."
   (let* ((note (format-spec ebib-notes-template
                             `((?K . ,(funcall ebib-notes-identifier-function key))
-                              (?T . ,(funcall ebib-notes-title-function key)))))
+                              (?T . ,(funcall ebib-notes-title-function key))
+			      (?U . ,(funcall ebib-notes-url-function key))
+			      (?L . ,(funcall ebib-notes-label-function key)))))
          (point (string-match-p ">|<" note)))
     (if point
         (setq note (replace-regexp-in-string ">|<" "" note))
