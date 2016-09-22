@@ -18,8 +18,8 @@ The easiest way to install Ebib is to use Emacs' package manager. Ebib is availa
 
 ## Debian and Ubuntu ##
 
-Users of Debian 9 or later and Ubuntu 16.10 or later may simply
-`apt-get install elpa-ebib`.
+Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's package manager: `apt-get install elpa-ebib`.
+
 
 ## Manual installation ##
 
