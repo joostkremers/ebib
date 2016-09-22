@@ -63,7 +63,7 @@ New entries are created on the basis of this template.  The
 template can contain format specifiers consisting of a percent
 sign and a character.  These specifiers are defined by
 `ebib-notes-template-specifiers'.  Note that the `%K' specifier
-must be present in the template, which should be replaced by an
+must be present in the template and should be replaced by an
 identifier that is unique for the entry.  This identifier is used
 to retrieve the item.  Without it, Ebib is not able to determine
 whether an entry is on the reading list or not."
