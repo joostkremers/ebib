@@ -2445,8 +2445,7 @@ exists and runs `ebib-reading-list-new-item-hook'."
        (if (file-writable-p ebib-reading-list-file)
            (unless (ebib--reading-list-new-item key ebib--cur-db)
              (error "[Ebib] Could not create reading list item for `%s'" key))
-         (error "[Ebib] Reading list file is not writable")))
-     (run-hooks 'ebib-reading-list-new-item-hook))
+         (error "[Ebib] Reading list file is not writable"))))
     ((default)
      (beep))))
 
@@ -2466,8 +2465,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
          (error "[Ebib] Reading list file is not writable"))
        (if (ebib--reading-list-remove-item key)
            (message "Reading list item for `%s' marked as done." key)
-         (error "[Ebib] Could not create reading list item for `%s'" key)))
-     (run-hooks 'ebib-reading-list-new-item-hook))
+         (error "[Ebib] Could not create reading list item for `%s'" key))))
     ((default)
      (beep))))
 

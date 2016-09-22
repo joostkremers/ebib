@@ -190,6 +190,7 @@ return nil."
     (unless (ebib--reading-list-locate-item key)
       (goto-char (point-max))
       (insert (ebib--reading-list-fill-template key db))
+      (run-hooks 'ebib-reading-list-new-item-hook)
       (save-buffer)
       key)))
 
@@ -200,6 +201,7 @@ do nothing and return nil."
   (with-current-buffer (ebib--reading-list-buffer)
     (when (ebib--reading-list-locate-item key)
       (funcall ebib-reading-list-remove-item-function)
+      (run-hooks 'ebib-reading-list-remove-item-hook)
       (save-buffer)
       key)))
 
