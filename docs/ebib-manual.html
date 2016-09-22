@@ -57,7 +57,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#package-manager">Package manager</a></li>
 <li><a href="#debian-and-ubuntu">Debian and Ubuntu</a></li>
 <li><a href="#manual-installation">Manual installation</a></li>
-<li><a href="#installing-the-info-file">Installing the info file</a></li>
 <li><a href="#starting-ebib">Starting Ebib</a></li>
 <li><a href="#upgrading-from-ebib-1.x">Upgrading from Ebib 1.x</a></li>
 </ul></li>
@@ -135,20 +134,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2 id="debian-and-ubuntu">Debian and Ubuntu</h2>
 <p>Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's package manager: <code>apt-get install elpa-ebib</code>.</p>
 <h2 id="manual-installation">Manual installation</h2>
-<p>You can also install Ebib manually by copying the file <code>ebib.el</code> to somewhere in your load path and add the following line to Emacs' init file <code>~/.emacs</code>:</p>
-<pre><code>(autoload &#39;ebib &quot;ebib&quot; &quot;Ebib, a BibTeX database manager.&quot; t)</code></pre>
-<p>On a default installation, the load path probably only contains system directories. If you want to run <code>ebib.el</code> from somewhere else (e.g., directly from the source directory), you can add this directory to your load path:</p>
-<pre><code>(add-to-list &#39;load-path &quot;~/src/ebib&quot;))</code></pre>
-<p>Note: if you do not know what your load path is set to, go to the <code>*scratch*</code> buffer, type <code>load-path</code> on an empty line, put the cursor right after it and type <code>C-j</code>. The value of <code>load-path</code> will then appear in the buffer.</p>
-<p>Alternatively, you can load Ebib directly by putting the following in <code>.emacs</code>:</p>
-<pre><code>(load &quot;/path/to/ebib&quot;)</code></pre>
-<p>The difference between <code>load</code> and <code>autoload</code> is that the former loads Ebib immediately and thus slows down Emacs' startup (a bit), while the latter loads Ebib only when it is called (and thus slows down Ebib's first time start up a bit).</p>
-<p>It is recommended to byte-compile the source, Ebib runs quite a lot faster when it is byte-compiled. You can do this either within Emacs with <code>M-x byte-compile-file</code> (recommended on OS X), or from your shell by going into the directory where you put <code>ebib.el</code> and typing:</p>
-<pre><code>emacs -batch -f batch-byte-compile ebib.el</code></pre>
-<p>This will create a file <code>ebib.elc</code>, which Emacs will load instead of <code>ebib.el</code>. Do this for every <code>.el</code> file in the source.</p>
-<h2 id="installing-the-info-file">Installing the info file</h2>
-<p>If you install Ebib through the package manager, the Info file is installed automatically as well. However, if you install Ebib manually, or run it from the source directory, this is not the case. If you want the Info file to be accessible from within Emacs, you need to put it in a directory where Emacs can find it. One way to do this is to put <code>ebib.info</code> in one of the standard info directories. Make sure to run <code>install-info ebib.info dir</code>, so that Emacs knows about the new info file.</p>
-<p>Alternatively, you can leave <code>ebib.info</code> in Ebib's source directory and add that dir to <code>Info-additional-directory-list</code>. It contains a suitable <code>dir</code> file, so there's no need to run <code>install-info</code>.</p>
+<p>It's also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you're doing so detailed instructions are omitted here. Just be sure to also install Ebib's dependencies, the <a href="https://github.com/magnars/dash.el">dash</a> and <a href="https://github.com/joostkremers/parsebib">parsebib</a> libraries.</p>
 <h2 id="starting-ebib">Starting Ebib</h2>
 <p>Once Ebib has been installed and is loaded, you can start it with <code>M-x ebib</code>. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs' init file:</p>
 <pre><code>(global-set-key &quot;\C-ce&quot; &#39;ebib)</code></pre>

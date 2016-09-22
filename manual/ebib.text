@@ -20,37 +20,9 @@ The easiest way to install Ebib is to use Emacs' package manager. Ebib is availa
 
 Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's package manager: `apt-get install elpa-ebib`.
 
-
 ## Manual installation ##
 
-You can also install Ebib manually by copying the file `ebib.el` to somewhere in your load path and add the following line to Emacs' init file `~/.emacs`:
-
-    (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
-
-On a default installation, the load path probably only contains system directories. If you want to run `ebib.el` from somewhere else (e.g., directly from the source directory), you can add this directory to your load path:
-
-    (add-to-list 'load-path "~/src/ebib"))
-
-Note: if you do not know what your load path is set to, go to the `*scratch*` buffer, type `load-path` on an empty line, put the cursor right after it and type `C-j`. The value of `load-path` will then appear in the buffer.
-
-Alternatively, you can load Ebib directly by putting the following in `.emacs`:
-
-    (load "/path/to/ebib")
-
-The difference between `load` and `autoload` is that the former loads Ebib immediately and thus slows down Emacs' startup (a bit), while the latter loads Ebib only when it is called (and thus slows down Ebib's first time start up a bit).
-
-It is recommended to byte-compile the source, Ebib runs quite a lot faster when it is byte-compiled. You can do this either within Emacs with `M-x byte-compile-file` (recommended on OS X), or from your shell by going into the directory where you put `ebib.el` and typing:
-
-    emacs -batch -f batch-byte-compile ebib.el
-
-This will create a file `ebib.elc`, which Emacs will load instead of `ebib.el`. Do this for every `.el` file in the source.
-
-
-## Installing the info file ##
-
-If you install Ebib through the package manager, the Info file is installed automatically as well. However, if you install Ebib manually, or run it from the source directory, this is not the case. If you want the Info file to be accessible from within Emacs, you need to put it in a directory where Emacs can find it. One way to do this is to put `ebib.info` in one of the standard info directories. Make sure to run `install-info ebib.info dir`, so that Emacs knows about the new info file.
-
-Alternatively, you can leave `ebib.info` in Ebib's source directory and add that dir to `Info-additional-directory-list`. It contains a suitable `dir` file, so there's no need to run `install-info`.
+It's also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you're doing so detailed instructions are omitted here. Just be sure to also install Ebib's dependencies, the [dash](https://github.com/magnars/dash.el) and [parsebib](https://github.com/joostkremers/parsebib) libraries.
 
 
 ## Starting Ebib ##
