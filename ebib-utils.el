@@ -1096,6 +1096,90 @@ error."
         (setq url (match-string 1 url)))
     url))
 
+(defun ebib-create-org-identifier (key _)
+  "Create a unique identifier for KEY for use in an org file.
+The key is prepended with the string \"Custom_id:\", so that it
+can be used in a :PROPERTIES: block."
+  (format ":Custom_id: %s" key))
+
+(defun ebib-create-org-title (key db)
+  "Return a title for an orgmode note for KEY in DB.
+The title is formed from the author(s) or editor(s) of the entry,
+its year and its title.  Newlines are removed from the resulting
+string."
+  (let ((author (or (ebib-db-get-field-value "author" key db 'noerror 'unbraced 'xref)
+                    (ebib-db-get-field-value "editor" key db 'noerror 'unbraced 'xref)
+                    "(No Author)"))
+        (year (or (ebib-db-get-field-value "year" key db 'noerror 'unbraced 'xref)
+                  "????"))
+        (title (or (ebib-db-get-field-value "title" key db 'noerror 'unbraced 'xref)
+                   "(No Title)")))
+    (remove ?\n (format "%s (%s): %s" author year title))))
+
+(defun ebib-create-org-link (key db)
+  "Create an org link for KEY in DB.
+Check the entry designated by KEY whether it has a file, a doi or
+a URL (in that order) and use the first element found to create
+an org link.  If none of these elements is found, return the
+empty string."
+  (cond
+   ((ebib-db-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)
+    (ebib-create-org-file-link key db))
+   ((ebib-db-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)
+    (ebib-create-org-doi-link key db))
+   ((ebib-db-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref)
+    (ebib-create-org-url-link key db))
+   (t "")))
+
+(defun ebib-create-org-file-link (key db)
+  "Create an org link to the file in entry KEY in DB.
+The file is taken from `ebib-file-field' in the entry designated
+by KEY in the current database.  If that field contains more than
+one file name, the user is asked to select one.  If
+`ebib-file-field' is empty, create a file name based on KEY,
+using the function `ebib--create-file-name-from-key'."
+  (let ((files (ebib-db-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)))
+    (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))))
+
+(defun ebib-create-org-doi-link (key db)
+  "Create an org link to the DOI in entry KEY in DB.
+The file is taken from `ebib-doi-field' in the entry designated
+by KEY in the current database.  If `ebib-doi-field' is empty,
+return the empty string."
+  (let ((doi (ebib-db-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)))
+    (if doi (format "[[doi:%s]]" doi) "")))
+
+(defun ebib-create-org-url-link (key db)
+  "Create an org link to the URL in entry KEY in DB.
+The URL is taken from `ebib-url-field' in the entry designated by
+KEY in the current database.  If that field contains more than
+one url, the user is asked to select one.  If `ebib-url-field' is
+empty, return the empty string."
+  (let* ((urls (ebib-db-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref))
+         (url (ebib--select-url urls nil)))
+    (if url (format "[[%s]]" url) "")))
+
+(defun ebib-format-template (template specifiers &rest args)
+  "Format TEMPLATE using SPECIFIERS.
+SPECIFIERS is an alist of characters and symbols.  Each
+function should take ARGS as arguments and should return a string
+which is substituted for the specifier in TEMPLATE.  Specs in
+SPECIFIERS that do not occur in TEMPLATE are ignored."
+  ;; First remove specs that do not occur in TEMPLATE.  In principle,
+  ;; `format-spec' ignores all specs that do not occur in the template, but we
+  ;; do not want to apply the functions of specs that are not needed.
+  (setq specifiers (cl-remove-if-not (lambda (elt)
+                                       (string-match-p (format "%%%c" (car elt)) template))
+                                     specifiers))
+  (format-spec template (delq nil (mapcar (lambda (spec)
+                                            (let* ((replacer (cdr spec))
+                                                   (replacement (if (fboundp replacer)
+                                                                    (ignore-errors (apply (cdr spec) args))
+                                                                  (symbol-value replacer))))
+                                              (if replacement
+                                                  (cons (car spec) replacement))))
+                                          specifiers))))
+
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
   (if (stringp string)
