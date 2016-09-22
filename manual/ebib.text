@@ -15,9 +15,8 @@ The advantage of having a BibTeX database manager inside Emacs is that X is no l
 ## Version 2.7, 22 September 2016 ##
 
 - Reading list management: add and remove BibTeX entries to an Org reading list.
-- Changes to the customisation of the notes file(s).
-    - Remove options `ebib-notes-identifier-function` and  `ebib-notes-title-function`.
-    - Add option`ebib-notes-template-specifiers`: allow customisation of the format specs used in `ebib-notes-template`. (This option replaces `ebib-notes-identifier-function` and  `ebib-notes-title-function`).
+- Remove options `ebib-notes-identifier-function` and  `ebib-notes-title-function`.
+- Add option `ebib-notes-template-specifiers`: allow customisation of the format specs used in `ebib-notes-template`. (This option replaces `ebib-notes-identifier-function` and  `ebib-notes-title-function`).
 
 ## Version 2.6.3, 31 August 2016 ##
 
