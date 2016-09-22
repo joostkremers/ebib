@@ -53,6 +53,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="TOC">
 <ul>
+<li><a href="#news">News</a><ul>
+<li><a href="#version-2.7-22-september-2016">Version 2.7, 22 September 2016</a></li>
+<li><a href="#version-2.6.3-31-august-2016">Version 2.6.3, 31 August 2016</a></li>
+</ul></li>
 <li><a href="#installation">Installation</a><ul>
 <li><a href="#package-manager">Package manager</a></li>
 <li><a href="#debian-and-ubuntu">Debian and Ubuntu</a></li>
@@ -128,6 +132,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Ebib is a program with which you can manage BibTeX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <p>The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.</p>
+<h1 id="news">News</h1>
+<h2 id="version-2.7-22-september-2016">Version 2.7, 22 September 2016</h2>
+<ul>
+<li>Reading list management: add and remove BibTeX entries to an Org reading list.</li>
+<li>Changes to the customisation of the notes file(s).
+<ul>
+<li>Remove options <code>ebib-notes-identifier-function</code> and <code>ebib-notes-title-function</code>.</li>
+<li>Add option<code>ebib-notes-template-specifiers</code>: allow customisation of the format specs used in <code>ebib-notes-template</code>. (This option replaces <code>ebib-notes-identifier-function</code> and <code>ebib-notes-title-function</code>).</li>
+</ul></li>
+</ul>
+<h2 id="version-2.6.3-31-august-2016">Version 2.6.3, 31 August 2016</h2>
+<ul>
+<li>Allow storing notes in a single file rather than using one file per note.</li>
+<li>Correct handling of DOIs.</li>
+<li>Add option <code>ebib-truncate-file-names</code>: if set (the default), file names added to the <code>file</code> field are truncated relative to <code>ebib-file-search-dirs</code>.</li>
+<li>Add option <code>ebib-file-name-mod-function</code>: modify file paths before storing them in the <code>file</code> field.</li>
+</ul>
 <h1 id="installation">Installation</h1>
 <h2 id="package-manager">Package manager</h2>
 <p>The easiest way to install Ebib is to use Emacs' package manager. Ebib is available as a package from the <a href="http://melpa.org/">Melpa package archive</a>. If you add the Melpa archive to your <code>package-archive</code> list, you can install Ebib from the package manager. This will also install the Info file so you can access the Ebib manual within Emacs.</p>

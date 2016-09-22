@@ -10,6 +10,23 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.
 
 
+# News #
+
+## Version 2.7, 22 September 2016 ##
+
+- Reading list management: add and remove BibTeX entries to an Org reading list.
+- Changes to the customisation of the notes file(s).
+    - Remove options `ebib-notes-identifier-function` and  `ebib-notes-title-function`.
+    - Add option`ebib-notes-template-specifiers`: allow customisation of the format specs used in `ebib-notes-template`. (This option replaces `ebib-notes-identifier-function` and  `ebib-notes-title-function`).
+
+## Version 2.6.3, 31 August 2016 ##
+
+- Allow storing notes in a single file rather than using one file per note.
+- Correct handling of DOIs.
+- Add option `ebib-truncate-file-names`: if set (the default), file names added to the `file` field are truncated relative to `ebib-file-search-dirs`.
+- Add option `ebib-file-name-mod-function`: modify file paths before storing them in the `file` field.
+
+
 # Installation #
 
 ## Package manager ##
