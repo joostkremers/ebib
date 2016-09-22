@@ -121,10 +121,10 @@ want to set another function here."
   (org-todo ebib-reading-list-done-marker))
 
 (defcustom ebib-reading-list-item-active-function 'ebib-reading-list-item-org-active-p
-  "Function to determine whether a reading list item is done.
+  "Function to determine whether a reading list item is active.
 This function is called with point inside the item, at the end of
 the item's identifier.  It should return non-nil when the item is
-done, nil if it is still open."
+still pending, nil if it is done."
   :group 'ebib-reading-list
   :type 'function)
 
