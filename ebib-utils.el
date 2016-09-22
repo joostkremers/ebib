@@ -1072,7 +1072,10 @@ the function `ebib--create-file-name-from-key' for details."
 URLS is a string containing one or more URLs.  URLS is split
 using `ebib-url-regexp' and the Nth URL is returned.  If N is
 nil, the user is asked which URL to select, unless there is only
-one."
+one.  If URLS is nil or does not contain any valid URLs, raise an
+error."
+  (unless urls
+    (error "[Ebib] No URLs found"))
   (setq urls (let ((start 0)
                    (result nil))
                (while (string-match ebib-url-regexp urls start)
