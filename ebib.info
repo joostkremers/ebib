@@ -1814,8 +1814,8 @@ it by displaying the string ‘[N]’ (customisable with
 a single file to store all notes.  If you wish to use separate files for
 each note, you need to configure the directory in which to store them by
 setting the option ‘ebib-notes-directory’.  If this is not set, Ebib
-uses the first directory in ‘ebib-file-search-dirs’, which defaults to
-the user’s home directory.
+uses the first directory in ‘ebib-file-search-dirs’, (which defaults to
+the user’s home directory).
 
    The name of a notes file is formed by taking the entry’s key and
 appending the extension ‘.org’ to it, which means that a notes file is
@@ -1830,9 +1830,8 @@ applied, you can set ‘ebib-notes-name-transform-function’ to ‘identity’.
    When a new note is created, it is given a title consisting of the
 author(s), year and title of the entry.  Ebib also includes a
 ‘:PROPERTIES:’ block containing a custom ID for the entry, which
-consists of the entry key.  This initial contents can be customised, see
-the options ‘ebib-notes-template’, ‘ebib-notes-title-function’ and
-‘ebib-notes-identifier-function’ for details.
+consists of the entry key.  This initial contents is based on a
+template, which can be customised.  See below for details.
 
    As mentioned, notes files are org-mode files by default.  This can be
 changed by customising the option ‘ebib-notes-file-extension’.  If you
@@ -1850,11 +1849,7 @@ extension of the notes file.  The option
 notes using the template in ‘ebib-notes-template’, but the org-mode
 format is not enforced.  If you specify a notes file with an extension
 different from ‘.org’, the corresponding format will be used, which
-probably requires customising the template.  Note that if you do change
-the template, it is crucial that you include a ‘%K’ directive in it.
-This directive is replaced with a unique identifier, which is used by
-Ebib to identify and retrieve the note.  Without it, Ebib cannot
-determine whether an entry has a note associated with it.
+probably requires customising the template (see below for details).
 
    There are three hooks that can be used to change the way the notes
 file is displayed when a note is opened.  When an existing note is
@@ -1871,13 +1866,84 @@ For a new note, the cursor is positioned after the title and the
    Because both these hooks narrow the notes buffer, there must be a way
 to widen the buffer again when searching for another note.  This is the
 purpose of ‘ebib-notes-search-note-before-hook’.  This hook is run every
-time a note is searched (regardless of whether it exists or not) and by
+time Ebib searches a note (to see if it exists or to open it) and by
 default contains the function ‘widen’, so that the entire buffer is
 searched.
 
    All three hooks are customisable.  For example, if you prefer not to
 narrow the buffer, simply remove the corresponding functions from the
 hooks.
+* Menu:
+
+* Customising the notes template::
+
+
+File: ebib.info,  Node: Customising the notes template,  Up: Notes files
+
+13.1 Customising the notes template
+===================================
+
+By default, each note is an org-mode entry whose header consists of the
+author or editor, the year of publication and the title.  The entry has
+a ‘:PROPERTIES:’ block containing a ‘Custom_id:’.  This initial contents
+is created on the basis of a template, which has the following form:
+
+"* %T
+:PROPERTIES:
+%K
+:END:
+>|<
+"
+
+   This template contains two format specifiers: ‘%K’ and ‘%T’.  ‘%K’ is
+replaced with the key of the entry prepended with the string
+‘"Custom_id: "’ in order to create an org-mode property.  The ‘%T’
+specifier is replaced with the title of the note, which consists of the
+author (or editor), the year of publication and the title of the
+bibliography entry.  The template also contains the string ‘">|<"’,
+which indicates the position of the cursor when a new note is created.
+
+   It is possible to change the template by customising the option
+‘ebib-notes-template’.  Note that if you do this, the ‘%K’ directive
+should not be removed.  It is required in order to identify the note and
+connect it to its BibTeX entry.  Without it, Ebib won’t be able to tell
+whether a BibTeX entry has a note or not.  The ‘%T’ directive and the
+cursor indicator may be left out.
+
+   There are in fact a few more specifiers that may be used in the
+template: ‘%F’ creates a link to the file in the BibTeX entry’s ‘file’
+field, ‘%D’ creates a link to the DOI in the entry’s ‘doi’ field, and
+‘%U’ a link to the entry’s ‘url’ field.  There is also a ‘%L’ specifier,
+which creates a link to the entry’s file, its DOI, or its URL, whichever
+is found first.
+
+   It is possible to change the strings that the specifiers produce by
+customising ‘ebib-notes-template-specifiers’.  This option contains
+pairs of characters and functions.  Each function takes two arguments,
+‘key’ and ‘db’, the key of the entry for which a note is created and the
+database in which it is stored.  It should return a string (possibly
+empty), which replaces the specifier in the template.  In order to
+change the string that a specifier is replaced with, write your own
+function and set ‘ebib-notes-template-specifiers’ to use it.
+
+   It is also possible to add new specifiers.  Simply add a pair (cons
+cell) ‘(<char> . <function>)’ to ‘ebib-notes-template-specifiers’.  The
+character should obviously be unique (just supply the character, without
+‘%’), and the function should take the key and the database as arguments
+and return a string.
+
+   When the specifier functions are called, the ‘key’ argument is set to
+the key of the current entry and the ‘db’ argument to the current
+database.  With these arguments, it is possible to, e.g., retrieve the
+value of a specific field in the entry:
+
+(ebib-db-get-field-value <field> key db 'noerror 'unbraced 'xref)
+
+   where ‘<field>’ is the field (as a string) whose value is to be
+retrieved.
+
+   Instead of a function, you may also provide a variable.  The
+variable’s value is then used to replace the specifier.
 
 
 File: ebib.info,  Node: Window Management,  Next: Creating Entry Stubs,  Prev: Notes files,  Up: Top
@@ -2660,34 +2726,36 @@ Node: Editing the file field88239
 Ref: #editing-the-file-field88374
 Node: Notes files89717
 Ref: #notes-files89845
-Node: Window Management94317
-Ref: #window-management94464
-Node: Creating Entry Stubs97620
-Ref: #creating-entry-stubs97782
-Node: @Preamble Definition98783
-Ref: #preamble-definition98947
-Node: @String Definitions100933
-Ref: #string-definitions101084
-Node: @Comments104593
-Ref: #comments104721
-Node: Managing Keywords105086
-Ref: #managing-keywords105231
-Node: Sorting the bib File111116
-Ref: #sorting-the-.bib-file111289
-Node: Merging and Importing114416
-Ref: #merging-and-importing114581
-Node: Exporting Entries116355
-Ref: #exporting-entries116517
-Node: Multiple Identical Fields118492
-Ref: #multiple-identical-fields118671
-Node: Multiline Edit Buffers120564
-Ref: #multiline-edit-buffers120736
-Node: The Options Menu124866
-Ref: #the-options-menu125014
-Node: Customisation125635
-Ref: #customisation125746
-Node: Modifying Key Bindings126689
-Ref: #modifying-key-bindings126816
+Node: Customising the notes template94015
+Ref: #customising-the-notes-template94164
+Node: Window Management97223
+Ref: #window-management97370
+Node: Creating Entry Stubs100526
+Ref: #creating-entry-stubs100688
+Node: @Preamble Definition101689
+Ref: #preamble-definition101853
+Node: @String Definitions103839
+Ref: #string-definitions103990
+Node: @Comments107499
+Ref: #comments107627
+Node: Managing Keywords107992
+Ref: #managing-keywords108137
+Node: Sorting the bib File114022
+Ref: #sorting-the-.bib-file114195
+Node: Merging and Importing117322
+Ref: #merging-and-importing117487
+Node: Exporting Entries119261
+Ref: #exporting-entries119423
+Node: Multiple Identical Fields121398
+Ref: #multiple-identical-fields121577
+Node: Multiline Edit Buffers123470
+Ref: #multiline-edit-buffers123642
+Node: The Options Menu127772
+Ref: #the-options-menu127920
+Node: Customisation128541
+Ref: #customisation128652
+Node: Modifying Key Bindings129595
+Ref: #modifying-key-bindings129722
 
 End Tag Table
 

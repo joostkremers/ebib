@@ -59,51 +59,43 @@ the mode line of the entry buffer after the entry key."
 
 (defcustom ebib-reading-list-template "* %M %T\n:PROPERTIES:\n%K\n:END:\n%F\n"
   "Template for an entry in the reading list.
-New entries are created on the basis of this template, which should
-contain the following directives:
-
-%M : the TODO marker
-%T : the title of the entry
-%K : the unique identifier of the note
-%F : the file path to the file to read.
-
-The identifier is created on the basis of the entry key using the
-function in the option `ebib-reading-list-identifier-function'.
-The %T directive is replaced with the title of the item, which is
-created using the function in `ebib-reading-list-title-function'.
-The %F directive is replaced with a link to the file associated
-with the item, which is created using the function in
-`ebib-reading-list-file-link-function'.  The TODO marker is a
-string indicating that the item is still on the todo list.  It is
-set with the option `ebib-reading-list-todo-marker'."
+New entries are created on the basis of this template.  The
+template can contain format specifiers consisting of a percent
+sign and a character.  These specifiers are defined by
+`ebib-notes-template-specifiers'.  Note that the `%K' specifier
+must be present in the template, which should be replaced by an
+identifier that is unique for the entry.  This identifier is used
+to retrieve the item.  Without it, Ebib is not able to determine
+whether an entry is on the reading list or not."
   :group 'ebib-reading-list
   :type '(string "Reading list item template"))
 
-(defcustom ebib-reading-list-title-function 'ebib-create-org-title
-  "Function to create the title for a reading list entry.
-This function is used to fill the %T directive in
-`ebib-reading-list-template'.  It should take one argument, the
-key of the entry for which a title is to be created."
-  :group 'ebib-reading-list
-  :type 'function)
+(defcustom ebib-reading-list-template-specifiers '((?K . ebib-reading-list-create-org-identifier)
+                                               (?T . ebib-create-org-title)
+                                               (?M . ebib-reading-list-todo-marker)
+                                               (?L . ebib-create-org-link)
+                                               (?F . ebib-create-org-file-link)
+                                               (?D . ebib-create-org-doi-link)
+                                               (?U . ebib-create-org-url-link))
+  "Specifiers used in `ebib-reading-list-template'.
+Each specifier consists of a character (which is preceded by a
+percent sign in `ebib-reading-list-template') and a symbol, which
+either names a function to be executed or a variable, which
+should hold a string.  If a function, it should take two
+arguments, the entry key and the database, and should return a
+string that is substituted for the specifier in the template."
+  :group 'ebib-notes
+  :type '(repeat (cons :tag "Specifier"
+                       (character :tag "Character")
+                       (symbol :tag "Function or variable"))))
 
-(defcustom ebib-reading-list-identifier-function 'ebib-create-org-identifier
-  "Function to create the identifier of a reading list item.
-This function should take the key of the entry as argument and
-should return a string that uniquely identifies the entry in the
-notes file.  Note that the string \"reading_\" is prefixed to the
-key before this function is called, in order to distinguish it
-from the identifier used in notes files (see the option
-`ebib-notes-identifier-function'."
-  :group 'ebib-reading-list
-  :type 'function)
-
-(defcustom ebib-reading-list-link-function 'ebib-create-org-link
-  "Function to create a link in a reading list item.
-This function should take one argument, the key of the relevant
-entry."
-  :group 'ebib-reading-list
-  :type 'function)
+(defun ebib-reading-list-create-org-identifier (key _)
+  "Create a unique identifier for KEY for use in a reading list file.
+The prefix \"reading_\" is added to the key to create an
+identifier that differs from the identifier used in notes files.
+Furthermore, the string \"Custom_id:\" is prepended, so that it
+can be used in an org :PROPERTIES: block."
+  (format ":Custom_id: reading_%s" key))
 
 (defcustom ebib-reading-list-todo-marker "TODO"
   "Marker for reading list items that are still open."
@@ -188,16 +180,16 @@ value is nil.  Note that this function searches in the current
 buffer."
   (save-excursion
     (goto-char (point-min))
-    (search-forward (funcall ebib-reading-list-identifier-function (concat "reading_" key)) nil t)))
+    (search-forward (funcall (cdr (assoc ?K ebib-reading-list-template-specifiers)) key nil) nil t)))
 
-(defun ebib--reading-list-new-item (key)
-  "Add a reading list item for KEY.
+(defun ebib--reading-list-new-item (key db)
+  "Add a reading list item for KEY in DB.
 Return KEY.  If there is already an item for KEY, do nothing and
 return nil."
   (with-current-buffer (ebib--reading-list-buffer)
     (unless (ebib--reading-list-locate-item key)
       (goto-char (point-max))
-      (insert (ebib--reading-list-fill-template key))
+      (insert (ebib--reading-list-fill-template key db))
       (save-buffer)
       key)))
 
@@ -211,13 +203,9 @@ do nothing and return nil."
       (save-buffer)
       key)))
 
-(defun ebib--reading-list-fill-template (key)
-  "Create the text for a reading list item for KEY."
-  (format-spec ebib-reading-list-template
-               `((?K . ,(funcall ebib-reading-list-identifier-function (concat "reading_" key)))
-                 (?T . ,(funcall ebib-reading-list-title-function key))
-                 (?M . ,ebib-reading-list-todo-marker)
-                 (?F . ,(funcall ebib-reading-list-link-function key)))))
+(defun ebib--reading-list-fill-template (key db)
+  "Create the text for a reading list item for KEY in DB."
+  (ebib-format-template ebib-reading-list-template ebib-reading-list-template-specifiers key db))
 
 (provide 'ebib-reading-list)
 

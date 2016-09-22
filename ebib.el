@@ -1072,8 +1072,8 @@ interactively."
   (ebib--execute-when
     ((entries)
      (if ebib-notes-use-single-file
-         (ebib--notes-open-common-notes-file (ebib--cur-entry-key))
-       (ebib--notes-open-notes-file-for-entry (ebib--cur-entry-key))))
+         (ebib--notes-open-common-notes-file (ebib--cur-entry-key) ebib--cur-db)
+       (ebib--notes-open-notes-file-for-entry (ebib--cur-entry-key) ebib--cur-db)))
     ((default)
      (beep))))
 
@@ -2443,7 +2443,7 @@ exists and runs `ebib-reading-list-new-item-hook'."
        (if (ebib--reading-list-item-p key)
            (error "Entry `%s' is already on the reading list" key))
        (if (file-writable-p ebib-reading-list-file)
-           (unless (ebib--reading-list-new-item key)
+           (unless (ebib--reading-list-new-item key ebib--cur-db)
              (error "[Ebib] Could not create reading list item for `%s'" key))
          (error "[Ebib] Reading list file is not writable")))
      (run-hooks 'ebib-reading-list-new-item-hook))
