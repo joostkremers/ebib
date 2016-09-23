@@ -169,8 +169,11 @@ list file is not accessible to the user."
   (if (and ebib-reading-list-file
            (file-writable-p ebib-reading-list-file))
       (with-current-buffer (ebib--reading-list-buffer)
-        (if (ebib--reading-list-locate-item key)
-            (funcall ebib-reading-list-item-active-function)))))
+        (save-excursion
+          (let ((loc (ebib--reading-list-locate-item key)))
+            (when loc
+              (goto-char loc)
+              (funcall ebib-reading-list-item-active-function)))))))
 
 (defun ebib--reading-list-locate-item (key)
   "Return the location of the reading list item for KEY.
