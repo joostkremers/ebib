@@ -1063,7 +1063,7 @@ the function `ebib--create-file-name-from-key' for details."
         (setq n 1))
        ((null n)
         (setq n (string-to-number (read-string (format "Select file [1-%d]: " (length file-list)))))))
-      (unless (<= n 1 (length file-list))  ; unless n is within range
+      (unless (<= 1 n (length file-list))  ; unless n is within range
         (error "[Ebib] No such file (%d)" n))
       (nth (1- n) file-list))))
 
