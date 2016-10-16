@@ -1038,9 +1038,10 @@ FILE is a file name, possibly with a partial file path.  It is
 expanded relative to `ebib-file-search-dirs'.  If the file cannot
 be found, the non-directory part is searched for as well.  As a
 last resort, FILE is expanded relative to `default-directory'.
-If FILE is an absolute file name, return it unchanged."
+If FILE is an absolute file name, expand it with
+`expand-file-name' and return the result."
   (if (file-name-absolute-p file)
-      file
+      (expand-file-name file)
     (let* ((unmod-file (funcall ebib-file-name-mod-function file nil)))
       (or (locate-file unmod-file ebib-file-search-dirs)
           (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
