@@ -2750,16 +2750,16 @@ If FILE is not in (a subdirectory of) one of the directories in
   "Edit a field that does not require special treatment."
   (let* ((cur-field (ebib--current-field))
          (init-contents (ebib-db-get-field-value cur-field (ebib--cur-entry-key) ebib--cur-db 'noerror))
-         (braced? nil))
+         (unbraced? nil))
     (if (ebib--multiline-p init-contents)
         (ebib-edit-multiline-field)     ; this always returns nil
       (when init-contents
-        (setq braced? (ebib-db-unbraced-p init-contents))
+        (setq unbraced? (ebib-db-unbraced-p init-contents))
         (setq init-contents (ebib-db-unbrace init-contents)))
       (ebib--ifstring (new-contents (read-string (format "%s: " cur-field)
                                              (if init-contents
                                                  (cons init-contents 0))))
-          (ebib-db-set-field-value cur-field new-contents (ebib--cur-entry-key) ebib--cur-db 'overwrite braced?)
+          (ebib-db-set-field-value cur-field new-contents (ebib--cur-entry-key) ebib--cur-db 'overwrite unbraced?)
         (ebib-db-remove-field-value cur-field (ebib--cur-entry-key) ebib--cur-db))
       (ebib--redisplay-current-field)
       (ebib--set-modified t))))
