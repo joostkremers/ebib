@@ -245,13 +245,18 @@ mode line of the entry buffer is not changed."
   :group 'ebib-windows
   :type 'string)
 
-(defcustom ebib-index-display-fields nil
-  "List of the fields to display in the index buffer.
-By default, the index buffer only shows the entry key of each
-entry.  If this provides too little information, you can have Ebib
-add the contents of certain fields to the index buffer."
+(defcustom ebib-index-fields '(("Key" 40 t)
+                           ("Author" 40 t)
+                           ("Year" 6 t)
+                           ("Title" 50 t))
+  "Fields to display in the index buffer.
+Any field BibTeX or biblatex field can be used.  Note, however,
+that the \"Author\" field is special here: if an entry's actual
+Author field is empty, its Editor field is displayed instead."
   :group 'ebib
-  :type '(repeat (string :tag "Index Field")))
+  :type '(repeat (list  (string :tag "Field")
+                        (integer :tag "Width")
+                        (boolean :tag "Sort"))))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
