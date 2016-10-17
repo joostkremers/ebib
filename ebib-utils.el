@@ -823,7 +823,8 @@ result of evaluating <value>.  If VALUE is a nonempty string,
 THEN (a single sexpr) is executed and its return value returned.
 If VALUE is either \"\" or nil, the forms in ELSE are executed
 and the return value of its last form is returned."
-  (declare (indent 2))
+  (declare (indent 2)
+           (debug ((symbolp form) form body)))
   `(let ,(list bindvar)
      (if (not (or (null ,(car bindvar))
                   (equal ,(car bindvar) "")))
