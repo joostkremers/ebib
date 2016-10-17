@@ -1249,18 +1249,26 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
          (ebib--redisplay)
          (message "Database closed."))))))
 
-(defun ebib-index-sort-ascending (field)
-  "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect ebib--cur-db)) nil t nil 'ebib--field-history)))
-  (unless (string= field "")
-    (ebib-db-set-sortinfo (cons field 'ascend) ebib--cur-db)
-    (ebib--redisplay)))
+(defun ebib-index-sort-ascending ()
+  "Sort the entries in the index buffer in ascending order.
+Sort key is FIELD, which must be one of the fields specified in
+`ebib-index-fields'."
+  (interactive (list (completing-read "Sort field: " (mapcar #'car ebib-index-fields) nil t nil 'ebib--field-history)))
+  (ebib--index-sort field 'ascend))
 
 (defun ebib-index-sort-descending (field)
-  "Sort the entries in the index according to the contents of FIELD."
-  (interactive (list (completing-read "Sort field: " (ebib--list-fields-uniquely (ebib--get-dialect ebib--cur-db)) nil t nil 'ebib--field-history)))
+  "Sort the entries in the index buffer in descending order.
+Sort key is FIELD, which must be one of the fields specified in
+`ebib-index-fields'."
+  (interactive (list (completing-read "Sort field: " (mapcar #'car ebib-index-fields) nil t nil 'ebib--field-history)))
+  (ebib--index-sort field 'descend))
+
+(defun ebib--index-sort (field order)
+  "Sort the entries in the index buffer according to FIELD.
+ORDER indicates the sort order and should be either `ascend' or
+`descend'."
   (unless (string= field "")
-    (ebib-db-set-sortinfo (cons field 'descend) ebib--cur-db)
+    (ebib-db-set-sortinfo (cons field order) ebib--cur-db)
     (ebib--redisplay)))
 
 (defun ebib-index-default-sort ()
