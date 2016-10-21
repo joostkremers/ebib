@@ -257,10 +257,10 @@ it is highlighted.  DB defaults to the current database."
          (req-fields (ebib--list-fields entry-type 'required dialect))
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
-         (undef-fields (-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key ebib--cur-db) dialect)))))
+         (undef-fields (-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key db) dialect)))))
     (insert (format "%-19s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
-                    (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) 'case-fold)
+                    (if (assoc-string entry-type (ebib--list-entry-types dialect t) 'case-fold)
                         entry-type
                       (propertize entry-type 'face 'error))
                     (if (and (eq dialect 'biblatex)
