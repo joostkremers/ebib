@@ -1321,12 +1321,6 @@ Possible values for DIALECT are those listed in
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
-(defun ebib--erase-buffer (buffer)
-  "Erase BUFFER, even if it is read-only."
-  (with-current-buffer buffer
-    (with-ebib-buffer-writable
-      (erase-buffer))))
-
 (provide 'ebib-utils)
 
 ;;; ebib-utils.el ends here
