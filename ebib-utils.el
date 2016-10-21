@@ -1146,11 +1146,9 @@ SPECIFIERS that do not occur in TEMPLATE are ignored."
   (if (stringp string)
       (string-match-p "\n" string)))
 
-(defun ebib--first-line (string)
+(defsubst ebib--first-line (string)
   "Return the first line of a multiline STRING."
-  (if (string-match "\n" string)
-      (substring string 0 (match-beginning 0))
-    string))
+  (car (split-string string "\n")))
 
 (defun ebib--sort-in-buffer (str limit)
   "Move POINT to the right position to insert STR in the current buffer.
