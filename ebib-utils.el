@@ -805,7 +805,8 @@ BUFFER is a symbol referring to a buffer in
 (defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
 Restore the dedicated status after executing BODY."
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug t))
   `(let ((dedicated (window-dedicated-p)))
      (unwind-protect
          (progn
