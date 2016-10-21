@@ -794,14 +794,6 @@ BUFFER is a symbol referring to a buffer in
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
 
-(defmacro with-ebib-buffer-writable (&rest body)
-  "Make the current buffer writable and execute BODY."
-  (declare (indent defun)
-           (debug t))
-  `(unwind-protect
-       (let ((buffer-read-only nil))
-         ,@body)))
-
 (defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
 Restore the dedicated status after executing BODY."

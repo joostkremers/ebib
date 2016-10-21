@@ -176,7 +176,7 @@ values of the fields listed in `ebib-index-fields'."
           (progn
             (ebib--update-entry-buffer)
             (re-search-forward "^crossref"))
-        (with-ebib-buffer-writable
+        (let ((inhibit-read-only t))
           (delete-region (point-at-bol) (point-at-eol))
           (insert (propertize (format "%-17s " field) 'face 'ebib-field-face)
                   (ebib--get-field-highlighted field (ebib--db-get-current-entry-key ebib--cur-db)))
@@ -185,7 +185,7 @@ values of the fields listed in `ebib-index-fields'."
 (defun ebib--redisplay-current-string ()
   "Redisplay the current string definition in the strings buffer."
   (with-current-ebib-buffer 'strings
-    (with-ebib-buffer-writable
+    (let ((inhibit-read-only t))
       (let* ((string (ebib--current-string))
              (val (ebib-db-get-string string ebib--cur-db nil 'unbraced)))
         (delete-region (point-at-bol) (point-at-eol))
@@ -296,7 +296,7 @@ If point is not on a BibTeX entry, return nil."
 If `ebib--cur-db' is nil, the buffer is just erased and its name set
 to \"none\". This function sets `ebib--cur-keys-list'."
   (with-current-ebib-buffer 'index
-    (with-ebib-buffer-writable
+    (let ((inhibit-read-only t))
       (erase-buffer)
       (if (not ebib--cur-db)
           (progn (rename-buffer " none")
@@ -344,7 +344,7 @@ NB: if BEG and END are omitted, this function changes point."
 MATCH-STR is a regexp that will be highlighted when it occurs in
 the field contents."
   (with-current-ebib-buffer 'entry
-    (with-ebib-buffer-writable
+    (let ((inhibit-read-only t))
       (erase-buffer)
       (when ebib--cur-keys-list         ; are there entries being displayed?
         (ebib--display-fields (ebib--get-key-at-point) ebib--cur-db match-str)
@@ -1361,7 +1361,7 @@ This function updates both the database and the buffer."
   (ebib--execute-when
     ((entries)
      (with-current-ebib-buffer 'index
-       (with-ebib-buffer-writable
+       (let ((inhibit-read-only t))
          (ebib-db-toggle-mark (ebib--get-key-at-point) ebib--cur-db)
          (ebib--display-mark (ebib-db-marked-p (ebib--get-key-at-point) ebib--cur-db)))
        (ebib-next-entry)))
@@ -3075,7 +3075,7 @@ beginning of the current line."
 (defun ebib--fill-strings-buffer ()
   "Fill the strings buffer with the @STRING definitions."
   (with-current-ebib-buffer 'strings
-    (with-ebib-buffer-writable
+    (let ((inhibit-read-only t))
       (erase-buffer)
       (cl-dolist (elem (ebib-db-list-strings ebib--cur-db 'sort))
         (let ((str (ebib-db-get-string elem ebib--cur-db 'noerror 'unbraced)))
@@ -3116,7 +3116,7 @@ When the user enters an empty string, the value is not changed."
   (let ((string (ebib--current-string)))
     (when (y-or-n-p (format "Delete @STRING definition %s? " string))
       (ebib-db-remove-string string ebib--cur-db)
-      (with-ebib-buffer-writable
+      (let ((inhibit-read-only t))
         (delete-region (point-at-bol) (point-at-eol)))
       (when (eobp)                      ; deleted the last string
         (forward-line -1))
@@ -3134,7 +3134,7 @@ When the user enters an empty string, the value is not changed."
             (progn
               (ebib-db-set-string new-abbr new-string ebib--cur-db)
               (ebib--sort-in-buffer new-abbr (length (ebib-db-list-strings ebib--cur-db)))
-              (with-ebib-buffer-writable
+              (let ((inhibit-read-only t))
                 (insert (format "%-19s %s\n" new-abbr new-string)))
               (forward-line -1)
               (ebib--set-modified t))))))
