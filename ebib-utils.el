@@ -789,13 +789,15 @@ BUFFER is a symbol referring to a buffer in
   "Make BUFFER current and execute BODY.
 BUFFER is a symbol referring to a buffer in
 `ebib--buffer-alist'."
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug t))
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
 
 (defmacro with-ebib-buffer-writable (&rest body)
   "Make the current buffer writable and execute BODY."
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug t))
   `(unwind-protect
        (let ((buffer-read-only nil))
          ,@body)))
