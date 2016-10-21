@@ -149,7 +149,8 @@ entry with KEY in the buffer, point is not moved."
       (while (not (string= key (ebib--get-key-at-point)))
         (forward-line 1))
       (if (eobp)
-          (goto-char p)))))
+          (goto-char p)
+        (set-window-point (get-buffer-window) (point))))))
 
 (defun ebib--get-tabulated-data (key)
   "Get data for KEY.
@@ -320,7 +321,6 @@ to \"none\". This function sets `ebib--cur-keys-list'."
                           (ebib--display-mark t))))
                     ebib--cur-keys-list)
               (ebib--goto-entry-in-index cur-entry)
-              (set-window-point (get-buffer-window) (point))
               (hl-line-highlight))))
         (rename-buffer (concat (format " %d:" (1+ (- (length ebib--databases)
                                                      (length (member ebib--cur-db ebib--databases)))))
