@@ -135,7 +135,7 @@ still pending, nil if it is done."
 (defcustom ebib-reading-list-new-item-hook nil
   "Hook run when a new reading list item is created.
 The functions in this hook can use the variable `ebib--cur-db' to
-access the current database, the function `ebib--cur-entry-key'
+access the current database, the function `ebib--get-key-at-point'
 to obtain the key of the current entry, and the database
 functions, especially `ebib-db-get-field-value' and
 `ebib-db-get-entry', to access the current entry's data
@@ -146,7 +146,7 @@ fields."
 (defcustom ebib-reading-list-remove-item-hook nil
   "Hook run when an item is removed from the reading list.
 The functions in this hook can use the variable `ebib--cur-db' to
-access the current database, the function `ebib--cur-entry-key'
+access the current database, the function `ebib--get-key-at-point'
 to obtain the key of the current entry, and the database
 functions, especially `ebib-db-get-field-value' and
 `ebib-db-get-entry', to access the current entry's data fields."

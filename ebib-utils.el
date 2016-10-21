@@ -225,7 +225,7 @@ The rest of the frame is used for the entry buffer, unless
                               ebib--mode-line-modified
                               mode-line-buffer-identification
                               (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
-                              (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
+                              (:eval (if (and ebib--cur-db (ebib--get-key-at-point)) "     Entry %l" "     No Entries"))
                               (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|"(ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
@@ -679,8 +679,8 @@ Ebib (not Emacs)."
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
-(defface ebib-overlay-face '((t (:inherit highlight)))
-  "Face used for the overlays."
+(defface ebib-highlight-face '((t (:inherit highlight)))
+  "Face used for the highlights."
   :group 'ebib-faces)
 
 (defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
@@ -736,9 +736,6 @@ Currently, the following problems are marked:
   "List of entry type aliases for Biblatex.")
 
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
-(defvar ebib--index-overlay nil "Overlay to mark the current entry.")
-(defvar ebib--fields-overlay nil "Overlay to mark the current field.")
-(defvar ebib--strings-overlay nil "Overlay to mark the current string.")
 
 ;; general bookkeeping
 (defvar ebib--field-history nil "Minibuffer field name history.")
@@ -927,55 +924,9 @@ function adds a newline to the message being logged."
                                     "\n")
                    args))))
 
-(defun ebib--make-overlay (begin end buffer)
-  "Create an overlay from BEGIN to END in BUFFER."
-  (let (overlay)
-    (setq overlay (make-overlay begin end buffer))
-    (overlay-put overlay 'face 'ebib-overlay-face)
-    overlay))
-
-(defun ebib--set-index-overlay ()
-  "Set the overlay of the index buffer."
-  (with-current-ebib-buffer 'index
-    (beginning-of-line)
-    (let ((beg (point)))
-      (if ebib-index-display-fields
-          (end-of-line)
-        (skip-chars-forward "^ "))
-      (move-overlay ebib--index-overlay beg (point) (cdr (assq 'index ebib--buffer-alist)))
-      (beginning-of-line))))
-
-(defun ebib--set-fields-overlay ()
-  "Set the overlay in the fields buffer."
-  (with-current-ebib-buffer 'entry
-    (beginning-of-line)
-    (save-excursion
-      (let ((beg (point)))
-        (ebib--looking-at-goto-end "[^ \t\n\f]*")
-        (move-overlay ebib--fields-overlay beg (point))))))
-
-(defun ebib--set-strings-overlay ()
-  "Set the overlay in the strings buffer."
-  (with-current-ebib-buffer 'strings
-    (beginning-of-line)
-    (save-excursion
-      (let ((beg (point)))
-        (ebib--looking-at-goto-end "[^ \t\n\f]*")
-        (move-overlay ebib--strings-overlay beg (point))))))
-
-;; This is simply to save some typing.
-(defsubst ebib--cur-entry-key ()
-  "Get the key of the current entry."
-  (ebib--db-get-current-entry-key ebib--cur-db))
-
-(defun ebib--search-key-in-buffer (entry-key)
-  "Search ENTRY-KEY in the index buffer.
-Point is moved to the first character of the key.  Return value
-is the new value of point."
-  (goto-char (point-min))
-  (re-search-forward (concat "^" entry-key))
-  (beginning-of-line)
-  (point))
+;; (defsubst ebib--cur-entry-key ()
+;;   "Get the key of the current entry."
+;;   (ebib--db-get-current-entry-key ebib--cur-db))
 
 (defun ebib--read-file-to-list (filename)
   "Return the contents of FILENAME as a list of lines."
