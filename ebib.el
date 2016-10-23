@@ -118,11 +118,12 @@ window.  If all else fails, pop up a new frame."
                       display-buffer-pop-up-frame))
                    t)))
 
-(defun ebib--display-entry-key (key)
+(defun ebib--display-entry-key (key &optional mark)
   "Display BibTeX item designated by KEY in the index buffer at POINT.
 Included in the display are the data in the fields specified in
 `ebib-index-fields'.  The item is given the text property
-`ebib-key' with KEY as value."
+`ebib-key' with KEY as value.  If MARK is t, `ebib-marked-face'
+is applied to the item."
   (let ((data (ebib--get-tabulated-data key))
         (n 0)
         (max (1- (length ebib-index-fields))))
@@ -137,6 +138,8 @@ Included in the display are the data in the fields specified in
       ;; Add a text property to identify the entry.
       (add-text-properties (point-at-bol) (point)
                            `(ebib-key ,key))
+      (if mark
+          (add-text-properties (point-at-bol) (1+ (point)) '(face ebib-marked-face)))
       (insert "\n"))))
 
 (defun ebib--goto-entry-in-index (key)
