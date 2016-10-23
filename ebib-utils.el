@@ -761,7 +761,6 @@ Currently, the following problems are marked:
 ;; the master list and the current database
 (defvar ebib--databases nil "List of structs containing the databases.")
 (defvar ebib--cur-db nil "The database that is currently active.")
-(defvar ebib--cur-keys-list nil "Sorted list of entry keys in the current database.")
 
 ;; bookkeeping required when editing field values or @STRING definitions
 
@@ -833,7 +832,7 @@ and the return value of its last form is returned."
     "Helper function for `ebib--execute-when'."
     (cond
      ((eq env 'entries)
-      'ebib--cur-keys-list)
+      '(ebib-db-list-keys ebib--cur-db))
      ((eq env 'marked-entries)
       '(and ebib--cur-db
             (ebib-db-marked-entries-p ebib--cur-db)))
