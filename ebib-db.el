@@ -549,8 +549,8 @@ The filter is set unconditionally, overwriting any existing filter."
 
 (defun ebib-db-set-sortinfo (sortinfo db)
   "Set the SORTINFO of DB.
-The sortinfo is set unconditionally, overwriting
-any existing sortinfo."
+The sortinfo is set unconditionally, overwriting any existing
+sortinfo."
   (setf (ebib--db-struct-sortinfo db) sortinfo))
 
 (defun ebib-db-custom-sorted-p (db)
