@@ -692,7 +692,8 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "\C-xb" #'ebib-leave-ebib-windows)
     (define-key map "\C-xk" #'ebib-quit)
     (define-key map "X" #'ebib-export-preamble)
-    (define-key map "y" #'ebib-keywords-add) ; prefix
+    (define-key map "y" #'ebib-yank-entry)
+    (define-key map "Y" #'ebib-keywords-add) ; prefix
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
     map)
@@ -1671,6 +1672,64 @@ their contents into a single field."
          (message (format "Entry `%s' deleted." key))
          (ebib--set-modified t)
          (ebib--redisplay))))
+    ((default)
+     (beep))))
+
+(defun ebib-yank-entry (arg)
+  "Yank the BibTeX entry at the front of the kill ring.
+This function works by yanking the front of the kill ring to a
+temporary buffer and trying to read a BibTeX entry from the
+yanked text.  If an entry is found, it is added to the current
+database.  If no entry was found, just rotate the kill ring.
+
+This command can be repeated in order to yank the next element in
+the kill ring, but note that each following yank does not replace
+the entry that was added during the previous yank.  Repeating the
+yank is primarily meant for yanking past kill ring entries that
+do not constitute BibTeX items.
+
+It is also possible to yank @Preamble, @String or @Comment
+definitions.
+
+The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
+  (interactive "P")
+  (ebib--execute-when
+    ((database)
+     (message "%s" last-command)
+     (let ((entry (current-kill (cond
+                                 ((listp arg)
+                                  (if (eq last-command 'ebib-yank-entry) 1 0))
+                                 ((eq arg '-) -2)
+                                 (t (1- arg)))))
+           (needs-redisplay nil))
+       (with-temp-buffer
+         (insert entry)
+         (goto-char (point-min))
+         (let ((entry-type (ebib--find-next-bibtex-item)))
+           (ebib--set-modified t)
+           (cond
+            ((cl-equalp entry-type "string") ; `cl-equalp' compares strings case-insensitively.
+             (if (ebib--read-string ebib--cur-db)
+                 (message "[Ebib] Yanked @String definition.")))
+            ((cl-equalp entry-type "preamble")
+             (when (ebib--read-preamble ebib--cur-db)
+               (message "[Ebib] Yanked @Preamble definition.")))
+            ((cl-equalp entry-type "comment")
+             (when (ebib--read-comment ebib--cur-db)
+               (message "[Ebib] Yanked @Comment.")))
+            ((stringp entry-type)
+             (let ((entry (ebib--read-entry entry-type ebib--cur-db t)))
+               (if entry
+                   (progn (ebib-db-set-current-entry-key entry ebib--cur-db)
+                          (setq needs-redisplay t)
+                          (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) 'case-fold)
+                              (message "[Ebib] Yanked entry.")
+                            (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
+                 (message "[Ebib] Could not yank a valid entry")
+                 (ebib--set-modified nil))))
+            (t (message "[Ebib] No entry in kill ring: \"%s\"." entry)
+               (ebib--set-modified nil)))))
+       (if needs-redisplay (ebib--redisplay))))
     ((default)
      (beep))))
 
