@@ -1387,7 +1387,7 @@ all entries are marked."
     ((default)
      (beep))))
 
-(defun ebib--format-entry (key db timestamp &optional sort)
+(defun ebib--format-entry (key db &optional timestamp sort)
   "Write entry KEY in DB into the current buffer in BibTeX format.
 If TIMESTAMP is non-nil and `ebib-use-timestamp' is set, a
 timestamp is added to the entry, possibly overwriting an existing
