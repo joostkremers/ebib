@@ -1675,6 +1675,29 @@ their contents into a single field."
     ((default)
      (beep))))
 
+(defun ebib-kill-entry ()
+  "Kill the current entry.
+The entry is put in the kill ring."
+  (interactive)
+  (ebib--execute-when
+    ((entries)
+     (let ((key (ebib--cur-entry-key)))
+       (with-temp-buffer
+         (ebib--format-entry key ebib--cur-db)
+         (kill-new (buffer-substring-no-properties (point-min) (point-max))))
+       (ebib-db-remove-entry key ebib--cur-db)
+       (let ((new-cur-key (ebib--next-elem key ebib--cur-keys-list)))
+         (setq ebib--cur-keys-list (delete key ebib--cur-keys-list))
+         (ebib-db-set-current-entry-key (or new-cur-key  ; If new-cur-key is nil, we've deleted the last entry.
+                                        (-last-item ebib--cur-keys-list))
+                                    ebib--cur-db
+                                    'first))
+       (message (format "Entry `%s' killed." key))
+       (ebib--set-modified t)
+       (ebib--redisplay)))
+    ((default)
+     (beep))))
+
 (defun ebib-yank-entry (arg)
   "Yank the BibTeX entry at the front of the kill ring.
 This function works by yanking the front of the kill ring to a
