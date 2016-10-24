@@ -1907,7 +1907,7 @@ a filename is asked to which the entry is appended."
 
 (defun ebib-search ()
   "Search the current Ebib database.
-The search is conducted with STRING-MATCH-P and can therefore be
+The search is conducted with `string-match-p' and can therefore be
 a regexp.  Searching starts with the current entry.  In a
 filtered database, only the visible entries are searched."
   (interactive)
