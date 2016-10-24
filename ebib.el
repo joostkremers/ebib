@@ -1905,23 +1905,36 @@ a filename is asked to which the entry is appended."
     ((default)
      (beep))))
 
-(defun ebib-search ()
+(defvar ebib-search-map
+  (let ((map (make-keymap)))
+    (suppress-keymap map 'no-digits)
+    (define-key map "/" #'ebib-search-next)
+    (define-key map [return] #'ebib-search-next)
+    map)
+  "Keymap that is active when a search is preformed.")
+
+(defun ebib-search (arg)
   "Search the current Ebib database.
 The search is conducted with `string-match-p' and can therefore be
 a regexp.  Searching starts with the current entry.  In a
-filtered database, only the visible entries are searched."
-  (interactive)
+filtered database, only the visible entries are searched.
+
+If prefix argument ARG is non-nil, do not ask for a search
+string, search for the previous search string instead."
+  (interactive "P")
   (ebib--execute-when
     ((entries)
-     (ebib--ifstring (search-str (read-string "Search database for: "))
-         (progn
-           (setq ebib--search-string search-str)
-           ;; first we search the current entry
-           (if (ebib--search-in-entry ebib--search-string
-                                  (ebib-db-get-entry (ebib--cur-entry-key) ebib--cur-db))
-               (ebib--fill-entry-buffer ebib--search-string)
-             ;; if the search string wasn't found in the current entry, we continue searching.
-             (ebib-search-next)))))
+     (ebib--ifstring (search-str (or (and arg ebib--search-string)
+                                 (read-string "Search database for: ")))
+         (progn (set-transient-map ebib-search-map t)
+                (setq ebib--search-string search-str)
+                ;; first we search the current entry
+                (if (ebib--search-in-entry ebib--search-string
+                                       (ebib-db-get-entry (ebib--cur-entry-key) ebib--cur-db))
+                    (progn (ebib--fill-entry-buffer ebib--search-string)
+                           (message "Found search string in current entry."))
+                  ;; if the search string wasn't found in the current entry, we continue searching.
+                  (ebib-search-next)))))
     ((default)
      (beep))))
 
@@ -1949,7 +1962,8 @@ are searched."
              (re-search-forward (format "^%s " (regexp-quote (ebib--cur-entry-key))))
              (beginning-of-line)
              (ebib--set-index-overlay)
-             (ebib--fill-entry-buffer ebib--search-string))))))
+             (ebib--fill-entry-buffer ebib--search-string))
+           (message "Found search string in entry `%s'." (ebib--cur-entry-key))))))
     ((default)
      (beep))))
 
