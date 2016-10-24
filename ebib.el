@@ -2927,8 +2927,9 @@ viewed."
           (kill-new contents)
           (message "Field contents copied."))))))
 
-(defun ebib-cut-field-contents ()
-  "Kill the contents of the current field.  The killed text is put in the kill ring."
+(defun ebib-kill-field-contents ()
+  "Kill the contents of the current field.
+The killed text is put in the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (or (not field)
