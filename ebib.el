@@ -408,27 +408,30 @@ filter are returned.  The returned list is sorted."
 Optional argument FILE is a file to load.  If FILE is already
 loaded, switch to it.  If KEY is given, jump to it."
   (interactive)
-  ;; Save the buffer from which Ebib is called.
-  (setq ebib--buffer-before (current-buffer))
-  ;; And set it as the buffer to push entries to.
-  (setq ebib--push-buffer (current-buffer))
-  ;; See if there are local databases.
-  (or ebib--local-bibtex-filenames
-      (setq ebib--local-bibtex-filenames (ebib--get-local-databases)))
-  ;; See if there's a key at point.
-  (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
-  ;; Initialize Ebib if required.
-  (unless ebib--initialized
-    (ebib--init))
-  ;; Set up the windows.
-  (ebib--setup-windows)
-  ;; See if we have a file.
-  (if file
-      (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
-  ;; See if we have a key.
-  (when key
-    (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
-  (ebib--update-buffers))
+  (let ((needs-update nil))
+    ;; Save the buffer from which Ebib is called.
+    (setq ebib--buffer-before (current-buffer))
+    ;; And set it as the buffer to push entries to.
+    (setq ebib--push-buffer (current-buffer))
+    ;; See if there are local databases.
+    (or ebib--local-bibtex-filenames
+        (setq ebib--local-bibtex-filenames (ebib--get-local-databases)))
+    ;; See if there's a key at point.
+    (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
+    ;; Initialize Ebib if required.
+    (unless ebib--initialized
+      (ebib--init)
+      (setq needs-update t))
+    ;; Set up the windows.
+    (ebib--setup-windows)
+    ;; See if we have a file.
+    (when file
+      (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
+      (setq needs-update t))
+    ;; See if we have a key.
+    (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
+      (setq needs-update t))
+    (if needs-update (ebib--update-buffers))))
 
 ;;;###autoload
 (defun ebib-show-entry (key)
