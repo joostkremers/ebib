@@ -1957,6 +1957,7 @@ string, search for the previous search string instead."
      (ebib--ifstring (search-str (or (and arg ebib--search-string)
                                  (read-string "Search database for: ")))
          (progn
+           (set-transient-map ebib-search-map t)
            (setq ebib--search-string search-str)
            ;; first we search the current entry
            (if (ebib--search-in-entry ebib--search-string
