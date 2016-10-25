@@ -136,8 +136,7 @@ is applied to the item."
       ;; The last item isn't truncated
       (insert (nth n (cadr data)))
       ;; Add a text property to identify the entry.
-      (add-text-properties (point-at-bol) (point)
-                           `(ebib-key ,key))
+      (add-text-properties (point-at-bol) (point) `(ebib-key ,key))
       (if mark
           (add-text-properties (point-at-bol) (1+ (point)) '(face ebib-marked-face)))
       (insert "\n"))))
