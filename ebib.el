@@ -1926,13 +1926,13 @@ string, search for the previous search string instead."
     ((entries)
      (ebib--ifstring (search-str (or (and arg ebib--search-string)
                                  (read-string "Search database for: ")))
-         (progn (set-transient-map ebib-search-map t)
+         (progn (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
                 (setq ebib--search-string search-str)
                 ;; first we search the current entry
                 (if (ebib--search-in-entry ebib--search-string
                                        (ebib-db-get-entry (ebib--cur-entry-key) ebib--cur-db))
                     (progn (ebib--fill-entry-buffer ebib--search-string)
-                           (message "Found search string in current entry."))
+                           (message "Found search string in current entry.  `/' or RET for next match."))
                   ;; if the search string wasn't found in the current entry, we continue searching.
                   (ebib-search-next)))))
     ((default)
@@ -1963,7 +1963,7 @@ are searched."
              (beginning-of-line)
              (ebib--set-index-overlay)
              (ebib--fill-entry-buffer ebib--search-string))
-           (message "Found search string in entry `%s'." (ebib--cur-entry-key))))))
+           (message "Found search string in entry `%s'.  `/' or RET for next match." (ebib--cur-entry-key))))))
     ((default)
      (beep))))
 
