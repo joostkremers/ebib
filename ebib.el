@@ -182,7 +182,7 @@ values of the fields listed in `ebib-index-fields'."
         (let ((inhibit-read-only t))
           (delete-region (point-at-bol) (point-at-eol))
           (insert (propertize (format "%-17s " field) 'face 'ebib-field-face)
-                  (ebib--get-field-highlighted field (ebib--db-get-current-entry-key ebib--cur-db)))
+                  (ebib--get-field-highlighted field (ebib--get-key-at-point)))
           (beginning-of-line))))))
 
 (defun ebib--redisplay-current-string ()
