@@ -2670,10 +2670,10 @@ hook `ebib-reading-list-remove-item-hook' is run."
 (define-minor-mode ebib-entry-minor-mode
   "Ebib entry minor mode.
 Primarily used to add some info to the entry buffer mode line."
-  :init-value nil :lighter (:eval (ebib--format-entry-info))
+  :init-value nil :lighter (:eval (ebib--format-entry-info-for-modeline))
   :global nil)
 
-(defun ebib--format-entry-info ()
+(defun ebib--format-entry-info-for-modeline ()
   "Format information about the current entry for display in the mode line.
 Return a string that contains the entry key, `ebib-notes-symbol'
 if the current entry has a note and `ebib-reading-list-symbol' if
