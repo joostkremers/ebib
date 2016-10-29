@@ -2917,8 +2917,8 @@ With a prefix argument PFX, the `keywords' field and the field in
 prefix argument has no meaning."
   (interactive "p")
   (let* ((field (ebib--current-field))
-         ;; we save the result of editing the field, so we can move to the
-         ;; next field if necessary.
+         ;; We save the result of editing the field, so we can take some action
+         ;; if the edit wasn't aborted.
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
                   ((member-ignore-case field '("crossref" "xref" "related")) (ebib--edit-crossref field))
@@ -2929,19 +2929,34 @@ prefix argument has no meaning."
                         (= 1 pfx))
                    (ebib--edit-file-field))
                   ((member-ignore-case field '("annote" "annotation"))
-                   ;; a multiline edit differs from the other ones, because
+                   ;; A multiline edit differs from the other ones, because
                    ;; the edit isn't done when `ebib-edit-multiline-field'
-                   ;; returns. this means we cannot move to the next field.
+                   ;; returns. This means we cannot move to the next field.
                    ;; (in fact, the entry buffer isn't even displayed at
                    ;; this point.) for this reason, we return `nil', so
                    ;; `ebib-next-field' below isn't called.
                    (ebib-edit-multiline-field)
                    nil)
                   (t (ebib--edit-normal-field)))))
-    ;; move to the next field, but only if if the edit wasn't aborted and
-    ;; the function was called interactively (hence pfx):
-    (if (and result pfx)
-        (ebib-next-field))))
+    ;; When the edit returns, see if we need to move to the next field and
+    ;; whether we need to update the index display.
+    (when result
+      (when pfx
+        (ebib-next-field))
+      (ebib--redisplay-index-item field))))
+
+(defun ebib--redisplay-index-item (field)
+  "Redisplay current index item if FIELD is being displayed."
+  (when (or (assoc-string field ebib-index-fields t)
+            (and (cl-equalp field "Editor")
+                 (assoc-string "Author" ebib-index-fields t)))
+    (with-current-ebib-buffer 'index
+      (let ((key (ebib--get-key-at-point))
+            (inhibit-read-only t))
+        (delete-region (point-at-bol) (1+ (point-at-eol)))
+        (ebib--display-entry-key key (ebib-db-marked-p key ebib--cur-db))
+        (forward-line -1)
+        (hl-line-highlight)))))
 
 (defun ebib-browse-url-in-field (arg)
   "Browse a URL in the current field.
@@ -2989,6 +3004,7 @@ The killed text is put in the kill ring."
           (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
           (kill-new contents)
           (ebib--redisplay-current-field)
+          (ebib--redisplay-index-item field)
           (ebib--set-modified t)
           (message "Field contents killed."))))))
 
@@ -3015,6 +3031,7 @@ Prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
         (when new-contents
           (ebib-db-set-field-value field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
+          (ebib--redisplay-index-item field)
           (ebib--set-modified t))))))
 
 (defun ebib-delete-field-contents ()
@@ -3027,6 +3044,7 @@ The deleted text is not put in the kill ring."
       (when (y-or-n-p "Delete field contents? ")
         (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
         (ebib--redisplay-current-field)
+        (ebib--redisplay-index-item field)
         (ebib--set-modified t)
         (message "Field contents deleted.")))))
 
