@@ -1692,7 +1692,7 @@ The entry is put in the kill ring."
                                         (-last-item ebib--cur-keys-list))
                                     ebib--cur-db
                                     'first))
-       (message (format "Entry `%s' killed." key))
+       (message (format "Entry `%s' killed.  Use `y' to yank (or `C-y' outside Ebib)." key))
        (ebib--set-modified t)
        (ebib--redisplay)))
     ((default)
