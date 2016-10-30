@@ -3602,14 +3602,11 @@ BIBFILES is a list of bibliography files.  The collection is
 created from the keys in these files, provided they are opened in
 Ebib.  If BIBFILES is the symbol `none', the collection is
 created from the current database."
-  (let (collection)
-    (if (eq bibfiles 'none)
-        (ebib-db-list-keys ebib--cur-db 'sort)
-      (mapc (lambda (file)
-              (let ((db (ebib--get-db-from-filename file)))
-                (setq collection (append (ebib-db-list-keys db) collection))))
-            bibfiles))
-    collection))
+  (if (eq bibfiles 'none)
+      (ebib-db-list-keys ebib--cur-db 'sort)
+    (let (collection)
+      (dolist (file bibfiles collection)
+        (setq collection (append (ebib-db-list-keys (ebib--get-db-from-filename file)) collection))))))
 
 (defun ebib-insert-bibtex-key ()
   "Insert a BibTeX key at POINT.
