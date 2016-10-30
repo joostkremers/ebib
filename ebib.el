@@ -2947,16 +2947,21 @@ prefix argument has no meaning."
 
 (defun ebib--redisplay-index-item (field)
   "Redisplay current index item if FIELD is being displayed."
-  (when (or (assoc-string field ebib-index-fields t)
-            (and (cl-equalp field "Editor")
-                 (assoc-string "Author" ebib-index-fields t)))
+  (cond
+   ;; TODO In the case that the sort field is updated, we'd rather just move the
+   ;; entry to its correct location, rather than updating the entire buffer.
+   ((cl-equalp field (ebib-db-get-sort-field ebib--cur-db))
+    (ebib--update-index-buffer))
+   ((or (assoc-string field ebib-index-fields t)
+        (and (cl-equalp field "Editor")
+             (assoc-string "Author" ebib-index-fields t)))
     (with-current-ebib-buffer 'index
       (let ((key (ebib--get-key-at-point))
             (inhibit-read-only t))
         (delete-region (point-at-bol) (1+ (point-at-eol)))
         (ebib--display-entry-key key (ebib-db-marked-p key ebib--cur-db))
         (forward-line -1)
-        (hl-line-highlight)))))
+        (hl-line-highlight))))))
 
 (defun ebib-browse-url-in-field (arg)
   "Browse a URL in the current field.
