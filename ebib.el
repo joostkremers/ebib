@@ -2196,9 +2196,8 @@ argument ARG can be used to specify which file to choose."
     ((entries)
      (let ((file (ebib-db-get-field-value ebib-file-field (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
            (num (if (numberp arg) arg nil)))
-       (if file
-           (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
-         (error "[Ebib] No file found in `%s' field" ebib-file-field))))
+       (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
+       (error "[Ebib] No file found in `%s' field" ebib-file-field)))
     ((default)
      (beep))))
 
@@ -2926,9 +2925,8 @@ viewed."
   (interactive "P")
   (let ((file (ebib-db-get-field-value (ebib--current-field) (ebib--cur-entry-key) ebib--cur-db 'noerror 'unbraced 'xref))
         (num (if (numberp arg) arg nil)))
-    (if file
-        (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
-      (error "[Ebib] No file found in `%s' field" (ebib--current-field)))))
+    (ebib--call-file-viewer (ebib--select-file file num (ebib--cur-entry-key)))
+    (error "[Ebib] No file found in `%s' field" (ebib--current-field))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring."
