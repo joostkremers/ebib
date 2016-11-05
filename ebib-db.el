@@ -588,7 +588,7 @@ sortinfo."
   keys)
 
 (defun ebib-db-set-backup (backup db)
-  "Set the backup flag of DB to BACKUP.
+  "Set BACKUP as the backup flag of DB.
 BACKUP must be either t (make backup at next save) or nil (do not
 make backup at next save)."
   (setf (ebib--db-struct-backup db) backup))
