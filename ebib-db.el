@@ -203,7 +203,7 @@ If SORT is non-nil, the list is sorted."
 		 (push key keys))
 	     (ebib--db-struct-database db))
     (if sort
-        (ebib-db-sort-keys-list keys db)
+        (sort keys #'string<)
       keys)))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
@@ -526,13 +526,9 @@ unmarked."
       (ebib-db-unmark-entry entry db)
     (ebib-db-mark-entry entry db)))
 
-(defun ebib-db-list-marked-entries (db &optional sort)
-  "Return a list of entry keys of all marked entries in DB.
-If SORT is non-nil, the list is sorted."
-  (let ((entries (copy-sequence (ebib--db-struct-marked-entries db))))
-    (if sort
-        (ebib-db-sort-keys-list entries db)
-      entries)))
+(defun ebib-db-list-marked-entries (db)
+  "Return a list of entry keys of all marked entries in DB."
+  (copy-sequence (ebib--db-struct-marked-entries db)))
 
 (defun ebib-db-filtered-p (db)
   "Return t if a filter exists for DB."
@@ -564,28 +560,6 @@ sortinfo."
 (defun ebib-db-get-sort-order (db)
   "Return the sort order of DB, or nil if there is none."
   (cdr (ebib--db-struct-sortinfo db)))
-
-(defun ebib-db-sort-keys-list (keys db)
-  "Sort KEYS according to the sort info of DB."
-  ;; first sort the keys themselves
-  (setq keys (sort keys #'string<))
-  ;; and then stably sort on the sort field, if any
-  (when (ebib-db-custom-sorted-p db)
-    (let* ((field (ebib-db-get-sort-field db))
-           ;; We use a temp list for sorting, so that the :key argument to
-           ;; `cl-stable-sort' can simply be `car' rather than (a much
-           ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
-           ;; that way.
-           (list (mapcar (lambda (key)
-                           (cons (ebib-db-get-field-value field key db "" 'unbraced 'xref) key))
-                         keys)))
-      (setq list (cl-stable-sort list #'string-lessp :key #'car))
-      (setq keys (mapcar #'cdr list)))
-    ;; reverse the list if necessary
-    (if (eq (ebib-db-get-sort-order db) 'descend)
-        (setq keys (nreverse keys))))
-  ;; now return the list of keys
-  keys)
 
 (defun ebib-db-set-backup (backup db)
   "Set BACKUP as the backup flag of DB.
