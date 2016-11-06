@@ -2257,17 +2257,17 @@ is used)."
               (memq dialect bibtex-dialect-list))
     (error "[Ebib] Not a valid BibTeX dialect: %s" dialect))
   (ebib--execute-when
-   ((database)
-    (ebib-db-set-dialect dialect ebib--cur-db)
-    (let ((lvars (ebib-db-get-local-vars ebib--cur-db)))
-      (setq lvars (if dialect
-                      (ebib--local-vars-add-dialect lvars dialect 'overwrite)
-                    (ebib--local-vars-delete-dialect lvars)))
-      (ebib-db-set-local-vars lvars ebib--cur-db))
-    (ebib--set-modified t ebib--cur-db)
-    (ebib--update-entry-buffer))
-   ((default)
-    (beep))))
+    ((database)
+     (ebib-db-set-dialect dialect ebib--cur-db)
+     (let ((lvars (ebib-db-get-local-vars ebib--cur-db)))
+       (setq lvars (if dialect
+                       (ebib--local-vars-add-dialect lvars dialect 'overwrite)
+                     (ebib--local-vars-delete-dialect lvars)))
+       (ebib-db-set-local-vars lvars ebib--cur-db))
+     (ebib--set-modified t ebib--cur-db)
+     (ebib--update-entry-buffer))
+    ((default)
+     (beep))))
 
 (defun ebib-show-log ()
   "Display the contents of the log buffer."
