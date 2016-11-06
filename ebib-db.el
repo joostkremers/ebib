@@ -123,7 +123,7 @@ unconditionally set to the alphabetically first entry in DB.
 Return the new entry key if successful, nil otherwise."
   (cond
    ((stringp key)
-    (if (ebib-db-get-ntry key db 'noerror)
+    (if (ebib-db-get-entry key db 'noerror)
         (setf (ebib--db-struct-cur-entry db) key)
       (unless noerror
         (error "[Ebib] No entry key `%s' in the current database" key))
