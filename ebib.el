@@ -148,7 +148,8 @@ entry with KEY in the buffer, point is not moved."
   (with-current-ebib-buffer 'index
     (let ((p (point)))
       (goto-char (point-min))
-      (while (not (string= key (ebib--get-key-at-point)))
+      (while (not (or (string= key (ebib--get-key-at-point))
+                      (eobp)))
         (forward-line 1))
       (if (eobp)
           (goto-char p)
