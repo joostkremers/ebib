@@ -1986,7 +1986,7 @@ are searched."
     ((entries)
      (if (null ebib--search-string)
          (message "No search string")
-       (let ((cur-search-entry (cdr (member (ebib--get-key-at-point) (ebib-db-list-keys ebib--cur-db 'sort)))))
+       (let ((cur-search-entry (cdr (member (ebib--get-key-at-point) (ebib--sort-keys-list (ebib-db-list-keys ebib--cur-db) ebib--cur-db)))))
          (while (and cur-search-entry
                      (null (ebib--search-in-entry ebib--search-string
                                               (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
