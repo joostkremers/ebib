@@ -396,9 +396,10 @@ may also result in an error."
 If a filter is active, only the keys of entries that match the
 filter are returned.  The returned list is sorted."
   (when ebib--cur-db
-    (if (ebib-db-get-filter ebib--cur-db)
-        (ebib--filters-run-filter ebib--cur-db 'sort)
-      (ebib-db-list-keys ebib--cur-db 'sort))))
+    (let ((keys (if (ebib-db-get-filter ebib--cur-db)
+                    (ebib--filters-run-filter ebib--cur-db)
+                  (ebib-db-list-keys ebib--cur-db))))
+      (ebib--sort-keys-list keys ebib--cur-db))))
 
 ;;; Main
 
@@ -2074,8 +2075,9 @@ Either prints the entire database, or the marked entries."
   (interactive)
   (ebib--execute-when
     ((entries)
-     (let ((entries (or (ebib-db-list-marked-entries ebib--cur-db 'sort)
-                        (ebib-db-list-keys ebib--cur-db 'sort))))
+     (let ((entries (ebib--sort-keys-list (or (ebib-db-list-marked-entries ebib--cur-db)
+                                          (ebib-db-list-keys ebib--cur-db))
+                                      ebib--cur-db)))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                  ebib-print-tempfile
                                (read-file-name "Use temp file: " "~/" nil nil)))
@@ -2132,9 +2134,8 @@ Operates either on all entries or on the marked entries."
                      ebib-latex-preamble))
              (insert "\n\\begin{document}\n\n")
              (if (ebib-db-marked-entries-p ebib--cur-db)
-                 (mapc (lambda (entry)
-                         (insert (format "\\nocite{%s}\n" entry)))
-                       (ebib-db-list-marked-entries ebib--cur-db 'sort))
+                 (dolist (entry (ebib--sort-keys-list (ebib-db-list-marked-entries ebib--cur-db) ebib--cur-db))
+                   (insert (format "\\nocite{%s}\n" entry)))
                (insert "\\nocite{*}\n"))
              (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))
              (insert "\\end{document}\n")
@@ -2357,7 +2358,7 @@ The user is prompted for the buffer to push the entry into."
                          (concat (ebib--create-citation-command before)
                                  (mapconcat (lambda (key) ; then deal with the entries one by one
                                               (ebib--create-citation-command repeater key))
-                                            (ebib-db-list-marked-entries ebib--cur-db 'sort)
+                                            (ebib--sort-keys-list (ebib-db-list-marked-entries ebib--cur-db) ebib--cur-db)
                                             (if separator separator (read-from-minibuffer "Separator: ")))
                                  (ebib--create-citation-command after)))
                         (t        ; otherwise just take the current entry
@@ -2366,7 +2367,7 @@ The user is prompted for the buffer to push the entry into."
                    (if (ebib-db-marked-entries-p ebib--cur-db)
                        (mapconcat (lambda (key)
                                     key)
-                                  (ebib-db-list-marked-entries ebib--cur-db 'sort)
+                                  (ebib--sort-keys-list (ebib-db-list-marked-entries ebib--cur-db) ebib--cur-db)
                                   (read-from-minibuffer "Separator: "))
                      (ebib--get-key-at-point)))))
            (when citation-command
