@@ -51,6 +51,7 @@
 (require 'cl-lib)
 (require 'easymenu)
 (require 'bibtex)
+(require 'seq)
 (require 'dash)
 (require 'pp)
 (require 'parsebib)
@@ -162,16 +163,39 @@ entry with KEY in the buffer, point is not moved."
 Return value is a list consisting of KEY and a list of the
 values of the fields listed in `ebib-index-fields'."
   (list key (mapcar (lambda (elt)
-                      (let* ((field (car elt))
-                             (value (cond
-                                     ((cl-equalp field "Key")
-                                      key)
-                                     ((cl-equalp field "Author")
-                                      (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
-                                          (ebib-db-get-field-value "Editor" key ebib--cur-db "" 'unbraced 'xref)))
-                                     (t (ebib-db-get-field-value field key ebib--cur-db "" 'unbraced 'xref)))))
-                        (ebib--first-line value)))
+                      (ebib--first-line (ebib--get-field-value-for-index (car elt) key)))
                     ebib-index-fields)))
+
+(defun ebib--get-field-value-for-index (field key)
+  "Get the value of FIELD in entry KEY.
+The field \"Author\" is treated special: if its value is empty,
+the value of the \"Editor\" field is used instead."
+  (cond
+   ((cl-equalp field "Key")
+    key)
+   ((cl-equalp field "Author")
+    (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
+        (ebib-db-get-field-value "Editor" key ebib--cur-db "" 'unbraced 'xref)))
+   (t (ebib-db-get-field-value field key ebib--cur-db "" 'unbraced 'xref))))
+
+(defun ebib--insert-entry-in-index-sorted (key &optional move-point mark)
+  "Insert KEY in the index buffer obeying the sort order.
+Unless MOVE-POINT is non-nil, this function does not move point.
+If MARK is non-nil, `ebib-mark-face' is applied to the entry."
+  (with-current-ebib-buffer 'index
+    (let ((inhibit-read-only t))
+      (let* ((keys-list (ebib--sort-keys-list (ebib-db-list-keys ebib--cur-db) ebib--cur-db))
+             (pos (seq-position keys-list key #'string=))
+             (new-pos (save-excursion
+                        (goto-char (point-min))
+                        (forward-line pos)
+                        (ebib--display-entry-key key mark)
+                        (point))))
+        (when move-point
+          (goto-char new-pos)
+          (forward-line -1)
+          (set-window-point (get-buffer-window) (point))
+          (hl-line-highlight))))))
 
 (defun ebib--redisplay-current-field ()
   "Redisplay the contents of the current field in the entry buffer."
@@ -1137,12 +1161,9 @@ replaced with a number in ascending sequence."
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
          (push (cons '=key= (read-string "New entry key: " nil 'ebib--key-history)) entry-alist))
-       (ebib-db-set-current-entry-key (ebib--add-entry-stub entry-alist ebib--cur-db) ebib--cur-db)
-       ;; TODO Updating the index buffer can be slow, but just inserting the new
-       ;; entry in its correct position is more difficult, given that we'd need
-       ;; to take custom sort keys into account.  For now, we just take the easy
-       ;; way out.  See also the comment in `ebib--update-keyname'.
-       (ebib--update-buffers)
+       (let ((new-key (ebib--add-entry-stub entry-alist ebib--cur-db)))
+         (ebib-db-set-current-entry-key new-key ebib--cur-db)
+         (ebib--insert-entry-in-index-sorted new-key t))
        (ebib--edit-entry-internal)))
     ((no-database)
      (error "[Ebib] No database open.  Use `o' to open a database first"))
@@ -1350,19 +1371,16 @@ ORDER indicates the sort order and should be either `ascend' or
 (defun ebib--update-keyname (new-key)
   "Change the key of the current BibTeX entry to NEW-KEY.
 This function updates both the database and the buffer."
-  (let ((marked (ebib-db-marked-p (ebib--get-key-at-point) ebib--cur-db))
-        (actual-new-key (ebib-db-change-key (ebib--get-key-at-point) new-key ebib--cur-db (if ebib-uniquify-keys 'uniquify 'noerror))))
+  (let* ((cur-key (ebib--get-key-at-point))
+         (marked (ebib-db-marked-p cur-key ebib--cur-db))
+         (actual-new-key (ebib-db-change-key cur-key new-key ebib--cur-db (if ebib-uniquify-keys 'uniquify 'noerror))))
     (when actual-new-key
       (ebib-db-set-current-entry-key actual-new-key ebib--cur-db)
-      (if marked (ebib-mark-entry))
-      ;; TODO If the index buffer isn't sorted on the entry key, we might get by
-      ;; not updating the index buffer at all (though in some rare cases, this
-      ;; will result in the "wrong" order, because the entry key is used as the
-      ;; secondary sort key).  In order to implement this, we need better
-      ;; sorting functionality, though, which includes an explicit default sort
-      ;; key.  So for now, we just update the buffers unconditionally, despite
-      ;; the fact that this is slow.
-      (ebib--update-buffers)
+      (when marked
+        (ebib-db-toggle-mark cur-key ebib--cur-db)
+        (ebib-db-toggle-mark actual-new-key ebib--cur-db))
+      (let ((inhibit-read-only t)) (delete-region (point-at-bol) (1+ (point-at-eol))))
+      (ebib--insert-entry-in-index-sorted actual-new-key t marked)
       (ebib--set-modified t))))
 
 (defun ebib-mark-entry ()
@@ -1761,7 +1779,8 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
                                   (if (eq last-command 'ebib-yank-entry) 1 0))
                                  ((eq arg '-) -2)
                                  (t (1- arg)))))
-           (needs-update nil))
+           (needs-update nil)
+           entry-key)
        (with-temp-buffer
          (insert entry)
          (goto-char (point-min))
@@ -1778,18 +1797,18 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
              (when (ebib--read-comment ebib--cur-db)
                (message "[Ebib] Yanked @Comment.")))
             ((stringp entry-type)
-             (let ((entry (ebib--read-entry entry-type ebib--cur-db t)))
-               (if entry
-                   (progn (ebib-db-set-current-entry-key entry ebib--cur-db)
-                          (setq needs-update t)
-                          (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) 'case-fold)
-                              (message "[Ebib] Yanked entry.")
-                            (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
-                 (message "[Ebib] Could not yank a valid entry")
-                 (ebib--set-modified nil))))
+             (setq entry-key (ebib--read-entry entry-type ebib--cur-db t))
+             (if entry-key
+                 (progn (ebib-db-set-current-entry-key entry-key ebib--cur-db)
+                        (setq needs-update t)
+                        (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) 'case-fold)
+                            (message "[Ebib] Yanked entry.")
+                          (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
+               (message "[Ebib] Could not yank a valid entry")
+               (ebib--set-modified nil)))
             (t (message "[Ebib] No entry in kill ring: \"%s\"." entry)
                (ebib--set-modified nil)))))
-       (if needs-update (ebib--update-buffers)))) ; TODO See comment in `ebib--update-keyname'.
+       (if needs-update (ebib--insert-entry-in-index-sorted entry-key t))))
     ((default)
      (beep))))
 
@@ -2951,21 +2970,14 @@ prefix argument has no meaning."
 
 (defun ebib--redisplay-index-item (field)
   "Redisplay current index item if FIELD is being displayed."
-  (cond
-   ;; TODO In the case that the sort field is updated, we'd rather just move the
-   ;; entry to its correct location, rather than updating the entire buffer.
-   ((cl-equalp field (ebib-db-get-sort-field ebib--cur-db))
-    (ebib--update-index-buffer))
-   ((or (assoc-string field ebib-index-fields t)
-        (and (cl-equalp field "Editor")
-             (assoc-string "Author" ebib-index-fields t)))
-    (with-current-ebib-buffer 'index
-      (let ((key (ebib--get-key-at-point))
-            (inhibit-read-only t))
-        (delete-region (point-at-bol) (1+ (point-at-eol)))
-        (ebib--display-entry-key key (ebib-db-marked-p key ebib--cur-db))
-        (forward-line -1)
-        (hl-line-highlight))))))
+  (if (or (assoc-string field ebib-index-fields t)
+          (and (cl-equalp field "Editor")
+               (assoc-string "Author" ebib-index-fields t)))
+      (with-current-ebib-buffer 'index
+        (let ((key (ebib--get-key-at-point))
+              (inhibit-read-only t))
+          (delete-region (point-at-bol) (1+ (point-at-eol)))
+          (ebib--insert-entry-in-index-sorted key t)))))
 
 (defun ebib-browse-url-in-field (arg)
   "Browse a URL in the current field.
