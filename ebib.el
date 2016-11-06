@@ -137,9 +137,11 @@ is applied to the item."
       (insert (nth n (cadr data)))
       ;; Add a text property to identify the entry.
       (add-text-properties (point-at-bol) (point) `(ebib-key ,key))
-      (if mark
-          (add-text-properties (point-at-bol) (1+ (point)) '(face ebib-marked-face)))
-      (insert "\n"))))
+      (insert "\n")
+      (when mark
+        (forward-line -1)
+        (add-text-properties (point-at-bol) (1+ (point-at-eol)) '(face ebib-marked-face))
+        (forward-line 1)))))
 
 (defun ebib--goto-entry-in-index (key)
   "Move point to the entry designated by KEY.
