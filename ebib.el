@@ -2139,6 +2139,7 @@ Either prints the entire database, or the marked entries."
     ((default)
      (beep))))
 
+;; TODO We should account for biblatex here.
 (defun ebib-latex-entries ()
   "Create a LaTeX file that \\nocites entries from the database.
 Operates either on all entries or on the marked entries."
