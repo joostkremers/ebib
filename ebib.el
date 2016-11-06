@@ -1274,7 +1274,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
   "Sort the entries in the index buffer in ascending order.
 Sort key is FIELD, which must be one of the fields specified in
 `ebib-index-fields'."
-  (interactive (list (completing-read "Sort field (ascending: " (-map #'car (--filter (nth 2 it) ebib-index-fields)) nil t nil 'ebib--field-history)))
+  (interactive (list (completing-read "Sort field (ascending): " (-map #'car (--filter (nth 2 it) ebib-index-fields)) nil t nil 'ebib--field-history)))
   (ebib--index-sort field 'ascend))
 
 (defun ebib-index-sort-descending (field)
