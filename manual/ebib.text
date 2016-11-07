@@ -7,10 +7,14 @@ Ebib is a program with which you can manage BibTeX database files without having
 
 It should be noted that Ebib is *not* a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.
 
-The advantage of having a BibTeX database manager inside Emacs is that X is no longer required, as Emacs can run on the console, and also that some integration with Emacs' TeX and LaTeX modes becomes possible. For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or, vice versa, when you're in a LaTeX buffer, you can consult your BibTeX database and insert a key from it into the document. Another advantage of Ebib is that it is completely controlled by key commands: no stressful mouse movements are required, as with most other (usually X-based) BibTeX database managers.
-
 
 # News #
+
+## 7 November 2016 ##
+
+- New tabulated list interface in index buffer. This interface is not based on Emacs' built-in `tabulated-list-mode`, hence sorting cannot be done by clicking on the column headers. Sorting can be done with `<`, `>` (sort ascending and sort descending, respectively, which ask for the column to sort) and `=`, to reset to default sort (which is on the entry key).
+- The user option `ebib-index-display-fields` is replaced with `ebib-index-columns`, which has a different format: each element in `ebib-index-columns` describes a column in the tabulated view and consists of a list containing the field name, the column's width and a boolean indicating whether sorting on this column is possible.
+
 
 ## Version 2.8, 26 October 2016 ##
 
@@ -93,7 +97,7 @@ Lastly, if you use Biblatex, make sure to read the section on using Ebib with Bi
 
 A BibTeX database is somewhat of a free-form database. A BibTeX entry consists of a set of field-value pairs. Furthermore, each entry is known by a unique key. The way that Ebib navigates this database is by having two windows, one that contains a list of all the entry keys in the database, and one that contains the fields and values of the currently highlighted entry.
 
-When Ebib is started, the current windows in Emacs are hidden and the Emacs frame is divided into two windows. The top one contains a buffer that is called the *index buffer*, while the lower window contains the *entry buffer*. When a database is loaded, the index buffer holds a list of all the keys in the database. You can move through these keys with the cursor keys. In the entry buffer, the fields of the currently highlighted entry are shown, with their values.
+When Ebib is started, the current windows in Emacs are hidden and the Emacs frame is divided into two windows. The top one contains a buffer that is called the *index buffer*, while the lower window contains the *entry buffer*. When a database is loaded, the index buffer holds a list of all the keys in the database plus some additional information for each entry: the author or editor, its year of publication, and the title. You can move through the entries with the cursor keys. In the entry buffer, the fields of the currently highlighted entry are shown, with their values.
 
 This manual first describes Ebib's basic functionality, so that you can get started with it. At times, reference will be made to later sections, where more specific functions are described.
 
@@ -122,7 +126,7 @@ By default, `.bib` files are searched for in your home directory. Since this is 
 
 ## Navigating a `.bib` File ##
 
-Once you've opened a `.bib` file, the keys of all the entries in the file are shown in alphabetical order in the index buffer in the top Ebib window. (In fact, it is possible to show more than just the entry key in this buffer. See the option "Index Display Fields" (`ebib-index-display-fields`) on how to accomplish this.) The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. `book`, `article`, etc.).
+Once you've opened a `.bib` file, all the entries in the file are shown in alphabetical order (sorted by entry key) in the index buffer in the top Ebib window. The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. `book`, `article`, etc.).
 
 Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that Bib(La)TeX requires to be filled. The second group are the optional fields, which do not have to be filled but which Bib(La)TeX will normally add to the bibliography if they do have a value. The third group is the so-called extra fields. These fields are usually ignored by Bib(La)TeX (note that Bib(La)TeX normally ignores *all* fields it does not know), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are defined in the user option "Extra Fields" (`ebib-extra-fields`). Lastly, the fourth set of fields shown in the entry buffer are fields that exist in the entry but are not defined as part of the entry type nor as extra fields.
 
@@ -157,7 +161,7 @@ Deleting an entry is done in two ways. The key `d` deletes an entry from the dat
 
 The key `y` lets you yank an entry from the kill ring into the current database. If the first element in the kill ring is not a properly formatted BibTeX entry, the kill ring is simply rotated. This means that you can press `y` again to (try and) add the next element in the kill ring to the database.
 
-In order for `y` to add a BibTeX entry to the database, the first item in the kill ring must be a string that constitutes a properly formatted BibTeX entry. Killing an entry from a database will result in such a string (so you can easily move entries from one database to another by killing and then yanking them), but killing a BibTeX entry from another buffer or copying one from an outside source (e.g., a website) is also possible. Furthermore, yanking also works with `@Preamble`, `@String` and `@Comment` definitions.
+In order for `y` to add a BibTeX entry to the database, the kill ring item to be yanked must be a string that constitutes a properly formatted BibTeX entry. Killing an entry from a database will result in such a string (so you can easily move entries from one database to another by killing and then yanking them), but killing a BibTeX entry from another buffer or copying one from an outside source (e.g., a website) is also possible. Furthermore, yanking also works with `@Preamble`, `@String` and `@Comment` definitions.
 
 
 ## Editing Fields Values ##
@@ -244,7 +248,7 @@ Compared to BibTeX, Biblatex has a greatly expanded number of fields, a somewhat
 
 ## Setting the BibTeX Dialect ##
 
-Biblatex files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a Biblatex is determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`, the default being `BibTeX`. (These values are taken from the variable `bibtex-dialect-list`.)
+Biblatex files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a Biblatex file is determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`, the default being `BibTeX`. (These values are taken from the variable `bibtex-dialect-list`.)
 
 The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of “Illegal entry type” errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs’ `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
 
@@ -258,6 +262,17 @@ The mode line of the index buffer shows the dialect that Ebib assumes for the cu
 The set of entry types defined by Biblatex differs from the set used by BibTeX. Mostly, Biblatex adds new entry types, but there are a few BibTeX entry types that have been dropped. For legacy reasons, Biblatex still recognises these entry types, but it treats them as aliases for some of its own types. The relevant entry types are `@conference` (treated as an alias for `@inproceedings`), `@electronic` (alias for `@online`), `@mastersthesis` (alias for `@thesis` with the `type` field set to 'Master's thesis'), `@phdthesis` (alias for `@thesis` with the `type` field set to 'PhD thesis'), `@techreport` (alias for `@report` with the `type` field set to 'technical report') and `@www` (alias for `@online`). If an entry has such an alias as entry type, Ebib displays the entry type that Biblatex treats it as in the entry buffer. (For example, the entry type alias `phdthesis` is shown as  `phdthesis [==> Thesis]`.)
 
 Similarly, a number of fields are deprecated but still accepted as aliases. These are `address` (alias for `location`), `annote` (alias for `annotation`), `archiveprefix` (for `eprinttype`), `journal` (for `journaltitle`), `key` (for `sortkey`), `pdf` (for `file`), `primaryclass` (for `eprintclass`), and `school` (for `institution`). These aliases are also indicated in the entry buffer, albeit in a slightly different way. For example, if an entry has a `journal` field, its value is shown as the value of the `journaltitle` field; a tag `[<== journal]` is placed after the field value, indicating that the value is actually contained in the journal field. The `journal` field itself is shown as an undefined field (i.e., after all other fields). That is, in such cases, the value is shown twice: once as the `journaltitle` field (among the obligatory fields), and once as the `journal` field. This is done so that you can easily copy the value of the `journal` field to the `journaltitle` field, if you wish to bring your entries into line with Biblatex's conventions.
+
+
+# The Entries List #
+
+By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted alphanumerically in ascending order of the entry key.  You can sort the entries on one of the other columns using the keys `<` and `>`. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with `=`.
+
+You can customise the fields that are displayed in the index buffer with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
+
+You can use any BibTeX / BibLaTeX field to define a column in the index buffer. In addition, there are two column labels with a special meaning: `"Entry Key"`, which displays the entry key, and `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise.
+
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. It is not possible to set another column as the default sort key.
 
 
 # Searching #
@@ -405,9 +420,9 @@ If a database has an active filter, the save command is disabled, because it wou
 One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
 
 
-# Consulting BibTeX Databases outside Ebib #
+# Accessing BibTeX Databases outside Ebib #
 
-Having a BibTeX database manager running inside Emacs has an additional advantage: it makes it easy to consult your BibTeX databases from a text buffer. By default, this functionality is set up for LaTeX, for [Org mode](http://orgmode.org) and for [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
+Having a BibTeX database manager running inside Emacs has the advantage that it makes it easy to consult your BibTeX databases from a text buffer. By default, this functionality is set up for LaTeX, for [Org mode](http://orgmode.org) and for [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
 
 In any (text mode) buffer, you can call the command `ebib-insert-bibtex-key` to insert a citation. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can use TAB completion to enter a citation key, and after hitting `RET`, Emacs puts a citation at the cursor position in the current buffer with the key you selected. This citation includes the additional markup for the text mode in question. That is, if you call `ebib-insert-bibtex-key` from a LaTeX buffer, Ebib inserts `\<cite>{<key>}` into your buffer, substituting the citation command you select for `<cite>` and the key for `<key>`.
 
@@ -543,7 +558,7 @@ When you fill in the `crossref` field in Ebib, Ebib displays the values of the c
 
 BibTeX inheritance mechanism is rather crude: cross-referencing entries simply inherit the fields of the same name from the cross-referenced entry. Biblatex's mechanism is more sophisticated. Biblatex inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `inbook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `mvbook`, and a `booktitle` field if the cross-referenced entry is of type `book`. The inheritance scheme for Biblatex is defined by the option "Biblatex Inheritances", which is set up with the default inheritance relations defined by Biblatex, but which can be customised if needed.
 
-If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type `n`, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type `g` and then `n`.)
+If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type `C`. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key `C`: if you type `C` on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type `C` again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type `n`, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type `g` and then `/`.)
 
 Note that if you want to use Bib(La)TeX's cross-referencing options, the option "Save Xrefs first" needs to be set (which it is by default). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, cross-referencing will not work reliably.
 
@@ -909,7 +924,7 @@ Even more drastically, you could put something like the following in your `~/.em
                  "\C-c\C-s" 'ebib-save-from-multiline-buffer)))
 ```
 
-This sets up `C-c C-c`, `C-c C-q` and `C-c C-s` for use in the multiline edit buffer. Since such key combinations are restricted for use with major modes, however, Ebib cannot set these up automatically, but as an Emacs user, you are free do do as you like, of course.
+This sets up `C-c C-c`, `C-c C-q` and `C-c C-s` for use in the multiline edit buffer. Since such key combinations are restricted for use with major modes, however, Ebib cannot set these up automatically, but as an Emacs user, you are free to do as you like, of course.
 
 
 # The Options Menu #

@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 5.2 from ebib.texi.
+This is ebib.info, produced by makeinfo version 6.1 from ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -21,16 +21,6 @@ or tar archive on Github’s releases page.)
 editing BibTeX files.  It is a program in itself, which just happens to
 make use of Emacs as a working environment, in the same way that for
 example Gnus is.
-
-   The advantage of having a BibTeX database manager inside Emacs is
-that X is no longer required, as Emacs can run on the console, and also
-that some integration with Emacs’ TeX and LaTeX modes becomes possible.
-For example, you can push a BibTeX key from Ebib to a LaTeX buffer, or,
-vice versa, when you’re in a LaTeX buffer, you can consult your BibTeX
-database and insert a key from it into the document.  Another advantage
-of Ebib is that it is completely controlled by key commands: no
-stressful mouse movements are required, as with most other (usually
-X-based) BibTeX database managers.
 * Menu:
 
 * News::
@@ -39,8 +29,9 @@ X-based) BibTeX database managers.
 * Editing the Database::
 * Saving a Database::
 * Using Biblatex::
+* The Entries List::
 * Searching::
-* Consulting BibTeX Databases outside Ebib::
+* Accessing BibTeX Databases outside Ebib::
 * Cross-referencing::
 * Marking Entries::
 * Printing the Database::
@@ -70,22 +61,52 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
-* Version 28 24 October 2016::
+* 7 November 2016::
+* Version 28 26 October 2016::
 * Version 27 22 September 2016::
 * Version 263 31 August 2016::
 
 
-File: ebib.info,  Node: Version 28 24 October 2016,  Next: Version 27 22 September 2016,  Up: News
+File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Up: News
 
-1.1 Version 2.8, 24 October 2016
+1.1 7 November 2016
+===================
+
+   • New tabulated list interface in index buffer.  This interface is
+     not based on Emacs’ built-in ‘tabulated-list-mode’, hence sorting
+     cannot be done by clicking on the column headers.  Sorting can be
+     done with ‘<’, ‘>’ (sort ascending and sort descending,
+     respectively, which ask for the column to sort) and ‘=’, to reset
+     to default sort (which is on the entry key).
+   • The user option ‘ebib-index-display-fields’ is replaced with
+     ‘ebib-index-columns’, which has a different format: each element in
+     ‘ebib-index-columns’ describes a column in the tabulated view and
+     consists of a list containing the field name, the column’s width
+     and a boolean indicating whether sorting on this column is
+     possible.
+
+
+File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 September 2016,  Prev: 7 November 2016,  Up: News
+
+1.2 Version 2.8, 26 October 2016
 ================================
 
    • Changed key bindings: ‘j’ and ‘k’ no longer move up/down in the
-     index, entry and strings buffers.  Use ‘p’ and ‘n’ instead.
-   • In the index buffer, ‘?’ (i.e., ‘S-/’) executes the command
-     ‘ebib-search-next’ (used to be ‘n’), ‘i’ executes
-     ‘ebib-push-bibtex-key’ (used to be ‘p’), and ‘i’ executes
-     ‘ebib-browse-doi’ (used to be ‘i’).
+     index, entry and strings buffers; use ‘p’ and ‘n’ instead.
+     Furthermore, ‘i’ now executes ‘ebib-push-bibtex-key’ (used to be
+     ‘p’), and ‘I’ (capital I) executes ‘ebib-browse-doi’ (used to be
+     ‘i’).
+   • In the index buffer, ‘ebib-search-next’ (which used to be bound to
+     ‘n’) is no longer bound.  Instead, ‘ebib-search’ (still bound to
+     ‘/’) activates a transient map which binds the keys ‘/’ and ‘RET’
+     to ‘ebib-search-next’.  Any other key disables the transient keymap
+     and is executed normally.
+   • In the index buffer, ‘C-u /’ repeats the previous search.  (This
+     fixes a small bug that has so far gone unnoticed: moving to the top
+     of the databas and calling ‘ebib-search-next’, as previously
+     suggested in the manual to get around the fact that
+     ‘ebib-search-next’ does not wrap) would not search the first
+     entry.)
    • In the entry buffer, ‘x’ is replaced by ‘k’
      (‘ebib-kill-field-contents’).
    • New functions: ‘ebib-kill-entry’ and ‘ebib-yank-entry’ for killing
@@ -95,9 +116,9 @@ File: ebib.info,  Node: Version 28 24 October 2016,  Next: Version 27 22 Septemb
      database.
 
 
-File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 August 2016,  Prev: Version 28 24 October 2016,  Up: News
+File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 August 2016,  Prev: Version 28 26 October 2016,  Up: News
 
-1.2 Version 2.7, 22 September 2016
+1.3 Version 2.7, 22 September 2016
 ==================================
 
    • Reading list management: add and remove BibTeX entries to an Org
@@ -112,7 +133,7 @@ File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 Augu
 
 File: ebib.info,  Node: Version 263 31 August 2016,  Prev: Version 27 22 September 2016,  Up: News
 
-1.3 Version 2.6.3, 31 August 2016
+1.4 Version 2.6.3, 31 August 2016
 =================================
 
    • Allow storing notes in a single file rather than using one file per
@@ -277,9 +298,11 @@ currently highlighted entry.
 Emacs frame is divided into two windows.  The top one contains a buffer
 that is called the _index buffer_, while the lower window contains the
 _entry buffer_.  When a database is loaded, the index buffer holds a
-list of all the keys in the database.  You can move through these keys
-with the cursor keys.  In the entry buffer, the fields of the currently
-highlighted entry are shown, with their values.
+list of all the keys in the database plus some additional information
+for each entry: the author or editor, its year of publication, and the
+title.  You can move through the entries with the cursor keys.  In the
+entry buffer, the fields of the currently highlighted entry are shown,
+with their values.
 
    This manual first describes Ebib’s basic functionality, so that you
 can get started with it.  At times, reference will be made to later
@@ -370,15 +393,13 @@ File: ebib.info,  Node: Navigating a bib File,  Next: Starting a New bib File,  
 3.3 Navigating a ‘.bib’ File
 ============================
 
-Once you’ve opened a ‘.bib’ file, the keys of all the entries in the
-file are shown in alphabetical order in the index buffer in the top Ebib
-window.  (In fact, it is possible to show more than just the entry key
-in this buffer.  See the option "Index Display Fields"
-(‘ebib-index-display-fields’) on how to accomplish this.)  The first
-entry is highlighted, meaning it is the current entry.  The fields it
-holds and their values are shown in the entry buffer in the bottom Ebib
-window.  The first field is the type field, which tells you what kind of
-entry you’re dealing with (i.e.  ‘book’, ‘article’, etc.).
+Once you’ve opened a ‘.bib’ file, all the entries in the file are shown
+in alphabetical order (sorted by entry key) in the index buffer in the
+top Ebib window.  The first entry is highlighted, meaning it is the
+current entry.  The fields it holds and their values are shown in the
+entry buffer in the bottom Ebib window.  The first field is the type
+field, which tells you what kind of entry you’re dealing with (i.e.
+‘book’, ‘article’, etc.).
 
    Below the type field, Ebib displays (up to) four sets of fields.  The
 first set are the so-called required fields, the fields that Bib(La)TeX
@@ -497,14 +518,14 @@ properly formatted BibTeX entry, the kill ring is simply rotated.  This
 means that you can press ‘y’ again to (try and) add the next element in
 the kill ring to the database.
 
-   In order for ‘y’ to add a BibTeX entry to the database, the first
-item in the kill ring must be a string that constitutes a properly
-formatted BibTeX entry.  Killing an entry from a database will result in
-such a string (so you can easily move entries from one database to
-another by killing and then yanking them), but killing a BibTeX entry
-from another buffer or copying one from an outside source (e.g., a
-website) is also possible.  Furthermore, yanking also works with
-‘@Preamble’, ‘@String’ and ‘@Comment’ definitions.
+   In order for ‘y’ to add a BibTeX entry to the database, the kill ring
+item to be yanked must be a string that constitutes a properly formatted
+BibTeX entry.  Killing an entry from a database will result in such a
+string (so you can easily move entries from one database to another by
+killing and then yanking them), but killing a BibTeX entry from another
+buffer or copying one from an outside source (e.g., a website) is also
+possible.  Furthermore, yanking also works with ‘@Preamble’, ‘@String’
+and ‘@Comment’ definitions.
 
 
 File: ebib.info,  Node: Editing Fields Values,  Next: Editing Multiline Values,  Prev: Adding and Deleting Entries,  Up: Editing the Database
@@ -751,7 +772,7 @@ fact any other prefix argument) in order to overwrite any existing file
 without asking for confirmation.
 
 
-File: ebib.info,  Node: Using Biblatex,  Next: Searching,  Prev: Saving a Database,  Up: Top
+File: ebib.info,  Node: Using Biblatex,  Next: The Entries List,  Prev: Saving a Database,  Up: Top
 
 6 Using Biblatex
 ****************
@@ -772,10 +793,10 @@ File: ebib.info,  Node: Setting the BibTeX Dialect,  Next: Alias Types and Field
 ==============================
 
 Biblatex files use the same ‘.bib’ suffix that BibTeX files use.
-Whether Ebib interprets a file as a BibTeX or a Biblatex is determined
-by the user option “Bibtex Dialect” (‘ebib-bibtex-dialect’).  Possible
-values for this option are ‘BibTeX’ and ‘biblatex’, the default being
-‘BibTeX’.  (These values are taken from the variable
+Whether Ebib interprets a file as a BibTeX or a Biblatex file is
+determined by the user option “Bibtex Dialect” (‘ebib-bibtex-dialect’).
+Possible values for this option are ‘BibTeX’ and ‘biblatex’, the default
+being ‘BibTeX’.  (These values are taken from the variable
 ‘bibtex-dialect-list’.)
 
    The dialect specified determines which entry types Ebib recognises
@@ -844,9 +865,42 @@ done so that you can easily copy the value of the ‘journal’ field to the
 Biblatex’s conventions.
 
 
-File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Ebib,  Prev: Using Biblatex,  Up: Top
+File: ebib.info,  Node: The Entries List,  Next: Searching,  Prev: Using Biblatex,  Up: Top
 
-7 Searching
+7 The Entries List
+******************
+
+By default, the index buffer displays the list of entries in the
+database in a table format using the entry key, and the author, year and
+title fields of each entry.  The entries are sorted alphanumerically in
+ascending order of the entry key.  You can sort the entries on one of
+the other columns using the keys ‘<’ and ‘>’.  The former performs an
+ascending sort (smallest to largest, hence the smaller-than sign), the
+latter a descending sort.  They both ask you for the column to sort on.
+Restoring the default sort can be done with ‘=’.
+
+   You can customise the fields that are displayed in the index buffer
+with the user option ‘ebib-index-columns’.  Each element in this option
+describes a column and consists of the field to display (which is also
+the column label), the width of the column and a flag indicating whether
+the column can be sorted.  You can add or remove fields, or reorder the
+existing ones.
+
+   You can use any BibTeX / BibLaTeX field to define a column in the
+index buffer.  In addition, there are two column labels with a special
+meaning: ‘"Entry Key"’, which displays the entry key, and
+‘"Author/Editor"’, which displays the contents of the author field if it
+is not empty, and the contents of the editor field otherwise.
+
+   The first column defined in ‘ebib-index-colums’ is the column on
+which the entries are sorted by default, i.e., when the database is
+first opened and when you press ‘=’.  It is not possible to set another
+column as the default sort key.
+
+
+File: ebib.info,  Node: Searching,  Next: Accessing BibTeX Databases outside Ebib,  Prev: The Entries List,  Up: Top
+
+8 Searching
 ***********
 
 * Menu:
@@ -857,46 +911,57 @@ File: ebib.info,  Node: Searching,  Next: Consulting BibTeX Databases outside Eb
 
 File: ebib.info,  Node: Simple Searches,  Next: Filters,  Up: Searching
 
-7.1 Simple Searches
+8.1 Simple Searches
 ===================
 
-Ebib provides several search methods.  The simplest method is to type
-‘/’, which searches for a string (more precisely, a regular expression)
-starting from the current entry (i.e., _not_ from the first entry) and
-will display the entry with the first occurrence of the search string
-that it finds.  All the occurrences of the search string in that entry
-are highlighted.
+Ebib provides several search methods.  First of all, in the index
+buffer, the normal Emacs incremental searches, ‘C-s’ and ‘C-r’, can be
+used to search entry keys.  Once you’ve found the key you’re searching,
+you must hit ‘RET’ to quit the search and again ‘RET’ to make the entry
+you found active: Ebib does not update the entry buffer during
+incremental search.  If you make frequent use of this option, you may
+want to make the cursor visible in the Ebib buffers.  Unset the
+customisation option "Hide Cursor" (‘ebib-hide-cursor’) to do so.
+
+   The contents of the entries can be searched with ‘/’.  This command
+(‘ebib-search’) which searches for a string (more precisely, a regular
+expression) starting from the current entry (i.e., _not_ from the first
+entry) and will display the entry with the first occurrence of the
+search string that it finds.  All the occurrences of the search string
+in that entry are highlighted.
 
    Ebib searches all the fields of each entry.  It is not possible with
 ‘/’ to specify the fields to search.  Note that if the search term is
 found in a field with a multiline value, Ebib will highlight the ‘+’
-sign that it displays in front of the field value.  Keep an eye out for
-this when doing a search, because Ebib only shows the first line of
-multiline values, and if the search term appears in another line, the
-highlighted ‘+’ is the only indication that the search term was found.
-(Well, that and the fact that Ebib does _not_ say "Search string not
-found", of course...)
+sign that it displays in front of the field value.  When the search term
+is found, Ebib gives a message saying so, similarly if the search term
+was not found.
 
    A search term may of course appear more than once in the database.
-To search for the next occurrence, type ‘n’.  This will continue
-searching for the search string in the rest of the database.  Again, the
-first entry found to contain the search string is displayed.  Note that
-‘n’ does not wrap: if the end of the database is reached, Ebib stops
-searching.  To continue searching from the top, hit ‘g’ and then ‘n’.
+To search for the next occurrence, type ‘/’ again (or, alternatively
+type ‘RET’).  This continues searching for the search term in the rest
+of the database.  Again, the first entry found to contain the search
+string is displayed.  Note that the search does not wrap: if the end of
+the database is reached, Ebib stops searching and informs you that the
+no further occurrence of the search string was found.
 
-   Note, by the way, that if you are in the index buffer, the normal
-Emacs incremental searches, ‘C-s’ and ‘C-r’, can be used to search entry
-keys.  Once you’ve found the key you’re searching, you must hit ‘RET’ to
-quit the search and again ‘RET’ to make the entry you found active: Ebib
-does not update the entry buffer during incremental search.  If you make
-frequent use of this option, you may want to make the cursor visible in
-the Ebib buffers.  Unset the customisation option "Hide Cursor"
-(‘ebib-hide-cursor’) to do so.
+   To resume the previous search, you can pass a prefix argument to ‘/’.
+So typing ‘C-u /’ (or any other prefix argument) starts searching for
+the previous search string again.  This can be useful if you’ve reached
+the end of the database and want to continue searching from the top.
+Just type ‘g’ to go to the top of the database and then press ‘C-u /’.
+
+   Note that once you’ve started a search with ‘/’, Ebib activates a
+transient key map called ‘ebib-search-map’.  It is this map that holds
+the bindings of ‘/’ and ‘RET’ to the function ‘ebib-search-next’ to
+continue searching after the current entry.  If you wish to rebind the
+key used for ‘ebib-search-next’, bind it in this keymap, not in
+‘ebib-index-mode-map’.
 
 
 File: ebib.info,  Node: Filters,  Prev: Simple Searches,  Up: Searching
 
-7.2 Filters
+8.2 Filters
 ===========
 
 Ebib also has a much more sophisticated search mechanism that makes use
@@ -923,7 +988,7 @@ criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
 
 File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
 
-7.2.1 Simple Selection
+8.2.1 Simple Selection
 ----------------------
 
 Creating a filter is simple: press ‘&’, and Ebib will ask you for a
@@ -958,7 +1023,7 @@ enter any search term, of course.
 
 File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Prev: Simple Selection,  Up: Filters
 
-7.2.2 Complex Filters
+8.2.2 Complex Filters
 ---------------------
 
 Once you have a filter on your database, you can refine or extend it.
@@ -1030,7 +1095,7 @@ Modifying Key Bindings: #modifying-key-bindings. for details.)
 
 File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
 
-7.2.3 Storing and Saving Filters
+8.2.3 Storing and Saving Filters
 --------------------------------
 
 When you cancel a filter, it is automatically stored so that it can be
@@ -1086,7 +1151,7 @@ accident, you can reload them from ‘~/.emacs.d/ebib-filters’ with ‘F l’.
 
 File: ebib.info,  Node: Special Filters,  Next: An Example Listing Recent Additions,  Prev: Storing and Saving Filters,  Up: Filters
 
-7.2.4 Special Filters
+8.2.4 Special Filters
 ---------------------
 
 Filters are essentially Lisp expressions that consist of the functions
@@ -1121,7 +1186,7 @@ include the fields ‘=key=’ and ‘=type=’ for the entry key and type:
 
 File: ebib.info,  Node: An Example Listing Recent Additions,  Next: Properties of Filtered Databases,  Prev: Special Filters,  Up: Filters
 
-7.2.5 An Example: Listing Recent Additions
+8.2.5 An Example: Listing Recent Additions
 ------------------------------------------
 
 One special filter is included with Ebib.  It filters recent additions
@@ -1173,7 +1238,7 @@ and returns ‘t’ if the latter precedes the former.
 
 File: ebib.info,  Node: Properties of Filtered Databases,  Prev: An Example Listing Recent Additions,  Up: Filters
 
-7.2.6 Properties of Filtered Databases
+8.2.6 Properties of Filtered Databases
 --------------------------------------
 
 When a filter is active, there are a few things that are not possible or
@@ -1205,13 +1270,13 @@ other commands operate on the stored filters and can be used when no
 filter is active.
 
 
-File: ebib.info,  Node: Consulting BibTeX Databases outside Ebib,  Next: Cross-referencing,  Prev: Searching,  Up: Top
+File: ebib.info,  Node: Accessing BibTeX Databases outside Ebib,  Next: Cross-referencing,  Prev: Searching,  Up: Top
 
-8 Consulting BibTeX Databases outside Ebib
-******************************************
+9 Accessing BibTeX Databases outside Ebib
+*****************************************
 
-Having a BibTeX database manager running inside Emacs has an additional
-advantage: it makes it easy to consult your BibTeX databases from a text
+Having a BibTeX database manager running inside Emacs has the advantage
+that it makes it easy to consult your BibTeX databases from a text
 buffer.  By default, this functionality is set up for LaTeX, for Org
 mode (http://orgmode.org) and for Pandoc
 (http://johnmacfarlane.net/pandoc/) Markdown.
@@ -1289,9 +1354,9 @@ those after using ‘ebib-create-bib-from-bbl’.
 * Associating a Database with a LaTeX File::
 
 
-File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Up: Consulting BibTeX Databases outside Ebib
+File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Up: Accessing BibTeX Databases outside Ebib
 
-8.1 Key Bindings
+9.1 Key Bindings
 ================
 
 Of course, the easiest way to use the commands discussed here is to bind
@@ -1311,9 +1376,9 @@ the same key sequence in every text mode in which you use citations and
 Ebib will do the right thing.
 
 
-File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a LaTeX File,  Prev: Key Bindings,  Up: Consulting BibTeX Databases outside Ebib
+File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a LaTeX File,  Prev: Key Bindings,  Up: Accessing BibTeX Databases outside Ebib
 
-8.2 Defining Citation Commands
+9.2 Defining Citation Commands
 ==============================
 
 As mentioned, you should probably set up some citation commands if you
@@ -1459,9 +1524,9 @@ the citation command but the string that will be displayed in the Org
 buffer.
 
 
-File: ebib.info,  Node: Associating a Database with a LaTeX File,  Prev: Defining Citation Commands,  Up: Consulting BibTeX Databases outside Ebib
+File: ebib.info,  Node: Associating a Database with a LaTeX File,  Prev: Defining Citation Commands,  Up: Accessing BibTeX Databases outside Ebib
 
-8.3 Associating a Database with a LaTeX File
+9.3 Associating a Database with a LaTeX File
 ============================================
 
 The commands ‘ebib-insert-bibtex-key’ and ‘ebib-entry-summary’ must
@@ -1512,10 +1577,10 @@ bibliography command.  (Note, however, that you can set
 file-local variable section of a file.)
 
 
-File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Consulting BibTeX Databases outside Ebib,  Up: Top
+File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Accessing BibTeX Databases outside Ebib,  Up: Top
 
-9 Cross-referencing
-*******************
+10 Cross-referencing
+********************
 
 Both BibTeX and Biblatex have a cross-referencing facility.  Suppose you
 have an entry ‘Jones1998’, which appeared in a book that is also in your
@@ -1564,7 +1629,7 @@ type ‘C’ again to find the next one.  (Instead, it would take you back
 to the cross-referenced entry.)  In order to find the next
 cross-referencing entry, you have to type ‘n’, as with a normal search.
 (Also, if the cross-referenced entry appears alphabetically before the
-cross-referencing entry, you need to type ‘g’ and then ‘n’.)
+cross-referencing entry, you need to type ‘g’ and then ‘/’.)
 
    Note that if you want to use Bib(La)TeX’s cross-referencing options,
 the option "Save Xrefs first" needs to be set (which it is by default).
@@ -1574,7 +1639,7 @@ This tells Ebib to save all entries with a ‘crossref’ field first in the
 
 File: ebib.info,  Node: Marking Entries,  Next: Printing the Database,  Prev: Cross-referencing,  Up: Top
 
-10 Marking Entries
+11 Marking Entries
 ******************
 
 Commands in the index buffer generally operate on one single entry, or
@@ -1598,7 +1663,7 @@ entries, marks all entries in the current database.
 
 File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser,  Prev: Marking Entries,  Up: Top
 
-11 Printing the Database
+12 Printing the Database
 ************************
 
 Sometimes it may be useful to have a ‘.pdf’ file or print-out of your
@@ -1672,7 +1737,7 @@ Preamble" you can set your preferred bibliography style.
 
 File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing the Database,  Up: Top
 
-12 Calling a Browser
+13 Calling a Browser
 ********************
 
 With most scientific literature nowadays being available on-line, it is
@@ -1721,7 +1786,7 @@ Field".  The same can be done for the DOI field.
 
 File: ebib.info,  Node: Viewing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
 
-13 Viewing Files
+14 Viewing Files
 ****************
 
 If you have electronic versions of the papers in your database stored on
@@ -1796,7 +1861,7 @@ defined for the purpose.
 
 File: ebib.info,  Node: Editing the file field,  Up: Viewing Files
 
-13.1 Editing the ‘file’ field
+14.1 Editing the ‘file’ field
 =============================
 
 As mentioned above, editing the ‘file’ field is a bit different from
@@ -1824,7 +1889,7 @@ file names are always stored as absolute paths.)
 
 File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Viewing Files,  Up: Top
 
-14 Notes files
+15 Notes files
 **************
 
 Ebib supports the ‘annote’ (or ‘annotation’) field, but if you prefer to
@@ -1906,7 +1971,7 @@ hooks.
 
 File: ebib.info,  Node: Customising the notes template,  Up: Notes files
 
-14.1 Customising the notes template
+15.1 Customising the notes template
 ===================================
 
 By default, each note is an Org entry whose header consists of the
@@ -1974,7 +2039,7 @@ variable’s value is then used to replace the specifier.
 
 File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev: Notes files,  Up: Top
 
-15 Managing a reading list
+16 Managing a reading list
 **************************
 
 Ebib offers the ability to manage a reading list as an Org file.  In
@@ -2032,7 +2097,7 @@ buffer).  By default, these hooks are empty.
 
 File: ebib.info,  Node: Window Management,  Next: Creating Entry Stubs,  Prev: Managing a reading list,  Up: Top
 
-16 Window Management
+17 Window Management
 ********************
 
 By default, Ebib takes over the entire Emacs frame it is started in,
@@ -2092,7 +2157,7 @@ is displayed at the top or on the left of the frame.)
 
 File: ebib.info,  Node: Creating Entry Stubs,  Next: @Preamble Definition,  Prev: Window Management,  Up: Top
 
-17 Creating Entry Stubs
+18 Creating Entry Stubs
 ***********************
 
 If you have a directory full of (pdf) files of articles that you want to
@@ -2115,7 +2180,7 @@ hand, you can do so by pressing ‘E’ in the index buffer.
 
 File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Creating Entry Stubs,  Up: Top
 
-18 @Preamble Definition
+19 @Preamble Definition
 ***********************
 
 Apart from database entries, BibTeX allows three more types of elements
@@ -2161,7 +2226,7 @@ manner just described and saves them in one ‘@preamble’ definition.
 
 File: ebib.info,  Node: @String Definitions,  Next: @Comments,  Prev: @Preamble Definition,  Up: Top
 
-19 @String Definitions
+20 @String Definitions
 **********************
 
 If you press (uppercase) ‘S’ in the index buffer, Ebib hides the entry
@@ -2233,7 +2298,7 @@ completion to complete a partial string.
 
 File: ebib.info,  Node: @Comments,  Next: Managing Keywords,  Prev: @String Definitions,  Up: Top
 
-20 @Comments
+21 @Comments
 ************
 
 If Ebib finds a ‘@comment’ in a ‘.bib’ file, it will read it and store
@@ -2245,7 +2310,7 @@ where in the ‘.bib’ file a comment is placed, but they won’t be lost.
 
 File: ebib.info,  Node: Managing Keywords,  Next: Sorting the bib File,  Prev: @Comments,  Up: Top
 
-21 Managing Keywords
+22 Managing Keywords
 ********************
 
 Ebib provides some special functionality for handling keywords.  By
@@ -2350,7 +2415,7 @@ it to the separator.
 
 File: ebib.info,  Node: Sorting the bib File,  Next: Merging and Importing,  Prev: Managing Keywords,  Up: Top
 
-22 Sorting the ‘.bib’ File
+23 Sorting the ‘.bib’ File
 **************************
 
 By default, the entries in the database are saved to the ‘.bib’ file in
@@ -2411,7 +2476,7 @@ set by default, you need to unset if you set "Sort Order".
 
 File: ebib.info,  Node: Merging and Importing,  Next: Exporting Entries,  Prev: Sorting the bib File,  Up: Top
 
-23 Merging and Importing
+24 Merging and Importing
 ************************
 
 As described in the previous chapter, adding entries to a database can
@@ -2448,7 +2513,7 @@ them.  See the option "Autogenerate Keys" for details.
 
 File: ebib.info,  Node: Exporting Entries,  Next: Multiple Identical Fields,  Prev: Merging and Importing,  Up: Top
 
-24 Exporting Entries
+25 Exporting Entries
 ********************
 
 Sometimes it can be useful to copy entries from one database to another,
@@ -2487,7 +2552,7 @@ corresponding open database.
 
 File: ebib.info,  Node: Multiple Identical Fields,  Next: Multiline Edit Buffers,  Prev: Exporting Entries,  Up: Top
 
-25 Multiple Identical Fields
+26 Multiple Identical Fields
 ****************************
 
 Under normal circumstances, a BibTeX entry only contains one occurrence
@@ -2538,7 +2603,7 @@ Fields" set, you will get the following:
 
 File: ebib.info,  Node: Multiline Edit Buffers,  Next: The Options Menu,  Prev: Multiple Identical Fields,  Up: Top
 
-26 Multiline Edit Buffers
+27 Multiline Edit Buffers
 *************************
 
 As mentioned several times before, Ebib has a special multiline edit
@@ -2615,12 +2680,12 @@ your ‘~/.emacs’:
    This sets up ‘C-c C-c’, ‘C-c C-q’ and ‘C-c C-s’ for use in the
 multiline edit buffer.  Since such key combinations are restricted for
 use with major modes, however, Ebib cannot set these up automatically,
-but as an Emacs user, you are free do do as you like, of course.
+but as an Emacs user, you are free to do as you like, of course.
 
 
 File: ebib.info,  Node: The Options Menu,  Next: Customisation,  Prev: Multiline Edit Buffers,  Up: Top
 
-27 The Options Menu
+28 The Options Menu
 *******************
 
 In the index buffer, Ebib’s menu has an Options submenu.  This menu
@@ -2638,7 +2703,7 @@ customisation buffer do not change.
 
 File: ebib.info,  Node: Customisation,  Prev: The Options Menu,  Up: Top
 
-28 Customisation
+29 Customisation
 ****************
 
 Ebib can be customised through Emacs’ standard customisation interface.
@@ -2662,7 +2727,7 @@ but it can in fact be used to run any Lisp code.
 
 File: ebib.info,  Node: Modifying Key Bindings,  Up: Customisation
 
-28.1 Modifying Key Bindings
+29.1 Modifying Key Bindings
 ===========================
 
 If you would like to change Ebib’s standard key bindings, or if you
@@ -2722,132 +2787,136 @@ bindings.
 
 Tag Table:
 Node: Top186
-Node: News2052
-Ref: #news2142
-Node: Version 28 24 October 20162247
-Ref: #version-2.8-24-october-20162416
-Node: Version 27 22 September 20163240
-Ref: #version-2.7-22-september-20163448
-Node: Version 263 31 August 20163885
-Ref: #version-2.6.3-31-august-20164056
-Node: Installation4475
-Ref: #installation4593
-Node: Package manager4714
-Ref: #package-manager4843
-Node: Debian and Ubuntu5194
-Ref: #debian-and-ubuntu5355
-Node: Manual installation5489
-Ref: #manual-installation5652
-Node: Starting Ebib6055
-Ref: #starting-ebib6211
-Node: Upgrading from Ebib 1x7119
-Ref: #upgrading-from-ebib-1.x7267
-Node: Getting Started10372
-Ref: #getting-started10512
-Node: Opening a bib File12775
-Ref: #opening-a-.bib-file12929
-Node: Preloading bib Files14640
-Ref: #preloading-.bib-files14828
-Node: Navigating a bib File15626
-Ref: #navigating-a-.bib-file15821
-Node: Starting a New bib File19287
-Ref: #starting-a-new-.bib-file19457
-Node: Editing the Database19749
-Ref: #editing-the-database19904
-Node: Adding and Deleting Entries20281
-Ref: #adding-and-deleting-entries20458
-Node: Editing Fields Values23034
-Ref: #editing-fields-values23232
-Node: Editing Multiline Values25881
-Ref: #editing-multiline-values26074
-Node: Undefined Fields28588
-Ref: #undefined-fields28757
-Node: Hidden Fields29749
-Ref: #hidden-fields29898
-Node: Timestamps30786
-Ref: #timestamps30948
-Node: Copy Cut Kill Paste Yank and Delete33007
-Ref: #copy-cut-kill-paste-yank-and-delete33211
-Node: Saving a Database34163
-Ref: #saving-a-database34311
-Node: Using Biblatex35982
-Ref: #using-biblatex36113
-Node: Setting the BibTeX Dialect36440
-Ref: #setting-the-bibtex-dialect36609
-Node: Alias Types and Fields38645
-Ref: #alias-types-and-fields38806
-Node: Searching40992
-Ref: #searching41136
-Node: Simple Searches41178
-Ref: #simple-searches41294
-Node: Filters43255
-Ref: #filters43355
-Node: Simple Selection44409
-Ref: #simple-selection44538
-Node: Complex Filters46216
-Ref: #complex-filters46378
-Node: Storing and Saving Filters50365
-Ref: #storing-and-saving-filters50548
-Node: Special Filters53419
-Ref: #special-filters53600
-Node: An Example Listing Recent Additions54955
-Ref: #an-example-listing-recent-additions55184
-Node: Properties of Filtered Databases57352
-Ref: #properties-of-filtered-databases57549
-Node: Consulting BibTeX Databases outside Ebib59203
-Ref: #consulting-bibtex-databases-outside-ebib59412
-Node: Key Bindings63832
-Ref: #key-bindings63989
-Node: Defining Citation Commands64761
-Ref: #defining-citation-commands64995
-Node: Associating a Database with a LaTeX File70910
-Ref: #associating-a-database-with-a-latex-file71151
-Node: Cross-referencing74097
-Ref: #cross-referencing74266
-Node: Marking Entries77567
-Ref: #marking-entries77715
-Node: Printing the Database78694
-Ref: #printing-the-database78854
-Node: Calling a Browser82642
-Ref: #calling-a-browser82792
-Node: Viewing Files85412
-Ref: #viewing-files85544
-Node: Editing the file field89325
-Ref: #editing-the-file-field89460
-Node: Notes files90803
-Ref: #notes-files90937
-Node: Customising the notes template95082
-Ref: #customising-the-notes-template95231
-Node: Managing a reading list98280
-Ref: #managing-a-reading-list98442
-Node: Window Management101537
-Ref: #window-management101696
-Node: Creating Entry Stubs104852
-Ref: #creating-entry-stubs105014
-Node: @Preamble Definition106015
-Ref: #preamble-definition106179
-Node: @String Definitions108165
-Ref: #string-definitions108316
-Node: @Comments111824
-Ref: #comments111952
-Node: Managing Keywords112317
-Ref: #managing-keywords112462
-Node: Sorting the bib File118347
-Ref: #sorting-the-.bib-file118520
-Node: Merging and Importing121647
-Ref: #merging-and-importing121812
-Node: Exporting Entries123586
-Ref: #exporting-entries123748
-Node: Multiple Identical Fields125723
-Ref: #multiple-identical-fields125902
-Node: Multiline Edit Buffers127795
-Ref: #multiline-edit-buffers127967
-Node: The Options Menu132097
-Ref: #the-options-menu132245
-Node: Customisation132866
-Ref: #customisation132977
-Node: Modifying Key Bindings133920
-Ref: #modifying-key-bindings134047
+Node: News1472
+Ref: #news1562
+Node: 7 November 20161687
+Ref: #november-20161817
+Node: Version 28 26 October 20162607
+Ref: #version-2.8-26-october-20162800
+Node: Version 27 22 September 20164238
+Ref: #version-2.7-22-september-20164446
+Node: Version 263 31 August 20164883
+Ref: #version-2.6.3-31-august-20165054
+Node: Installation5473
+Ref: #installation5591
+Node: Package manager5712
+Ref: #package-manager5841
+Node: Debian and Ubuntu6192
+Ref: #debian-and-ubuntu6353
+Node: Manual installation6487
+Ref: #manual-installation6650
+Node: Starting Ebib7053
+Ref: #starting-ebib7209
+Node: Upgrading from Ebib 1x8117
+Ref: #upgrading-from-ebib-1.x8265
+Node: Getting Started11370
+Ref: #getting-started11510
+Node: Opening a bib File13884
+Ref: #opening-a-.bib-file14038
+Node: Preloading bib Files15749
+Ref: #preloading-.bib-files15937
+Node: Navigating a bib File16735
+Ref: #navigating-a-.bib-file16930
+Node: Starting a New bib File20225
+Ref: #starting-a-new-.bib-file20395
+Node: Editing the Database20687
+Ref: #editing-the-database20842
+Node: Adding and Deleting Entries21219
+Ref: #adding-and-deleting-entries21396
+Node: Editing Fields Values23972
+Ref: #editing-fields-values24170
+Node: Editing Multiline Values26819
+Ref: #editing-multiline-values27012
+Node: Undefined Fields29526
+Ref: #undefined-fields29695
+Node: Hidden Fields30687
+Ref: #hidden-fields30836
+Node: Timestamps31724
+Ref: #timestamps31886
+Node: Copy Cut Kill Paste Yank and Delete33945
+Ref: #copy-cut-kill-paste-yank-and-delete34149
+Node: Saving a Database35101
+Ref: #saving-a-database35249
+Node: Using Biblatex36920
+Ref: #using-biblatex37058
+Node: Setting the BibTeX Dialect37385
+Ref: #setting-the-bibtex-dialect37554
+Node: Alias Types and Fields39594
+Ref: #alias-types-and-fields39755
+Node: The Entries List41941
+Ref: #the-entries-list42075
+Node: Searching43600
+Ref: #searching43745
+Node: Simple Searches43787
+Ref: #simple-searches43903
+Node: Filters46499
+Ref: #filters46599
+Node: Simple Selection47653
+Ref: #simple-selection47782
+Node: Complex Filters49460
+Ref: #complex-filters49622
+Node: Storing and Saving Filters53609
+Ref: #storing-and-saving-filters53792
+Node: Special Filters56663
+Ref: #special-filters56844
+Node: An Example Listing Recent Additions58199
+Ref: #an-example-listing-recent-additions58428
+Node: Properties of Filtered Databases60596
+Ref: #properties-of-filtered-databases60793
+Node: Accessing BibTeX Databases outside Ebib62447
+Ref: #accessing-bibtex-databases-outside-ebib62653
+Node: Key Bindings67067
+Ref: #key-bindings67223
+Node: Defining Citation Commands67995
+Ref: #defining-citation-commands68228
+Node: Associating a Database with a LaTeX File74143
+Ref: #associating-a-database-with-a-latex-file74383
+Node: Cross-referencing77329
+Ref: #cross-referencing77499
+Node: Marking Entries80800
+Ref: #marking-entries80948
+Node: Printing the Database81927
+Ref: #printing-the-database82087
+Node: Calling a Browser85875
+Ref: #calling-a-browser86025
+Node: Viewing Files88645
+Ref: #viewing-files88777
+Node: Editing the file field92558
+Ref: #editing-the-file-field92693
+Node: Notes files94036
+Ref: #notes-files94170
+Node: Customising the notes template98315
+Ref: #customising-the-notes-template98464
+Node: Managing a reading list101513
+Ref: #managing-a-reading-list101675
+Node: Window Management104770
+Ref: #window-management104929
+Node: Creating Entry Stubs108085
+Ref: #creating-entry-stubs108247
+Node: @Preamble Definition109248
+Ref: #preamble-definition109412
+Node: @String Definitions111398
+Ref: #string-definitions111549
+Node: @Comments115057
+Ref: #comments115185
+Node: Managing Keywords115550
+Ref: #managing-keywords115695
+Node: Sorting the bib File121580
+Ref: #sorting-the-.bib-file121753
+Node: Merging and Importing124880
+Ref: #merging-and-importing125045
+Node: Exporting Entries126819
+Ref: #exporting-entries126981
+Node: Multiple Identical Fields128956
+Ref: #multiple-identical-fields129135
+Node: Multiline Edit Buffers131028
+Ref: #multiline-edit-buffers131200
+Node: The Options Menu135330
+Ref: #the-options-menu135478
+Node: Customisation136099
+Ref: #customisation136210
+Node: Modifying Key Bindings137153
+Ref: #modifying-key-bindings137280
 
 End Tag Table
 
