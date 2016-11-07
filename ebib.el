@@ -855,7 +855,6 @@ FILE must be a fully expanded filename."
           (progn
             (ebib--load-entries file ebib--cur-db)
             (ebib-db-set-backup t ebib--cur-db)
-            (ebib-db-set-current-entry-key t ebib--cur-db)
             (ebib--set-modified nil))
         ;; if the file does not exist, we need to issue a message.
         (ebib--log 'message "(New file)"))
@@ -905,7 +904,7 @@ FILE must be a fully expanded filename."
     (ebib--load-entries file db)
     ;; If the user makes any changes, we'll want to create a back-up.
     (ebib-db-set-backup t ebib--cur-db)
-    (ebib-db-set-current-entry-key cur-key db 'first)))
+    (ebib-db-set-current-entry-key cur-key db)))
 
 (defun ebib-merge-bibtex-file ()
   "Merge a BibTeX file into the current database."
@@ -918,7 +917,6 @@ FILE must be a fully expanded filename."
          (setq ebib--log-error nil)      ; we haven't found any errors (yet)
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
          (ebib--load-entries file ebib--cur-db 'ignore-modtime)
-         (ebib-db-set-current-entry-key (or (ebib--get-key-at-point) t) ebib--cur-db 'first)
          (ebib--update-buffers)
          (ebib--set-modified t))))
     ((default) (beep))))
@@ -1051,7 +1049,7 @@ be added.  (Whether a timestamp is actually added also depends on
 If optional argument SOFT is non-NIL, just switch to a non-Ebib
 buffer if Ebib is not occupying the entire frame."
   (interactive)
-  (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db 'first)
+  (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
   (unless (member (window-buffer) (mapcar #'cdr ebib--buffer-alist))
     (error "Ebib is not active "))
   (cond
@@ -1213,7 +1211,7 @@ case add new entry stubs for each file anyway."
                 (cl-dolist (fp (split-string entry-files (regexp-quote ebib-filename-separator)))
                   (push (locate-file fp ebib-file-search-dirs) all-entry-files))))))
       (add-file-entry filepath)
-      (ebib-db-set-current-entry-key t ebib--cur-db)
+      (ebib-db-set-current-entry-key nil ebib--cur-db)
       (ebib--update-buffers))))
 
 (defun ebib-generate-autokey ()
@@ -1923,10 +1921,6 @@ a filename is asked to which the entry is appended."
                              (if (member entry-key (ebib-db-list-keys db))
                                  (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
                                (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
-                               ;; if this is the first entry in the target DB,
-                               ;; its CUR-ENTRY must be set!
-                               (when (null (ebib--db-get-current-entry-key db))
-                                 (ebib-db-set-current-entry-key t db))
                                t)))) ; we must return T, WHEN does not always do this.
        (ebib--export-to-file (format "Export `%s' to file: " (ebib--get-key-at-point))
                          (lambda ()
@@ -1950,9 +1944,6 @@ a filename is asked to which the entry is appended."
                         (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
                       (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)))
                   (ebib-db-list-marked-entries ebib--cur-db))
-            ;; if the target DB was empty before, its CUR-ENTRY must be set!
-            (when (null (ebib--db-get-current-entry-key db))
-              (ebib-db-set-current-entry-key t db))
             t))         ; we must return T, WHEN does not always do this.
        (ebib--export-to-file "Export to file: "
                          (lambda ()
@@ -2176,7 +2167,7 @@ Operates either on all entries or on the marked entries."
   (let ((new-db (nth (1- num) ebib--databases)))
     (unless new-db
       (error "[Ebib] Database %d does not exist" num))
-    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db 'first)
+    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
     (setq ebib--cur-db new-db)
     (ebib--update-buffers)))
 
@@ -2188,7 +2179,7 @@ Operates either on all entries or on the marked entries."
      (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases)))
        (unless new-db
          (setq new-db (car ebib--databases)))
-       (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db 'first)
+       (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
        (ebib--update-buffers)))))
 
@@ -2200,7 +2191,7 @@ Operates either on all entries or on the marked entries."
      (let ((new-db (ebib--prev-elem ebib--cur-db ebib--databases)))
        (unless new-db
          (setq new-db (-last-item ebib--databases)))
-       (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db 'first)
+       (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
        (ebib--update-buffers)))))
 
@@ -3449,7 +3440,7 @@ Also return focus to the index or entry buffer."
      ((eq (car info) 'field)
       ;; make sure we display the correct entry & field
       (setq ebib--cur-db (ebib--get-db-from-filename (cl-second info)))
-      (ebib-db-set-current-entry-key (cl-third info) ebib--cur-db 'first)
+      (ebib-db-set-current-entry-key (cl-third info) ebib--cur-db)
       (ebib--update-buffers)
       (ebib--pop-to-buffer (ebib--buffer 'entry))
       (re-search-forward (concat "^" (regexp-quote (cl-fourth info))) nil t)
@@ -3536,8 +3527,6 @@ or on the region if it is active."
           (with-temp-buffer
             (insert-buffer-substring buffer)
             (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
-              (unless (ebib--get-key-at-point)
-                (ebib-db-set-current-entry-key t ebib--cur-db))
               (ebib--update-buffers)
               (ebib--set-modified t)
               (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
