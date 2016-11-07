@@ -122,15 +122,15 @@ window.  If all else fails, pop up a new frame."
 (defun ebib--display-entry-key (key &optional mark)
   "Display BibTeX item designated by KEY in the index buffer at POINT.
 Included in the display are the data in the fields specified in
-`ebib-index-fields'.  The item is given the text property
+`ebib-index-columns'.  The item is given the text property
 `ebib-key' with KEY as value.  If MARK is t, `ebib-marked-face'
 is applied to the item."
   (let ((data (ebib--get-tabulated-data key))
         (n 0)
-        (max (1- (length ebib-index-fields))))
+        (max (1- (length ebib-index-columns))))
     (with-current-ebib-buffer 'index
       (while (< n max)
-        (let ((width (cadr (nth n ebib-index-fields)))
+        (let ((width (cadr (nth n ebib-index-columns)))
               (item (nth n (cadr data))))
           (insert (format (concat "%-" (int-to-string width) "s") (truncate-string-to-width item width nil nil t)) "  "))
         (cl-incf n))
@@ -161,19 +161,19 @@ entry with KEY in the buffer, point is not moved."
 (defun ebib--get-tabulated-data (key)
   "Get data for KEY.
 Return value is a list consisting of KEY and a list of the
-values of the fields listed in `ebib-index-fields'."
+values of the fields listed in `ebib-index-columns'."
   (list key (mapcar (lambda (elt)
                       (ebib--first-line (ebib--get-field-value-for-index (car elt) key)))
-                    ebib-index-fields)))
+                    ebib-index-columns)))
 
 (defun ebib--get-field-value-for-index (field key)
   "Get the value of FIELD in entry KEY.
 The field \"Author\" is treated special: if its value is empty,
 the value of the \"Editor\" field is used instead."
   (cond
-   ((cl-equalp field "Key")
+   ((cl-equalp field "Entry Key")
     key)
-   ((cl-equalp field "Author")
+   ((cl-equalp field "Author/Editor")
     (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
         (ebib-db-get-field-value "Editor" key ebib--cur-db "" 'unbraced 'xref)))
    (t (ebib-db-get-field-value field key ebib--cur-db "" 'unbraced 'xref))))
@@ -1295,15 +1295,15 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
 (defun ebib-index-sort-ascending (field)
   "Sort the entries in the index buffer in ascending order.
 Sort key is FIELD, which must be one of the fields specified in
-`ebib-index-fields'."
-  (interactive (list (completing-read "Sort field (ascending): " (-map #'car (--filter (nth 2 it) ebib-index-fields)) nil t nil 'ebib--field-history)))
+`ebib-index-columns'."
+  (interactive (list (completing-read "Sort field (ascending): " (-map #'car (--filter (nth 2 it) ebib-index-columns)) nil t nil 'ebib--field-history)))
   (ebib--index-sort field 'ascend))
 
 (defun ebib-index-sort-descending (field)
   "Sort the entries in the index buffer in descending order.
 Sort key is FIELD, which must be one of the fields specified in
-`ebib-index-fields'."
-  (interactive (list (completing-read "Sort field (descending): " (-map #'car (--filter (nth 2 it) ebib-index-fields)) nil t nil 'ebib--field-history)))
+`ebib-index-columns'."
+  (interactive (list (completing-read "Sort field (descending): " (-map #'car (--filter (nth 2 it) ebib-index-columns)) nil t nil 'ebib--field-history)))
   (ebib--index-sort field 'descend))
 
 (defun ebib--index-sort (field order)
@@ -2969,9 +2969,9 @@ prefix argument has no meaning."
 
 (defun ebib--redisplay-index-item (field)
   "Redisplay current index item if FIELD is being displayed."
-  (if (or (assoc-string field ebib-index-fields t)
-          (and (cl-equalp field "Editor")
-               (assoc-string "Author" ebib-index-fields t)))
+  (if (or (assoc-string field ebib-index-columns t)
+          (and (member-ignore-case field '("Author" "Editor"))
+               (assoc-string "Author/Editor" ebib-index-columns t)))
       (with-current-ebib-buffer 'index
         (let ((key (ebib--get-key-at-point))
               (inhibit-read-only t))
