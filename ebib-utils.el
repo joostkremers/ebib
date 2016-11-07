@@ -250,9 +250,22 @@ mode line of the entry buffer is not changed."
                            ("Year" 6 t)
                            ("Title" 50 t))
   "Fields to display in the index buffer.
-Any field BibTeX or biblatex field can be used.  Note, however,
-that the \"Author\" field is special here: if an entry's actual
-Author field is empty, its Editor field is displayed instead."
+Each element describes a column in the index buffer and consists
+of the BibTeX field to be displayed, the column's maximum width
+and a flag indicating whether sorting on this column is possible.
+
+Any field BibTeX or biblatex field can be used.  Two fields are
+special, the Author and the Key field.  The Key field displays
+the entry's BibTeX key; if you have an actual \"Key\" field in
+your entries, it cannot be displayed in the index buffer.  (It
+will show up normally in the entry buffer.)  The Author field
+displays the contents of the Author field, or, if that is empty,
+the contents of the Editor field.
+
+Note that the default sort field is the entry key, even if the
+Key field is absent from the index buffer.  That is, you can
+remove the Key field from this option, but that will not change
+the default sort."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
