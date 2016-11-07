@@ -1327,21 +1327,22 @@ Possible values for DIALECT are those listed in
   "Sort KEYS according to the sort info of DB."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
-  ;; And then stably sort on the sort field, if any.
-  (when (ebib-db-custom-sorted-p db)
-    (let* ((field (ebib-db-get-sort-field db))
-           ;; We use a temp list for sorting, so that the :key argument to
-           ;; `cl-stable-sort' can simply be `car' rather than (a much
-           ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
-           ;; that way.
-           (list (mapcar (lambda (key)
-                           (cons (ebib--get-field-value-for-index field key) key))
-                         keys)))
-      (setq list (cl-stable-sort list #'string-lessp :key #'car))
-      (setq keys (mapcar #'cdr list)))
-    ;; Reverse the list if necessary.
-    (if (eq (ebib-db-get-sort-order db) 'descend)
-        (setq keys (nreverse keys))))
+  ;; And then stably sort on the sort field.
+  (let* ((field (if (ebib-db-custom-sorted-p db)
+                    (ebib-db-get-sort-field db)
+                  (caar ebib-index-columns)))
+         ;; We use a temp list for sorting, so that the :key argument to
+         ;; `cl-stable-sort' can simply be `car' rather than (a much
+         ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
+         ;; that way.
+         (list (mapcar (lambda (key)
+                         (cons (ebib--get-field-value-for-index field key) key))
+                       keys)))
+    (setq list (cl-stable-sort list #'string-lessp :key #'car))
+    (setq keys (mapcar #'cdr list)))
+  ;; Reverse the list if necessary.
+  (if (eq (ebib-db-get-sort-order db) 'descend)
+      (setq keys (nreverse keys)))
   ;; Now return the list of keys.
   keys)
 
