@@ -346,7 +346,7 @@ to \"none\"."
               (cur-entry (ebib--db-get-current-entry-key ebib--cur-db)))
           ;; We may call this function when there are no entries in the
           ;; database. If so, we don't need to do this:
-          (when cur-entry
+          (unless (= 0 (ebib-db-count-entries ebib--cur-db))
             ;; It may be that no entry satisfies the filter.
             (if (not cur-keys-list)
                 (message "No entries matching the filter")
@@ -355,9 +355,10 @@ to \"none\"."
                 (ebib--display-entry-key entry (member entry marked-entries)))
               ;; Make sure the current entry is among the visible entries.
               (unless (member cur-entry cur-keys-list)
-                (ebib-db-set-current-entry-key (car cur-keys-list) ebib--cur-db)
                 (setq cur-entry (car cur-keys-list)))
-              (ebib--goto-entry-in-index cur-entry)
+              (if cur-entry
+                  (ebib--goto-entry-in-index cur-entry)
+                (goto-char (point-min)))
               (hl-line-highlight)))))
       (rename-buffer new-buf-name))))
 
