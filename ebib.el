@@ -1654,6 +1654,7 @@ first entry with the current entry's key in its crossref field."
       ;; Otherwise, we assume the user wants to search for entries
       ;; cross-referencing the current one.
       (setq ebib--search-string (ebib--get-key-at-point))
+      (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
       (ebib-search-next))))
 
 (defun ebib-toggle-hidden ()
