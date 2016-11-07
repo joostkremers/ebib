@@ -80,6 +80,10 @@ it is deleted."
   (setf (ebib--db-struct-modified db) nil)
   (setf (ebib--db-struct-backup db) nil))
 
+(defun ebib-db-count-entries (db)
+  "Return the number of entries in DB."
+  (hash-table-count (ebib--db-struct-database db)))
+
 (defun ebib-db-get-dialect (db)
   "Return the BibTeX dialect of DB."
   (ebib--db-struct-dialect db))
