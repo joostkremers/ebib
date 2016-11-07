@@ -113,28 +113,19 @@ No check is performed to see if VARS is really a local variable block."
   "Return the key of the current entry in DB."
   (ebib--db-struct-cur-entry db))
 
-(defun ebib-db-set-current-entry-key (key db &optional noerror)
+(defun ebib-db-set-current-entry-key (key db)
   "Set KEY as the current entry of DB.
-KEY is a key in DB.  If KEY is not in DB, an error is raised
-unless NOERROR is non-nil.  In this case, if NOERROR is `first',
-the current entry key is set to the alphabetically first key in
-DB.  Any other non-nil value means do not change the current entry
-if KEY is not in DB.
+KEY is a key in DB.  If KEY is not in DB, the current entry is
+set to nil, which signifies that a new current entry should be
+set.  It is allowed to pass a alue of nil for KEY, to unset the
+current entry unconditionally.
 
-KEY may also be t, in which case the current entry is
-unconditionally set to the alphabetically first entry in DB.
-
-Return the new entry key if successful, nil otherwise."
-  (cond
-   ((stringp key)
-    (if (ebib-db-get-entry key db 'noerror)
-        (setf (ebib--db-struct-cur-entry db) key)
-      (unless noerror
-        (error "[Ebib] No entry key `%s' in the current database" key))
-      (if (eq noerror 'first)
-          (setf (ebib--db-struct-cur-entry db) (car (ebib-db-list-keys db 'sort))))))
-   ((eq key t)
-    (setf (ebib--db-struct-cur-entry db) (car (ebib-db-list-keys db 'sort))))))
+Return the new entry key if it could be made the new entry key,
+nil otherwise."
+  (if (and (stringp key)
+           (ebib-db-get-entry key db 'noerror))
+      (setf (ebib--db-struct-cur-entry db) key)
+    (setf (ebib--db-struct-cur-entry db) nil)))
 
 (defun ebib-db-set-entry (key data db &optional if-exists)
   "Set KEY to DATA in database DB.
