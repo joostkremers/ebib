@@ -2213,7 +2213,7 @@ argument ARG can be used to specify which file to choose."
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
             (find-file file-full-path)))
-      (error "[Ebib] File not found: `%s'" (funcall ebib-file-name-mod-function file)))))
+      (error "[Ebib] File not found: `%s'" (funcall ebib-file-name-mod-function file nil)))))
 
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
