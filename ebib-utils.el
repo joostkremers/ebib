@@ -225,8 +225,8 @@ The rest of the frame is used for the entry buffer, unless
                               ebib--mode-line-modified
                               mode-line-buffer-identification
                               (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
-                              (:eval (if (and ebib--cur-db (ebib--cur-entry-key)) "     Entry %l" "     No Entries"))
-                              (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|"(ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
+                              (:eval (if (and ebib--cur-db (ebib--get-key-at-point)) "     Entry %l" "     No Entries"))
+                              (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
 information.  You can customize this information if you wish, or
@@ -245,13 +245,18 @@ mode line of the entry buffer is not changed."
   :group 'ebib-windows
   :type 'string)
 
-(defcustom ebib-index-display-fields nil
-  "List of the fields to display in the index buffer.
-By default, the index buffer only shows the entry key of each
-entry.  If this provides too little information, you can have Ebib
-add the contents of certain fields to the index buffer."
+(defcustom ebib-index-fields '(("Key" 40 t)
+                           ("Author" 40 t)
+                           ("Year" 6 t)
+                           ("Title" 50 t))
+  "Fields to display in the index buffer.
+Any field BibTeX or biblatex field can be used.  Note, however,
+that the \"Author\" field is special here: if an entry's actual
+Author field is empty, its Editor field is displayed instead."
   :group 'ebib
-  :type '(repeat (string :tag "Index Field")))
+  :type '(repeat (list  (string :tag "Field")
+                        (integer :tag "Width")
+                        (boolean :tag "Sort"))))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
@@ -674,8 +679,8 @@ Ebib (not Emacs)."
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
-(defface ebib-overlay-face '((t (:inherit highlight)))
-  "Face used for the overlays."
+(defface ebib-highlight-face '((t (:inherit highlight)))
+  "Face used for the highlights."
   :group 'ebib-faces)
 
 (defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
@@ -713,27 +718,24 @@ Currently, the following problems are marked:
 
 ;; Entry type and field aliases defined by Biblatex.
 (defconst ebib--field-aliases '(("location" . "address")
-                                ("annotation" . "annote")
-                                ("eprinttype" . "archiveprefix")
-                                ("journaltitle" . "journal")
-                                ("sortkey" . "key")
-                                ("file" . "pdf")
-                                ("eprintclass" . "primaryclass")
-                                ("institution" . "school"))
+                            ("annotation" . "annote")
+                            ("eprinttype" . "archiveprefix")
+                            ("journaltitle" . "journal")
+                            ("sortkey" . "key")
+                            ("file" . "pdf")
+                            ("eprintclass" . "primaryclass")
+                            ("institution" . "school"))
   "List of field aliases for Biblatex.")
 
 (defconst ebib--type-aliases '(("Conference" . "InProceedings")
-                               ("Electronic" . "Online")
-                               ("MastersThesis" . "Thesis")
-                               ("PhDThesis" . "Thesis")
-                               ("TechReport" . "Report")
-                               ("WWW" . "Online"))
+                           ("Electronic" . "Online")
+                           ("MastersThesis" . "Thesis")
+                           ("PhDThesis" . "Thesis")
+                           ("TechReport" . "Report")
+                           ("WWW" . "Online"))
   "List of entry type aliases for Biblatex.")
 
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
-(defvar ebib--index-overlay nil "Overlay to mark the current entry.")
-(defvar ebib--fields-overlay nil "Overlay to mark the current field.")
-(defvar ebib--strings-overlay nil "Overlay to mark the current string.")
 
 ;; general bookkeeping
 (defvar ebib--field-history nil "Minibuffer field name history.")
@@ -759,7 +761,6 @@ Currently, the following problems are marked:
 ;; the master list and the current database
 (defvar ebib--databases nil "List of structs containing the databases.")
 (defvar ebib--cur-db nil "The database that is currently active.")
-(defvar ebib--cur-keys-list nil "Sorted list of entry keys in the current database.")
 
 ;; bookkeeping required when editing field values or @STRING definitions
 
@@ -787,21 +788,16 @@ BUFFER is a symbol referring to a buffer in
   "Make BUFFER current and execute BODY.
 BUFFER is a symbol referring to a buffer in
 `ebib--buffer-alist'."
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug t))
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
-
-(defmacro with-ebib-buffer-writable (&rest body)
-  "Make the current buffer writable and execute BODY."
-  (declare (indent defun))
-  `(unwind-protect
-       (let ((buffer-read-only nil))
-         ,@body)))
 
 (defmacro with-ebib-window-nondedicated (&rest body)
   "Execute BODY with the current window non-dedicated.
 Restore the dedicated status after executing BODY."
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug t))
   `(let ((dedicated (window-dedicated-p)))
      (unwind-protect
          (progn
@@ -823,7 +819,8 @@ result of evaluating <value>.  If VALUE is a nonempty string,
 THEN (a single sexpr) is executed and its return value returned.
 If VALUE is either \"\" or nil, the forms in ELSE are executed
 and the return value of its last form is returned."
-  (declare (indent 2))
+  (declare (indent 2)
+           (debug ((symbolp form) form body)))
   `(let ,(list bindvar)
      (if (not (or (null ,(car bindvar))
                   (equal ,(car bindvar) "")))
@@ -835,7 +832,7 @@ and the return value of its last form is returned."
     "Helper function for `ebib--execute-when'."
     (cond
      ((eq env 'entries)
-      'ebib--cur-keys-list)
+      '(ebib-db-list-keys ebib--cur-db))
      ((eq env 'marked-entries)
       '(and ebib--cur-db
             (ebib-db-marked-entries-p ebib--cur-db)))
@@ -921,55 +918,9 @@ function adds a newline to the message being logged."
                                     "\n")
                    args))))
 
-(defun ebib--make-overlay (begin end buffer)
-  "Create an overlay from BEGIN to END in BUFFER."
-  (let (overlay)
-    (setq overlay (make-overlay begin end buffer))
-    (overlay-put overlay 'face 'ebib-overlay-face)
-    overlay))
-
-(defun ebib--set-index-overlay ()
-  "Set the overlay of the index buffer."
-  (with-current-ebib-buffer 'index
-    (beginning-of-line)
-    (let ((beg (point)))
-      (if ebib-index-display-fields
-          (end-of-line)
-        (skip-chars-forward "^ "))
-      (move-overlay ebib--index-overlay beg (point) (cdr (assq 'index ebib--buffer-alist)))
-      (beginning-of-line))))
-
-(defun ebib--set-fields-overlay ()
-  "Set the overlay in the fields buffer."
-  (with-current-ebib-buffer 'entry
-    (beginning-of-line)
-    (save-excursion
-      (let ((beg (point)))
-        (ebib--looking-at-goto-end "[^ \t\n\f]*")
-        (move-overlay ebib--fields-overlay beg (point))))))
-
-(defun ebib--set-strings-overlay ()
-  "Set the overlay in the strings buffer."
-  (with-current-ebib-buffer 'strings
-    (beginning-of-line)
-    (save-excursion
-      (let ((beg (point)))
-        (ebib--looking-at-goto-end "[^ \t\n\f]*")
-        (move-overlay ebib--strings-overlay beg (point))))))
-
-;; This is simply to save some typing.
-(defsubst ebib--cur-entry-key ()
-  "Get the key of the current entry."
-  (ebib--db-get-current-entry-key ebib--cur-db))
-
-(defun ebib--search-key-in-buffer (entry-key)
-  "Search ENTRY-KEY in the index buffer.
-Point is moved to the first character of the key.  Return value
-is the new value of point."
-  (goto-char (point-min))
-  (re-search-forward (concat "^" entry-key))
-  (beginning-of-line)
-  (point))
+;; (defsubst ebib--cur-entry-key ()
+;;   "Get the key of the current entry."
+;;   (ebib--db-get-current-entry-key ebib--cur-db))
 
 (defun ebib--read-file-to-list (filename)
   "Return the contents of FILENAME as a list of lines."
@@ -1186,11 +1137,9 @@ SPECIFIERS that do not occur in TEMPLATE are ignored."
   (if (stringp string)
       (string-match-p "\n" string)))
 
-(defun ebib--first-line (string)
+(defsubst ebib--first-line (string)
   "Return the first line of a multiline STRING."
-  (if (string-match "\n" string)
-      (substring string 0 (match-beginning 0))
-    string))
+  (car (split-string string "\n")))
 
 (defun ebib--sort-in-buffer (str limit)
   "Move POINT to the right position to insert STR in the current buffer.
@@ -1363,11 +1312,27 @@ Possible values for DIALECT are those listed in
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
-(defun ebib--erase-buffer (buffer)
-  "Erase BUFFER, even if it is read-only."
-  (with-current-buffer buffer
-    (with-ebib-buffer-writable
-      (erase-buffer))))
+(defun ebib--sort-keys-list (keys db)
+  "Sort KEYS according to the sort info of DB."
+  ;; First sort the keys themselves.
+  (setq keys (sort keys #'string<))
+  ;; And then stably sort on the sort field, if any.
+  (when (ebib-db-custom-sorted-p db)
+    (let* ((field (ebib-db-get-sort-field db))
+           ;; We use a temp list for sorting, so that the :key argument to
+           ;; `cl-stable-sort' can simply be `car' rather than (a much
+           ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
+           ;; that way.
+           (list (mapcar (lambda (key)
+                           (cons (ebib--get-field-value-for-index field key) key))
+                         keys)))
+      (setq list (cl-stable-sort list #'string-lessp :key #'car))
+      (setq keys (mapcar #'cdr list)))
+    ;; Reverse the list if necessary.
+    (if (eq (ebib-db-get-sort-order db) 'descend)
+        (setq keys (nreverse keys))))
+  ;; Now return the list of keys.
+  keys)
 
 (provide 'ebib-utils)
 

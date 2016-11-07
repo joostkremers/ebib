@@ -109,27 +109,27 @@ No check is performed to see if VARS is really a local variable block."
   "Return the key of the current entry in DB."
   (ebib--db-struct-cur-entry db))
 
-(defun ebib-db-set-current-entry-key (entry db &optional noerror)
-  "Set ENTRY as the current entry of DB.
-ENTRY is a key in DB.  If ENTRY is not in DB, an error is raised
+(defun ebib-db-set-current-entry-key (key db &optional noerror)
+  "Set KEY as the current entry of DB.
+KEY is a key in DB.  If KEY is not in DB, an error is raised
 unless NOERROR is non-nil.  In this case, if NOERROR is `first',
 the current entry key is set to the alphabetically first key in
 DB.  Any other non-nil value means do not change the current entry
-if ENTRY is not in DB.
+if KEY is not in DB.
 
-ENTRY may also be t, in which case the current entry is
+KEY may also be t, in which case the current entry is
 unconditionally set to the alphabetically first entry in DB.
 
 Return the new entry key if successful, nil otherwise."
   (cond
-   ((stringp entry)
-    (if (ebib-db-get-entry entry db 'noerror)
-        (setf (ebib--db-struct-cur-entry db) entry)
+   ((stringp key)
+    (if (ebib-db-get-entry key db 'noerror)
+        (setf (ebib--db-struct-cur-entry db) key)
       (unless noerror
-        (error "[Ebib] No entry key `%s' in the current database" entry))
+        (error "[Ebib] No entry key `%s' in the current database" key))
       (if (eq noerror 'first)
           (setf (ebib--db-struct-cur-entry db) (car (ebib-db-list-keys db 'sort))))))
-   ((eq entry t)
+   ((eq key t)
     (setf (ebib--db-struct-cur-entry db) (car (ebib-db-list-keys db 'sort))))))
 
 (defun ebib-db-set-entry (key data db &optional if-exists)
@@ -203,7 +203,7 @@ If SORT is non-nil, the list is sorted."
 		 (push key keys))
 	     (ebib--db-struct-database db))
     (if sort
-        (ebib-db-sort-keys-list keys db)
+        (sort keys #'string<)
       keys)))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
@@ -526,13 +526,9 @@ unmarked."
       (ebib-db-unmark-entry entry db)
     (ebib-db-mark-entry entry db)))
 
-(defun ebib-db-list-marked-entries (db &optional sort)
-  "Return a list of entry keys of all marked entries in DB.
-If SORT is non-nil, the list is sorted."
-  (let ((entries (copy-sequence (ebib--db-struct-marked-entries db))))
-    (if sort
-        (ebib-db-sort-keys-list entries db)
-      entries)))
+(defun ebib-db-list-marked-entries (db)
+  "Return a list of entry keys of all marked entries in DB."
+  (copy-sequence (ebib--db-struct-marked-entries db)))
 
 (defun ebib-db-filtered-p (db)
   "Return t if a filter exists for DB."
@@ -549,8 +545,8 @@ The filter is set unconditionally, overwriting any existing filter."
 
 (defun ebib-db-set-sortinfo (sortinfo db)
   "Set the SORTINFO of DB.
-The sortinfo is set unconditionally, overwriting
-any existing sortinfo."
+The sortinfo is set unconditionally, overwriting any existing
+sortinfo."
   (setf (ebib--db-struct-sortinfo db) sortinfo))
 
 (defun ebib-db-custom-sorted-p (db)
@@ -565,30 +561,8 @@ any existing sortinfo."
   "Return the sort order of DB, or nil if there is none."
   (cdr (ebib--db-struct-sortinfo db)))
 
-(defun ebib-db-sort-keys-list (keys db)
-  "Sort KEYS according to the sort info of DB."
-  ;; first sort the keys themselves
-  (setq keys (sort keys #'string<))
-  ;; and then stably sort on the sort field, if any
-  (when (ebib-db-custom-sorted-p db)
-    (let* ((field (ebib-db-get-sort-field db))
-           ;; We use a temp list for sorting, so that the :key argument to
-           ;; `cl-stable-sort' can simply be `car' rather than (a much
-           ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
-           ;; that way.
-           (list (mapcar (lambda (key)
-                           (cons (ebib-db-get-field-value field key db "" 'unbraced 'xref) key))
-                         keys)))
-      (setq list (cl-stable-sort list #'string-lessp :key #'car))
-      (setq keys (mapcar #'cdr list)))
-    ;; reverse the list if necessary
-    (if (eq (ebib-db-get-sort-order db) 'descend)
-        (setq keys (nreverse keys))))
-  ;; now return the list of keys
-  keys)
-
 (defun ebib-db-set-backup (backup db)
-  "Set the backup flag of DB to BACKUP.
+  "Set BACKUP as the backup flag of DB.
 BACKUP must be either t (make backup at next save) or nil (do not
 make backup at next save)."
   (setf (ebib--db-struct-backup db) backup))
