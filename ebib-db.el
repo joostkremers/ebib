@@ -199,12 +199,13 @@ is suffixed, then `ab' etc."
 	(setq suffix ?a)))
     unique-key))
 
+;; TODO Perhaps we can get rid of the optional argument SORT.
 (defun ebib-db-list-keys (db &optional sort)
   "Return a list of keys in DB.
 If SORT is non-nil, the list is sorted."
   (let (keys)
-    (maphash #'(lambda (key _)
-		 (push key keys))
+    (maphash (lambda (key _)
+               (push key keys))
 	     (ebib--db-struct-database db))
     (if sort
         (sort keys #'string<)
