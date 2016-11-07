@@ -1314,7 +1314,7 @@ ORDER indicates the sort order and should be either `ascend' or
     (ebib--update-buffers)))
 
 (defun ebib-index-default-sort ()
-  "Sort index buffer on citation key."
+  "Sort the index buffer on the first column."
   (interactive)
   (ebib-db-set-sortinfo nil ebib--cur-db)
   (ebib--update-buffers))
