@@ -140,9 +140,7 @@ is applied to the item."
       (add-text-properties (point-at-bol) (point) `(ebib-key ,key))
       (insert "\n")
       (when mark
-        (forward-line -1)
-        (add-text-properties (point-at-bol) (1+ (point-at-eol)) '(face ebib-marked-face))
-        (forward-line 1)))))
+        (add-text-properties (point-at-bol 0) (point) '(face ebib-marked-face))))))
 
 (defun ebib--goto-entry-in-index (key)
   "Move point to the entry designated by KEY.
