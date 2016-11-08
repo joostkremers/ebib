@@ -266,13 +266,13 @@ Similarly, a number of fields are deprecated but still accepted as aliases. Thes
 
 # The Entries List #
 
-By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted alphanumerically in ascending order of the entry key.  You can sort the entries on one of the other columns using the keys `<` and `>`. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with `=`.
+By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted alphanumerically on the entry key in ascending order.  You can sort the entries on one of the other columns using the keys `<` and `>`. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with `=`.
 
-You can customise the fields that are displayed in the index buffer with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
+The fields that are displayed in the index buffer can be customised with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
 
 You can use any BibTeX / BibLaTeX field to define a column in the index buffer. In addition, there are two column labels with a special meaning: `"Entry Key"`, which displays the entry key, and `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise.
 
-The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. It is not possible to set another column as the default sort key.
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. It is not possible to set another column as the default sort key (though you can, of course, sort on them using `<` or `>`).
 
 
 # Searching #

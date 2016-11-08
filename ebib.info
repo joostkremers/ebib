@@ -872,14 +872,14 @@ File: ebib.info,  Node: The Entries List,  Next: Searching,  Prev: Using Biblate
 
 By default, the index buffer displays the list of entries in the
 database in a table format using the entry key, and the author, year and
-title fields of each entry.  The entries are sorted alphanumerically in
-ascending order of the entry key.  You can sort the entries on one of
+title fields of each entry.  The entries are sorted alphanumerically on
+the entry key in ascending order.  You can sort the entries on one of
 the other columns using the keys ‘<’ and ‘>’.  The former performs an
 ascending sort (smallest to largest, hence the smaller-than sign), the
 latter a descending sort.  They both ask you for the column to sort on.
 Restoring the default sort can be done with ‘=’.
 
-   You can customise the fields that are displayed in the index buffer
+   The fields that are displayed in the index buffer can be customised
 with the user option ‘ebib-index-columns’.  Each element in this option
 describes a column and consists of the field to display (which is also
 the column label), the width of the column and a flag indicating whether
@@ -895,7 +895,8 @@ is not empty, and the contents of the editor field otherwise.
    The first column defined in ‘ebib-index-colums’ is the column on
 which the entries are sorted by default, i.e., when the database is
 first opened and when you press ‘=’.  It is not possible to set another
-column as the default sort key.
+column as the default sort key (though you can, of course, sort on them
+using ‘<’ or ‘>’).
 
 
 File: ebib.info,  Node: Searching,  Next: Accessing BibTeX Databases outside Ebib,  Prev: The Entries List,  Up: Top
@@ -2845,78 +2846,78 @@ Node: Alias Types and Fields39594
 Ref: #alias-types-and-fields39755
 Node: The Entries List41941
 Ref: #the-entries-list42075
-Node: Searching43600
-Ref: #searching43745
-Node: Simple Searches43787
-Ref: #simple-searches43903
-Node: Filters46499
-Ref: #filters46599
-Node: Simple Selection47653
-Ref: #simple-selection47782
-Node: Complex Filters49460
-Ref: #complex-filters49622
-Node: Storing and Saving Filters53609
-Ref: #storing-and-saving-filters53792
-Node: Special Filters56663
-Ref: #special-filters56844
-Node: An Example Listing Recent Additions58199
-Ref: #an-example-listing-recent-additions58428
-Node: Properties of Filtered Databases60596
-Ref: #properties-of-filtered-databases60793
-Node: Accessing BibTeX Databases outside Ebib62447
-Ref: #accessing-bibtex-databases-outside-ebib62653
-Node: Key Bindings67067
-Ref: #key-bindings67223
-Node: Defining Citation Commands67995
-Ref: #defining-citation-commands68228
-Node: Associating a Database with a LaTeX File74143
-Ref: #associating-a-database-with-a-latex-file74383
-Node: Cross-referencing77329
-Ref: #cross-referencing77499
-Node: Marking Entries80800
-Ref: #marking-entries80948
-Node: Printing the Database81927
-Ref: #printing-the-database82087
-Node: Calling a Browser85875
-Ref: #calling-a-browser86025
-Node: Viewing Files88645
-Ref: #viewing-files88777
-Node: Editing the file field92558
-Ref: #editing-the-file-field92693
-Node: Notes files94036
-Ref: #notes-files94170
-Node: Customising the notes template98315
-Ref: #customising-the-notes-template98464
-Node: Managing a reading list101513
-Ref: #managing-a-reading-list101675
-Node: Window Management104770
-Ref: #window-management104929
-Node: Creating Entry Stubs108085
-Ref: #creating-entry-stubs108247
-Node: @Preamble Definition109248
-Ref: #preamble-definition109412
-Node: @String Definitions111398
-Ref: #string-definitions111549
-Node: @Comments115057
-Ref: #comments115185
-Node: Managing Keywords115550
-Ref: #managing-keywords115695
-Node: Sorting the bib File121580
-Ref: #sorting-the-.bib-file121753
-Node: Merging and Importing124880
-Ref: #merging-and-importing125045
-Node: Exporting Entries126819
-Ref: #exporting-entries126981
-Node: Multiple Identical Fields128956
-Ref: #multiple-identical-fields129135
-Node: Multiline Edit Buffers131028
-Ref: #multiline-edit-buffers131200
-Node: The Options Menu135330
-Ref: #the-options-menu135478
-Node: Customisation136099
-Ref: #customisation136210
-Node: Modifying Key Bindings137153
-Ref: #modifying-key-bindings137280
+Node: Searching43667
+Ref: #searching43812
+Node: Simple Searches43854
+Ref: #simple-searches43970
+Node: Filters46566
+Ref: #filters46666
+Node: Simple Selection47720
+Ref: #simple-selection47849
+Node: Complex Filters49527
+Ref: #complex-filters49689
+Node: Storing and Saving Filters53676
+Ref: #storing-and-saving-filters53859
+Node: Special Filters56730
+Ref: #special-filters56911
+Node: An Example Listing Recent Additions58266
+Ref: #an-example-listing-recent-additions58495
+Node: Properties of Filtered Databases60663
+Ref: #properties-of-filtered-databases60860
+Node: Accessing BibTeX Databases outside Ebib62514
+Ref: #accessing-bibtex-databases-outside-ebib62720
+Node: Key Bindings67134
+Ref: #key-bindings67290
+Node: Defining Citation Commands68062
+Ref: #defining-citation-commands68295
+Node: Associating a Database with a LaTeX File74210
+Ref: #associating-a-database-with-a-latex-file74450
+Node: Cross-referencing77396
+Ref: #cross-referencing77566
+Node: Marking Entries80867
+Ref: #marking-entries81015
+Node: Printing the Database81994
+Ref: #printing-the-database82154
+Node: Calling a Browser85942
+Ref: #calling-a-browser86092
+Node: Viewing Files88712
+Ref: #viewing-files88844
+Node: Editing the file field92625
+Ref: #editing-the-file-field92760
+Node: Notes files94103
+Ref: #notes-files94237
+Node: Customising the notes template98382
+Ref: #customising-the-notes-template98531
+Node: Managing a reading list101580
+Ref: #managing-a-reading-list101742
+Node: Window Management104837
+Ref: #window-management104996
+Node: Creating Entry Stubs108152
+Ref: #creating-entry-stubs108314
+Node: @Preamble Definition109315
+Ref: #preamble-definition109479
+Node: @String Definitions111465
+Ref: #string-definitions111616
+Node: @Comments115124
+Ref: #comments115252
+Node: Managing Keywords115617
+Ref: #managing-keywords115762
+Node: Sorting the bib File121647
+Ref: #sorting-the-.bib-file121820
+Node: Merging and Importing124947
+Ref: #merging-and-importing125112
+Node: Exporting Entries126886
+Ref: #exporting-entries127048
+Node: Multiple Identical Fields129023
+Ref: #multiple-identical-fields129202
+Node: Multiline Edit Buffers131095
+Ref: #multiline-edit-buffers131267
+Node: The Options Menu135397
+Ref: #the-options-menu135545
+Node: Customisation136166
+Ref: #customisation136277
+Node: Modifying Key Bindings137220
+Ref: #modifying-key-bindings137347
 
 End Tag Table
 
