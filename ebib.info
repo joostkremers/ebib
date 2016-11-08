@@ -94,7 +94,7 @@ File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 Septemb
    • Changed key bindings: ‘j’ and ‘k’ no longer move up/down in the
      index, entry and strings buffers; use ‘p’ and ‘n’ instead.
      Furthermore, ‘i’ now executes ‘ebib-push-bibtex-key’ (used to be
-     ‘p’), and ‘I’ (capital I) executes ‘ebib-browse-doi’ (used to be
+     ‘p’), and ‘I’ (capital i) executes ‘ebib-browse-doi’ (used to be
      ‘i’).
    • In the index buffer, ‘ebib-search-next’ (which used to be bound to
      ‘n’) is no longer bound.  Instead, ‘ebib-search’ (still bound to
@@ -105,7 +105,7 @@ File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 Septemb
      fixes a small bug that has so far gone unnoticed: moving to the top
      of the databas and calling ‘ebib-search-next’, as previously
      suggested in the manual to get around the fact that
-     ‘ebib-search-next’ does not wrap) would not search the first
+     ‘ebib-search-next’ does not wrap, would not search the first
      entry.)
    • In the entry buffer, ‘x’ is replaced by ‘k’
      (‘ebib-kill-field-contents’).
