@@ -162,7 +162,7 @@ entry with KEY in the buffer, point is not moved."
 Return value is a list consisting of KEY and a list of the
 values of the fields listed in `ebib-index-columns'."
   (list key (mapcar (lambda (elt)
-                      (ebib--first-line (ebib--get-field-value-for-index (car elt) key ebib--cur-db)))
+                      (ebib--first-line (ebib--get-field-value-for-display (car elt) key ebib--cur-db)))
                     ebib-index-columns)))
 
 (defun ebib--insert-entry-in-index-sorted (key &optional move-point mark)
