@@ -782,10 +782,6 @@ function adds a newline to the message being logged."
                                     "\n")
                    args))))
 
-;; (defsubst ebib--cur-entry-key ()
-;;   "Get the key of the current entry."
-;;   (ebib--db-get-current-entry-key ebib--cur-db))
-
 (defun ebib--read-file-to-list (filename)
   "Return the contents of FILENAME as a list of lines."
   (if (and filename                               ; protect against 'filename' being 'nil'
