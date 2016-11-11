@@ -1161,7 +1161,7 @@ This variable is initialized by `ebib--list-field-uniquely'.")
 (defun ebib--list-fields-uniquely (dialect)
   "Return a list of all fields of BibTeX DIALECT.
 Possible values for DIALECT are those listed in
-`bibtex-dialect-list' or NIL, in which case the value of
+`bibtex-dialect-list' or nil, in which case the value of
 `ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (or (cdr (assq dialect ebib--unique-field-alist))
