@@ -40,6 +40,155 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'bibtex)
+
+;; Entry type and field aliases defined by Biblatex.
+(defconst ebib--field-aliases '(("location" . "address")
+                            ("annotation" . "annote")
+                            ("eprinttype" . "archiveprefix")
+                            ("journaltitle" . "journal")
+                            ("sortkey" . "key")
+                            ("file" . "pdf")
+                            ("eprintclass" . "primaryclass")
+                            ("institution" . "school"))
+  "List of field aliases for Biblatex.")
+
+(defconst ebib--type-aliases '(("Conference" . "InProceedings")
+                           ("Electronic" . "Online")
+                           ("MastersThesis" . "Thesis")
+                           ("PhDThesis" . "Thesis")
+                           ("TechReport" . "Report")
+                           ("WWW" . "Online"))
+  "List of entry type aliases for Biblatex.")
+
+(defcustom ebib-bibtex-dialect 'BibTeX
+  "The default BibTeX dialect.
+A `.bib' file/database without explicit dialect setting is
+assumed to use this dialect.  Possible values are those listed in
+`bibtex-dialect-list'."
+  :group 'ebib
+  :type `(choice :tag "BibTeX Dialect"
+                 ,@(mapcar (lambda (d) `(const ,d))
+                           bibtex-dialect-list)))
+
+(defcustom ebib-biblatex-inheritances '(("all"
+                                     "all"
+                                     (("ids" . none)
+                                      ("crossref" . none)
+                                      ("xref" . none)
+                                      ("entryset" . none)
+                                      ("entrysubtype" . none)
+                                      ("execute" . none)
+                                      ("label" . none)
+                                      ("options" . none)
+                                      ("presort" . none)
+                                      ("related" . none)
+                                      ("relatedoptions" . none)
+                                      ("relatedstring" . none)
+                                      ("relatedtype" . none)
+                                      ("shorthand" . none)
+                                      ("shorthandintro" . none)
+                                      ("sortkey" . none)))
+
+                                    ("inbook, bookinbook, suppbook"
+                                     "mvbook, book"
+                                     (("author" . "author")
+                                      ("bookauthor" . "author")))
+
+                                    ("book, inbook, bookinbook, suppbook"
+                                     "mvbook"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+
+                                    ("collection, reference, incollection, inreference, suppcollection"
+                                     "mvcollection, mvreference"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+
+                                    ("proceedings, inproceedings"
+                                     "mvproceedings"
+                                     (("maintitle" . "title")
+                                      ("mainsubtitle" . "subtitle")
+                                      ("maintitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+
+                                    ("inbook, bookinbook, suppbook"
+                                     "book"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+
+                                    ("incollection, inreference, suppcollection"
+                                     "collection, reference"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+
+                                    ("inproceedings"
+                                     "proceedings"
+                                     (("booktitle" . "title")
+                                      ("booksubtitle" . "subtitle")
+                                      ("booktitleaddon" . "titleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
+                                    ("article, suppperiodical"
+                                     "periodical"
+                                     (("title" . "journaltitle")
+                                      ("subtitle" . "journalsubtitle")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none))))
+  "Inheritance scheme for cross-referencing.
+This option allows you to define inheritances for Biblatex.
+Inheritances are specified for pairs of target and source entry
+type, where the target is the cross-referencing entry and the
+source the cross-referenced entry.  For each pair, specify the
+fields that can inherit a value (the targets) and the fields that
+they inherit from (the sources).
+
+Inheritances for all entry types can be defined by specifying
+`all' as the entry type.  The entry type may also be
+a (comma-separated) list of entry types.
+
+If no inheritance rule is set up for a given entry type+field
+combination, the field inherits from the same-name field in the
+cross-referenced entry.  If no inheritance should take place, set
+the source field to \"No inheritance\".
+
+Note that this option is only relevant for Biblatex.  If the
+BibTeX dialect is set to `BibTeX', this option is ignored."
+  :group 'ebib
+  :type '(repeat (list (string :tag "Target entry type(s)")
+                       (string :tag "Source entry type(s)")
+                       (repeat (cons :tag "Inheritance"
+                                     (string :tag "Target field")
+                                     (choice (string :tag "Source field)")
+                                             (const :tag "No inheritance" none)))))))
+
 
 ;; each database is represented by a struct
 (cl-defstruct ebib--db-struct
