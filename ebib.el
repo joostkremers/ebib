@@ -61,6 +61,7 @@
 (require 'ebib-keywords)
 (require 'ebib-notes)
 (require 'ebib-reading-list)
+(require 'org-ebib)
 
 ;;; Helper functions
 
