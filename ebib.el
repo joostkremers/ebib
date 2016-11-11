@@ -161,20 +161,8 @@ entry with KEY in the buffer, point is not moved."
 Return value is a list consisting of KEY and a list of the
 values of the fields listed in `ebib-index-columns'."
   (list key (mapcar (lambda (elt)
-                      (ebib--first-line (ebib--get-field-value-for-index (car elt) key)))
+                      (ebib--first-line (ebib--get-field-value-for-index (car elt) key ebib--cur-db)))
                     ebib-index-columns)))
-
-(defun ebib--get-field-value-for-index (field key)
-  "Get the value of FIELD in entry KEY.
-The field \"Author\" is treated special: if its value is empty,
-the value of the \"Editor\" field is used instead."
-  (cond
-   ((cl-equalp field "Entry Key")
-    key)
-   ((cl-equalp field "Author/Editor")
-    (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
-        (ebib-db-get-field-value "Editor" key ebib--cur-db "" 'unbraced 'xref)))
-   (t (ebib-db-get-field-value field key ebib--cur-db "" 'unbraced 'xref))))
 
 (defun ebib--insert-entry-in-index-sorted (key &optional move-point mark)
   "Insert KEY in the index buffer obeying the sort order.

@@ -1172,6 +1172,18 @@ Possible values for DIALECT are those listed in
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
+(defun ebib--get-field-value-for-index (field key db)
+  "Get the value of FIELD in entry KEY in DB.
+The field \"Author\" is treated special: if its value is empty,
+the value of the \"Editor\" field is used instead."
+  (cond
+   ((cl-equalp field "Entry Key")
+    key)
+   ((cl-equalp field "Author/Editor")
+    (or (ebib-db-get-field-value "Author" key db 'noerror 'unbraced 'xref)
+        (ebib-db-get-field-value "Editor" key db "" 'unbraced 'xref)))
+   (t (ebib-db-get-field-value field key db "" 'unbraced 'xref))))
+
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB."
   ;; First sort the keys themselves.
@@ -1185,7 +1197,7 @@ Possible values for DIALECT are those listed in
          ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
          ;; that way.
          (list (mapcar (lambda (key)
-                         (cons (ebib--get-field-value-for-index field key) key))
+                         (cons (ebib--get-field-value-for-index field key db) key))
                        keys)))
     (setq list (cl-stable-sort list #'string-lessp :key #'car))
     (setq keys (mapcar #'cdr list)))
