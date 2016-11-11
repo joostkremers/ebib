@@ -969,10 +969,11 @@ empty, return the empty string."
 
 (defun ebib-format-template (template specifiers &rest args)
   "Format TEMPLATE using SPECIFIERS.
-SPECIFIERS is an alist of characters and symbols.  Each
-function should take ARGS as arguments and should return a string
-which is substituted for the specifier in TEMPLATE.  Specs in
-SPECIFIERS that do not occur in TEMPLATE are ignored."
+SPECIFIERS is an alist of characters and symbols.  Each symbol
+should be the name of a function that takes ARGS as arguments and
+returns a string which is substituted for the specifier in
+TEMPLATE.  Specs in SPECIFIERS that do not occur in TEMPLATE are
+ignored."
   ;; First remove specs that do not occur in TEMPLATE.  In principle,
   ;; `format-spec' ignores all specs that do not occur in the template, but we
   ;; do not want to apply the functions of specs that are not needed.
