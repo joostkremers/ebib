@@ -2291,7 +2291,8 @@ surrounding it is not included in the citation command."
     (setq format-string (replace-match key t t format-string)))
   (let (arg-prompt)
     (cl-loop for n = 1 then (1+ n)
-             until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A\\|%D" format-string)) do
+             until (null (string-match "%<\\(.*?\\)%A\\(.*?\\)%>\\|%A\\|%D" format-string))
+             do
              (setq arg-prompt
                    (if (string= (match-string 0 format-string) "%D")
                        "Description"
@@ -2299,16 +2300,17 @@ surrounding it is not included in the citation command."
              (setq format-string
                    (replace-match (ebib--ifstring (argument
                                                (save-match-data
-                                                 (read-from-minibuffer (format "%s%s%s: "
-                                                                               arg-prompt
-                                                                               (if (string= arg-prompt "Argument")
-                                                                                   (format " %s" n)
-                                                                                 "")
-                                                                               (if key
-                                                                                   (concat " for " key)
-                                                                                 "")))))
-                                      (concat "\\1" argument "\\2")
-                                    "")
+                                                 (read-from-minibuffer
+                                                  (format "%s%s%s: "
+                                                          arg-prompt
+                                                          (if (string= arg-prompt "Argument")
+                                                              (format " %s" n)
+                                                            "")
+                                                          (if key
+                                                              (concat " for " key)
+                                                            "")))))
+                                              (concat "\\1" argument "\\2")
+                                              "")
                                   t nil format-string))
              finally return format-string)))
 
