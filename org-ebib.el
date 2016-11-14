@@ -33,6 +33,10 @@
 
 ;; This is to silence the byte-compiler and flycheck.
 (defvar ebib--cur-db)
+(declare-function ebib "ebib" (&optional file key))
+(declare-function ebib--get-key-at-point "ebib" ())
+(declare-function ebib-db-get-field-value "ebib-db" (field key db &optional noerror unbraced xref))
+(declare-function org-link-set-parameters "org" (type &rest parameters))
 
 (defcustom org-ebib-description-function 'org-ebib-author-year-description
   "Function to create the description of an Org Ebib link.
