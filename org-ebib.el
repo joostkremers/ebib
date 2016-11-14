@@ -56,12 +56,12 @@ function can access the current database through the variable
   "Provide an author/year description for an Org Ebib link to KEY."
   (format "%s (%s)"
           (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
-              (ebib-db-get-field-value "Editor" key ebib--cur-db "" 'unbraced 'xref))
-          (ebib-db-get-field-value "Year" key ebib--cur-db "" 'unbraced 'xref)))
+              (ebib-db-get-field-value "Editor" key ebib--cur-db "(No Author)" 'unbraced 'xref))
+          (ebib-db-get-field-value "Year" key ebib--cur-db "XXXX" 'unbraced 'xref)))
 
 (defun org-ebib-title-description (key)
   "Provide a title description for an Org Ebib link to KEY."
-  (ebib-db-get-field-value "Title" key ebib--cur-db 'noerror 'unbraced 'xref))
+  (ebib-db-get-field-value "Title" key ebib--cur-db "(Untitled)" 'unbraced 'xref))
 
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
