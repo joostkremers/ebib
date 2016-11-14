@@ -8,7 +8,7 @@
 ;; Created: 2003
 ;; Version: 2.8
 ;; Keywords: text bibtex
-;; Package-Requires: ((dash "2.5.0") (parsebib "1.0") (emacs "24.3"))
+;; Package-Requires: ((dash "2.5.0") (seq "2.15") (parsebib "1.0") (emacs "24.3"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
