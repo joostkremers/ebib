@@ -600,7 +600,7 @@ Currently, the following problems are marked:
 ;; general bookkeeping
 (defvar ebib--field-history nil "Minibuffer field name history.")
 (defvar ebib--filters-history nil "Minibuffer history for filters.")
-(defvar ebib--cite-command-history nil "Minibuffer history for citation commands.")
+(defvar ebib--citation-history nil "Minibuffer history for citation commands.")
 (defvar ebib--key-history nil "Minibuffer history for entry keys.")
 (defvar ebib--keywords-history nil "Minibuffer history for keywords.")
 
