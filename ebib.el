@@ -530,7 +530,7 @@ the buffers, reads the rc file and loads the files in
   (let ((index-window (get-buffer-window (ebib--buffer 'index) t))
         (old-frame (selected-frame)))
     (if index-window
-        (progn (select-window index-window)
+        (progn (select-window index-window t)
                (unless (eq (window-frame) old-frame)
                  (select-frame-set-input-focus (window-frame))
                  (setq ebib--frame-before old-frame)))
