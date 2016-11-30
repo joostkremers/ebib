@@ -758,6 +758,7 @@ Currently, the following problems are marked:
 (defvar ebib--saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib--window-before nil "The window that was active when Ebib was called.")
 (defvar ebib--buffer-before nil "The buffer that was active when Ebib was called.")
+(defvar ebib--frame-before nil "The frame that was active when Ebib was called.")
 (defvar ebib--export-filename nil "Filename to export entries to.")
 (defvar ebib--push-buffer nil "Buffer to push entries to.")
 (defvar ebib--search-string nil "Stores the last search string.")

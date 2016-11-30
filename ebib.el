@@ -532,9 +532,11 @@ the buffers, reads the rc file and loads the files in
     (if index-window
         (progn (select-window index-window)
                (unless (eq (window-frame) old-frame)
-                 (select-frame-set-input-focus (window-frame))))
+                 (select-frame-set-input-focus (window-frame))
+                 (setq ebib--frame-before old-frame)))
       ;; Save the current window configuration.
       (setq ebib--saved-window-config (current-window-configuration))
+      (setq ebib--frame-before nil)
       (cond
        ((eq ebib-layout 'full)
         (delete-other-windows))
@@ -1060,7 +1062,9 @@ buffer if Ebib is not occupying the entire frame."
     (other-window 1)
     (if (member (current-buffer) (mapcar #'cdr ebib--buffer-alist))
         (switch-to-buffer nil)))
-   (t (set-window-configuration ebib--saved-window-config)))
+   (t (if (not (eq (window-frame) ebib--frame-before))
+          (select-frame-set-input-focus ebib--frame-before)
+        (set-window-configuration ebib--saved-window-config))))
   (mapc (lambda (buffer)
           (bury-buffer buffer))
         (mapcar #'cdr ebib--buffer-alist)))
