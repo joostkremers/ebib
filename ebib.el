@@ -1065,6 +1065,7 @@ buffer if Ebib is not occupying the entire frame."
    ((not (eq (window-frame) ebib--frame-before))
     (if (frame-live-p ebib--frame-before)
         (select-frame-set-input-focus ebib--frame-before)
+      (setq ebib--frame-before nil)
       (select-window (get-buffer-window (ebib--buffer 'index))) ; Just to be sure.
       (delete-other-windows)
       (set-window-dedicated-p (selected-window) nil)
