@@ -5,9 +5,6 @@
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
-;; Created: 2014
-;; Version: 2.8
-;; Keywords: text bibtex
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions

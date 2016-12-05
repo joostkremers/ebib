@@ -422,23 +422,42 @@ One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and
 
 # Accessing BibTeX Databases outside Ebib #
 
-Having a BibTeX database manager running inside Emacs has the advantage that it makes it easy to consult your BibTeX databases from a text buffer. By default, this functionality is set up for LaTeX, for [Org mode](http://orgmode.org) and for [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown.
+When you're in a text buffer, you can insert a citation with the command `ebib-insert-citation`. This command asks for a key and inserts a citation with that key in a (user-selectable) form that is appropriate for the current buffer. By default, this is set up for LaTeX and  [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers, and for [Org mode](http://orgmode.org).
 
-In any (text mode) buffer, you can call the command `ebib-insert-bibtex-key` to insert a citation. When you invoke this command, Emacs prompts you for a key from the database(s) associated with the current buffer, a citation command and any optional argument(s) the command allows. You can use TAB completion to enter a citation key, and after hitting `RET`, Emacs puts a citation at the cursor position in the current buffer with the key you selected. This citation includes the additional markup for the text mode in question. That is, if you call `ebib-insert-bibtex-key` from a LaTeX buffer, Ebib inserts `\<cite>{<key>}` into your buffer, substituting the citation command you select for `<cite>` and the key for `<key>`.
+When you invoke `ebib-insert-citation`, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use TAB completion when typing the key. If you have the `ivy` package installed, however, Ebib uses a more sophisticated method: instead of typing just the key, you can type (parts of) the author name, publication year and title in order to find the reference you wish to cite.
 
-You can also do it the other way around: if you're in the index buffer in Ebib, you can push an entry to a text buffer. To do this, use the command `p`. Ebib will ask you for a buffer to push the entry to (which defaults to the buffer you started Ebib from, or the buffer you previously pushed an entry to), a citation command and also any optional arguments, and then inserts a citation at the current cursor position in the buffer you've supplied.
+You can define different citation commands for each type of file that you use. That is, you can have one set of citation commands for LaTeX files, another set for Org files, etc. For LaTeX buffers, the only citation command that has been predefined is `cite`, which inserts a citation of the form `\cite[arg]{key}`. You may want to define more commands.
 
-The citation command that `ebib-insert-bibtex-key` and the command key `p` ask for have to be defined before you can use them. How to do this is explained below, [Defining Citation Commands](#defining-citation-commands). For LaTeX, only the `\cite` command is set up by default, so you may want to add some commands. In Org files, Ebib inserts a link of the form `[[ebib:Jones1992][Jones (1992)]]`. (Actually, you'll need to provide the `Jones (1992)` yourself, when Ebib asks for a description.) If you use this, you should add the following line to your init file:
+For Markdown buffers, three commands have been predefined: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
 
-    (org-add-link-type "ebib" 'ebib-open-org-link)
+In Org buffers, citations are inserted in the form `[[ebib:<key>][<description>]]`. You are prompted for the description, which you have to provide yourself, unless you use the `ivy` package, in which case a default description is provided, which you can accept by pressing `ENTER`. If you use this type of Org link, you may want to load the `org-ebib` package, which allows you to open Ebib with `org-open-at-point` (by default bound to `C-c C-o`). This package also enables you to create Org links to Ebib entries with `org-store-link`.
 
-This will allow Org to recognise Ebib links and allow you to jump to the BibTeX entry in Ebib using `C-c C-o` (`org-open-at-point`, the normal Org command for following links). Note that such org links aren't properly translated to LaTeX citation commands when you export your org file. For that, you'll need to set up a different link type for each citation command and provide functions for exporting them to LaTeX. The Org documentation explains how this is done. (You could, in fact, create similar functions for exporting to other formats.)
+Ebib also provides a way to insert citations into a buffer from within Ebib. If you're in the index buffer and press `i`, Ebib asks you for a buffer to insert the citation into (which defaults to the buffer you started Ebib from, or the buffer you previously inserted an entry into), a citation command and also any optional arguments, and then inserts a citation at the current cursor position in the buffer you've supplied.
 
-If you use `ebib-insert-bibtex-key` in a `markdown-mode` buffer, you can choose one of the citation commands defined for Pandoc Markdown: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
+Both methods use the same sets of citation commands, which are defined in the user option `ebib-citation-commands`. You can customise this option, as discussed below, [Defining Citation Commands](#defining-citation-commands). For LaTeX, only the `\cite` command is set up by default, so you may want to add some commands. For example, this is what I use:
+
+```
+(setq ebib-citation-commands
+      '((any
+         (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
+          ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+          ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+          ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
+          ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
+          ("posstext"    "\\posstextcite%<[%A]%>{%K}")
+          ("posscite"    "\\posscite%<[%A]%>{%K}")
+          ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
+        (org-mode
+         (("ebib"        "[[ebib:%K][%D]]")))
+        (markdown-mode
+         (("text"        "@%K%< [%A]%>")
+          ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
+          ("year"        "[-@%K%< %A%>]")))))
+```
 
 Calling Ebib from a text mode buffer has another small advantage. If point is on a BibTeX key when Ebib is called, it jumps to that entry in your database. This allows you to quickly check a reference in your text. Ebib will search the entry in the current database, or, if you're calling Ebib from a LaTeX file and there is a `\bibliography` or `\addbibresource` command in the file, in the databases in these commands, if they are opened in Ebib, [Associating a Database with a LaTeX File](#associating-a-database-with-a-latex-file) below for details.
 
-There is one more command that can be useful: `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. Note, however, that this command does not add cross-referenced entries to the newly created `.bib` file, nor does it add `@string` definitions and the `@preamble`. So make sure to add those after using `ebib-create-bib-from-bbl`.
+There is one more command that can be useful: `ebib-create-bib-from-bbl` creates a `.bib` file from the `.bbl` file associated with the LaTeX document in the current buffer. This makes it easy to create a `.bib` file containing just the BibTeX entries that are used in the document. Note, however, that this command does not add cross-referenced entries to the newly created `.bib` file, nor does it add `@String` definitions and the `@Preamble`. So make sure to add those after using `ebib-create-bib-from-bbl`.
 
 
 ## Key Bindings ##
@@ -498,7 +517,7 @@ Now, if you leave the arguments empty, Ebib produces the following citation:
 
     \citet{Jones1992}
 
-Note however, that in this format string is problematic. If you fill out the first argument but not the second, Ebib produces the wrong format string:
+Note however, that this format string is problematic. If you fill out the first argument but not the second, Ebib produces the wrong format string:
 
     \citet[cf.]{Jones1992}
 
@@ -508,7 +527,7 @@ If only one optional argument is provided, `natbib` assumes that it is a postnot
 
 This way, the second pair of brackets is always inserted, regardless of whether you provide a second argument or not.
 
-`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `p` to push them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
+`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `i` to insert them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
 
     \citet{Jones1992,Haddock2004}
 

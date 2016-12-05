@@ -5,10 +5,6 @@
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
-;; Created: 2014
-;; Version: 2.8
-;; Keywords: text bibtex
-;; Package-Requires: ((dash "2.5.0") (emacs "24.3"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -66,16 +62,6 @@
 (defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
 
 (defgroup ebib-windows nil "Ebib window management" :group 'ebib)
-
-(defcustom ebib-bibtex-dialect 'BibTeX
-  "The default BibTeX dialect.
-A `.bib' file/database without explicit dialect setting is
-assumed to use this dialect.  Possible values are those listed in
-`bibtex-dialect-list'."
-  :group 'ebib
-  :type `(choice :tag "BibTeX Dialect"
-                 ,@(mapcar (lambda (d) `(const ,d))
-                           bibtex-dialect-list)))
 
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
@@ -299,26 +285,92 @@ documentation for details."
                                  (("text" "@%K%< [%A]%>")
                                   ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
                                   ("year" "[-@%K%< %A%>]"))))
-  "A list of format strings to insert a citation into a buffer.
-This option defines the citation commands that you can use when
-inserting a citation key into a buffer (with
-`ebib--insert-bibtex-key' or `ebib--push-bibtex-key').  The citation
-command (which can be any string, it does not have to correspond
-to an actual LaTeX macro) can be selected with TAB completion.
-You can define a different set of citation commands for each
-major mode.  There is a catch-all option `any`, which is chosen
-when the major mode from which `ebib--insert-bibtex-key` is not on
-the list.  By default, this is used for LaTeX citations, so as to
-cover all TeX and LaTeX modes.
+  "A list of format strings used to insert citations into text buffers.
+Each item in this option consists of a major mode and a list of
+identifier + format strings pairs.  The identifiers (which can be
+any string) are used to select the citation command in
+`ebib-insert-citation' and `ebib-push-citation'.  The format
+strings are used to construct the citation command that is
+inserted in the buffer.
 
-The format string that defines the actual citation command
-inserted in the buffer is described in the manual/info file in
-the section \"Defining Citation Commands\"."
+The major mode can also be specified as `any', which defines
+citation commands that are available in buffers that do not have
+any of the major modes listed in this option.  By default, this
+is used for LaTeX citations, so as to cover all TeX and LaTeX
+modes.
+
+The format string template can contain a number of formatting
+directives:
+
+%K: the key of the entry.
+%A: an argument; prompts the user.
+%D: a description; prompts the user.
+%<...%>: optional material surrounding %A.
+%(...%): a repeater, which must contain %K.
+
+%A is used for arguments to the citation command, which are
+elements such as page numbers, etc.  %A accommodates optional
+arguments in LaTeX-based citations and, similarly, optional
+material in Pandoc Markdown citations.  %D can be used to provide
+a description as used in Org-mode links.  The user is prompted
+for this description, but if possible a default is provided,
+which can be accepted by hitting RET.
+
+Optional material around %A is only included if the user provides
+some string for %A.  If not, the optional material is omitted.
+
+The command `ebib-push-citation' can be used on multiple
+entries (by marking them in the index buffer).  If the template
+contains a repeater, the material inside this repeater is
+processed for each key individually.  If there is no repeater,
+all keys are substituted for %K using a separator for which the
+user is prompted.
+
+The repeater can optionally contain a separator, which must be
+placed between % and ); to use comma as a separator, the format
+shring should contain \"%(%K%,)\".  If the separator is not
+provided, the user is prompted to supply one."
   :group 'ebib
   :type '(repeat (list :tag "Mode" (symbol :tag "Mode name")
                        (repeat (list :tag "Citation command"
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
+
+(defcustom ebib-citation-description-function 'ebib-author-year-description
+  "Function for creating a description to be used in citations.
+This function is called to provide a description to substitute
+for the %D directive in `ebib-citation-commands', and also when
+creating Org links with `org-store-link', provided the library
+`org-ebib' is loaded.
+
+The default value of this option provides an author/year
+description composed of the author or editor field of the entry
+and the year field, combined as \"Author (Year)\".  A second
+option is to use the Title field on an entry for the link
+description.
+
+It is also possible to specify a user-defined function.  This
+function should take two arguments: the key of the entry for
+which a description is to be created, and the database that
+contains the entry."
+  :group 'ebib
+  :type '(choice (function-item :tag "Author/Year" ebib-author-year-description)
+                 (function-item :tag "Title" ebib-title-description)
+                 (function :tag "Custom function")))
+
+(defun ebib-author-year-description (key db)
+  "Provide an author/year description for an Org Ebib link.
+KEY is the key of the entry to provide the link for, DB the
+database that contains the entry."
+  (format "%s (%s)"
+          (ebib--get-field-value-for-display "Author/Editor" key db)
+          (ebib--get-field-value-for-display "Year" key db)))
+
+(defun ebib-title-description (key db)
+  "Provide a title description for an Org Ebib link.
+KEY is the key of the entry to provide the link for, DB the
+database that contains the entry."
+  (ebib-db-get-field-value "Title" key db "(Untitled)" 'unbraced 'xref))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "The major mode of the multiline edit buffer."
@@ -559,124 +611,6 @@ unset the option entirely."
   :group 'ebib
   :type '(repeat (string :tag "Extension")))
 
-(defcustom ebib-biblatex-inheritances '(("all"
-                                     "all"
-                                     (("ids" . none)
-                                      ("crossref" . none)
-                                      ("xref" . none)
-                                      ("entryset" . none)
-                                      ("entrysubtype" . none)
-                                      ("execute" . none)
-                                      ("label" . none)
-                                      ("options" . none)
-                                      ("presort" . none)
-                                      ("related" . none)
-                                      ("relatedoptions" . none)
-                                      ("relatedstring" . none)
-                                      ("relatedtype" . none)
-                                      ("shorthand" . none)
-                                      ("shorthandintro" . none)
-                                      ("sortkey" . none)))
-
-                                    ("inbook, bookinbook, suppbook"
-                                     "mvbook, book"
-                                     (("author" . "author")
-                                      ("bookauthor" . "author")))
-
-                                    ("book, inbook, bookinbook, suppbook"
-                                     "mvbook"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-
-                                    ("collection, reference, incollection, inreference, suppcollection"
-                                     "mvcollection, mvreference"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-
-                                    ("proceedings, inproceedings"
-                                     "mvproceedings"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-
-                                    ("inbook, bookinbook, suppbook"
-                                     "book"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-
-                                    ("incollection, inreference, suppcollection"
-                                     "collection, reference"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-
-                                    ("inproceedings"
-                                     "proceedings"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none)))
-                                    ("article, suppperiodical"
-                                     "periodical"
-                                     (("title" . "journaltitle")
-                                      ("subtitle" . "journalsubtitle")
-                                      ("shorttitle" . none)
-                                      ("sorttitle" . none)
-                                      ("indextitle" . none)
-                                      ("indexsorttitle" . none))))
-  "Inheritance scheme for cross-referencing.
-This option allows you to define inheritances for Biblatex.
-Inheritances are specified for pairs of target and source entry
-type, where the target is the cross-referencing entry and the
-source the cross-referenced entry.  For each pair, specify the
-fields that can inherit a value (the targets) and the fields that
-they inherit from (the sources).
-
-Inheritances for all entry types can be defined by specifying
-`all' as the entry type.  The entry type may also be
-a (comma-separated) list of entry types.
-
-If no inheritance rule is set up for a given entry type+field
-combination, the field inherits from the same-name field in the
-cross-referenced entry.  If no inheritance should take place, set
-the source field to \"No inheritance\".
-
-Note that this option is only relevant for Biblatex.  If the
-BibTeX dialect is set to `BibTeX', this option is ignored."
-  :group 'ebib
-  :type '(repeat (list (string :tag "Target entry type(s)")
-                       (string :tag "Source entry type(s)")
-                       (repeat (cons :tag "Inheritance"
-                                     (string :tag "Target field")
-                                     (choice (string :tag "Source field)")
-                                             (const :tag "No inheritance" none)))))))
-
 (defcustom ebib-hide-cursor t
   "Hide the cursor in the Ebib buffers.
 Normally, the cursor is hidden in Ebib buffers, with the
@@ -727,31 +661,12 @@ Currently, the following problems are marked:
 ;; constants and variables that are set only once
 (defvar ebib--initialized nil "T if Ebib has been initialized.")
 
-;; Entry type and field aliases defined by Biblatex.
-(defconst ebib--field-aliases '(("location" . "address")
-                            ("annotation" . "annote")
-                            ("eprinttype" . "archiveprefix")
-                            ("journaltitle" . "journal")
-                            ("sortkey" . "key")
-                            ("file" . "pdf")
-                            ("eprintclass" . "primaryclass")
-                            ("institution" . "school"))
-  "List of field aliases for Biblatex.")
-
-(defconst ebib--type-aliases '(("Conference" . "InProceedings")
-                           ("Electronic" . "Online")
-                           ("MastersThesis" . "Thesis")
-                           ("PhDThesis" . "Thesis")
-                           ("TechReport" . "Report")
-                           ("WWW" . "Online"))
-  "List of entry type aliases for Biblatex.")
-
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
 
 ;; general bookkeeping
 (defvar ebib--field-history nil "Minibuffer field name history.")
 (defvar ebib--filters-history nil "Minibuffer history for filters.")
-(defvar ebib--cite-command-history nil "Minibuffer history for citation commands.")
+(defvar ebib--citation-history nil "Minibuffer history for citation commands.")
 (defvar ebib--key-history nil "Minibuffer history for entry keys.")
 (defvar ebib--keywords-history nil "Minibuffer history for keywords.")
 
@@ -929,10 +844,6 @@ function adds a newline to the message being logged."
                                       format-string)
                                     "\n")
                    args))))
-
-;; (defsubst ebib--cur-entry-key ()
-;;   "Get the key of the current entry."
-;;   (ebib--db-get-current-entry-key ebib--cur-db))
 
 (defun ebib--read-file-to-list (filename)
   "Return the contents of FILENAME as a list of lines."
@@ -1125,10 +1036,11 @@ empty, return the empty string."
 
 (defun ebib-format-template (template specifiers &rest args)
   "Format TEMPLATE using SPECIFIERS.
-SPECIFIERS is an alist of characters and symbols.  Each
-function should take ARGS as arguments and should return a string
-which is substituted for the specifier in TEMPLATE.  Specs in
-SPECIFIERS that do not occur in TEMPLATE are ignored."
+SPECIFIERS is an alist of characters and symbols.  Each symbol
+should be the name of a function that takes ARGS as arguments and
+returns a string which is substituted for the specifier in
+TEMPLATE.  Specs in SPECIFIERS that do not occur in TEMPLATE are
+ignored."
   ;; First remove specs that do not occur in TEMPLATE.  In principle,
   ;; `format-spec' ignores all specs that do not occur in the template, but we
   ;; do not want to apply the functions of specs that are not needed.
@@ -1152,31 +1064,6 @@ SPECIFIERS that do not occur in TEMPLATE are ignored."
 (defsubst ebib--first-line (string)
   "Return the first line of a multiline STRING."
   (car (split-string string "\n")))
-
-(defun ebib--sort-in-buffer (str limit)
-  "Move POINT to the right position to insert STR in the current buffer.
-The buffer must contain lines that are sorted A--Z.  LIMIT is the
-last line of the buffer.  Note that STR is not actually
-inserted."
-  (let ((upper limit)
-        middle)
-    (when (> limit 0)
-      (let ((lower 0))
-        (goto-char (point-min))
-        (while (progn
-                 (setq middle (/ (+ lower upper 1) 2))
-                 (goto-char (point-min))
-                 (forward-line (1- middle)) ; if this turns out to be where we need to be,
-                 (beginning-of-line)        ; this puts POINT at the right spot.
-                 ;; if upper and lower differ by only 1, we have found the
-                 ;; position to insert the entry in.
-                 (> (- upper lower) 1))
-          (save-excursion
-            (let ((beg (point)))
-              (end-of-line)
-              (if (string< (buffer-substring-no-properties beg (point)) str)
-                  (setq lower middle)
-                (setq upper middle)))))))))
 
 (defun ebib--match-all-in-string (match-str string)
   "Highlight all the matches of MATCH-STR in STRING.
@@ -1313,7 +1200,7 @@ This variable is initialized by `ebib--list-field-uniquely'.")
 (defun ebib--list-fields-uniquely (dialect)
   "Return a list of all fields of BibTeX DIALECT.
 Possible values for DIALECT are those listed in
-`bibtex-dialect-list' or NIL, in which case the value of
+`bibtex-dialect-list' or nil, in which case the value of
 `ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (or (cdr (assq dialect ebib--unique-field-alist))
@@ -1324,8 +1211,39 @@ Possible values for DIALECT are those listed in
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
+(defun ebib--get-field-value-for-display (field key db)
+  "Return the value of FIELD in entry KEY in DB for display.
+This function returns a value for FIELD in such a way that it can
+be used to display to the user.  Therefore, if a field value is
+empty, the return value is not an empty string, but the string
+\"(No <FIELD>)\", or, if FIELD is \"Year\", the string \"(XXXX)\".
+
+In addition, If FIELD is \"Entry Key\", KEY is returned, and if
+FIELD is \"Author/Editor\", the contents of the Author field is
+returned or, if the Author field is empty, the contents of the
+Editor field.  If the Editor field is empty as well, return the
+string \"(No Author/Editor)\"."
+  (cond
+   ((cl-equalp field "Entry Key")
+    key)
+   ((cl-equalp field "Author/Editor")
+    (or (ebib-db-get-field-value "Author" key db 'noerror 'unbraced 'xref)
+        (ebib-db-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
+   ((cl-equalp field "Year")
+    (ebib-db-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
+   (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
+
 (defun ebib--sort-keys-list (keys db)
-  "Sort KEYS according to the sort info of DB."
+  "Sort KEYS according to the sort info of DB.
+First, the keys are sorted themselves, then the list is stably
+sorted on the sort info of DB.  Thus if two entries have the same
+value for the sort field, their keys determine the order in which
+they appear.
+
+Sorting on the sort field is done with `string-collate-lessp', so
+that the order in which the entries appear depends on the user's
+locale.  This is only relevant if one uses BibLaTeX and UTF-8
+characters in fields."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
   ;; And then stably sort on the sort field.
@@ -1337,9 +1255,9 @@ Possible values for DIALECT are those listed in
          ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
          ;; that way.
          (list (mapcar (lambda (key)
-                         (cons (ebib--get-field-value-for-index field key) key))
+                         (cons (ebib--get-field-value-for-display field key db) key))
                        keys)))
-    (setq list (cl-stable-sort list #'string-lessp :key #'car))
+    (setq list (cl-stable-sort list #'string-collate-lessp :key #'car))
     (setq keys (mapcar #'cdr list)))
   ;; Reverse the list if necessary.
   (if (eq (ebib-db-get-sort-order db) 'descend)
