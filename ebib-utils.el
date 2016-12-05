@@ -1212,19 +1212,25 @@ Possible values for DIALECT are those listed in
 
 (defun ebib--get-field-value-for-display (field key db)
   "Return the value of FIELD in entry KEY in DB for display.
-FIELD can be any valid field.  In addition, it can be the string
-\"Entry Key\", in which case KEY is returned, or
-\"Author/Editor\", in which case the contents of the Author field
-is returned or, if the Author filed is empty, the contents of the
-Editor field.  If FIELD has no value in entry KEY, the empty
-string is returned."
+This function returns a value for FIELD in such a way that it can
+be used to display to the user.  Therefore, if a field value is
+empty, the return value is not an empty string, but the string
+\"(No <FIELD>)\", or, if FIELD is \"Year\", the string \"(XXXX)\".
+
+In addition, If FIELD is \"Entry Key\", KEY is returned, and if
+FIELD is \"Author/Editor\", the contents of the Author field is
+returned or, if the Author field is empty, the contents of the
+Editor field.  If the Editor field is empty as well, return the
+string \"(No Author/Editor)\"."
   (cond
    ((cl-equalp field "Entry Key")
     key)
    ((cl-equalp field "Author/Editor")
     (or (ebib-db-get-field-value "Author" key db 'noerror 'unbraced 'xref)
-        (ebib-db-get-field-value "Editor" key db "" 'unbraced 'xref)))
-   (t (ebib-db-get-field-value field key db "" 'unbraced 'xref))))
+        (ebib-db-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
+   ((cl-equalp field "Year")
+    (ebib-db-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
+   (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
 
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB."
