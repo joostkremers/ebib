@@ -1233,7 +1233,16 @@ string \"(No Author/Editor)\"."
    (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
 
 (defun ebib--sort-keys-list (keys db)
-  "Sort KEYS according to the sort info of DB."
+  "Sort KEYS according to the sort info of DB.
+First, the keys are sorted themselves, then the list is stably
+sorted on the sort info of DB.  Thus if two entries have the same
+value for the sort field, their keys determine the order in which
+they appear.
+
+Sorting on the sort field is done with `string-collate-lessp', so
+that the order in which the entries appear depends on the user's
+locale.  This is only relevant if one uses BibLaTeX and UTF-8
+characters in fields."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
   ;; And then stably sort on the sort field.
@@ -1247,7 +1256,7 @@ string \"(No Author/Editor)\"."
          (list (mapcar (lambda (key)
                          (cons (ebib--get-field-value-for-display field key db) key))
                        keys)))
-    (setq list (cl-stable-sort list #'string-lessp :key #'car))
+    (setq list (cl-stable-sort list #'string-collate-lessp :key #'car))
     (setq keys (mapcar #'cdr list)))
   ;; Reverse the list if necessary.
   (if (eq (ebib-db-get-sort-order db) 'descend)
