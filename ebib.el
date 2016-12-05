@@ -448,16 +448,6 @@ loaded, switch to it.  If KEY is given, jump to it."
       (setq needs-update t))
     (if needs-update (ebib--update-buffers))))
 
-;;;###autoload
-(defun ebib-show-entry (key)
-  "Open Ebib and jump to KEY."
-  (ebib nil key))
-
-;;;###autoload
-(defalias 'ebib-open-org-link 'ebib-show-entry
-  "Open Ebib and jump to KEY.
-This is for use in Org-mode links.")
-
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
 FILES is a list of BibTeX files in which KEY is searched.  If

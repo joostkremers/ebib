@@ -40,6 +40,7 @@
 
 (defcustom org-ebib-description-function 'org-ebib-author-year-description
   "Function to create the description of an Org Ebib link.
+;;;###autoload
 The default value of this option provides an author/year
 description composed of the author or editor field of the entry
 and the year field, combined as \"Author (Year)\".  A second
