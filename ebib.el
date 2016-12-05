@@ -36,9 +36,9 @@
 ;;; Commentary:
 
 ;; Ebib is a BibTeX database manager that runs in GNU Emacs.  With Ebib, you
-;; can create and manage .bib-files, all within Emacs.  It supports @string
-;; and @preamble definitions, multi-line field values, searching, and
-;; integration with Emacs' (La)TeX mode.
+;; can create and manage .bib-files, all within Emacs.  It supports @String
+;; and @Preamble definitions, multi-line field values, searching, and
+;; integration with Emacs' (La)TeX mode, Org mode and others.
 
 ;; See the Ebib manual for usage and installation instructions.
 
