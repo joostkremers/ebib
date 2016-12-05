@@ -3270,16 +3270,18 @@ When the user enters an empty string, the value is not changed."
   "Create a new @STRING definition."
   (interactive)
   (ebib--ifstring (new-abbr (read-string "New @STRING abbreviation: " nil 'ebib--key-history))
-      (progn
-        (if (member new-abbr (ebib-db-list-strings ebib--cur-db))
-            (error "[Ebib] %s already exists" new-abbr))
+      (if (member new-abbr (ebib-db-list-strings ebib--cur-db))
+          (error "[Ebib] %s already exists" new-abbr)
         (ebib--ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
             (progn
               (ebib-db-set-string new-abbr new-string ebib--cur-db)
-              (ebib--sort-in-buffer new-abbr (length (ebib-db-list-strings ebib--cur-db)))
               (let ((inhibit-read-only t))
-                (insert (format "%-19s %s\n" new-abbr new-string)))
-              (forward-line -1)
+                (goto-char (point-min))
+                (insert (format "%-19s %s\n" new-abbr new-string))
+                (sort-lines nil (point-min) (point-max)))
+              (goto-char (point-min))
+              (re-search-forward new-string nil 'noerror)
+              (beginning-of-line)
               (ebib--set-modified t))))))
 
 (defun ebib-export-string (prefix)

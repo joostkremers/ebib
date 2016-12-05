@@ -1064,31 +1064,6 @@ ignored."
   "Return the first line of a multiline STRING."
   (car (split-string string "\n")))
 
-(defun ebib--sort-in-buffer (str limit)
-  "Move POINT to the right position to insert STR in the current buffer.
-The buffer must contain lines that are sorted A--Z.  LIMIT is the
-last line of the buffer.  Note that STR is not actually
-inserted."
-  (let ((upper limit)
-        middle)
-    (when (> limit 0)
-      (let ((lower 0))
-        (goto-char (point-min))
-        (while (progn
-                 (setq middle (/ (+ lower upper 1) 2))
-                 (goto-char (point-min))
-                 (forward-line (1- middle)) ; if this turns out to be where we need to be,
-                 (beginning-of-line)        ; this puts POINT at the right spot.
-                 ;; if upper and lower differ by only 1, we have found the
-                 ;; position to insert the entry in.
-                 (> (- upper lower) 1))
-          (save-excursion
-            (let ((beg (point)))
-              (end-of-line)
-              (if (string< (buffer-substring-no-properties beg (point)) str)
-                  (setq lower middle)
-                (setq upper middle)))))))))
-
 (defun ebib--match-all-in-string (match-str string)
   "Highlight all the matches of MATCH-STR in STRING.
 The return value is a list of two elements: the first is the
