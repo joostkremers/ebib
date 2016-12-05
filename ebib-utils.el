@@ -285,26 +285,92 @@ documentation for details."
                                  (("text" "@%K%< [%A]%>")
                                   ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
                                   ("year" "[-@%K%< %A%>]"))))
-  "A list of format strings to insert a citation into a buffer.
-This option defines the citation commands that you can use when
-inserting a citation key into a buffer (with
-`ebib--insert-bibtex-key' or `ebib--push-bibtex-key').  The citation
-command (which can be any string, it does not have to correspond
-to an actual LaTeX macro) can be selected with TAB completion.
-You can define a different set of citation commands for each
-major mode.  There is a catch-all option `any`, which is chosen
-when the major mode from which `ebib--insert-bibtex-key` is not on
-the list.  By default, this is used for LaTeX citations, so as to
-cover all TeX and LaTeX modes.
+  "A list of format strings used to insert citations into text buffers.
+Each item in this option consists of a major mode and a list of
+identifier + format strings pairs.  The identifiers (which can be
+any string) are used to select the citation command in
+`ebib-insert-citation' and `ebib-push-citation'.  The format
+strings are used to construct the citation command that is
+inserted in the buffer.
 
-The format string that defines the actual citation command
-inserted in the buffer is described in the manual/info file in
-the section \"Defining Citation Commands\"."
+The major mode can also be specified as `any', which defines
+citation commands that are available in buffers that do not have
+any of the major modes listed in this option.  By default, this
+is used for LaTeX citations, so as to cover all TeX and LaTeX
+modes.
+
+The format string template can contain a number of formatting
+directives:
+
+%K: the key of the entry.
+%A: an argument; prompts the user.
+%D: a description; prompts the user.
+%<...%>: optional material surrounding %A.
+%(...%): a repeater, which must contain %K.
+
+%A is used for arguments to the citation command, which are
+elements such as page numbers, etc.  %A accommodates optional
+arguments in LaTeX-based citations and, similarly, optional
+material in Pandoc Markdown citations.  %D can be used to provide
+a description as used in Org-mode links.  The user is prompted
+for this description, but if possible a default is provided,
+which can be accepted by hitting RET.
+
+Optional material around %A is only included if the user provides
+some string for %A.  If not, the optional material is omitted.
+
+The command `ebib-push-citation' can be used on multiple
+entries (by marking them in the index buffer).  If the template
+contains a repeater, the material inside this repeater is
+processed for each key individually.  If there is no repeater,
+all keys are substituted for %K using a separator for which the
+user is prompted.
+
+The repeater can optionally contain a separator, which must be
+placed between % and ); to use comma as a separator, the format
+shring should contain \"%(%K%,)\".  If the separator is not
+provided, the user is prompted to supply one."
   :group 'ebib
   :type '(repeat (list :tag "Mode" (symbol :tag "Mode name")
                        (repeat (list :tag "Citation command"
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
+
+(defcustom ebib-citation-description-function 'ebib-author-year-description
+  "Function for creating a description to be used in citations.
+This function is called to provide a description to substitute
+for the %D directive in `ebib-citation-commands', and also when
+creating Org links with `org-store-link', provided the library
+`org-ebib' is loaded.
+
+The default value of this option provides an author/year
+description composed of the author or editor field of the entry
+and the year field, combined as \"Author (Year)\".  A second
+option is to use the Title field on an entry for the link
+description.
+
+It is also possible to specify a user-defined function.  This
+function should take two arguments: the key of the entry for
+which a description is to be created, and the database that
+contains the entry."
+  :group 'ebib
+  :type '(choice (function-item :tag "Author/Year" ebib-author-year-description)
+                 (function-item :tag "Title" ebib-title-description)
+                 (function :tag "Custom function")))
+
+(defun ebib-author-year-description (key db)
+  "Provide an author/year description for an Org Ebib link.
+KEY is the key of the entry to provide the link for, DB the
+database that contains the entry."
+  (format "%s (%s)"
+          (ebib--get-field-value-for-display "Author/Editor" key db)
+          (ebib--get-field-value-for-display "Year" key db)))
+
+(defun ebib-title-description (key db)
+  "Provide a title description for an Org Ebib link.
+KEY is the key of the entry to provide the link for, DB the
+database that contains the entry."
+  (ebib-db-get-field-value "Title" key db "(Untitled)" 'unbraced 'xref))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "The major mode of the multiline edit buffer."
