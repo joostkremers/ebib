@@ -525,8 +525,9 @@ the buffers, reads the rc file and loads the files in
   (setq ebib--initialized t))
 
 (defun ebib--setup-windows ()
-  "Create Ebib's window configuration in the current frame."
-  ;; If the index buffer is visible, just switch to it.
+  "Create Ebib's window configuration.
+If the index buffer is already visible in some frame, select its
+window and make the frame active,"
   (let ((index-window (get-buffer-window (ebib--buffer 'index) t))
         (old-frame (selected-frame)))
     (if index-window
@@ -534,7 +535,6 @@ the buffers, reads the rc file and loads the files in
                (unless (eq (window-frame) old-frame)
                  (select-frame-set-input-focus (window-frame))
                  (setq ebib--frame-before old-frame)))
-      ;; Save the current window configuration.
       (setq ebib--saved-window-config (current-window-configuration))
       (setq ebib--frame-before nil)
       (cond
