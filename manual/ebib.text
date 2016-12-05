@@ -10,6 +10,12 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## 5 December 2016 ##
+
+- New library `org-ebib`. This defines a new Org link type `ebib:`, which uses the command `org-ebib-open` to open Ebib. The previous commands to do this, `ebib-show-entry` and `ebib-open-org-link` have been removed. `org-ebib` also allows the creation of Org links to Ebib entries with `org-store-link`.
+- New citation insertion command `ebib-insert-citation`. This replaces `ebib-insert-bibtex-key`, so please update your key bindings. The new command uses `ivy` for completion if this package is available, so that it is possible to select an entry by typing parts of its author and/or title.
+
+
 ## 7 November 2016 ##
 
 - New tabulated list interface in index buffer. This interface is not based on Emacs' built-in `tabulated-list-mode`, hence sorting cannot be done by clicking on the column headers. Sorting can be done with `<`, `>` (sort ascending and sort descending, respectively, which ask for the column to sort) and `=`, to reset to default sort (which is on the entry key).
@@ -462,15 +468,15 @@ There is one more command that can be useful: `ebib-create-bib-from-bbl` creates
 
 ## Key Bindings ##
 
-Of course, the easiest way to use the commands discussed here is to bind them to a key sequence. For example, the following binds `C-c b` to `ebib-insert-bibtex-key` in AUCTeX's LaTeX mode:
+Of course, the easiest way to use the commands discussed here is to bind them to a key sequence. For example, the following binds `C-c b` to `ebib-insert-citation` in AUCTeX's LaTeX mode:
 
 ```
-(define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-bibtex-key)
+(define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-citation)
 ```
 
 Note that commands of the form `C-c <letter>` are reserved for the user, and should therefore not be set by any package. For this reasons, Ebib does not set this command itself.
 
-`ebib-insert-bibtex-key` recognises the major mode of the buffer it is called from and uses this information to determine which kinds of citations to insert. So you can bind the `ebib-insert-bibtex-key` to the same key sequence in every text mode in which you use citations and Ebib will do the right thing.
+`ebib-insert-citation` recognises the major mode of the buffer it is called from and uses this information to determine which kinds of citations to insert. So you can bind the `ebib-insert-citation` to the same key sequence in every text mode in which you use citations and Ebib will do the right thing.
 
 
 ## Defining Citation Commands ##
@@ -527,7 +533,7 @@ If only one optional argument is provided, `natbib` assumes that it is a postnot
 
 This way, the second pair of brackets is always inserted, regardless of whether you provide a second argument or not.
 
-`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-bibtex-key` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `i` to insert them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
+`Natbib` commands also accept multiple citation keys. When you call `ebib-insert-citation` from within a LaTeX buffer, you can only provide one key, but when you're in Ebib, you can mark multiple entry keys and then use `i` to insert them to a buffer. In this case, Ebib asks you for a separator and then inserts all keys into the position of `%K`:
 
     \citet{Jones1992,Haddock2004}
 
@@ -558,7 +564,7 @@ Lastly, a citation command can also contain a `%D` directive. This is mainly for
 
 ## Associating a Database with a LaTeX File ##
 
-The commands `ebib-insert-bibtex-key` and `ebib-entry-summary` must consult the database or databases loaded in Ebib, and Ebib tries to be smart about which database(s) to consult. Usually, a LaTeX file has a `\bibliography` command somewhere toward the end, or an `\addbibresource` command in the preamble, which names the `.bib` file or files that contain the bibliography entries. If you consult a BibTeX database from within a LaTeX file, Ebib first looks for one of these commands, reads the names of the `.bib` file(s) from it, and then sees if those files happen to be open. If they are, Ebib uses them to let you pick an entry key (in the case of `ebib-insert-entry-key`) or to search for the entry (in the case of `ebib-entry-summary`).
+The commands `ebib-insert-citation` and `ebib-entry-summary` must consult the database or databases loaded in Ebib, and Ebib tries to be smart about which database(s) to consult. Usually, a LaTeX file has a `\bibliography` command somewhere toward the end, or an `\addbibresource` command in the preamble, which names the `.bib` file or files that contain the bibliography entries. If you consult a BibTeX database from within a LaTeX file, Ebib first looks for one of these commands, reads the names of the `.bib` file(s) from it, and then sees if those files happen to be open. If they are, Ebib uses them to let you pick an entry key (in the case of `ebib-insert-entry-key`) or to search for the entry (in the case of `ebib-entry-summary`).
 
 Of course, it may be the case that the LaTeX file is actually part of a bigger project, and that only the master file contains a `\bibliography` or `\addbibresource` command. To accommodate for this, Ebib checks whether the (buffer-local) variable `TeX-master` is set to a filename. If it is, it reads that file and tries to find the relevant command there. (Note: `TeX-master` is an AUCTeX variable, which is used to keep track of multi-file projects. If you don't use AUCTeX, this functionality doesn't work, and Ebib will only check the current file for a `\bibliography` or `\addbibresource` command.)
 

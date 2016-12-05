@@ -61,15 +61,33 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
+* 5 December 2016::
 * 7 November 2016::
 * Version 28 26 October 2016::
 * Version 27 22 September 2016::
 * Version 263 31 August 2016::
 
 
-File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Up: News
+File: ebib.info,  Node: 5 December 2016,  Next: 7 November 2016,  Up: News
 
-1.1 7 November 2016
+1.1 5 December 2016
+===================
+
+   • New library ‘org-ebib’.  This defines a new Org link type ‘ebib:’,
+     which uses the command ‘org-ebib-open’ to open Ebib.  The previous
+     commands to do this, ‘ebib-show-entry’ and ‘ebib-open-org-link’
+     have been removed.  ‘org-ebib’ also allows the creation of Org
+     links to Ebib entries with ‘org-store-link’.
+   • New citation insertion command ‘ebib-insert-citation’.  This
+     replaces ‘ebib-insert-bibtex-key’, so please update your key
+     bindings.  The new command uses ‘ivy’ for completion if this
+     package is available, so that it is possible to select an entry by
+     typing parts of its author and/or title.
+
+
+File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Prev: 5 December 2016,  Up: News
+
+1.2 7 November 2016
 ===================
 
    • New tabulated list interface in index buffer.  This interface is
@@ -88,7 +106,7 @@ File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Up:
 
 File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 September 2016,  Prev: 7 November 2016,  Up: News
 
-1.2 Version 2.8, 26 October 2016
+1.3 Version 2.8, 26 October 2016
 ================================
 
    • Changed key bindings: ‘j’ and ‘k’ no longer move up/down in the
@@ -118,7 +136,7 @@ File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 Septemb
 
 File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 August 2016,  Prev: Version 28 26 October 2016,  Up: News
 
-1.3 Version 2.7, 22 September 2016
+1.4 Version 2.7, 22 September 2016
 ==================================
 
    • Reading list management: add and remove BibTeX entries to an Org
@@ -133,7 +151,7 @@ File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 Augu
 
 File: ebib.info,  Node: Version 263 31 August 2016,  Prev: Version 27 22 September 2016,  Up: News
 
-1.4 Version 2.6.3, 31 August 2016
+1.5 Version 2.6.3, 31 August 2016
 =================================
 
    • Allow storing notes in a single file rather than using one file per
@@ -1377,19 +1395,19 @@ File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Up: Ac
 
 Of course, the easiest way to use the commands discussed here is to bind
 them to a key sequence.  For example, the following binds ‘C-c b’ to
-‘ebib-insert-bibtex-key’ in AUCTeX’s LaTeX mode:
+‘ebib-insert-citation’ in AUCTeX’s LaTeX mode:
 
-(define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-bibtex-key)
+(define-key 'LaTeX-mode-map "\C-cb" 'ebib-insert-citation)
 
    Note that commands of the form ‘C-c <letter>’ are reserved for the
 user, and should therefore not be set by any package.  For this reasons,
 Ebib does not set this command itself.
 
-   ‘ebib-insert-bibtex-key’ recognises the major mode of the buffer it
-is called from and uses this information to determine which kinds of
-citations to insert.  So you can bind the ‘ebib-insert-bibtex-key’ to
-the same key sequence in every text mode in which you use citations and
-Ebib will do the right thing.
+   ‘ebib-insert-citation’ recognises the major mode of the buffer it is
+called from and uses this information to determine which kinds of
+citations to insert.  So you can bind the ‘ebib-insert-citation’ to the
+same key sequence in every text mode in which you use citations and Ebib
+will do the right thing.
 
 
 File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a LaTeX File,  Prev: Key Bindings,  Up: Accessing BibTeX Databases outside Ebib
@@ -1483,11 +1501,10 @@ Therefore, it is best not to make the second argument optional:
 of whether you provide a second argument or not.
 
    ‘Natbib’ commands also accept multiple citation keys.  When you call
-‘ebib-insert-bibtex-key’ from within a LaTeX buffer, you can only
-provide one key, but when you’re in Ebib, you can mark multiple entry
-keys and then use ‘i’ to insert them to a buffer.  In this case, Ebib
-asks you for a separator and then inserts all keys into the position of
-‘%K’:
+‘ebib-insert-citation’ from within a LaTeX buffer, you can only provide
+one key, but when you’re in Ebib, you can mark multiple entry keys and
+then use ‘i’ to insert them to a buffer.  In this case, Ebib asks you
+for a separator and then inserts all keys into the position of ‘%K’:
 
 \citet{Jones1992,Haddock2004}
 
@@ -1546,7 +1563,7 @@ File: ebib.info,  Node: Associating a Database with a LaTeX File,  Prev: Definin
 9.3 Associating a Database with a LaTeX File
 ============================================
 
-The commands ‘ebib-insert-bibtex-key’ and ‘ebib-entry-summary’ must
+The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
 consult the database or databases loaded in Ebib, and Ebib tries to be
 smart about which database(s) to consult.  Usually, a LaTeX file has a
 ‘\bibliography’ command somewhere toward the end, or an
@@ -2806,134 +2823,136 @@ Tag Table:
 Node: Top186
 Node: News1472
 Ref: #news1562
-Node: 7 November 20161687
-Ref: #november-20161817
-Node: Version 28 26 October 20162607
-Ref: #version-2.8-26-october-20162800
-Node: Version 27 22 September 20164238
-Ref: #version-2.7-22-september-20164446
-Node: Version 263 31 August 20164883
-Ref: #version-2.6.3-31-august-20165054
-Node: Installation5473
-Ref: #installation5591
-Node: Package manager5712
-Ref: #package-manager5841
-Node: Debian and Ubuntu6192
-Ref: #debian-and-ubuntu6353
-Node: Manual installation6487
-Ref: #manual-installation6650
-Node: Starting Ebib7053
-Ref: #starting-ebib7209
-Node: Upgrading from Ebib 1x8117
-Ref: #upgrading-from-ebib-1.x8265
-Node: Getting Started11370
-Ref: #getting-started11510
-Node: Opening a bib File13884
-Ref: #opening-a-.bib-file14038
-Node: Preloading bib Files15749
-Ref: #preloading-.bib-files15937
-Node: Navigating a bib File16735
-Ref: #navigating-a-.bib-file16930
-Node: Starting a New bib File20225
-Ref: #starting-a-new-.bib-file20395
-Node: Editing the Database20687
-Ref: #editing-the-database20842
-Node: Adding and Deleting Entries21219
-Ref: #adding-and-deleting-entries21396
-Node: Editing Fields Values23972
-Ref: #editing-fields-values24170
-Node: Editing Multiline Values26819
-Ref: #editing-multiline-values27012
-Node: Undefined Fields29526
-Ref: #undefined-fields29695
-Node: Hidden Fields30687
-Ref: #hidden-fields30836
-Node: Timestamps31724
-Ref: #timestamps31886
-Node: Copy Cut Kill Paste Yank and Delete33945
-Ref: #copy-cut-kill-paste-yank-and-delete34149
-Node: Saving a Database35101
-Ref: #saving-a-database35249
-Node: Using Biblatex36920
-Ref: #using-biblatex37058
-Node: Setting the BibTeX Dialect37385
-Ref: #setting-the-bibtex-dialect37554
-Node: Alias Types and Fields39594
-Ref: #alias-types-and-fields39755
-Node: The Entries List41941
-Ref: #the-entries-list42075
-Node: Searching43667
-Ref: #searching43812
-Node: Simple Searches43854
-Ref: #simple-searches43970
-Node: Filters46566
-Ref: #filters46666
-Node: Simple Selection47720
-Ref: #simple-selection47849
-Node: Complex Filters49527
-Ref: #complex-filters49689
-Node: Storing and Saving Filters53676
-Ref: #storing-and-saving-filters53859
-Node: Special Filters56730
-Ref: #special-filters56911
-Node: An Example Listing Recent Additions58266
-Ref: #an-example-listing-recent-additions58495
-Node: Properties of Filtered Databases60663
-Ref: #properties-of-filtered-databases60860
-Node: Accessing BibTeX Databases outside Ebib62514
-Ref: #accessing-bibtex-databases-outside-ebib62720
-Node: Key Bindings67640
-Ref: #key-bindings67796
-Node: Defining Citation Commands68568
-Ref: #defining-citation-commands68801
-Node: Associating a Database with a LaTeX File74715
-Ref: #associating-a-database-with-a-latex-file74955
-Node: Cross-referencing77901
-Ref: #cross-referencing78071
-Node: Marking Entries81372
-Ref: #marking-entries81520
-Node: Printing the Database82499
-Ref: #printing-the-database82659
-Node: Calling a Browser86447
-Ref: #calling-a-browser86597
-Node: Viewing Files89217
-Ref: #viewing-files89349
-Node: Editing the file field93130
-Ref: #editing-the-file-field93265
-Node: Notes files94608
-Ref: #notes-files94742
-Node: Customising the notes template98887
-Ref: #customising-the-notes-template99036
-Node: Managing a reading list102085
-Ref: #managing-a-reading-list102247
-Node: Window Management105342
-Ref: #window-management105501
-Node: Creating Entry Stubs108657
-Ref: #creating-entry-stubs108819
-Node: @Preamble Definition109820
-Ref: #preamble-definition109984
-Node: @String Definitions111970
-Ref: #string-definitions112121
-Node: @Comments115629
-Ref: #comments115757
-Node: Managing Keywords116122
-Ref: #managing-keywords116267
-Node: Sorting the bib File122152
-Ref: #sorting-the-.bib-file122325
-Node: Merging and Importing125452
-Ref: #merging-and-importing125617
-Node: Exporting Entries127391
-Ref: #exporting-entries127553
-Node: Multiple Identical Fields129528
-Ref: #multiple-identical-fields129707
-Node: Multiline Edit Buffers131600
-Ref: #multiline-edit-buffers131772
-Node: The Options Menu135902
-Ref: #the-options-menu136050
-Node: Customisation136671
-Ref: #customisation136782
-Node: Modifying Key Bindings137725
-Ref: #modifying-key-bindings137852
+Node: 5 December 20161707
+Ref: #december-20161826
+Node: 7 November 20162518
+Ref: #november-20162672
+Node: Version 28 26 October 20163462
+Ref: #version-2.8-26-october-20163655
+Node: Version 27 22 September 20165093
+Ref: #version-2.7-22-september-20165301
+Node: Version 263 31 August 20165738
+Ref: #version-2.6.3-31-august-20165909
+Node: Installation6328
+Ref: #installation6446
+Node: Package manager6567
+Ref: #package-manager6696
+Node: Debian and Ubuntu7047
+Ref: #debian-and-ubuntu7208
+Node: Manual installation7342
+Ref: #manual-installation7505
+Node: Starting Ebib7908
+Ref: #starting-ebib8064
+Node: Upgrading from Ebib 1x8972
+Ref: #upgrading-from-ebib-1.x9120
+Node: Getting Started12225
+Ref: #getting-started12365
+Node: Opening a bib File14739
+Ref: #opening-a-.bib-file14893
+Node: Preloading bib Files16604
+Ref: #preloading-.bib-files16792
+Node: Navigating a bib File17590
+Ref: #navigating-a-.bib-file17785
+Node: Starting a New bib File21080
+Ref: #starting-a-new-.bib-file21250
+Node: Editing the Database21542
+Ref: #editing-the-database21697
+Node: Adding and Deleting Entries22074
+Ref: #adding-and-deleting-entries22251
+Node: Editing Fields Values24827
+Ref: #editing-fields-values25025
+Node: Editing Multiline Values27674
+Ref: #editing-multiline-values27867
+Node: Undefined Fields30381
+Ref: #undefined-fields30550
+Node: Hidden Fields31542
+Ref: #hidden-fields31691
+Node: Timestamps32579
+Ref: #timestamps32741
+Node: Copy Cut Kill Paste Yank and Delete34800
+Ref: #copy-cut-kill-paste-yank-and-delete35004
+Node: Saving a Database35956
+Ref: #saving-a-database36104
+Node: Using Biblatex37775
+Ref: #using-biblatex37913
+Node: Setting the BibTeX Dialect38240
+Ref: #setting-the-bibtex-dialect38409
+Node: Alias Types and Fields40449
+Ref: #alias-types-and-fields40610
+Node: The Entries List42796
+Ref: #the-entries-list42930
+Node: Searching44522
+Ref: #searching44667
+Node: Simple Searches44709
+Ref: #simple-searches44825
+Node: Filters47421
+Ref: #filters47521
+Node: Simple Selection48575
+Ref: #simple-selection48704
+Node: Complex Filters50382
+Ref: #complex-filters50544
+Node: Storing and Saving Filters54531
+Ref: #storing-and-saving-filters54714
+Node: Special Filters57585
+Ref: #special-filters57766
+Node: An Example Listing Recent Additions59121
+Ref: #an-example-listing-recent-additions59350
+Node: Properties of Filtered Databases61518
+Ref: #properties-of-filtered-databases61715
+Node: Accessing BibTeX Databases outside Ebib63369
+Ref: #accessing-bibtex-databases-outside-ebib63575
+Node: Key Bindings68495
+Ref: #key-bindings68651
+Node: Defining Citation Commands69415
+Ref: #defining-citation-commands69648
+Node: Associating a Database with a LaTeX File75560
+Ref: #associating-a-database-with-a-latex-file75800
+Node: Cross-referencing78744
+Ref: #cross-referencing78914
+Node: Marking Entries82215
+Ref: #marking-entries82363
+Node: Printing the Database83342
+Ref: #printing-the-database83502
+Node: Calling a Browser87290
+Ref: #calling-a-browser87440
+Node: Viewing Files90060
+Ref: #viewing-files90192
+Node: Editing the file field93973
+Ref: #editing-the-file-field94108
+Node: Notes files95451
+Ref: #notes-files95585
+Node: Customising the notes template99730
+Ref: #customising-the-notes-template99879
+Node: Managing a reading list102928
+Ref: #managing-a-reading-list103090
+Node: Window Management106185
+Ref: #window-management106344
+Node: Creating Entry Stubs109500
+Ref: #creating-entry-stubs109662
+Node: @Preamble Definition110663
+Ref: #preamble-definition110827
+Node: @String Definitions112813
+Ref: #string-definitions112964
+Node: @Comments116472
+Ref: #comments116600
+Node: Managing Keywords116965
+Ref: #managing-keywords117110
+Node: Sorting the bib File122995
+Ref: #sorting-the-.bib-file123168
+Node: Merging and Importing126295
+Ref: #merging-and-importing126460
+Node: Exporting Entries128234
+Ref: #exporting-entries128396
+Node: Multiple Identical Fields130371
+Ref: #multiple-identical-fields130550
+Node: Multiline Edit Buffers132443
+Ref: #multiline-edit-buffers132615
+Node: The Options Menu136745
+Ref: #the-options-menu136893
+Node: Customisation137514
+Ref: #customisation137625
+Node: Modifying Key Bindings138568
+Ref: #modifying-key-bindings138695
 
 End Tag Table
 
