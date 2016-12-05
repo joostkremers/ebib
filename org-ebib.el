@@ -33,43 +33,14 @@
 
 ;; This is to silence the byte-compiler and flycheck.
 (defvar ebib--cur-db)
+(defvar ebib-citation-description-function)
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
-(declare-function ebib-db-get-field-value "ebib-db" (field key db &optional noerror unbraced xref))
 (declare-function org-link-set-parameters "org" (type &rest parameters))
-
-(defcustom org-ebib-description-function 'org-ebib-author-year-description
-  "Function to create the description of an Org Ebib link.
-;;;###autoload
-The default value of this option provides an author/year
-description composed of the author or editor field of the entry
-and the year field, combined as \"Author (Year)\".  A second
-optino is to use the Title field on an entry for the link
-description.
-
-It is also possible to specify a user-defined function.  This
-function should take the key of the entry as argument and should
-return a string that will be used as a description.  This
-function can access the current database through the variable
-`ebib--cur-db'."
-  :group 'ebib
-  :type '(choice (function-item :tag "Author/Year" org-ebib-author-year-description)
-                 (function-item :tag "Title" org-ebib-title-description)
-                 (function :tag "Custom function")))
-
-(defun org-ebib-author-year-description (key)
-  "Provide an author/year description for an Org Ebib link to KEY."
-  (format "%s (%s)"
-          (or (ebib-db-get-field-value "Author" key ebib--cur-db 'noerror 'unbraced 'xref)
-              (ebib-db-get-field-value "Editor" key ebib--cur-db "(No Author)" 'unbraced 'xref))
-          (ebib-db-get-field-value "Year" key ebib--cur-db "XXXX" 'unbraced 'xref)))
-
-(defun org-ebib-title-description (key)
-  "Provide a title description for an Org Ebib link to KEY."
-  (ebib-db-get-field-value "Title" key ebib--cur-db "(Untitled)" 'unbraced 'xref))
 
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
+;;;###autoload
 (defun org-ebib-open (key)
   "Open Ebib and jump to KEY."
   (ebib nil key))
@@ -80,7 +51,7 @@ function can access the current database through the variable
     ;; This is an Ebib entry
     (let* ((key (ebib--get-key-at-point))
            (link (concat "ebib:" key))
-           (description (ignore-errors (funcall org-ebib-description-function key))))
+           (description (ignore-errors (funcall ebib-citation-description-function key ebib--cur-db))))
       (org-store-link-props :type "ebib"
                             :link link
                             :description description))))
