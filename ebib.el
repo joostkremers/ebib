@@ -1062,7 +1062,8 @@ buffer if Ebib is not occupying the entire frame."
     (other-window 1)
     (if (member (current-buffer) (mapcar #'cdr ebib--buffer-alist))
         (switch-to-buffer nil)))
-   ((not (eq (window-frame) ebib--frame-before))
+   ((and ebib--frame-before
+         (not (eq (window-frame) ebib--frame-before)))
     (if (frame-live-p ebib--frame-before)
         (select-frame-set-input-focus ebib--frame-before)
       (setq ebib--frame-before nil)
