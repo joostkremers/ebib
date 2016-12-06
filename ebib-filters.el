@@ -297,16 +297,16 @@ there is a name conflict."
 
 (defun ebib--filters-save-file (file)
   "Write `ebib--filters-alist' to FILE."
-  (with-temp-buffer
-    (let ((print-length nil)
-          (print-level nil)
-          (print-circle nil))
-      (insert ";; -*- mode: emacs-lisp -*-\n\n")
-      (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
-      (pp ebib--filters-alist (current-buffer))
-      (condition-case nil ;; TODO I should use this for the keywords file as well, so that ebib--quit doesn't terminate prematurely.
-	  (write-region (point-min) (point-max) file)
-	(file-error (message "Can't write %s" file))))))
+  (if (file-writable-p file)
+      (with-temp-buffer
+        (let ((print-length nil)
+              (print-level nil)
+              (print-circle nil))
+          (insert ";; -*- mode: emacs-lisp -*-\n\n")
+          (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
+          (pp ebib--filters-alist (current-buffer))
+          (write-region (point-min) (point-max) file)))
+    (ebib-log 'warning "Could not write to filters file `%s'" file)))
 
 (defun ebib--filters-update-filters-file ()
   "Update the filters file.
