@@ -539,12 +539,9 @@ the value without braces."
   "Return the alist containing all @STRING definitions in DB."
   (ebib--db-struct-strings db))
 
-(defun ebib-db-list-strings (db)
+(defsubst ebib-db-list-strings (db)
   "Return a list of @STRING abbreviations in DB without expansions."
-  (let ((list (mapcar #'car (ebib--db-struct-strings db))))
-    (if sort
-        (sort list 'string<)
-      list)))
+  (mapcar #'car (ebib--db-struct-strings db)))
 
 (defun ebib-db-set-preamble (preamble db &optional if-exists)
   "Set PREAMBLE as the preamble of DB.
