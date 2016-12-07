@@ -1529,7 +1529,7 @@ referred to by ENTRY-KEY."
                    (string< x y)))))    ; compare entry keys
     ;; Only entries in visible the index buffer are saved, in case we're writing
     ;; a filtered db to a new file.
-    (let ((sorted-list (ebib-db-list-keys ebib--cur-db 'sort)))
+    (let ((sorted-list (sort (ebib-db-list-keys ebib--cur-db 'sort) #'string<)))
       (cond
        (ebib-save-xrefs-first
         (setq sorted-list (sort sorted-list #'compare-xrefs)))
@@ -3336,7 +3336,7 @@ beginning of the current line."
   (with-current-ebib-buffer 'strings
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (cl-dolist (elem (ebib-db-list-strings ebib--cur-db 'sort))
+      (cl-dolist (elem (sort (ebib-db-list-strings ebib--cur-db) #'string<))
         (let ((str (ebib-db-get-string elem ebib--cur-db 'noerror 'unbraced)))
           (insert (format "%-18s %s\n" elem
                           (if (ebib--multiline-p str)
@@ -3723,7 +3723,7 @@ created from the keys in these files, provided they are opened in
 Ebib.  If BIBFILES is the symbol `none', the collection is
 created from the current database."
   (if (eq bibfiles 'none)
-      (ebib-db-list-keys ebib--cur-db 'sort)
+      (sort (ebib-db-list-keys ebib--cur-db) #'string<)
     (let (collection)
       (dolist (file bibfiles collection)
         (setq collection (append (ebib-db-list-keys (ebib--get-db-from-filename file)) collection))))))
