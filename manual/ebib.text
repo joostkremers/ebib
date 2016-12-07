@@ -10,6 +10,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## 7 December 2016 ##
+
+- Upgrade Emacs dependency to 24.4.
+
 ## 5 December 2016 ##
 
 - New library `org-ebib`. This defines a new Org link type `ebib:`, which uses the command `org-ebib-open` to open Ebib. The previous commands to do this, `ebib-show-entry` and `ebib-open-org-link` have been removed. `org-ebib` also allows the creation of Org links to Ebib entries with `org-store-link`.
