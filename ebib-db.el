@@ -336,17 +336,9 @@ is suffixed, then `ab' etc."
 	(setq suffix ?a)))
     unique-key))
 
-;; TODO Perhaps we can get rid of the optional argument SORT.
-(defun ebib-db-list-keys (db &optional sort)
-  "Return a list of keys in DB.
-If SORT is non-nil, the list is sorted."
-  (let (keys)
-    (maphash (lambda (key _)
-               (push key keys))
-	     (ebib--db-struct-database db))
-    (if sort
-        (sort keys #'string<)
-      keys)))
+(defun ebib-db-list-keys (db)
+  "Return a list of keys in DB."
+  (hash-table-keys (ebib--db-struct-database db)))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
   "Change entry key KEY to NEW-KEY in DB.
@@ -547,9 +539,8 @@ the value without braces."
   "Return the alist containing all @STRING definitions in DB."
   (ebib--db-struct-strings db))
 
-(defun ebib-db-list-strings (db &optional sort)
-  "Return a list of @STRING abbreviations in DB without expansions.
-If SORT is non-nil, the list is sorted."
+(defun ebib-db-list-strings (db)
+  "Return a list of @STRING abbreviations in DB without expansions."
   (let ((list (mapcar #'car (ebib--db-struct-strings db))))
     (if sort
         (sort list 'string<)

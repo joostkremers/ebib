@@ -128,16 +128,11 @@ Also automatically remove duplicates."
                    (file-name-directory (ebib-db-get-filename db)))))    ; per-directory keywords files
       (push keyword (cl-third (assoc dir ebib--keywords-files-alist))))))
 
-(defun ebib--keywords-to-list (str)
+(defsubst ebib--keywords-to-list (str)
   "Convert STR to a list of keywords.
 STR should be a string containing keywords separated by
 `ebib-keywords-separator'."
-  ;; TODO I use `replace-regexp-in-string' to trim the individual strings.
-  ;; In Emacs 24.4, `split-string' has an additional argument that does
-  ;; this, but that's not available in 24.3. An alternative would be
-  ;; `s-trim' from the `s' library.
-  (--map (replace-regexp-in-string "\\`[[:space:]]*\\(.*?\\)[[:space:]]*\\'" "\\1" it t)
-         (split-string str (regexp-quote ebib-keywords-separator) t)))
+  (split-string str (regexp-quote ebib-keywords-separator) t "[[:space:]]*"))
 
 (defun ebib--keywords-sort (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string.
