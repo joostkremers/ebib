@@ -1529,7 +1529,7 @@ referred to by ENTRY-KEY."
                    (string< x y)))))    ; compare entry keys
     ;; Only entries in visible the index buffer are saved, in case we're writing
     ;; a filtered db to a new file.
-    (let ((sorted-list (sort (ebib-db-list-keys ebib--cur-db 'sort) #'string<)))
+    (let ((sorted-list (sort (ebib-db-list-keys ebib--cur-db) #'string<)))
       (cond
        (ebib-save-xrefs-first
         (setq sorted-list (sort sorted-list #'compare-xrefs)))
