@@ -1257,7 +1257,10 @@ characters in fields."
          (list (mapcar (lambda (key)
                          (cons (ebib--get-field-value-for-display field key db) key))
                        keys)))
-    (setq list (cl-stable-sort list #'string-collate-lessp :key #'car))
+    (setq list (cl-stable-sort list (if (fboundp 'string-collate-lessp)
+                                        #'string-collate-lessp
+                                      #'string-lessp)
+                               :key #'car))
     (setq keys (mapcar #'cdr list)))
   ;; Reverse the list if necessary.
   (if (eq (ebib-db-get-sort-order db) 'descend)
