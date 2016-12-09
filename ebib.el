@@ -51,6 +51,7 @@
 (require 'cl-lib)
 (require 'easymenu)
 (require 'bibtex)
+(require 'subr-x) ; hash-table-keys
 (require 'seq)
 (require 'dash)
 (require 'pp)
