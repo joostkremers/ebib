@@ -10,6 +10,11 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## 19 December 2016 ##
+
+- Remove support for a separate rc file for Ebib. User configuration should be moved to Emacs' `init.el` file. To keep Ebib customisation in a separate file, simply load it from `init.el`.
+- The macro `ebib-key` has also been removed. Simply use `define-key` or any other key binding mechanism to define keys for Ebib. See the section [Modifying Key Bindings](#modifying-key-bindings) for details.
+
 ## 7 December 2016 ##
 
 - Upgrade Emacs dependency to 24.4.
@@ -972,30 +977,11 @@ Another way to customise Ebib is to use the initialisation file `~/.emacs.d/ebib
 
 ## Modifying Key Bindings ##
 
-If you would like to change Ebib's standard key bindings, or if you would like to bind a command that is only available through the menu to a key, you can do so by creating a file `~/.emacs.d/ebibrc` and writing your preferred key bindings in it. A key binding can be defined as follows:
+If you would like to change Ebib's standard key bindings, or if you would like to bind a command that is only available through the menu to a key, you can do so by adding the relevant key bindings to Emacs init file (`~.emacs.d/init.el` by default). The relevant key maps are `ebib-index-mode-map`, `ebib-entry-mode-map`, `ebib-strings-mode-map` for the index, entry, and strings buffer, and `ebib-multiline-mode-map`, which adds keys to finish writing multiline field values.
 
-    (ebib-key <buffer> <key> <command>)
+In addition, `ebib-search-map` is a transient key map that is activated when `ebib-search` is called, and `ebib-filters-map`, `ebib-keywords-map` and `ebib-reading-list-map` are key maps (set up using `define-prefix-command`) that contain bindings for filters, keywords and the reading list, respectively. Finally, there is `ebib-log-mode-map` which is active in Ebib's log buffer.
 
-`<buffer>` is either `index`, `entry` or `strings`, for the corresponding buffer. `<key>` is a standard Emacs key description, and `<command>` is the Ebib command to be associated with the key (which does not have to be quoted, unlike `define-key` and friends). Note that it is possible to bind more than one key to a single function: just add as many `ebib-key` statements as necessary.
-
-As an example, the following binds `C-s` to `ebib-search` in the index buffer, so that the database can be searched with `C-s` as well as with `/`:
-
-    (ebib-key index "\C-s" ebib-search)
-
-If you want to unbind a key, you can simply leave out `<command>`. So if you want to bind the command `ebib-delete-entry` to `D` rather than `d`, you need to put the following in `~/.emacs.d/ebibrc`:
-
-    (ebib-key index "D" ebib-delete-entry)
-    (ebib-key index "d")
-
-The first line binds `D` to the command `ebib-delete-entry`. The second line unbinds `d`.
-
-`ebib-key` allows you to redefine the second key in the key bindings of the multiline edit buffer:
-
-    (ebib-key multiline "&")
-
-This piece of code changes the commands `C-c | q`, `C-c | c` and `C-c | s` to `C-c & q`, `C-c & c` and `C-c & s`, respectively.
-
-Alternatively, if you find these key bindings awkward, you could put something like the following code in `~/.emacs.d/ebibrc`:
+As an example, the default keybindings in`ebib-multiline-mode-map`, which are rather awkward to type, can be redefined as follows:
 
 ```Commonlisp
 (define-key ebib-multiline-mode-map
@@ -1005,7 +991,5 @@ Alternatively, if you find these key bindings awkward, you could put something l
 (define-key ebib-multiline-mode-map
             "\C-c\C-s" 'ebib-save-from-multiline-buffer)
 ```
-
-This will bind the relevant commands to `C-c C-c`, `C-c C-q` and C-c C-s`, which are of course more convenient than the standard key bindings.
 
 </article>

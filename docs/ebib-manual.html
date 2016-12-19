@@ -54,8 +54,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="TOC">
 <ul>
 <li><a href="#news">News</a><ul>
-<li><a href="#december-2016">7 December 2016</a></li>
-<li><a href="#december-2016-1">5 December 2016</a></li>
+<li><a href="#december-2016">19 December 2016</a></li>
+<li><a href="#december-2016-1">7 December 2016</a></li>
+<li><a href="#december-2016-2">5 December 2016</a></li>
 <li><a href="#november-2016">7 November 2016</a></li>
 <li><a href="#version-2.8-26-october-2016">Version 2.8, 26 October 2016</a></li>
 <li><a href="#version-2.7-22-september-2016">Version 2.7, 22 September 2016</a></li>
@@ -137,11 +138,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Ebib is a program with which you can manage BibTeX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <h1 id="news">News</h1>
-<h2 id="december-2016">7 December 2016</h2>
+<h2 id="december-2016">19 December 2016</h2>
+<ul>
+<li>Remove support for a separate rc file for Ebib. User configuration should be moved to Emacs' <code>init.el</code> file. To keep Ebib customisation in a separate file, simply load it from <code>init.el</code>.</li>
+<li>The macro <code>ebib-key</code> has also been removed. Simply use <code>define-key</code> or any other key binding mechanism to define keys for Ebib. See the section <a href="#modifying-key-bindings">Modifying Key Bindings</a> for details.</li>
+</ul>
+<h2 id="december-2016-1">7 December 2016</h2>
 <ul>
 <li>Upgrade Emacs dependency to 24.4.</li>
 </ul>
-<h2 id="december-2016-1">5 December 2016</h2>
+<h2 id="december-2016-2">5 December 2016</h2>
 <ul>
 <li>New library <code>org-ebib</code>. This defines a new Org link type <code>ebib:</code>, which uses the command <code>org-ebib-open</code> to open Ebib. The previous commands to do this, <code>ebib-show-entry</code> and <code>ebib-open-org-link</code> have been removed. <code>org-ebib</code> also allows the creation of Org links to Ebib entries with <code>org-store-link</code>.</li>
 <li>New citation insertion command <code>ebib-insert-citation</code>. This replaces <code>ebib-insert-bibtex-key</code>, so please update your key bindings. The new command uses <code>ivy</code> for completion if this package is available, so that it is possible to select an entry by typing parts of its author and/or title.</li>
@@ -648,26 +654,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Ebib can be customised through Emacs' standard customisation interface. The relevant customisation group is (obviously) called <code>ebib</code>, which has five subgroups: <code>ebib-faces</code>, <code>ebib-filters</code>, <code>ebib-notes</code>, and <code>ebib-keywords</code>, whose functions should be obvious, and <code>ebib-windows</code>, where options for Ebib's window management can be set. All options are documented in the customisation buffers. You can go to Ebib's customisation buffer with <code>M-x customize-group RET ebib RET</code>, or by using the menu «Ebib | Options | Customize Ebib».</p>
 <p>Another way to customise Ebib is to use the initialisation file <code>~/.emacs.d/ebibrc</code>. (Actually, the location and name of this file can be customised as well.) This file contains normal Lisp code and is the best way to customise key bindings (as discussed in the next section), but it can in fact be used to run any Lisp code.</p>
 <h2 id="modifying-key-bindings">Modifying Key Bindings</h2>
-<p>If you would like to change Ebib's standard key bindings, or if you would like to bind a command that is only available through the menu to a key, you can do so by creating a file <code>~/.emacs.d/ebibrc</code> and writing your preferred key bindings in it. A key binding can be defined as follows:</p>
-<pre><code>(ebib-key &lt;buffer&gt; &lt;key&gt; &lt;command&gt;)</code></pre>
-<p><code>&lt;buffer&gt;</code> is either <code>index</code>, <code>entry</code> or <code>strings</code>, for the corresponding buffer. <code>&lt;key&gt;</code> is a standard Emacs key description, and <code>&lt;command&gt;</code> is the Ebib command to be associated with the key (which does not have to be quoted, unlike <code>define-key</code> and friends). Note that it is possible to bind more than one key to a single function: just add as many <code>ebib-key</code> statements as necessary.</p>
-<p>As an example, the following binds <code>C-s</code> to <code>ebib-search</code> in the index buffer, so that the database can be searched with <code>C-s</code> as well as with <code>/</code>:</p>
-<pre><code>(ebib-key index &quot;\C-s&quot; ebib-search)</code></pre>
-<p>If you want to unbind a key, you can simply leave out <code>&lt;command&gt;</code>. So if you want to bind the command <code>ebib-delete-entry</code> to <code>D</code> rather than <code>d</code>, you need to put the following in <code>~/.emacs.d/ebibrc</code>:</p>
-<pre><code>(ebib-key index &quot;D&quot; ebib-delete-entry)
-(ebib-key index &quot;d&quot;)</code></pre>
-<p>The first line binds <code>D</code> to the command <code>ebib-delete-entry</code>. The second line unbinds <code>d</code>.</p>
-<p><code>ebib-key</code> allows you to redefine the second key in the key bindings of the multiline edit buffer:</p>
-<pre><code>(ebib-key multiline &quot;&amp;&quot;)</code></pre>
-<p>This piece of code changes the commands <code>C-c | q</code>, <code>C-c | c</code> and <code>C-c | s</code> to <code>C-c &amp; q</code>, <code>C-c &amp; c</code> and <code>C-c &amp; s</code>, respectively.</p>
-<p>Alternatively, if you find these key bindings awkward, you could put something like the following code in <code>~/.emacs.d/ebibrc</code>:</p>
+<p>If you would like to change Ebib's standard key bindings, or if you would like to bind a command that is only available through the menu to a key, you can do so by adding the relevant key bindings to Emacs init file (<code>~.emacs.d/init.el</code> by default). The relevant key maps are <code>ebib-index-mode-map</code>, <code>ebib-entry-mode-map</code>, <code>ebib-strings-mode-map</code> for the index, entry, and strings buffer, and <code>ebib-multiline-mode-map</code>, which adds keys to finish writing multiline field values.</p>
+<p>In addition, <code>ebib-search-map</code> is a transient key map that is activated when <code>ebib-search</code> is called, and <code>ebib-filters-map</code>, <code>ebib-keywords-map</code> and <code>ebib-reading-list-map</code> are key maps (set up using <code>define-prefix-command</code>) that contain bindings for filters, keywords and the reading list, respectively. Finally, there is <code>ebib-log-mode-map</code> which is active in Ebib's log buffer.</p>
+<p>As an example, the default keybindings in<code>ebib-multiline-mode-map</code>, which are rather awkward to type, can be redefined as follows:</p>
 <div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(define-key ebib-multiline-mode-map
             <span class="st">&quot;\C-c\C-c&quot;</span> &#39;ebib-quit-multiline-buffer-and-save)
 (define-key ebib-multiline-mode-map
             <span class="st">&quot;\C-c\C-q&quot;</span> &#39;ebib-cancel-multiline-buffer)
 (define-key ebib-multiline-mode-map
             <span class="st">&quot;\C-c\C-s&quot;</span> &#39;ebib-save-from-multiline-buffer)</code></pre></div>
-<p>This will bind the relevant commands to <code>C-c C-c</code>, <code>C-c C-q</code> and C-c C-s`, which are of course more convenient than the standard key bindings.</p>
 </article>
 </body>
 </html>

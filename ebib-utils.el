@@ -591,15 +591,6 @@ file."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-rc-file "~/.emacs.d/ebibrc"
-  "Customization file for Ebib.
-This file is read when Ebib is started.  It contains Lisp code,
-and can be used to define custom keys or set customization
-variables (as an alternative to the customization group), or even
-custom commands."
-  :group 'ebib
-  :type '(file :tag "Customization file:"))
-
 (defcustom ebib-bibtex-extensions '(".bib" ".bibtex")
   "List of possible filename extensions of BibTeX files.
 When loading a BibTeX filename without extension, Ebib tries to

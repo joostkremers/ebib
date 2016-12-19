@@ -500,7 +500,6 @@ the buffers, reads the rc file and loads the files in
   (ebib--filters-load-file ebib-filters-default-file)
   (add-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
   (add-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
-  (load ebib-rc-file 'noerror)
   (if ebib-preload-bib-files
       (mapc (lambda (file)
               (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
@@ -628,33 +627,6 @@ keywords before Emacs is killed."
            (buffer-modified-p))
       (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
     t))
-
-(defmacro ebib-key (buffer key &optional command _)
-  "Create a key bind in an Ebib buffer.
-BUFFER is a symbol designating an Ebib buffer and can be `index',
-`entry', `strings'.  KEY is a standard Emacs key description as
-passed to `define-key'.  If COMMAND is nil, KEY is unbound.
-
-BUFFER can also be `multiline', in which case the second
-character of the commands in the multiline edit buffer is set to
-KEY.  In this case, COMMAND is meaningless."
-  ;; note: the fourth argument is for backward compatibility
-  (cond
-   ((eq buffer 'index)
-    `(define-key ebib-index-mode-map ,key (quote ,command)))
-   ((eq buffer 'entry)
-    `(define-key ebib-entry-mode-map ,key (quote ,command)))
-   ((eq buffer 'strings)
-    `(define-key ebib-strings-mode-map ,key (quote ,command)))
-   ((eq buffer 'multiline)
-    `(progn
-       (define-key ebib-multiline-mode-map "\C-c" nil)
-       (mapc (lambda (command)
-               (define-key ebib-multiline-mode-map (format "\C-c%s%c" ,key (car command)) (cdr command)))
-             '((?q . ebib-quit-multiline-buffer-and-save)
-               (?c . ebib-cancel-multiline-buffer)
-               (?s . ebib-save-from-multiline-buffer)))
-       (setq ebib--multiline-key (string-to-char ,key))))))
 
 ;;; index-mode
 
