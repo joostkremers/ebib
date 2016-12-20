@@ -255,6 +255,11 @@ not change the default sort."
                         (integer :tag "Width")
                         (boolean :tag "Sort"))))
 
+(defcustom ebib-index-column-separator "  "
+  "Separator between columns in the index buffer."
+  :group 'ebib
+  :type 'string)
+
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
 When adding new entries to the database, Ebib does not allow
