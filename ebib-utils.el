@@ -260,6 +260,18 @@ not change the default sort."
   :group 'ebib
   :type 'string)
 
+(defcustom ebib-field-transformation-function '(("Title" . ebib-clean-markup-in-title)
+                                                ("Doi" . ebib-display-www-link)
+                                                ("Url" . ebib-display-www-link)
+                                                ("Note" . ebib-display-note-symbol))
+  "Functions transforming field contents to appropriate forms.
+Each function accepts three arguments (see
+`ebib--get-field-value-for-display') and returns a string to be
+displayed in the ebib index buffer."
+  :group 'ebib
+  :type '(repeat (list (string :tag "Field")
+                       (function :tag "Transform function"))))
+
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
 When adding new entries to the database, Ebib does not allow
@@ -1227,7 +1239,9 @@ In addition, If FIELD is \"Entry Key\", KEY is returned, and if
 FIELD is \"Author/Editor\", the contents of the Author field is
 returned or, if the Author field is empty, the contents of the
 Editor field.  If the Editor field is empty as well, return the
-string \"(No Author/Editor)\"."
+string \"(No Author/Editor)\".  If FIELD is found in
+`ebib-field-transformation-function', return the field content
+transformed by the associated function."
   (cond
    ((cl-equalp field "Entry Key")
     key)
@@ -1236,7 +1250,35 @@ string \"(No Author/Editor)\"."
         (ebib-db-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
    ((cl-equalp field "Year")
     (ebib-db-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
+   ((assoc field ebib-field-transformation-function)
+    (funcall (cdr (assoc field ebib-field-transformation-function)) field key db))
    (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
+
+(defun ebib-clean-markup-in-title (field key db)
+  "Return the title without latex markups."
+  (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
+    (replace-regexp-in-string "[{}]" "" str)))
+
+(defun ebib-display-note-symbol (_field key _db)
+  "Return the note symbol for displaying if there exists a note."
+  (if (ebib--notes-exists-note key)
+      (propertize ebib-notes-symbol
+                  'face '(:height 0.8 :inherit link)
+                  'mouse-face 'highlight)
+    (propertize (make-string (string-width ebib-notes-symbol) ?\s)
+                'face '(:height 0.8))))
+
+(defun ebib-display-www-link (field key db)
+  "Return a link for the Doi or Url field."
+  (let ((str (ebib-db-get-field-value field key db 'noerror 'unbraced 'xref)))
+    (if (and str (string-match-p "^[0-9]" str))
+        (setq str (concat "https://dx.doi.org/" str)))
+    (if str
+        (propertize "www"
+                    'face '(:height 0.8 :inherit link)
+                    'mouse-face 'highlight
+                    'help-echo str)
+      (propertize "   " 'face '(:height 0.8)))))
 
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB.
