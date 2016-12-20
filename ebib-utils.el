@@ -265,11 +265,11 @@ not change the default sort."
                                                 ("Url" . ebib-display-www-link)
                                                 ("Note" . ebib-display-note-symbol))
   "Functions transforming field contents to appropriate forms.
-Each function accepts three arguments (see
+Each function accepts three arguments (same with the arguments of
 `ebib--get-field-value-for-display') and returns a string to be
 displayed in the ebib index buffer."
   :group 'ebib
-  :type '(repeat (list (string :tag "Field")
+  :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
 (defcustom ebib-uniquify-keys nil
