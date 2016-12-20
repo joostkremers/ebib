@@ -728,7 +728,7 @@ KEY.  In this case, COMMAND is meaningless."
     (define-key map "Y" #'ebib-keywords-add) ; prefix
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
-    (define-key map [mouse-1] #'ebib-open-at-point)
+    (define-key map [mouse-1] #'ebib-index-open-at-point)
     map)
   "Keymap for the ebib index buffer.")
 
@@ -2198,9 +2198,11 @@ Operates either on all entries or on the marked entries."
   "Open link, note or files at point."
   (interactive)
   (let* ((word (thing-at-point 'word))
-         (link (and (get-text-property 0 'mouse-face word)
+         (link (and word
+                    (get-text-property 0 'mouse-face word)
                     (get-text-property 0 'help-echo word)))
-         (notep (and (get-text-property 0 'mouse-face word)
+         (notep (and word
+                     (get-text-property 0 'mouse-face word)
                      (string-equal word ebib-notes-symbol))))
     (cond
      (link
