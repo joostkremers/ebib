@@ -1259,6 +1259,17 @@ transformed by the associated function."
   (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
     (replace-regexp-in-string "[{}]" "" str)))
 
+(defun ebib-display-journal-initials (field key db)
+  (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
+    (if (string-match-p "\s+" str)
+        (apply 'concat
+               (mapcar
+                (lambda (str) (substring str 0 1))
+                (seq-difference
+                 (mapcar 'capitalize (split-string str "\\Sw+" t))
+                 '("A" "An" "At" "Of" "On" "And" "For"))))
+      str)))
+
 (defun ebib-display-note-symbol (_field key _db)
   "Return the note symbol for displaying if there exists a note."
   (if (ebib--notes-exists-note key)
