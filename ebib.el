@@ -137,7 +137,9 @@ is applied to the item."
       (while (< n max)
         (let ((width (cadr (nth n ebib-index-columns)))
               (item (nth n (cadr data))))
-          (insert (format (concat "%-" (int-to-string width) "s") (truncate-string-to-width item width nil nil t)) "  "))
+          (insert (format
+                   (concat "%-" (int-to-string width) "s") (truncate-string-to-width item width nil nil t))
+                  ebib-index-column-separator))
         (cl-incf n))
       ;; The last item isn't truncated
       (insert (nth n (cadr data)))
@@ -698,6 +700,7 @@ keywords before Emacs is killed."
     (define-key map "Y" #'ebib-keywords-add) ; prefix
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
+    (define-key map [mouse-1] #'ebib-index-open-at-point)
     map)
   "Keymap for the ebib index buffer.")
 
@@ -2162,6 +2165,24 @@ Operates either on all entries or on the marked entries."
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
        (ebib--update-buffers)))))
+
+(defun ebib-index-open-at-point ()
+  "Open link, note or files at point."
+  (interactive)
+  (let* ((word (thing-at-point 'word))
+         (link (and word
+                    (get-text-property 0 'mouse-face word)
+                    (get-text-property 0 'help-echo word)))
+         (notep (and word
+                     (get-text-property 0 'mouse-face word)
+                     (string-equal word ebib-notes-symbol))))
+    (cond
+     (link
+      (ebib--call-browser link))
+     (notep
+      (ebib-open-note))
+     (t
+      (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (arg)
   "Browse the URL in the standard URL field.
