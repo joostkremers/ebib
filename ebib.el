@@ -2252,7 +2252,10 @@ argument ARG can be used to specify which file to choose."
           (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
               (progn
                 (message "Executing `%s %s'" viewer file-full-path)
-                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+                (if (string-match (regexp-quote "%s") viewer)
+                    (let* ((viewer-arg-list (split-string-and-unquote (format viewer file-full-path))))
+                      (apply 'start-process (concat "ebib " ext " viewer process") nil viewer-arg-list))
+                  (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path)))
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
             (find-file file-full-path)))
