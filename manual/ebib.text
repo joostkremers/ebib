@@ -10,7 +10,7 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
-## 9 January 2017 ##
+## Version 2.9, January 2017 ##
 
 - Allow `%s` in the program strings in `ebib-file-associations`, making it possible to pass command line arguments to the program being called.
 
