@@ -10,6 +10,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## 9 January 2017 ##
+
+- Allow `%s` in the program strings in `ebib-file-associations`, making it possible to pass command line arguments to the program being called.
+
 ## 19 December 2016 ##
 
 - Remove support for a separate rc file for Ebib. User configuration should be moved to Emacs' `init.el` file. To keep Ebib customisation in a separate file, simply load it from `init.el`.
