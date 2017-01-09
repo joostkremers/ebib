@@ -474,8 +474,10 @@ this command extracts the filename."
                                 ("ps" . "gv"))
   "List of file associations.
 Lists file extensions together with external programs to handle
-files with those extensions.  The program is searched for in
-`exec-path'.
+files with those extensions.  If the program string contains a
+literal `%s', it is replaced with the name of the file being
+opened, allowing the use of command-line options.  Otherwise, the
+string is treated as an executable, searched for in `exec-path'.
 
 When you open a file for which no external program is defined,
 the file is opened in Emacs."
