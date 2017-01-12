@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.9
+;; Version: 2.10
 ;; Keywords: text bibtex
 ;; Package-Requires: ((dash "2.5.0") (seq "2.15") (parsebib "1.0") (emacs "24.4"))
 
@@ -505,7 +505,7 @@ the buffers, reads the rc file and loads the files in
   (if ebib-preload-bib-files
       (mapc (lambda (file)
               (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
-                                               file)))
+                                                   file)))
             ebib-preload-bib-files))
   (setq ebib--initialized t))
 
@@ -731,7 +731,7 @@ number is also the argument to the function."
     ["Open Database..." ebib-load-bibtex-file t]
     ["Merge Database..." ebib-merge-bibtex-file (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Save Database" ebib-save-current-database (and ebib--cur-db
-                                                 (ebib-db-modified-p ebib--cur-db))]
+                                                     (ebib-db-modified-p ebib--cur-db))]
     ["Save All Databases" ebib-save-all-databases (ebib--modified-p)]
     ["Save Database As..." ebib-write-database ebib--cur-db]
     ["Close Database" ebib-close-database ebib--cur-db]
@@ -754,8 +754,8 @@ number is also the argument to the function."
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
      ["Delete" ebib-delete-entry (and ebib--cur-db
-                                  (ebib--get-key-at-point)
-                                  (not (ebib-db-get-filter ebib--cur-db)))])
+                                      (ebib--get-key-at-point)
+                                      (not (ebib-db-get-filter ebib--cur-db)))])
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     "--"
@@ -897,11 +897,11 @@ unless IGNORE-MODTIME is non-nil."
     (let ((result (ebib--find-bibtex-entries db nil)))
       ;; Log the results.
       (ebib--log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
-             (car result)
-             (cadr result)
-             (if (nth 2 result)
-                 "a"
-               "no"))
+                 (car result)
+                 (cadr result)
+                 (if (nth 2 result)
+                     "a"
+                   "no"))
       (when ebib--log-error
         (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors")))))))
 
@@ -974,7 +974,7 @@ Return value is the string if one was read, nil otherwise."
         (if (ebib-db-set-string abbr string db 'noerror)
             string
           (ebib--log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
-                                  (line-number-at-pos) abbr)))
+                                      (line-number-at-pos) abbr)))
       (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos)))))
 
 (defun ebib--read-preamble (db)
@@ -1257,8 +1257,8 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
        (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases)))
          (setq ebib--databases (delq ebib--cur-db ebib--databases))
          (setq ebib--cur-db (if ebib--databases   ; do we still have another database loaded?
-                            (or new-db (-last-item ebib--databases))
-                          nil))
+                                (or new-db (-last-item ebib--databases))
+                              nil))
          (ebib--update-buffers)
          (message "Database closed."))))))
 
@@ -1333,8 +1333,8 @@ ORDER indicates the sort order and should be either `ascend' or
     ((real-db entries)
      (let ((cur-keyname (ebib--get-key-at-point)))
        (ebib--ifstring (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
-                                             cur-keyname
-                                             'ebib--key-history))
+                                                 cur-keyname
+                                                 'ebib--key-history))
            (ebib--update-keyname new-keyname))))
     ((default)
      (beep))))
@@ -1842,7 +1842,7 @@ the current buffer: it is called within a `with-temp-buffer',
 whose contents is appended to the file the user enters."
   (let ((insert-default-directory (not ebib--export-filename)))
     (ebib--ifstring (filename (read-file-name
-                           prompt-string "~/" nil nil ebib--export-filename))
+                               prompt-string "~/" nil nil ebib--export-filename))
         (with-temp-buffer
           (funcall insert-fn)
           (append-to-file (point-min) (point-max) filename)
@@ -1887,16 +1887,16 @@ a filename is asked to which the entry is appended."
     ((entries)
      (if num
          (ebib--export-to-db num (format "Entry `%s' copied to database %%d." (ebib--get-key-at-point))
-                         (lambda (db)
-                           (let ((entry-key (ebib--get-key-at-point)))
-                             (if (member entry-key (ebib-db-list-keys db))
-                                 (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
-                               (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
-                               t)))) ; we must return T, WHEN does not always do this.
+                             (lambda (db)
+                               (let ((entry-key (ebib--get-key-at-point)))
+                                 (if (member entry-key (ebib-db-list-keys db))
+                                     (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
+                                   (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
+                                   t)))) ; we must return T, WHEN does not always do this.
        (ebib--export-to-file (format "Export `%s' to file: " (ebib--get-key-at-point))
-                         (lambda ()
-                           (insert "\n")
-                           (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db t)))))
+                             (lambda ()
+                               (insert "\n")
+                               (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db t)))))
     ((default)
      (beep))))
 
@@ -1917,11 +1917,11 @@ a filename is asked to which the entry is appended."
                   (ebib-db-list-marked-entries ebib--cur-db))
             t))         ; we must return T, WHEN does not always do this.
        (ebib--export-to-file "Export to file: "
-                         (lambda ()
-                           (mapc (lambda (entry-key)
-                                   (insert "\n")
-                                   (ebib--format-entry entry-key ebib--cur-db t))
-                                 (ebib-db-list-marked-entries ebib--cur-db))))))
+                             (lambda ()
+                               (mapc (lambda (entry-key)
+                                       (insert "\n")
+                                       (ebib--format-entry entry-key ebib--cur-db t))
+                                     (ebib-db-list-marked-entries ebib--cur-db))))))
     ((default)
      (beep))))
 
@@ -2047,11 +2047,11 @@ the preamble is appended."
        (let ((num (ebib--prefix prefix)))
          (if num
              (ebib--export-to-db num "@PREAMBLE copied to database %d"
-                             (lambda (db)
-                               (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
+                                 (lambda (db)
+                                   (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
            (ebib--export-to-file "Export @PREAMBLE to file: "
-                             (lambda ()
-                               (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
+                                 (lambda ()
+                                   (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
     ((default)
      (beep))))
 
@@ -2062,11 +2062,11 @@ Either prints the entire database, or the marked entries."
   (ebib--execute-when
     ((entries)
      (let ((entries (ebib--sort-keys-list (or (ebib-db-list-marked-entries ebib--cur-db)
-                                          (ebib-db-list-keys ebib--cur-db))
-                                      ebib--cur-db)))
+                                              (ebib-db-list-keys ebib--cur-db))
+                                          ebib--cur-db)))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                                 ebib-print-tempfile
-                               (read-file-name "Use temp file: " "~/" nil nil)))
+                                     ebib-print-tempfile
+                                   (read-file-name "Use temp file: " "~/" nil nil)))
            (progn
              (with-temp-buffer
                (when ebib-print-preamble
@@ -2111,8 +2111,8 @@ Operates either on all entries or on the marked entries."
   (ebib--execute-when
     ((real-db entries)
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                               ebib-print-tempfile
-                             (read-file-name "Use temp file: " "~/" nil nil)))
+                                   ebib-print-tempfile
+                                 (read-file-name "Use temp file: " "~/" nil nil)))
          (progn
            (with-temp-buffer
              (when ebib-latex-preamble
