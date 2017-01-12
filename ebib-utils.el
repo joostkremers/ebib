@@ -260,14 +260,19 @@ not change the default sort."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-field-transformation-function '(("Title" . ebib-clean-markup-in-title)
-                                                ("Doi" . ebib-display-www-link)
-                                                ("Url" . ebib-display-www-link)
-                                                ("Note" . ebib-display-note-symbol))
+(defcustom ebib-field-transformation-functions '(("Title" . ebib-clean-TeX-markup)
+                                             ("Doi" . ebib-display-www-link)
+                                             ("Url" . ebib-display-www-link)
+                                             ("Note" . ebib-display-note-symbol))
   "Functions transforming field contents to appropriate forms.
-Each function accepts three arguments (same with the arguments of
-`ebib--get-field-value-for-display') and returns a string to be
-displayed in the ebib index buffer."
+Each function should accept three arguments, the field to be
+displayed, the key of the entry being displayed, and the database
+that contains the entry, and should return a string to be
+displayed in the ebib index buffer.  In principle, this string
+should be the contents of the field transformed in some way, but
+it may actually be anything.  In fact, it is not necessary for
+the field to be an actual Bib(La)TeX field, as long as the
+transformation function returns something that can be displayed."
   :group 'ebib
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
@@ -1222,18 +1227,26 @@ Possible values for DIALECT are those listed in
 (defun ebib--get-field-value-for-display (field key db)
   "Return the value of FIELD in entry KEY in DB for display.
 This function returns a value for FIELD in such a way that it can
-be used to display to the user.  Therefore, if a field value is
-empty, the return value is not an empty string, but the string
-\"(No <FIELD>)\", or, if FIELD is \"Year\", the string \"(XXXX)\".
+be used to display to the user.  If FIELD is found in
+`ebib-field-transformation-functions', return the field content
+transformed by the associated function.
 
-In addition, If FIELD is \"Entry Key\", KEY is returned, and if
-FIELD is \"Author/Editor\", the contents of the Author field is
+Otherwise, If FIELD is \"Entry Key\", KEY is returned; if FIELD
+is \"Author/Editor\", the contents of the Author field is
 returned or, if the Author field is empty, the contents of the
-Editor field.  If the Editor field is empty as well, return the
-string \"(No Author/Editor)\".  If FIELD is found in
-`ebib-field-transformation-function', return the field content
-transformed by the associated function."
+Editor field; if the Editor field is empty as well, return the
+string \"(No Author/Editor)\".  These defaults can be overridden
+by adding an appropriate transformation function to
+`ebib-field-transformation-functions'.
+
+If FIELD is not found in `ebib-field-transformation-functions'
+and is not one of the special fields listed above, the field
+value is returned.  If a field value is empty, the return value
+is the string \"(No <FIELD>)\", or, if FIELD is \"Year\", the
+string \"(XXXX)\"."
   (cond
+   ((assoc-string field ebib-field-transformation-functions 'case-fold)
+    (funcall (cdr (assoc field ebib-field-transformation-functions)) field key db))
    ((cl-equalp field "Entry Key")
     key)
    ((cl-equalp field "Author/Editor")
@@ -1241,28 +1254,34 @@ transformed by the associated function."
         (ebib-db-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
    ((cl-equalp field "Year")
     (ebib-db-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
-   ((assoc field ebib-field-transformation-function)
-    (funcall (cdr (assoc field ebib-field-transformation-function)) field key db))
    (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
 
-(defun ebib-clean-markup-in-title (field key db)
-  "Return the title without latex markups."
+(defun ebib-clean-TeX-markup (field key db)
+  "Return the contents of FIELD from KEY in DB without TeX markups."
   (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
+    ;; First replace TeX commands with their arguments, i.e., \textsc{CLS} ==> CLS.
+    ;; Note that optional arguments are also removed.
+    (setq str (replace-regexp-in-string "\\\\[a-zA-Z*]*\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" "\\1" str))
+    ;; Now replace all remaining braces. This also takes care of nested braces.
     (replace-regexp-in-string "[{}]" "" str)))
 
-(defun ebib-display-journal-initials (field key db)
+(defun ebib-abbreviate-journal-title (field key db)
+  "Abbreviate the content of FIELD from KEY in database DB.
+This function is intended to abbreviate journal titles.  Short
+function words (specifically \"a, an, at, of, on, and\" and
+\"for\") are removed, the initial letters of the remaining words
+are returned as a string."
   (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
     (if (string-match-p "\s+" str)
         (apply 'concat
-               (mapcar
-                (lambda (str) (substring str 0 1))
-                (seq-difference
-                 (mapcar 'capitalize (split-string str "\\Sw+" t))
-                 '("A" "An" "At" "Of" "On" "And" "For"))))
+               (mapcar (lambda (str) (substring str 0 1))
+                       (seq-difference
+                        (mapcar 'capitalize (split-string str "\\Sw+" t))
+                        '("A" "An" "At" "Of" "On" "And" "For"))))
       str)))
 
 (defun ebib-display-note-symbol (_field key _db)
-  "Return the note symbol for displaying if there exists a note."
+  "Return the note symbol for displaying if a note exists for KEY."
   (if (ebib--notes-exists-note key)
       (propertize ebib-notes-symbol
                   'face '(:height 0.8 :inherit link)
@@ -1271,7 +1290,8 @@ transformed by the associated function."
                 'face '(:height 0.8))))
 
 (defun ebib-display-www-link (field key db)
-  "Return a link for the Doi or Url field."
+  "Return the content of FIELD from KEY in DB as a link.
+This function is mainly intended for the DOI and URL fields."
   (let ((str (ebib-db-get-field-value field key db 'noerror 'unbraced 'xref)))
     (if (and str (string-match-p "^[0-9]" str))
         (setq str (concat "https://dx.doi.org/" str)))

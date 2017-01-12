@@ -2177,12 +2177,9 @@ Operates either on all entries or on the marked entries."
                      (get-text-property 0 'mouse-face word)
                      (string-equal word ebib-notes-symbol))))
     (cond
-     (link
-      (ebib--call-browser link))
-     (notep
-      (ebib-open-note))
-     (t
-      (ebib-select-and-popup-entry)))))
+     (link (ebib--call-browser link))
+     (notep (ebib-open-note))
+     (t (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (arg)
   "Browse the URL in the standard URL field.
