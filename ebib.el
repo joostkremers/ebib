@@ -294,7 +294,8 @@ it is highlighted.  DB defaults to the current database."
             (when fields ; If one of the sets is empty, we don't want an extra empty line.
               (insert "\n")
               (mapc (lambda (field)
-                      (unless (and (member-ignore-case field ebib-hidden-fields)
+                      (unless (and (not (assoc-string field entry 'case-fold))
+                                   (member-ignore-case field ebib-hidden-fields)
                                    ebib--hide-hidden-fields)
                         (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
                         (insert (or (ebib--get-field-highlighted field key db match-str)
@@ -2890,13 +2891,9 @@ was called interactively."
   "Add FIELD to the current entry."
   (interactive "sField: ")
   ;; We store the field with a `nil' value and let the user edit it later.
-  (let ((type (ebib-db-get-field-value "=type=" (ebib--get-key-at-point) ebib--cur-db)))
-    (if (or (member-ignore-case field (ebib--list-fields type 'all (ebib--get-dialect ebib--cur-db)))
-            (not (ebib-db-set-field-value field nil (ebib--get-key-at-point) ebib--cur-db 'noerror)))
-        (message "Field `%s' already exists in entry `%s'%s" field (ebib--get-key-at-point)
-                 (if (member-ignore-case field ebib-hidden-fields)
-                     " but is hidden"
-                   ""))
+  (let ((key (ebib--get-key-at-point)))
+    (if (not (ebib-db-set-field-value field nil key ebib--cur-db 'noerror))
+        (message "Field `%s' already has a value in entry `%s'" field key)
       (ebib--update-entry-buffer)
       (re-search-forward (concat "^" field))
       (ebib--set-modified t)
