@@ -37,6 +37,10 @@
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
 (declare-function org-link-set-parameters "org" (type &rest parameters))
+(declare-function org-element-context "org-element" (&optional element))
+(declare-function org-element-property "org-element" (property element))
+(declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
+(declare-function reftex-format-citation "reftex-cite" (entry format))
 
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
@@ -55,6 +59,43 @@
       (org-store-link-props :type "ebib"
                             :link link
                             :description description))))
+
+(with-eval-after-load "reftex-cite"
+  (org-link-set-parameters "ebib" :help-echo #'org-ebib-show-citation-info))
+
+(defun org-ebib-show-citation-info (window _object position)
+  (with-selected-window window
+    (save-excursion
+      (goto-char position)
+      (goto-char (org-element-property :begin (org-element-context)))
+      (cond
+       ((looking-at org-bracket-link-regexp)
+        (mapconcat 'org-ebib-make-help-echo-string
+                   (split-string
+                    (cadr (split-string (match-string-no-properties 1)
+                                        ":" t "[[:punct:]]*"))
+                    "," t)
+                   "\n"))
+       ((looking-at org-plain-link-re)
+        (mapconcat 'org-ebib-make-help-echo-string
+                   (split-string
+                    (cadr (split-string (match-string-no-properties 0)
+                                        ":" t "[[:punct:]]*"))
+                    "," t)
+                   "\n"))
+       (t "Not a link?")))))
+
+(defun org-ebib-make-help-echo-string (key &optional format)
+  "Return the citation string of KEY according to FORMAT.
+It is adapted from `reftex-make-cite-echo-string'."
+  (let ((entry (ebib-db-get-entry key ebib--cur-db 'noerror))
+        (reftex-cite-punctuation '(" " " & " " et al.")))
+    (or format (setq format "%2a (%y), %t, %b, %j %<"))
+    (if entry
+        (replace-regexp-in-string
+         "[\"{}]" ""
+         (reftex-format-citation entry format))
+      (format "Key %s is not found in current database." key))))
 
 (provide 'org-ebib)
 
