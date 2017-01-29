@@ -85,12 +85,19 @@
                    "\n"))
        (t "Not a link?")))))
 
+(defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
+  "Citation format used to display citation info in the message area.
+Must NOT contain %l.  See the variable `reftex-cite-format' for
+possible percent escapes."
+  :group 'ebib
+  :type 'string)
+
 (defun org-ebib-make-help-echo-string (key &optional format)
   "Return the citation string of KEY according to FORMAT.
 It is adapted from `reftex-make-cite-echo-string'."
   (let ((entry (ebib-db-get-entry key ebib--cur-db 'noerror))
         (reftex-cite-punctuation '(" " " & " " et al.")))
-    (or format (setq format "%2a (%y), %t, %b, %j %<"))
+    (or format (setq format org-ebib-help-echo-format))
     (if entry
         (replace-regexp-in-string
          "[\"{}]" ""
