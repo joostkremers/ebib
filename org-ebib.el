@@ -64,6 +64,9 @@
   (org-link-set-parameters "ebib" :help-echo #'org-ebib-show-citation-info))
 
 (defun org-ebib-show-citation-info (window _object position)
+  "Help echo function for org-ebib links.
+WINDOW is the window displaying the link, POSITION the link's
+position in the relevant buffer."
   (with-selected-window window
     (save-excursion
       (goto-char position)
