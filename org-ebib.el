@@ -34,6 +34,7 @@
 ;; This is to silence the byte-compiler and flycheck.
 (defvar ebib--cur-db)
 (defvar ebib-citation-description-function)
+(defvar reftex-cite-punctuation)
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
 (declare-function org-link-set-parameters "org" (type &rest parameters))
