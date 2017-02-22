@@ -3694,6 +3694,8 @@ If no .bib files are found, return the symbol `none'."
                   (push file files)))))))
       (if files
           (mapcar (lambda (file)
+                    (if (string= file "\\jobname.bib")
+                        (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))
                     ;; If a file has a directory part, we expand it, so
                     ;; `ebib--get-db-from-filename' can match it up with a
                     ;; database's file path.
