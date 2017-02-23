@@ -2895,6 +2895,11 @@ was called interactively."
     (if (not (ebib-db-set-field-value field nil key ebib--cur-db 'noerror))
         (message "Field `%s' already has a value in entry `%s'" field key)
       (ebib--update-entry-buffer)
+      (when (and (member-ignore-case field ebib-hidden-fields)
+               ebib--hide-hidden-fields)
+        (message-box "Hidden field `%s' added, therefore now showing hidden fields."
+                 field)
+        (ebib-toggle-hidden))
       (re-search-forward (concat "^" field))
       (ebib--set-modified t)
       (ebib-edit-field))))
