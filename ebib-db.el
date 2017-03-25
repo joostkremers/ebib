@@ -87,72 +87,73 @@ assumed to use this dialect.  Possible values are those listed in
                                       ("shorthandintro" . none)
                                       ("sortkey" . none)))
 
-                                    ("inbook, bookinbook, suppbook"
-                                     "mvbook, book"
+                                    ("mvbook, book"
+                                     "inbook, bookinbook, suppbook"
                                      (("author" . "author")
-                                      ("bookauthor" . "author")))
+                                      ("author" . "bookauthor")))
 
-                                    ("book, inbook, bookinbook, suppbook"
-                                     "mvbook"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
+                                    ("mvbook"
+                                     "book, inbook, bookinbook, suppbook"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
 
-                                    ("collection, reference, incollection, inreference, suppcollection"
-                                     "mvcollection, mvreference"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
+                                    ("mvcollection, mvreference"
+                                     "collection, reference, incollection, inreference, suppcollection"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
 
-                                    ("proceedings, inproceedings"
-                                     "mvproceedings"
-                                     (("maintitle" . "title")
-                                      ("mainsubtitle" . "subtitle")
-                                      ("maintitleaddon" . "titleaddon")
+                                    ("mvproceedings"
+                                     "proceedings, inproceedings"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
 
-                                    ("inbook, bookinbook, suppbook"
-                                     "book"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
+                                    ("book"
+                                     "inbook, bookinbook, suppbook"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
 
-                                    ("incollection, inreference, suppcollection"
-                                     "collection, reference"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
+                                    ("collection, reference"
+                                     "incollection, inreference, suppcollection"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
 
-                                    ("inproceedings"
-                                     "proceedings"
-                                     (("booktitle" . "title")
-                                      ("booksubtitle" . "subtitle")
-                                      ("booktitleaddon" . "titleaddon")
+                                    ("proceedings"
+                                     "inproceedings"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
                                       ("shorttitle" . none)
                                       ("sorttitle" . none)
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none)))
-                                    ("article, suppperiodical"
-                                     "periodical"
+
+                                    ("periodical"
+                                     "article, suppperiodical"
                                      (("title" . "journaltitle")
                                       ("subtitle" . "journalsubtitle")
                                       ("shorttitle" . none)
@@ -160,30 +161,30 @@ assumed to use this dialect.  Possible values are those listed in
                                       ("indextitle" . none)
                                       ("indexsorttitle" . none))))
   "Inheritance scheme for cross-referencing.
-This option allows you to define inheritances for Biblatex.
-Inheritances are specified for pairs of target and source entry
-type, where the target is the cross-referencing entry and the
-source the cross-referenced entry.  For each pair, specify the
-fields that can inherit a value (the targets) and the fields that
-they inherit from (the sources).
+This option defines inheritances for BibLaTeX.  Inheritances are
+specified for pairs of source and target entry type, where the
+source is the cross-referenced entry and the target the
+cross-referencing entry.  For each pair, specify the fields in
+the source and the fields in the target that they correspond
+with.
 
-Inheritances for all entry types can be defined by specifying
-`all' as the entry type.  The entry type may also be
-a (comma-separated) list of entry types.
+Inheritances valid for all entry types can be defined by
+specifying \"all\" as the entry type.  Entry types (both source
+and target) may also be a (comma-separated) list of entry types.
 
 If no inheritance rule is set up for a given entry type+field
 combination, the field inherits from the same-name field in the
 cross-referenced entry.  If no inheritance should take place, set
-the source field to \"No inheritance\".
+the target field to \"No inheritance\".
 
-Note that this option is only relevant for Biblatex.  If the
+Note that this option is only relevant for BibLaTeX.  If the
 BibTeX dialect is set to `BibTeX', this option is ignored."
   :group 'ebib
-  :type '(repeat (list (string :tag "Target entry type(s)")
-                       (string :tag "Source entry type(s)")
+  :type '(repeat (list (string :tag "Source entry type(s)")
+                       (string :tag "Target entry type(s)")
                        (repeat (cons :tag "Inheritance"
-                                     (string :tag "Target field")
-                                     (choice (string :tag "Source field)")
+                                     (string :tag "Source field")
+                                     (choice (string :tag "Target field)")
                                              (const :tag "No inheritance" none)))))))
 
 
@@ -478,8 +479,8 @@ inherit a value, this function returns nil."
   (if (eq dialect 'BibTeX)
       target-field
     (let* ((inheritance (cl-third (cl-find-if (lambda (e)
-                                                (and (string-match-p (concat "\\b" target-entry "\\b") (cl-first e))
-                                                     (string-match-p (concat "\\b" source-entry "\\b") (cl-second e))))
+                                                (and (string-match-p (concat "\\b" source-entry "\\b") (cl-first e))
+                                                     (string-match-p (concat "\\b" target-entry "\\b") (cl-second e))))
                                               ebib-biblatex-inheritances)))
            (source-field (or (cdr (assoc-string target-field inheritance 'case-fold))
                              (cdr (assoc-string target-field
