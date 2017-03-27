@@ -1477,9 +1477,9 @@ referred to by ENTRY-KEY."
 
 (defun ebib--format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
+  (ebib--format-comments db)
   (when (ebib-db-get-preamble db)
     (insert (format "@PREAMBLE{%s}\n\n" (ebib-db-get-preamble db))))
-  (ebib--format-comments db)
   (ebib--format-strings db)
   ;; We define two comparison functions for `sort'. These must simply
   ;; return non-NIL if the first element is to be sorted before the second.
