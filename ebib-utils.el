@@ -1109,7 +1109,7 @@ STR must start with \"Local Variables:\" and end with \"End:\".
 The return value is a list of lists, where each sublist has the
 form (\"<variable>\" \"<value>\"). If STR is not a local variable
 block, the return value is nil."
-  (let ((vars (split-string str "[\n]+" t "[ \t\r]+")))
+  (let ((vars (split-string str "[{}\n]+" t "[{} \t\r]+")))
     (when (and (string= (car vars) "Local Variables:")
                (string= (-last-item vars) "End:"))
       (--map (split-string it ": " t "[ \t]+") (-slice vars 1 -1)))))

@@ -6,9 +6,9 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.10
+;; Version: 2.11
 ;; Keywords: text bibtex
-;; Package-Requires: ((dash "2.5.0") (seq "2.15") (parsebib "1.0") (emacs "24.4"))
+;; Package-Requires: ((dash "2.5.0") (seq "2.15") (parsebib "2.3") (emacs "24.4"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -982,7 +982,7 @@ Return value is the string if one was read, nil otherwise."
   "Read a @PREAMBLE definition and store it in DB.
 If there was already another @PREAMBLE definition, the new one is
 added to the existing one with a hash sign `#' between them."
-  (let ((preamble (parsebib-read-preamble)))
+  (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
     (if preamble
         (ebib-db-set-preamble preamble db 'append))))
 
@@ -1442,11 +1442,9 @@ formatting the entry."
       (insert "\n}\n\n"))))
 
 (defun ebib--format-comments (db)
-  "Write the @COMMENTS of DB into the current buffer in BibTeX format.
-If DB is set to a specific dialect, write it to a @COMMENT as
-well, if it is not already in a @COMMENT."
+  "Write the @COMMENTS of DB into the current buffer in BibTeX format."
   (mapc (lambda (c)
-          (insert (format "@Comment{%s}\n\n" c)))
+          (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
 
 (defun ebib--format-strings (db)
