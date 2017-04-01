@@ -480,16 +480,13 @@ inherit a value, this function returns nil."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (if (eq dialect 'BibTeX)
       target-field
-    (let* ((inheritance (cl-third (cl-find-if (lambda (e)
-                                                (and (string-match-p (concat "\\b" source-entry "\\b") (cl-first e))
-                                                     (string-match-p (concat "\\b" target-entry "\\b") (cl-second e))))
-                                              ebib-biblatex-inheritances)))
-           (source-field (or (cdr (assoc-string target-field inheritance 'case-fold))
-                             (cdr (assoc-string target-field
-                                                (cl-third (assoc-string "all" ebib-biblatex-inheritances 'case-fold))
-                                                'case-fold)))))
-      (unless (eq source-field 'none)
-        (or source-field target-field)))))
+    (let* ((inheritance (append (cl-third (cl-find-if (lambda (e)
+                                                        (and (string-match-p (concat "\\b" source-entry "\\b") (cl-first e))
+                                                             (string-match-p (concat "\\b" target-entry "\\b") (cl-second e))))
+                                                      ebib-biblatex-inheritances))
+                                (cl-third (assoc-string "all" ebib-biblatex-inheritances 'case-fold)))))
+      (or (car (rassoc (downcase target-field) inheritance))
+          target-field))))
 
 (defun ebib-db-set-string (abbr value db &optional if-exists)
   "Set the @string definition ABBR to VALUE in database DB.
