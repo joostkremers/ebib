@@ -177,6 +177,8 @@ combination, the field inherits from the same-name field in the
 cross-referenced entry.  If no inheritance should take place, set
 the target field to \"No inheritance\".
 
+All entries made in this option should be in lower case.
+
 Note that this option is only relevant for BibLaTeX.  If the
 BibTeX dialect is set to `BibTeX', this option is ignored."
   :group 'ebib
