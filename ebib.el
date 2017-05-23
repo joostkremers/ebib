@@ -1929,6 +1929,7 @@ a filename is asked to which the entry is appended."
     (suppress-keymap map 'no-digits)
     (define-key map "/" #'ebib-search-next)
     (define-key map [return] #'ebib-search-next)
+    (define-key map "g" #'ebib-search-goto-first-entry)
     map)
   "Keymap that is active when a search is preformed.")
 
@@ -2010,6 +2011,12 @@ result."
                 (setq result (cons (car f) result))))
             entry))
     result))
+
+(defun ebib-search-goto-first-entry ()
+  "Goto the first entry and issue a message that search is still active."
+  (interactive)
+  (ebib-goto-first-entry)
+  (message "Jumped to first entry in database.  Continue searching with `/' or RET."))
 
 (defun ebib-edit-strings ()
   "Edit the @STRING definitions in the database."
