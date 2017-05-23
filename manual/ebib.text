@@ -3,7 +3,7 @@
 
 <article>
 
-Ebib is a program with which you can manage BibTeX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)
+Ebib is a program with which you can manage BibTeX and BibLateX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)
 
 It should be noted that Ebib is *not* a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.
 
@@ -300,15 +300,15 @@ The first column defined in `ebib-index-colums` is the column on which the entri
 
 Ebib provides several search methods. First of all, in the index buffer, the normal Emacs incremental searches, `C-s` and `C-r`, can be used to search entry keys. Once you've found the key you're searching, you must hit `RET` to quit the search and again `RET` to make the entry you found active: Ebib does not update the entry buffer during incremental search. If you make frequent use of this option, you may want to make the cursor visible in the Ebib buffers. Unset the customisation option "Hide Cursor" (`ebib-hide-cursor`) to do so.
 
-The contents of the entries can be searched with `/`. This command (`ebib-search`) which searches for a string (more precisely, a regular expression) starting from the current entry (i.e., *not* from the first entry) and will display the entry with the first occurrence of the search string that it finds. All the occurrences of the search string in that entry are highlighted.
+The contents of the entries can be searched with `/`. This command (`ebib-search`) searches for a string (more precisely, a regular expression) starting from the current entry (i.e., *not* from the first entry) and will display the entry with the first occurrence of the search string that it finds. All the occurrences of the search string in that entry are highlighted.
 
-Ebib searches all the fields of each entry. It is not possible with `/` to specify the fields to search. Note that if the search term is found in a field with a multiline value, Ebib will highlight the `+` sign that it displays in front of the field value. When the search term is found, Ebib gives a message saying so, similarly if the search term was not found.
+Ebib searches all the fields of each entry. It is not possible with `/` to specify the fields to search. Note that if the search term is found in a field with a multiline value, Ebib will highlight the `+` sign that is displayed in front of the field value. When the search term is found, Ebib gives a message saying so, similarly if the search term was not found.
 
-A search term may of course appear more than once in the database. To search for the next occurrence, type `/` again (or, alternatively type `RET`). This continues searching for the search term in the rest of the database. Again, the first entry found to contain the search string is displayed. Note that the search does not wrap: if the end of the database is reached, Ebib stops searching and informs you that the no further occurrence of the search string was found.
+A search term may of course appear more than once in the database. To search for the next occurrence, type `/` again (or, alternatively type `RET`). This continues searching for the search term in the rest of the database. Again, the first entry found to contain the search string is displayed. Note that the search does not wrap: if the end of the database is reached, Ebib stops searching and informs you that no further occurrence of the search string was found. If you want to continue searching from the top, type `g` and then continue the search with `/` or `RET`.
 
-To resume the previous search, you can pass a prefix argument to `/`. So typing `C-u /` (or any other prefix argument) starts searching for the previous search string again. This can be useful if you've reached the end of the database and want to continue searching from the top. Just type `g` to go to the top of the database and then press `C-u /`.
+Note that once you've started a search with `/`, Ebib activates a transient key map called `ebib-search-map`. It is this map that holds the bindings of `/` and `RET` to continue searching after the current entry and of the key `g` to jump to the top of the database. You can, of course, bind or rebind keys in this map.
 
-Note that once you've started a search with `/`, Ebib activates a transient key map called `ebib-search-map`. It is this map that holds the bindings of `/` and `RET` to the function `ebib-search-next` to continue searching after the current entry. If you wish to rebind the key used for `ebib-search-next`, bind it in this keymap, not in `ebib-index-mode-map`.
+Exiting a search (i.e., getting rid of the transient key map) is done by pressing any key other than `/`, `RET` or `g`. The search is ended and the command associated with this key is executed normally. If you want to repeat a previous search, you can pass a prefix argument to `/`. So typing `C-u /` (or any other prefix argument) starts searching for the previous search string again.
 
 
 ## Filters ##
