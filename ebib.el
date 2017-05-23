@@ -2933,9 +2933,10 @@ was called interactively."
                                        ebib--cur-db
                                        'overwrite)
                   (ebib--redisplay-current-field)
+                  (ebib--set-modified t)
                   (unless (member keyword collection)
                     (ebib--keywords-add-keyword keyword ebib--cur-db)))
-             finally return (ebib--set-modified t))))
+             finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--edit-file-field ()
   "Edit the `ebib-file-field'.
@@ -2955,8 +2956,9 @@ otherwise they are stored as absolute paths."
                                       (concat conts ebib-filename-separator file-name)
                                     file-name)))
                   (ebib-db-set-field-value ebib-file-field new-conts (ebib--get-key-at-point) ebib--cur-db 'overwrite)
-                  (ebib--redisplay-current-field))
-             finally return (ebib--set-modified t))))
+                  (ebib--redisplay-current-field)
+                  (ebib--set-modified t))
+             finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--transform-file-name-for-storing (file)
   "Return a name for FILE that can be stored in the file field.
