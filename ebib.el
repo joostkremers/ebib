@@ -1927,7 +1927,6 @@ a filename is asked to which the entry is appended."
 (defvar ebib-search-map
   (let ((map (make-keymap)))
     (suppress-keymap map 'no-digits)
-    (define-key map "/" #'ebib-search-next)
     (define-key map [return] #'ebib-search-next)
     (define-key map "g" #'ebib-search-goto-first-entry)
     map)
@@ -1945,14 +1944,14 @@ string, search for the previous search string instead."
   (ebib--execute-when
     ((entries)
      (ebib--ifstring (search-str (or (and arg ebib--search-string)
-                                     (read-string "Search database for: ")))
+                                 (read-string "Search database for: ")))
          (progn (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
                 (setq ebib--search-string search-str)
                 ;; first we search the current entry
                 (if (ebib--search-in-entry ebib--search-string
-                                           (ebib-db-get-entry (ebib--get-key-at-point) ebib--cur-db))
+                                       (ebib-db-get-entry (ebib--get-key-at-point) ebib--cur-db))
                     (progn (ebib--update-entry-buffer ebib--search-string)
-                           (message "Found search string in current entry.  `/' or RET for next match."))
+                           (message "Found search string in current entry.  RET for next match."))
                   ;; if the search string wasn't found in the current entry, we continue searching.
                   (ebib-search-next)))))
     ((default)
