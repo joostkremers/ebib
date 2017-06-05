@@ -453,7 +453,7 @@ string has the text property `ebib--alias' with value t."
           (setq value (cdr (assoc-string alias entry 'case-fold)))))
     (unless (or value noerror)
       (error "[Ebib] Field `%s' does not exist in entry `%s'" field key))
-    (when value
+    (unless (= 0 (length value)) ; (length value) == 0 if value is nil or if value is "".
       (setq value (copy-sequence value))
       (when unbraced
         (setq value (ebib-db-unbrace value)))
