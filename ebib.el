@@ -1012,7 +1012,8 @@ be added.  (Whether a timestamp is actually added also depends on
 If optional argument SOFT is non-NIL, just switch to a non-Ebib
 buffer if Ebib is not occupying the entire frame."
   (interactive)
-  (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+  (if ebib--cur-db
+      (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db))
   (unless (member (window-buffer) (mapcar #'cdr ebib--buffer-alist))
     (error "Ebib is not active "))
   (cond

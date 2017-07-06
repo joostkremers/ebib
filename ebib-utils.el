@@ -826,12 +826,13 @@ conditions are AND'ed.)"
   "Return a string describing the modified status of DB.
 DB defaults to the current database."
   (or db (setq db ebib--cur-db))
-  (if (not (ebib-db-modified-p db))
-      " "
-    (propertize ebib-modified-char
-                'face 'ebib-modified-face
-                'help-echo "Database modified\nmouse-1: Save database"
-                'local-map '(keymap (mode-line keymap (mouse-1 . ebib-save-current-database))))))
+  (when db  ; Note that `ebib--cur-db' may also be nil!
+    (if (not (ebib-db-modified-p db))
+        " "
+      (propertize ebib-modified-char
+                  'face 'ebib-modified-face
+                  'help-echo "Database modified\nmouse-1: Save database"
+                  'local-map '(keymap (mode-line keymap (mouse-1 . ebib-save-current-database)))))))
 
 (defun ebib--log (type format-string &rest args)
   "Write a message to Ebib's log buffer.
@@ -1118,7 +1119,7 @@ block, the return value is nil."
   "Get the dialect of DB.
 If DB has no dialect, return the default dialect, as stored in
 `ebib-bibtex-dialect'."
-  (or (ebib-db-get-dialect db)
+  (or (and db (ebib-db-get-dialect db))
       ebib-bibtex-dialect))
 
 (defun ebib--local-vars-add-dialect (vars dialect &optional overwrite)
