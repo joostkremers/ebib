@@ -2578,7 +2578,7 @@ not been saved yet."
     (mapc (lambda (k)
             (ebib--keywords-add-keyword k ebib--cur-db))
           new-keywords))
-  (ebib--update-index-buffer))
+  (ebib--update-entry-buffer))
 
 ;;; Interactive filter functions
 
