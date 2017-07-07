@@ -2940,10 +2940,10 @@ was called interactively."
                                        (ebib--get-key-at-point)
                                        ebib--cur-db
                                        'overwrite)
-                  (ebib--redisplay-current-field)
-                  (ebib--set-modified t)
                   (unless (member keyword collection)
-                    (ebib--keywords-add-keyword keyword ebib--cur-db)))
+                    (ebib--keywords-add-keyword keyword ebib--cur-db))
+                  (ebib--redisplay-current-field)
+                  (ebib--set-modified t))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--edit-file-field ()
