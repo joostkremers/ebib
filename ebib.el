@@ -750,6 +750,7 @@ number is also the argument to the function."
     "--"
     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib--keywords-new-p ebib--cur-db)]
     ["Save All New Keywords" ebib-keywords-save-all-new (ebib--keywords-new-p)]
+    ["Save Keywords From Current Entry" ebib-keywords-save-from-entry t]
     "--"
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
