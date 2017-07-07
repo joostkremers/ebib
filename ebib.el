@@ -732,7 +732,7 @@ number is also the argument to the function."
     ["Open Database..." ebib-load-bibtex-file t]
     ["Merge Database..." ebib-merge-bibtex-file (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Save Database" ebib-save-current-database (and ebib--cur-db
-                                                     (ebib-db-modified-p ebib--cur-db))]
+                                                 (ebib-db-modified-p ebib--cur-db))]
     ["Save All Databases" ebib-save-all-databases (ebib--modified-p)]
     ["Save Database As..." ebib-write-database ebib--cur-db]
     ["Close Database" ebib-close-database ebib--cur-db]
@@ -755,8 +755,8 @@ number is also the argument to the function."
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
      ["Delete" ebib-delete-entry (and ebib--cur-db
-                                      (ebib--get-key-at-point)
-                                      (not (ebib-db-get-filter ebib--cur-db)))])
+                                  (ebib--get-key-at-point)
+                                  (not (ebib-db-get-filter ebib--cur-db)))])
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     "--"
