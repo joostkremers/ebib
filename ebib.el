@@ -2432,7 +2432,8 @@ associated with the current buffer, see
                                                                (ebib--get-field-value-for-display "Title" key db))
                                                        'ebib-key key
                                                        'ebib-db db))
-                                         keys)))))))
+                                         keys)
+                                 collection))))))
 
 ;;;###autoload
 (defun ebib-ivy-insert-citation ()
