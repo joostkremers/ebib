@@ -1979,7 +1979,7 @@ are searched."
              (message (format "`%s' not found" ebib--search-string))
            (ebib-db-set-current-entry-key (car cur-search-entry) ebib--cur-db)
            (ebib--goto-entry-in-index (car cur-search-entry))
-           (message "Found search string in entry `%s'.  `/' or RET for next match." (ebib--get-key-at-point))
+           (message "Found search string in entry `%s'.  RET for next match." (ebib--get-key-at-point))
            (ebib--update-entry-buffer ebib--search-string)))))
     ((default)
      (beep))))
@@ -2017,7 +2017,7 @@ result."
   "Goto the first entry and issue a message that search is still active."
   (interactive)
   (ebib-goto-first-entry)
-  (message "Jumped to first entry in database.  Continue searching with `/' or RET."))
+  (message "Jumped to first entry in database.  Continue searching with RET."))
 
 (defun ebib-edit-strings ()
   "Edit the @STRING definitions in the database."
