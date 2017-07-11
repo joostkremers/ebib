@@ -1973,7 +1973,7 @@ are searched."
        (let ((cur-search-entry (cdr (member (ebib--get-key-at-point) (ebib--sort-keys-list (ebib-db-list-keys ebib--cur-db) ebib--cur-db)))))
          (while (and cur-search-entry
                      (null (ebib--search-in-entry ebib--search-string
-                                                  (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
+                                              (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
            (setq cur-search-entry (cdr cur-search-entry)))
          (if (null cur-search-entry)
              (message (format "`%s' not found" ebib--search-string))
