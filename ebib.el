@@ -2958,7 +2958,13 @@ otherwise they are stored as absolute paths."
   (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs))))
     (cl-loop for file = (expand-file-name (read-file-name "Add file (ENTER to finish): " start-dir nil 'confirm-after-completion) start-dir)
              until (or (string= file "")
-                       (string= file (expand-file-name start-dir)))
+                       ;; When using Ivy, the return value of
+                       ;; `ivy-immediate-done' is the `start-dir' rather than
+                       ;; the empty string, so we check for that. To be on the
+                       ;; safe side, expand the returned path and make sure
+                       ;; directories do not end in trailing slash.
+                       (string= (directory-file-name file)
+                                (directory-file-name (expand-file-name start-dir))))
              do (let* ((file-name (ebib--transform-file-name-for-storing file))
                        (conts (ebib-db-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
