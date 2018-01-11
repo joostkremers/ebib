@@ -429,7 +429,7 @@ otherwise return nil.  If UNBRACED is non-nil, return the value
 without braces.
 
 If XREF is non-nil, the field value may be retrieved from a
-cross-referenced entry.  If the result in non-nil, the returned
+cross-referenced entry.  If the result is non-nil, the returned
 text has the text property `ebib--xref', which has as value the
 key of the entry from which the field value was retrieved.
 
