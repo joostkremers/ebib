@@ -503,11 +503,12 @@ the buffers, reads the rc file and loads the files in
   (ebib--filters-load-file ebib-filters-default-file)
   (add-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
   (add-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
-  (if ebib-preload-bib-files
-      (mapc (lambda (file)
-              (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
-                                                   file)))
-            ebib-preload-bib-files))
+  (when ebib-preload-bib-files
+    (mapc (lambda (file)
+            (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
+                                             file)))
+          ebib-preload-bib-files)
+    (setq ebib--cur-db (car ebib--databases))) ; Display the first database in the list.
   (setq ebib--initialized t))
 
 (defun ebib--setup-windows ()
