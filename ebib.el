@@ -223,7 +223,7 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
   ;; are made to the value as stored in the database. Hence copy-sequence.
   (or db (setq db ebib--cur-db))
   (let* ((case-fold-search t)
-         (value (ebib-db-get-field-value field key db 'noerror nil 'xref))
+         (value (ebib-get-field-value field key db 'noerror nil 'xref))
          (raw " ")
          (multiline " ")
          (matched nil)
@@ -761,9 +761,9 @@ number is also the argument to the function."
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     "--"
-    ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-db-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-    ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-db-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-    ["View File" ebib-view-file (and ebib--cur-db (ebib-db-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+    ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+    ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+    ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["As Index Cards" ebib-print-entries ebib--cur-db]
@@ -1075,7 +1075,7 @@ interactively."
     (with-help-window (help-buffer)
       (princ (propertize (format "Annotation for `%s' [%s]" (ebib--get-key-at-point) (ebib-db-get-filename ebib--cur-db 'shortened)) 'face '(:weight bold)))
       (princ "\n\n")
-      (let ((contents (ebib-db-get-field-value "annotation" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+      (let ((contents (ebib-get-field-value "annotation" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
         (if contents
             (princ contents)
           (princ "[No annotation]"))))))
@@ -1180,7 +1180,7 @@ case add new entry stubs for each file anyway."
       ;;collect all file paths from db entries into single list
       (unless allow-duplicates
         (cl-dolist (entry-key (ebib-db-list-keys db))
-          (let ((entry-files (ebib-db-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
+          (let ((entry-files (ebib-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
             (if entry-files
                 (cl-dolist (fp (split-string entry-files (regexp-quote ebib-filename-separator)))
                   (push (locate-file fp ebib-file-search-dirs) all-entry-files))))))
@@ -1202,7 +1202,7 @@ generate the key, see that function's documentation for details."
               ;; `bibtex-generate-autokey' will simply use the first one it
               ;; finds. By sorting we make sure it's always the author.
               (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db nil 'sort)
-              (let ((x-ref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+              (let ((x-ref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
                 (if x-ref
                     (ebib--format-entry x-ref ebib--cur-db nil 'sort)))
               (goto-char (point-min))
@@ -1463,7 +1463,7 @@ the sort value.  DB is the database that contains the entry
 referred to by ENTRY-KEY."
   (let ((sort-string nil))
     (while (and sortkey-list
-                (null (setq sort-string (ebib-db-get-field-value (car sortkey-list) entry-key db 'noerror 'unbraced))))
+                (null (setq sort-string (ebib-get-field-value (car sortkey-list) entry-key db 'noerror 'unbraced))))
       (setq sortkey-list (cdr sortkey-list)))
     sort-string))
 
@@ -1490,7 +1490,7 @@ referred to by ENTRY-KEY."
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
       ;; field).
       ((compare-xrefs (x _)
-                      (ebib-db-get-field-value "crossref" x db 'noerror))
+                      (ebib-get-field-value "crossref" x db 'noerror))
        ;; This one's a bit trickier. We iterate over the lists of fields in
        ;; `ebib-sort-order'. For each level, `ebib--get-sortstring' then
        ;; returns the string that can be used for sorting. If all fails,
@@ -1612,7 +1612,7 @@ file was modified."
 If the current entry's crossref field is empty, search for the
 first entry with the current entry's key in its crossref field."
   (interactive)
-  (let ((xref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+  (let ((xref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
     (if xref
         ;; If there is a cross-reference, see if we can find it.
         (cond
@@ -2196,7 +2196,7 @@ argument ARG."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (let ((urls (ebib-db-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+     (let ((urls (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
        (if urls
            (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
          (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
@@ -2211,7 +2211,7 @@ contain only one DOI.  The DOI is combined with the URL
   (interactive)
   (ebib--execute-when
     ((entries)
-     (let ((doi (ebib-db-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+     (let ((doi (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
        (if doi
            (ebib--call-browser (concat "http://dx.doi.org/" doi))
          (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))))
@@ -2235,7 +2235,7 @@ argument ARG can be used to specify which file to choose."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (let ((file (ebib-db-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
+     (let ((file (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
            (num (if (numberp arg) arg nil)))
        (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
     ((default)
@@ -2542,7 +2542,7 @@ add keywords to all of them.  If not, the keywords are added to
 the current entry."
   (interactive)
   (cl-flet ((add-keywords (entry-key keywords)
-                          (let* ((conts (ebib-db-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
+                          (let* ((conts (ebib-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
                                  (new-conts (if conts
                                                 (concat conts ebib-keywords-separator keywords)
                                               keywords)))
@@ -2574,7 +2574,7 @@ the current entry."
 Check the keywords of the current entry and save those that have
 not been saved yet."
   (interactive)
-  (let* ((keywords (ebib-db-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
+  (let* ((keywords (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
          (new-keywords (ebib--keywords-remove-existing (ebib--keywords-to-list keywords) ebib--cur-db)))
     (mapc (lambda (k)
             (ebib--keywords-add-keyword k ebib--cur-db))
@@ -2930,7 +2930,7 @@ was called interactively."
         (collection (ebib--keywords-for-database ebib--cur-db)))
     (cl-loop for keyword = (completing-read "Add a new keyword (ENTER to finish): " collection nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
-             do (let* ((conts (ebib-db-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
+             do (let* ((conts (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-keywords-separator keyword)
                                     keyword)))
@@ -2966,7 +2966,7 @@ otherwise they are stored as absolute paths."
                        (string= (directory-file-name file)
                                 (directory-file-name (expand-file-name start-dir))))
              do (let* ((file-name (ebib--transform-file-name-for-storing file))
-                       (conts (ebib-db-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
+                       (conts (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-filename-separator file-name)
                                     file-name)))
@@ -3006,7 +3006,7 @@ If FILE is not in (a subdirectory of) one of the directories in
 (defun ebib--edit-normal-field ()
   "Edit a field that does not require special treatment."
   (let* ((cur-field (ebib--current-field))
-         (init-contents (ebib-db-get-field-value cur-field (ebib--get-key-at-point) ebib--cur-db 'noerror))
+         (init-contents (ebib-get-field-value cur-field (ebib--get-key-at-point) ebib--cur-db 'noerror))
          (unbraced? nil))
     (if (ebib--multiline-p init-contents)
         (ebib-edit-multiline-field)     ; this always returns nil
@@ -3087,7 +3087,7 @@ If the field contains multiple URLs (as defined by
 `ebib-url-regexp'), the user is asked which one to open.
 Altertanively, a numeric prefix argument ARG can be passed."
   (interactive "P")
-  (let ((urls (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+  (let ((urls (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
     (if urls
         (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
       (error "[Ebib] No URL found in `%s' field" (ebib--current-field)))))
@@ -3098,7 +3098,7 @@ The field may contain multiple filenames, in which case the
 prefix argument ARG can be used to specify which file is to be
 viewed."
   (interactive "P")
-  (let ((file (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
+  (let ((file (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
         (num (if (numberp arg) arg nil)))
     (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
 
@@ -3108,7 +3108,7 @@ viewed."
   (let ((field (ebib--current-field)))
     (unless (or (not field)
                 (string= field "=type="))
-      (let ((contents (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
         (when (stringp contents)
           (kill-new contents)
           (message "Field contents copied."))))))
@@ -3120,7 +3120,7 @@ The killed text is put in the kill ring."
   (let ((field (ebib--current-field)))
     (unless (or (not field)
                 (string= field "=type="))
-      (let ((contents (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
         (when (stringp contents)
           (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
           (kill-new contents)
@@ -3140,7 +3140,7 @@ Prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
   (let ((field (ebib--current-field)))
     (if (or (member-ignore-case field '("=type=" "crossref")) ; We cannot yank into the `=type=' or `crossref' fields.
             (unless (eq last-command 'ebib--yank-field-contents) ; Nor into a field already filled.
-              (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+              (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
         (progn
           (setq this-command t)
           (beep))
@@ -3174,12 +3174,12 @@ The deleted text is not put in the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref" "xref" "related" "keywords"))
-      (let ((contents (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
         (if (ebib--multiline-p contents) ; multiline fields cannot be special
             (beep)
           (unless contents              ; If there is no value,
             (ebib-edit-field) ; the user can enter one, which we must then store unbraced.
-            (setq contents (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+            (setq contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
           (when contents ; We must check to make sure the user entered some value.
             (ebib-db-set-field-value field contents (ebib--get-key-at-point) ebib--cur-db 'overwrite (not (ebib-db-unbraced-p contents)))
             (ebib--redisplay-current-field)
@@ -3190,7 +3190,7 @@ The deleted text is not put in the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref" "xref" "related"))
-      (let ((text (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+      (let ((text (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
         (if (ebib-db-unbraced-p text) ; unbraced fields cannot be multiline
             (beep)
           (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-db-unbrace text)))))))
@@ -3199,7 +3199,7 @@ The deleted text is not put in the kill ring."
   "Insert an abbreviation from the ones defined in the database."
   (interactive)
   (let ((field (ebib--current-field)))
-    (if (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)
+    (if (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)
         (beep)
       (let ((strings (ebib-db-list-strings ebib--cur-db)))
         (when strings
@@ -3219,7 +3219,7 @@ The deleted text is not put in the kill ring."
     (with-help-window (help-buffer)
       (princ (propertize (format "%s" field) 'face '(:weight bold)))
       (princ "\n\n")
-      (let ((contents (ebib-db-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
         (if contents
             (princ contents)
           (princ "[Empty field]"))))))

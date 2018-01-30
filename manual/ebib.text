@@ -730,7 +730,7 @@ It is also possible to add new specifiers. Simply add a pair (cons cell) `(<char
 When the specifier functions are called, the `key` argument is set to the key of the current entry and the `db` argument to the current database. With these arguments, it is possible to, e.g., retrieve the value of a specific field in the entry:
 
 ```
-(ebib-db-get-field-value <field> key db 'noerror 'unbraced 'xref)
+(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
 ```
 
 where `<field>` is the field (as a string) whose value is to be retrieved.

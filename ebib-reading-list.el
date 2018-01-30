@@ -133,7 +133,7 @@ still pending, nil if it is done."
 The functions in this hook can use the variable `ebib--cur-db' to
 access the current database, the function `ebib--get-key-at-point'
 to obtain the key of the current entry, and the database
-functions, especially `ebib-db-get-field-value' and
+functions, especially `ebib-get-field-value' and
 `ebib-db-get-entry', to access the current entry's data
 fields."
   :group 'ebib-reading-list
@@ -144,7 +144,7 @@ fields."
 The functions in this hook can use the variable `ebib--cur-db' to
 access the current database, the function `ebib--get-key-at-point'
 to obtain the key of the current entry, and the database
-functions, especially `ebib-db-get-field-value' and
+functions, especially `ebib-get-field-value' and
 `ebib-db-get-entry', to access the current entry's data fields."
   :group 'ebib-reading-list
   :type 'hook)

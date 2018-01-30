@@ -295,7 +295,7 @@ options have changed.  If you never made any customisations to Ebib, the
 upgrade should not pose any problems.  If you have, however, read on.
 
    The most important change is that the variable ‘ebib-entry-types’
-(option "Entry Types") has been removed.  Ebib now uses the entry type
+(option “Entry Types”) has been removed.  Ebib now uses the entry type
 definitions of the built-in ‘bibtex-mode’, which means that if you wish
 to customise the entry types, you should customise
 ‘bibtex-BibTeX-entry-alist’ or ‘bibtex-biblatex-entry-alist’.
@@ -325,8 +325,8 @@ value.  First, the default location of the rc file has moved to
 ‘~/.emacs.d/ebibrc’, in line with the recommendation to keep all
 Emacs-related files in ‘~/.emacs.d’.  If you kept an ‘.ebibrc’ file in
 your home directory, move it to ‘~/.emacs.d’.  Second, a
-‘\documentclass’ definition has been added to the user options "Latex
-Preamble" (‘ebib-latex-preamble’) and "Print Preamble"
+‘\documentclass’ definition has been added to the user options “Latex
+Preamble” (‘ebib-latex-preamble’) and “Print Preamble”
 (‘ebib-print-preamble’).  If you customised one of these, you should add
 a document class specification, otherwise the LaTeX file won’t compile.
 Third, the option ‘ebib-save-xrefs-first’ now defaults to ‘t’.
@@ -430,14 +430,14 @@ Chances are that you will be doing most of your work with one or a few
 ‘.bib’ files, and you may find yourself opening the same file or files
 every time you start Ebib.  If so, you can tell Ebib to always load
 specific ‘.bib’ files on startup.  To do this, specify the files in
-Ebib’s customisation buffer, under the option "Preload Bib Files"
+Ebib’s customisation buffer, under the option “Preload Bib Files”
 (‘ebib-preload-bib-files’).
 
    By default, ‘.bib’ files are searched for in your home directory.
 Since this is most likely not where you keep the files, you need to
 specify either the file’s full path or a relative path starting from
-your home directory.  Alternatively, you can customise the option "Bib
-Search Dirs" (‘ebib-bib-search-dirs’) to specify one or more directories
+your home directory.  Alternatively, you can customise the option “Bib
+Search Dirs” (‘ebib-bib-search-dirs’) to specify one or more directories
 in which Ebib should search the ‘.bib’ files.
 
 
@@ -463,7 +463,7 @@ extra fields.  These fields are usually ignored by Bib(La)TeX (note that
 Bib(La)TeX normally ignores _all_ fields it does not know), although
 there are bibliography styles that treat some of these fields as
 optional rather than as extra.  Extra fields are defined in the user
-option "Extra Fields" (‘ebib-extra-fields’).  Lastly, the fourth set of
+option “Extra Fields” (‘ebib-extra-fields’).  Lastly, the fourth set of
 fields shown in the entry buffer are fields that exist in the entry but
 are not defined as part of the entry type nor as extra fields.
 
@@ -475,7 +475,7 @@ database.  Ebib by default defines the following extra fields:
 ‘abstract’, ‘keywords’, ‘file’, ‘timestamp’, and ‘doi’ (BibTeX only).
 ‘url’ and ‘doi’ are defined only for BibTeX, since Biblatex defines them
 as optional fields for most entry types.  If these are not sufficient
-for you, you can customise the option "Extra Fields".
+for you, you can customise the option “Extra Fields”.
 
    To move around in the index buffer, you can use the ‘up’ and ‘down’
 cursor keys, ‘p’ and ‘n’ and also the versions with the control key
@@ -543,7 +543,7 @@ Since the entry key must be unique, Ebib will complain if you enter a
 key that already exists.
 
    You can also let Ebib automatically generate entry keys: if you set
-the customisation option "Autogenerate Keys" (‘ebib-autogenerate-keys’),
+the customisation option “Autogenerate Keys” (‘ebib-autogenerate-keys’),
 Ebib does not ask you for a key when you add a new entry.  Instead, it
 creates a temporary key (of the form ‘<new-entry00>’).  When you have
 finished entering the field values for the new entry, Ebib automatically
@@ -601,7 +601,7 @@ and ‘G’, and ‘Home’ and ‘End’ also work as expected.
 buffer, ‘RET’ is equivalent to ‘e’.)  For most fields, Ebib simply asks
 you for a string value in the minibuffer.  (Here, ‘RET’ confirms the
 edit, while ‘C-g’ cancels it.)  Although BibTeX requires that field
-values be surrounded by braces {} (or double quotes "", but Ebib does
+values be surrounded by braces {} (or double quotes “”, but Ebib does
 not use those, even though it can of course handle them when they are
 used in an existing ‘.bib’ file) you do not need to type these.  Ebib
 adds them when it saves the ‘.bib’ file.
@@ -695,7 +695,7 @@ entry buffer, following the extra fields.
    It is even possible to add such fields to an entry by pressing ‘a’ in
 the entry buffer.  This asks for a field name and then a value.  If you
 make heavy use of this option, it may be better to define the relevant
-fields through the user option "Extra Fields", but undefined fields may
+fields through the user option “Extra Fields”, but undefined fields may
 be useful when reading or importing BibTeX entries from a different
 source that contain non-standard fields.
 
@@ -714,16 +714,16 @@ Biblatex defines a large number of fields, many of which are optional
 for most entry types.  Displaying all these fields in the entry buffer
 would not be very practical, because you are most likely interested in
 only a few of them.  For this reason, Ebib defines a (fairly large)
-number of fields as ’hidden’, meaning that they are not shown in the
+number of fields as ‘hidden’, meaning that they are not shown in the
 entry buffer.  You can make these fields visible with the key ‘H’ in the
 index buffer.  Which fields are treated as hidden is controlled by the
-option "Hidden Fields" (‘ebib-hidden-fields’), which can be customised.
+option “Hidden Fields” (‘ebib-hidden-fields’), which can be customised.
 
    Most of the fields defined as hidden are Biblatex-specific, because
 BibTeX recognises a much smaller number of fields and there isn’t much
 of a need to hide the lesser used ones.  However, the functionality is
 available: if you wish to use it, just add the relevant fields to the
-option "Hidden Fields".
+option “Hidden Fields”.
 
 
 File: ebib.info,  Node: Timestamps,  Next: Copy Cut Kill Paste Yank and Delete,  Prev: Hidden Fields,  Up: Editing the Database
@@ -735,8 +735,8 @@ Ebib provides the possibility to add a timestamp to every new entry,
 recording the time it was added to the database.  The timestamp is
 recorded in the (extra) field ‘timestamp’, which is hidden by default.
 
-   You can tell Ebib to create timestamps by setting the option "Use
-Timestamp" (‘ebib-use-timestamp’) in Ebib’s customisation buffer.  With
+   You can tell Ebib to create timestamps by setting the option “Use
+Timestamp” (‘ebib-use-timestamp’) in Ebib’s customisation buffer.  With
 this option set, a timestamp is included in entries added to the
 database with ‘a’.  Ebib will also add a timestamp to entries imported
 from a buffer or merged from a file, and to entries exported to another
@@ -803,7 +803,7 @@ database to the file it was loaded from without asking for confirmation.
 (It is similar to ‘C-x C-s’ in Emacs.)  If you’re saving a file for the
 first time after loading it, Ebib creates a backup file.  (Ebib honours
 ‘backup-directory-alist’ when saving backups.  Note that you can also
-disable backups altogether with the option "Create Backups",
+disable backups altogether with the option “Create Backups”,
 ‘ebib-create-backups’.)
 
    If you want to force-save a database that has not been modified, you
@@ -892,9 +892,9 @@ still recognises these entry types, but it treats them as aliases for
 some of its own types.  The relevant entry types are ‘@conference’
 (treated as an alias for ‘@inproceedings’), ‘@electronic’ (alias for
 ‘@online’), ‘@mastersthesis’ (alias for ‘@thesis’ with the ‘type’ field
-set to ’Master’s thesis’), ‘@phdthesis’ (alias for ‘@thesis’ with the
-‘type’ field set to ’PhD thesis’), ‘@techreport’ (alias for ‘@report’
-with the ‘type’ field set to ’technical report’) and ‘@www’ (alias for
+set to ‘Master’s thesis’), ‘@phdthesis’ (alias for ‘@thesis’ with the
+‘type’ field set to ‘PhD thesis’), ‘@techreport’ (alias for ‘@report’
+with the ‘type’ field set to ‘technical report’) and ‘@www’ (alias for
 ‘@online’).  If an entry has such an alias as entry type, Ebib displays
 the entry type that Biblatex treats it as in the entry buffer.  (For
 example, the entry type alias ‘phdthesis’ is shown as ‘phdthesis [==>
@@ -975,7 +975,7 @@ you must hit ‘RET’ to quit the search and again ‘RET’ to make the entry
 you found active: Ebib does not update the entry buffer during
 incremental search.  If you make frequent use of this option, you may
 want to make the cursor visible in the Ebib buffers.  Unset the
-customisation option "Hide Cursor" (‘ebib-hide-cursor’) to do so.
+customisation option “Hide Cursor” (‘ebib-hide-cursor’) to do so.
 
    The contents of the entries can be searched with ‘/’.  This command
 (‘ebib-search’) searches for a string (more precisely, a regular
@@ -1025,11 +1025,11 @@ of _filters_.  A filter is basically a search expression that selects
 entries from the current database.  When you apply a filter to a
 database, only the entries that match are shown.  With filters, you can,
 for example, select all entries from a database that contain the string
-"Jones" in their ‘author’ field.  A filter can be as complex as you
-want: you can select all entries that do _not_ contain "Jones" in the
-‘author’ field, or all entries that contain "Jones" in either the
-‘author’ or the ‘editor’ field, or all entries that contain "Jones" in
-the ‘author’ field, and "symbiotic hibernation" in the ‘keyword’ field,
+“Jones” in their ‘author’ field.  A filter can be as complex as you
+want: you can select all entries that do _not_ contain “Jones” in the
+‘author’ field, or all entries that contain “Jones” in either the
+‘author’ or the ‘editor’ field, or all entries that contain “Jones” in
+the ‘author’ field, and “symbiotic hibernation” in the ‘keyword’ field,
 etc.  Basically, the filter can consist of an arbitary number of search
 criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
 * Menu:
@@ -1049,24 +1049,24 @@ File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
 
 Creating a filter is simple: press ‘&’, and Ebib will ask you for a
 field to select on, and for a regular expression to select with.  So if
-you want to select all entries that contain "Jones" in the ‘author’
+you want to select all entries that contain “Jones” in the ‘author’
 field, you press ‘&’ and type ‘author’ as the field and ‘Jones’ as the
 regexp to filter on.  Ebib then runs this filter on the database, and
 only shows those entries that match the filter.  To indicate that a
 filter is active, the active filter is displayed in the mode line of
 index buffer.  (The filter can be displayed in Lisp form, if you prefer:
-customise "Filters Display As Lisp" to do so.)
+customise “Filters Display As Lisp” to do so.)
 
    If you don’t want to filter on one specific field but rather want to
 select all entries that match a certain regexp in any field, you can
 type ‘any’ as the field to filter on.  So specifying ‘any’ as the field
 and ‘Jones’ as the regexp will give you all entries that have a field
-that contains "Jones" in them.
+that contains “Jones” in them.
 
    Note that you can also select items based on their entry type.  In
 order to do that, you need to specify ‘=type=’ as the field to search,
 which is the field name in which Ebib stores the entry type internally.
-(There is also a "normal" field called ‘type’, hence the equal signs.)
+(There is also a “normal” field called ‘type’, hence the equal signs.)
 If you search the ‘=type=’ field, only exact matches are returned, so if
 you search for ‘book’, only the entries that are of type ‘book’ are
 returned, not those of type ‘inbook’.  You can use TAB completion in
@@ -1084,30 +1084,30 @@ File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Pre
 
 Once you have a filter on your database, you can refine or extend it.
 For example, suppose you have a filter selecting all entries with
-"Jones" in the ‘author’ field and want to add all entries that have
-"Jones" in the editor field to your selection.  In this case you need to
+“Jones” in the ‘author’ field and want to add all entries that have
+“Jones” in the editor field to your selection.  In this case you need to
 do a logical ‘or’ operation: you want to select an entry if it contains
-"Jones" in the ‘author’ field (which you already did) _or_ if it
-contains "Jones" in the ‘editor’ field.
+“Jones” in the ‘author’ field (which you already did) _or_ if it
+contains “Jones” in the ‘editor’ field.
 
    A short sidenote: the first impulse in a case like this might be to
 use ‘and’ instead of ‘or’: after all, you want to select all entries
-that contain "Jones" in the ‘author’ field _and_ all entries that
-contain "Jones" in the ‘editor’ field.  However, the filter that you
+that contain “Jones” in the ‘author’ field _and_ all entries that
+contain “Jones” in the ‘editor’ field.  However, the filter that you
 build up is used to test each entry _individually_ whether it meets the
 selection criterion.  An entry meets the criterion if it contains
-"Jones" in the ‘author’ field _or_ if it contains "Jones" in the
+“Jones” in the ‘author’ field _or_ if it contains “Jones” in the
 ‘editor’ field.  Therefore, ‘or’ is the required operator in this case.
 If you would use ‘and’, you would only get those entries that contain
-"Jones" in both the ‘author’ _and_ ‘editor’ fields.
+“Jones” in both the ‘author’ _and_ ‘editor’ fields.
 
    To perform a logical ‘or’ operation, press the key ‘|’.  As before,
 you will be asked which field you want to filter on, and which regexp
 you want to filter with.  Ebib will then update the index buffer.
 
    It is also possible to perform a logical ‘and’ on the filter.  Use
-this if you want to select those entries that contain "Jones" in the
-‘author’ field and e.g.  "symbiotic hibernation" in the ‘keyword’ field.
+this if you want to select those entries that contain “Jones” in the
+‘author’ field and e.g.  “symbiotic hibernation” in the ‘keyword’ field.
 A logical ‘and’ operation is done with the key ‘&’.  (Note: this is the
 same key that is used to create the filter.  In fact, you can create a
 filter with ‘|’ as well: when used in an unfiltered database, ‘&’ and
@@ -1119,15 +1119,15 @@ argument ‘M--’ (or ‘C-u -’, which is identical).  In this case, the
 search criterion is negated.  That is, the negative prefix argument
 performs a logical ‘not’ operation on the search criterion.  For
 example, if you want to select all entries from a database that do _not_
-contain "Jones" in the ‘author’ field, you can do this by typing ‘M-- &’
+contain “Jones” in the ‘author’ field, you can do this by typing ‘M-- &’
 and then filling out the relevant field and regexp.
 
    There is another way of performing a logical ‘not’ operation, which
 is only available when a filter is active: by pressing the key ‘~’, you
 invert the current filter.  That is, if you have a filtered database
-with all the entries containing "Jones" in the ‘author’ or in the
+with all the entries containing “Jones” in the ‘author’ or in the
 ‘editor’ field, and you press ‘~’, the selection is inverted, and now
-contains all entries that do _not_ have "Jones" in the ‘author’ or
+contains all entries that do _not_ have “Jones” in the ‘author’ or
 ‘editor’ field.
 
    Although ‘~’ and the negative prefix argument to ‘&’ or ‘|’ both
@@ -1165,7 +1165,7 @@ more filters, you have to name them.  You can store the currently active
 filter or the last used filter with ‘F s’.  Ebib will ask you for a name
 for the filter in order to identify it later.  By default, filter names
 are case-insensitive, but if you prefer to use case-sensitive filter
-names, you can unset the option "Filters Ignore Case".  When Ebib is
+names, you can unset the option “Filters Ignore Case”.  When Ebib is
 closed, all stored filters are saved to a file and they’re automatically
 reloaded when you open Ebib again.  Stored filters are not associated
 with a particular database: once a filter is stored, it is available to
@@ -1181,7 +1181,7 @@ keeping the old one.
 
    The file that Ebib uses to store filters is
 ‘~/.emacs.d/ebib-filters’, although that can of course be customised
-(see the option "Filters Default File").  As mentioned, stored filters
+(see the option “Filters Default File”).  As mentioned, stored filters
 are saved automatically when Ebib closes, but you can also save them
 manually with ‘F S’.  Note that if there are no stored filters when Ebib
 is closed (or when you press ‘F S’), the file is deleted.
@@ -1314,7 +1314,7 @@ then cancel the filter and perform an action on them.
 because it would not be clear whether you want to save the entire
 database or just the filtered entries.  If you want to save only the
 filtered entries to a file, you can use the command ‘w’ (or the menu
-option "Save Database As").  This also saves the ‘@string’, ‘@preamble’
+option “Save Database As”).  This also saves the ‘@string’, ‘@preamble’
 and ‘@comments’, as well as any file-local variables, so you will have a
 self-contained ‘.bib’ file with only the filtered entries.  In order to
 save the entire database, you need to cancel the filter.  After saving,
@@ -1454,7 +1454,7 @@ File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Databas
 
 As mentioned, you should probably set up some citation commands if you
 use Ebib with LaTeX documents.  The customisation option that allows you
-to do this is "Citation Commands".
+to do this is “Citation Commands”.
 
    Citation commands are defined for specific major modes.  You can also
 define commands for all modes under the heading ‘any’.  (By default,
@@ -1640,7 +1640,7 @@ RET’) to make sure Ebib rereads the bibliography command.
 
    If no ‘\bibliography’ or ‘\addbibresource’ command is found at all,
 either in the LaTeX file itself, or in the master file, Ebib simply
-consults the current database, i.e.  the database that was active when
+consults the current database, i.e. the database that was active when
 Ebib was lowered with ‘z’.  This is also what Ebib does for Org mode or
 Pandoc Markdown files, since they do not have the equivalent of a
 bibliography command.  (Note, however, that you can set
@@ -1670,7 +1670,7 @@ values of the cross-referenced entry in the entry buffer.  To indicate
 that they are just inherited values, they are marked with
 ‘ebib-crossref-face’, which by default inherits from
 ‘font-lock-comment-face’.  (You can customise it, of course.  See the
-customisation option "Crossref Face".)  These values are merely
+customisation option “Crossref Face”.)  These values are merely
 displayed for convenience: they cannot be edited.  (They can be copied,
 however).
 
@@ -1683,7 +1683,7 @@ to specify that the ‘inbook’ entry type can inherit a ‘maintitle’ field
 from the ‘title’ field if the cross-referenced entry is of type
 ‘mvbook’, and a ‘booktitle’ field if the cross-referenced entry is of
 type ‘book’.  The inheritance scheme for Biblatex is defined by the
-option "Biblatex Inheritances", which is set up with the default
+option “Biblatex Inheritances”, which is set up with the default
 inheritance relations defined by Biblatex, but which can be customised
 if needed.
 
@@ -1703,7 +1703,7 @@ cross-referencing entry, you have to type ‘n’, as with a normal search.
 cross-referencing entry, you need to type ‘g’ and then ‘/’.)
 
    Note that if you want to use Bib(La)TeX’s cross-referencing options,
-the option "Save Xrefs first" needs to be set (which it is by default).
+the option “Save Xrefs first” needs to be set (which it is by default).
 This tells Ebib to save all entries with a ‘crossref’ field first in the
 ‘.bib’ file.  Without this, cross-referencing will not work reliably.
 
@@ -1720,7 +1720,7 @@ This can be achieved by selecting entries.  You can select the entries
 you want to perform a command on with the key ‘m’.  This selects (or
 unselects) the current entry.  Selected entries are highlighted.  (Note
 that the face properties of selected entries can be customised through
-the customisation option "Selected Face".)
+the customisation option “Selected Face”.)
 
    Commands for which it makes sense automatically operate on all marked
 entries if there are any.  Of the commands discussed so far, these are
@@ -1773,11 +1773,11 @@ this option set, Ebib includes all multiline values in the LaTeX file
 that it creates.  Note however that Ebib does not change anything about
 the formatting of the text in a multiline value.  So if you plan to make
 (heavy) use of this option, make sure that the way you type your text
-conforms to LaTeX’s conventions (e.g.  empty lines to mark paragraphs,
+conforms to LaTeX’s conventions (e.g. empty lines to mark paragraphs,
 etc.)  and doesn’t contain any characters such as ‘&’ that are illegal
 in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
 
-   As mentioned, when you "print" the database, Ebib really just creates
+   As mentioned, when you “print” the database, Ebib really just creates
 a LaTeX file.  More precisely, it creates a temporary buffer and writes
 the LaTeX code into it, and then saves the contents of that buffer to a
 file.  After it has done that, Ebib lowers itself and instruct Emacs to
@@ -1790,7 +1790,7 @@ simply assumes that if you provide a filename of an existing file, it
 can overwrite that file without warning!
 
    A better way to tell Ebib which file to use is to set the option
-"Print Tempfile" in Ebib’s customisation buffer to some temporary file.
+“Print Tempfile” in Ebib’s customisation buffer to some temporary file.
 When this option is set, Ebib will always use this file to write to, and
 will not ask you for a filename anymore.
 
@@ -1798,12 +1798,12 @@ will not ask you for a filename anymore.
 or on the selected entries.
 
    There are two more customisation options for printing the database.
-These are "Print Preamble" and "LaTeX Preamble".  With these options,
+These are “Print Preamble” and “LaTeX Preamble”.  With these options,
 you can specify what Ebib should put in the preamble of the LaTeX files
 it creates.  Use this if you want to use specific packages.  This is
 especially useful for printing a bibliography, since by default, Ebib
-uses BibTeX’s standard bibliography style.  With the option "LaTeX
-Preamble" you can set your preferred bibliography style.
+uses BibTeX’s standard bibliography style.  With the option “LaTeX
+Preamble” you can set your preferred bibliography style.
 
 
 File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing the Database,  Up: Top
@@ -1839,7 +1839,7 @@ default Ebib also regards everything that is enclosed in a LaTeX
 then happen to run into a URL that contains a semicolon, you can enclose
 it in ‘\url{...}’ and it will be recognised properly.  You can, of
 course, customise the regular expression that controls this behaviour.
-See the option "Url Regexp" for details.
+See the option “Url Regexp” for details.
 
    Similarly, with the key ‘i’ in the index buffer you can send a DOI to
 a browser.  The DOI must be stored in the ‘doi’ field.  Unlike URLs,
@@ -1850,9 +1850,9 @@ the ‘doi’ field should contain just the DOI itself.
 
    Ebib uses the Emacs function ‘browse-url’ to call the default browser
 on the system.  If you prefer to use another browser, however, you can
-specify this with the option "Browser Command".  You can also customise
-the field that Ebib takes URLs from, with the option "Standard Url
-Field".  The same can be done for the DOI field.
+specify this with the option “Browser Command”.  You can also customise
+the field that Ebib takes URLs from, with the option “Standard Url
+Field”.  The same can be done for the DOI field.
 
 
 File: ebib.info,  Node: Viewing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
@@ -1875,18 +1875,18 @@ you can just hit ENTER. Alternatively, you can provide a prefix
 argument: ‘M-2 f’ for the second file, etc.
 
    The file names in the ‘file’ field do not have to have full paths.
-You can set the option "File Search Dirs" to a list of directories that
+You can set the option “File Search Dirs” to a list of directories that
 Ebib should search when opening a file from the ‘file’ field.  Note that
 Ebib searches only the directories in this list, not their
 subdirectories.  However, you can specify a relative path in the ‘file’
 field: if you put something like ‘a/Abney1987.pdf’ in the ‘file’ field,
 Ebib searches for the relevant file in a subdirectory ‘a/’ of the
-directories listed in the option "File Search Dirs".  As an extra
+directories listed in the option “File Search Dirs”.  As an extra
 service, Ebib also searches for the base filename, i.e., ‘Abney1987’ in
 this particular case.
 
    Ebib can call different external programs depending on the file
-extension of the relevant file.  The option "File Associations" allows
+extension of the relevant file.  The option “File Associations” allows
 you to specify which programs to call for which types of files.  By
 default, ‘.pdf’ and ‘.ps’ files are handled, by ‘xpdf’ and ‘gv’,
 respectively.  You can specify further file types by their extensions
@@ -1942,17 +1942,17 @@ Ebib adds the filename to the ‘file’ field, appending it no any existing
 contents (adding a separator if necessary), and then asks you for the
 next file.  If you don’t want to add another, just hit ENTER. The
 default separator is ‘"; "’ (semicolon-space), but this can be
-customised (see the option "Filename Separator" for details).  The
+customised (see the option “Filename Separator” for details).  The
 advantage of this method is that you can use TAB completion to complete
 file names.
 
-   The first directory in the option "File Search Dirs" is used as the
+   The first directory in the option “File Search Dirs” is used as the
 starting directory for filename completion when editing the ‘file’
 field.  Note that when completing file names, Ebib does not take the
-directories in "File Search Dirs" into account: completion is done using
+directories in “File Search Dirs” into account: completion is done using
 the standard Emacs file name completion mechanism.  However, when you
 enter a file name, Ebib checks if it is in a (subdirectory of) one of
-the directories in "File Search Dirs", and if so, cuts off the relevant
+the directories in “File Search Dirs”, and if so, cuts off the relevant
 part of the file name to turn it into a relative path.  (You can disable
 this behaviour with the option ‘ebib-truncate-file-names’: if unset,
 file names are always stored as absolute paths.)
@@ -2099,7 +2099,7 @@ the key of the current entry and the ‘db’ argument to the current
 database.  With these arguments, it is possible to, e.g., retrieve the
 value of a specific field in the entry:
 
-(ebib-db-get-field-value <field> key db 'noerror 'unbraced 'xref)
+(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
 
    where ‘<field>’ is the field (as a string) whose value is to be
 retrieved.
@@ -2176,7 +2176,7 @@ displaying the index window at the top and the entry window below it.
 There are a few options to change this behaviour, however.  They are all
 part of the customisation group ‘ebib-windows’, and allow you to specify
 two alternative ways to deal with Ebib windows.  The main layout option
-is simply called "Layout" and has four options: use the full frame (the
+is simply called “Layout” and has four options: use the full frame (the
 default), use the current window, use the right part of the frame, or
 display only the index window.
 
@@ -2184,7 +2184,7 @@ display only the index window.
 Ebib buffers are displayed on the right of the frame, with the (usually
 larger) left part of the frame displaying some other buffer, normally
 the buffer from which you called Ebib.  The width of the Ebib windows
-can be set with the option "Width", which defaults to 80, and which can
+can be set with the option “Width”, which defaults to 80, and which can
 be specified as an absolute value (the number of columns), but also as a
 value relative to the current window.  In that case, you must specify a
 value between 0 and 1.  Note that when this option is used, the key ‘z’
@@ -2212,16 +2212,16 @@ Rather, it just selects another, non-Ebib window.  In order to hide the
 index window, you can use (uppercase) ‘Z’.
 
    If you set Ebib’s layout to display only the index buffer on startup,
-you can additionally set the option "Popup Entry Window".  Normally,
+you can additionally set the option “Popup Entry Window”.  Normally,
 Ebib will reuse an existing window to display the entry buffer (and
 restore its original buffer when you leave the entry buffer).  With this
 option set, however, Ebib uses the Emacs function
 ‘display-buffer-popup-window’ to create a new window (which is destroyed
 again when you leave the entry buffer).
 
-   Further relevant options are "Window Vertical Split", which displays
+   Further relevant options are “Window Vertical Split”, which displays
 the index buffer to the left of the frame rather than at the top, and
-"Index Window Size", which determines the size of the index window
+“Index Window Size”, which determines the size of the index window
 (either its height or its width, depending on whether the index window
 is displayed at the top or on the left of the frame.)
 
@@ -2349,11 +2349,11 @@ documentation for example explains that if you have defined:
 
 title = 1966 # WGA
 
-   which will produce "1966 World Gnus Almanac".  Or you can do:
+   which will produce “1966 World Gnus Almanac”.  Or you can do:
 
 month = "1~" # jan
 
-   which will produce someting like "1 January", assuming your
+   which will produce someting like “1 January”, assuming your
 bibliography style has defined the abbreviation ‘jan’.  All this is
 possible with Ebib, simply by entering the exact text including quotes
 or braces around the strings, and marking the relevant field as special.
@@ -2418,11 +2418,11 @@ entries, so that you can add keywords to multiple entries in one go.
    Remembering keywords is practical, but it is even more useful if
 remembered keywords can be saved, so that they are available the next
 time you start Ebib.  There are two ways of doing this: first, there is
-an option "Keywords List" that you can use to store keywords.  Keywords
+an option “Keywords List” that you can use to store keywords.  Keywords
 stored in this option will be available for TAB completion to all
 databases in Ebib.  New keywords, however, will not automatically be
 stored.  If you find you need a keyword not on the list and want to make
-it permanent, you’ll have to add it to "Keywords List" yourself.
+it permanent, you’ll have to add it to “Keywords List” yourself.
 
    The other way of making keywords permanent is by storing them in a
 file.  Ebib offers two ways of doing this (which are mutually exclusive,
@@ -2430,7 +2430,7 @@ so you have to choose one).  You can either configure a single keyword
 file, with keywords that are available to all databases, or you can
 configure per-directory keyword files, with keywords that are available
 for all ‘.bib’ files in the same directory.  You can set up keyword
-files by configuring the option "Keywords File".  You can either set it
+files by configuring the option “Keywords File”.  You can either set it
 to use a single keyword file, in which case you need to specify a file
 with its full path, or you can use per-directory keyword files, in which
 case you must provide a filename without a path.  That is, if you use
@@ -2456,15 +2456,15 @@ same directory, Ebib won’t reload the keywords file.
 
    When you close a database, Ebib checks if you have added new keywords
 to it and asks you if you want to save them.  You can tell Ebib to save
-new keywords automatically by setting the option "Keywords File Save On
-Exit" to ‘always’.  Note that this doesn’t save the keywords when you
+new keywords automatically by setting the option “Keywords File Save On
+Exit” to ‘always’.  Note that this doesn’t save the keywords when you
 enter them, only when you close the database or quit Ebib.  You can also
 set this option to ‘never’, which means Ebib will discard new keywords
 when the database is closed.  Note that if you want to save the keywords
 file without having to close the database, you can do so through the
 menu.
 
-   The option "Keywords Use Only File" controls whether Ebib uses only
+   The option “Keywords Use Only File” controls whether Ebib uses only
 the keyword file, or both the keyword file and the configured keyword
 list.  This option is only useful when you have configured a keyword
 file.  In that case, setting this option to use both the keyword list
@@ -2472,8 +2472,8 @@ and the keyword file tells Ebib to offer keywords from both sources when
 you edit the keyword field.  Otherwise, only the keyword file is used.
 
    It is also possible to tell Ebib to sort the keywords in the
-‘keywords’ field in alphabetical order.  Set the option "Keywords Field
-Keep Sorted" if you want to do this.  Note that setting this option also
+‘keywords’ field in alphabetical order.  Set the option “Keywords Field
+Keep Sorted” if you want to do this.  Note that setting this option also
 automatically removes duplicates.
 
    Lastly, you can configure the separator used between keywords in the
@@ -2539,10 +2539,10 @@ The second sort level is only used if the first yields _identical_
 values for two or more entries.)
 
    Note that if you wish to make use of this option, you need to unset
-the option "Save Xrefs First" (*note Cross-referencing:
+the option “Save Xrefs First” (*note Cross-referencing:
 #cross-referencing.).  It is pointless to set a sort order if
-cross-referenced entries are saved first.  Since "Save Xrefs First" is
-set by default, you need to unset if you set "Sort Order".
+cross-referenced entries are saved first.  Since “Save Xrefs First” is
+set by default, you need to unset if you set “Sort Order”.
 
 
 File: ebib.info,  Node: Merging and Importing,  Next: Exporting Entries,  Prev: Sorting the bib File,  Up: Top
@@ -2567,19 +2567,18 @@ unique key.
    Another way to add entries to a database is to import them from an
 Emacs buffer.  If, for example, you find ready-formatted BibTeX entries
 in a text file or on the internet, you can copy & paste them to any
-Emacs buffer (e.g.  the ‘*scratch*’ buffer), and then execute the
-command ‘M-x ebib-import’.  Ebib then goes through the buffer and loads
-all BibTeX entries it finds into the current database (i.e.  the
-database that was active when you lowered Ebib).  If you call
-‘ebib-import’ while the region is active, Ebib only reads the BibTeX
-entries in the region.
+Emacs buffer (e.g. the ‘*scratch*’ buffer), and then execute the command
+‘M-x ebib-import’.  Ebib then goes through the buffer and loads all
+BibTeX entries it finds into the current database (i.e. the database
+that was active when you lowered Ebib).  If you call ‘ebib-import’ while
+the region is active, Ebib only reads the BibTeX entries in the region.
 
    If a BibTeX entry in the buffer lack an entry key (which sometimes
 happens with BibTeX entries found on the internet), Ebib will generate a
 temporary key for it of the form ‘<new-keyXX>’, where ‘XX’ is a number.
 You can change such keys by hitting ‘E’ in the index buffer.  They will
 also automatically be replaced with a more sensible key when you edit
-them.  See the option "Autogenerate Keys" for details.
+them.  See the option “Autogenerate Keys” for details.
 
 
 File: ebib.info,  Node: Exporting Entries,  Next: Multiple Identical Fields,  Prev: Merging and Importing,  Up: Top
@@ -2636,18 +2635,18 @@ fields appear more than once in an entry, BibTeX does not warn you,
 since it ignores those fields anyway.  Here, too, Ebib’s standard
 behaviour is to ignore all but the last value.
 
-   However, some online reference management services "use" this feature
+   However, some online reference management services “use” this feature
 of BibTeX in that they put multiple ‘keywords’ fields in the BibTeX
 entries that they produce.  If you were to import such an entry into
 Ebib, you would lose all your keywords except the last one.  To remedy
 this, you can tell Ebib that it should allow multiple occurrences of a
 single field in a BibTeX entry.  You can do this by setting the
-customisation option "Allow Identical Fields".
+customisation option “Allow Identical Fields”.
 
    With this option set, Ebib collapses the multiple occurrences into a
 single occurrence.  All the values of the different occurrences are
 collected and stored in the single occurrence, separated by colons
-(actually, the value of the option "Keywords Separator").  That is, Ebib
+(actually, the value of the option “Keywords Separator”).  That is, Ebib
 does not retain the multiple occurrences, but it does retain the values.
 So suppose you have an entry that contains the following ‘keywords’
 fields:
@@ -2661,8 +2660,8 @@ fields:
     keywords = {hibernation}
 }
 
-   If you load this entry into Ebib with the option "Allow Identical
-Fields" set, you will get the following:
+   If you load this entry into Ebib with the option “Allow Identical
+Fields” set, you will get the following:
 
 @book{Jones1998,
     author = {Jones, Joan},
@@ -2860,114 +2859,114 @@ Node: Starting Ebib9131
 Ref: #starting-ebib9287
 Node: Upgrading from Ebib 1x10195
 Ref: #upgrading-from-ebib-1.x10343
-Node: Getting Started13448
-Ref: #getting-started13588
-Node: Opening a bib File15962
-Ref: #opening-a-.bib-file16116
-Node: Preloading bib Files17827
-Ref: #preloading-.bib-files18015
-Node: Navigating a bib File18813
-Ref: #navigating-a-.bib-file19008
-Node: Starting a New bib File22303
-Ref: #starting-a-new-.bib-file22473
-Node: Editing the Database22765
-Ref: #editing-the-database22920
-Node: Adding and Deleting Entries23297
-Ref: #adding-and-deleting-entries23474
-Node: Editing Fields Values26050
-Ref: #editing-fields-values26248
-Node: Editing Multiline Values28897
-Ref: #editing-multiline-values29090
-Node: Undefined Fields31604
-Ref: #undefined-fields31773
-Node: Hidden Fields32765
-Ref: #hidden-fields32914
-Node: Timestamps33802
-Ref: #timestamps33964
-Node: Copy Cut Kill Paste Yank and Delete36023
-Ref: #copy-cut-kill-paste-yank-and-delete36227
-Node: Saving a Database37179
-Ref: #saving-a-database37327
-Node: Using Biblatex38998
-Ref: #using-biblatex39136
-Node: Setting the BibTeX Dialect39463
-Ref: #setting-the-bibtex-dialect39632
-Node: Alias Types and Fields41672
-Ref: #alias-types-and-fields41833
-Node: The Entries List44019
-Ref: #the-entries-list44153
-Node: Searching45745
-Ref: #searching45890
-Node: Simple Searches45932
-Ref: #simple-searches46048
-Node: Filters48743
-Ref: #filters48843
-Node: Simple Selection49897
-Ref: #simple-selection50026
-Node: Complex Filters51704
-Ref: #complex-filters51866
-Node: Storing and Saving Filters55853
-Ref: #storing-and-saving-filters56036
-Node: Special Filters58907
-Ref: #special-filters59088
-Node: An Example Listing Recent Additions60443
-Ref: #an-example-listing-recent-additions60672
-Node: Properties of Filtered Databases62840
-Ref: #properties-of-filtered-databases63037
-Node: Accessing BibTeX Databases outside Ebib64691
-Ref: #accessing-bibtex-databases-outside-ebib64897
-Node: Key Bindings69817
-Ref: #key-bindings69973
-Node: Defining Citation Commands70737
-Ref: #defining-citation-commands70970
-Node: Associating a Database with a LaTeX File76882
-Ref: #associating-a-database-with-a-latex-file77122
-Node: Cross-referencing80066
-Ref: #cross-referencing80236
-Node: Marking Entries83537
-Ref: #marking-entries83685
-Node: Printing the Database84664
-Ref: #printing-the-database84824
-Node: Calling a Browser88612
-Ref: #calling-a-browser88762
-Node: Viewing Files91382
-Ref: #viewing-files91514
-Node: Editing the file field95295
-Ref: #editing-the-file-field95430
-Node: Notes files96773
-Ref: #notes-files96907
-Node: Customising the notes template101052
-Ref: #customising-the-notes-template101201
-Node: Managing a reading list104250
-Ref: #managing-a-reading-list104412
-Node: Window Management107507
-Ref: #window-management107666
-Node: Creating Entry Stubs110822
-Ref: #creating-entry-stubs110984
-Node: @Preamble Definition111985
-Ref: #preamble-definition112149
-Node: @String Definitions114135
-Ref: #string-definitions114286
-Node: @Comments117794
-Ref: #comments117922
-Node: Managing Keywords118287
-Ref: #managing-keywords118432
-Node: Sorting the bib File124317
-Ref: #sorting-the-.bib-file124490
-Node: Merging and Importing127617
-Ref: #merging-and-importing127782
-Node: Exporting Entries129556
-Ref: #exporting-entries129718
-Node: Multiple Identical Fields131693
-Ref: #multiple-identical-fields131872
-Node: Multiline Edit Buffers133765
-Ref: #multiline-edit-buffers133937
-Node: The Options Menu138067
-Ref: #the-options-menu138215
-Node: Customisation138836
-Ref: #customisation138947
-Node: Modifying Key Bindings139890
-Ref: #modifying-key-bindings140017
+Node: Getting Started13460
+Ref: #getting-started13600
+Node: Opening a bib File15974
+Ref: #opening-a-.bib-file16128
+Node: Preloading bib Files17839
+Ref: #preloading-.bib-files18027
+Node: Navigating a bib File18833
+Ref: #navigating-a-.bib-file19028
+Node: Starting a New bib File22331
+Ref: #starting-a-new-.bib-file22501
+Node: Editing the Database22793
+Ref: #editing-the-database22948
+Node: Adding and Deleting Entries23325
+Ref: #adding-and-deleting-entries23502
+Node: Editing Fields Values26082
+Ref: #editing-fields-values26280
+Node: Editing Multiline Values28933
+Ref: #editing-multiline-values29126
+Node: Undefined Fields31640
+Ref: #undefined-fields31809
+Node: Hidden Fields32805
+Ref: #hidden-fields32954
+Node: Timestamps33850
+Ref: #timestamps34012
+Node: Copy Cut Kill Paste Yank and Delete36075
+Ref: #copy-cut-kill-paste-yank-and-delete36279
+Node: Saving a Database37231
+Ref: #saving-a-database37379
+Node: Using Biblatex39054
+Ref: #using-biblatex39192
+Node: Setting the BibTeX Dialect39519
+Ref: #setting-the-bibtex-dialect39688
+Node: Alias Types and Fields41728
+Ref: #alias-types-and-fields41889
+Node: The Entries List44075
+Ref: #the-entries-list44209
+Node: Searching45801
+Ref: #searching45946
+Node: Simple Searches45988
+Ref: #simple-searches46104
+Node: Filters48803
+Ref: #filters48903
+Node: Simple Selection49977
+Ref: #simple-selection50106
+Node: Complex Filters51800
+Ref: #complex-filters51962
+Node: Storing and Saving Filters56005
+Ref: #storing-and-saving-filters56188
+Node: Special Filters59067
+Ref: #special-filters59248
+Node: An Example Listing Recent Additions60603
+Ref: #an-example-listing-recent-additions60832
+Node: Properties of Filtered Databases63000
+Ref: #properties-of-filtered-databases63197
+Node: Accessing BibTeX Databases outside Ebib64855
+Ref: #accessing-bibtex-databases-outside-ebib65061
+Node: Key Bindings69981
+Ref: #key-bindings70137
+Node: Defining Citation Commands70901
+Ref: #defining-citation-commands71134
+Node: Associating a Database with a LaTeX File77050
+Ref: #associating-a-database-with-a-latex-file77290
+Node: Cross-referencing80233
+Ref: #cross-referencing80403
+Node: Marking Entries83716
+Ref: #marking-entries83864
+Node: Printing the Database84847
+Ref: #printing-the-database85007
+Node: Calling a Browser88814
+Ref: #calling-a-browser88964
+Node: Viewing Files91596
+Ref: #viewing-files91728
+Node: Editing the file field95521
+Ref: #editing-the-file-field95656
+Node: Notes files97015
+Ref: #notes-files97149
+Node: Customising the notes template101294
+Ref: #customising-the-notes-template101443
+Node: Managing a reading list104489
+Ref: #managing-a-reading-list104651
+Node: Window Management107746
+Ref: #window-management107905
+Node: Creating Entry Stubs111081
+Ref: #creating-entry-stubs111243
+Node: @Preamble Definition112244
+Ref: #preamble-definition112408
+Node: @String Definitions114394
+Ref: #string-definitions114545
+Node: @Comments118061
+Ref: #comments118189
+Node: Managing Keywords118554
+Ref: #managing-keywords118699
+Node: Sorting the bib File124608
+Ref: #sorting-the-.bib-file124781
+Node: Merging and Importing127920
+Ref: #merging-and-importing128085
+Node: Exporting Entries129861
+Ref: #exporting-entries130023
+Node: Multiple Identical Fields131998
+Ref: #multiple-identical-fields132177
+Node: Multiline Edit Buffers134086
+Ref: #multiline-edit-buffers134258
+Node: The Options Menu138388
+Ref: #the-options-menu138536
+Node: Customisation139157
+Ref: #customisation139268
+Node: Modifying Key Bindings140211
+Ref: #modifying-key-bindings140338
 
 End Tag Table
 

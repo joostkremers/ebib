@@ -392,7 +392,7 @@ database that contains the entry."
   "Provide a title description for an Org Ebib link.
 KEY is the key of the entry to provide the link for, DB the
 database that contains the entry."
-  (ebib-db-get-field-value "Title" key db "(Untitled)" 'unbraced 'xref))
+  (ebib-get-field-value "Title" key db "(Untitled)" 'unbraced 'xref))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "The major mode of the multiline edit buffer."
@@ -405,6 +405,156 @@ This option is described in the manual/info file in the section
 \"Sorting the .bib file\"."
   :group 'ebib
   :type '(repeat (repeat :tag "Sort level" (string :tag "Sort field"))))
+
+;; Entry type and field aliases defined by Biblatex.
+(defconst ebib--field-aliases '(("location" . "address")
+                                ("annotation" . "annote")
+                                ("eprinttype" . "archiveprefix")
+                                ("journaltitle" . "journal")
+                                ("sortkey" . "key")
+                                ("file" . "pdf")
+                                ("eprintclass" . "primaryclass")
+                                ("institution" . "school"))
+  "List of field aliases for Biblatex.")
+
+(defconst ebib--type-aliases '(("Conference" . "InProceedings")
+                               ("Electronic" . "Online")
+                               ("MastersThesis" . "Thesis")
+                               ("PhDThesis" . "Thesis")
+                               ("TechReport" . "Report")
+                               ("WWW" . "Online"))
+  "List of entry type aliases for Biblatex.")
+
+(defcustom ebib-bibtex-dialect 'BibTeX
+  "The default BibTeX dialect.
+A `.bib' file/database without explicit dialect setting is
+assumed to use this dialect.  Possible values are those listed in
+`bibtex-dialect-list'."
+  :group 'ebib
+  :type `(choice :tag "BibTeX Dialect"
+                 ,@(mapcar (lambda (d) `(const ,d))
+                           bibtex-dialect-list)))
+
+(defcustom ebib-biblatex-inheritances '(("all"
+                                         "all"
+                                         (("ids" . none)
+                                          ("crossref" . none)
+                                          ("xref" . none)
+                                          ("entryset" . none)
+                                          ("entrysubtype" . none)
+                                          ("execute" . none)
+                                          ("label" . none)
+                                          ("options" . none)
+                                          ("presort" . none)
+                                          ("related" . none)
+                                          ("relatedoptions" . none)
+                                          ("relatedstring" . none)
+                                          ("relatedtype" . none)
+                                          ("shorthand" . none)
+                                          ("shorthandintro" . none)
+                                          ("sortkey" . none)))
+
+                                        ("mvbook, book"
+                                         "inbook, bookinbook, suppbook"
+                                         (("author" . "author")
+                                          ("author" . "bookauthor")))
+
+                                        ("mvbook"
+                                         "book, inbook, bookinbook, suppbook"
+                                         (("title" . "maintitle")
+                                          ("subtitle" . "mainsubtitle")
+                                          ("titleaddon" . "maintitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("mvcollection, mvreference"
+                                         "collection, reference, incollection, inreference, suppcollection"
+                                         (("title" . "maintitle")
+                                          ("subtitle" . "mainsubtitle")
+                                          ("titleaddon" . "maintitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("mvproceedings"
+                                         "proceedings, inproceedings"
+                                         (("title" . "maintitle")
+                                          ("subtitle" . "mainsubtitle")
+                                          ("titleaddon" . "maintitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("book"
+                                         "inbook, bookinbook, suppbook"
+                                         (("title" . "booktitle")
+                                          ("subtitle" . "booksubtitle")
+                                          ("titleaddon" . "booktitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("collection, reference"
+                                         "incollection, inreference, suppcollection"
+                                         (("title" . "booktitle")
+                                          ("subtitle" . "booksubtitle")
+                                          ("titleaddon" . "booktitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("proceedings"
+                                         "inproceedings"
+                                         (("title" . "booktitle")
+                                          ("subtitle" . "booksubtitle")
+                                          ("titleaddon" . "booktitleaddon")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none)))
+
+                                        ("periodical"
+                                         "article, suppperiodical"
+                                         (("title" . "journaltitle")
+                                          ("subtitle" . "journalsubtitle")
+                                          ("shorttitle" . none)
+                                          ("sorttitle" . none)
+                                          ("indextitle" . none)
+                                          ("indexsorttitle" . none))))
+  "Inheritance scheme for cross-referencing.
+This option defines inheritances for BibLaTeX.  Inheritances are
+specified for pairs of source and target entry type, where the
+source is the cross-referenced entry and the target the
+cross-referencing entry.  For each pair, specify the fields in
+the source and the fields in the target that they correspond
+with.
+
+Inheritances valid for all entry types can be defined by
+specifying \"all\" as the entry type.  Entry types (both source
+and target) may also be a (comma-separated) list of entry types.
+
+If no inheritance rule is set up for a given entry type+field
+combination, the field inherits from the same-name field in the
+cross-referenced entry.  If no inheritance should take place, set
+the target field to \"No inheritance\".
+
+All entries made in this option should be in lower case.
+
+Note that this option is only relevant for BibLaTeX.  If the
+BibTeX dialect is set to `BibTeX', this option is ignored."
+  :group 'ebib
+  :type '(repeat (list (string :tag "Source entry type(s)")
+                       (string :tag "Target entry type(s)")
+                       (repeat (cons :tag "Inheritance"
+                                     (string :tag "Source field")
+                                     (choice (string :tag "Target field)")
+                                             (const :tag "No inheritance" none)))))))
 
 (defcustom ebib-save-xrefs-first t
   "Save entries with a crossref field first in the BibTeX-file.
@@ -998,12 +1148,12 @@ can be used in a :PROPERTIES: block."
 The title is formed from the author(s) or editor(s) of the entry,
 its year and its title.  Newlines are removed from the resulting
 string."
-  (let ((author (or (ebib-db-get-field-value "author" key db 'noerror 'unbraced 'xref)
-                    (ebib-db-get-field-value "editor" key db 'noerror 'unbraced 'xref)
+  (let ((author (or (ebib-get-field-value "author" key db 'noerror 'unbraced 'xref)
+                    (ebib-get-field-value "editor" key db 'noerror 'unbraced 'xref)
                     "(No Author)"))
-        (year (or (ebib-db-get-field-value "year" key db 'noerror 'unbraced 'xref)
+        (year (or (ebib-get-field-value "year" key db 'noerror 'unbraced 'xref)
                   "????"))
-        (title (or (ebib-db-get-field-value "title" key db 'noerror 'unbraced 'xref)
+        (title (or (ebib-get-field-value "title" key db 'noerror 'unbraced 'xref)
                    "(No Title)")))
     (remove ?\n (format "%s (%s): %s" author year title))))
 
@@ -1014,11 +1164,11 @@ a URL (in that order) and use the first element found to create
 an org link.  If none of these elements is found, return the
 empty string."
   (cond
-   ((ebib-db-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)
     (ebib-create-org-file-link key db))
-   ((ebib-db-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)
     (ebib-create-org-doi-link key db))
-   ((ebib-db-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref)
     (ebib-create-org-url-link key db))
    (t "")))
 
@@ -1029,7 +1179,7 @@ by KEY in the current database.  If that field contains more than
 one file name, the user is asked to select one.  If
 `ebib-file-field' is empty, create a file name based on KEY,
 using the function `ebib--create-file-name-from-key'."
-  (let ((files (ebib-db-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)))
+  (let ((files (ebib-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)))
     (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))))
 
 (defun ebib-create-org-doi-link (key db)
@@ -1037,7 +1187,7 @@ using the function `ebib--create-file-name-from-key'."
 The file is taken from `ebib-doi-field' in the entry designated
 by KEY in the current database.  If `ebib-doi-field' is empty,
 return the empty string."
-  (let ((doi (ebib-db-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)))
+  (let ((doi (ebib-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)))
     (if doi (format "[[doi:%s]]" doi) "")))
 
 (defun ebib-create-org-url-link (key db)
@@ -1046,7 +1196,7 @@ The URL is taken from `ebib-url-field' in the entry designated by
 KEY in the current database.  If that field contains more than
 one url, the user is asked to select one.  If `ebib-url-field' is
 empty, return the empty string."
-  (let* ((urls (ebib-db-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref))
+  (let* ((urls (ebib-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref))
          (url (ebib--select-url urls nil)))
     (if url (format "[[%s]]" url) "")))
 
@@ -1152,6 +1302,87 @@ argument to a function or not."
   (when (numberp num)
     num))
 
+(defun ebib-get-field-value (field key db &optional noerror unbraced xref)
+  "Return the value of FIELD in entry KEY in database DB.
+If FIELD or KEY does not exist, trigger an error, unless NOERROR
+is non-nil.  In this case, if NOERROR is a string, return NOERROR,
+otherwise return nil.  If UNBRACED is non-nil, return the value
+without braces.
+
+If XREF is non-nil, the field value may be retrieved from a
+cross-referenced entry.  If the result is non-nil, the returned
+text has the text property `ebib--xref', which has as value the
+key of the entry from which the field value was retrieved.
+
+Similarly, the value can be retrieved from an alias field.  (See
+the variable `ebib--field-aliases').  In this case, the returned
+string has the text property `ebib--alias' with value t."
+  (let* ((value (ebib-db-get-field-value field key db 'noerror))
+         (type (ebib-db-get-field-value "=type=" key db 'noerror))
+         (xref-key)
+         (alias))
+    (when (and (not value) xref)      ; Check if there's a cross-reference.
+      (setq xref-key (ebib-db-unbrace (ebib-db-get-field-value "crossref" key db 'noerror)))
+      (when xref-key
+        (let ((xref-db (ebib--find-db-for-key xref-key db)))
+          (when xref-db
+            (let* ((source-type (ebib-db-get-field-value "=type=" xref-key xref-db 'noerror))
+                   (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db))))
+              (when xref-field
+                (setq value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror))))))))
+    (when (not value)                   ; Check if there is a field alias
+      (setq alias (cdr (assoc-string field ebib--field-aliases 'case-fold)))
+      (if alias
+          (setq value (ebib-db-get-field-value alias key db 'noerror))))
+    (unless (or value noerror)
+      (error "[Ebib] Field `%s' does not exist in entry `%s'" field key))
+    (unless (= 0 (length value)) ; (length value) == 0 if value is nil or if value is "".
+      (setq value (copy-sequence value)) ; Copy the value so we can add text properties.
+      (when unbraced
+        (setq value (ebib-db-unbrace value)))
+      (when alias
+        (add-text-properties 0 1 '(ebib--alias t) value))
+      (when xref
+        (add-text-properties 0 1 `(ebib--xref ,xref-key) value)))
+    (when (and (not value)
+               (stringp noerror))
+      (setq value noerror))
+    value))
+
+(defun ebib--find-db-for-key (key db)
+  "Return the database containing KEY.
+First see if KEY is in DB.  If not, check all members of
+`ebib--databases'.  If there is no database with KEY, return
+nil."
+  (if (ebib-db-get-entry key db 'noerror)
+      db
+    (let ((dbs (reverse ebib--databases)))
+      (while (and dbs (not (ebib-db-get-entry key (car dbs) 'noerror)))
+        (setq dbs (cdr dbs)))
+      (car dbs))))
+
+(defun ebib--get-xref-field (target-field target-entry source-entry &optional dialect)
+  "Return the field from which TARGET-FIELD inherits.
+TARGET-ENTRY is the type of the cross-referencing entry, (the
+entry containing the field that should inherit a value).
+SOURCE-ENTRY is the entry type of the cross-referenced
+entry, (the entry providing the value).  DIALECT is a BibTeX
+dialect and defaults to the default value of
+`ebib-bibtex-dialect'.  If it is `BibTeX', the return value is
+simply TARGET-FIELD; otherwise the inheritances are taken from
+the variable `ebib-biblatex-inheritances'.  If TARGET-FIELD cannot
+inherit a value, this function returns nil."
+  (or dialect (setq dialect ebib-bibtex-dialect))
+  (if (eq dialect 'BibTeX)
+      target-field
+    (let* ((inheritance (append (cl-third (cl-find-if (lambda (e)
+                                                        (and (string-match-p (concat "\\b" source-entry "\\b") (cl-first e))
+                                                             (string-match-p (concat "\\b" target-entry "\\b") (cl-second e))))
+                                                      ebib-biblatex-inheritances))
+                                (cl-third (assoc-string "all" ebib-biblatex-inheritances 'case-fold)))))
+      (or (car (rassoc (downcase target-field) inheritance))
+          target-field))))
+
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list.  It is a symbol and can be
@@ -1253,15 +1484,15 @@ string \"(XXXX)\"."
    ((cl-equalp field "Entry Key")
     key)
    ((cl-equalp field "Author/Editor")
-    (or (ebib-db-get-field-value "Author" key db 'noerror 'unbraced 'xref)
-        (ebib-db-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
+    (or (ebib-get-field-value "Author" key db 'noerror 'unbraced 'xref)
+        (ebib-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
    ((cl-equalp field "Year")
-    (ebib-db-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
-   (t (ebib-db-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
+    (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
+   (t (ebib-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
 
 (defun ebib-clean-TeX-markup (field key db)
   "Return the contents of FIELD from KEY in DB without TeX markups."
-  (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
+  (let ((str (ebib-get-field-value field key db "" 'unbraced 'xref)))
     ;; First replace TeX commands with their arguments, i.e., \textsc{CLS} ==> CLS.
     ;; Note that optional arguments are also removed.
     (setq str (replace-regexp-in-string "\\\\[a-zA-Z*]*\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" "\\1" str))
@@ -1274,7 +1505,7 @@ This function is intended to abbreviate journal titles.  Short
 function words (specifically \"a, an, at, of, on, and\" and
 \"for\") are removed, the initial letters of the remaining words
 are returned as a string."
-  (let ((str (ebib-db-get-field-value field key db "" 'unbraced 'xref)))
+  (let ((str (ebib-get-field-value field key db "" 'unbraced 'xref)))
     (if (string-match-p "\s+" str)
         (apply 'concat
                (mapcar (lambda (str) (substring str 0 1))
@@ -1295,7 +1526,7 @@ are returned as a string."
 (defun ebib-display-www-link (field key db)
   "Return the content of FIELD from KEY in DB as a link.
 This function is mainly intended for the DOI and URL fields."
-  (let ((str (ebib-db-get-field-value field key db 'noerror 'unbraced 'xref)))
+  (let ((str (ebib-get-field-value field key db 'noerror 'unbraced 'xref)))
     (if (and str (string-match-p "^[0-9]" str))
         (setq str (concat "https://dx.doi.org/" str)))
     (if str
@@ -1324,7 +1555,7 @@ characters in fields."
                   (caar ebib-index-columns)))
          ;; We use a temp list for sorting, so that the :key argument to
          ;; `cl-stable-sort' can simply be `car' rather than (a much
-         ;; heavier) `ebib-db-get-field-value'. Sorting is much faster
+         ;; heavier) `ebib-get-field-value'. Sorting is much faster
          ;; that way.
          (list (mapcar (lambda (key)
                          (cons (ebib--get-field-value-for-display field key db) key))
