@@ -1238,7 +1238,7 @@ modified string, the second either t or nil, indicating whether a
 match was found at all."
   (cl-do ((counter 0 (match-end 0)))
       ((not (string-match match-str string counter)) (cl-values string (not (= counter 0))))
-    (add-text-properties (match-beginning 0) (match-end 0) '(face highlight) string)))
+    (add-text-properties (match-beginning 0) (match-end 0) '(face ebib-highlight-face) string)))
 
 (defun ebib--looking-at-goto-end (regexp &optional match)
   "Return t if text after point matches REGEXP and move point.
