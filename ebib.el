@@ -1931,6 +1931,8 @@ a filename is asked to which the entry is appended."
   (let ((map (make-keymap)))
     (suppress-keymap map 'no-digits)
     (define-key map [return] #'ebib-search-next)
+    (define-key map [left] #'ebib-search-prev-db)
+    (define-key map [right] #'ebib-search-next-db)
     (define-key map "g" #'ebib-search-goto-first-entry)
     map)
   "Keymap that is active when a search is preformed.")
@@ -1977,7 +1979,7 @@ are searched."
                                               (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
            (setq cur-search-entry (cdr cur-search-entry)))
          (if (null cur-search-entry)
-             (message (format "`%s' not found" ebib--search-string))
+             (message (format "`%s' not found.  [g] to jump to top, [left]/[right] to search previous/next database." ebib--search-string))
            (ebib-db-set-current-entry-key (car cur-search-entry) ebib--cur-db)
            (ebib--goto-entry-in-index (car cur-search-entry))
            (message "Found search string in entry `%s'.  RET for next match." (ebib--get-key-at-point))
@@ -2019,6 +2021,18 @@ result."
   (interactive)
   (ebib-goto-first-entry)
   (message "Jumped to first entry in database.  Continue searching with RET."))
+
+(defun ebib-search-prev-db ()
+  "Go to the previous database and issue a message that search is still active."
+  (interactive)
+  (ebib-prev-database t)
+  (message "Switched to previous database.  Continue searching with RET."))
+
+(defun ebib-search-next-db ()
+  "Go to the next database and issue a message that search is still active."
+  (interactive)
+  (ebib-next-database t)
+  (message "Switched to next database.  Continue searching with RET."))
 
 (defun ebib-edit-strings ()
   "Edit the @STRING definitions in the database."
@@ -2150,9 +2164,11 @@ Operates either on all entries or on the marked entries."
     (setq ebib--cur-db new-db)
     (ebib--update-buffers)))
 
-(defun ebib-next-database ()
-  "Switch to the next database."
-  (interactive)
+(defun ebib-next-database (&optional arg)
+  "Switch to the next database.
+If ARG is non-nil, make the first entry the current entry in the
+new database."
+  (interactive "P")
   (ebib--execute-when
     ((database)
      (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases)))
@@ -2160,11 +2176,15 @@ Operates either on all entries or on the marked entries."
          (setq new-db (car ebib--databases)))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
+       (if arg
+           (ebib-db-set-current-entry-key nil ebib--cur-db))
        (ebib--update-buffers)))))
 
-(defun ebib-prev-database ()
-  "Switch to the preceding database."
-  (interactive)
+(defun ebib-prev-database (&optional arg)
+  "Switch to the preceding database.
+If ARG is non-nil, make the first entry the current entry in the
+new database."
+  (interactive "P")
   (ebib--execute-when
     ((database)
      (let ((new-db (ebib--prev-elem ebib--cur-db ebib--databases)))
@@ -2172,6 +2192,8 @@ Operates either on all entries or on the marked entries."
          (setq new-db (-last-item ebib--databases)))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
+       (if arg
+           (ebib-db-set-current-entry-key nil ebib--cur-db))
        (ebib--update-buffers)))))
 
 (defun ebib-index-open-at-point ()
