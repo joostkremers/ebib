@@ -1889,16 +1889,16 @@ a filename is asked to which the entry is appended."
     ((entries)
      (if num
          (ebib--export-to-db num (format "Entry `%s' copied to database %%d." (ebib--get-key-at-point))
-                             (lambda (db)
-                               (let ((entry-key (ebib--get-key-at-point)))
-                                 (if (member entry-key (ebib-db-list-keys db))
-                                     (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
-                                   (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
-                                   t)))) ; we must return T, WHEN does not always do this.
+                         (lambda (db)
+                           (let ((entry-key (ebib--get-key-at-point)))
+                             (if (member entry-key (ebib-db-list-keys db))
+                                 (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
+                               (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
+                               t)))) ; we must return T, WHEN does not always do this.
        (ebib--export-to-file (format "Export `%s' to file: " (ebib--get-key-at-point))
-                             (lambda ()
-                               (insert "\n")
-                               (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db t)))))
+                         (lambda ()
+                           (insert "\n")
+                           (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db t)))))
     ((default)
      (beep))))
 
@@ -1919,11 +1919,11 @@ a filename is asked to which the entry is appended."
                   (ebib-db-list-marked-entries ebib--cur-db))
             t))         ; we must return T, WHEN does not always do this.
        (ebib--export-to-file "Export to file: "
-                             (lambda ()
-                               (mapc (lambda (entry-key)
-                                       (insert "\n")
-                                       (ebib--format-entry entry-key ebib--cur-db t))
-                                     (ebib-db-list-marked-entries ebib--cur-db))))))
+                         (lambda ()
+                           (mapc (lambda (entry-key)
+                                   (insert "\n")
+                                   (ebib--format-entry entry-key ebib--cur-db t))
+                                 (ebib-db-list-marked-entries ebib--cur-db))))))
     ((default)
      (beep))))
 
