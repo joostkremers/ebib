@@ -288,7 +288,7 @@ files, and when changing a key."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-autogenerate-keys nil
+(defcustom ebib-autogenerate-keys t
   "Automatically generate keys for new entries.
 With this option set, Ebib does not ask for a key when you add a
 new entry.  Instead, it gives the entry a temporary key and
