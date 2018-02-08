@@ -240,11 +240,11 @@ Each column consists of the BibTeX field to be displayed, which
 is also the column's label, the column's maximum width and a flag
 indicating whether sorting on this column is possible.
 
-Any field BibTeX or biblatex field can be used.  There are two
-special labels: \"Entry Key\" and \"Author\".  The label \"Entry
-Key\" displays the entry's BibTeX key, and the label
-\"Author/Editor\" displays the contents of the Author field, or,
-if that is empty, the contents of the Editor field.
+Any BibTeX or biblatex field can be used as a label.  There are
+also two special labels: \"Entry Key\" and \"Author/Editor\".
+The label \"Entry Key\" displays the entry's BibTeX key, and the
+label \"Author/Editor\" displays the contents of the Author
+field, or, if that is empty, the contents of the Editor field.
 
 Note that the default sort field is the entry key, even if the
 \"Entry Key\" field is absent from the index buffer.  You can
