@@ -1493,9 +1493,18 @@ string \"(XXXX)\"."
 (defun ebib-clean-TeX-markup (field key db)
   "Return the contents of FIELD from KEY in DB without TeX markups."
   (let ((str (ebib-get-field-value field key db "" 'unbraced 'xref)))
-    ;; First replace TeX commands with their arguments, i.e., \textsc{CLS} ==> CLS.
-    ;; Note that optional arguments are also removed.
-    (setq str (replace-regexp-in-string "\\\\[a-zA-Z*]*\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" "\\1" str))
+    ;; First replace TeX commands with their arguments and do some
+    ;; transformations, i.e., \textsc{cls} ==> CLS.  Note that optional
+    ;; arguments are also removed.
+    (save-match-data
+      (let ((case-fold-search t))
+        (while (string-match "\\\\\\([a-zA-Z*]*\\)\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" str)
+          (let ((arg (copy-sequence (match-string 2 str))))
+            (pcase (match-string 1 str)
+              ((or "emph" "textit") (setq arg (propertize arg 'face '(italic))))
+              ("textbf" (setq arg (propertize arg 'face '(bold))))
+              ("textsc" (setq arg (upcase arg))))
+            (setq str (replace-match arg t t str))))))
     ;; Now replace all remaining braces. This also takes care of nested braces.
     (replace-regexp-in-string "[{}]" "" str)))
 
