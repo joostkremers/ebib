@@ -802,7 +802,7 @@ number is also the argument to the function."
   "Open the BibTeX file FILE."
   (interactive)
   (unless file
-    (setq file (ebib--ensure-extension (read-file-name "File to open: " "~/") (car ebib-bibtex-extensions))))
+    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: " "~/")) (car ebib-bibtex-extensions))))
   (ebib--load-bibtex-file-internal file)
   (ebib--update-buffers))
 
