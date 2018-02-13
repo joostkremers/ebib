@@ -1,6 +1,6 @@
 ;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: nil -*-
 
-;; Copyright (c) 2003-2016 Joost Kremers
+;; Copyright (c) 2003-2018 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
