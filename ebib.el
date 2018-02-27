@@ -2133,8 +2133,8 @@ Operates either on all entries or on the marked entries."
   (ebib--execute-when
     ((real-db entries)
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                                   ebib-print-tempfile
-                                 (read-file-name "Use temp file: " "~/" nil nil)))
+                               ebib-print-tempfile
+                             (read-file-name "Use temp file: " "~/" nil nil)))
          (progn
            (with-temp-buffer
              (when ebib-latex-preamble
