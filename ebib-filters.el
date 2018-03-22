@@ -306,7 +306,7 @@ there is a name conflict."
           (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
           (pp ebib--filters-alist (current-buffer))
           (write-region (point-min) (point-max) file)))
-    (ebib-log 'warning "Could not write to filters file `%s'" file)))
+    (ebib--log 'warning "Could not write to filters file `%s'" file)))
 
 (defun ebib--filters-update-filters-file ()
   "Update the filters file.
