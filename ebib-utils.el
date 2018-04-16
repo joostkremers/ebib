@@ -148,7 +148,7 @@ or through the menu."
 
 (defcustom ebib-layout 'full
   "Ebib window layout.
-This option defines how Ebib displays the buffers its uses.  By
+This option defines how Ebib displays the buffers it uses.  By
 default, Ebib takes over the entire frame and creates two windows
 to display the index and the entry buffer.  Alternatively, Ebib
 can use just the right part of the frame (the width can be

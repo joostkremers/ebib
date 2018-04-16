@@ -80,9 +80,9 @@ option is only used for multiple notes files, i.e., when
 
 (defcustom ebib-notes-name-transform-function nil
   "Function for transforming keys into notes file names.
-This only takes effect files when multiple notes files are used.
-If this is nil, the function `ebib-name-transform-function' is
-used instead."
+This only takes effect when multiple notes files are used.  If
+this is nil, the function `ebib-name-transform-function' is used
+instead."
   :group 'ebib-notes
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
