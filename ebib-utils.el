@@ -408,21 +408,21 @@ This option is described in the manual/info file in the section
 
 ;; Entry type and field aliases defined by Biblatex.
 (defconst ebib--field-aliases '(("location" . "address")
-                                ("annotation" . "annote")
-                                ("eprinttype" . "archiveprefix")
-                                ("journaltitle" . "journal")
-                                ("sortkey" . "key")
-                                ("file" . "pdf")
-                                ("eprintclass" . "primaryclass")
-                                ("institution" . "school"))
+                            ("annotation" . "annote")
+                            ("eprinttype" . "archiveprefix")
+                            ("journaltitle" . "journal")
+                            ("sortkey" . "key")
+                            ("file" . "pdf")
+                            ("eprintclass" . "primaryclass")
+                            ("institution" . "school"))
   "List of field aliases for Biblatex.")
 
 (defconst ebib--type-aliases '(("Conference" . "InProceedings")
-                               ("Electronic" . "Online")
-                               ("MastersThesis" . "Thesis")
-                               ("PhDThesis" . "Thesis")
-                               ("TechReport" . "Report")
-                               ("WWW" . "Online"))
+                           ("Electronic" . "Online")
+                           ("MastersThesis" . "Thesis")
+                           ("PhDThesis" . "Thesis")
+                           ("TechReport" . "Report")
+                           ("WWW" . "Online"))
   "List of entry type aliases for Biblatex.")
 
 (defcustom ebib-bibtex-dialect 'BibTeX
@@ -436,97 +436,97 @@ assumed to use this dialect.  Possible values are those listed in
                            bibtex-dialect-list)))
 
 (defcustom ebib-biblatex-inheritances '(("all"
-                                         "all"
-                                         (("ids" . none)
-                                          ("crossref" . none)
-                                          ("xref" . none)
-                                          ("entryset" . none)
-                                          ("entrysubtype" . none)
-                                          ("execute" . none)
-                                          ("label" . none)
-                                          ("options" . none)
-                                          ("presort" . none)
-                                          ("related" . none)
-                                          ("relatedoptions" . none)
-                                          ("relatedstring" . none)
-                                          ("relatedtype" . none)
-                                          ("shorthand" . none)
-                                          ("shorthandintro" . none)
-                                          ("sortkey" . none)))
+                                     "all"
+                                     (("ids" . none)
+                                      ("crossref" . none)
+                                      ("xref" . none)
+                                      ("entryset" . none)
+                                      ("entrysubtype" . none)
+                                      ("execute" . none)
+                                      ("label" . none)
+                                      ("options" . none)
+                                      ("presort" . none)
+                                      ("related" . none)
+                                      ("relatedoptions" . none)
+                                      ("relatedstring" . none)
+                                      ("relatedtype" . none)
+                                      ("shorthand" . none)
+                                      ("shorthandintro" . none)
+                                      ("sortkey" . none)))
 
-                                        ("mvbook, book"
-                                         "inbook, bookinbook, suppbook"
-                                         (("author" . "author")
-                                          ("author" . "bookauthor")))
+                                    ("mvbook, book"
+                                     "inbook, bookinbook, suppbook"
+                                     (("author" . "author")
+                                      ("author" . "bookauthor")))
 
-                                        ("mvbook"
-                                         "book, inbook, bookinbook, suppbook"
-                                         (("title" . "maintitle")
-                                          ("subtitle" . "mainsubtitle")
-                                          ("titleaddon" . "maintitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("mvbook"
+                                     "book, inbook, bookinbook, suppbook"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("mvcollection, mvreference"
-                                         "collection, reference, incollection, inreference, suppcollection"
-                                         (("title" . "maintitle")
-                                          ("subtitle" . "mainsubtitle")
-                                          ("titleaddon" . "maintitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("mvcollection, mvreference"
+                                     "collection, reference, incollection, inreference, suppcollection"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("mvproceedings"
-                                         "proceedings, inproceedings"
-                                         (("title" . "maintitle")
-                                          ("subtitle" . "mainsubtitle")
-                                          ("titleaddon" . "maintitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("mvproceedings"
+                                     "proceedings, inproceedings"
+                                     (("title" . "maintitle")
+                                      ("subtitle" . "mainsubtitle")
+                                      ("titleaddon" . "maintitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("book"
-                                         "inbook, bookinbook, suppbook"
-                                         (("title" . "booktitle")
-                                          ("subtitle" . "booksubtitle")
-                                          ("titleaddon" . "booktitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("book"
+                                     "inbook, bookinbook, suppbook"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("collection, reference"
-                                         "incollection, inreference, suppcollection"
-                                         (("title" . "booktitle")
-                                          ("subtitle" . "booksubtitle")
-                                          ("titleaddon" . "booktitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("collection, reference"
+                                     "incollection, inreference, suppcollection"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("proceedings"
-                                         "inproceedings"
-                                         (("title" . "booktitle")
-                                          ("subtitle" . "booksubtitle")
-                                          ("titleaddon" . "booktitleaddon")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none)))
+                                    ("proceedings"
+                                     "inproceedings"
+                                     (("title" . "booktitle")
+                                      ("subtitle" . "booksubtitle")
+                                      ("titleaddon" . "booktitleaddon")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none)))
 
-                                        ("periodical"
-                                         "article, suppperiodical"
-                                         (("title" . "journaltitle")
-                                          ("subtitle" . "journalsubtitle")
-                                          ("shorttitle" . none)
-                                          ("sorttitle" . none)
-                                          ("indextitle" . none)
-                                          ("indexsorttitle" . none))))
+                                    ("periodical"
+                                     "article, suppperiodical"
+                                     (("title" . "journaltitle")
+                                      ("subtitle" . "journalsubtitle")
+                                      ("shorttitle" . none)
+                                      ("sorttitle" . none)
+                                      ("indextitle" . none)
+                                      ("indexsorttitle" . none))))
   "Inheritance scheme for cross-referencing.
 This option defines inheritances for BibLaTeX.  Inheritances are
 specified for pairs of source and target entry type, where the
