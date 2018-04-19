@@ -673,7 +673,7 @@ keywords before Emacs is killed."
     (define-key map "H" #'ebib-toggle-hidden)
     (define-key map "i" #'ebib-push-citation) ; prefix
     (define-key map "I" #'ebib-browse-doi)
-    (define-key map "J" #'ebib-switch-to-database)
+    (define-key map "J" #'ebib-switch-to-database-nth)
     (define-key map "k" #'ebib-kill-entry)
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "l" #'ebib-show-log)
@@ -707,16 +707,16 @@ keywords before Emacs is killed."
     map)
   "Keymap for the ebib index buffer.")
 
-(defun ebib-switch-to-database-nth (nth)
-  "Switch to the NTH database.
-This function is meant to be bound to the keys 1-9, whereby the
-number is also the argument to the function."
+(defun ebib-switch-to-database-key (n)
+  "Switch to database N.
+This function is meant to be bound to the keys 1-9.  N is a
+character ?1-?9, which is converted to the corresponding number."
   (interactive (list last-command-event))
-  (ebib-switch-to-database (- nth 48)))
+  (ebib-switch-to-database-nth (- n 48)))
 
 (mapc (lambda (key)
         (define-key ebib-index-mode-map (format "%d" key)
-          'ebib-switch-to-database-nth))
+          'ebib-switch-to-database-key))
       '(1 2 3 4 5 6 7 8 9))
 
 (define-derived-mode ebib-index-mode
@@ -1616,16 +1616,21 @@ first entry with the current entry's key in its crossref field."
   (interactive)
   (let ((xref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
     (if xref
-        ;; If there is a cross-reference, see if we can find it.
-        (cond
-         ((ebib--key-in-index-p xref)
-          (ebib--goto-entry-in-index xref)
-          (ebib--update-entry-buffer))
-         ((member xref (ebib-db-list-keys ebib--cur-db))
-          (error "[Ebib] Crossreference `%s' not visible due to active filter" xref))
-         (t (error "[Ebib] Entry `%s' does not exist" xref)))
-      ;; Otherwise, we assume the user wants to search for entries
-      ;; cross-referencing the current one.
+        ;; If the entry has a crossref, see if we can find the relevant entry.
+        (let ((database (seq-find (lambda (db)
+                                    (ebib-db-get-entry xref db 'noerror))
+                                  ebib--databases)))
+          (unless database
+            (error "[Ebib] Entry `%s' not found in any open database" xref))
+          ;; If the entry exists, switch to the relevant database and try to
+          ;; show the entry.
+          (ebib-switch-to-database database)
+          (if (not (ebib--key-in-index-p xref))
+              (error "[Ebib] Crossreference `%s' not visible due to active filter" xref)
+            (ebib--goto-entry-in-index xref)
+            (ebib--update-entry-buffer)))
+      ;; If the entry has no crossref, we assume the user wants to search for
+      ;; entries cross-referencing the current one.
       (setq ebib--search-string (ebib--get-key-at-point))
       (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
       (ebib-search-next))))
@@ -2155,15 +2160,20 @@ Operates either on all entries or on the marked entries."
     ((default)
      (beep))))
 
-(defun ebib-switch-to-database (num)
-  "Switch do database NUM."
+(defun ebib-switch-to-database-nth (num)
+  "Switch to database NUM."
   (interactive "NSwitch to database number: ")
   (let ((new-db (nth (1- num) ebib--databases)))
     (unless new-db
       (error "[Ebib] Database %d does not exist" num))
-    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
-    (setq ebib--cur-db new-db)
-    (ebib--update-buffers)))
+    (ebib-switch-to-database new-db)))
+
+(defun ebib-switch-to-database (db)
+  "Make DB the active database."
+  ;; First save the current entry key of the still current database.
+  (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+  (setq ebib--cur-db db)
+  (ebib--update-buffers))
 
 (defun ebib-next-database (&optional arg)
   "Switch to the next database.
