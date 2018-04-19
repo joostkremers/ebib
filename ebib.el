@@ -308,7 +308,8 @@ it is highlighted.  DB defaults to the current database."
   "Return t if the entry for KEY is listed in the index buffer."
   (with-current-ebib-buffer 'index
     (goto-char (point-min))
-    (while (not (string= key (ebib--get-key-at-point)))
+    (while (not (or (string= key (ebib--get-key-at-point))
+                    (eobp)))
       (forward-line 1))
     (not (eobp))))
 
