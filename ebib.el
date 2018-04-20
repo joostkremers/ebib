@@ -1526,12 +1526,27 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
           (copy-file file backup-file t)
         (ebib--log 'error "Could not create backup file `%s'" backup-file)))))
 
-(defun ebib--save-database (db)
-  "Save the database DB."
+(defun ebib--save-database (db &optional force)
+  "Save the database DB.
+The FORCE argument is used as in `ebib-save-current-database'."
+  ;; See if we need to make a backup.
   (when (and (ebib-db-backup-p db)
              (file-exists-p (ebib-db-get-filename db)))
     (ebib--make-backup (ebib-db-get-filename db))
     (ebib-db-set-backup nil db))
+
+  ;; Check if the file has changed on disk.
+  (let ((db-modtime (ebib-db-get-modtime db))
+        (file-modtime (ebib--get-file-modtime (ebib-db-get-filename db))))
+    ;; If the file to be saved has been newly created, both modtimes are nil.
+    (when (and db-modtime file-modtime
+               (time-less-p db-modtime file-modtime))
+      (unless (or (and (listp force)
+                       (eq 16 (car force)))
+                  (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename db))))
+        (error "[Ebib] File not saved"))))
+
+  ;; Now save the database.
   (with-temp-buffer
     (ebib--format-database-as-bibtex db)
     (write-region (point-min) (point-max) (ebib-db-get-filename db)))
@@ -1579,16 +1594,7 @@ file was modified."
      (if (and (not force)
               (not (ebib-db-modified-p ebib--cur-db)))
          (message "No changes need to be saved.")
-       (let ((db-modtime (ebib-db-get-modtime ebib--cur-db))
-             (file-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db))))
-         ;; if the file to be saved has been newly created, both modtimes are nil
-         (when (and db-modtime file-modtime
-                    (time-less-p db-modtime file-modtime))
-           (unless (or (and (listp force)
-                            (eq 16 (car force)))
-                       (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename ebib--cur-db))))
-             (error "[Ebib] File not saved"))))
-       (ebib--save-database ebib--cur-db)
+       (ebib--save-database ebib--cur-db force)
        (ebib-db-set-modtime (ebib--get-file-modtime (ebib-db-get-filename ebib--cur-db)) ebib--cur-db)))
     ((filtered-db)
      ;; Saving a filtered db would result in saving only the entries that
