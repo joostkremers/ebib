@@ -491,8 +491,7 @@ CHARS is a string of characters that should not occur in the string."
 (defun ebib--init ()
   "Initialise Ebib.
 This function sets all variables to their initial values, creates
-the buffers, reads the rc file and loads the files in
-`ebib-preload-bib-files'."
+the buffers and loads the files in `ebib-preload-bib-files'."
   (setq ebib--saved-window-config nil)
   (ebib--create-buffers)
   (if (and ebib-keywords-file
