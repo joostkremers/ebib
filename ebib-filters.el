@@ -255,7 +255,7 @@ return value is also nil."
       (cl-labels
           ((pp-filter (f)
                       (cond
-                       ((listp f) ; f is either a list or a string
+                       ((listp f) ; `f' is either a list or a string.
                         (let ((op (cl-first f)))
                           (cond
                            ((eq op 'not)
@@ -270,7 +270,7 @@ return value is also nil."
         (let ((pretty-filter (pp-filter filter)))
           (if (not pretty-filter)
               "Filtered"
-            (if (string-match "\\`(\\(.*\\))\\'" pretty-filter) ; remove the outer parentheses
+            (if (string-match "\\`(\\(.*\\))\\'" pretty-filter) ; Remove the outer parentheses.
                 (match-string 1 pretty-filter)
               pretty-filter)))))))
 

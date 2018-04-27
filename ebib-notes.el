@@ -170,7 +170,7 @@ string where point should be located."
             (ebib--notes-locate-note key)))
     (file-readable-p (ebib--create-notes-file-name key))))
 
-;;; one file per note
+;;; One file per note.
 
 (defun ebib--create-notes-file-name (key)
   "Create a notes filename for KEY.
@@ -198,7 +198,7 @@ name is fully qualified by prepending the directory in
           (insert (car note))
           (forward-char (cdr note))))))
 
-;;; common notes file
+;;; Common notes file.
 
 (defun ebib--notes-buffer ()
   "Return the buffer containing the notes file.

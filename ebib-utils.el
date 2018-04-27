@@ -50,14 +50,14 @@
 (make-obsolete-variable 'ebib-standard-file-field 'ebib-file-field "24.4")
 (make-obsolete-variable 'ebib-standard-doi-field 'ebib-doi-field "24.4")
 
-;; Make sure we can call bibtex-generate-autokey
+;; Make sure we can call bibtex-generate-autokey.
 (declare-function bibtex-generate-autokey "bibtex" nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; global variables ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-;; user customisation
+;; User customisation.
 
 (defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
 
@@ -821,14 +821,14 @@ Currently, the following problems are marked:
 * Keywords that have not been saved."
   :group 'ebib-faces)
 
-;; generic for all databases
+;; Generic for all databases.
 
-;; constants and variables that are set only once
+;; Constants and variables that are set only once.
 (defvar ebib--initialized nil "T if Ebib has been initialized.")
 
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
 
-;; general bookkeeping
+;; General bookkeeping.
 (defvar ebib--field-history nil "Minibuffer field name history.")
 (defvar ebib--filters-history nil "Minibuffer history for filters.")
 (defvar ebib--citation-history nil "Minibuffer history for citation commands.")
@@ -848,27 +848,27 @@ Currently, the following problems are marked:
 (defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
 (put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (--remove (stringp it) v))))
 
-;; The databases
+;; The databases.
 
-;; the master list and the current database
+;; The master list and the current database.
 (defvar ebib--databases nil "List of structs containing the databases.")
 (defvar ebib--cur-db nil "The database that is currently active.")
 
-;; bookkeeping required when editing field values or @STRING definitions
+;; Bookkeeping required when editing field values or @STRING definitions.
 
 (defvar ebib--hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
-;; the prefix key and the multiline key are stored in a variable so that the
+;; The prefix key and the multiline key are stored in a variable so that the
 ;; user can customise them.
 (defvar ebib--prefix-key ?\;)
 (defvar ebib--multiline-key ?\|)
 
-;; this is an AucTeX variable, but we want to check its value, so let's
+;; This is an AUCTeX variable, but we want to check its value, so let's
 ;; keep the compiler from complaining.
 (eval-when-compile
   (defvar TeX-master))
 
-;; General functions
+;; General functions.
 
 (defun ebib--buffer (buffer)
   "Return the buffer object referred to by BUFFER.
@@ -1013,17 +1013,16 @@ function adds a newline to the message being logged."
 
 (defun ebib--read-file-to-list (filename)
   "Return the contents of FILENAME as a list of lines."
-  (if (and filename                               ; protect against 'filename' being 'nil'
+  (if (and filename                               ; Protect against `filename' being nil.
            (file-readable-p filename))
       (with-temp-buffer
         (insert-file-contents filename)
-        (split-string (buffer-string) "\n" t))))    ; 't' is omit nulls, blank lines in this case
+        (split-string (buffer-string) "\n" 'omit-nulls))))    ; Nulls are empty lines in this case.
 
-;; we sometimes need to walk through lists.  these functions yield the
-;; element directly preceding or following ELEM in LIST. in order to work
-;; properly, ELEM must be unique in LIST, obviously. if ELEM is the
-;; first/last element of LIST, or if it is not contained in LIST at all,
-;; the result is nil.
+;; We sometimes need to walk through lists.  These functions yield the element
+;; directly preceding or following ELEM in LIST.  In order to work properly,
+;; ELEM must be unique in LIST, obviously.  If ELEM is the first/last element of
+;; LIST, or if it is not contained in LIST at all, the result is nil.
 (defun ebib--next-elem (elem list)
   "Return the element following ELEM in LIST.
 If ELEM is the last element, return nil."
@@ -1104,7 +1103,7 @@ the function `ebib--create-file-name-from-key' for details."
         (setq n 1))
        ((null n)
         (setq n (string-to-number (read-string (format "Select file [1-%d]: " (length file-list)))))))
-      (unless (<= 1 n (length file-list))  ; unless n is within range
+      (unless (<= 1 n (length file-list))  ; Unless n is within range.
         (error "[Ebib] No such file (%d)" n))
       (nth (1- n) file-list))))
 
@@ -1128,12 +1127,12 @@ error."
   (cond
    ((= (length urls) 1)
     (setq n 1))
-   ((null n) ; the user didn't provide a numeric prefix argument
+   ((null n) ; The user didn't provide a numeric prefix argument.
     (setq n (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls)))))))
-  (unless (<= 1 n (length urls))  ; unless n is within range
+  (unless (<= 1 n (length urls))  ; Unless n is within range.
     (error "[Ebib] No such URL (%d)" n))
   (let ((url (nth (1- n) urls)))
-    (if (string-match "\\\\url{\\(.*?\\)}" url) ; see if the url is contained in \url{...}
+    (if (string-match "\\\\url{\\(.*?\\)}" url) ; See if the url is contained in \url{...}.
         (setq url (match-string 1 url)))
     url))
 
@@ -1292,9 +1291,9 @@ VARS is a list as returned by `ebib--local-vars-to-list'.  VARS is
 not modified, instead the new list is returned."
   (--remove (string= (car it) "bibtex-dialect") vars))
 
-;; The numeric prefix argument is 1 if the user gave no prefix argument at
-;; all. The raw prefix argument is not always a number. So we need to do
-;; our own conversion.
+;; The numeric prefix argument is 1 if the user gave no prefix argument at all.
+;; The raw prefix argument is not always a number.  So we need to do our own
+;; conversion.
 (defun ebib--prefix (num)
   "Return NUM if it is a number, otherwise return nil.
 This can be used to check if the user provided a numeric prefix

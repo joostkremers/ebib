@@ -93,18 +93,16 @@ Also automatically remove duplicates."
   :type '(choice (const :tag "Sort keywords field" t)
                  (const :tag "Do not sort keywords field" nil)))
 
-;; `ebib--keywords-files-alist' lists directories with keywords
-;; files plus the keywords in them. If there is a single keywords
-;; file, then there is only one entry. Entries have three
-;; elements: the dir (or full filename in case of a single
-;; keywords file), a list of saved keywords, and a list of new
-;; keywords added during the current session.
+;; `ebib--keywords-files-alist' lists directories with keywords files plus the
+;; keywords in them.  If there is a single keywords file, then there is only one
+;; entry.  Entries have three elements: the dir (or full filename in case of a
+;; single keywords file), a list of saved keywords, and a list of new keywords
+;; added during the current session.
 (defvar ebib--keywords-files-alist nil "Alist of keywords files.")
 
-;; `ebib--keywords-list-per-session' is composed of the keywords
-;; in `ebib--keywords-list' and whatever new keywords are added by
-;; the user during the current session. These new additions are
-;; discarded when ebib is closed.
+;; `ebib--keywords-list-per-session' is composed of the keywords in
+;; `ebib--keywords-list' and whatever new keywords are added by the user during the
+;; current session.  These new additions are discarded when ebib is closed.
 (defvar ebib--keywords-list-per-session nil "List of keywords for the current session.")
 
 (defun ebib--keywords-load-keywords (db)
@@ -114,7 +112,7 @@ Also automatically remove duplicates."
     (let ((dir (expand-file-name (file-name-directory (ebib-db-get-filename db)))))
       (if dir
           (let ((keyword-list (ebib--read-file-to-list (concat dir ebib-keywords-file))))
-            ;; note: even if keyword-list is empty, we store it, because the user
+            ;; Note: even if keyword-list is empty, we store it, because the user
             ;; may subsequently add keywords.
             (cl-pushnew (list dir keyword-list nil)   ; the extra empty list is for new keywords
                         ebib--keywords-files-alist
@@ -155,14 +153,14 @@ When the keywords come from a file, add the keywords in
 `ebib-keywords-list', unless `ebib--keywords-use-only-file' is set."
   (if (not ebib-keywords-file)        ; only the general list exists
       ebib--keywords-list-per-session
-    (let* ((dir (or (file-name-directory ebib-keywords-file)     ; a single keywords file
-                    (file-name-directory (ebib-db-get-filename db))))    ; per-directory keywords files
+    (let* ((dir (or (file-name-directory ebib-keywords-file)     ; A single keywords file.
+                    (file-name-directory (ebib-db-get-filename db))))    ; Per-directory keywords files.
            (lst (assoc dir ebib--keywords-files-alist)))
       (append (cl-second lst) (cl-third lst)))))
 
 (defun ebib--keywords-get-file (db)
   "Return the name of the keywords file for DB."
-  (if (and ebib-keywords-file ; TODO not sure if this function'll work correctly if ebib--keywords-file is NIL.
+  (if (and ebib-keywords-file ; TODO Not sure if this function'll work correctly if ebib--keywords-file is nil.
            (file-name-directory ebib-keywords-file))
       ebib-keywords-file
     (concat (file-name-directory (ebib-db-get-filename db)) ebib-keywords-file)))
@@ -187,12 +185,12 @@ keywords and the third the keywords added in this session."
 (defun ebib--keywords-save-new-keywords (db)
   "Check if new keywords were added to DB and save them as required."
   (let ((lst (ebib--keywords-new-p db)))
-    (when (and (cl-third lst)           ; if there are new keywords
+    (when (and (cl-third lst)           ; If there are new keywords.
                (or (eq ebib-keywords-file-save-on-exit 'always)
                    (and (eq ebib-keywords-file-save-on-exit 'ask)
                         (y-or-n-p "New keywords have been added.  Save? "))))
       (ebib--keywords-save-to-file lst)
-      ;; now move the new keywords to the list of existing keywords
+      ;; Now move the new keywords to the list of existing keywords.
       (setf (cl-second lst) (append (cl-second lst) (cl-third lst)))
       (setf (cl-third lst) nil))))
 

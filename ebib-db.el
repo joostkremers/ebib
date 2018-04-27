@@ -39,22 +39,22 @@
 (require 'cl-lib)
 (require 'bibtex)
 
-;; each database is represented by a struct
+;; Each database is represented by a struct.
 (cl-defstruct ebib--db-struct
-  (database (make-hash-table :test 'equal)) ; hashtable containing the database itself
-  (strings)                                 ; alist with the @STRING definitions
-  (preamble)                                ; string with the @PREAMBLE definition
-  (comments)                                ; list of @COMMENTS
-  (local-vars)                              ; the file's local variable block
-  (dialect)                                 ; the dialect of this database
-  (cur-entry)                               ; the current entry
-  (marked-entries)                          ; list of marked entries
-  (filter)                                  ; the active filter
-  (sortinfo)                                ; custom sorting
-  (filename)                                ; name of the BibTeX file that holds this database
-  (modtime)                                 ; modification time of the .bib file
-  (modified)                                ; flag indicating whether this database has been modified
-  (backup))                                 ; flag indicating whether we need to make a backup of the .bib file
+  (database (make-hash-table :test 'equal)) ; Hashtable containing the database itself.
+  (strings)                                 ; Alist with the @STRING definitions.
+  (preamble)                                ; String with the @PREAMBLE definition.
+  (comments)                                ; List of @COMMENTS.
+  (local-vars)                              ; The file's local variable block.
+  (dialect)                                 ; The dialect of this database.
+  (cur-entry)                               ; The current entry.
+  (marked-entries)                          ; List of marked entries.
+  (filter)                                  ; The active filter.
+  (sortinfo)                                ; Custom sorting.
+  (filename)                                ; Name of the BibTeX file that holds this database.
+  (modtime)                                 ; Modification time of the .bib file.
+  (modified)                                ; Flag indicating whether this database has been modified.
+  (backup))                                 ; Flag indicating whether we need to make a backup of the .bib file.
 
 (defun ebib-db-new-database ()
   "Create a new database instance and return it."
@@ -143,14 +143,14 @@ If storing/updating/deleting the entry is successful, return its key."
   (let ((exists (gethash key (ebib--db-struct-database db))))
     (when exists
       (cond
-       ;;  if so required, make the entry unique:
+       ;;  If so required, make the entry unique:
        ((eq if-exists 'uniquify)
 	(setq key (ebib-db-uniquify-key key db))
 	(setq exists nil))
-       ;; if the entry is an update, we simply pretend the key does not exist:
+       ;; If the entry is an update, we simply pretend the key does not exist:
        ((eq if-exists 'overwrite)
 	(setq exists nil))
-       ;; otherwise signal an error, if so requested:
+       ;; Otherwise signal an error, if so requested:
        ((not (eq if-exists 'noerror))
 	(error "[Ebib] Key `%s' exists in database; cannot overwrite" key))))
     (unless exists
@@ -245,26 +245,25 @@ Return non-nil upon success, or nil if the value could not be stored."
           (setq old-value nil))
          ((not (eq if-exists 'noerror))
           (error "[Ebib] Field `%s' exists in entry `%s'; cannot overwrite" field key)))
-      ;; Otherwise add the new field. We just add the field here, the value
-      ;; is added later, so that we can put braces around it if needed.
-      ;; This also makes it easier to return `nil' when storing/changing
-      ;; the field value wasn't successful. Note that if `elem' is
-      ;; non-`nil', we mustn't add the field again. Note also: we use
-      ;; `setcdr' to modify the entry in place.
+      ;; Otherwise add the new field.  We just add the field here, the value is
+      ;; added later, so that we can put braces around it if needed.  This also
+      ;; makes it easier to return nil when storing/changing the field value
+      ;; wasn't successful.  Note that if `elem' is non-nil, we mustn't add the
+      ;; field again.  Note also: we use `setcdr' to modify the entry in place.
       (unless elem
         (setq elem (car (setcdr (last entry) (list (cons field nil))))))) ; Make sure `elem' points to the newly added field.
     ;; If there is (still) an old value, do nothing.
     (unless old-value
-      ;; Otherwise overwrite the existing entry. Note that to delete a
-      ;; field, we set its value to `nil', rather than removing it
-      ;; altogether from the database. In `ebib--display-fields', such
-      ;; fields are ignored, so they're not saved.
+      ;; Otherwise overwrite the existing entry.  Note that to delete a field,
+      ;; we set its value to nil, rather than removing it altogether from the
+      ;; database.  In `ebib--display-fields', such fields are ignored, so they're
+      ;; not saved.
       (if (and value nobrace)
           (unless (eq nobrace 'as-is)
             (setq value (ebib-db-unbrace value)))
         (setq value (ebib-db-brace value)))
       (setcdr elem value)
-      t))) ; make sure we return non-`nil'.
+      t))) ; Make sure we return non-nil.
 
 (defun ebib-db-remove-field-value (field key db)
   "Remove FIELD from entry KEY in DB."
@@ -307,8 +306,8 @@ set IF-EXISTS to `overwrite'."
       (setf (ebib--db-struct-strings db)
 	    (if (null value)
                 strings-list
-              ;; put the new string at the end of the list, to keep them in
-              ;; the order in which they appear in the .bib file. this is
+              ;; Put the new string at the end of the list, to keep them in the
+              ;; order in which they appear in the .bib file.  This is
               ;; preferable for version control.
               (append strings-list (list (cons abbr (ebib-db-brace value)))))))))
 
@@ -538,17 +537,17 @@ make backup at next save)."
     (when (stringp string)
       (cond
        ((eq (string-to-char string) ?\{)
-        ;; first, remove all escaped { and } from the string:
+        ;; First, remove all escaped { and } from the string:
         (setq string (remove-from-string (remove-from-string string "[\\][{]")
                                          "[\\][}]"))
-        ;; then remove the innermost braces with their contents and continue until
+        ;; Then remove the innermost braces with their contents and continue until
         ;; no more braces are left.
         (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
           (setq string (remove-from-string string "{[^{]*?}")))
-        ;; if STRING is not empty, the original string contains material not in braces
+        ;; If STRING is not empty, the original string contains material not in braces
         (> (length string) 0))
        ((eq (string-to-char string) ?\")
-        ;; remove escaped ", then remove any occurrences of balanced quotes with
+        ;; Remove escaped ", then remove any occurrences of balanced quotes with
         ;; their contents and check for the length of the remaining string.
         (> (length (remove-from-string (remove-from-string string "[\\][\"]")
                                        "\"[^\"]*?\""))
