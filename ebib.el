@@ -1336,8 +1336,8 @@ ORDER indicates the sort order and should be either `ascend' or
     ((real-db entries)
      (let ((cur-keyname (ebib--get-key-at-point)))
        (ebib--ifstring (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
-                                                 cur-keyname
-                                                 'ebib--key-history))
+                                             cur-keyname
+                                             'ebib--key-history))
            (ebib--update-keyname new-keyname))))
     ((default)
      (beep))))
@@ -1854,7 +1854,7 @@ the current buffer: it is called within a `with-temp-buffer',
 whose contents is appended to the file the user enters."
   (let ((insert-default-directory (not ebib--export-filename)))
     (ebib--ifstring (filename (read-file-name
-                               prompt-string "~/" nil nil ebib--export-filename))
+                           prompt-string "~/" nil nil ebib--export-filename))
         (with-temp-buffer
           (funcall insert-fn)
           (append-to-file (point-min) (point-max) filename)
@@ -2079,11 +2079,11 @@ the preamble is appended."
        (let ((num (ebib--prefix prefix)))
          (if num
              (ebib--export-to-db num "@PREAMBLE copied to database %d"
-                                 (lambda (db)
-                                   (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
+                             (lambda (db)
+                               (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
            (ebib--export-to-file "Export @PREAMBLE to file: "
-                                 (lambda ()
-                                   (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
+                             (lambda ()
+                               (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
     ((default)
      (beep))))
 
@@ -2094,11 +2094,11 @@ Either prints the entire database, or the marked entries."
   (ebib--execute-when
     ((entries)
      (let ((entries (ebib--sort-keys-list (or (ebib-db-list-marked-entries ebib--cur-db)
-                                              (ebib-db-list-keys ebib--cur-db))
-                                          ebib--cur-db)))
+                                          (ebib-db-list-keys ebib--cur-db))
+                                      ebib--cur-db)))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                                     ebib-print-tempfile
-                                   (read-file-name "Use temp file: " "~/" nil nil)))
+                                 ebib-print-tempfile
+                               (read-file-name "Use temp file: " "~/" nil nil)))
            (progn
              (with-temp-buffer
                (when ebib-print-preamble
@@ -3454,13 +3454,13 @@ which the string is appended."
         (num (ebib--prefix prefix)))
     (if num
         (ebib--export-to-db num (format "@STRING definition `%s' copied to database %%d" string)
-                        (lambda (db)
-                          (ebib-db-set-string string (ebib-db-get-string string ebib--cur-db) db)))
+                            (lambda (db)
+                              (ebib-db-set-string string (ebib-db-get-string string ebib--cur-db) db)))
       (ebib--export-to-file (format "Export @STRING definition `%s' to file: " string)
-                        (lambda ()
-                          (insert (format "\n@string{%s = %s}\n"
-                                          string
-                                          (ebib-db-get-string string ebib--cur-db))))))))
+                            (lambda ()
+                              (insert (format "\n@string{%s = %s}\n"
+                                              string
+                                              (ebib-db-get-string string ebib--cur-db))))))))
 
 (defun ebib-export-all-strings (prefix)
   "Export all @STRING definitions.
