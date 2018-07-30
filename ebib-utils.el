@@ -1468,15 +1468,18 @@ Otherwise, If FIELD is \"Entry Key\", KEY is returned; if FIELD
 is \"Author/Editor\", the contents of the Author field is
 returned or, if the Author field is empty, the contents of the
 Editor field; if the Editor field is empty as well, return the
-string \"(No Author/Editor)\".  These defaults can be overridden
-by adding an appropriate transformation function to
+string \"(No Author/Editor)\".  If FIELD is \"Year\", the year of
+the first date in the Date field is returned (i.e., date ranges
+are ignored), or, if no year can be found in the Date field, the
+contents of the Year field is returned.  If this field is empty,
+the string \"XXXX\" is returned.  These defaults can be
+overridden by adding an appropriate transformation function to
 `ebib-field-transformation-functions'.
 
 If FIELD is not found in `ebib-field-transformation-functions'
 and is not one of the special fields listed above, the field
 value is returned.  If a field value is empty, the return value
-is the string \"(No <FIELD>)\", or, if FIELD is \"Year\", the
-string \"(XXXX)\"."
+is the string \"(No <FIELD>)\"."
   (cond
    ((assoc-string field ebib-field-transformation-functions 'case-fold)
     (funcall (cdr (assoc field ebib-field-transformation-functions)) field key db))
@@ -1486,8 +1489,23 @@ string \"(XXXX)\"."
     (or (ebib-get-field-value "Author" key db 'noerror 'unbraced 'xref)
         (ebib-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
    ((cl-equalp field "Year")
-    (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref))
+    (ebib-get-year-for-display key db))
    (t (ebib-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
+
+(defun ebib-get-year-for-display (key db)
+  "Return the year for entry KEY in DB.
+In BibTeX, this simply returns the value of the Year field, or
+the string \"XXXX\" if this is empty.  For BibLaTeX, this first
+checks the Date field and returns the year from the first date in
+this field (meaning date ranges are ignored).  If no year can be
+found in the Date field, the value of the Year field is returned,
+or \"XXXX\" if it's empty."
+  (save-match-data
+    (let ((date (ebib-get-field-value "Date" key db 'noerror 'unbraced 'xref)))
+      (if (and date
+               (string-match "^\\(?:\\.\\.\\)?/?\\([0-9]\\{4\\}\\)" date))
+          (match-string 1 date)
+        (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref)))))
 
 (defun ebib-clean-TeX-markup (field key db)
   "Return the contents of FIELD from KEY in DB without TeX markups."
