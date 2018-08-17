@@ -226,7 +226,7 @@ This function also runs `ebib-notes-search-note-before-hook'."
   (run-hooks 'ebib-notes-search-note-before-hook)
   (save-excursion
     (goto-char (point-min))
-    (search-forward (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil) nil t)))
+    (re-search-forward (concat (regexp-quote (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil)) "$") nil t)))
 
 (defun ebib--notes-open-common-notes-file (key db)
   "Open the notes file for entry KEY in DB or create a new note."
