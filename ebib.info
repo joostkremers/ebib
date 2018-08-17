@@ -61,6 +61,10 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
+* Version 212 August 2018::
+* Version 21112 July 2018::
+* Version 211 January 2017::
+* Version 210 January 2017::
 * Version 29 January 2017::
 * 19 December 2016::
 * 7 December 2016::
@@ -71,9 +75,50 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 * Version 263 31 August 2016::
 
 
-File: ebib.info,  Node: Version 29 January 2017,  Next: 19 December 2016,  Up: News
+File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,  Up: News
 
-1.1 Version 2.9, January 2017
+1.1 Version 2.12, August 2018
+=============================
+
+   • Add an option to specify the default sort field and direction.  It
+     is no longer necessary to set the desired sort field as the first
+     column in the index buffer, but Ebib still defaults to this if the
+     default sort field and direction are not set explicitly.
+
+
+File: ebib.info,  Node: Version 21112 July 2018,  Next: Version 211 January 2017,  Prev: Version 212 August 2018,  Up: News
+
+1.2 Version 2.11.12, July 2018
+==============================
+
+   • Use BibLaTeX’s ‘Date’ field, if present, for displaying the year.
+   • Check for changed files on disk when saving all databases, not just
+     when saving the current database.
+   • Improve handling of multiple databases: ‘crossref’ entries can now
+     occur in other open databases as well, and searches with ‘/’ can be
+     continued in other databases.
+   • Autogenerating keys is now on by default.
+
+
+File: ebib.info,  Node: Version 211 January 2017,  Next: Version 210 January 2017,  Prev: Version 21112 July 2018,  Up: News
+
+1.3 Version 2.11, January 2017
+==============================
+
+   • Update for ‘parsebib’ v.  2.3.
+
+
+File: ebib.info,  Node: Version 210 January 2017,  Next: Version 29 January 2017,  Prev: Version 211 January 2017,  Up: News
+
+1.4 Version 2.10, January 2017
+==============================
+
+   • Improved index column display.
+
+
+File: ebib.info,  Node: Version 29 January 2017,  Next: 19 December 2016,  Prev: Version 210 January 2017,  Up: News
+
+1.5 Version 2.9, January 2017
 =============================
 
    • Allow ‘%s’ in the program strings in ‘ebib-file-associations’,
@@ -83,7 +128,7 @@ File: ebib.info,  Node: Version 29 January 2017,  Next: 19 December 2016,  Up: N
 
 File: ebib.info,  Node: 19 December 2016,  Next: 7 December 2016,  Prev: Version 29 January 2017,  Up: News
 
-1.2 19 December 2016
+1.6 19 December 2016
 ====================
 
    • Remove support for a separate rc file for Ebib.  User configuration
@@ -97,7 +142,7 @@ File: ebib.info,  Node: 19 December 2016,  Next: 7 December 2016,  Prev: Version
 
 File: ebib.info,  Node: 7 December 2016,  Next: 5 December 2016,  Prev: 19 December 2016,  Up: News
 
-1.3 7 December 2016
+1.7 7 December 2016
 ===================
 
    • Upgrade Emacs dependency to 24.4.
@@ -105,7 +150,7 @@ File: ebib.info,  Node: 7 December 2016,  Next: 5 December 2016,  Prev: 19 Decem
 
 File: ebib.info,  Node: 5 December 2016,  Next: 7 November 2016,  Prev: 7 December 2016,  Up: News
 
-1.4 5 December 2016
+1.8 5 December 2016
 ===================
 
    • New library ‘org-ebib’.  This defines a new Org link type ‘ebib:’,
@@ -122,7 +167,7 @@ File: ebib.info,  Node: 5 December 2016,  Next: 7 November 2016,  Prev: 7 Decemb
 
 File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Prev: 5 December 2016,  Up: News
 
-1.5 7 November 2016
+1.9 7 November 2016
 ===================
 
    • New tabulated list interface in index buffer.  This interface is
@@ -141,8 +186,8 @@ File: ebib.info,  Node: 7 November 2016,  Next: Version 28 26 October 2016,  Pre
 
 File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 September 2016,  Prev: 7 November 2016,  Up: News
 
-1.6 Version 2.8, 26 October 2016
-================================
+1.10 Version 2.8, 26 October 2016
+=================================
 
    • Changed key bindings: ‘j’ and ‘k’ no longer move up/down in the
      index, entry and strings buffers; use ‘p’ and ‘n’ instead.
@@ -171,8 +216,8 @@ File: ebib.info,  Node: Version 28 26 October 2016,  Next: Version 27 22 Septemb
 
 File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 August 2016,  Prev: Version 28 26 October 2016,  Up: News
 
-1.7 Version 2.7, 22 September 2016
-==================================
+1.11 Version 2.7, 22 September 2016
+===================================
 
    • Reading list management: add and remove BibTeX entries to an Org
      reading list.
@@ -186,8 +231,8 @@ File: ebib.info,  Node: Version 27 22 September 2016,  Next: Version 263 31 Augu
 
 File: ebib.info,  Node: Version 263 31 August 2016,  Prev: Version 27 22 September 2016,  Up: News
 
-1.8 Version 2.6.3, 31 August 2016
-=================================
+1.12 Version 2.6.3, 31 August 2016
+==================================
 
    • Allow storing notes in a single file rather than using one file per
      note.
@@ -447,12 +492,12 @@ File: ebib.info,  Node: Navigating a bib File,  Next: Starting a New bib File,  
 ============================
 
 Once you’ve opened a ‘.bib’ file, all the entries in the file are shown
-in alphabetical order (sorted by entry key) in the index buffer in the
-top Ebib window.  The first entry is highlighted, meaning it is the
-current entry.  The fields it holds and their values are shown in the
-entry buffer in the bottom Ebib window.  The first field is the type
-field, which tells you what kind of entry you’re dealing with (i.e.
-‘book’, ‘article’, etc.).
+in alphabetical order (sorted by entry key, though this is customisable)
+in the index buffer in the top Ebib window.  The first entry is
+highlighted, meaning it is the current entry.  The fields it holds and
+their values are shown in the entry buffer in the bottom Ebib window.
+The first field is the type field, which tells you what kind of entry
+you’re dealing with (i.e.  ‘book’, ‘article’, etc.).
 
    Below the type field, Ebib displays (up to) four sets of fields.  The
 first set are the so-called required fields, the fields that Bib(La)TeX
@@ -601,7 +646,7 @@ and ‘G’, and ‘Home’ and ‘End’ also work as expected.
 buffer, ‘RET’ is equivalent to ‘e’.)  For most fields, Ebib simply asks
 you for a string value in the minibuffer.  (Here, ‘RET’ confirms the
 edit, while ‘C-g’ cancels it.)  Although BibTeX requires that field
-values be surrounded by braces {} (or double quotes “”, but Ebib does
+values be surrounded by braces {} (or double quotes "", but Ebib does
 not use those, even though it can of course handle them when they are
 used in an existing ‘.bib’ file) you do not need to type these.  Ebib
 adds them when it saves the ‘.bib’ file.
@@ -925,12 +970,12 @@ File: ebib.info,  Node: The Entries List,  Next: Searching,  Prev: Using Biblate
 
 By default, the index buffer displays the list of entries in the
 database in a table format using the entry key, and the author, year and
-title fields of each entry.  The entries are sorted alphanumerically on
-the entry key in ascending order.  You can sort the entries on one of
-the other columns using the keys ‘<’ and ‘>’.  The former performs an
-ascending sort (smallest to largest, hence the smaller-than sign), the
-latter a descending sort.  They both ask you for the column to sort on.
-Restoring the default sort can be done with ‘=’.
+title fields of each entry.  The entries are sorted in ascending order
+on the first column, which by default is the entry key.  You can sort
+the entries on one of the other columns using the keys ‘<’ and ‘>’.  The
+former performs an ascending sort (smallest to largest, hence the
+smaller-than sign), the latter a descending sort.  They both ask you for
+the column to sort on.  Restoring the default sort can be done with ‘=’.
 
    The fields that are displayed in the index buffer can be customised
 with the user option ‘ebib-index-columns’.  Each element in this option
@@ -947,9 +992,9 @@ is not empty, and the contents of the editor field otherwise.
 
    The first column defined in ‘ebib-index-colums’ is the column on
 which the entries are sorted by default, i.e., when the database is
-first opened and when you press ‘=’.  It is not possible to set another
-column as the default sort key (though you can, of course, sort on them
-using ‘<’ or ‘>’).
+first opened and when you press ‘=’.  You can change the default sort
+field and the default sort direction (which is ascending, i.e., A-Z and
+0-9) by customising the option ‘ebib-index-default-sort’.
 
 
 File: ebib.info,  Node: Searching,  Next: Accessing BibTeX Databases outside Ebib,  Prev: The Entries List,  Up: Top
@@ -2831,142 +2876,150 @@ Tag Table:
 Node: Top186
 Node: News1485
 Ref: #news1575
-Node: Version 29 January 20171789
-Ref: #version-2.9-january-20171937
-Node: 19 December 20162105
-Ref: #december-20162259
-Node: 7 December 20162720
-Ref: #december-2016-12864
-Node: 5 December 20162906
-Ref: #december-2016-23049
-Node: 7 November 20163741
-Ref: #november-20163895
-Node: Version 28 26 October 20164685
-Ref: #version-2.8-26-october-20164878
-Node: Version 27 22 September 20166316
-Ref: #version-2.7-22-september-20166524
-Node: Version 263 31 August 20166961
-Ref: #version-2.6.3-31-august-20167132
-Node: Installation7551
-Ref: #installation7669
-Node: Package manager7790
-Ref: #package-manager7919
-Node: Debian and Ubuntu8270
-Ref: #debian-and-ubuntu8431
-Node: Manual installation8565
-Ref: #manual-installation8728
-Node: Starting Ebib9131
-Ref: #starting-ebib9287
-Node: Upgrading from Ebib 1x10195
-Ref: #upgrading-from-ebib-1.x10343
-Node: Getting Started13460
-Ref: #getting-started13600
-Node: Opening a bib File15974
-Ref: #opening-a-.bib-file16128
-Node: Preloading bib Files17839
-Ref: #preloading-.bib-files18027
-Node: Navigating a bib File18833
-Ref: #navigating-a-.bib-file19028
-Node: Starting a New bib File22331
-Ref: #starting-a-new-.bib-file22501
-Node: Editing the Database22793
-Ref: #editing-the-database22948
-Node: Adding and Deleting Entries23325
-Ref: #adding-and-deleting-entries23502
-Node: Editing Fields Values26082
-Ref: #editing-fields-values26280
-Node: Editing Multiline Values28933
-Ref: #editing-multiline-values29126
-Node: Undefined Fields31640
-Ref: #undefined-fields31809
-Node: Hidden Fields32805
-Ref: #hidden-fields32954
-Node: Timestamps33850
-Ref: #timestamps34012
-Node: Copy Cut Kill Paste Yank and Delete36075
-Ref: #copy-cut-kill-paste-yank-and-delete36279
-Node: Saving a Database37231
-Ref: #saving-a-database37379
-Node: Using Biblatex39054
-Ref: #using-biblatex39192
-Node: Setting the BibTeX Dialect39519
-Ref: #setting-the-bibtex-dialect39688
-Node: Alias Types and Fields41728
-Ref: #alias-types-and-fields41889
-Node: The Entries List44075
-Ref: #the-entries-list44209
-Node: Searching45801
-Ref: #searching45946
-Node: Simple Searches45988
-Ref: #simple-searches46104
-Node: Filters48803
-Ref: #filters48903
-Node: Simple Selection49977
-Ref: #simple-selection50106
-Node: Complex Filters51800
-Ref: #complex-filters51962
-Node: Storing and Saving Filters56005
-Ref: #storing-and-saving-filters56188
-Node: Special Filters59067
-Ref: #special-filters59248
-Node: An Example Listing Recent Additions60603
-Ref: #an-example-listing-recent-additions60832
-Node: Properties of Filtered Databases63000
-Ref: #properties-of-filtered-databases63197
-Node: Accessing BibTeX Databases outside Ebib64855
-Ref: #accessing-bibtex-databases-outside-ebib65061
-Node: Key Bindings69981
-Ref: #key-bindings70137
-Node: Defining Citation Commands70901
-Ref: #defining-citation-commands71134
-Node: Associating a Database with a LaTeX File77050
-Ref: #associating-a-database-with-a-latex-file77290
-Node: Cross-referencing80233
-Ref: #cross-referencing80403
-Node: Marking Entries83716
-Ref: #marking-entries83864
-Node: Printing the Database84847
-Ref: #printing-the-database85007
-Node: Calling a Browser88814
-Ref: #calling-a-browser88964
-Node: Viewing Files91596
-Ref: #viewing-files91728
-Node: Editing the file field95521
-Ref: #editing-the-file-field95656
-Node: Notes files97015
-Ref: #notes-files97149
-Node: Customising the notes template101294
-Ref: #customising-the-notes-template101443
-Node: Managing a reading list104489
-Ref: #managing-a-reading-list104651
-Node: Window Management107746
-Ref: #window-management107905
-Node: Creating Entry Stubs111081
-Ref: #creating-entry-stubs111243
-Node: @Preamble Definition112244
-Ref: #preamble-definition112408
-Node: @String Definitions114394
-Ref: #string-definitions114545
-Node: @Comments118061
-Ref: #comments118189
-Node: Managing Keywords118554
-Ref: #managing-keywords118699
-Node: Sorting the bib File124608
-Ref: #sorting-the-.bib-file124781
-Node: Merging and Importing127920
-Ref: #merging-and-importing128085
-Node: Exporting Entries129861
-Ref: #exporting-entries130023
-Node: Multiple Identical Fields131998
-Ref: #multiple-identical-fields132177
-Node: Multiline Edit Buffers134086
-Ref: #multiline-edit-buffers134258
-Node: The Options Menu138388
-Ref: #the-options-menu138536
-Node: Customisation139157
-Ref: #customisation139268
-Node: Modifying Key Bindings140211
-Ref: #modifying-key-bindings140338
+Node: Version 212 August 20181903
+Ref: #version-2.12-august-20182058
+Node: Version 21112 July 20182338
+Ref: #version-2.11.12-july-20182528
+Node: Version 211 January 20172961
+Ref: #version-2.11-january-20173152
+Node: Version 210 January 20173195
+Ref: #version-2.10-january-20173386
+Node: Version 29 January 20173425
+Ref: #version-2.9-january-20173606
+Node: 19 December 20163774
+Ref: #december-20163928
+Node: 7 December 20164389
+Ref: #december-2016-14533
+Node: 5 December 20164575
+Ref: #december-2016-24718
+Node: 7 November 20165410
+Ref: #november-20165564
+Node: Version 28 26 October 20166354
+Ref: #version-2.8-26-october-20166549
+Node: Version 27 22 September 20167987
+Ref: #version-2.7-22-september-20168197
+Node: Version 263 31 August 20168634
+Ref: #version-2.6.3-31-august-20168807
+Node: Installation9226
+Ref: #installation9344
+Node: Package manager9465
+Ref: #package-manager9594
+Node: Debian and Ubuntu9945
+Ref: #debian-and-ubuntu10106
+Node: Manual installation10240
+Ref: #manual-installation10403
+Node: Starting Ebib10806
+Ref: #starting-ebib10962
+Node: Upgrading from Ebib 1x11870
+Ref: #upgrading-from-ebib-1.x12018
+Node: Getting Started15135
+Ref: #getting-started15275
+Node: Opening a bib File17649
+Ref: #opening-a-.bib-file17803
+Node: Preloading bib Files19514
+Ref: #preloading-.bib-files19702
+Node: Navigating a bib File20508
+Ref: #navigating-a-.bib-file20703
+Node: Starting a New bib File24035
+Ref: #starting-a-new-.bib-file24205
+Node: Editing the Database24497
+Ref: #editing-the-database24652
+Node: Adding and Deleting Entries25029
+Ref: #adding-and-deleting-entries25206
+Node: Editing Fields Values27786
+Ref: #editing-fields-values27984
+Node: Editing Multiline Values30633
+Ref: #editing-multiline-values30826
+Node: Undefined Fields33340
+Ref: #undefined-fields33509
+Node: Hidden Fields34505
+Ref: #hidden-fields34654
+Node: Timestamps35550
+Ref: #timestamps35712
+Node: Copy Cut Kill Paste Yank and Delete37775
+Ref: #copy-cut-kill-paste-yank-and-delete37979
+Node: Saving a Database38931
+Ref: #saving-a-database39079
+Node: Using Biblatex40754
+Ref: #using-biblatex40892
+Node: Setting the BibTeX Dialect41219
+Ref: #setting-the-bibtex-dialect41388
+Node: Alias Types and Fields43428
+Ref: #alias-types-and-fields43589
+Node: The Entries List45775
+Ref: #the-entries-list45909
+Node: Searching47556
+Ref: #searching47701
+Node: Simple Searches47743
+Ref: #simple-searches47859
+Node: Filters50558
+Ref: #filters50658
+Node: Simple Selection51732
+Ref: #simple-selection51861
+Node: Complex Filters53555
+Ref: #complex-filters53717
+Node: Storing and Saving Filters57760
+Ref: #storing-and-saving-filters57943
+Node: Special Filters60822
+Ref: #special-filters61003
+Node: An Example Listing Recent Additions62358
+Ref: #an-example-listing-recent-additions62587
+Node: Properties of Filtered Databases64755
+Ref: #properties-of-filtered-databases64952
+Node: Accessing BibTeX Databases outside Ebib66610
+Ref: #accessing-bibtex-databases-outside-ebib66816
+Node: Key Bindings71736
+Ref: #key-bindings71892
+Node: Defining Citation Commands72656
+Ref: #defining-citation-commands72889
+Node: Associating a Database with a LaTeX File78805
+Ref: #associating-a-database-with-a-latex-file79045
+Node: Cross-referencing81988
+Ref: #cross-referencing82158
+Node: Marking Entries85471
+Ref: #marking-entries85619
+Node: Printing the Database86602
+Ref: #printing-the-database86762
+Node: Calling a Browser90569
+Ref: #calling-a-browser90719
+Node: Viewing Files93351
+Ref: #viewing-files93483
+Node: Editing the file field97276
+Ref: #editing-the-file-field97411
+Node: Notes files98770
+Ref: #notes-files98904
+Node: Customising the notes template103049
+Ref: #customising-the-notes-template103198
+Node: Managing a reading list106244
+Ref: #managing-a-reading-list106406
+Node: Window Management109501
+Ref: #window-management109660
+Node: Creating Entry Stubs112836
+Ref: #creating-entry-stubs112998
+Node: @Preamble Definition113999
+Ref: #preamble-definition114163
+Node: @String Definitions116149
+Ref: #string-definitions116300
+Node: @Comments119816
+Ref: #comments119944
+Node: Managing Keywords120309
+Ref: #managing-keywords120454
+Node: Sorting the bib File126363
+Ref: #sorting-the-.bib-file126536
+Node: Merging and Importing129675
+Ref: #merging-and-importing129840
+Node: Exporting Entries131616
+Ref: #exporting-entries131778
+Node: Multiple Identical Fields133753
+Ref: #multiple-identical-fields133932
+Node: Multiline Edit Buffers135841
+Ref: #multiline-edit-buffers136013
+Node: The Options Menu140143
+Ref: #the-options-menu140291
+Node: Customisation140912
+Ref: #customisation141023
+Node: Modifying Key Bindings141966
+Ref: #modifying-key-bindings142093
 
 End Tag Table
 

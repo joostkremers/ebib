@@ -15,7 +15,7 @@
   <style type="text/css">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -28,13 +28,11 @@ code.sourceCode { white-space: pre-wrap; }
 a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
 pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
+  { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -77,7 +75,7 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="ebib.css">
+  <link rel="stylesheet" href="ebib.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -90,6 +88,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <nav id="TOC">
 <ul>
 <li><a href="#news">News</a><ul>
+<li><a href="#version-2.12-august-2018">Version 2.12, August 2018</a></li>
+<li><a href="#version-2.11.12-july-2018">Version 2.11.12, July 2018</a></li>
+<li><a href="#version-2.11-january-2017">Version 2.11, January 2017</a></li>
+<li><a href="#version-2.10-january-2017">Version 2.10, January 2017</a></li>
 <li><a href="#version-2.9-january-2017">Version 2.9, January 2017</a></li>
 <li><a href="#december-2016">19 December 2016</a></li>
 <li><a href="#december-2016-1">7 December 2016</a></li>
@@ -175,6 +177,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Ebib is a program with which you can manage BibTeX and BibLateX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github’s releases page.)</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <h1 id="news">News</h1>
+<h2 id="version-2.12-august-2018">Version 2.12, August 2018</h2>
+<ul>
+<li>Add an option to specify the default sort field and direction. It is no longer necessary to set the desired sort field as the first column in the index buffer, but Ebib still defaults to this if the default sort field and direction are not set explicitly.</li>
+</ul>
+<h2 id="version-2.11.12-july-2018">Version 2.11.12, July 2018</h2>
+<ul>
+<li>Use BibLaTeX’s <code>Date</code> field, if present, for displaying the year.</li>
+<li>Check for changed files on disk when saving all databases, not just when saving the current database.</li>
+<li>Improve handling of multiple databases: <code>crossref</code> entries can now occur in other open databases as well, and searches with <code>/</code> can be continued in other databases.</li>
+<li>Autogenerating keys is now on by default.</li>
+</ul>
+<h2 id="version-2.11-january-2017">Version 2.11, January 2017</h2>
+<ul>
+<li>Update for <code>parsebib</code> v. 2.3.</li>
+</ul>
+<h2 id="version-2.10-january-2017">Version 2.10, January 2017</h2>
+<ul>
+<li>Improved index column display.</li>
+</ul>
 <h2 id="version-2.9-january-2017">Version 2.9, January 2017</h2>
 <ul>
 <li>Allow <code>%s</code> in the program strings in <code>ebib-file-associations</code>, making it possible to pass command line arguments to the program being called.</li>
@@ -264,7 +285,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Chances are that you will be doing most of your work with one or a few <code>.bib</code> files, and you may find yourself opening the same file or files every time you start Ebib. If so, you can tell Ebib to always load specific <code>.bib</code> files on startup. To do this, specify the files in Ebib’s customisation buffer, under the option “Preload Bib Files” (<code>ebib-preload-bib-files</code>).</p>
 <p>By default, <code>.bib</code> files are searched for in your home directory. Since this is most likely not where you keep the files, you need to specify either the file’s full path or a relative path starting from your home directory. Alternatively, you can customise the option “Bib Search Dirs” (<code>ebib-bib-search-dirs</code>) to specify one or more directories in which Ebib should search the <code>.bib</code> files.</p>
 <h2 id="navigating-a-.bib-file">Navigating a <code>.bib</code> File</h2>
-<p>Once you’ve opened a <code>.bib</code> file, all the entries in the file are shown in alphabetical order (sorted by entry key) in the index buffer in the top Ebib window. The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you’re dealing with (i.e. <code>book</code>, <code>article</code>, etc.).</p>
+<p>Once you’ve opened a <code>.bib</code> file, all the entries in the file are shown in alphabetical order (sorted by entry key, though this is customisable) in the index buffer in the top Ebib window. The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you’re dealing with (i.e. <code>book</code>, <code>article</code>, etc.).</p>
 <p>Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that Bib(La)TeX requires to be filled. The second group are the optional fields, which do not have to be filled but which Bib(La)TeX will normally add to the bibliography if they do have a value. The third group is the so-called extra fields. These fields are usually ignored by Bib(La)TeX (note that Bib(La)TeX normally ignores <em>all</em> fields it does not know), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are defined in the user option “Extra Fields” (<code>ebib-extra-fields</code>). Lastly, the fourth set of fields shown in the entry buffer are fields that exist in the entry but are not defined as part of the entry type nor as extra fields.</p>
 <p>The first two groups of fields are different for each entry type, while the third group is common to all entry types. You can use the extra fields, for example, to add personal comments to the works in your database. Ebib by default defines the following extra fields: <code>crossref</code>, <code>url</code> (BibTeX only), <code>annote</code> (<code>annotation</code> for Biblatex), <code>abstract</code>, <code>keywords</code>, <code>file</code>, <code>timestamp</code>, and <code>doi</code> (BibTeX only). <code>url</code> and <code>doi</code> are defined only for BibTeX, since Biblatex defines them as optional fields for most entry types. If these are not sufficient for you, you can customise the option “Extra Fields”.</p>
 <p>To move around in the index buffer, you can use the <code>up</code> and <code>down</code> cursor keys, <code>p</code> and <code>n</code> and also the versions with the control key <code>C-p</code> and <code>C-n</code>. Furthermore, <code>Space</code> and <code>PgDn</code> move a screenful of entries down, while <code>b</code> and <code>PgUp</code> move in the other direction. Lastly, <code>g</code> and <code>Home</code> move to the first entry, while <code>G</code> and <code>End</code> move to the last one.</p>
@@ -284,7 +305,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="editing-fields-values">Editing Fields Values</h2>
 <p>Editing the field values for an entry is done in the lower of the two Ebib buffers, the so-called entry buffer. You can move focus to the entry buffer and start editing field values by typing the command <code>e</code> in the index buffer.</p>
 <p>You can move between fields with the same keys that you use to move between entries in the index buffer: the cursor keys <code>up</code> and <code>down</code>, <code>p</code> and <code>n</code> or <code>C-p</code> and <code>C-n</code>. <code>Space</code> and <code>PgDn</code> move to the next set of fields, while <code>PgUp</code> and <code>b</code> move to the previous set of fields. <code>g</code> and <code>G</code>, and <code>Home</code> and <code>End</code> also work as expected.</p>
-<p>Editing a field value can be done with <code>e</code>. (In fact, in the entry buffer, <code>RET</code> is equivalent to <code>e</code>.) For most fields, Ebib simply asks you for a string value in the minibuffer. (Here, <code>RET</code> confirms the edit, while <code>C-g</code> cancels it.) Although BibTeX requires that field values be surrounded by braces {} (or double quotes “”, but Ebib does not use those, even though it can of course handle them when they are used in an existing <code>.bib</code> file) you do not need to type these. Ebib adds them when it saves the <code>.bib</code> file.</p>
+<p>Editing a field value can be done with <code>e</code>. (In fact, in the entry buffer, <code>RET</code> is equivalent to <code>e</code>.) For most fields, Ebib simply asks you for a string value in the minibuffer. (Here, <code>RET</code> confirms the edit, while <code>C-g</code> cancels it.) Although BibTeX requires that field values be surrounded by braces {} (or double quotes &quot;&quot;, but Ebib does not use those, even though it can of course handle them when they are used in an existing <code>.bib</code> file) you do not need to type these. Ebib adds them when it saves the <code>.bib</code> file.</p>
 <p>Some fields, however, are handled in a special way. The first of these is the <code>type</code> field: if you edit this field, you must enter one of the predefined entry types. Ebib won’t allow you to enter anything else. You can use TAB completion in this case. Similarly, if you edit the <code>crossref</code> field, Ebib requires that you fill in a key from the database. Here, too, you can use TAB completion. The fields <code>keywords</code> and <code>file</code> are also treated differently, see <a href="#managing-keywords">Managing keywords</a> and <a href="#viewing-files">Viewing Files</a>, respectively.</p>
 <p>Note that if you’re adding a new entry, Ebib automatically puts you in the entry buffer after you’ve typed the entry key: you don’t have to type <code>e</code> to move to the entry buffer. When creating a new entry, you should set the <code>type</code> field first, because the <code>type</code> field determines which other fields are available for an entry. After editing a field, Ebib puts you on the next field. This is convenient if you’re creating a new entry and need to fill out several fields in a row.</p>
 <p>If you’re done editing the fields of the entry, type <code>q</code> to move focus back to the index buffer. (Note: keys may have different functions in the index buffer and the entry buffer. <code>q</code> is a typical example: in the entry buffer, it quits editing the entry and moves focus back to the index buffer. In the index buffer, however, <code>q</code> quits Ebib.)</p>
@@ -327,10 +348,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The set of entry types defined by Biblatex differs from the set used by BibTeX. Mostly, Biblatex adds new entry types, but there are a few BibTeX entry types that have been dropped. For legacy reasons, Biblatex still recognises these entry types, but it treats them as aliases for some of its own types. The relevant entry types are <code>@conference</code> (treated as an alias for <code>@inproceedings</code>), <code>@electronic</code> (alias for <code>@online</code>), <code>@mastersthesis</code> (alias for <code>@thesis</code> with the <code>type</code> field set to ‘Master’s thesis’), <code>@phdthesis</code> (alias for <code>@thesis</code> with the <code>type</code> field set to ‘PhD thesis’), <code>@techreport</code> (alias for <code>@report</code> with the <code>type</code> field set to ‘technical report’) and <code>@www</code> (alias for <code>@online</code>). If an entry has such an alias as entry type, Ebib displays the entry type that Biblatex treats it as in the entry buffer. (For example, the entry type alias <code>phdthesis</code> is shown as <code>phdthesis [==&gt; Thesis]</code>.)</p>
 <p>Similarly, a number of fields are deprecated but still accepted as aliases. These are <code>address</code> (alias for <code>location</code>), <code>annote</code> (alias for <code>annotation</code>), <code>archiveprefix</code> (for <code>eprinttype</code>), <code>journal</code> (for <code>journaltitle</code>), <code>key</code> (for <code>sortkey</code>), <code>pdf</code> (for <code>file</code>), <code>primaryclass</code> (for <code>eprintclass</code>), and <code>school</code> (for <code>institution</code>). These aliases are also indicated in the entry buffer, albeit in a slightly different way. For example, if an entry has a <code>journal</code> field, its value is shown as the value of the <code>journaltitle</code> field; a tag <code>[&lt;== journal]</code> is placed after the field value, indicating that the value is actually contained in the journal field. The <code>journal</code> field itself is shown as an undefined field (i.e., after all other fields). That is, in such cases, the value is shown twice: once as the <code>journaltitle</code> field (among the obligatory fields), and once as the <code>journal</code> field. This is done so that you can easily copy the value of the <code>journal</code> field to the <code>journaltitle</code> field, if you wish to bring your entries into line with Biblatex’s conventions.</p>
 <h1 id="the-entries-list">The Entries List</h1>
-<p>By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted alphanumerically on the entry key in ascending order. You can sort the entries on one of the other columns using the keys <code>&lt;</code> and <code>&gt;</code>. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with <code>=</code>.</p>
+<p>By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted in ascending order on the first column, which by default is the entry key. You can sort the entries on one of the other columns using the keys <code>&lt;</code> and <code>&gt;</code>. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with <code>=</code>.</p>
 <p>The fields that are displayed in the index buffer can be customised with the user option <code>ebib-index-columns</code>. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.</p>
 <p>You can use any BibTeX / BibLaTeX field to define a column in the index buffer. In addition, there are two column labels with a special meaning: <code>&quot;Entry Key&quot;</code>, which displays the entry key, and <code>&quot;Author/Editor&quot;</code>, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise.</p>
-<p>The first column defined in <code>ebib-index-colums</code> is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press <code>=</code>. It is not possible to set another column as the default sort key (though you can, of course, sort on them using <code>&lt;</code> or <code>&gt;</code>).</p>
+<p>The first column defined in <code>ebib-index-colums</code> is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press <code>=</code>. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option <code>ebib-index-default-sort</code>.</p>
 <h1 id="searching">Searching</h1>
 <h2 id="simple-searches">Simple Searches</h2>
 <p>Ebib provides several search methods. First of all, in the index buffer, the normal Emacs incremental searches, <code>C-s</code> and <code>C-r</code>, can be used to search entry keys. Once you’ve found the key you’re searching, you must hit <code>RET</code> to quit the search and again <code>RET</code> to make the entry you found active: Ebib does not update the entry buffer during incremental search. If you make frequent use of this option, you may want to make the cursor visible in the Ebib buffers. Unset the customisation option “Hide Cursor” (<code>ebib-hide-cursor</code>) to do so.</p>

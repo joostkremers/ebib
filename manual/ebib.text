@@ -10,6 +10,25 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.12, August 2018 ##
+
+- Add an option to specify the default sort field and direction. It is no longer necessary to set the desired sort field as the first column in the index buffer, but Ebib still defaults to this if the default sort field and direction are not set explicitly.
+
+## Version 2.11.12,  July 2018##
+
+- Use BibLaTeX's `Date` field, if present, for displaying the year.
+- Check for changed files on disk when saving all databases, not just when saving the current database.
+- Improve handling of multiple databases: `crossref` entries can now occur in other open databases as well, and searches with `/` can be continued in other databases.
+- Autogenerating keys is now on by default.
+
+## Version 2.11, January 2017 ##
+
+- Update for `parsebib` v. 2.3.
+
+## Version 2.10, January 2017 ##
+
+- Improved index column display.
+
 ## Version 2.9, January 2017 ##
 
 - Allow `%s` in the program strings in `ebib-file-associations`, making it possible to pass command line arguments to the program being called.
@@ -145,7 +164,7 @@ By default, `.bib` files are searched for in your home directory. Since this is 
 
 ## Navigating a `.bib` File ##
 
-Once you've opened a `.bib` file, all the entries in the file are shown in alphabetical order (sorted by entry key) in the index buffer in the top Ebib window. The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. `book`, `article`, etc.).
+Once you've opened a `.bib` file, all the entries in the file are shown in alphabetical order (sorted by entry key, though this is customisable) in the index buffer in the top Ebib window. The first entry is highlighted, meaning it is the current entry. The fields it holds and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field, which tells you what kind of entry you're dealing with (i.e. `book`, `article`, etc.).
 
 Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that Bib(La)TeX requires to be filled. The second group are the optional fields, which do not have to be filled but which Bib(La)TeX will normally add to the bibliography if they do have a value. The third group is the so-called extra fields. These fields are usually ignored by Bib(La)TeX (note that Bib(La)TeX normally ignores *all* fields it does not know), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are defined in the user option "Extra Fields" (`ebib-extra-fields`). Lastly, the fourth set of fields shown in the entry buffer are fields that exist in the entry but are not defined as part of the entry type nor as extra fields.
 
@@ -285,13 +304,13 @@ Similarly, a number of fields are deprecated but still accepted as aliases. Thes
 
 # The Entries List #
 
-By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted alphanumerically on the entry key in ascending order.  You can sort the entries on one of the other columns using the keys `<` and `>`. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with `=`.
+By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted in ascending order on the first column, which by default is the entry key.  You can sort the entries on one of the other columns using the keys `<` and `>`. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with `=`.
 
 The fields that are displayed in the index buffer can be customised with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
 
 You can use any BibTeX / BibLaTeX field to define a column in the index buffer. In addition, there are two column labels with a special meaning: `"Entry Key"`, which displays the entry key, and `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise.
 
-The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. It is not possible to set another column as the default sort key (though you can, of course, sort on them using `<` or `>`).
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort`. 
 
 
 # Searching #
