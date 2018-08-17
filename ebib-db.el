@@ -473,8 +473,8 @@ The sortinfo is set unconditionally, overwriting any existing
 sortinfo."
   (setf (ebib--db-struct-sortinfo db) sortinfo))
 
-(defun ebib-db-custom-sorted-p (db)
-  "Return t if DB has a custom sort."
+(defun ebib-db-get-sortinfo (db)
+  "Return the sort infor for DB."
   (ebib--db-struct-sortinfo db))
 
 (defun ebib-db-get-sort-field (db)

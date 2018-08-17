@@ -255,6 +255,15 @@ not change the default sort."
                         (integer :tag "Width")
                         (boolean :tag "Sort"))))
 
+(defcustom ebib-index-default-sort nil
+  "Default sort field and direction."
+  :group 'ebib
+  :type '(choice (const :tag "Use First Index Column" nil)
+                 (cons :tag "User-Defined Sort"
+                       (string :tag "Sort Field")
+                       (choice (const :tag "Ascending Sort" ascend)
+                               (const :tag "Descending Sort" descend)))))
+
 (defcustom ebib-index-column-separator "  "
   "Separator between columns in the index buffer."
   :group 'ebib
@@ -1576,9 +1585,11 @@ characters in fields."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
   ;; And then stably sort on the sort field.
-  (let* ((field (if (ebib-db-custom-sorted-p db)
-                    (ebib-db-get-sort-field db)
-                  (caar ebib-index-columns)))
+  (let* ((sortinfo (or (ebib-db-get-sortinfo db)
+                       ebib-index-default-sort
+                       (cons (caar ebib-index-columns) 'ascend)))
+         (field (car sortinfo))
+         (direction (cdr sortinfo))
          ;; We use a temp list for sorting, so that the :key argument to
          ;; `cl-stable-sort' can simply be `car' rather than (a much
          ;; heavier) `ebib-get-field-value'. Sorting is much faster
@@ -1590,10 +1601,10 @@ characters in fields."
                                         #'string-collate-lessp
                                       #'string-lessp)
                                :key #'car))
-    (setq keys (mapcar #'cdr list)))
-  ;; Reverse the list if necessary.
-  (if (eq (ebib-db-get-sort-order db) 'descend)
-      (setq keys (nreverse keys)))
+    (setq keys (mapcar #'cdr list))
+    ;; Reverse the list if necessary.
+    (if (eq direction 'descend)
+        (setq keys (nreverse keys))))
   ;; Now return the list of keys.
   keys)
 
