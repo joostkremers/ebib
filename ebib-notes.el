@@ -246,6 +246,16 @@ This function also runs `ebib-notes-search-note-before-hook'."
     (ebib-lower)
     (switch-to-buffer buf)))
 
+
+(defun ebib-display-note-symbol (_field key _db)
+  "Return the note symbol for displaying if a note exists for KEY."
+  (if (ebib--notes-exists-note key)
+      (propertize ebib-notes-symbol
+                  'face '(:height 0.8 :inherit link)
+                  'mouse-face 'highlight)
+    (propertize (make-string (string-width ebib-notes-symbol) ?\s)
+                'face '(:height 0.8))))
+
 (provide 'ebib-notes)
 
 ;;; ebib-notes.el ends here
