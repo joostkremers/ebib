@@ -627,7 +627,8 @@ keywords before Emacs is killed."
 
 (defun ebib--kill-multiline-query-function ()
   "Function to call when killing a multiline edit buffer."
-  (if (and ebib-multiline-mode
+  (if (and (with-no-warnings ; `ebib-multiline-mode' is not defined yet.
+             ebib-multiline-mode)
            (buffer-modified-p))
       (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
     t))
@@ -1613,32 +1614,6 @@ file was modified."
   (interactive)
   (message (ebib-db-get-filename ebib--cur-db)))
 
-(defun ebib-follow-crossref ()
-  "Follow the crossref field and jump to that entry.
-If the current entry's crossref field is empty, search for the
-first entry with the current entry's key in its crossref field."
-  (interactive)
-  (let ((xref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
-    (if xref
-        ;; If the entry has a crossref, see if we can find the relevant entry.
-        (let ((database (seq-find (lambda (db)
-                                    (ebib-db-get-entry xref db 'noerror))
-                                  ebib--databases)))
-          (unless database
-            (error "[Ebib] Entry `%s' not found in any open database" xref))
-          ;; If the entry exists, switch to the relevant database and try to
-          ;; show the entry.
-          (ebib-switch-to-database database)
-          (if (not (ebib--key-in-index-p xref))
-              (error "[Ebib] Crossreference `%s' not visible due to active filter" xref)
-            (ebib--goto-entry-in-index xref)
-            (ebib--update-entry-buffer)))
-      ;; If the entry has no crossref, we assume the user wants to search for
-      ;; entries cross-referencing the current one.
-      (setq ebib--search-string (ebib--get-key-at-point))
-      (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
-      (ebib-search-next))))
-
 (defun ebib-toggle-hidden ()
   "Toggle viewing hidden fields."
   (interactive)
@@ -2025,6 +2000,33 @@ result."
                 (setq result (cons (car f) result))))
             entry))
     result))
+
+
+(defun ebib-follow-crossref ()
+  "Follow the crossref field and jump to that entry.
+If the current entry's crossref field is empty, search for the
+first entry with the current entry's key in its crossref field."
+  (interactive)
+  (let ((xref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+    (if xref
+        ;; If the entry has a crossref, see if we can find the relevant entry.
+        (let ((database (seq-find (lambda (db)
+                                    (ebib-db-get-entry xref db 'noerror))
+                                  ebib--databases)))
+          (unless database
+            (error "[Ebib] Entry `%s' not found in any open database" xref))
+          ;; If the entry exists, switch to the relevant database and try to
+          ;; show the entry.
+          (ebib-switch-to-database database)
+          (if (not (ebib--key-in-index-p xref))
+              (error "[Ebib] Crossreference `%s' not visible due to active filter" xref)
+            (ebib--goto-entry-in-index xref)
+            (ebib--update-entry-buffer)))
+      ;; If the entry has no crossref, we assume the user wants to search for
+      ;; entries cross-referencing the current one.
+      (setq ebib--search-string (ebib--get-key-at-point))
+      (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
+      (ebib-search-next))))
 
 (defun ebib-search-goto-first-entry ()
   "Goto the first entry and issue a message that search is still active."
