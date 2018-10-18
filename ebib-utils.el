@@ -1549,6 +1549,15 @@ are returned as a string."
                         '("A" "An" "At" "Of" "On" "And" "For"))))
       str)))
 
+(defun ebib-display-note-symbol (_field key _db)
+  "Return the note symbol for displaying if a note exists for KEY."
+  (if (ebib--notes-exists-note key)
+      (propertize ebib-notes-symbol
+                  'face '(:height 0.8 :inherit link)
+                  'mouse-face 'highlight)
+    (propertize (make-string (string-width ebib-notes-symbol) ?\s)
+                'face '(:height 0.8))))
+
 (defun ebib-display-www-link (field key db)
   "Return the content of FIELD from KEY in DB as a link.
 This function is mainly intended for the DOI and URL fields."
