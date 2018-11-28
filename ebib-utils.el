@@ -1310,6 +1310,23 @@ argument to a function or not."
   (when (numberp num)
     num))
 
+(defun ebib--store-entry (entry-key fields db &optional timestamp if-exists)
+  "Store the entry defined by ENTRY-KEY and FIELDS into DB.
+Optional argument TIMESTAMP indicates whether a timestamp is to
+be added to the entry.  Note that for a timestamp to be added,
+`ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
+`ebib-db-set-entry'.
+
+Return ENTRY-KEY if storing the entry was succesful, nil
+otherwise.  Depending on the value of IF-EXISTS, storing an entry
+may also result in an error."
+  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
+    (when result
+      (ebib--set-modified t db)
+      (when (and timestamp ebib-use-timestamp)
+        (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
+    result))
+
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
