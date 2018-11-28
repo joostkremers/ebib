@@ -10,6 +10,14 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.12.3, November 2018 ##
+
+- Bug fix: when searching the database, only search visible entries.
+
+## Version 2.12.2, November 2018 ##
+
+- Bug fix: when editing the `crossref` field, offer keys from all databases as completion targets, not just the current one.
+
 ## Version 2.12, August 2018 ##
 
 - Add an option to specify the default sort field and direction. It is no longer necessary to set the desired sort field as the first column in the index buffer, but Ebib still defaults to this if the default sort field and direction are not set explicitly.
