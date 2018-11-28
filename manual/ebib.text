@@ -158,11 +158,11 @@ You can quit Ebib by typing `q`. You will be asked for confirmation, and you wil
 
 ## Opening a `.bib` File ##
 
-Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the file that you specify, and reports how many entries it found, how many `@string` definitions it found, and whether a `@preamble` was found. Note that when Ebib reads a `.bib` file, it only reads entry types (e.g. `book, article, phdthesis` etc.) that it knows about.  Therefore, you should make sure that all the entry types and fields that your databases use are defined. Ebib uses the entry type definitions of `bibtex.el`, which is fairly complete, but if you use non-standard entry types, you may need to customise `bibtex-bibtex-entry-alist` or `bibtex-biblatex-entry-alist`, depending on which of the two you use.
+Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the file that you specify, and reports how many entries it found, how many `@string` definitions it found, and whether a `@preamble` was found.
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged. If Ebib finds something that it cannot parse, it will log an error. If warnings and/or errors occurred during loading, Ebib will issue a message when it finishes loading the `.bib` and direct you to the log buffer.
 
-If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this will happen is when you load a Biblatex file without letting Ebib know the file is Biblatex-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use Biblatex files, make sure to read the section on Biblatex ([Using Biblatex](#using-biblatex)).
+In order to parse `.bib` files, Ebib uses the entry type definitions of `bibtex.el`, which is fairly complete, but if you use non-standard entry types, you may need to customise `bibtex-bibtex-entry-alist` or `bibtex-biblatex-entry-alist`, depending on which of the two you use. If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this may happen is when you load a Biblatex file without letting Ebib know the file is Biblatex-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use Biblatex files, make sure to read the section on Biblatex ([Using Biblatex](#using-biblatex)).
 
 
 ## Preloading `.bib` Files ##
