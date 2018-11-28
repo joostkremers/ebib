@@ -397,15 +397,16 @@ Returns the first modified database, or NIL if none was modified."
     (setq ebib--databases (append ebib--databases (list new-db)))
     new-db))
 
-(defun ebib--list-keys ()
-  "Return a list of entry keys in the current database.
+(defun ebib--list-keys (&optional db)
+  "Return a list of entry keys in DB.
 If a filter is active, only the keys of entries that match the
-filter are returned.  The returned list is sorted."
-  (when ebib--cur-db
-    (let ((keys (if (ebib-db-get-filter ebib--cur-db)
-                    (ebib--filters-run-filter ebib--cur-db)
-                  (ebib-db-list-keys ebib--cur-db))))
-      (ebib--sort-keys-list keys ebib--cur-db))))
+filter are returned.  The returned list is sorted.  DB defaults
+to the current database."
+  (or db (setq db ebib--cur-db))
+  (let ((keys (if (ebib-db-get-filter db)
+                  (ebib--filters-run-filter db)
+                (ebib-db-list-keys db))))
+    (ebib--sort-keys-list keys db)))
 
 ;;; Main
 
@@ -2939,11 +2940,12 @@ was called interactively."
 
 (defun ebib--edit-crossref (field)
   "Edit cross-referencing FIELD."
-  (ebib--ifstring (key (completing-read (format "Key to insert in `%s': " field) (ebib-db-list-keys ebib--cur-db) nil t nil 'ebib--key-history))
-      (progn
-        (ebib-db-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
-        (ebib--redisplay-current-field)
-        (ebib--set-modified t))))
+  (let ((keys (apply #'append (mapcar #'ebib-db-list-keys ebib--databases))))
+    (ebib--ifstring (key (completing-read (format "Key to insert in `%s': " field) keys nil t nil 'ebib--key-history))
+        (progn
+          (ebib-db-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
+          (ebib--redisplay-current-field)
+          (ebib--set-modified t)))))
 
 (defun ebib--edit-keywords-field ()
   "Edit the keywords field."
