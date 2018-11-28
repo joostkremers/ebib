@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 6.1 from ebib.texi.
+This is ebib.info, produced by makeinfo version 6.5 from ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -21,6 +21,7 @@ as a zip or tar archive on Github’s releases page.)
 editing BibTeX files.  It is a program in itself, which just happens to
 make use of Emacs as a working environment, in the same way that for
 example Gnus is.
+
 * Menu:
 
 * News::
@@ -424,6 +425,7 @@ database.  You can also leave Ebib with the command ‘z’.  However,
 unlike ‘q’, which completely quits Ebib, ‘z’ only lowers it, so that it
 remains active in the background.  The ‘.bib’ files that you have opened
 remain loaded, and you can return to them by typing ‘M-x ebib’ again.
+
 * Menu:
 
 * Opening a bib File::
@@ -441,7 +443,7 @@ Loading a ‘.bib’ file into Ebib is done with the command ‘o’.  Ebib
 reads the file that you specify, and reports how many entries it found,
 how many ‘@string’ definitions it found, and whether a ‘@preamble’ was
 found.  Note that when Ebib reads a ‘.bib’ file, it only reads entry
-types (e.g.  ‘book, article, phdthesis’ etc.)  that it knows about.
+types (e.g. ‘book, article, phdthesis’ etc.)  that it knows about.
 Therefore, you should make sure that all the entry types and fields that
 your databases use are defined.  Ebib uses the entry type definitions of
 ‘bibtex.el’, which is fairly complete, but if you use non-standard entry
@@ -497,7 +499,7 @@ in the index buffer in the top Ebib window.  The first entry is
 highlighted, meaning it is the current entry.  The fields it holds and
 their values are shown in the entry buffer in the bottom Ebib window.
 The first field is the type field, which tells you what kind of entry
-you’re dealing with (i.e.  ‘book’, ‘article’, etc.).
+you’re dealing with (i.e. ‘book’, ‘article’, etc.).
 
    Below the type field, Ebib displays (up to) four sets of fields.  The
 first set are the so-called required fields, the fields that Bib(La)TeX
@@ -565,6 +567,7 @@ File: ebib.info,  Node: Editing the Database,  Next: Saving a Database,  Prev: G
 Of course, being able to open and view ‘.bib’ files is only half the
 fun.  One needs to be able to edit the files as well.  Ebib’s essential
 editing facilities are discussed here.
+
 * Menu:
 
 * Adding and Deleting Entries::
@@ -879,6 +882,7 @@ Compared to BibTeX, Biblatex has a greatly expanded number of fields, a
 somewhat different set of entry types and a much more complex system of
 field value inheritances.  Ebib can handle both kinds of files, provided
 it is set up for the right “dialect”.
+
 * Menu:
 
 * Setting the BibTeX Dialect::
@@ -1037,27 +1041,33 @@ term is found, Ebib gives a message saying so, similarly if the search
 term was not found.
 
    A search term may of course appear more than once in the database.
-To search for the next occurrence, type ‘/’ again (or, alternatively
-type ‘RET’).  This continues searching for the search term in the rest
-of the database.  Again, the first entry found to contain the search
-string is displayed.  Note that the search does not wrap: if the end of
-the database is reached, Ebib stops searching and informs you that no
-further occurrence of the search string was found.  If you want to
-continue searching from the top, type ‘g’ and then continue the search
-with ‘/’ or ‘RET’.
+To search for the next occurrence, type ‘RET’.  This continues searching
+for the search term in the rest of the database.  Again, the first entry
+found to contain the search string is displayed.  Note that the search
+does not wrap: if the end of the database is reached, Ebib stops
+searching and informs you that no further occurrence of the search
+string was found.  If you want to continue searching from the top, type
+‘g’ and then continue the search with ‘RET’.
 
    Note that once you’ve started a search with ‘/’, Ebib activates a
 transient key map called ‘ebib-search-map’.  It is this map that holds
-the bindings of ‘/’ and ‘RET’ to continue searching after the current
-entry and of the key ‘g’ to jump to the top of the database.  You can,
-of course, bind or rebind keys in this map.
+the binding for ‘RET’ to continue searching after the current entry and
+of the key ‘g’ to jump to the top of the database.  There are also
+bindings for the left and right cursor keys, which take you to the
+previous and next database, so you can continue searching there.
 
    Exiting a search (i.e., getting rid of the transient key map) is done
-by pressing any key other than ‘/’, ‘RET’ or ‘g’.  The search is ended
-and the command associated with this key is executed normally.  If you
-want to repeat a previous search, you can pass a prefix argument to ‘/’.
-So typing ‘C-u /’ (or any other prefix argument) starts searching for
-the previous search string again.
+by pressing any key other than ‘RET’, ‘g’ or the left/right cursor keys.
+The search is ended and the command associated with this key is executed
+normally.  If you want to repeat a previous search, you can pass a
+prefix argument to ‘/’.  So typing ‘C-u /’ starts searching for the
+previous search string again.
+
+   Note that if you start a search in a filtered database (i.e., a
+database in which not all entries are visible; see the next section),
+only the visible entries are searched.  If the search string is present
+in the database but not in one of the visible entries, Ebib will respond
+with a “search string not found” message.
 
 
 File: ebib.info,  Node: Filters,  Prev: Simple Searches,  Up: Searching
@@ -1077,6 +1087,7 @@ want: you can select all entries that do _not_ contain “Jones” in the
 the ‘author’ field, and “symbiotic hibernation” in the ‘keyword’ field,
 etc.  Basically, the filter can consist of an arbitary number of search
 criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
+
 * Menu:
 
 * Simple Selection::
@@ -1152,7 +1163,7 @@ you want to filter with.  Ebib will then update the index buffer.
 
    It is also possible to perform a logical ‘and’ on the filter.  Use
 this if you want to select those entries that contain “Jones” in the
-‘author’ field and e.g.  “symbiotic hibernation” in the ‘keyword’ field.
+‘author’ field and e.g. “symbiotic hibernation” in the ‘keyword’ field.
 A logical ‘and’ operation is done with the key ‘&’.  (Note: this is the
 same key that is used to create the filter.  In fact, you can create a
 filter with ‘|’ as well: when used in an unfiltered database, ‘&’ and
@@ -1299,7 +1310,7 @@ to the database.  The command that creates the filter is
   (interactive "nNumber of days: ")
   ;; save the database's current filter, if there is one.
   (let ((filter (ebib-db-get-filter ebib--cur-db)))
-    (when filter (setq ebib--filters-last-filter filter)))
+    (when filter (setq ebib--filters-last-filter filter))) 
   (let*
       ;; calculate the from-date in Emacs' time format
       ((date (time-subtract (current-time) (days-to-time days)))
@@ -1463,6 +1474,7 @@ used in the document.  Note, however, that this command does not add
 cross-referenced entries to the newly created ‘.bib’ file, nor does it
 add ‘@String’ definitions and the ‘@Preamble’.  So make sure to add
 those after using ‘ebib-create-bib-from-bbl’.
+
 * Menu:
 
 * Key Bindings::
@@ -1970,6 +1982,7 @@ is then appended with the extension ‘.pdf’.
    Of course, the function in ‘ebib-name-transform-function’ does not
 have to be a lambda.  It can also be the name of a function that you’ve
 defined for the purpose.
+
 * Menu:
 
 * Editing the file field::
@@ -2080,6 +2093,7 @@ searched.
    All three hooks are customisable.  For example, if you prefer not to
 narrow the buffer, simply remove the corresponding functions from the
 hooks.
+
 * Menu:
 
 * Customising the notes template::
@@ -2835,6 +2849,7 @@ using the menu «Ebib | Options | Customize Ebib».
 be customised as well.)  This file contains normal Lisp code and is the
 best way to customise key bindings (as discussed in the next section),
 but it can in fact be used to run any Lisp code.
+
 * Menu:
 
 * Modifying Key Bindings::
@@ -2874,152 +2889,152 @@ which are rather awkward to type, can be redefined as follows:
 
 Tag Table:
 Node: Top186
-Node: News1485
-Ref: #news1575
-Node: Version 212 August 20181903
-Ref: #version-2.12-august-20182058
-Node: Version 21112 July 20182338
-Ref: #version-2.11.12-july-20182528
-Node: Version 211 January 20172961
-Ref: #version-2.11-january-20173152
-Node: Version 210 January 20173195
-Ref: #version-2.10-january-20173386
-Node: Version 29 January 20173425
-Ref: #version-2.9-january-20173606
-Node: 19 December 20163774
-Ref: #december-20163928
-Node: 7 December 20164389
-Ref: #december-2016-14533
-Node: 5 December 20164575
-Ref: #december-2016-24718
-Node: 7 November 20165410
-Ref: #november-20165564
-Node: Version 28 26 October 20166354
-Ref: #version-2.8-26-october-20166549
-Node: Version 27 22 September 20167987
-Ref: #version-2.7-22-september-20168197
-Node: Version 263 31 August 20168634
-Ref: #version-2.6.3-31-august-20168807
-Node: Installation9226
-Ref: #installation9344
-Node: Package manager9465
-Ref: #package-manager9594
-Node: Debian and Ubuntu9945
-Ref: #debian-and-ubuntu10106
-Node: Manual installation10240
-Ref: #manual-installation10403
-Node: Starting Ebib10806
-Ref: #starting-ebib10962
-Node: Upgrading from Ebib 1x11870
-Ref: #upgrading-from-ebib-1.x12018
-Node: Getting Started15135
-Ref: #getting-started15275
-Node: Opening a bib File17649
-Ref: #opening-a-.bib-file17803
-Node: Preloading bib Files19514
-Ref: #preloading-.bib-files19702
-Node: Navigating a bib File20508
-Ref: #navigating-a-.bib-file20703
+Node: News1486
+Ref: #news1576
+Node: Version 212 August 20181904
+Ref: #version-2.12-august-20182059
+Node: Version 21112 July 20182339
+Ref: #version-2.11.12-july-20182529
+Node: Version 211 January 20172962
+Ref: #version-2.11-january-20173153
+Node: Version 210 January 20173196
+Ref: #version-2.10-january-20173387
+Node: Version 29 January 20173426
+Ref: #version-2.9-january-20173607
+Node: 19 December 20163775
+Ref: #december-20163929
+Node: 7 December 20164390
+Ref: #december-2016-14534
+Node: 5 December 20164576
+Ref: #december-2016-24719
+Node: 7 November 20165411
+Ref: #november-20165565
+Node: Version 28 26 October 20166355
+Ref: #version-2.8-26-october-20166550
+Node: Version 27 22 September 20167988
+Ref: #version-2.7-22-september-20168198
+Node: Version 263 31 August 20168635
+Ref: #version-2.6.3-31-august-20168808
+Node: Installation9227
+Ref: #installation9345
+Node: Package manager9466
+Ref: #package-manager9595
+Node: Debian and Ubuntu9946
+Ref: #debian-and-ubuntu10107
+Node: Manual installation10241
+Ref: #manual-installation10404
+Node: Starting Ebib10807
+Ref: #starting-ebib10963
+Node: Upgrading from Ebib 1x11871
+Ref: #upgrading-from-ebib-1.x12019
+Node: Getting Started15136
+Ref: #getting-started15276
+Node: Opening a bib File17651
+Ref: #opening-a-.bib-file17805
+Node: Preloading bib Files19515
+Ref: #preloading-.bib-files19703
+Node: Navigating a bib File20509
+Ref: #navigating-a-.bib-file20704
 Node: Starting a New bib File24035
 Ref: #starting-a-new-.bib-file24205
 Node: Editing the Database24497
 Ref: #editing-the-database24652
-Node: Adding and Deleting Entries25029
-Ref: #adding-and-deleting-entries25206
-Node: Editing Fields Values27786
-Ref: #editing-fields-values27984
-Node: Editing Multiline Values30633
-Ref: #editing-multiline-values30826
-Node: Undefined Fields33340
-Ref: #undefined-fields33509
-Node: Hidden Fields34505
-Ref: #hidden-fields34654
-Node: Timestamps35550
-Ref: #timestamps35712
-Node: Copy Cut Kill Paste Yank and Delete37775
-Ref: #copy-cut-kill-paste-yank-and-delete37979
-Node: Saving a Database38931
-Ref: #saving-a-database39079
-Node: Using Biblatex40754
-Ref: #using-biblatex40892
-Node: Setting the BibTeX Dialect41219
-Ref: #setting-the-bibtex-dialect41388
-Node: Alias Types and Fields43428
-Ref: #alias-types-and-fields43589
-Node: The Entries List45775
-Ref: #the-entries-list45909
-Node: Searching47556
-Ref: #searching47701
-Node: Simple Searches47743
-Ref: #simple-searches47859
-Node: Filters50558
-Ref: #filters50658
-Node: Simple Selection51732
-Ref: #simple-selection51861
-Node: Complex Filters53555
-Ref: #complex-filters53717
-Node: Storing and Saving Filters57760
-Ref: #storing-and-saving-filters57943
-Node: Special Filters60822
-Ref: #special-filters61003
-Node: An Example Listing Recent Additions62358
-Ref: #an-example-listing-recent-additions62587
-Node: Properties of Filtered Databases64755
-Ref: #properties-of-filtered-databases64952
-Node: Accessing BibTeX Databases outside Ebib66610
-Ref: #accessing-bibtex-databases-outside-ebib66816
-Node: Key Bindings71736
-Ref: #key-bindings71892
-Node: Defining Citation Commands72656
-Ref: #defining-citation-commands72889
-Node: Associating a Database with a LaTeX File78805
-Ref: #associating-a-database-with-a-latex-file79045
-Node: Cross-referencing81988
-Ref: #cross-referencing82158
-Node: Marking Entries85471
-Ref: #marking-entries85619
-Node: Printing the Database86602
-Ref: #printing-the-database86762
-Node: Calling a Browser90569
-Ref: #calling-a-browser90719
-Node: Viewing Files93351
-Ref: #viewing-files93483
-Node: Editing the file field97276
-Ref: #editing-the-file-field97411
-Node: Notes files98770
-Ref: #notes-files98904
-Node: Customising the notes template103049
-Ref: #customising-the-notes-template103198
-Node: Managing a reading list106244
-Ref: #managing-a-reading-list106406
-Node: Window Management109501
-Ref: #window-management109660
-Node: Creating Entry Stubs112836
-Ref: #creating-entry-stubs112998
-Node: @Preamble Definition113999
-Ref: #preamble-definition114163
-Node: @String Definitions116149
-Ref: #string-definitions116300
-Node: @Comments119816
-Ref: #comments119944
-Node: Managing Keywords120309
-Ref: #managing-keywords120454
-Node: Sorting the bib File126363
-Ref: #sorting-the-.bib-file126536
-Node: Merging and Importing129675
-Ref: #merging-and-importing129840
-Node: Exporting Entries131616
-Ref: #exporting-entries131778
-Node: Multiple Identical Fields133753
-Ref: #multiple-identical-fields133932
-Node: Multiline Edit Buffers135841
-Ref: #multiline-edit-buffers136013
-Node: The Options Menu140143
-Ref: #the-options-menu140291
-Node: Customisation140912
-Ref: #customisation141023
-Node: Modifying Key Bindings141966
-Ref: #modifying-key-bindings142093
+Node: Adding and Deleting Entries25030
+Ref: #adding-and-deleting-entries25207
+Node: Editing Fields Values27787
+Ref: #editing-fields-values27985
+Node: Editing Multiline Values30634
+Ref: #editing-multiline-values30827
+Node: Undefined Fields33341
+Ref: #undefined-fields33510
+Node: Hidden Fields34506
+Ref: #hidden-fields34655
+Node: Timestamps35551
+Ref: #timestamps35713
+Node: Copy Cut Kill Paste Yank and Delete37776
+Ref: #copy-cut-kill-paste-yank-and-delete37980
+Node: Saving a Database38932
+Ref: #saving-a-database39080
+Node: Using Biblatex40755
+Ref: #using-biblatex40893
+Node: Setting the BibTeX Dialect41221
+Ref: #setting-the-bibtex-dialect41390
+Node: Alias Types and Fields43430
+Ref: #alias-types-and-fields43591
+Node: The Entries List45777
+Ref: #the-entries-list45911
+Node: Searching47558
+Ref: #searching47703
+Node: Simple Searches47745
+Ref: #simple-searches47861
+Node: Filters50909
+Ref: #filters51009
+Node: Simple Selection52084
+Ref: #simple-selection52213
+Node: Complex Filters53907
+Ref: #complex-filters54069
+Node: Storing and Saving Filters58111
+Ref: #storing-and-saving-filters58294
+Node: Special Filters61173
+Ref: #special-filters61354
+Node: An Example Listing Recent Additions62709
+Ref: #an-example-listing-recent-additions62938
+Node: Properties of Filtered Databases65107
+Ref: #properties-of-filtered-databases65304
+Node: Accessing BibTeX Databases outside Ebib66962
+Ref: #accessing-bibtex-databases-outside-ebib67168
+Node: Key Bindings72089
+Ref: #key-bindings72245
+Node: Defining Citation Commands73009
+Ref: #defining-citation-commands73242
+Node: Associating a Database with a LaTeX File79158
+Ref: #associating-a-database-with-a-latex-file79398
+Node: Cross-referencing82341
+Ref: #cross-referencing82511
+Node: Marking Entries85824
+Ref: #marking-entries85972
+Node: Printing the Database86955
+Ref: #printing-the-database87115
+Node: Calling a Browser90922
+Ref: #calling-a-browser91072
+Node: Viewing Files93704
+Ref: #viewing-files93836
+Node: Editing the file field97630
+Ref: #editing-the-file-field97765
+Node: Notes files99124
+Ref: #notes-files99258
+Node: Customising the notes template103404
+Ref: #customising-the-notes-template103553
+Node: Managing a reading list106599
+Ref: #managing-a-reading-list106761
+Node: Window Management109856
+Ref: #window-management110015
+Node: Creating Entry Stubs113191
+Ref: #creating-entry-stubs113353
+Node: @Preamble Definition114354
+Ref: #preamble-definition114518
+Node: @String Definitions116504
+Ref: #string-definitions116655
+Node: @Comments120171
+Ref: #comments120299
+Node: Managing Keywords120664
+Ref: #managing-keywords120809
+Node: Sorting the bib File126718
+Ref: #sorting-the-.bib-file126891
+Node: Merging and Importing130030
+Ref: #merging-and-importing130195
+Node: Exporting Entries131971
+Ref: #exporting-entries132133
+Node: Multiple Identical Fields134108
+Ref: #multiple-identical-fields134287
+Node: Multiline Edit Buffers136196
+Ref: #multiline-edit-buffers136368
+Node: The Options Menu140498
+Ref: #the-options-menu140646
+Node: Customisation141267
+Ref: #customisation141378
+Node: Modifying Key Bindings142322
+Ref: #modifying-key-bindings142449
 
 End Tag Table
 
