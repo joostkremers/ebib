@@ -134,9 +134,11 @@ Secondly, a few user options have been renamed because their types have changed.
 
 Note that even if you customised `ebib-biblatex-inheritance`, there is most likely no need to customise its replacement `ebib-biblatex-inheritances`, because the latter is set up with the default inheritance rules that Biblatex defines.
 
-Another thing to note is that four user options have a new default value. First, the default location of the rc file has moved to `~/.emacs.d/ebibrc`, in line with the recommendation to keep all Emacs-related files in `~/.emacs.d`. If you kept an `.ebibrc` file in your home directory, move it to `~/.emacs.d`. Second, a `\documentclass` definition has been added to the user options "Latex Preamble" (`ebib-latex-preamble`) and "Print Preamble" (`ebib-print-preamble`). If you customised one of these, you should add a document class specification, otherwise the LaTeX file won't compile. Third, the option `ebib-save-xrefs-first` now defaults to `t`.
+Another thing to note is that a `\documentclass` definition has been added to the user options "Latex Preamble" (`ebib-latex-preamble`) and "Print Preamble" (`ebib-print-preamble`). If you customised one of these, you should add a document class specification, otherwise the LaTeX file won't compile. 
 
-Lastly, if you use Biblatex, make sure to read the section on using Ebib with Biblatex files.
+Lastly, the option `ebib-save-xrefs-first` now defaults to `t`.
+
+Also note: if you use Biblatex, make sure to read the section on using Ebib with Biblatex files.
 
 
 # Getting Started #
@@ -1004,8 +1006,6 @@ The same is true for the printing options that are in the Print menu. When set o
 # Customisation #
 
 Ebib can be customised through Emacs' standard customisation interface. The relevant customisation group is (obviously) called `ebib`, which has five subgroups: `ebib-faces`, `ebib-filters`, `ebib-notes`, and `ebib-keywords`, whose functions should be obvious, and `ebib-windows`, where options for Ebib's window management can be set. All options are documented in the customisation buffers. You can go to Ebib's customisation buffer with `M-x customize-group RET ebib RET`, or by using the menu «Ebib | Options | Customize Ebib».
-
-Another way to customise Ebib is to use the initialisation file `~/.emacs.d/ebibrc`. (Actually, the location and name of this file can be customised as well.) This file contains normal Lisp code and is the best way to customise key bindings (as discussed in the next section), but it can in fact be used to run any Lisp code.
 
 
 ## Modifying Key Bindings ##
