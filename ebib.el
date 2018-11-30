@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.12
+;; Version: 2.13
 ;; Keywords: text bibtex
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.3"))
 

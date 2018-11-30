@@ -10,6 +10,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.13, November 2018 ##
+
+- Use a separate index buffer for each open `.bib` file. Filling the index buffer can be slow for large `.bib` files, because of the need to calculate the tabulated columns.
+
 ## Version 2.12.3, November 2018 ##
 
 - Bug fix: when searching the database, only search visible entries.
