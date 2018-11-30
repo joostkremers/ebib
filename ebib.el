@@ -443,8 +443,8 @@ may also result in an error."
         (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
     result))
 
-(defun ebib--list-keys ()
-  "Return a list of entry keys in the current database.
+(defun ebib--list-keys (&optional db)
+  "Return a list of entry keys in DB.
 If a filter is active, only the keys of entries that match the
 filter are returned.  The returned list is sorted.  DB defaults
 to the current database."
@@ -1891,10 +1891,10 @@ whose contents is appended to the file the user enters."
   (let ((insert-default-directory (not ebib--export-filename)))
     (ebib--ifstring (filename (read-file-name
                            prompt-string "~/" nil nil ebib--export-filename))
-                (with-temp-buffer
-                  (funcall insert-fn)
-                  (append-to-file (point-min) (point-max) filename)
-                  (setq ebib--export-filename filename)))))
+        (with-temp-buffer
+          (funcall insert-fn)
+          (append-to-file (point-min) (point-max) filename)
+          (setq ebib--export-filename filename)))))
 
 (defun ebib--export-entries (entries &optional source-db filename)
   "Export ENTRIES from SOURCE-DB to FILENAME.
@@ -1994,8 +1994,8 @@ string, search for the previous search string instead."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (ebib--ifstring ((search-str (or (and arg ebib--search-string)
-                                  (read-string "Search database for: "))))
+     (ebib--ifstring (search-str (or (and arg ebib--search-string)
+                                 (read-string "Search database for: ")))
          (progn (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
                 (setq ebib--search-string search-str)
                 ;; First we search the current entry.
@@ -3118,8 +3118,8 @@ If FILE is not in (a subdirectory of) one of the directories in
       (ebib--ifstring (new-contents (read-string (format "%s: " cur-field)
                                              (if init-contents
                                                  (cons init-contents 0))))
-                  (ebib-set-field-value cur-field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite unbraced?)
-                  (ebib-db-remove-field-value cur-field (ebib--get-key-at-point) ebib--cur-db))
+          (ebib-set-field-value cur-field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite unbraced?)
+        (ebib-db-remove-field-value cur-field (ebib--get-key-at-point) ebib--cur-db))
       (ebib--redisplay-current-field)
       (ebib--set-modified t))))
 
