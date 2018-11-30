@@ -170,6 +170,15 @@ string where point should be located."
             (ebib--notes-locate-note key)))
     (file-readable-p (ebib--create-notes-file-name key))))
 
+(defun ebib-notes-display-note-symbol (_field key _db)
+  "Return the note symbol for displaying if a note exists for KEY."
+  (if (ebib--notes-exists-note key)
+      (propertize ebib-notes-symbol
+                  'face '(:height 0.8 :inherit link)
+                  'mouse-face 'highlight)
+    (propertize (make-string (string-width ebib-notes-symbol) ?\s)
+                'face '(:height 0.8))))
+
 ;;; One file per note.
 
 (defun ebib--create-notes-file-name (key)

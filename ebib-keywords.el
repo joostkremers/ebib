@@ -37,7 +37,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'dash)
 (require 'ebib-utils)
 (require 'ebib-db)
 
@@ -145,7 +144,9 @@ Note: KEYWORDS should be unbraced."
 KEYWORDS is a list of keywords.  The return value is a list of
 keywords that do not exist in DB."
   (let ((all-keywords (ebib--keywords-for-database db)))
-    (--remove (member-ignore-case it all-keywords) keywords)))
+    (seq-remove (lambda (elt)
+                  (member-ignore-case elt all-keywords))
+                keywords)))
 
 (defun ebib--keywords-for-database (db)
   "Return the list of keywords for database DB.

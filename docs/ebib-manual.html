@@ -108,7 +108,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#debian-and-ubuntu">Debian and Ubuntu</a></li>
 <li><a href="#manual-installation">Manual installation</a></li>
 <li><a href="#starting-ebib">Starting Ebib</a></li>
-<li><a href="#upgrading-from-ebib-1.x">Upgrading from Ebib 1.x</a></li>
 </ul></li>
 <li><a href="#getting-started">Getting Started</a><ul>
 <li><a href="#opening-a-.bib-file">Opening a <code>.bib</code> File</a></li>
@@ -256,7 +255,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="debian-and-ubuntu">Debian and Ubuntu</h2>
 <p>Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro’s package manager: <code>apt-get install elpa-ebib</code>.</p>
 <h2 id="manual-installation">Manual installation</h2>
-<p>It’s also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you’re doing so detailed instructions are omitted here. Just be sure to also install Ebib’s dependencies, the <a href="https://github.com/magnars/dash.el">dash</a> and <a href="https://github.com/joostkremers/parsebib">parsebib</a> libraries.</p>
+<p>It’s also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you’re doing so detailed instructions are omitted here. Just be sure to also install the <a href="https://github.com/joostkremers/parsebib">parsebib</a> package, which Ebib depends on.</p>
 <h2 id="starting-ebib">Starting Ebib</h2>
 <p>Once Ebib has been installed and is loaded, you can start it with <code>M-x ebib</code>. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs’ init file:</p>
 <pre><code>(global-set-key &quot;\C-ce&quot; &#39;ebib)</code></pre>
@@ -264,23 +263,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>You can also call Ebib from an Eshell command line. This in itself is entirely unspectacular (in Eshell, you can invoke any Emacs function), but the nice thing is that you can then provide a filename to load. So, provided a file <code>references.bib</code> exists in <code>~/Work/Papers/</code>, the following command:</p>
 <pre><code>~/Work/Papers $ ebib references.bib</code></pre>
 <p>starts Ebib and loads the file <code>references.bib</code>.</p>
-<h2 id="upgrading-from-ebib-1.x">Upgrading from Ebib 1.x</h2>
-<p>If you upgrade from Ebib 1.x to the current version 2, there are a few things you need to be aware of. First, Ebib 2 does not support Emacs versions below 24.3. If you’re on an older version of Emacs, either upgrade Emacs, or do not upgrade Ebib. Ebib 1.x will continue to be available in the <code>pasture</code> branch on Github or as a package on the Github releases page, so if for some reason you do not want to upgrade, you can continue to use this branch. Ebib 1.x will continue to be supported with bug fixes and possibly the occasional (small) feature addition, though no major changes will take place.</p>
-<p>If you do upgrade, it is important to note that a few customisation options have changed. If you never made any customisations to Ebib, the upgrade should not pose any problems. If you have, however, read on.</p>
-<p>The most important change is that the variable <code>ebib-entry-types</code> (option “Entry Types”) has been removed. Ebib now uses the entry type definitions of the built-in <code>bibtex-mode</code>, which means that if you wish to customise the entry types, you should customise <code>bibtex-BibTeX-entry-alist</code> or <code>bibtex-biblatex-entry-alist</code>.</p>
-<p>Secondly, a few user options have been renamed because their types have changed. (Mainly from <code>symbol</code> to <code>string</code>). The name change means that existing customisations are lost, but it also prevents Ebib from throwing cryptic errors and refusing to run. If you customised any of the following options, you should redo them after upgrading Ebib (and preferably remove the old ones from your init file):</p>
-<ul>
-<li><code>ebib-default-entry</code>: renamed to <code>ebib-default-entry-type</code>.</li>
-<li><code>ebib-additional-fields</code>: renamed to <code>ebib-extra-fields</code>.</li>
-<li><code>ebib-standard-url-field</code>: renamed to <code>ebib-url-field</code>.</li>
-<li><code>ebib-standard-file-field</code>: renamed to <code>ebib-file-field</code>.</li>
-<li><code>ebib-standard-doi-field</code>: renamed to <code>ebib-doi-field</code>.</li>
-<li><code>ebib-biblatex-inheritance</code>: renamed to <code>ebib-biblatex-inheritances</code> (note the <code>s</code>).</li>
-</ul>
-<p>Note that even if you customised <code>ebib-biblatex-inheritance</code>, there is most likely no need to customise its replacement <code>ebib-biblatex-inheritances</code>, because the latter is set up with the default inheritance rules that Biblatex defines.</p>
-<p>Another thing to note is that a <code>\documentclass</code> definition has been added to the user options “Latex Preamble” (<code>ebib-latex-preamble</code>) and “Print Preamble” (<code>ebib-print-preamble</code>). If you customised one of these, you should add a document class specification, otherwise the LaTeX file won’t compile.</p>
-<p>Lastly, the option <code>ebib-save-xrefs-first</code> now defaults to <code>t</code>.</p>
-<p>Also note: if you use Biblatex, make sure to read the section on using Ebib with Biblatex files.</p>
 <h1 id="getting-started">Getting Started</h1>
 <p>A BibTeX database is somewhat of a free-form database. A BibTeX entry consists of a set of field-value pairs. Furthermore, each entry is known by a unique key. The way that Ebib navigates this database is by having two windows, one that contains a list of all the entry keys in the database, and one that contains the fields and values of the currently highlighted entry.</p>
 <p>When Ebib is started, the current windows in Emacs are hidden and the Emacs frame is divided into two windows. The top one contains a buffer that is called the <em>index buffer</em>, while the lower window contains the <em>entry buffer</em>. When a database is loaded, the index buffer holds a list of all the keys in the database plus some additional information for each entry: the author or editor, its year of publication, and the title. You can move through the entries with the cursor keys. In the entry buffer, the fields of the currently highlighted entry are shown, with their values.</p>
@@ -398,9 +380,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>To see what filters are currently stored, use <code>F V</code>. If you want to rename a filter, you can do so with <code>F R</code>.</p>
 <p>Note that cancelling a filter with <code>F c</code> does not delete it from the list of stored filters, it will remain available for later application. If you want to delete a filter from the list of stored filters, use <code>F d</code>. You can also delete all stored filters with <code>F D</code>. These deletion commands do not ask for confirmation, but if you delete any filters by accident, you can reload them from <code>~/.emacs.d/ebib-filters</code> with <code>F l</code>.</p>
 <h3 id="special-filters">Special Filters</h3>
-<p>Filters are essentially Lisp expressions that consist of the functions <code>and</code>, <code>or</code>, and <code>not</code>, together with a special macro <code>contains</code>. However, filters are not limited to these forms. They can essentially contain any Lisp expression. It is not possible to create such special filters interactively, but it is possible to write such filters and put them in a filter file, or to write a function that creates a special filter.</p>
-<p>A filter is a Lisp expression that should return either <code>t</code> or <code>nil</code>, indicating whether the entry being tested matches the filter or not. The contents of the entry is available in a variable <code>entry</code>. This variable is given a value by the function that runs the filter, but it is not passed as an argument. Rather, it is a local dynamic variable, which means that the file that defines the filter function should have the variable <code>lexical-binding</code> set to <code>nil</code>.</p>
-<p>The value of <code>entry</code> is an alist of fields and their values. These include the fields <code>=key=</code> and <code>=type=</code> for the entry key and type:</p>
+<p>Filters are essentially Lisp expressions that consist of the functions <code>and</code>, <code>or</code>, and <code>not</code>, together with a special macro <code>contains</code>. However, filters are not limited to these forms. They can essentially contain any Lisp expression. It is not possible to create such special filters interactively, but it is possible to write such filters and put them in a filter file, or to write a function that creates such a special filter.</p>
+<p>A filter is a Lisp expression that should return either <code>t</code> or <code>nil</code>, indicating whether the entry being tested matches the filter or not. The contents of the entry is available in a variable <code>ebib-entry</code>. This variable is given a value by the function that runs the filter, but it is not passed as an argument. Rather, it is a dynamic variable, which means that the file that defines the filter function should declare the variable with <code>(defvar ebib-entry)</code>. When the filter is run, the value of <code>ebib-entry</code> is an alist of fields and their values. These include the fields <code>=key=</code> and <code>=type=</code> for the entry key and type:</p>
 <pre><code>((&quot;author&quot; . &quot;{Noam Chomsky}&quot;)
  (&quot;title&quot; . &quot;{Syntactic Structures}&quot;)
  (&quot;publisher&quot; . &quot;{The Hague: Mouton}&quot;)
@@ -415,19 +396,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb4"><pre class="sourceCode lisp"><code class="sourceCode commonlisp"><a class="sourceLine" id="cb4-1" title="1">(<span class="kw">defun</span><span class="fu"> ebib-list-recent </span>(days)</a>
 <a class="sourceLine" id="cb4-2" title="2">  <span class="st">&quot;List entries created in the last DAYS days.&quot;</span></a>
 <a class="sourceLine" id="cb4-3" title="3">  (interactive <span class="st">&quot;nNumber of days: &quot;</span>)</a>
-<a class="sourceLine" id="cb4-4" title="4">  <span class="co">;; save the database&#39;s current filter, if there is one.</span></a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="co">;; Save the database&#39;s current filter, if there is one.</span></a>
 <a class="sourceLine" id="cb4-5" title="5">  (<span class="kw">let</span> ((filter (ebib-db-get-filter ebib--cur-db)))</a>
-<a class="sourceLine" id="cb4-6" title="6">    (<span class="kw">when</span> filter (<span class="kw">setq</span> ebib--filters-last-filter filter))) </a>
+<a class="sourceLine" id="cb4-6" title="6">    (<span class="kw">when</span> filter (<span class="kw">setq</span> ebib--filters-last-filter filter)))</a>
 <a class="sourceLine" id="cb4-7" title="7">  (<span class="kw">let*</span></a>
-<a class="sourceLine" id="cb4-8" title="8">      <span class="co">;; calculate the from-date in Emacs&#39; time format</span></a>
+<a class="sourceLine" id="cb4-8" title="8">      <span class="co">;; Calculate the from-date in Emacs&#39; time format.</span></a>
 <a class="sourceLine" id="cb4-9" title="9">      ((date (time-subtract (current-time) (days-to-time days)))</a>
-<a class="sourceLine" id="cb4-10" title="10">       <span class="co">;; create a Lisp expression that will function as the filter</span></a>
+<a class="sourceLine" id="cb4-10" title="10">       <span class="co">;; Create a Lisp expression that will function as the filter.</span></a>
 <a class="sourceLine" id="cb4-11" title="11">       (filter `(ebib--newer-than (<span class="kw">quote</span> ,date))))</a>
-<a class="sourceLine" id="cb4-12" title="12">    <span class="co">;; install it as the curretn database&#39;s filter</span></a>
+<a class="sourceLine" id="cb4-12" title="12">    <span class="co">;; Install it as the current database&#39;s filter.</span></a>
 <a class="sourceLine" id="cb4-13" title="13">    (ebib-db-set-filter filter ebib--cur-db)</a>
-<a class="sourceLine" id="cb4-14" title="14">    <span class="co">;; update the display, so that only filtered entries are visible</span></a>
-<a class="sourceLine" id="cb4-15" title="15">    (ebib--redisplay)))</a></code></pre></div>
-<p>First, this function saves the current filter if there is one. It then creates a date in Emacs’ internal time format by subtracting the number of days provided by the user from the current date and uses this date to create a Lisp expression which is then installed as the filter for the current database. A call to <code>ebib--redisplay</code> then updates the display, taking the filter into account.</p>
+<a class="sourceLine" id="cb4-14" title="14">    <span class="co">;; Update the current entry key.</span></a>
+<a class="sourceLine" id="cb4-15" title="15">    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)</a>
+<a class="sourceLine" id="cb4-16" title="16">    <span class="co">;; Update the display, so that only filtered entries are visible.</span></a>
+<a class="sourceLine" id="cb4-17" title="17">    (ebib--update-buffers)))</a></code></pre></div>
+<p>First, this function saves the current filter if there is one. It then calculates a date in Emacs’ internal time format by subtracting the number of days provided by the user from the current date and creates a Lisp expression that tests whether an entry’s timestamp is earlier or later than this date. This expression is then installed as the filter for the current database. A call to <code>ebib--update-buffers</code> then updates the display, taking the filter into account.</p>
 <p>The function <code>ebib--newer-than</code> is defined as follows:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode lisp"><code class="sourceCode commonlisp"><a class="sourceLine" id="cb5-1" title="1">(<span class="kw">defun</span><span class="fu"> ebib--newer-than </span>(date)</a>
 <a class="sourceLine" id="cb5-2" title="2">  <span class="st">&quot;Function for use in filters.</span></a>
@@ -436,11 +419,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb5-5" title="5"><span class="st">compared to the timestamp of the entry being tested.  If the</span></a>
 <a class="sourceLine" id="cb5-6" title="6"><span class="st">entry has no timestamp, or a timestamp that cannot be converted</span></a>
 <a class="sourceLine" id="cb5-7" title="7"><span class="st">into a date representation, return nil.&quot;</span></a>
-<a class="sourceLine" id="cb5-8" title="8">  (<span class="kw">let</span> ((timestamp (<span class="kw">cdr</span> (assoc-string <span class="st">&quot;timestamp&quot;</span> entry))))</a>
+<a class="sourceLine" id="cb5-8" title="8">  (<span class="kw">let</span> ((timestamp (<span class="kw">cdr</span> (assoc-string <span class="st">&quot;timestamp&quot;</span> ebib-entry))))</a>
 <a class="sourceLine" id="cb5-9" title="9">    (<span class="kw">when</span> (<span class="kw">and</span> timestamp</a>
 <a class="sourceLine" id="cb5-10" title="10">               (<span class="kw">setq</span> timestamp (<span class="kw">ignore-errors</span> (date-to-time timestamp))))</a>
 <a class="sourceLine" id="cb5-11" title="11">      (time-less-p date timestamp))))</a></code></pre></div>
-<p>This function obtains the time stamp of the entry being tested from the variable <code>entry</code> and then tries to convert it to Emacs’ time format. If successful, it compares this time to the date passed as an argument and returns <code>t</code> if the latter precedes the former.</p>
+<p>This function obtains the time stamp of the entry being tested from the variable <code>ebib-entry</code> and then tries to convert it to Emacs’ time format. If successful, it compares this time to the date passed as an argument and returns <code>t</code> if the latter precedes the former.</p>
 <h3 id="properties-of-filtered-databases">Properties of Filtered Databases</h3>
 <p>When a filter is active, there are a few things that are not possible or function differently. First, it is not possible to add or delete entries, either interactively or by merging or exporting. Exporting from a filtered database or saving a filtered database is also disabled. Editing existing entries is possible, however. Note that if the entry doesn’t match the filter anymore after the edit, it doesn’t disappear from view. For that, you need to reapply the filter with <code>F r</code>.</p>
 <p>It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with <code>M</code>, then cancel the filter and perform an action on them.</p>

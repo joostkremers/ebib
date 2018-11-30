@@ -37,7 +37,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'bibtex)
 
 ;; Each database is represented by a struct.
 (cl-defstruct ebib--db-struct
@@ -47,6 +46,7 @@
   (comments)                                ; List of @COMMENTS.
   (local-vars)                              ; The file's local variable block.
   (dialect)                                 ; The dialect of this database.
+  (buffer)                                  ; The index buffer.
   (cur-entry)                               ; The current entry.
   (marked-entries)                          ; List of marked entries.
   (filter)                                  ; The active filter.
@@ -62,14 +62,19 @@
 
 (defun ebib-db-clear-database (db)
   "Remove all information in DB.
-The database object itself is retained, only the information in
-it is deleted."
+The database object itself is retained, only the references to
+the relevant data in it is deleted.
+
+Note that the data itself is not destroyed, but may eventually be
+GC'ed, with the exception of the buffer pointed to by the buffer
+field.  This should be killed separately."
   (clrhash (ebib--db-struct-database db))
   (setf (ebib--db-struct-strings db) nil)
   (setf (ebib--db-struct-preamble db) nil)
   (setf (ebib--db-struct-comments db) nil)
   (setf (ebib--db-struct-local-vars db) nil)
   (setf (ebib--db-struct-dialect db) nil)
+  (setf (ebib--db-struct-buffer db) nil)
   (setf (ebib--db-struct-cur-entry db) nil)
   (setf (ebib--db-struct-marked-entries db) nil)
   (setf (ebib--db-struct-filter db) nil)
@@ -106,6 +111,14 @@ No check is performed to see if VARS is really a local variable block."
 (defun ebib-db-get-local-vars (db)
   "Return the local variable block of DB."
   (ebib--db-struct-local-vars db))
+
+(defun ebib-db-get-buffer (db)
+  "Return the index buffer of DB."
+  (ebib--db-struct-buffer db))
+
+(defun ebib-db-set-buffer (buffer db)
+  "Set BUFFER as DB's index buffer."
+  (setf (ebib--db-struct-buffer db) buffer))
 
 (defun ebib--db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
@@ -209,61 +222,40 @@ Return the new key upon succes, or nil if nothing was updated."
       (ebib-db-remove-entry key db)
       actual-new-key)))
 
-(defun ebib-db-set-field-value (field value key db &optional if-exists nobrace)
+(defun ebib-db-set-field-value (field value key db &optional overwrite)
   "Set FIELD to VALUE in entry KEY in database DB.
 
-IF-EXISTS determines what to do if the field already exists.  If
-it is `overwrite', the existing value is overwritten.  If it is
-`noerror', the value is not stored and the function returns nil.
-If it is nil (or any other value), an error is raised.
-
-IF-EXISTS can also be the symbol `append' or a string.  In this
-case, the new value is appended to the old value, separated by a
-space or by the string.  Before appending, braces/double quotes
-are removed from both values.
-
-If NOBRACE is t, the value is stored without braces.  If it is
-nil, braces are added if not already present.  NOBRACE may also be
-the symbol `as-is', in which case the value is stored as is.
+OVERWRITE determines what to do if the field already exists.  If
+it is t, the existing value is overwritten.  If it is nil, the
+value is not stored and the function returns nil.  OVERWRITE can
+can also be the symbol `error', in which case an error is raised
+and the value is not changed.
 
 A field can be removed from the entry by passing nil as VALUE and
-setting IF-EXISTS to 'overwrite.
+setting OVERWRITE to t.
 
-Return non-nil upon success, or nil if the value could not be stored."
-  (if (eq if-exists 'append)
-      (setq if-exists " "))
+Return t upon success, or nil if the value could not be stored."
   (let* ((entry (ebib-db-get-entry key db))
 	 (elem (assoc-string field entry 'case-fold))
          (old-value (cdr elem)))
     ;; If the field has a value, decide what to do:
     (if old-value
         (cond
-         ((eq if-exists 'overwrite)
-          (setq old-value nil))
-         ((stringp if-exists)
-          (setq value (concat (ebib-db-unbrace old-value) if-exists (ebib-db-unbrace value)))
-          (setq old-value nil))
-         ((not (eq if-exists 'noerror))
-          (error "[Ebib] Field `%s' exists in entry `%s'; cannot overwrite" field key)))
-      ;; Otherwise add the new field.  We just add the field here, the value is
-      ;; added later, so that we can put braces around it if needed.  This also
-      ;; makes it easier to return nil when storing/changing the field value
-      ;; wasn't successful.  Note that if `elem' is non-nil, we mustn't add the
-      ;; field again.  Note also: we use `setcdr' to modify the entry in place.
+         ((eq overwrite 'error)
+          (error "[Ebib] Field `%s' exists in entry `%s'; cannot overwrite" field key))
+         (overwrite
+          (setq old-value nil)))
+      ;; Create the field if it doesn't exist yet. The value is initially set to nil.
       (unless elem
         (setq elem (car (setcdr (last entry) (list (cons field nil))))))) ; Make sure `elem' points to the newly added field.
     ;; If there is (still) an old value, do nothing.
     (unless old-value
-      ;; Otherwise overwrite the existing entry.  Note that to delete a field,
-      ;; we set its value to nil, rather than removing it altogether from the
-      ;; database.  In `ebib--display-fields', such fields are ignored, so they're
+      ;; Otherwise overwrite the existing entry.  Note that to delete a field, we
+      ;; set its value to nil, rather than removing it altogether from the
+      ;; database.  In `ebib--display-fields', such fields are ignored, and they're
       ;; not saved.
-      (if (and value nobrace)
-          (unless (eq nobrace 'as-is)
-            (setq value (ebib-db-unbrace value)))
-        (setq value (ebib-db-brace value)))
       (setcdr elem value)
-      t))) ; Make sure we return non-nil.
+      t))) ; Make sure we return non-nil, `value' may be nil, after all.
 
 (defun ebib-db-remove-field-value (field key db)
   "Remove FIELD from entry KEY in DB."
@@ -282,52 +274,53 @@ otherwise return nil."
       (setq value noerror))
     value))
 
-(defun ebib-db-set-string (abbr value db &optional if-exists)
+(defun ebib-db-set-string (abbr value db &optional overwrite)
   "Set the @string definition ABBR to VALUE in database DB.
-If ABBR does not exist, create it.  VALUE is enclosed in braces if
-it isn't already.
+If ABBR does not exist, create it.
 
-IF-EXISTS determines what to do when ABBR already exists.  If it
-is `overwrite', the new string replaces the existing one.  If it is
-`noerror', the string is not stored and the function returns nil.
-If it is nil (or any other value), an error is raised.
+OVERWRITE determines what to do when ABBR already exists.  If it
+is t, the new string replaces the existing one.  If it is nil,
+the string is not stored and the function returns nil.  If it is
+the symbol `error', an error is raised.
 
 In order to remove a @STRING definition, pass nil as VALUE and
 set IF-EXISTS to `overwrite'."
-  (let* ((old-string (ebib-db-get-string abbr db 'noerror))
-	 (strings-list (delete (cons abbr old-string) (ebib--db-struct-strings db))))
-    (when old-string
-      (cond
-       ((eq if-exists 'overwrite)
-	(setq old-string nil))
-       ((not (eq if-exists 'noerror))
-	(error "[Ebib] @STRING abbreviation `%s' exists in database %s" abbr (ebib-db-get-filename db 'short)))))
-    (unless old-string
-      (setf (ebib--db-struct-strings db)
-	    (if (null value)
-                strings-list
-              ;; Put the new string at the end of the list, to keep them in the
-              ;; order in which they appear in the .bib file.  This is
-              ;; preferable for version control.
-              (append strings-list (list (cons abbr (ebib-db-brace value)))))))))
+  (let* ((strings-list (ebib--db-struct-strings db))
+         (old-string (cdr (assoc abbr strings-list))))
+    (if old-string
+        (cond
+         ((eq overwrite 'error)
+          (error "[Ebib] @STRING abbreviation `%s' exists in database %s"
+                 abbr (ebib-db-get-filename db 'short)))
+         ((and overwrite value)
+          (setcdr (assoc-string abbr strings-list) value)
+          (setq value nil)) ; Set `value' to nil to indicate we're done.
+         (overwrite
+          (setq strings-list (delete (cons abbr old-string) strings-list))
+          (setq value nil)))) ; Set `value' to nil to indicate we're done.
+    (when value
+      ;; Put the new string at the end of the list, to keep them in the order in
+      ;; which they appear in the .bib file.  This is preferable for version
+      ;; control.
+      (if strings-list
+          (setcdr (last strings-list) (list (cons abbr value)))
+        (setq strings-list (list (cons abbr value)))))
+    (setf (ebib--db-struct-strings db) strings-list)))
 
 (defun ebib-db-remove-string (abbr db)
   "Remove @STRING definition ABBR ttfrom DB."
   (ebib-db-set-string abbr nil db 'overwrite))
 
-(defun ebib-db-get-string (abbr db &optional noerror unbraced)
+(defun ebib-db-get-string (abbr db &optional noerror)
   "Return the value of @STRING definition ABBR in database DB.
 If ABBR does not exist, trigger an error, unless NOERROR is
-non-nil, in which case return nil.  If UNBRACED is non-nil, return
-the value without braces."
+non-nil, in which case return nil."
   ;; I assume abbreviations should be case-sensitive, so I use assoc
   ;; instead of assoc-string here.
   (let ((value (cdr (assoc abbr (ebib--db-struct-strings db)))))
     (unless (or value noerror)
       (error "[Ebib] @STRING abbreviation `%s' does not exist" abbr))
-    (if unbraced
-        (ebib-db-unbrace value)
-      value)))
+    value))
 
 (defun ebib-db-get-all-strings (db)
   "Return the alist containing all @STRING definitions in DB."
@@ -400,10 +393,11 @@ IF-EXISTS is nil, an existing filename triggers an error."
 (defun ebib-db-get-filename (db &optional shortened)
   "Return the filename of DB.
 If SHORTENED is non-nil, return only the filename part, otherwise
-return the full path."
-  (if shortened
-      (file-name-nondirectory (ebib--db-struct-filename db))
-    (ebib--db-struct-filename db)))
+return the full path.  If DB is nil, return nil."
+  (when db
+    (if shortened
+        (file-name-nondirectory (ebib--db-struct-filename db))
+      (ebib--db-struct-filename db))))
 
 (defun ebib-db-get-modtime (db)
   "Return the mod time stored for DB."
@@ -494,80 +488,6 @@ make backup at next save)."
 (defun ebib-db-backup-p (db)
   "Return backup flag of DB."
   (ebib--db-struct-backup db))
-
-;; EBIB-DB-UNBRACED-P determines if STRING is enclosed in braces. Note that
-;; we cannot do this by simply checking whether STRING begins with { and
-;; ends with } (or begins and ends with "), because something like "{abc} #
-;; D # {efg}" would then be incorrectly recognised as braced. So we need to
-;; do the following: take out everything that is between braces or quotes,
-;; and see if anything is left. If there is, the original string was
-;; braced, otherwise it was not.
-
-;; So we first check whether the string begins with { or ". if not, we
-;; certainly have an unbraced string. (EBIB-DB-UNBRACED-P recognises this
-;; through the default clause of the COND.) If the first character is { or
-;; ", we first take out every occurrence of backslash-escaped { and } or ",
-;; so that the rest of the function does not get confused over them.
-
-;; Then, if the first character is {, REMOVE-FROM-STRING takes out every
-;; occurrence of the regex "{[^{]*?}", which translates to "the smallest string
-;; that starts with { and ends with }, and does not contain another {. IOW, it
-;; takes out the innermost braces and their contents.  Because braces may be
-;; embedded, we have to repeat this step until no more balanced braces are found
-;; in the string. (Note that it would be unwise to check for just the occurrence
-;; of { or }, because that would throw EBIB-DB-UNBRACED-P in an infinite loop if
-;; a string contains an unbalanced brace.)
-
-;; For strings beginning with " we do the same, except that it is not
-;; necessary to repeat this in a WHILE loop, for the simple reason that
-;; strings surrounded with double quotes cannot be embedded; i.e.,
-;; "ab"cd"ef" is not a valid (BibTeX) string, while {ab{cd}ef} is.
-
-;; Note: because these strings are to be fed to BibTeX and ultimately
-;; (La)TeX, it might seem that we don't need to worry about strings
-;; containing unbalanced braces, because (La)TeX would choke on them. But
-;; the user may inadvertently enter such a string, and we therefore need to
-;; be able to handle it. (Alternatively, we could perform a check on
-;; strings and warn the user.)
-
-(defun ebib-db-unbraced-p (string)
-  "Non-nil if STRING is not enclosed in braces or quotes."
-  (cl-flet ((remove-from-string (string remove)
-                                (apply #'concat (split-string string remove))))
-    (when (stringp string)
-      (cond
-       ((eq (string-to-char string) ?\{)
-        ;; First, remove all escaped { and } from the string:
-        (setq string (remove-from-string (remove-from-string string "[\\][{]")
-                                         "[\\][}]"))
-        ;; Then remove the innermost braces with their contents and continue until
-        ;; no more braces are left.
-        (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
-          (setq string (remove-from-string string "{[^{]*?}")))
-        ;; If STRING is not empty, the original string contains material not in braces
-        (> (length string) 0))
-       ((eq (string-to-char string) ?\")
-        ;; Remove escaped ", then remove any occurrences of balanced quotes with
-        ;; their contents and check for the length of the remaining string.
-        (> (length (remove-from-string (remove-from-string string "[\\][\"]")
-                                       "\"[^\"]*?\""))
-           0))
-       (t t)))))
-
-(defun ebib-db-unbrace (string)
-  "Convert STRING to its unbraced counterpart.
-If STRING is already unbraced, do nothing."
-  (if (and (stringp string)
-           (not (ebib-db-unbraced-p string)))
-      (substring string 1 -1)
-    string))
-
-(defun ebib-db-brace (string)
-  "Put braces around STRING.
-If STRING is already braced, do nothing."
-  (if (ebib-db-unbraced-p string)
-      (concat "{" string "}")
-    string))
 
 (provide 'ebib-db)
 

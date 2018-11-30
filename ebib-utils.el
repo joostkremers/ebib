@@ -37,7 +37,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'dash)
+(require 'seq)
 (require 'bibtex)
 (require 'ebib-db)
 
@@ -272,7 +272,7 @@ not change the default sort."
 (defcustom ebib-field-transformation-functions '(("Title" . ebib-clean-TeX-markup)
                                              ("Doi" . ebib-display-www-link)
                                              ("Url" . ebib-display-www-link)
-                                             ("Note" . ebib-display-note-symbol))
+                                             ("Note" . ebib-notes-display-note-symbol))
   "Functions transforming field contents to appropriate forms.
 Each function should accept three arguments, the field to be
 displayed, the key of the entry being displayed, and the database
@@ -855,7 +855,7 @@ Currently, the following problems are marked:
 (defvar-local ebib--multiline-info nil "Information about the multiline text being edited.")
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
 (defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
-(put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (--remove (stringp it) v))))
+(put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (seq-remove #'stringp v))))
 
 ;; The databases.
 
@@ -1270,8 +1270,10 @@ form (\"<variable>\" \"<value>\"). If STR is not a local variable
 block, the return value is nil."
   (let ((vars (split-string str "[{}\n]+" t "[{} \t\r]+")))
     (when (and (string= (car vars) "Local Variables:")
-               (string= (-last-item vars) "End:"))
-      (--map (split-string it ": " t "[ \t]+") (-slice vars 1 -1)))))
+               (string= (car (last vars)) "End:"))
+      (mapcar (lambda (elt)
+                (split-string elt ": " t "[ \t]+"))
+              (seq-subseq vars 1 -1)))))
 
 (defun ebib--get-dialect (db)
   "Get the dialect of DB.
@@ -1287,10 +1289,10 @@ DIALECT must be a symbol, possible values are listed in
 `bibtex-dialect-list'.  If OVERWRITE is non-nil, overwrite an
 existing dialect variable, otherwise do nothing.  The return
 value is the (un)modified list."
-  (let ((ind (--find-index (string= (car it) "bibtex-dialect") vars)))
-    (if ind
+  (let ((item (seq-find (lambda (elt) (string= (car elt) "bibtex-dialect")) vars)))
+    (if item
         (when overwrite
-          (setq vars (-replace-at ind (list "bibtex-dialect" (symbol-name dialect)) vars)))
+          (setq vars (setcdr item (symbol-name dialect))))
       (setq vars (push (list "bibtex-dialect" (symbol-name dialect)) vars)))
     vars))
 
@@ -1298,7 +1300,9 @@ value is the (un)modified list."
   "Delete the dialect definition from VARS.
 VARS is a list as returned by `ebib--local-vars-to-list'.  VARS is
 not modified, instead the new list is returned."
-  (--remove (string= (car it) "bibtex-dialect") vars))
+  (seq-remove (lambda (elt)
+                (string= (car elt) "bibtex-dialect"))
+              vars))
 
 ;; The numeric prefix argument is 1 if the user gave no prefix argument at all.
 ;; The raw prefix argument is not always a number.  So we need to do our own
@@ -1310,22 +1314,57 @@ argument to a function or not."
   (when (numberp num)
     num))
 
-(defun ebib--store-entry (entry-key fields db &optional timestamp if-exists)
-  "Store the entry defined by ENTRY-KEY and FIELDS into DB.
-Optional argument TIMESTAMP indicates whether a timestamp is to
-be added to the entry.  Note that for a timestamp to be added,
-`ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
-`ebib-db-set-entry'.
+;;; Functions for database access
+;;
+;; We can mostly use the ebib-db-* functions directly, but we don't want to handle
+;; the braces in `ebib-db.el', so we define some extra access functions here.
 
-Return ENTRY-KEY if storing the entry was succesful, nil
-otherwise.  Depending on the value of IF-EXISTS, storing an entry
-may also result in an error."
-  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
-    (when result
-      (ebib--set-modified t db)
-      (when (and timestamp ebib-use-timestamp)
-        (ebib-db-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
-    result))
+(defun ebib-set-field-value (field value key db &optional if-exists nobrace)
+  "Set FIELD to VALUE in entry KEY in database DB.
+
+IF-EXISTS determines what to do if the field already exists.  If
+it is `overwrite', the existing value is overwritten.  If it is
+`noerror', the value is not stored and the function returns nil.
+If it is nil (or any other value), an error is raised.
+
+IF-EXISTS can also be the symbol `append' or a string.  In this
+case, the new value is appended to the old value, separated by a
+space or by the string.  Before appending, braces/double quotes
+are removed from both values.  Whether braces are added to the
+new value depends on the value of NOBRACE.
+
+If NOBRACE is t, the value is stored without braces.  If it is
+nil, braces are added if not already present.  NOBRACE may also be
+the symbol `as-is', in which case the value is stored as is.
+
+A field can be removed from the entry by passing nil as VALUE and
+setting IF-EXISTS to 'overwrite.
+
+Return t upon success, or nil if the value could not be stored."
+  (if (eq if-exists 'append)
+      (setq if-exists " "))
+  (let ((old-value (ebib-db-get-field-value field key db 'norerror)))
+    ;; If the field has a value, decide what to do:
+    (if old-value
+        (cond
+         ((eq if-exists 'overwrite)
+          (setq old-value nil))
+         ((stringp if-exists)
+          (setq value (concat (ebib-unbrace old-value) if-exists (ebib-unbrace value)))
+          (setq old-value nil))
+         ((not (eq if-exists 'noerror))
+          (error "[Ebib] Field `%s' exists in entry `%s'; cannot overwrite" field key))))
+    ;; If there is (still) an old value, do nothing.
+    (unless old-value
+      ;; Otherwise overwrite the existing entry. Note that to delete a field, we
+      ;; set its value to nil, rather than removing it altogether from the
+      ;; database. In `ebib--display-fields', such fields are ignored, and they're
+      ;; not saved.
+      (if (and value nobrace)
+          (unless (eq nobrace 'as-is)
+            (setq value (ebib-unbrace value)))
+        (setq value (ebib-brace value)))
+      (ebib-db-set-field-value field value key db 'overwrite))))
 
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref)
   "Return the value of FIELD in entry KEY in database DB.
@@ -1347,7 +1386,7 @@ string has the text property `ebib--alias' with value t."
          (xref-key)
          (alias))
     (when (and (not value) xref)      ; Check if there's a cross-reference.
-      (setq xref-key (ebib-db-unbrace (ebib-db-get-field-value "crossref" key db 'noerror)))
+      (setq xref-key (ebib-unbrace (ebib-db-get-field-value "crossref" key db 'noerror)))
       (when xref-key
         (let ((xref-db (ebib--find-db-for-key xref-key db)))
           (when xref-db
@@ -1364,7 +1403,7 @@ string has the text property `ebib--alias' with value t."
     (unless (= 0 (length value)) ; (length value) == 0 if value is nil or if value is "".
       (setq value (copy-sequence value)) ; Copy the value so we can add text properties.
       (when unbraced
-        (setq value (ebib-db-unbrace value)))
+        (setq value (ebib-unbrace value)))
       (when alias
         (add-text-properties 0 1 '(ebib--alias t) value))
       (when xref
@@ -1408,6 +1447,109 @@ inherit a value, this function returns nil."
       (or (car (rassoc (downcase target-field) inheritance))
           target-field))))
 
+;; ebib-set-string is just a front-end for `ebib-db-set-string'.  The only additional
+;; functionality is that it wraps the string value in braces if it isn't
+;; already.  We need to do this because the brace functions are in this file and
+;; `ebib-db.el' cannot depend on `ebib-utils.el' (because `ebib-utils.el' already depends on
+;; `ebib-db.el').  Similar considerations apply to `ebib-get-string' below.
+
+(defun ebib-set-string (abbr value db &optional overwrite)
+  "Set the @string definition ABBR to VALUE in database DB.
+If ABBR does not exist, create it.  OVERWRITE functions as in
+`ebib-db-set-string'.  VALUE is enclosed in braces if it isn't
+already.
+
+This function basically just calls `ebib-db-set-string' to do the
+  real work."
+  (ebib-db-set-string abbr (if (ebib-unbraced-p value)
+                           (ebib-brace value)
+                         value)
+                  db overwrite))
+
+(defun ebib-get-string (abbr db &optional noerror unbraced)
+  "Return the value of @STRING definition ABBR in database DB.
+NOERROR functions as in `ebib-db-get-string', which this
+functions calls to get the actual value.  The braces around the
+value are removed if UNBRACED is non-nil."
+  (let ((value (ebib-db-get-string abbr db noerror)))
+    (if unbraced
+        (ebib-unbrace value)
+      value)))
+
+;; EBIB-UNBRACED-P determines if STRING is enclosed in braces.  Note that we
+;; cannot do this by simply checking whether STRING begins with { and ends with
+;; } (or begins and ends with "), because something like "{abc} # D # {efg}"
+;; would then be incorrectly recognised as braced.  So we need to do the
+;; following: take out everything that is between braces or quotes, and see if
+;; anything is left.  If there is, the original string was braced, otherwise it
+;; was not.
+
+;; So we first check whether the string begins with { or ".  If not, we
+;; certainly have an unbraced string.  (EBIB-UNBRACED-P recognises this
+;; through the default clause of the COND.)  If the first character is { or ",
+;; we first take out every occurrence of backslash-escaped { and } or ", so that
+;; the rest of the function does not get confused over them.
+
+;; Then, if the first character is {, REMOVE-FROM-STRING takes out every
+;; occurrence of the regex "{[^{]*?}", which translates to "the smallest string
+;; that starts with { and ends with }, and does not contain another {.  IOW, it
+;; takes out the innermost braces and their contents.  Because braces may be
+;; embedded, we have to repeat this step until no more balanced braces are found
+;; in the string.  (Note that it would be unwise to check for just the occurrence
+;; of { or }, because that would throw EBIB-UNBRACED-P in an infinite loop if
+;; a string contains an unbalanced brace.)
+
+;; For strings beginning with " we do the same, except that it is not
+;; necessary to repeat this in a WHILE loop, for the simple reason that
+;; strings surrounded with double quotes cannot be embedded; i.e.,
+;; "ab"cd"ef" is not a valid (BibTeX) string, while {ab{cd}ef} is.
+
+;; Note: because these strings are to be fed to BibTeX and ultimately
+;; (La)TeX, it might seem that we don't need to worry about strings
+;; containing unbalanced braces, because (La)TeX would choke on them.  But
+;; the user may inadvertently enter such a string, and we therefore need to
+;; be able to handle it.  (Alternatively, we could perform a check on
+;; strings and warn the user.)
+
+(defun ebib-unbraced-p (string)
+  "Non-nil if STRING is not enclosed in braces or quotes."
+  (cl-flet ((remove-from-string (string remove)
+                                (apply #'concat (split-string string remove))))
+    (when (stringp string)
+      (cond
+       ((eq (string-to-char string) ?\{)
+        ;; first, remove all escaped { and } from the string:
+        (setq string (remove-from-string (remove-from-string string "[\\][{]")
+                                         "[\\][}]"))
+        ;; then remove the innermost braces with their contents and continue until
+        ;; no more braces are left.
+        (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
+          (setq string (remove-from-string string "{[^{]*?}")))
+        ;; if STRING is not empty, the original string contains material not in braces
+        (> (length string) 0))
+       ((eq (string-to-char string) ?\")
+        ;; remove escaped ", then remove any occurrences of balanced quotes with
+        ;; their contents and check for the length of the remaining string.
+        (> (length (remove-from-string (remove-from-string string "[\\][\"]")
+                                       "\"[^\"]*?\""))
+           0))
+       (t t)))))
+
+(defun ebib-unbrace (string)
+  "Convert STRING to its unbraced counterpart.
+If STRING is already unbraced, do nothing."
+  (if (and (stringp string)
+           (not (ebib-unbraced-p string)))
+      (substring string 1 -1)
+    string))
+
+(defun ebib-brace (string)
+  "Put braces around STRING.
+If STRING is already braced, do nothing."
+  (if (ebib-unbraced-p string)
+      (concat "{" string "}")
+    string))
+
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list.  It is a symbol and can be
@@ -1433,7 +1575,9 @@ which ENTRY-TYPE is an alias."
     (when (memq type '(optional extra all))
       (setq optional (mapcar #'car (nth 4 (assoc-string entry-type (bibtex-entry-alist dialect) 'case-fold)))))
     (when (memq type '(all extra))
-      (setq extra (--remove (member-ignore-case it (append required optional)) (cdr (assq dialect ebib-extra-fields)))))
+      (setq extra (seq-remove (lambda (elt)
+                                (member-ignore-case elt (append required optional)))
+                              (cdr (assq dialect ebib-extra-fields)))))
     (cond
      ((eq type 'required) required)
      ((eq type 'optional) optional)
@@ -1452,7 +1596,9 @@ in `bibtex-dialect-list' or NIL, in which case the value of
 `ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (let ((fields (ebib--list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
-    (--remove (member-ignore-case (car it) (cons "=type=" fields)) entry)))
+    (seq-remove (lambda (elt)
+                  (member-ignore-case (car elt) (cons "=type=" fields)))
+                entry)))
 
 (defun ebib--list-entry-types (&optional dialect include-aliases)
   "Return a list of entry types.
@@ -1478,7 +1624,7 @@ Possible values for DIALECT are those listed in
   (or (cdr (assq dialect ebib--unique-field-alist))
       (let (fields)
         (mapc (lambda (entry)
-                (setq fields (-union fields (ebib--list-fields (car entry) 'all dialect))))
+                (setq fields (seq-uniq (seq-concatenate 'list fields (ebib--list-fields (car entry) 'all dialect)))))
               (bibtex-entry-alist dialect))
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
@@ -1566,15 +1712,6 @@ are returned as a string."
                         '("A" "An" "At" "Of" "On" "And" "For"))))
       str)))
 
-(defun ebib-display-note-symbol (_field key _db)
-  "Return the note symbol for displaying if a note exists for KEY."
-  (if (ebib--notes-exists-note key)
-      (propertize ebib-notes-symbol
-                  'face '(:height 0.8 :inherit link)
-                  'mouse-face 'highlight)
-    (propertize (make-string (string-width ebib-notes-symbol) ?\s)
-                'face '(:height 0.8))))
-
 (defun ebib-display-www-link (field key db)
   "Return the content of FIELD from KEY in DB as a link.
 This function is mainly intended for the DOI and URL fields."
@@ -1614,10 +1751,7 @@ characters in fields."
          (list (mapcar (lambda (key)
                          (cons (ebib--get-field-value-for-display field key db) key))
                        keys)))
-    (setq list (cl-stable-sort list (if (fboundp 'string-collate-lessp)
-                                        #'string-collate-lessp
-                                      #'string-lessp)
-                               :key #'car))
+    (setq list (cl-stable-sort list #'string-collate-lessp :key #'car))
     (setq keys (mapcar #'cdr list))
     ;; Reverse the list if necessary.
     (if (eq direction 'descend)

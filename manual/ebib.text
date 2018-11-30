@@ -97,7 +97,7 @@ Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's
 
 ## Manual installation ##
 
-It's also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you're doing so detailed instructions are omitted here. Just be sure to also install Ebib's dependencies, the [dash](https://github.com/magnars/dash.el) and [parsebib](https://github.com/joostkremers/parsebib) libraries.
+It's also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you're doing so detailed instructions are omitted here. Just be sure to also install the [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib depends on.
 
 
 ## Starting Ebib ##
@@ -113,32 +113,6 @@ You can also call Ebib from an Eshell command line. This in itself is entirely u
     ~/Work/Papers $ ebib references.bib
 
 starts Ebib and loads the file `references.bib`.
-
-
-## Upgrading from Ebib 1.x ##
-
-If you upgrade from Ebib 1.x to the current version 2, there are a few things you need to be aware of. First, Ebib 2 does not support Emacs versions below 24.3. If you're on an older version of Emacs, either upgrade Emacs, or do not upgrade Ebib. Ebib 1.x will continue to be available in the `pasture` branch on Github or as a package on the Github releases page, so if for some reason you do not want to upgrade, you can continue to use this branch. Ebib 1.x will continue to be supported with bug fixes and possibly the occasional (small) feature addition, though no major changes will take place.
-
-If you do upgrade, it is important to note that a few customisation options have changed. If you never made any customisations to Ebib, the upgrade should not pose any problems. If you have, however, read on.
-
-The most important change is that the variable `ebib-entry-types` (option "Entry Types") has been removed. Ebib now uses the entry type definitions of the built-in `bibtex-mode`, which means that if you wish to customise the entry types, you should customise `bibtex-BibTeX-entry-alist` or `bibtex-biblatex-entry-alist`.
-
-Secondly, a few user options have been renamed because their types have changed. (Mainly from `symbol` to `string`). The name change means that existing customisations are lost, but it also prevents Ebib from throwing cryptic errors and refusing to run. If you customised any of the following options, you should redo them after upgrading Ebib (and preferably remove the old ones from your init file):
-
-- `ebib-default-entry`: renamed to `ebib-default-entry-type`.
-- `ebib-additional-fields`: renamed to `ebib-extra-fields`.
-- `ebib-standard-url-field`: renamed to `ebib-url-field`.
-- `ebib-standard-file-field`: renamed to `ebib-file-field`.
-- `ebib-standard-doi-field`: renamed to `ebib-doi-field`.
-- `ebib-biblatex-inheritance`: renamed to `ebib-biblatex-inheritances` (note the `s`).
-
-Note that even if you customised `ebib-biblatex-inheritance`, there is most likely no need to customise its replacement `ebib-biblatex-inheritances`, because the latter is set up with the default inheritance rules that Biblatex defines.
-
-Another thing to note is that a `\documentclass` definition has been added to the user options "Latex Preamble" (`ebib-latex-preamble`) and "Print Preamble" (`ebib-print-preamble`). If you customised one of these, you should add a document class specification, otherwise the LaTeX file won't compile. 
-
-Lastly, the option `ebib-save-xrefs-first` now defaults to `t`.
-
-Also note: if you use Biblatex, make sure to read the section on using Ebib with Biblatex files.
 
 
 # Getting Started #
@@ -398,11 +372,10 @@ Note that cancelling a filter with `F c` does not delete it from the list of sto
 
 ### Special Filters ###
 
-Filters are essentially Lisp expressions that consist of the functions `and`, `or`, and `not`, together with a special macro `contains`. However, filters are not limited to these forms. They can essentially contain any Lisp expression. It is not possible to create such special filters interactively, but it is possible to write such filters and put them in a filter file, or to write a function that creates a special filter.
+Filters are essentially Lisp expressions that consist of the functions `and`, `or`, and `not`, together with a special macro `contains`. However, filters are not limited to these forms. They can essentially contain any Lisp expression. It is not possible to create such special filters interactively, but it is possible to write such filters and put them in a filter file, or to write a function that creates such a special filter.
 
-A filter is a Lisp expression that should return either `t` or `nil`, indicating whether the entry being tested matches the filter or not. The contents of the entry is available in a variable `entry`. This variable is given a value by the function that runs the filter, but it is not passed as an argument. Rather, it is a local dynamic variable, which means that the file that defines the filter function should have the variable `lexical-binding` set to `nil`.
-
-The value of `entry` is an alist of fields and their values. These include the fields `=key=` and `=type=` for the entry key and type:
+A filter is a Lisp expression that should return either `t` or `nil`, indicating whether the entry being tested matches the filter or not. The contents of the entry is available in a variable `ebib-entry`. This variable is given a value by the function that runs the filter, but it is not passed as an argument. Rather, it is a dynamic variable, which means that the file that defines the filter function should declare the variable with `(defvar ebib-entry)`.
+When the filter is run, the value of `ebib-entry` is an alist of fields and their values. These include the fields `=key=` and `=type=` for the entry key and type:
 
 ```
 (("author" . "{Noam Chomsky}")
@@ -424,21 +397,23 @@ One special filter is included with Ebib. It filters recent additions to the dat
 (defun ebib-list-recent (days)
   "List entries created in the last DAYS days."
   (interactive "nNumber of days: ")
-  ;; save the database's current filter, if there is one.
+  ;; Save the database's current filter, if there is one.
   (let ((filter (ebib-db-get-filter ebib--cur-db)))
-    (when filter (setq ebib--filters-last-filter filter))) 
+    (when filter (setq ebib--filters-last-filter filter)))
   (let*
-      ;; calculate the from-date in Emacs' time format
+      ;; Calculate the from-date in Emacs' time format.
       ((date (time-subtract (current-time) (days-to-time days)))
-       ;; create a Lisp expression that will function as the filter
+       ;; Create a Lisp expression that will function as the filter.
        (filter `(ebib--newer-than (quote ,date))))
-    ;; install it as the curretn database's filter
+    ;; Install it as the current database's filter.
     (ebib-db-set-filter filter ebib--cur-db)
-    ;; update the display, so that only filtered entries are visible
-    (ebib--redisplay)))
+    ;; Update the current entry key.
+    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+    ;; Update the display, so that only filtered entries are visible.
+    (ebib--update-buffers)))
 ```
 
-First, this function saves the current filter if there is one. It then creates a date in Emacs’ internal time format by subtracting the number of days provided by the user from the current date and uses this date to create a Lisp expression which is then installed as the filter for the current database. A call to `ebib--redisplay` then updates the display, taking the filter into account.
+First, this function saves the current filter if there is one. It then calculates a date in Emacs’ internal time format by subtracting the number of days provided by the user from the current date and creates a Lisp expression that tests whether an entry's timestamp is earlier or later than this date. This expression is then installed as the filter for the current database. A call to `ebib--update-buffers` then updates the display, taking the filter into account.
 
 The function `ebib--newer-than` is defined as follows:
 
@@ -450,13 +425,13 @@ be a list of the format returned by `current-time' and is
 compared to the timestamp of the entry being tested.  If the
 entry has no timestamp, or a timestamp that cannot be converted
 into a date representation, return nil."
-  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+  (let ((timestamp (cdr (assoc-string "timestamp" ebib-entry))))
     (when (and timestamp
                (setq timestamp (ignore-errors (date-to-time timestamp))))
       (time-less-p date timestamp))))
 ```
 
-This function obtains the time stamp of the entry being tested from the variable `entry` and then tries to convert it to Emacs’ time format. If successful, it compares this time to the date passed as an argument and returns `t` if the latter precedes the former.
+This function obtains the time stamp of the entry being tested from the variable `ebib-entry` and then tries to convert it to Emacs’ time format. If successful, it compares this time to the date passed as an argument and returns `t` if the latter precedes the former.
 
 
 ### Properties of Filtered Databases ###

@@ -38,6 +38,8 @@
 
 (require 'ebib-utils)
 
+(declare-function org-get-todo-state "org.el")
+
 (defgroup ebib-reading-list nil "Settings for the reading list." :group 'ebib)
 
 (defcustom ebib-reading-list-symbol "R"

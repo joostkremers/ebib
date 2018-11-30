@@ -73,7 +73,7 @@ a logical `not' is applied to the selection."
          (field (completing-read (format "Filter: %s<field> contains <search string>%s. Enter field: "
                                          (if (< not 0) "not " "")
                                          (if (< not 0) "" ""))
-                                 (append (list "any" "=type=") (-union (ebib--list-fields-uniquely dialect) (cdr (assq dialect ebib-extra-fields))))
+                                 (append (list "any" "=type=") (seq-uniq (seq-concatenate 'list (ebib--list-fields-uniquely dialect) (cdr (assq dialect ebib-extra-fields)))))
                                  nil nil nil 'ebib--field-history)))
     (let* ((prompt (format "Filter: %s%s contains <search string>%s. Enter %s: "
                            (if (< not 0) "not " "")
@@ -228,17 +228,20 @@ If there are no stored filters, the filter file is deleted."
     (let ((file (read-file-name "Save filters to file: ")))
       (ebib--filters-save-file file))))
 
+(defvar ebib-entry nil "Variable used to store an entry during filtering.
+See `ebib--filters-run-filter'.")
+
 (defun ebib--filters-run-filter (db)
   "Run the filter of DB and return a list of matching keys."
   ;; The filter uses a macro `contains', which we locally define here. This
-  ;; macro in turn uses a dynamic variable `entry', which we must set
+  ;; macro in turn uses a dynamic variable `ebib-entry', which we must set
   ;; before eval'ing the filter.
   (let ((filter (ebib-db-get-filter db)))
     (eval
      `(cl-macrolet ((contains (field regexp)
-                              `(ebib--search-in-entry ,regexp entry ,(unless (cl-equalp field "any") field))))
+                              `(ebib--search-in-entry ,regexp ebib-entry ,(unless (cl-equalp field "any") field))))
         (delq nil (mapcar (lambda (key)
-                            (let ((entry (ebib-db-get-entry key db 'noerror)))
+                            (let ((ebib-entry (ebib-db-get-entry key db 'noerror)))
                               (when ,filter
                                 key)))
                           (ebib-db-list-keys db)))))))
@@ -353,7 +356,7 @@ be a list of the format returned by `current-time' and is
 compared to the timestamp of the entry being tested.  If the
 entry has no timestamp, or a timestamp that cannot be converted
 into a date representation, return nil."
-  (let ((timestamp (cdr (assoc-string "timestamp" entry))))
+  (let ((timestamp (cdr (assoc-string "timestamp" ebib-entry))))
     (when (and timestamp
                (setq timestamp (ignore-errors (date-to-time timestamp))))
       (time-less-p date timestamp))))

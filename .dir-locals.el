@@ -4,4 +4,3 @@
 ((emacs-lisp-mode
   (eval . (nameless-mode 1))
   (nameless-current-name . "ebib")))
-
