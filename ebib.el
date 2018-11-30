@@ -3441,13 +3441,13 @@ which the string is appended."
         (num (ebib--prefix prefix)))
     (if num
         (ebib--export-to-db num (format "@STRING definition `%s' copied to database %%d" string)
-                            (lambda (db)
-                              (ebib-db-set-string string (ebib-db-get-string string ebib--cur-db) db)))
+                        (lambda (db)
+                          (ebib-db-set-string string (ebib-db-get-string string ebib--cur-db) db)))
       (ebib--export-to-file (format "Export @STRING definition `%s' to file: " string)
-                            (lambda ()
-                              (insert (format "\n@string{%s = %s}\n"
-                                              string
-                                              (ebib-db-get-string string ebib--cur-db))))))))
+                        (lambda ()
+                          (insert (format "\n@string{%s = %s}\n"
+                                          string
+                                          (ebib-db-get-string string ebib--cur-db))))))))
 
 (defun ebib-export-all-strings (prefix)
   "Export all @STRING definitions.
