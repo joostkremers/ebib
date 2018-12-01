@@ -1891,7 +1891,7 @@ whose contents is appended to the file the user enters."
           (append-to-file (point-min) (point-max) filename)
           (setq ebib--export-filename filename)))))
 
-(defun ebib--export-entries (entries &optional source-db filename)
+(defun ebib--export-entries-to-file (entries &optional source-db filename)
   "Export ENTRIES from SOURCE-DB to FILENAME.
 ENTRIES is a list of entry keys.  SOURCE-DB defaults to the
 current database.  If FILENAME is not provided, the user is asked
@@ -3859,7 +3859,7 @@ created containing only these entries."
                                   ebib--local-bibtex-filenames))))
            (with-temp-buffer
              (insert-file-contents bbl-file)
-             (ebib--export-entries (ebib-read-entries-from-bbl) databases bib-file))))))
+             (ebib--export-entries-to-file (ebib-read-entries-from-bbl) databases bib-file))))))
     ((default)
      (beep))))
 
