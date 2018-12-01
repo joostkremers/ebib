@@ -1858,11 +1858,6 @@ buffer and switch to it."
       (ebib-db-set-current-entry-key key ebib--cur-db)
       (ebib--update-entry-buffer))))
 
-;; The exporting functions will have to be redesigned completely.  For now (1
-;; Feb 2012) we just define a new function ebib--export-entries.  In the long run,
-;; this should be the general exporting function, calling other functions as the
-;; need arises.
-
 (defun ebib--export-to-db (num message copy-fn)
   "Export data to another database.
 NUM is the number of the database to which the data is to be copied.
