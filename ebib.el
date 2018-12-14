@@ -437,6 +437,16 @@ to the current database."
                 (ebib-db-list-keys db))))
     (ebib--sort-keys-list keys db)))
 
+(defun ebib-read-database (prompt)
+  "Read the filename of a database, with completion.
+The filenames of the databases in `ebib--databases' are offered
+for completion, the database associated with the selected
+filename is returned.  PROMPT is a string used to prompt the
+user."
+  (ebib--get-db-from-filename (completing-read prompt (mapcar (lambda (s)
+                                                            (ebib-db-get-filename s 'shortened))
+                                                          ebib--databases)
+                                           nil t)))
 ;;; Main
 
 ;;;###autoload
