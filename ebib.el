@@ -426,23 +426,6 @@ Returns the first modified database, or NIL if none was modified."
     (setq ebib--databases (append ebib--databases (list new-db)))
     new-db))
 
-(defun ebib--store-entry (entry-key fields db &optional timestamp if-exists)
-  "Store the entry defined by ENTRY-KEY and FIELDS into DB.
-Optional argument TIMESTAMP indicates whether a timestamp is to
-be added to the entry.  Note that for a timestamp to be added,
-`ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
-`ebib-db-set-entry'.
-
-Return ENTRY-KEY if storing the entry was succesful, nil
-otherwise.  Depending on the value of IF-EXISTS, storing an entry
-may also result in an error."
-  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
-    (when result
-      (ebib--set-modified t db)
-      (when (and timestamp ebib-use-timestamp)
-        (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
-    result))
-
 (defun ebib--list-keys (&optional db)
   "Return a list of entry keys in DB.
 If a filter is active, only the keys of entries that match the

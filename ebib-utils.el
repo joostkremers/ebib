@@ -1319,6 +1319,23 @@ argument to a function or not."
 ;; We can mostly use the ebib-db-* functions directly, but we don't want to handle
 ;; the braces in `ebib-db.el', so we define some extra access functions here.
 
+(defun ebib--store-entry (entry-key fields db &optional timestamp if-exists)
+  "Store the entry defined by ENTRY-KEY and FIELDS into DB.
+Optional argument TIMESTAMP indicates whether a timestamp is to
+be added to the entry.  Note that for a timestamp to be added,
+`ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
+`ebib-db-set-entry'.
+
+Return ENTRY-KEY if storing the entry was succesful, nil
+otherwise.  Depending on the value of IF-EXISTS, storing an entry
+may also result in an error."
+  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
+    (when result
+      (ebib--set-modified t db)
+      (when (and timestamp ebib-use-timestamp)
+        (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
+    result))
+
 (defun ebib-set-field-value (field value key db &optional if-exists nobrace)
   "Set FIELD to VALUE in entry KEY in database DB.
 
