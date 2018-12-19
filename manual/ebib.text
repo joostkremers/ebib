@@ -141,7 +141,7 @@ You can quit Ebib by typing `q`. You will be asked for confirmation, and you wil
 
 ## Opening a `.bib` File ##
 
-Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the file that you specify, and reports how many entries it found, how many `@string` definitions it found, and whether a `@preamble` was found.
+Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the file that you specify, and reports how many entries it found, how many `@String` definitions it found, and whether a `@Preamble` was found.
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged. If Ebib finds something that it cannot parse, it will log an error. If warnings and/or errors occurred during loading, Ebib will issue a message when it finishes loading the `.bib` and direct you to the log buffer.
 
@@ -449,7 +449,7 @@ When a filter is active, there are a few things that are not possible or functio
 
 It is also possible to mark entries. Marked entries stay marked when you cancel the filter, so in order to do something with all the entries matching a filter, you can mark them all in the filter view with `M`, then cancel the filter and perform an action on them.
 
-If a database has an active filter, the save command is disabled, because it would not be clear whether you want to save the entire database or just the filtered entries. If you want to save only the filtered entries to a file, you can use the command `w` (or the menu option "Save Database As"). This also saves the `@string`, `@preamble` and `@comments`, as well as any file-local variables, so you will have a self-contained `.bib` file with only the filtered entries. In order to save the entire database, you need to cancel the filter. After saving, you can reapply the filter with `F L`, of course.
+If a database has an active filter, the save command is disabled, because it would not be clear whether you want to save the entire database or just the filtered entries. If you want to save only the filtered entries to a file, you can use the command `w` (or the menu option "Save Database As"). This also saves the `@String`, `@Preamble` and `@comments`, as well as any file-local variables, so you will have a self-contained `.bib` file with only the filtered entries. In order to save the entire database, you need to cancel the filter. After saving, you can reapply the filter with `F L`, of course.
 
 One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and `F v` are only available when a filter is active. The other commands operate on the stored filters and can be used when no filter is active.
 
@@ -794,44 +794,44 @@ Note that the entry keys for the stubs are temporary keys. They will be replaced
 
 # @Preamble Definition #
 
-Apart from database entries, BibTeX allows three more types of elements to appear in a `.bib` file. These are `@comment`, `@preamble` and `@string` definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.
+Apart from database entries, BibTeX allows three more types of elements to appear in a `.bib` file. These are `@comment`, `@Preamble` and `@String` definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.
 
-Ebib allows you to add one `@preamble` definition to the database. In principle, BibTeX allows more than one such definition, but really one suffices, because you can use the concatenation character `#` to include multiple TeX or LaTeX commands. So, rather than having two `@preamble` definitions such as:
+Ebib allows you to add one `@Preamble` definition to the database. In principle, BibTeX allows more than one such definition, but really one suffices, because you can use the concatenation character `#` to include multiple TeX or LaTeX commands. So, rather than having two `@Preamble` definitions such as:
 
-    @preamble{ "\newcommand{\noopsort}[1]{} " }
-    @preamble{ "\newcommand{\singleletter}[1]{#1} " }
+    @Preamble{ "\newcommand{\noopsort}[1]{} " }
+    @Preamble{ "\newcommand{\singleletter}[1]{#1} " }
 
 you can write this in your `.bib` file:
 
-    @preamble{ "\newcommand{\noopsort}[1]{} "
+    @Preamble{ "\newcommand{\noopsort}[1]{} "
              # "\newcommand{\singleletter}[1]{#1} " }
 
-Creating or editing a `@preamble` definition in Ebib is done by hitting (uppercase) `P` in the index buffer. Ebib uses the multiline edit buffer for editing the text of the `@preamble` definition, which means that `C-c | q` stores the `@preamble` text and returns focus to the index buffer, while `C-c | c` returns focus to the index buffer while abandoning any changes you may have made. (For details on using multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers).)
+Creating or editing a `@Preamble` definition in Ebib is done by hitting (uppercase) `P` in the index buffer. Ebib uses the multiline edit buffer for editing the text of the `@Preamble` definition, which means that `C-c | q` stores the `@Preamble` text and returns focus to the index buffer, while `C-c | c` returns focus to the index buffer while abandoning any changes you may have made. (For details on using multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers).)
 
-In order to create a `@preamble` as shown above in Ebib, you only have to type the text between the braces. Ebib takes care of including the braces of the `@preamble` command, but otherwise it saves the text exactly as you enter it. So in order to get the preamble above, you'd have to type the following in Ebib:
+In order to create a `@Preamble` as shown above in Ebib, you only have to type the text between the braces. Ebib takes care of including the braces of the `@Preamble` command, but otherwise it saves the text exactly as you enter it. So in order to get the preamble above, you'd have to type the following in Ebib:
 
     "\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
 
-Note that when Ebib loads a `.bib` file that contains more than one `@preamble` definition, it concatenates all the strings in them in the manner just described and saves them in one `@preamble` definition.
+Note that when Ebib loads a `.bib` file that contains more than one `@Preamble` definition, it concatenates all the strings in them in the manner just described and saves them in one `@Preamble` definition.
 
 
 # @String Definitions #
 
-If you press (uppercase) `S` in the index buffer, Ebib hides the entry buffer in the lower window and replaces it with the *strings buffer*. In this buffer, you can add, delete and edit `@string` definitions.
+If you press (uppercase) `S` in the index buffer, Ebib hides the entry buffer in the lower window and replaces it with the *strings buffer*. In this buffer, you can add, delete and edit `@String` definitions.
 
-Adding a `@string` definition is done with the command `a`. This will first ask you for an abbreviation and then for the value to be associated with that abbreviation. Once you've entered these, Ebib will sort the new abbreviation into the buffer.
+Adding a `@String` definition is done with the command `a`. This will first ask you for an abbreviation and then for the value to be associated with that abbreviation. Once you've entered these, Ebib will sort the new abbreviation into the buffer.
 
-Moving between the `@string` definitions can be done in the usual way: the cursor keys `up` and `down`, `p` and `n` or `C-p` and `C-n` move up and down. `Space` and `PgDn` move ten strings down, while `b` and `PgUp` move in the other direction. The keys `g`, `G`, `Home` and `End` also function as expected.
+Moving between the `@String` definitions can be done in the usual way: the cursor keys `up` and `down`, `p` and `n` or `C-p` and `C-n` move up and down. `Space` and `PgDn` move ten strings down, while `b` and `PgUp` move in the other direction. The keys `g`, `G`, `Home` and `End` also function as expected.
 
-To delete a `@string` definition, use `d`. To edit the value of a definition, use `e`. There is also a command `c`, which copies the value of the current `@string` definition to the kill ring. Unlike in the entry buffer, there are no corresponing commands `y` and `x`. (In fact, `x` does exist, but has another function.) Yanking from the kill ring can be done with `C-y/M-y` in the minibuffer when you edit a `@string`'s value. Cutting a `@string`'s value is pointless, because a `@string` definition must have a value.
+To delete a `@String` definition, use `d`. To edit the value of a definition, use `e`. There is also a command `c`, which copies the value of the current `@String` definition to the kill ring. Unlike in the entry buffer, there are no corresponing commands `y` and `x`. (In fact, `x` does exist, but has another function.) Yanking from the kill ring can be done with `C-y/M-y` in the minibuffer when you edit a `@String`'s value. Cutting a `@String`'s value is pointless, because a `@String` definition must have a value.
 
-Having defined `@string` definitions, there must of course be a way to use them. Just giving a field a string abbreviation as value will not do, because Ebib puts braces around the value that you enter when it writes the `.bib` file, so that BibTeX will not recognise the abbreviation, and will not expand it. BibTeX will only recognise an abbreviation if it appears in the `.bib` file outside of any braces.
+Having defined `@String` definitions, there must of course be a way to use them. Just giving a field a string abbreviation as value will not do, because Ebib puts braces around the value that you enter when it writes the `.bib` file, so that BibTeX will not recognise the abbreviation, and will not expand it. BibTeX will only recognise an abbreviation if it appears in the `.bib` file outside of any braces.
 
 To accomplish this, you must mark a field's value as special. A special field is a field whose value is not surrounded by braces when the database is saved, so that BibTeX recognises it as an abbreviation. To mark a field special, press `r`. An asterisk will appear before the field, indicating that has no braces. Pressing `r` again will change the field back to normal. If you press `r` on a field that does not have a value yet, Ebib will ask you for one.
 
 Note that this also makes it possible to enter field values that are composed of concatenations of strings and abbreviations. The BibTeX documentation for example explains that if you have defined:
 
-    @string{WGA = "World Gnus Almanac"}
+    @String{WGA = "World Gnus Almanac"}
 
 you can create a BibTeX field like this:
 
@@ -843,12 +843,12 @@ which will produce "1966 World Gnus Almanac". Or you can do:
 
 which will produce someting like "1 January", assuming your bibliography style has defined the abbreviation `jan`. All this is possible with Ebib, simply by entering the exact text including quotes or braces around the strings, and marking the relevant field as special.
 
-An easy way to enter a `@string` abbreviation as a field value is to use the key `s` instead of `e`. If you type `s`, Ebib asks you for a `@string` abbreviation to put in the current field, and automatically marks the field as special. With this command, Ebib only accepts `@string` definitions that are in the database, so that by using `s` you can make sure you don't make any typos. Note that you can use TAB completion to complete a partial string.
+An easy way to enter a `@String` abbreviation as a field value is to use the key `s` instead of `e`. If you type `s`, Ebib asks you for a `@String` abbreviation to put in the current field, and automatically marks the field as special. With this command, Ebib only accepts `@String` definitions that are in the database, so that by using `s` you can make sure you don't make any typos. Note that you can use TAB completion to complete a partial string.
 
 
 # @Comments #
 
-If Ebib finds a `@comment` in  a `.bib` file, it will read it and store it in the database. When the database is saved, all the `@comment`s will be saved with it, at the top of the file (right after the `@preamble`.) There is no way to edit comments, nor can you specify where in the `.bib` file a comment is placed, but they won't be lost.
+If Ebib finds a `@comment` in  a `.bib` file, it will read it and store it in the database. When the database is saved, all the `@comment`s will be saved with it, at the top of the file (right after the `@Preamble`.) There is no way to edit comments, nor can you specify where in the `.bib` file a comment is placed, but they won't be lost.
 
 
 # Managing Keywords #
@@ -914,7 +914,7 @@ Sometimes it can be useful to copy entries from one database to another, or to c
 
 You can also export entries to a file. To do this, call the command `x` with a prefix argument: `C-u x`. You will be prompted for the file name to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so it's possible to end up with duplicate entries in this way.
 
-Apart from entries, it is also possible to export the `@preamble` and `@string` definitions. The `@preamble` definition is exported with the command `X` in the index buffer. `@string` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@string` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
+Apart from entries, it is also possible to export the `@Preamble` and `@String` definitions. The `@Preamble` definition is exported with the command `X` in the index buffer. `@String` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@String` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
 
 
 # Multiple Identical Fields #
@@ -946,15 +946,15 @@ If you load this entry into Ebib with the option "Allow Identical Fields" set, y
 
 # Multiline Edit Buffers #
 
-As mentioned several times before, Ebib has a special multiline edit buffer, which is used to edit field values that contain newlines (so-called *multiline fields*), and also to edit the contents of the `@preamble` command. This section discusses the details of this buffer.
+As mentioned several times before, Ebib has a special multiline edit buffer, which is used to edit field values that contain newlines (so-called *multiline fields*), and also to edit the contents of the `@Preamble` command. This section discusses the details of this buffer.
 
-Ebib enters multiline edit mode in one of three cases: when you edit the `@preamble` definition, when you hit `m` in the entry buffer to edit the current field as multiline, or when you hit `e` on the `annote` field, or on a field whose value already is multiline.
+Ebib enters multiline edit mode in one of three cases: when you edit the `@Preamble` definition, when you hit `m` in the entry buffer to edit the current field as multiline, or when you hit `e` on the `annote` field, or on a field whose value already is multiline.
 
 The mode that is used in the multiline edit buffer is user-configurable. The default value is `text-mode`, but if you prefer to use some other mode, you can specify this through the customisation options. (Personally, I use `markdown-mode` in the multiline edit buffer, so that I can use [`Markdown`](http://daringfireball.net/projects/markdown/) to write annotations, which provides an easy way to create headers, use bold and italic, etc., in plain text.)
 
 Three commands are relevant for interacting with Ebib when you're in the multiline edit buffer, which are bound to key sequences in the minor mode `ebib-multiline-edit-mode`, which is activated automatically in the multiline edit buffer.
 
-`ebib-quit-multiline-buffer-and-save`, bound to `C-c | q`, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you've deleted all contents of the buffer (including the final newline!) and you were editing a field value or the `@preamble`, the field value or preamble is deleted. (This is in fact the *only* way to delete the `@preamble` definition. Field values on the other hand can also be deleted by hitting `x` or `d` on them in the entry buffer.) If you were editing a `@string` value, Ebib will just complain, because string definitions cannot be empty.
+`ebib-quit-multiline-buffer-and-save`, bound to `C-c | q`, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you've deleted all contents of the buffer (including the final newline!) and you were editing a field value or the `@Preamble`, the field value or preamble is deleted. (This is in fact the *only* way to delete the `@Preamble` definition. Field values on the other hand can also be deleted by hitting `x` or `d` on them in the entry buffer.) If you were editing a `@String` value, Ebib will just complain, because string definitions cannot be empty.
 
 `ebib-cancel-multiline-buffer`, bound to `C-c | c`, also leaves the multiline edit buffer, but it does so without storing the text. The original value of the field, string or preamble will be retained. If the text was modified, Ebib will ask for a confirmation before leaving the buffer.
 

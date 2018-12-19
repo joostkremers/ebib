@@ -576,7 +576,7 @@ window and make the frame active,"
   (with-current-ebib-buffer 'entry
     (ebib-entry-mode)
     (buffer-disable-undo))
-  ;; Then we create a buffer to hold the @STRING definitions.
+  ;; Then we create a buffer to hold the @String definitions.
   (push (cons 'strings (get-buffer-create "*Ebib-strings*")) ebib--buffer-alist)
   (with-current-ebib-buffer 'strings
     (ebib-strings-mode)
@@ -943,7 +943,7 @@ unless IGNORE-MODTIME is non-nil."
       (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
     (let ((result (ebib--find-bibtex-entries db nil)))
       ;; Log the results.
-      (ebib--log 'message "%d entries, %d @STRINGs and %s @PREAMBLE found in file."
+      (ebib--log 'message "%d entries, %d @Strings and %s @Preamble found in file."
                  (car result)
                  (cadr result)
                  (if (nth 2 result)
@@ -957,8 +957,8 @@ unless IGNORE-MODTIME is non-nil."
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
 first element is the number of entries found, the second the
-number of @STRING definitions, and the third is T or NIL,
-indicating whether a @PREAMBLE was found.
+number of @String definitions, and the third is T or NIL,
+indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry.  Note that a timestamp is only added if `ebib-use-timestamp'
@@ -1012,7 +1012,7 @@ DB."
           (ebib-db-set-comment comment db))))))
 
 (defun ebib--read-string (db)
-  "Read an @STRING definition and store it in DB.
+  "Read an @String definition and store it in DB.
 Return value is the string if one was read, nil otherwise."
   (let* ((def (parsebib-read-string))
          (abbr (car def))
@@ -1020,13 +1020,13 @@ Return value is the string if one was read, nil otherwise."
     (if def
         (if (ebib-set-string abbr string db)
             string
-          (ebib--log 'warning (format "Line %d: @STRING definition `%s' duplicated. Skipping."
+          (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
                                   (line-number-at-pos) abbr)))
       (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos)))))
 
 (defun ebib--read-preamble (db)
-  "Read a @PREAMBLE definition and store it in DB.
-If there was already another @PREAMBLE definition, the new one is
+  "Read a @Preamble definition and store it in DB.
+If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
   (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
     (if preamble
@@ -1506,9 +1506,9 @@ formatting the entry."
         (ebib-db-get-comments db)))
 
 (defun ebib--format-strings (db)
-  "Write the @STRINGs of DB into the current buffer in BibTeX format."
+  "Write the @Strings of DB into the current buffer in BibTeX format."
   (mapc (lambda (str)
-          (insert (format "@STRING{%s = %s}\n" (car str) (cdr str))))
+          (insert (format "@String{%s = %s}\n" (car str) (cdr str))))
         (ebib-db-get-all-strings db))
   (insert "\n"))
 
@@ -2011,7 +2011,7 @@ first entry with the current entry's key in its crossref field."
   (message "Switched to next database.  Continue searching with RET."))
 
 (defun ebib-edit-strings ()
-  "Edit the @STRING definitions in the database."
+  "Edit the @String definitions in the database."
   (interactive)
   (ebib--execute-when
     ((real-db)
@@ -2022,7 +2022,7 @@ first entry with the current entry's key in its crossref field."
      (beep))))
 
 (defun ebib-edit-preamble ()
-  "Edit the @PREAMBLE definition in the database."
+  "Edit the @Preamble definition in the database."
   (interactive)
   (ebib--execute-when
     ((real-db)
@@ -2031,31 +2031,31 @@ first entry with the current entry's key in its crossref field."
      (beep))))
 
 (defun ebib-export-preamble (prefix)
-  "Export the @PREAMBLE definition.
+  "Export the @Preamble definition.
 
-With PREFIX argument, export the @PREAMBLE to a file.  Otherwise export
-the @PREAMBLE to another open database.  The user is asked for the file
-or database to export the @PREAMBLE to.
+With PREFIX argument, export the @Preamble to a file.  Otherwise export
+the @Preamble to another open database.  The user is asked for the file
+or database to export the @Preamble to.
 
-If the goal database already has a preamble, the @PREAMBLE is be
+If the goal database already has a preamble, the @Preamble is be
 appended to it."
   (interactive "P")
   (ebib--execute-when
     ((real-db)
      (if (null (ebib-db-get-preamble ebib--cur-db))
-         (error "[Ebib] No @PREAMBLE defined"))
+         (error "[Ebib] No @Preamble defined"))
      (if prefix
-         (let ((filename (expand-file-name (read-file-name "File to export @PREAMBLE to: " nil nil nil ebib--export-filename))))
+         (let ((filename (expand-file-name (read-file-name "File to export @Preamble to: " nil nil nil ebib--export-filename))))
            (if (file-writable-p filename)
                (with-temp-buffer
                  (insert "\n")
-                 (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))
+                 (insert (format "\n@Preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))
                  (append-to-file (point-min) (point-max) filename)
                  (setq ebib--export-filename filename))
              (error "[Ebib] Cannot write to file `%s'" filename)))
-       (let* ((target-db (ebib-read-database "Export @PREAMBLE to database: ")))
+       (let* ((target-db (ebib-read-database "Export @Preamble to database: ")))
          (unless target-db
-           (error "[Ebib] Could not export @PREAMBLE"))
+           (error "[Ebib] Could not export @Preamble"))
          (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) target-db 'append)
          (ebib-db-set-modified t target-db))))
     ((default)
@@ -3290,7 +3290,7 @@ The deleted text is not put in the kill ring."
   (hl-line-mode 1))
 
 (defun ebib-quit-strings-buffer ()
-  "Quit editing the @STRING definitions."
+  "Quit editing the @String definitions."
   (interactive)
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
@@ -3302,7 +3302,7 @@ The deleted text is not put in the kill ring."
 (defun ebib--current-string ()
   "Return the currently selected string.
 The current string is simply the string that point is on.  If
-point is on an empty line (e.g., when there are no @string
+point is on an empty line (e.g., when there are no @String
 definitions), return nil.  This function leaves point at the
 beginning of the current line."
   (with-current-ebib-buffer 'strings
@@ -3353,7 +3353,7 @@ beginning of the current line."
       (forward-line -1)))
 
 (defun ebib--fill-strings-buffer ()
-  "Fill the strings buffer with the @STRING definitions."
+  "Fill the strings buffer with the @String definitions."
   (with-current-ebib-buffer 'strings
     (let ((inhibit-read-only t))
       (erase-buffer)
@@ -3367,7 +3367,7 @@ beginning of the current line."
     (set-buffer-modified-p nil)))
 
 (defun ebib-edit-string ()
-  "Edit the value of an @STRING definition.
+  "Edit the value of an @String definition.
 When the user enters an empty string, the value is not changed."
   (interactive)
   (let* ((string (ebib--current-string))
@@ -3381,7 +3381,7 @@ When the user enters an empty string, the value is not changed."
           (ebib--redisplay-current-string)
           (ebib-next-string)
           (ebib--set-modified t))
-      (error "[Ebib] @STRING definition cannot be empty"))))
+      (error "[Ebib] @String definition cannot be empty"))))
 
 (defun ebib-copy-string-contents ()
   "Copy the contents of the current string to the kill ring."
@@ -3391,22 +3391,22 @@ When the user enters an empty string, the value is not changed."
     (message "String value copied.")))
 
 (defun ebib-delete-string ()
-  "Delete the current @STRING definition from the database."
+  "Delete the current @String definition from the database."
   (interactive)
   (let ((string (ebib--current-string)))
-    (when (y-or-n-p (format "Delete @STRING definition %s? " string))
+    (when (y-or-n-p (format "Delete @String definition %s? " string))
       (ebib-db-remove-string string ebib--cur-db)
       (let ((inhibit-read-only t))
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
       (ebib--set-modified t)
-      (message "@STRING definition deleted."))))
+      (message "@String definition deleted."))))
 
 (defun ebib-add-string ()
-  "Create a new @STRING definition."
+  "Create a new @String definition."
   (interactive)
-  (ebib--ifstring (new-abbr (read-string "New @STRING abbreviation: " nil 'ebib--key-history))
+  (ebib--ifstring (new-abbr (read-string "New @String abbreviation: " nil 'ebib--key-history))
       (if (member new-abbr (ebib-db-list-strings ebib--cur-db))
           (error "[Ebib] %s already exists" new-abbr)
         (ebib--ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
@@ -3422,62 +3422,62 @@ When the user enters an empty string, the value is not changed."
               (ebib--set-modified t))))))
 
 (defun ebib-export-string (prefix)
-  "Export the current @STRING to another database.
-With PREFIX argument, export the @STRING to a file.  Otherwise export
-the @STRING to another open database.  The user is asked for the file
-or database to export the @STRING to."
+  "Export the current @String to another database.
+With PREFIX argument, export the @String to a file.  Otherwise export
+the @String to another open database.  The user is asked for the file
+or database to export the @String to."
   (interactive "P")
   (let ((string (ebib--current-string)))
     (unless string
       (error "No current string found"))
     (if prefix
         ;; Export to file.
-        (let ((filename (expand-file-name (read-file-name "File to export @STRING to:" nil nil nil ebib--export-filename))))
+        (let ((filename (expand-file-name (read-file-name "File to export @String to:" nil nil nil ebib--export-filename))))
           (if (file-writable-p filename)
               (with-temp-buffer
-                (insert (format "\n@string{%s = %s}\n"
+                (insert (format "\n@String{%s = %s}\n"
                                 string
                                 (ebib-db-get-string string ebib--cur-db))))
             (error "[Ebib] Cannot write to file `%s'" filename)))
       ;; Export to another database.
-      (let ((target-db (ebib-read-database "Export @STRING to database:")))
+      (let ((target-db (ebib-read-database "Export @String to database:")))
         (unless target-db
-          (error "[Ebib] Could not export @STRINGs"))
+          (error "[Ebib] Could not export @Strings"))
         (if (member string (ebib-db-list-strings target-db))
-            (ebib--log 'message "@STRING `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
+            (ebib--log 'message "@String `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
           (ebib-set-string string (ebib-db-get-string string ebib--cur-db) target-db 'error)
           (ebib-db-set-modified t target-db))))))
 
 (defun ebib-export-all-strings (prefix)
-  "Export all @STRING definitions to another database.
-With PREFIX argument, export the @STRING definitions to a file.
-Otherwise export the @STRING definitions to another open
+  "Export all @String definitions to another database.
+With PREFIX argument, export the @String definitions to a file.
+Otherwise export the @String definitions to another open
 database.  The user is asked for the file or database to export
-the @STRING definitions to."
+the @String definitions to."
   (interactive "P")
   (let ((strings (ebib-db-list-strings ebib--cur-db)))
     (unless strings
-      (error "No @STRING definitions found"))
+      (error "No @String definitions found"))
     (if prefix
         ;; Export to file.
-        (let ((filename (expand-file-name (read-file-name "File to export @STRING to:" nil nil nil ebib--export-filename))))
+        (let ((filename (expand-file-name (read-file-name "File to export @String to:" nil nil nil ebib--export-filename))))
           (if (file-writable-p filename)
               (with-temp-buffer
                 (mapc (lambda (string)
-                        (insert (format "\n@string{%s = %s}\n"
+                        (insert (format "\n@String{%s = %s}\n"
                                         string
                                         (ebib-db-get-string string ebib--cur-db))))
                       strings))
             (error "[Ebib] Cannot write to file `%s'" filename)))
       ;; Export to another database.
-      (let ((target-db (ebib-read-database "Export @STRING to database:")))
+      (let ((target-db (ebib-read-database "Export @String to database:")))
         (unless target-db
-          (error "[Ebib] Could not export @STRINGs"))
+          (error "[Ebib] Could not export @Strings"))
         (let ((modified nil)
               (target-strings (ebib-db-list-strings target-db)))
           (mapc (lambda (string)
                   (if (member string target-strings)
-                      (ebib--log 'message "@STRING `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
+                      (ebib--log 'message "@String `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
                     (ebib-set-string string (ebib-db-get-string string ebib--cur-db) target-db 'error)
                     (setq modified t)))
                 strings)
@@ -3682,7 +3682,7 @@ or on the region if it is active."
             (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
               (ebib--update-buffers)
               (ebib--set-modified t)
-              (message (format "%d entries, %d @STRINGs and %s @PREAMBLE found in buffer."
+              (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
                                (car result)
                                (cadr result)
                                (if (nth 2 result) "a" "no"))))))))))

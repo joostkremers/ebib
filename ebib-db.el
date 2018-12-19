@@ -42,7 +42,7 @@
 (cl-defstruct ebib--db-struct
   (database (make-hash-table :test 'equal)) ; Hashtable containing the database itself.
   (strings)                                 ; Alist with the @STRING definitions.
-  (preamble)                                ; String with the @PREAMBLE definition.
+  (preamble)                                ; String with the @Preamble definition.
   (comments)                                ; List of @COMMENTS.
   (local-vars)                              ; The file's local variable block.
   (dialect)                                 ; The dialect of this database.
@@ -367,7 +367,7 @@ Return non-nil on success or nil if PREAMBLE could not be stored."
 	(error "[Ebib] Preamble is not empty; cannot overwrite")))))
 
 (defun ebib-db-remove-preamble (db)
-  "Remove the @PREAMBLE definition from DB."
+  "Remove the @Preamble definition from DB."
   (ebib-db-set-preamble nil db 'overwrite))
 
 (defun ebib-db-get-preamble (db)
