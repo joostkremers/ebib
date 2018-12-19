@@ -120,6 +120,15 @@ No check is performed to see if VARS is really a local variable block."
   "Set BUFFER as DB's index buffer."
   (setf (ebib--db-struct-buffer db) buffer))
 
+(defun ebib-db-kill-buffer (db)
+  "Kill the index buffer of DB.
+This function can be used when entries are added to or removed
+from DB non-interactively, to ensure that the index buffer is
+recreated the next time DB becomes active."
+  (when (ebib--db-struct-buffer db)
+    (kill-buffer (ebib--db-struct-buffer db))
+    (setf (ebib--db-struct-buffer db) nil)))
+
 (defun ebib--db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
   (ebib--db-struct-cur-entry db))

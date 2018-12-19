@@ -734,7 +734,7 @@ keywords before Emacs is killed."
     (define-key map "S" #'ebib-edit-strings)
     (define-key map "u" #'ebib-browse-url)
     (define-key map "w" #'ebib-write-database)
-    (define-key map "x" #'ebib-export-entry) ; prefix
+    (define-key map "x" #'ebib-export-entries) ; prefix
     (define-key map "\C-xb" #'ebib-leave-ebib-windows)
     (define-key map "\C-xk" #'ebib-quit)
     (define-key map "X" #'ebib-export-preamble)
@@ -1852,115 +1852,29 @@ buffer and switch to it."
       (ebib-db-set-current-entry-key key ebib--cur-db)
       (ebib--update-entry-buffer))))
 
-(defun ebib--export-to-db (num message copy-fn)
-  "Export data to another database.
-NUM is the number of the database to which the data is to be copied.
+(defun ebib-export-entries (prefix)
+  "Export entries to another database.
+With PREFIX argument, export entries to a file.  Otherwise export
+entries to another open database.  The user is asked for the file
+or database to export entries to.
 
-MESSAGE is a string displayed in the echo area if the export was
-succesful.  It must contain a %d directive, which is used to
-display the database number to which the entry was exported.
-
-COPY-FN is the function that actually copies the relevant
-data.  It must take as argument the database to which the data is
-to be copied.  COPY-FN must return T if the copying was
-successful, and NIL otherwise."
-  (let ((goal-db (nth (1- num) ebib--databases)))
-    (if (not goal-db)
-        (error "[Ebib] Database %d does not exist" num)
-      (when (funcall copy-fn goal-db)
-        (ebib--set-modified t goal-db)
-        (message message num)))))
-
-(defun ebib--export-to-file (prompt-string insert-fn)
-  "Export data to a file.
-PROMPT-STRING is the string that is used to ask for the filename
-to export to.  INSERT-FN must insert the data to be exported into
-the current buffer: it is called within a `with-temp-buffer',
-whose contents is appended to the file the user enters."
-  (let ((insert-default-directory (not ebib--export-filename)))
-    (ebib--ifstring (filename (read-file-name
-                           prompt-string "~/" nil nil ebib--export-filename))
-        (with-temp-buffer
-          (funcall insert-fn)
-          (append-to-file (point-min) (point-max) filename)
-          (setq ebib--export-filename filename)))))
-
-(defun ebib--export-entries-to-file (entries &optional source-db filename)
-  "Export ENTRIES from SOURCE-DB to FILENAME.
-ENTRIES is a list of entry keys.  SOURCE-DB defaults to the
-current database.  If FILENAME is not provided, the user is asked
-for one."
-  (unless filename
-    (setq filename (read-file-name
-                    "File to export entries to:" "~/" nil nil ebib--export-filename)))
-  (unless source-db
-    (setq source-db ebib--cur-db))
-  (with-temp-buffer
-    (insert "\n")
-    (mapc (lambda (key)
-            (ebib--format-entry key ebib--cur-db nil))
-          entries)
-    (append-to-file (point-min) (point-max) filename)
-    (setq ebib--export-filename filename)))
-
-(defun ebib-export-entry (prefix)
-  "Copy entries to another database.
-The PREFIX argument indicates which database to copy the entry
-to.  If no prefix argument is present, a filename is asked to
-which the entry is appended."
+This function operates on the marked entries or, if no entries
+are marked, on the current entry."
   (interactive "P")
-  (let ((num (ebib--prefix prefix)))
-    (ebib--execute-when
-      ((marked-entries)
-       (ebib--export-marked-entries num))
-      ((entries)
-       (ebib--export-single-entry num)))))
-
-(defun ebib--export-single-entry (num)
-  "Copy the current entry to another database.
-NUM indicates which database to copy the entry to.  If it is nil,
-a filename is asked to which the entry is appended."
   (ebib--execute-when
     ((entries)
-     (if num
-         (ebib--export-to-db num (format "Entry `%s' copied to database %%d." (ebib--get-key-at-point))
-                         (lambda (db)
-                           (let ((entry-key (ebib--get-key-at-point)))
-                             (if (member entry-key (ebib-db-list-keys db))
-                                 (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
-                               (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)
-                               t)))) ; We must return T, WHEN does not always do this.
-       (ebib--export-to-file (format "Export `%s' to file: " (ebib--get-key-at-point))
-                         (lambda ()
-                           (insert "\n")
-                           (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db t)))))
-    ((default)
-     (beep))))
-
-(defun ebib--export-marked-entries (num)
-  "Copy the marked entries to another database.
-NUM indicates which database to copy the entry to.  If it is nil,
-a filename is asked to which the entry is appended."
-  (ebib--execute-when
-    ((marked-entries)
-     (if num
-         (ebib--export-to-db
-          num "Entries copied to database %d."
-          (lambda (db)
-            (mapc (lambda (entry-key)
-                    (if (member entry-key (ebib-db-list-keys db))
-                        (error "[Ebib] Entry key `%s' already exists in database %d" entry-key num)
-                      (ebib--store-entry entry-key (copy-tree (ebib-db-get-entry entry-key ebib--cur-db)) db t)))
-                  (ebib-db-list-marked-entries ebib--cur-db))
-            t)) ; We must return T, WHEN does not always do this.
-       (ebib--export-to-file "Export to file: "
-                         (lambda ()
-                           (mapc (lambda (entry-key)
-                                   (insert "\n")
-                                   (ebib--format-entry entry-key ebib--cur-db t))
-                                 (ebib-db-list-marked-entries ebib--cur-db))))))
-    ((default)
-     (beep))))
+     (let ((entries (or (ebib-db-list-marked-entries ebib--cur-db)
+                        (list (ebib--get-key-at-point)))))
+       (if prefix
+           (let ((filename (expand-file-name (read-file-name "File to export entries to: " nil nil nil ebib--export-filename))))
+             (if (file-writable-p filename)
+                 (ebib--export-entries-to-file entries filename ebib--cur-db)
+               (error "[Ebib] Cannot write to file `%s'" filename)))
+         (let* ((target-db (ebib-read-database "Export entries to database: ")))
+           (if target-db
+               (ebib--export-entries-to-db entries target-db ebib--cur-db)
+             (error "[Ebib] Could not export entries"))))))
+    ((default) (beep))))
 
 (defvar ebib-search-map
   (let ((map (make-keymap)))
@@ -2118,24 +2032,32 @@ first entry with the current entry's key in its crossref field."
 
 (defun ebib-export-preamble (prefix)
   "Export the @PREAMBLE definition.
-If a PREFIX argument is given, it is taken as the database to
-export the preamble to.  If the goal database already has a
-preamble, the new preamble will be appended to it.  If no prefix
-argument is given, the user is asked to enter a filename to which
-the preamble is appended."
+
+With PREFIX argument, export the @PREAMBLE to a file.  Otherwise export
+the @PREAMBLE to another open database.  The user is asked for the file
+or database to export the @PREAMBLE to.
+
+If the goal database already has a preamble, the @PREAMBLE is be
+appended to it."
   (interactive "P")
   (ebib--execute-when
     ((real-db)
      (if (null (ebib-db-get-preamble ebib--cur-db))
-         (error "[Ebib] No @PREAMBLE defined")
-       (let ((num (ebib--prefix prefix)))
-         (if num
-             (ebib--export-to-db num "@PREAMBLE copied to database %d"
-                             (lambda (db)
-                               (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) db 'append)))
-           (ebib--export-to-file "Export @PREAMBLE to file: "
-                             (lambda ()
-                               (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))))))))
+         (error "[Ebib] No @PREAMBLE defined"))
+     (if prefix
+         (let ((filename (expand-file-name (read-file-name "File to export @PREAMBLE to: " nil nil nil ebib--export-filename))))
+           (if (file-writable-p filename)
+               (with-temp-buffer
+                 (insert "\n")
+                 (insert (format "\n@preamble{%s}\n\n" (ebib-db-get-preamble ebib--cur-db)))
+                 (append-to-file (point-min) (point-max) filename)
+                 (setq ebib--export-filename filename))
+             (error "[Ebib] Cannot write to file `%s'" filename)))
+       (let* ((target-db (ebib-read-database "Export @PREAMBLE to database: ")))
+         (unless target-db
+           (error "[Ebib] Could not export @PREAMBLE"))
+         (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) target-db 'append)
+         (ebib-db-set-modified t target-db))))
     ((default)
      (beep))))
 
@@ -3500,42 +3422,67 @@ When the user enters an empty string, the value is not changed."
               (ebib--set-modified t))))))
 
 (defun ebib-export-string (prefix)
-  "Export the current @STRING.
-The PREFIX argument indicates which database to copy the string
-to.  If no prefix argument is present, a filename is asked to
-which the string is appended."
+  "Export the current @STRING to another database.
+With PREFIX argument, export the @STRING to a file.  Otherwise export
+the @STRING to another open database.  The user is asked for the file
+or database to export the @STRING to."
   (interactive "P")
-  (let ((string (ebib--current-string))
-        (num (ebib--prefix prefix)))
-    (if num
-        (ebib--export-to-db num (format "@STRING definition `%s' copied to database %%d" string)
-                        (lambda (db)
-                          (ebib-set-string string (ebib-db-get-string string ebib--cur-db) db 'error)))
-      (ebib--export-to-file (format "Export @STRING definition `%s' to file: " string)
-                        (lambda ()
-                          (insert (format "\n@string{%s = %s}\n"
-                                          string
-                                          (ebib-db-get-string string ebib--cur-db))))))))
+  (let ((string (ebib--current-string)))
+    (unless string
+      (error "No current string found"))
+    (if prefix
+        ;; Export to file.
+        (let ((filename (expand-file-name (read-file-name "File to export @STRING to:" nil nil nil ebib--export-filename))))
+          (if (file-writable-p filename)
+              (with-temp-buffer
+                (insert (format "\n@string{%s = %s}\n"
+                                string
+                                (ebib-db-get-string string ebib--cur-db))))
+            (error "[Ebib] Cannot write to file `%s'" filename)))
+      ;; Export to another database.
+      (let ((target-db (ebib-read-database "Export @STRING to database:")))
+        (unless target-db
+          (error "[Ebib] Could not export @STRINGs"))
+        (if (member string (ebib-db-list-strings target-db))
+            (ebib--log 'message "@STRING `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
+          (ebib-set-string string (ebib-db-get-string string ebib--cur-db) target-db 'error)
+          (ebib-db-set-modified t target-db))))))
 
 (defun ebib-export-all-strings (prefix)
-  "Export all @STRING definitions.
-If a PREFIX argument is given, it is taken as the database to
-copy the definitions to.  Without prefix argument, asks for a file
-to append them to."
+  "Export all @STRING definitions to another database.
+With PREFIX argument, export the @STRING definitions to a file.
+Otherwise export the @STRING definitions to another open
+database.  The user is asked for the file or database to export
+the @STRING definitions to."
   (interactive "P")
-  (when (ebib--current-string) ; There is always a current string, unless there are no strings.
-    (let ((num (ebib--prefix prefix)))
-      (if num
-          (ebib--export-to-db
-           num "All @STRING definitions copied to database %d"
-           (lambda (db)
-             (mapc (lambda (abbr)
-                     (ebib-set-string abbr (ebib-db-get-string abbr ebib--cur-db) db))
-                   (ebib-db-list-strings ebib--cur-db))))
-        (ebib--export-to-file "Export all @STRING definitions to file: "
-                          (lambda ()
-                            (insert (format "\n")) ; To keep things tidy.
-                            (ebib--format-strings ebib--cur-db)))))))
+  (let ((strings (ebib-db-list-strings ebib--cur-db)))
+    (unless strings
+      (error "No @STRING definitions found"))
+    (if prefix
+        ;; Export to file.
+        (let ((filename (expand-file-name (read-file-name "File to export @STRING to:" nil nil nil ebib--export-filename))))
+          (if (file-writable-p filename)
+              (with-temp-buffer
+                (mapc (lambda (string)
+                        (insert (format "\n@string{%s = %s}\n"
+                                        string
+                                        (ebib-db-get-string string ebib--cur-db))))
+                      strings))
+            (error "[Ebib] Cannot write to file `%s'" filename)))
+      ;; Export to another database.
+      (let ((target-db (ebib-read-database "Export @STRING to database:")))
+        (unless target-db
+          (error "[Ebib] Could not export @STRINGs"))
+        (let ((modified nil)
+              (target-strings (ebib-db-list-strings target-db)))
+          (mapc (lambda (string)
+                  (if (member string target-strings)
+                      (ebib--log 'message "@STRING `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
+                    (ebib-set-string string (ebib-db-get-string string ebib--cur-db) target-db 'error)
+                    (setq modified t)))
+                strings)
+          (when modified
+            (ebib-db-set-modified t target-db)))))))
 
 (defun ebib-strings-help ()
   "Show the info node on Ebib's strings buffer."
@@ -3856,7 +3803,7 @@ created containing only these entries."
                                   ebib--local-bibtex-filenames))))
            (with-temp-buffer
              (insert-file-contents bbl-file)
-             (ebib--export-entries-to-file (ebib-read-entries-from-bbl) databases bib-file))))))
+             (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))
     ((default)
      (beep))))
 

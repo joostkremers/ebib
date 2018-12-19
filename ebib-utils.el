@@ -1430,6 +1430,32 @@ string has the text property `ebib--alias' with value t."
       (setq value noerror))
     value))
 
+(defun ebib--export-entries-to-db (entries target-db source-db)
+  "Export ENTRIES from SOURCE-DB to TARGET-DB.
+ENTRIES is a list of entry keys."
+  (let ((target-keys-list (ebib-db-list-keys target-db))
+        (modified nil))
+    (mapc (lambda (key)
+            (if (member key target-keys-list)
+                (ebib--log 'message "Entry key `%s' already exists in database %s" key (ebib-db-get-filename target-db 'short))
+              (ebib--store-entry key (copy-tree (ebib-db-get-entry key source-db)) target-db t)
+              (setq modified t)))
+          entries)
+    (when modified
+      (ebib-db-kill-buffer target-db)
+      (ebib-db-set-modified t target-db))))
+
+(defun ebib--export-entries-to-file (entries filename source-db)
+  "Export ENTRIES from SOURCE-DB to FILENAME.
+ENTRIES is a list of entry keys."
+  (with-temp-buffer
+    (insert "\n")
+    (mapc (lambda (key)
+            (ebib--format-entry key source-db nil))
+          entries)
+    (append-to-file (point-min) (point-max) filename)
+    (setq ebib--export-filename filename)))
+
 (defun ebib--find-db-for-key (key db)
   "Return the database containing KEY.
 First see if KEY is in DB.  If not, check all members of
