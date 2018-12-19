@@ -1292,7 +1292,7 @@ value is the (un)modified list."
   (let ((item (seq-find (lambda (elt) (string= (car elt) "bibtex-dialect")) vars)))
     (if item
         (when overwrite
-          (setq vars (setcdr item (symbol-name dialect))))
+          (setcdr item (list (symbol-name dialect))))
       (setq vars (push (list "bibtex-dialect" (symbol-name dialect)) vars)))
     vars))
 
