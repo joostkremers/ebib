@@ -3,12 +3,17 @@
 
 <article>
 
-Ebib is a program with which you can manage BibTeX and BibLateX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 24.3 or higher. (Users of GNU/Emacs 23.1 and up can install Ebib 1.x, which is available in the pasture branch on Github or as a zip or tar archive on Github's releases page.)
+Ebib is a program with which you can manage BibTeX and BibLateX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 25.3 or higher.
 
 It should be noted that Ebib is *not* a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.
 
 
 # News #
+
+## Version 2.14, December 2018 ##
+
+- Change the user interface of the export functions. Calling one of the export functions now exports to another database. The user is asked to specify the database, enabling completion on the database names. To export to a file, the export functions have to be called with a prefix argument.
+- Bug fix: Handle overwriting the local BibTeX dialect correctly.
 
 ## Version 2.13, November 2018 ##
 
@@ -905,13 +910,11 @@ If a BibTeX entry in the buffer lack an entry key (which sometimes happens with 
 
 # Exporting Entries #
 
-Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to a `.bib` file, use the command `x`. This command operates on a single entry or on all marked entries.
+Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to another database, use the command `x`. This command operates on a single entry or on all marked entries. Ebib will ask you for the database to export the entry or entries to. TAB-completion is available, based on the file names of the databases.
 
-When you export one or more entries, Ebib will ask you for a filename to export them to. If you have already exported an entry before, Ebib will present the filename you used as default, but you can of course change it. For obvious reasons, Ebib appends the entry to the file that you enter if it already exists, it does not overwrite the file. If this is not what you want, delete the file first, as Ebib provides no way to do this.
+You can also export entries to a file. To do this, call the command `x` with a prefix argument: `C-u x`. You will be prompted for the file name to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so it's possible to end up with duplicate entries in this way.
 
-If you have more than one database open in Ebib, it is also possible to copy entries from one database to another. To do this, use the `x` command with a numeric prefix argument. E.g., if the database you want to export an entry to is the second database, type `M-2 x` to export the current entry to it. The number of the database is given in the modeline of the index buffer. If the database you're copying an entry to already contains an entry with the same entry key, Ebib won't copy the entry, and issues an appropriate warning message.
-
-Apart from entries, it is also possible to export the `@preamble` and `@string` definitions. The `@preamble` definition is exported with the command `X` in the index buffer. `@string` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@string` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for a filename, and then append the relevent data to that file. With a numeric prefix argument, they copy the relevant data to the corresponding open database.
+Apart from entries, it is also possible to export the `@preamble` and `@string` definitions. The `@preamble` definition is exported with the command `X` in the index buffer. `@string` definitions can be exported in the strings buffer: `x` in this buffer exports the current string, while `X` exports all `@string` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
 
 
 # Multiple Identical Fields #
