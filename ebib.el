@@ -765,6 +765,7 @@ character ?1-?9, which is converted to the corresponding number."
   (if ebib-hide-cursor
       (setq cursor-type nil))
   (setq truncate-lines t)
+  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
@@ -842,7 +843,7 @@ character ?1-?9, which is converted to the corresponding number."
   "Open the BibTeX file FILE."
   (interactive)
   (unless file
-    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: " "~/")) (car ebib-bibtex-extensions))))
+    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
   (ebib--load-bibtex-file-internal file)
   (ebib--update-buffers))
 
@@ -1616,7 +1617,7 @@ unconditionally, even if the new file already exists."
   (interactive "P")
   (ebib--execute-when
     ((database)
-     (ebib--ifstring (new-filename (expand-file-name (read-file-name "Save to file: " "~/")))
+     (ebib--ifstring (new-filename (expand-file-name (read-file-name "Save to file: ")))
          (when (or force
                    (not (file-exists-p new-filename))
                    (y-or-n-p (format (format "File %s already exists; overwrite? " new-filename))))
@@ -2149,7 +2150,7 @@ Either prints the entire database, or the marked entries."
                                       ebib--cur-db)))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                  ebib-print-tempfile
-                               (read-file-name "Use temp file: " "~/" nil nil)))
+                               (read-file-name "Use temp file: ")))
            (progn
              (with-temp-buffer
                (when ebib-print-preamble
@@ -2195,7 +2196,7 @@ Operates either on all entries or on the marked entries."
     ((real-db entries)
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                ebib-print-tempfile
-                             (read-file-name "Use temp file: " "~/" nil nil)))
+                             (read-file-name "Use temp file: ")))
          (progn
            (with-temp-buffer
              (when ebib-latex-preamble
@@ -2873,6 +2874,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (if ebib-hide-cursor
       (setq cursor-type nil))
   (setq truncate-lines t)
+  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1)
   (ebib-entry-minor-mode 1))
@@ -3361,6 +3363,7 @@ The deleted text is not put in the kill ring."
   (if ebib-hide-cursor
       (setq cursor-type nil))
   (setq truncate-lines t)
+  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
@@ -3698,7 +3701,8 @@ The text being edited is stored before saving the database."
   fundamental-mode "Ebib-log"
   "Major mode for the Ebib log buffer."
   (local-set-key "\C-xb" 'ebib-quit-log-buffer)
-  (local-set-key "\C-xk" 'ebib-quit-log-buffer))
+  (local-set-key "\C-xk" 'ebib-quit-log-buffer)
+  (setq default-directory "~/")) ; Make sure Ebib always thinks it's in $HOME.
 
 (defun ebib-quit-log-buffer ()
   "Exit the log buffer."
