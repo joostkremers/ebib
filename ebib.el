@@ -2934,7 +2934,7 @@ was called interactively."
   (let ((keys (apply #'append (mapcar #'ebib-db-list-keys ebib--databases))))
     (ebib--ifstring (key (completing-read (format "Key to insert in `%s': " field) keys nil t nil 'ebib--key-history))
         (progn
-          (ebib-db-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
+          (ebib-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
           (ebib--set-modified t)))))
 
