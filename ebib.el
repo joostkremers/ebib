@@ -1473,31 +1473,33 @@ all entries are marked."
     ((default)
      (beep))))
 
+
 (defun ebib--format-entry (key db &optional timestamp sort)
   "Write entry KEY in DB into the current buffer in BibTeX format.
 If TIMESTAMP is non-nil and `ebib-use-timestamp' is set, a
 timestamp is added to the entry, possibly overwriting an existing
 timestamp.  If SORT is non-nil, the fields are sorted before
 formatting the entry."
-  (let ((entry (ebib-db-get-entry key db 'noerror)))
+  (when-let* ((entry (copy-alist (ebib-db-get-entry key db 'noerror)))
+              (type (cdr (assoc "=type=" entry))))
+    (if (and timestamp ebib-use-timestamp)
+        (setf (alist-get "timestamp" entry nil nil #'cl-equalp) (format-time-string (concat "{" ebib-timestamp-format "}"))))
+    (setq entry (seq-filter (lambda (field)
+                              (and (cdr field) ; Remove fields with value nil. See `ebib-set-field-value'.
+                                   (not (ebib--special-field-p (car field)))))
+                            entry))
     (setq entry (if sort
-                    (cl-sort (copy-sequence entry) #'string< :key #'car)
+                    (cl-sort entry #'string< :key #'car)
                   ;; When reading, fields are stored with `push', so if we don't
                   ;; sort, we need to reverse them to get the original order
                   ;; back.  See github issues #42, #55, #62.
                   (reverse entry)))
-    (when entry
-      (insert (format "@%s{%s,\n" (cdr (assoc "=type=" entry)) key))
-      (mapc (lambda (field)
-              (unless (or (not (cdr field)) ; Deleted fields have their value set to nil. See `ebib-set-field-value'.
-                          (ebib--special-field-p (car field))
-                          (and (cl-equalp (car field) "timestamp") timestamp ebib-use-timestamp))
-                (insert (format "\t%s = %s,\n" (car field) (cdr field)))))
-            entry)
-      (if (and timestamp ebib-use-timestamp)
-          (insert (format "\ttimestamp = {%s}" (format-time-string ebib-timestamp-format)))
-        (delete-char -2))               ; The final ",\n" must be deleted.
-      (insert "\n}\n\n"))))
+    (insert (format "@%s{%s,\n" type key))
+    (insert (mapconcat (lambda (field)
+                         (format "\t%s = %s" (car field) (cdr field)))
+                       entry
+                       ",\n"))
+    (insert "\n}\n\n")))
 
 (defun ebib--format-comments (db)
   "Write the @COMMENTS of DB into the current buffer in BibTeX format."
