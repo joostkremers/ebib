@@ -2539,7 +2539,7 @@ uses standard Emacs completion."
 Return the keywords entered as a list.  Any keywords not in
 COLLECTION are added to the current database's keywords list.  If
 no keywords are entered, the return value is nil."
-  (let ((keywords (cl-loop for keyword = (completing-read (format "Add keyword (ENTER to finish) [%s]: " (mapconcat #'identity keywords " ")) collection nil nil nil 'ebib-keyword-history)
+  (let ((keywords (cl-loop for keyword = (completing-read (format "Add keyword (ENTER to finish) [%s]: " (mapconcat #'identity keywords " ")) collection nil nil nil 'ebib--keywords-history)
                            until (string= keyword "")
                            collecting keyword into keywords
                            finally return keywords)))
