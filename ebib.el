@@ -1044,7 +1044,8 @@ be added.  (Whether a timestamp is actually added also depends on
     (when (string= entry-key "")
       (setq entry-key (ebib--generate-tempkey db))
       (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-    (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
+    (if (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
+        (ebib--set-modified t)
       (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
     entry-key))                         ; Return the entry key.
 
@@ -1168,6 +1169,7 @@ is replaced with a number in ascending sequence."
       (push (cons "=type=" ebib-default-entry-type) fields))
     ;; Insert.
     (ebib--store-entry entry-key fields db t ebib-uniquify-keys)
+    (ebib--set-modified t)
     entry-key))
 
 (defun ebib-add-entry ()

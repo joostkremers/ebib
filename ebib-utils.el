@@ -1330,10 +1330,8 @@ Return ENTRY-KEY if storing the entry was succesful, nil
 otherwise.  Depending on the value of IF-EXISTS, storing an entry
 may also result in an error."
   (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
-    (when result
-      (ebib--set-modified t db)
-      (when (and timestamp ebib-use-timestamp)
-        (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite)))
+    (when (and result timestamp ebib-use-timestamp)
+      (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite))
     result))
 
 (defun ebib-set-field-value (field value key db &optional if-exists nobrace)
