@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'seq)
+(require 'subr-x) ; when-let*
 (require 'bibtex)
 (require 'ebib-db)
 

@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'subr-x) ; hash-table-keys
 
 ;; Each database is represented by a struct.
 (cl-defstruct ebib--db-struct
