@@ -40,6 +40,7 @@
 (require 'seq)
 (require 'subr-x) ; when-let*
 (require 'bibtex)
+(require 'format-spec)
 (require 'ebib-db)
 
 ;; Make a bunch of variables obsolete.

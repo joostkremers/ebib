@@ -53,6 +53,7 @@
 (require 'bibtex)
 (require 'seq)
 (require 'pp)
+(require 'hl-line)
 (require 'parsebib)
 (require 'ebib-utils)
 (require 'ebib-db)
