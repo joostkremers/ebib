@@ -409,7 +409,7 @@ database that contains the entry."
   :group 'ebib
   :type '(function :tag "Mode function"))
 
-(defcustom ebib-multiline-display-function #'ebib-multiline-display-paragraph
+(defcustom ebib-multiline-display-function 'ebib-multiline-display-paragraph
   "The way in which multiline field values are shown in the index buffer.
 The option \"First Line\" shows only the first line, regardless
 of its length.  (It will be truncated at the window edge.)  The
