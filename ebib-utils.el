@@ -389,7 +389,7 @@ contains the entry."
   :group 'ebib
   :type '(choice (function-item :tag "Author/Year" ebib-author-year-description)
                  (function-item :tag "Title" ebib-title-description)
-                 (function :tag "Custom function")))
+                 (function :tag "Custom Function")))
 
 (defun ebib-author-year-description (key db)
   "Provide an author/year description for an Org Ebib link.
