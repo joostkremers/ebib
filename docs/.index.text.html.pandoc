@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for index.text
-;; saved on 2016.02.22 13:56
+;; saved on 2019.01.07 15:16
 
 ((latexmathml)
  (mathml)
@@ -43,7 +43,7 @@
  (slide-level)
  (reference-odt)
  (reference-docx)
- (standalone)
+ (standalone . t)
  (template)
  (variable)
  (dpi)
