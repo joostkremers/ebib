@@ -216,15 +216,55 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
                             (concat "+" (ebib--first-line val))
                           (concat " " val))))))))
 
+(defun ebib-multiline-display-single-line (string)
+  "Reduce the multiline text STRING.
+Return a list with only the first line."
+  (list (car (split-string string "\n" t))))
+
+(defun ebib-multiline-display-paragraph (string)
+  "Reduce the multiline text STRING.
+The text is filled to account for the posibility that the
+original text is meant to be used with `visual-line-mode'.
+Return a list of strings, each a single line."
+  (split-string (with-temp-buffer
+                  (insert string)
+                  (goto-char (point-min))
+                  (forward-paragraph)
+                  (delete-region (point) (point-max))
+                  (fill-region (point-min) (point-max))
+                  (buffer-string))
+                "\n" t))
+
+(defun ebib--make-multiline-display (string matched)
+  "Return a string for multiline field values to display in the entry buffer.
+STRING is the text to display.  MATCHED indicates whether a
+search string match was found.  Only the first paragraph of
+STRING is displayed, but never more than
+`ebib-multiline-display-max-lines' lines.  A continuation symbol
+\"[...]\" is added as the last line.  If MATCHED is non-nil, this
+continuation symbol is highlighted."
+  (let ((multilines (funcall ebib-multiline-display-function string)))
+    (if (> (length multilines) ebib-multiline-display-max-lines)
+        (setq multilines (seq-subseq multilines 0 ebib-multiline-display-max-lines)))
+    (let ((first-line (car multilines))
+          (rest-lines (mapcar (lambda (line)
+                                (concat (make-string 19 ?\s) line))
+                              (cdr multilines))))
+      (cl-values (concat first-line
+                         (if rest-lines
+                             (concat "\n" (string-join rest-lines "\n"))))
+                 (concat "\n" (make-string 19 ?\s)
+                         (if matched
+                             (propertize "[...]" 'face 'highlight)
+                           "[...]"))))))
+
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
-  ;; Note: we need to work on a copy of the value, otherwise the highlights
-  ;; are made to the value as stored in the database. Hence copy-sequence.
   (or db (setq db ebib--cur-db))
   (let* ((case-fold-search t)
          (value (ebib-get-field-value field key db 'noerror nil 'xref))
+         (multiline "")
          (raw " ")
-         (multiline " ")
          (matched nil)
          (alias ""))
     ;; We have to do a couple of things now:
@@ -238,7 +278,7 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
       (if (stringp (get-text-property 0 'ebib--xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
       (if (and (member-ignore-case field '("crossref" "xref" "related"))
-               (not (ebib-db-get-entry key db 'noerror)))
+               (not (ebib--find-db-for-key (ebib-unbrace value) ebib--cur-db)))
           (setq value (propertize value 'face 'ebib-warning-face)))
       (if (cl-equalp field "keywords")
           (let* ((unbraced (ebib-unbraced-p value))
@@ -259,12 +299,8 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
       (when match-str
         (cl-multiple-value-setq (value matched) (ebib--match-all-in-string match-str value)))
       (when (ebib--multiline-p value)
-        (setq multiline (propertize "+" 'face nil)) ; Sometimes the face property persists.
-        (setq value (ebib--first-line value)))
-      (when (and matched
-                 (string= multiline "+"))
-        (add-text-properties 0 1 '(face highlight) multiline)))
-    (concat raw multiline value alias)))
+        (cl-multiple-value-setq (value multiline) (ebib--make-multiline-display value matched))))
+    (concat raw value alias multiline)))
 
 (defun ebib--display-fields (key &optional db match-str)
   "Display the fields of entry KEY in DB.
@@ -280,7 +316,7 @@ it is highlighted.  DB defaults to the current database."
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
          (undef-fields (seq-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key db) dialect)))))
-    (insert (format "%-19s %s%s\n"
+    (insert (format "%-18s %s%s\n"
                     (propertize "type" 'face 'ebib-field-face)
                     (if (assoc-string entry-type (ebib--list-entry-types dialect t) 'case-fold)
                         entry-type
@@ -2758,12 +2794,20 @@ the beginning of the current line."
                        (point))))
             (buffer-substring-no-properties beg end)))))))
 
+(defun ebib--empty-line-p ()
+  "Return t if point is at an empty line in the entry buffer.
+Return t if point is on an empty line or on a line that starts
+with spaces (which is part of a multiline value).  Return nil
+otherwise."
+  (or (eolp)
+      (looking-at-p "[[:space:]]")))
+
 (defun ebib-prev-field ()
   "Move to the previous field."
   (interactive)
   (if (= (forward-line -1) -1)
       (beep) ; We're at the first field already.
-    (while (eolp) ; If we're at an empty line,
+    (while (ebib--empty-line-p) ; If we're at an empty line,
       (forward-line -1)))) ; move up until we're not.
 
 (defun ebib-next-field (&optional pfx)
@@ -2776,7 +2820,7 @@ was called interactively."
     (if pfx                        ; the last field, beep and adjust.
         (beep))
     (forward-line -1))
-  (while (eolp)                         ; If we're at an empty line,
+  (while (ebib--empty-line-p)                         ; If we're at an empty line,
     (forward-line)))                    ; move down until we're not.
 
 (defun ebib-goto-first-field ()
@@ -2788,7 +2832,7 @@ was called interactively."
   "Move to the last field."
   (interactive)
   (goto-char (point-max))
-  (while (eolp)                 ; Move up as long as we're at an empty line.
+  (while (ebib--empty-line-p)                 ; Move up as long as we're at an empty line.
     (forward-line -1)))
 
 (defun ebib-goto-next-set ()
@@ -2796,7 +2840,7 @@ was called interactively."
   (interactive)
   (beginning-of-line)
   (let ((p (point)))
-    (while (not (eolp))              ; Search for the first empty line.
+    (while (not (ebib--empty-line-p))              ; Search for the first empty line.
       (forward-line))
     (if (not (= (forward-line) 0))   ; If we cannot move to the next line,
         (goto-char p))))             ; go back to where we started.
@@ -2807,7 +2851,7 @@ was called interactively."
   (beginning-of-line)
   (if (bobp)                  ; If we're at the =type= field, we don't move
       (beep)
-    (while (not (eolp))          ; Otherwise just find the first empty line
+    (while (not (ebib--empty-line-p))          ; Otherwise just find the first empty line
       (forward-line -1))
     (forward-line -1)))                   ; and move beyond it.
 

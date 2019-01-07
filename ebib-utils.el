@@ -410,6 +410,26 @@ database that contains the entry."
   :group 'ebib
   :type '(function :tag "Mode function"))
 
+(defcustom ebib-multiline-display-function #'ebib-multiline-display-paragraph
+  "The way in which multiline field values are shown in the index buffer.
+The option \"First Line\" shows only the first line, regardless
+of its length.  (It will be truncated at the window edge.)  The
+option \"First Paragraph\" displays the first paragraph, but
+never more than `ebib-multiline-display-max-lines' lines.
+
+It is possible to provide a custom function for this option.
+This function should take a (multiline) string as argument and
+return a list of lines to be displayed."
+  :group 'ebib
+  :type '(choice (function-item :tag "Show First Line" ebib-multiline-display-single-line)
+                 (function-item :tag "Show First Paragraph" ebib-multiline-display-paragraph)
+                 (function :tag "Custom Function")))
+
+(defcustom ebib-multiline-display-max-lines 10
+  "The maximum number of lines to display for multiline field values."
+  :group 'ebib
+  :type 'integer)
+
 (defcustom ebib-sort-order nil
   "The fields on which the BibTeX entries are to be sorted in the BibTeX file.
 This option is described in the manual/info file in the section
@@ -1237,7 +1257,7 @@ ignored."
   (if (stringp string)
       (string-match-p "\n" string)))
 
-(defsubst ebib--first-line (string)
+(defun ebib--first-line (string)
   "Return the first line of a multiline STRING."
   (car (split-string string "\n")))
 
@@ -1564,7 +1584,7 @@ nil."
   (if (ebib-db-get-entry key db 'noerror)
       db
     (let ((dbs (reverse ebib--databases)))
-      (while (and dbs (not (ebib-db-get-entry key (car dbs) 'noerror)))
+      (while (and dbs (not (ebib-db-has-key key (car dbs))))
         (setq dbs (cdr dbs)))
       (car dbs))))
 

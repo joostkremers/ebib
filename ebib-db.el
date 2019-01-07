@@ -215,6 +215,10 @@ is suffixed, then `ab' etc."
   "Return a list of keys in DB."
   (hash-table-keys (ebib--db-struct-database db)))
 
+(defun ebib-db-has-key (key db)
+  "Return t if KEY exists in DB."
+  (gethash key (ebib--db-struct-database db)))
+
 (defun ebib-db-change-key (key new-key db &optional if-exists)
   "Change entry key KEY to NEW-KEY in DB.
 ENTRY must be a key itself.  IF-EXISTS determines what to do when
