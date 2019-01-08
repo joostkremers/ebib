@@ -2992,12 +2992,12 @@ If FILE is not in (a subdirectory of) one of the directories in
   "Edit a field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' `crossref', `xref' and
-`related' fields offer completion, the `annote' field is edited
-as a multiline field, the `keywords' field adds keywords one by
-one, also allowing completion, and the field in `ebib-file-field'
-uses filename completion and shortens filenames if they are in (a
-subdirectory of) one of the directories in
-`ebib-file-search-dirs'.
+`related' fields offer completion, the `annote', `annotation' and
+`abstract' fields is edited as a multiline field, the `keywords'
+field adds keywords one by one, also allowing completion, and the
+field in `ebib-file-field' uses filename completion and shortens
+filenames if they are in (a subdirectory of) one of the
+directories in `ebib-file-search-dirs'.
 
 With a prefix argument PFX, the `keywords' field and the field in
 `ebib-file-field' can be edited directly.  For other fields, the
@@ -3015,7 +3015,7 @@ prefix argument has no meaning."
                   ((and (cl-equalp field ebib-file-field)
                         (= 1 pfx))
                    (ebib--edit-file-field))
-                  ((member-ignore-case field '("annote" "annotation"))
+                  ((member-ignore-case field '("annote" "annotation" "abstract"))
                    ;; A multiline edit differs from the other ones, because
                    ;; the edit isn't done when `ebib-edit-multiline-field'
                    ;; returns. This means we cannot move to the next field.
