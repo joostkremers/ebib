@@ -10,6 +10,11 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.15, January 2019 ##
+
+- Multiline field values can now be displayed in the entry buffer.
+- Various small bug fixes.
+
 ## Version 2.14, December 2018 ##
 
 - Change the user interface of the export functions. Calling one of the export functions now exports to another database. The user is asked to specify the database, enabling completion on the database names. To export to a file, the export functions have to be called with a prefix argument.

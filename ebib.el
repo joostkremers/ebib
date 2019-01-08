@@ -1,12 +1,12 @@
 ;;; ebib.el --- a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2018 Joost Kremers
+;; Copyright (c) 2003-2019 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.14
+;; Version: 2.15
 ;; Keywords: text bibtex
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.3"))
 
