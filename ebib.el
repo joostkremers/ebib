@@ -2794,7 +2794,7 @@ the beginning of the current line."
                        (point))))
             (buffer-substring-no-properties beg end)))))))
 
-(defun ebib--empty-line-p ()
+(defun ebib--outside-field-p ()
   "Return t if point is at an empty line in the entry buffer.
 Return t if point is on an empty line or on a line that starts
 with spaces (which is part of a multiline value).  Return nil
@@ -2807,7 +2807,7 @@ otherwise."
   (interactive)
   (if (= (forward-line -1) -1)
       (beep) ; We're at the first field already.
-    (while (ebib--empty-line-p) ; If we're at an empty line,
+    (while (ebib--outside-field-p) ; If we're at an empty line,
       (forward-line -1)))) ; move up until we're not.
 
 (defun ebib-next-field (&optional pfx)
@@ -2820,7 +2820,7 @@ was called interactively."
     (if pfx                        ; the last field, beep and adjust.
         (beep))
     (forward-line -1))
-  (while (ebib--empty-line-p)                         ; If we're at an empty line,
+  (while (ebib--outside-field-p)                         ; If we're at an empty line,
     (forward-line)))                    ; move down until we're not.
 
 (defun ebib-goto-first-field ()
@@ -2832,7 +2832,7 @@ was called interactively."
   "Move to the last field."
   (interactive)
   (goto-char (point-max))
-  (while (ebib--empty-line-p)                 ; Move up as long as we're at an empty line.
+  (while (ebib--outside-field-p)                 ; Move up as long as we're at an empty line.
     (forward-line -1)))
 
 (defun ebib-goto-next-set ()
