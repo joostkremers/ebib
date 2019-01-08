@@ -1150,13 +1150,14 @@ interactively."
      (beep))))
 
 (defun ebib-show-annotation ()
-  "Show the contents of the `annote' field in a *Help* window."
+  "Show the contents of the `annote' or `annotation' field in a *Help* window."
   (interactive)
-  (let ((help-window-select t)) ; Make sure the help window is selected.
+  (let ((help-window-select t) ; Make sure the help window is selected.
+        (field (cdr (assq (ebib-db-get-dialect ebib--cur-db) '((BibTeX . "annote") (biblatex . "annotation"))))))
     (with-help-window (help-buffer)
       (princ (propertize (format "Annotation for `%s' [%s]" (ebib--get-key-at-point) (ebib-db-get-filename ebib--cur-db 'shortened)) 'face '(:weight bold)))
       (princ "\n\n")
-      (let ((contents (ebib-get-field-value "annotation" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
         (if contents
             (princ contents)
           (princ "[No annotation]"))))))
