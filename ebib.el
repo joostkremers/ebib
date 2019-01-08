@@ -3610,6 +3610,47 @@ The text being edited is stored before saving the database."
       (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
 
+;;; Functions for downloading additional data
+
+(defun ebib-download-url (arg)
+  "Download file from standard URL field, named after bibtex key
+If this field contains more than one URL, ask the user which one
+to download.  Alternatively, the user can provide a numeric prefix
+argument ARG.
+The file is downloaded to the first entry for ebib-file-search-dirs.
+It is assumed that the file linked is a pdf.  It will be saved as
+[key of the entry].pdf"
+  (interactive "P")
+  (ebib--execute-when
+    ((entries)
+     (let ((urls (ebib-unbrace
+				  (ebib-db-get-field-value ebib-url-field
+										   (ebib--get-key-at-point)
+										   ebib--cur-db
+										   'noerror))))
+       (if urls
+		   (progn
+			 (let* ((fname (concat (ebib--get-key-at-point) ".pdf"))
+					(fullpath (concat (car ebib-file-search-dirs) fname))
+					(urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
+					(pdfurl (ebib--transform-url urlvalue)))
+			   (url-copy-file pdfurl fullpath t)
+			   (message (concat "downloaded url " pdfurl " to " fullpath))
+			   (ebib-db-set-field-value ebib-file-field
+										fname
+										(ebib--get-key-at-point)
+										ebib--cur-db 'overwrite)))
+         (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
+    ((default)
+     (beep))))
+
+(defun ebib--transform-url (pdfurl)
+  "Transform PDFURL to a URL acutally pointing to a PDF
+Currently, only arxiv links are handled."
+  (cond ((string-match-p "https?://arxiv.org/abs/" pdfurl)
+		 (concat (s-replace "/abs/" "/pdf/" pdfurl) ".pdf"))
+		(t pdfurl)))
+
 ;;; Functions for non-Ebib buffers
 
 (defun ebib-import ()
