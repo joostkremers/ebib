@@ -3026,7 +3026,7 @@ prefix argument has no meaning."
                    nil)
                   (t (ebib--edit-normal-field)))))
     ;; When the edit returns, see if we need to move to the next field and
-    ;; whether we need to update the index display.
+    ;; check whether we need to update the index display.
     (when result
       (when pfx
         (ebib-next-field))
