@@ -2840,7 +2840,7 @@ was called interactively."
   (interactive)
   (beginning-of-line)
   (let ((p (point)))
-    (while (not (ebib--empty-line-p))              ; Search for the first empty line.
+    (while (not (eolp))              ; Search for the first empty line.
       (forward-line))
     (if (not (= (forward-line) 0))   ; If we cannot move to the next line,
         (goto-char p))))             ; go back to where we started.
@@ -2851,7 +2851,7 @@ was called interactively."
   (beginning-of-line)
   (if (bobp)                  ; If we're at the =type= field, we don't move
       (beep)
-    (while (not (ebib--empty-line-p))          ; Otherwise just find the first empty line
+    (while (not (eolp))          ; Otherwise just find the first empty line
       (forward-line -1))
     (forward-line -1)))                   ; and move beyond it.
 
