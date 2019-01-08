@@ -38,7 +38,6 @@
 
 (require 'cl-lib)
 (require 'seq)
-(require 'subr-x) ; when-let*
 (require 'bibtex)
 (require 'format-spec)
 (require 'ebib-db)
@@ -410,7 +409,7 @@ database that contains the entry."
   :group 'ebib
   :type '(function :tag "Mode function"))
 
-(defcustom ebib-multiline-display-function #'ebib-multiline-display-paragraph
+(defcustom ebib-multiline-display-function 'ebib-multiline-display-paragraph
   "The way in which multiline field values are shown in the index buffer.
 The option \"First Line\" shows only the first line, regardless
 of its length.  (It will be truncated at the window edge.)  The
@@ -1457,26 +1456,27 @@ If TIMESTAMP is non-nil and `ebib-use-timestamp' is set, a
 timestamp is added to the entry, possibly overwriting an existing
 timestamp.  If SORT is non-nil, the fields are sorted before
 formatting the entry."
-  (when-let* ((entry (copy-alist (ebib-db-get-entry key db 'noerror)))
-              (type (cdr (assoc "=type=" entry))))
-    (if (and timestamp ebib-use-timestamp)
-        (setf (alist-get "timestamp" entry nil nil #'cl-equalp) (format-time-string (concat "{" ebib-timestamp-format "}"))))
-    (setq entry (seq-filter (lambda (field)
-                              (and (cdr field) ; Remove fields with value nil. See `ebib-set-field-value'.
-                                   (not (ebib--special-field-p (car field)))))
-                            entry))
-    (setq entry (if sort
-                    (cl-sort entry #'string< :key #'car)
-                  ;; When reading, fields are stored with `push', so if we don't
-                  ;; sort, we need to reverse them to get the original order
-                  ;; back.  See github issues #42, #55, #62.
-                  (reverse entry)))
-    (insert (format "@%s{%s,\n" type key))
-    (insert (mapconcat (lambda (field)
-                         (format "\t%s = %s" (car field) (cdr field)))
-                       entry
-                       ",\n"))
-    (insert "\n}\n\n")))
+  (let* ((entry (copy-alist (ebib-db-get-entry key db 'noerror)))
+         (type (cdr (assoc "=type=" entry))))
+    (when entry
+      (if (and timestamp ebib-use-timestamp)
+          (setcdr (assoc-string "timestamp" entry 'case-fold) (format-time-string (concat "{" ebib-timestamp-format "}"))))
+      (setq entry (seq-filter (lambda (field)
+                                (and (cdr field) ; Remove fields with value nil. See `ebib-set-field-value'.
+                                     (not (ebib--special-field-p (car field)))))
+                              entry))
+      (setq entry (if sort
+                      (cl-sort entry #'string< :key #'car)
+                    ;; When reading, fields are stored with `push', so if we don't
+                    ;; sort, we need to reverse them to get the original order
+                    ;; back.  See github issues #42, #55, #62.
+                    (reverse entry)))
+      (insert (format "@%s{%s,\n" type key))
+      (insert (mapconcat (lambda (field)
+                           (format "\t%s = %s" (car field) (cdr field)))
+                         entry
+                         ",\n"))
+      (insert "\n}\n\n"))))
 
 (defun ebib--format-comments (db)
   "Write the @COMMENTS of DB into the current buffer in BibTeX format."
