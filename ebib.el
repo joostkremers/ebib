@@ -1756,7 +1756,7 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
              (if entry-key
                  (progn (ebib-db-set-current-entry-key entry-key ebib--cur-db)
                         (setq needs-update t)
-                        (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) 'case-fold)
+                        (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) 'case-fold)
                             (message "[Ebib] Yanked entry.")
                           (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
                (message "[Ebib] Could not yank a valid entry")
@@ -2870,7 +2870,7 @@ was called interactively."
 
 (defun ebib--edit-entry-type ()
   "Edit the entry type."
-  (ebib--ifstring (new-type (completing-read "type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db)) nil t))
+  (ebib--ifstring (new-type (completing-read "type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
       (progn
         (ebib-set-field-value "=type=" new-type (ebib--get-key-at-point) ebib--cur-db 'overwrite 'unbraced)
         (ebib--update-entry-buffer)
