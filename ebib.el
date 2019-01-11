@@ -222,7 +222,8 @@ STRING is the text to display.  MATCHED indicates whether a
 search string match was found.  If the text is longer than
 `ebib-multiline-display-max-lines' lines, it is truncated and a
 continuation marker \"[...]\" is added.  If MATCHED is non-nil,
-this continuation marker is highlighted.
+this continuation marker is highlighted.  Empty lines from the
+beginning and end of STRING are removed.
 
 This function calls the function in
 `ebib-multiline-display-function' to convert the text to a list
@@ -232,6 +233,11 @@ of strings."
     (when (> (length multilines) ebib-multiline-display-max-lines)
       (setq multilines (seq-subseq multilines 0 ebib-multiline-display-max-lines))
       (setq truncated t))
+    (setq multilines (thread-last multilines
+                       (seq-drop-while (lambda (elt) (string= elt "")))
+                       (reverse)
+                       (seq-drop-while (lambda (elt) (string= elt "")))
+                       (reverse)))
     (let ((first-line (car multilines))
           (rest-lines (mapcar (lambda (line)
                                 (concat (make-string 19 ?\s) line))
