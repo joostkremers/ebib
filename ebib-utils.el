@@ -416,9 +416,7 @@ By default, the value is shown as-is, but never more than
 Paragraph\" displays the first paragraph (also with a maximum of
 `ebib-multiline-display-max-lines' lines), but in addition
 refills the text, which is useful if you use long lines in your
-multiline values.  The third option, \"First Line\" shows only
-the first line, regardless of its length.  (It will be truncated
-at the window edge.)
+multiline values.
 
 It is possible to provide a custom function for this option.
 This function should take a (multiline) string as argument and
@@ -426,7 +424,6 @@ return a list of lines to be displayed."
   :group 'ebib
   :type '(choice (function-item :tag "Show Value As-Is" ebib-multiline-display-as-is)
                  (function-item :tag "Show First Paragraph" ebib-multiline-display-paragraph)
-                 (function-item :tag "Show First Line" ebib-multiline-display-single-line)
                  (function :tag "Custom Function")))
 
 (defcustom ebib-multiline-display-max-lines 10

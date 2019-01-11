@@ -236,11 +236,6 @@ Return a list of strings, each a single line."
                   (buffer-string))
                 "\n" t))
 
-(defun ebib-multiline-display-single-line (string)
-  "Reduce the multiline text STRING.
-Return a list with only the first line."
-  (list (car (split-string string "\n" t))))
-
 (defun ebib--make-multiline-display (string matched)
   "Return a string for multiline field values to display in the entry buffer.
 STRING is the text to display.  MATCHED indicates whether a
