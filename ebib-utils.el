@@ -426,6 +426,26 @@ return a list of lines to be displayed."
                  (function-item :tag "Show First Paragraph" ebib-multiline-display-paragraph)
                  (function :tag "Custom Function")))
 
+(defun ebib-multiline-display-as-is (string)
+  "Reduce the multiline text STRING.
+The text is split into lines and returned.  No other
+modifications are made."
+  (split-string string "\n"))
+
+(defun ebib-multiline-display-paragraph (string)
+  "Reduce the multiline text STRING.
+The text is filled to account for the posibility that the
+original text is meant to be used with `visual-line-mode'.
+Return a list of strings, each a single line."
+  (split-string (with-temp-buffer
+                  (insert string)
+                  (goto-char (point-min))
+                  (forward-paragraph)
+                  (delete-region (point) (point-max))
+                  (fill-region (point-min) (point-max))
+                  (buffer-string))
+                "\n" t))
+
 (defcustom ebib-multiline-display-max-lines 10
   "The maximum number of lines to display for multiline field values."
   :group 'ebib

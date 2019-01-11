@@ -216,26 +216,6 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
                             (concat "+" (ebib--first-line val))
                           (concat " " val))))))))
 
-(defun ebib-multiline-display-as-is (string)
-  "Reduce the multiline text STRING.
-The text is split into lines and returned.  No other
-modifications are made."
-  (split-string string "\n"))
-
-(defun ebib-multiline-display-paragraph (string)
-  "Reduce the multiline text STRING.
-The text is filled to account for the posibility that the
-original text is meant to be used with `visual-line-mode'.
-Return a list of strings, each a single line."
-  (split-string (with-temp-buffer
-                  (insert string)
-                  (goto-char (point-min))
-                  (forward-paragraph)
-                  (delete-region (point) (point-max))
-                  (fill-region (point-min) (point-max))
-                  (buffer-string))
-                "\n" t))
-
 (defun ebib--make-multiline-display (string matched)
   "Return a string for multiline field values to display in the entry buffer.
 STRING is the text to display.  MATCHED indicates whether a
