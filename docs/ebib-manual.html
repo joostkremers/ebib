@@ -95,16 +95,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#version-2.12.2-november-2018">Version 2.12.2, November 2018</a></li>
 <li><a href="#version-2.12-august-2018">Version 2.12, August 2018</a></li>
 <li><a href="#version-2.11.12-july-2018">Version 2.11.12, July 2018</a></li>
-<li><a href="#version-2.11-january-2017">Version 2.11, January 2017</a></li>
-<li><a href="#version-2.10-january-2017">Version 2.10, January 2017</a></li>
-<li><a href="#version-2.9-january-2017">Version 2.9, January 2017</a></li>
-<li><a href="#december-2016">19 December 2016</a></li>
-<li><a href="#december-2016-1">7 December 2016</a></li>
-<li><a href="#december-2016-2">5 December 2016</a></li>
-<li><a href="#november-2016">7 November 2016</a></li>
-<li><a href="#version-2.8-26-october-2016">Version 2.8, 26 October 2016</a></li>
-<li><a href="#version-2.7-22-september-2016">Version 2.7, 22 September 2016</a></li>
-<li><a href="#version-2.6.3-31-august-2016">Version 2.6.3, 31 August 2016</a></li>
 </ul></li>
 <li><a href="#installation">Installation</a><ul>
 <li><a href="#package-manager">Package manager</a></li>
@@ -184,12 +174,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="version-2.15-january-2019">Version 2.15, January 2019</h2>
 <ul>
 <li>Multiline field values can now be displayed in the entry buffer.</li>
-<li>Various small bug fixes.</li>
+<li>Do not warn about aliased entry types when loading BibLaTeX files.</li>
+<li>The abstract field is now treated as a multiline field by default, similar to the annote/annotation field.</li>
+<li>Bug fix: <code>ebib-show-annotation</code> (bound to <code>A</code>) shows the contents of the annote field in BibTeX databases, not the annotation field (which is BibLaTeX-specific).</li>
 </ul>
 <h2 id="version-2.14-december-2018">Version 2.14, December 2018</h2>
 <ul>
 <li>Change the user interface of the export functions. Calling one of the export functions now exports to another database. The user is asked to specify the database, enabling completion on the database names. To export to a file, the export functions have to be called with a prefix argument.</li>
 <li>Bug fix: Handle overwriting the local BibTeX dialect correctly.</li>
+<li>Bug fix: Add braces to the crossref field.</li>
 </ul>
 <h2 id="version-2.13-november-2018">Version 2.13, November 2018</h2>
 <ul>
@@ -214,65 +207,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Improve handling of multiple databases: <code>crossref</code> entries can now occur in other open databases as well, and searches with <code>/</code> can be continued in other databases.</li>
 <li>Autogenerating keys is now on by default.</li>
 </ul>
-<h2 id="version-2.11-january-2017">Version 2.11, January 2017</h2>
-<ul>
-<li>Update for <code>parsebib</code> v. 2.3.</li>
-</ul>
-<h2 id="version-2.10-january-2017">Version 2.10, January 2017</h2>
-<ul>
-<li>Improved index column display.</li>
-</ul>
-<h2 id="version-2.9-january-2017">Version 2.9, January 2017</h2>
-<ul>
-<li>Allow <code>%s</code> in the program strings in <code>ebib-file-associations</code>, making it possible to pass command line arguments to the program being called.</li>
-</ul>
-<h2 id="december-2016">19 December 2016</h2>
-<ul>
-<li>Remove support for a separate rc file for Ebib. User configuration should be moved to Emacs’ <code>init.el</code> file. To keep Ebib customisation in a separate file, simply load it from <code>init.el</code>.</li>
-<li>The macro <code>ebib-key</code> has also been removed. Simply use <code>define-key</code> or any other key binding mechanism to define keys for Ebib. See the section <a href="#modifying-key-bindings">Modifying Key Bindings</a> for details.</li>
-</ul>
-<h2 id="december-2016-1">7 December 2016</h2>
-<ul>
-<li>Upgrade Emacs dependency to 24.4.</li>
-</ul>
-<h2 id="december-2016-2">5 December 2016</h2>
-<ul>
-<li>New library <code>org-ebib</code>. This defines a new Org link type <code>ebib:</code>, which uses the command <code>org-ebib-open</code> to open Ebib. The previous commands to do this, <code>ebib-show-entry</code> and <code>ebib-open-org-link</code> have been removed. <code>org-ebib</code> also allows the creation of Org links to Ebib entries with <code>org-store-link</code>.</li>
-<li>New citation insertion command <code>ebib-insert-citation</code>. This replaces <code>ebib-insert-bibtex-key</code>, so please update your key bindings. The new command uses <code>ivy</code> for completion if this package is available, so that it is possible to select an entry by typing parts of its author and/or title.</li>
-</ul>
-<h2 id="november-2016">7 November 2016</h2>
-<ul>
-<li>New tabulated list interface in index buffer. This interface is not based on Emacs’ built-in <code>tabulated-list-mode</code>, hence sorting cannot be done by clicking on the column headers. Sorting can be done with <code>&lt;</code>, <code>&gt;</code> (sort ascending and sort descending, respectively, which ask for the column to sort) and <code>=</code>, to reset to default sort (which is on the entry key).</li>
-<li>The user option <code>ebib-index-display-fields</code> is replaced with <code>ebib-index-columns</code>, which has a different format: each element in <code>ebib-index-columns</code> describes a column in the tabulated view and consists of a list containing the field name, the column’s width and a boolean indicating whether sorting on this column is possible.</li>
-</ul>
-<h2 id="version-2.8-26-october-2016">Version 2.8, 26 October 2016</h2>
-<ul>
-<li>Changed key bindings: <code>j</code> and <code>k</code> no longer move up/down in the index, entry and strings buffers; use <code>p</code> and <code>n</code> instead. Furthermore, <code>i</code> now executes <code>ebib-push-bibtex-key</code> (used to be <code>p</code>), and <code>I</code> (capital i) executes <code>ebib-browse-doi</code> (used to be <code>i</code>).</li>
-<li>In the index buffer, <code>ebib-search-next</code> (which used to be bound to <code>n</code>) is no longer bound. Instead, <code>ebib-search</code> (still bound to <code>/</code>) activates a transient map which binds the keys <code>/</code> and <code>RET</code> to <code>ebib-search-next</code>. Any other key disables the transient keymap and is executed normally.</li>
-<li>In the index buffer, <code>C-u /</code> repeats the previous search. (This fixes a small bug that has so far gone unnoticed: moving to the top of the databas and calling <code>ebib-search-next</code>, as previously suggested in the manual to get around the fact that <code>ebib-search-next</code> does not wrap, would not search the first entry.)</li>
-<li>In the entry buffer, <code>x</code> is replaced by <code>k</code> (<code>ebib-kill-field-contents</code>).</li>
-<li>New functions: <code>ebib-kill-entry</code> and <code>ebib-yank-entry</code> for killing and yanking BibTeX entries. <code>ebib-kill-entry</code> deletes the current entry from the database and puts it in the kill ring. <code>ebib-yank-entry</code> adds an entry from the kill ring to the current database.</li>
-</ul>
-<h2 id="version-2.7-22-september-2016">Version 2.7, 22 September 2016</h2>
-<ul>
-<li>Reading list management: add and remove BibTeX entries to an Org reading list.</li>
-<li>Remove options <code>ebib-notes-identifier-function</code> and <code>ebib-notes-title-function</code>.</li>
-<li>Add option <code>ebib-notes-template-specifiers</code>: allow customisation of the format specs used in <code>ebib-notes-template</code>. (This option replaces <code>ebib-notes-identifier-function</code> and <code>ebib-notes-title-function</code>).</li>
-</ul>
-<h2 id="version-2.6.3-31-august-2016">Version 2.6.3, 31 August 2016</h2>
-<ul>
-<li>Allow storing notes in a single file rather than using one file per note.</li>
-<li>Correct handling of DOIs.</li>
-<li>Add option <code>ebib-truncate-file-names</code>: if set (the default), file names added to the <code>file</code> field are truncated relative to <code>ebib-file-search-dirs</code>.</li>
-<li>Add option <code>ebib-file-name-mod-function</code>: modify file paths before storing them in the <code>file</code> field.</li>
-</ul>
 <h1 id="installation">Installation</h1>
 <h2 id="package-manager">Package manager</h2>
 <p>The easiest way to install Ebib is to use Emacs’ package manager. Ebib is available as a package from the <a href="http://melpa.org/">Melpa package archive</a>. If you add the Melpa archive to your <code>package-archive</code> list, you can install Ebib from the package manager. This will also install the Info file so you can access the Ebib manual within Emacs.</p>
 <h2 id="debian-and-ubuntu">Debian and Ubuntu</h2>
 <p>Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro’s package manager: <code>apt-get install elpa-ebib</code>.</p>
 <h2 id="manual-installation">Manual installation</h2>
-<p>It’s also possible to install Ebib manually by downloading the source, compiling it and telling Emacs where to find it. If you prefer this method, then you probably know what you’re doing so detailed instructions are omitted here. Just be sure to also install the <a href="https://github.com/joostkremers/parsebib">parsebib</a> package, which Ebib depends on.</p>
+<p>It’s also possible to install Ebib manually. If you prefer this method, then you probably know what you’re doing so detailed instructions are omitted here. Just be sure to also install the <a href="https://github.com/joostkremers/parsebib">parsebib</a> package, which Ebib depends on.</p>
 <h2 id="starting-ebib">Starting Ebib</h2>
 <p>Once Ebib has been installed and is loaded, you can start it with <code>M-x ebib</code>. This command is also used to return to Ebib when you have put the program in the background. You can bind this command to a key sequence by putting something like the following in Emacs’ init file:</p>
 <pre><code>(global-set-key &quot;\C-ce&quot; &#39;ebib)</code></pre>
@@ -323,7 +264,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Apart from the <code>type</code>, <code>keywords</code>, <code>file</code> and <code>crossref</code> fields, there are two other fields that Ebib handles in a special way when you edit its value. These are the <code>annote</code> field (or <code>annotation</code> in Biblatex), and the <code>abstract</code> field. Most field values normally consist of a single line of text. However, because the <code>annote</code>/<code>annotation</code> and <code>abstract</code> fields are meant for creating annotated bibliographies, it would not be very useful if you could only write one line of text in them. Therefore, when you edit one of these fields, Ebib puts you in a so-called <em>multiline edit buffer</em>. This is essentially a text mode buffer that allows you to enter as much text as you like. To store the text and leave the multiline edit buffer, type <code>C-c | q</code>.</p>
 <p>If you want to leave the multiline edit buffer without saving the text you have just typed, type <code>C-c | c</code>. This command cancels the edit and leaves the multiline edit buffer. The text that is stored in the field you were editing is not altered.</p>
 <p>Multiline values are not restricted to the <code>annote</code>/<code>annotation</code> and <code>abstract</code> fields. Any field (except the <code>type</code> and <code>crossref</code> fields) can in fact hold a multiline value. To give a field a multiline value, use <code>m</code> instead of <code>e</code>. You will again be put in a multiline edit buffer, where you can edit the value. Note that you can use <code>m</code> even if a field already has a single line value. Ebib will just make that the first line in the multiline edit buffer.</p>
-<p>When a field has a multiline value, only the first paragraph is shown in the entry buffer. To indicate that the value is multiline, an ellipsis indicator <code>[...]</code> is added after the last line that is displayed, indicating that the text may be longer. If you want to see the whole contents of a multiline field, you can use <code>v</code>: this will display the contents of the current field in a <code>*Help*</code> buffer. This buffer can be dismissed again with <code>q</code>. This is quicker than entering the multiline edit buffer just to read the contents of a field and it has the advantage that the other fields stay visible.</p>
+<p>When a field has a multiline value, at most ten lines are shown in the entry buffer. If the text is longer, an ellipsis indicator <code>[...]</code> is added after the last line that is displayed. If you want to see the whole contents of a multiline field, you can use <code>v</code>: this will display the contents of the current field in a <code>*Help*</code> buffer. This buffer can be dismissed again with <code>q</code>. This is quicker than entering the multiline edit buffer just to read the contents of a field and it has the advantage that the other fields stay visible.</p>
+<p>It’s possible to customise the way a multiline value is displayed in the entry buffer. See the options <code>ebib-multiline-display-function</code> and <code>ebib-multiline-display-max-lines</code> for details.</p>
 <p>By the way, the <code>e</code> key is smart about the way an entry must be edited. If you press <code>e</code> on a field that already has a multiline value, regardless of the fact whether it is the <code>annote</code>/<code>annotation</code> or <code>abstract</code> field or not, Ebib puts you in a multiline edit buffer. Therefore, you need <code>m</code> only if you want to give a field a multiline value when it doesn’t have one yet.</p>
 <p>For more details on working with multiline edit buffers, see <a href="#multiline-edit-buffers">Multiline Edit Buffers</a>.</p>
 <h2 id="undefined-fields">Undefined Fields</h2>
