@@ -216,10 +216,11 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
                             (concat "+" (ebib--first-line val))
                           (concat " " val))))))))
 
-(defun ebib-multiline-display-single-line (string)
+(defun ebib-multiline-display-as-is (string)
   "Reduce the multiline text STRING.
-Return a list with only the first line."
-  (list (car (split-string string "\n" t))))
+The text is split into lines and returned.  No other
+modifications are made."
+  (split-string string "\n"))
 
 (defun ebib-multiline-display-paragraph (string)
   "Reduce the multiline text STRING.
@@ -235,17 +236,27 @@ Return a list of strings, each a single line."
                   (buffer-string))
                 "\n" t))
 
+(defun ebib-multiline-display-single-line (string)
+  "Reduce the multiline text STRING.
+Return a list with only the first line."
+  (list (car (split-string string "\n" t))))
+
 (defun ebib--make-multiline-display (string matched)
   "Return a string for multiline field values to display in the entry buffer.
 STRING is the text to display.  MATCHED indicates whether a
-search string match was found.  Only the first paragraph of
-STRING is displayed, but never more than
-`ebib-multiline-display-max-lines' lines.  A continuation symbol
-\"[...]\" is added as the last line.  If MATCHED is non-nil, this
-continuation symbol is highlighted."
-  (let ((multilines (funcall ebib-multiline-display-function string)))
-    (if (> (length multilines) ebib-multiline-display-max-lines)
-        (setq multilines (seq-subseq multilines 0 ebib-multiline-display-max-lines)))
+search string match was found.  If the text is longer than
+`ebib-multiline-display-max-lines' lines, it is truncated and a
+continuation marker \"[...]\" is added.  If MATCHED is non-nil,
+this continuation marker is highlighted.
+
+This function calls the function in
+`ebib-multiline-display-function' to convert the text to a list
+of strings."
+  (let ((multilines (funcall ebib-multiline-display-function string))
+        (truncated nil))
+    (when (> (length multilines) ebib-multiline-display-max-lines)
+      (setq multilines (seq-subseq multilines 0 ebib-multiline-display-max-lines))
+      (setq truncated t))
     (let ((first-line (car multilines))
           (rest-lines (mapcar (lambda (line)
                                 (concat (make-string 19 ?\s) line))
@@ -253,10 +264,11 @@ continuation symbol is highlighted."
       (cl-values (concat first-line
                          (if rest-lines
                              (concat "\n" (string-join rest-lines "\n"))))
-                 (concat "\n" (make-string 19 ?\s)
-                         (if matched
-                             (propertize "[...]" 'face 'highlight)
-                           "[...]"))))))
+                 (if truncated
+                     (concat "\n" (make-string 19 ?\s)
+                             (if matched
+                                 (propertize "[...]" 'face 'highlight)
+                               "[...]")))))))
 
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
