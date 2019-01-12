@@ -205,6 +205,7 @@ name is fully qualified by prepending the directory in
     (if new
         (let ((note (ebib--notes-fill-template key db)))
           (insert (car note))
+          (goto-char (point-min))
           (forward-char (cdr note))))))
 
 ;;; Common notes file.
