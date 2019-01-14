@@ -3030,7 +3030,9 @@ prefix argument has no meaning."
   "Redisplay current index item if FIELD is being displayed."
   (if (or (assoc-string field ebib-index-columns t)
           (and (member-ignore-case field '("Author" "Editor"))
-               (assoc-string "Author/Editor" ebib-index-columns t)))
+               (assoc-string "Author/Editor" ebib-index-columns t))
+          (and (cl-equalp field "Date")
+               (assoc-string "Year" ebib-index-columns t)))
       (with-current-ebib-buffer 'index
         (let ((key (ebib--get-key-at-point))
               (inhibit-read-only t))
