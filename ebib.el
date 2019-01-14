@@ -1146,7 +1146,7 @@ interactively."
   "Show the contents of the `annote' or `annotation' field in a *Help* window."
   (interactive)
   (let ((help-window-select t) ; Make sure the help window is selected.
-        (field (cdr (assq (ebib-db-get-dialect ebib--cur-db) '((BibTeX . "annote") (biblatex . "annotation"))))))
+        (field (cdr (assq (ebib--get-dialect ebib--cur-db) '((BibTeX . "annote") (biblatex . "annotation"))))))
     (with-help-window (help-buffer)
       (princ (propertize (format "Annotation for `%s' [%s]" (ebib--get-key-at-point) (ebib-db-get-filename ebib--cur-db 'shortened)) 'face '(:weight bold)))
       (princ "\n\n")
