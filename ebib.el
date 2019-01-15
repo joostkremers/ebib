@@ -198,8 +198,15 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
           (progn
             (ebib--update-entry-buffer)
             (re-search-forward "^crossref"))
-        (let ((inhibit-read-only t))
-          (delete-region (point-at-bol) (point-at-eol))
+        (let ((inhibit-read-only t)
+              (end (save-excursion ; Find the end of a (possibly multiline) field.
+                     (forward-line 1)
+                     (while (and (not (eolp))
+                                 (looking-at-p "[[:space:]]"))
+                       (forward-line 1))
+                     (forward-line -1) ; We moved one line too far.
+                     (point-at-eol))))
+          (delete-region (point-at-bol) end)
           (insert (propertize (format "%-17s " field) 'face 'ebib-field-face)
                   (ebib--get-field-highlighted field (ebib--get-key-at-point)))
           (beginning-of-line))))))
