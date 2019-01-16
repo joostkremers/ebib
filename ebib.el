@@ -198,17 +198,12 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
           (progn
             (ebib--update-entry-buffer)
             (re-search-forward "^crossref"))
-        (let ((inhibit-read-only t)
-              (end (save-excursion ; Find the end of a (possibly multiline) field.
-                     (forward-line 1)
-                     (while (and (not (eolp))
-                                 (looking-at-p "[[:space:]]"))
-                       (forward-line 1))
-                     (forward-line -1) ; We moved one line too far.
-                     (point-at-eol))))
-          (delete-region (point-at-bol) end)
-          (insert (propertize (format "%-17s " field) 'face 'ebib-field-face)
-                  (ebib--get-field-highlighted field (ebib--get-key-at-point)))
+        (let ((inhibit-read-only t))
+          (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field))
+          (insert (propertize (format "%-17s %s"
+                                      (propertize field 'face 'ebib-field-face)
+                                      (ebib--get-field-highlighted field (ebib--get-key-at-point)))
+                              'ebib-field t))
           (beginning-of-line))))))
 
 (defun ebib--redisplay-current-string ()
@@ -332,10 +327,11 @@ it is highlighted.  DB defaults to the current database."
                       (unless (and (not (assoc-string field entry 'case-fold))
                                    (member-ignore-case field ebib-hidden-fields)
                                    ebib--hide-hidden-fields)
-                        (insert (propertize (format "%-17s " field) 'face 'ebib-field-face))
-                        (insert (or (ebib--get-field-highlighted field key db match-str)
-                                    ""))
-                        (insert "\n")))
+                        (insert (propertize (format "%-17s %s"
+                                                    (propertize field 'face 'ebib-field-face)
+                                                    (ebib--get-field-highlighted field key db match-str))
+                                            'ebib-field t)
+                                "\n")))
                     fields)))
           (list req-fields opt-fields extra-fields undef-fields))))
 
