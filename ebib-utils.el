@@ -667,6 +667,20 @@ possible to use the same separator in the `url' field as in the
   :group 'ebib
   :type 'string)
 
+(defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url))
+  "Transformations to apply to a URL before attempting to download a pdf file.
+Each entry consists of a matcher and a transformation function.
+The matcher is a regular expression that is matched (with
+`string-match-p') against a given URL.  If the URL matches, the
+transformation function is applied to the URL."
+  :group 'Ebib
+  :type '(repeat (cons :tag "Transformation"
+                       (regexp :tag "Matcher") (function :tag "Function"))))
+
+(defun ebib-transform-arXiv-url (url)
+  "Transform an arXiv URL to the URL of its correspnoding pdf file."
+  (concat (replace-regexp-in-string (regexp-quote "/abs/") "/pdf/" url t t) ".pdf"))
+
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
 If this option is unset, Ebib uses the Emacs function

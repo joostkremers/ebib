@@ -3611,43 +3611,51 @@ The text being edited is stored before saving the database."
 ;;; Functions for downloading additional data
 
 (defun ebib-download-url (arg)
-  "Download file from standard URL field, named after bibtex key
-If this field contains more than one URL, ask the user which one
+  "Download the file in the standard URL field from the Internet.
+If the URL field contains more than one URL, ask the user which one
 to download.  Alternatively, the user can provide a numeric prefix
 argument ARG.
-The file is downloaded to the first entry for ebib-file-search-dirs.
-It is assumed that the file linked is a pdf.  It will be saved as
-[key of the entry].pdf"
+
+If an entry is found in `ebib-url-download-transformations' that
+matches the URL, it is applied to the URL before attempting to
+download the file.
+
+The file is downloaded to the first entry for
+ebib-file-search-dirs.  It is assumed that the file linked is a
+pdf.  The file name is created by applying the function in
+`ebib-name-transform-function' to the entry key and by appending
+\".pdf\" to it."
   (interactive "P")
   (ebib--execute-when
     ((entries)
-     (let ((urls (ebib-unbrace
-				  (ebib-db-get-field-value ebib-url-field
-										   (ebib--get-key-at-point)
-										   ebib--cur-db
-										   'noerror))))
+     (let* ((key (ebib--get-key-at-point))
+            (urls (ebib-get-field-value ebib-url-field key ebib--cur-db 'noerror 'unbraced)))
        (if urls
-		   (progn
-			 (let* ((fname (concat (ebib--get-key-at-point) ".pdf"))
-					(fullpath (concat (car ebib-file-search-dirs) fname))
-					(urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
-					(pdfurl (ebib--transform-url urlvalue)))
-			   (url-copy-file pdfurl fullpath t)
-			   (message (concat "downloaded url " pdfurl " to " fullpath))
-			   (ebib-db-set-field-value ebib-file-field
-										fname
-										(ebib--get-key-at-point)
-										ebib--cur-db 'overwrite)))
+	   (let* ((fname (ebib--create-file-name-from-key key "pdf"))
+		  (fullpath (concat (car ebib-file-search-dirs) fname))
+		  (urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
+		  (pdfurl (ebib--transform-url urlvalue)))
+	     (condition-case nil
+                 (url-copy-file pdfurl fullpath t)
+               (error "[Ebib] Could not access URL %s" pdfurl))
+	     (message "[Ebib] Downloaded URL %s to %s" pdfurl fullpath)
+	     (ebib-set-field-value ebib-file-field fname key ebib--cur-db ebib-filename-separator)
+             (ebib--set-modified t ebib--cur-db))
          (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
     ((default)
      (beep))))
 
-(defun ebib--transform-url (pdfurl)
-  "Transform PDFURL to a URL acutally pointing to a PDF
-Currently, only arxiv links are handled."
-  (cond ((string-match-p "https?://arxiv.org/abs/" pdfurl)
-		 (concat (s-replace "/abs/" "/pdf/" pdfurl) ".pdf"))
-		(t pdfurl)))
+(defun ebib--transform-url (url)
+  "Transform URL by applying `ebib-url-download-transformations' to it.
+The first matching entry in `ebib-url-download-transformations'
+is applied.  If no entry matches, URL is returned unchanged."
+  (let* ((transformer (seq-find (lambda (elt)
+                                  (string-match-p (car elt) url))
+                                ebib-url-download-transformations))
+         (fn (cdr transformer)))
+    (if fn
+        (funcall fn url)
+      url)))
 
 ;;; Functions for non-Ebib buffers
 
