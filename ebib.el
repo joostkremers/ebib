@@ -445,12 +445,10 @@ return value is MOD."
 
 (defun ebib--modified-p ()
   "Check if any of the databases in Ebib were modified.
-Returns the first modified database, or NIL if none was modified."
-  (let ((db (car ebib--databases)))
-    (while (and db
-                (not (ebib-db-modified-p db)))
-      (setq db (ebib--next-elem db ebib--databases)))
-    db))
+Return the first modified database, or nil if none was modified."
+  (seq-find (lambda (db)
+              (ebib-db-modified-p db))
+            ebib--databases))
 
 (defun ebib--create-new-database ()
   "Create a new database instance and return it."
@@ -1338,12 +1336,13 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
        (ebib--keywords-save-new-keywords ebib--cur-db)
 
        ;; Remove the database from `ebib--databases', redisplay and kill the index buffer.
-       (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases))
+       (let ((new-db (cadr (member ebib--cur-db ebib--databases)))
              (index-buffer (ebib-db-get-buffer ebib--cur-db)))
          (setq ebib--databases (delq ebib--cur-db ebib--databases))
-         (setq ebib--cur-db (if ebib--databases   ; Do we still have another database loaded?
-                            (or new-db (car (last ebib--databases)))
-                          nil))
+         ;; If `new-db' is nil, we deleted the last database in the list.
+         (setq ebib--cur-db (or new-db
+                            (car ebib--databases)))
+         ;; `ebib--cur-db' may be nil at this point, but that's handled correctly by `ebib--update-buffers'.
          (ebib--update-buffers 'no-refresh)
          (kill-buffer index-buffer)
          (message "Database closed."))))))
@@ -2097,13 +2096,13 @@ new database."
   (interactive "P")
   (ebib--execute-when
     ((database)
-     (let ((new-db (ebib--next-elem ebib--cur-db ebib--databases)))
-       (unless new-db
-         (setq new-db (car ebib--databases)))
+     (let ((new-db (if (eq ebib--cur-db (car (last ebib--databases)))
+                       (car ebib--databases)
+                     (cadr (member ebib--cur-db ebib--databases)))))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
-       (if arg
-           (ebib-db-set-current-entry-key nil ebib--cur-db))
+       (when arg
+         (ebib-db-set-current-entry-key nil ebib--cur-db))
        (ebib--update-buffers 'no-refresh)))))
 
 (defun ebib-prev-database (&optional arg)
@@ -2113,13 +2112,13 @@ new database."
   (interactive "P")
   (ebib--execute-when
     ((database)
-     (let ((new-db (ebib--prev-elem ebib--cur-db ebib--databases)))
-       (unless new-db
-         (setq new-db (car (last ebib--databases))))
+     (let ((new-db (if (eq ebib--cur-db (car ebib--databases))
+                       (car (last ebib--databases))
+                     (car (last ebib--databases (1+ (length (member ebib--cur-db ebib--databases))))))))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (setq ebib--cur-db new-db)
-       (if arg
-           (ebib-db-set-current-entry-key nil ebib--cur-db))
+       (when arg
+         (ebib-db-set-current-entry-key nil ebib--cur-db))
        (ebib--update-buffers 'no-refresh)))))
 
 (defun ebib-index-open-at-point ()

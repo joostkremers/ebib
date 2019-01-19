@@ -1090,23 +1090,6 @@ function adds a newline to the message being logged."
         (insert-file-contents filename)
         (split-string (buffer-string) "\n" 'omit-nulls))))    ; Nulls are empty lines in this case.
 
-;; We sometimes need to walk through lists.  These functions yield the element
-;; directly preceding or following ELEM in LIST.  In order to work properly,
-;; ELEM must be unique in LIST, obviously.  If ELEM is the first/last element of
-;; LIST, or if it is not contained in LIST at all, the result is nil.
-(defun ebib--next-elem (elem list)
-  "Return the element following ELEM in LIST.
-If ELEM is the last element, return nil."
-  (cadr (member elem list)))
-
-(defun ebib--prev-elem (elem list)
-  "Return the element preceding ELEM in LIST.
-If ELEM is the first element, return nil."
-  (if (or (equal elem (car list))
-          (not (member elem list)))
-      nil
-    (car (last list (1+ (length (member elem list)))))))
-
 (defun ebib--locate-bibfile (file &optional dirs)
   "Locate and/or expand FILE to an absolute filename in DIRS.
 First try to locate BibTeX file FILE with `locate-file' and with
