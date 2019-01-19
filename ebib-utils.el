@@ -667,7 +667,8 @@ possible to use the same separator in the `url' field as in the
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url))
+(defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url)
+                                           ("https?://ling.auf.net/lingBuzz/" . ebib-transform-lingbuzz-url))
   "Transformations to apply to a URL before attempting to download a pdf file.
 Each entry consists of a matcher and a transformation function.
 The matcher is a regular expression that is matched (with
@@ -680,6 +681,10 @@ transformation function is applied to the URL."
 (defun ebib-transform-arXiv-url (url)
   "Transform an arXiv URL to the URL of its correspnoding pdf file."
   (concat (replace-regexp-in-string (regexp-quote "/abs/") "/pdf/" url t t) ".pdf"))
+
+(defun ebib-transform-lingbuzz-url (url)
+  "Transform a lingbuzz URL to the URL of its corresponding pdf file."
+  (concat url "/current.pdf"))
 
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
