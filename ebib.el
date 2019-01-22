@@ -3063,31 +3063,41 @@ viewed."
     (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
 
 (defun ebib-copy-field-contents ()
-  "Copy the contents of the current field to the kill ring."
+  "Copy the contents of the current field to the kill ring.
+If the field contains a value from a cross-referenced entry, that
+value is copied to the kill ring."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (or (not field)
                 (string= field "=type="))
       (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-        (when (stringp contents)
-          (kill-new contents)
-          (message "Field contents copied."))))))
+        (if (stringp contents)
+            (progn (kill-new contents)
+                   (message "Field contents copied."))
+          (error "Cannot copy an empty field"))))))
 
 (defun ebib-kill-field-contents ()
   "Kill the contents of the current field.
-The killed text is put in the kill ring."
+The killed text is put in the kill ring.  If the field contains a
+value from a cross-referenced entry, it is not killed."
   (interactive)
   (let ((field (ebib--current-field)))
     (unless (or (not field)
                 (string= field "=type="))
-      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
-        (when (stringp contents)
+      (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+        (cond
+         ((and (stringp contents)
+               (stringp (get-text-property 0 'ebib--xref contents)))
+          (error "Cannot kill a cross-referenced field value"))
+         ((stringp contents)
+          (stringp contents)
           (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
           (kill-new contents)
           (ebib--redisplay-current-field)
           (ebib--redisplay-index-item field)
           (ebib--set-modified t)
-          (message "Field contents killed."))))))
+          (message "Field contents killed."))
+         (t (error "Cannot kill an empty field")))))))
 
 (defun ebib-yank-field-contents (arg)
   "Insert the last killed text into the current field.
