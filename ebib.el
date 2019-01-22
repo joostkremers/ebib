@@ -3109,14 +3109,14 @@ Prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
   (interactive "P")
   (let ((field (ebib--current-field)))
     (if (or (member-ignore-case field '("=type=" "crossref")) ; We cannot yank into the `=type=' or `crossref' fields.
-            (unless (eq last-command 'ebib--yank-field-contents) ; Nor into a field already filled.
+            (unless (eq last-command 'ebib-yank-field-contents) ; Nor into a field already filled.
               (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
         (progn
           (setq this-command t)
           (beep))
       (let ((new-contents (current-kill (cond
                                          ((listp arg)
-                                          (if (eq last-command 'ebib--yank-field-contents) 1 0))
+                                          (if (eq last-command 'ebib-yank-field-contents) 1 0))
                                          ((eq arg '-) -2)
                                          (t (1- arg))))))
         (when new-contents
