@@ -3649,9 +3649,9 @@ pdf.  The file name is created by applying the function in
                  (error "[Ebib] File %s cannot be written to" fullpath))
              (while (and (file-exists-p fullpath)
                          (not overwrite))
-               (let ((choice (read-char-choice (format "File %s already exists. (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c))))
+               (let ((choice (read-char-choice (format "File %s already exists. (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c ?q))))
                  (cl-case choice
-                   (?c (error "[Ebib] Cancelled downloading URL"))
+                   ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
                    (?r (setq fname (read-string (format "Change `%s' to: " fname) fname))
                        (setq fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname)))
                    (?o (setq overwrite t)))))
