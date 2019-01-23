@@ -3648,13 +3648,13 @@ pdf.  The file name is created by applying the function in
              (if (not (file-writable-p fullpath))
                  (error "[Ebib] File %s cannot be written to" fullpath))
              (if (not (string-match-p "\\.pdf\\'" pdfurl))
-                 (let ((choice (read-char-choice (format "URL %s does not seem to be a pdf paper. (d)ownload anyway / (m)odify URL / (c)ancel? " pdfurl) '(?d ?m ?c ?q))))
+                 (let ((choice (read-char-choice (format "URL %s does not seem to be a pdf paper; (d)ownload anyway / (m)odify URL / (c)ancel? " pdfurl) '(?d ?m ?c ?q))))
                    (cl-case choice
                      ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
                      (?m (setq pdfurl (read-string "New URL: " pdfurl))))))
              (while (and (file-exists-p fullpath)
                          (not overwrite))
-               (let ((choice (read-char-choice (format "File %s already exists. (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c ?q))))
+               (let ((choice (read-char-choice (format "File %s already exists; (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c ?q))))
                  (cl-case choice
                    ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
                    (?r (setq fname (read-string (format "Change `%s' to: " fname) fname))
