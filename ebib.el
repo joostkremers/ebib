@@ -261,6 +261,17 @@ of strings."
                                (propertize "[...]" 'face 'highlight)
                              "[...]"))))))
 
+(defun ebib--display-file-field (file-field)
+  "Return a string for FILE-FIELD to display in the entry buffer."
+  (let ((files (split-string file-field ebib-filename-separator)))
+    (ebib--convert-multiline-to-string (mapcar (lambda (file)
+                                             (propertize file
+                                                         'face '(:box t)
+                                                         'mouse-face '(highlight (:box t))
+                                                         'help-echo "mouse-1: visit this file"
+                                                         'ebib-file file))
+                                           files))))
+
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
   (or db (setq db ebib--cur-db))
@@ -2732,6 +2743,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
+    (define-key map [mouse-1] #'ebib-entry-open-at-point)
     map)
   "Keymap for the Ebib entry buffer.")
 
@@ -3071,6 +3083,15 @@ viewed."
   (let ((file (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
         (num (if (numberp arg) arg nil)))
     (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
+
+(defun ebib-entry-open-at-point ()
+  "Open file at point."
+  (interactive)
+  (let* ((word (thing-at-point 'word))
+         (file (and word
+                    (get-text-property 0 'mouse-face word)
+                    (get-text-property 0 'ebib-file word))))
+    (if file (ebib--call-file-viewer file))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring.
