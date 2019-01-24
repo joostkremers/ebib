@@ -266,9 +266,9 @@ of strings."
   (let ((files (split-string file-field ebib-filename-separator)))
     (ebib--convert-multiline-to-string (mapcar (lambda (file)
                                              (propertize file
-                                                         'face '(:box t)
-                                                         'mouse-face '(highlight (:box t))
-                                                         'help-echo "mouse-1: visit this file"
+                                                         'face '(:inherit ebib-link-face)
+                                                         'mouse-face '(highlight (:inherit ebib-link-face))
+                                                         'help-echo "mouse-1: open this file"
                                                          'ebib-file file))
                                            files))))
 

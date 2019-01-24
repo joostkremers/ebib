@@ -892,6 +892,10 @@ Currently, the following problems are marked:
 * Keywords that have not been saved."
   :group 'ebib-faces)
 
+(defface ebib-link-face '((t (:inherit link)))
+  "Face used for marking links."
+  :group 'ebib-faces)
+
 ;; Generic for all databases.
 
 ;; Constants and variables that are set only once.
