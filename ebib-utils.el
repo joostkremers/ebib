@@ -1458,7 +1458,8 @@ string has the text property `ebib--alias' with value t."
                    (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db))))
               (when xref-field
                 (setq value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror))))))))
-    (when (not value)                   ; Check if there is a field alias
+    (when (and (not value)
+               (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
       (setq alias (cdr (assoc-string field ebib--field-aliases 'case-fold)))
       (if alias
           (setq value (ebib-db-get-field-value alias key db 'noerror))))
