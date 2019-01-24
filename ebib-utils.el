@@ -1911,7 +1911,7 @@ This function is mainly intended for the DOI and URL fields."
         (setq str (concat "https://dx.doi.org/" str)))
     (if str
         (propertize "www"
-                    'face '(:height 0.8 :inherit link)
+                    'face '(:height 0.8 :inherit ebib-link-face)
                     'mouse-face 'highlight
                     'help-echo str)
       (propertize "   " 'face '(:height 0.8)))))

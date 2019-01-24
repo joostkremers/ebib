@@ -174,7 +174,7 @@ string where point should be located."
   "Return the note symbol for displaying if a note exists for KEY."
   (if (ebib--notes-exists-note key)
       (propertize ebib-notes-symbol
-                  'face '(:height 0.8 :inherit link)
+                  'face '(:height 0.8 :inherit ebib-link-face)
                   'mouse-face 'highlight)
     (propertize (make-string (string-width ebib-notes-symbol) ?\s)
                 'face '(:height 0.8))))
