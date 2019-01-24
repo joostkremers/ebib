@@ -218,7 +218,21 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
                             (concat "+" (ebib--first-line val))
                           (concat " " val))))))))
 
-(defun ebib--make-multiline-display (string matched)
+(defun ebib--convert-multiline-to-string (multilines)
+  "Convert MULTILINES to a single multiline string.
+MULTILINES is a list of strings.  The resulting string is
+suitable for display in the entry buffer: each string in
+MULTILINES corresponds to a line in the resulting string, and all
+lines except the first one are prependen with 19 spaces."
+  (let ((first-line (car multilines))
+        (rest-lines (mapcar (lambda (line)
+                              (concat (make-string 19 ?\s) line))
+                            (cdr multilines))))
+    (concat first-line
+            (if rest-lines
+                (concat "\n" (string-join rest-lines "\n"))))))
+
+(defun ebib--display-multiline-field (string matched)
   "Return a string for multiline field values to display in the entry buffer.
 STRING is the text to display.  MATCHED indicates whether a
 search string match was found.  If the text is longer than
@@ -240,18 +254,12 @@ of strings."
                        (reverse)
                        (seq-drop-while (lambda (elt) (string= elt "")))
                        (reverse)))
-    (let ((first-line (car multilines))
-          (rest-lines (mapcar (lambda (line)
-                                (concat (make-string 19 ?\s) line))
-                              (cdr multilines))))
-      (cl-values (concat first-line
-                         (if rest-lines
-                             (concat "\n" (string-join rest-lines "\n"))))
-                 (if truncated
-                     (concat "\n" (make-string 19 ?\s)
-                             (if matched
-                                 (propertize "[...]" 'face 'highlight)
-                               "[...]")))))))
+    (cl-values (ebib--convert-multiline-to-string multilines)
+               (if truncated
+                   (concat "\n" (make-string 19 ?\s)
+                           (if matched
+                               (propertize "[...]" 'face 'highlight)
+                             "[...]"))))))
 
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
@@ -294,7 +302,9 @@ of strings."
       (when match-str
         (cl-multiple-value-setq (value matched) (ebib--match-all-in-string match-str value)))
       (when (ebib--multiline-p value)
-        (cl-multiple-value-setq (value multiline) (ebib--make-multiline-display value matched))))
+        (cl-multiple-value-setq (value multiline) (ebib--display-multiline-field value matched)))
+      (if (cl-equalp field "file")
+          (setq value (ebib--display-file-field value))))
     (concat raw value alias multiline)))
 
 (defun ebib--display-fields (key &optional db match-str)
