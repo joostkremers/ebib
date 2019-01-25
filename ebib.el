@@ -3661,7 +3661,7 @@ matches the URL, it is applied to the URL before attempting to
 download the file.
 
 The file is downloaded to the first entry for
-ebib-file-search-dirs.  It is assumed that the file linked is a
+`ebib-file-search-dirs'.  It is assumed that the file linked is a
 pdf.  The file name is created by applying the function in
 `ebib-name-transform-function' to the entry key and by appending
 \".pdf\" to it."
