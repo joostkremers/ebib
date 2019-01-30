@@ -968,10 +968,10 @@ Restore the dedicated status after executing BODY."
   `(let ((dedicated (window-dedicated-p)))
      (unwind-protect
          (progn
-           (set-window-dedicated-p window nil)
+           (set-window-dedicated-p ,window nil)
            ,@body)
        (if dedicated
-           (set-window-dedicated-p window t)))))
+           (set-window-dedicated-p ,window t)))))
 
 ;; We sometimes (often, in fact ;-) need to do something with a string, but
 ;; take special action (or do nothing) if that string is empty.
