@@ -965,13 +965,14 @@ BUFFER is a symbol referring to a buffer in
 Restore the dedicated status after executing BODY."
   (declare (indent defun)
            (debug t))
-  `(let ((dedicated (window-dedicated-p)))
-     (unwind-protect
-         (progn
-           (set-window-dedicated-p ,window nil)
-           ,@body)
-       (if dedicated
-           (set-window-dedicated-p ,window t)))))
+  (let ((w (make-symbol "win")))
+    `(let ((,w ,window)
+           (dedicated (window-dedicated-p ,w)))
+       (unwind-protect
+           (progn
+             (set-window-dedicated-p ,w nil)
+             ,@body)
+         (set-window-dedicated-p ,w dedicated)))))
 
 ;; We sometimes (often, in fact ;-) need to do something with a string, but
 ;; take special action (or do nothing) if that string is empty.
