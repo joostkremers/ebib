@@ -92,17 +92,15 @@ can be found, return NIL."
                                              ebib--buffer-alist))))
                        (if b (get-buffer-window b))))))
     (when window
-      (select-window window)
       (with-ebib-window-nondedicated
-        (switch-to-buffer buffer t))
+        (set-window-buffer window buffer))
       window)))
 
 (defun ebib--display-buffer-largest-window (buffer _)
   "Display BUFFER in the largest non-dedicated window."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
-      (select-window window)
-      (switch-to-buffer buffer)
+      (set-window-buffer window buffer)
       window)))
 
 (defun ebib--pop-to-buffer (buffer)
