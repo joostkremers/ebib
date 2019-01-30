@@ -943,8 +943,8 @@ Restore the dedicated status after executing BODY."
   (declare (indent defun)
            (debug t))
   (let ((w (make-symbol "win")))
-    `(let ((,w ,window)
-           (dedicated (window-dedicated-p ,w)))
+    `(let* ((,w ,window)
+            (dedicated (window-dedicated-p ,w)))
        (unwind-protect
            (progn
              (set-window-dedicated-p ,w nil)
