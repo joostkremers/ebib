@@ -788,7 +788,6 @@ keywords before Emacs is killed."
     (define-key map "\C-xk" #'ebib-quit)
     (define-key map "X" #'ebib-export-preamble)
     (define-key map "y" #'ebib-yank-entry)
-    (define-key map "Y" #'ebib-keywords-add) ; prefix
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
     (define-key map [mouse-1] #'ebib-index-open-at-point)
