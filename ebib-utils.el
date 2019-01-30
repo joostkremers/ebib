@@ -960,18 +960,18 @@ BUFFER is a symbol referring to a buffer in
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
 
-(defmacro with-ebib-window-nondedicated (&rest body)
-  "Execute BODY with the current window non-dedicated.
+(defmacro with-ebib-window-nondedicated (window &rest body)
+  "Execute BODY with WINDOW non-dedicated.
 Restore the dedicated status after executing BODY."
   (declare (indent defun)
            (debug t))
   `(let ((dedicated (window-dedicated-p)))
      (unwind-protect
          (progn
-           (set-window-dedicated-p (selected-window) nil)
+           (set-window-dedicated-p window nil)
            ,@body)
        (if dedicated
-           (set-window-dedicated-p (selected-window) t)))))
+           (set-window-dedicated-p window t)))))
 
 ;; We sometimes (often, in fact ;-) need to do something with a string, but
 ;; take special action (or do nothing) if that string is empty.

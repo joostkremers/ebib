@@ -92,17 +92,15 @@ can be found, return NIL."
                                              ebib--buffer-alist))))
                        (if b (get-buffer-window b))))))
     (when window
-      (select-window window)
-      (with-ebib-window-nondedicated
-        (switch-to-buffer buffer t))
+      (with-ebib-window-nondedicated (selected-window)
+        (set-window-buffer window buffer))
       window)))
 
 (defun ebib--display-buffer-largest-window (buffer _)
   "Display BUFFER in the largest non-dedicated window."
   (unless ebib-popup-entry-window
     (let ((window (get-largest-window)))
-      (select-window window)
-      (switch-to-buffer buffer)
+      (set-window-buffer window buffer)
       window)))
 
 (defun ebib--pop-to-buffer (buffer)
@@ -401,7 +399,7 @@ fill it."
     (setcdr (assq 'index ebib--buffer-alist) index-buffer)
     (when window ; This function is also called from `ebib-import', in which case `window' would be nil.
       (with-selected-window window
-        (with-ebib-window-nondedicated
+        (with-ebib-window-nondedicated (selected-window)
           (switch-to-buffer index-buffer))))
     (with-current-ebib-buffer 'index
       (unless no-refresh
@@ -2025,11 +2023,11 @@ Either prints the entire database, or the marked entries."
   (ebib--execute-when
     ((entries)
      (let ((entries (ebib--sort-keys-list (or (ebib-db-list-marked-entries ebib--cur-db)
-                                          (ebib-db-list-keys ebib--cur-db))
-                                      ebib--cur-db)))
+                                              (ebib-db-list-keys ebib--cur-db))
+                                          ebib--cur-db)))
        (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                                 ebib-print-tempfile
-                               (read-file-name "Use temp file: ")))
+                                     ebib-print-tempfile
+                                   (read-file-name "Use temp file: ")))
            (progn
              (with-temp-buffer
                (when ebib-print-preamble
@@ -3282,7 +3280,7 @@ The deleted text is not put in the kill ring."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (with-ebib-window-nondedicated
+    (with-ebib-window-nondedicated (selected-window)
       (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
 
@@ -3644,7 +3642,7 @@ The text being edited is stored before saving the database."
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
       (delete-window)
-    (with-ebib-window-nondedicated
+    (with-ebib-window-nondedicated (selected-window)
       (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
 
