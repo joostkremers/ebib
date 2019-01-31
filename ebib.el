@@ -817,43 +817,90 @@ character ?1-?9, which is converted to the corresponding number."
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
-(easy-menu-define ebib--index-menu ebib-index-mode-map "Ebib index menu"
+(easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
   `("Ebib"
-    ["Open Database..." ebib-load-bibtex-file t]
-    ["Merge Database..." ebib-merge-bibtex-file (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
-    ["Save Database" ebib-save-current-database (and ebib--cur-db
-                                                 (ebib-db-modified-p ebib--cur-db))]
-    ["Save All Databases" ebib-save-all-databases (ebib--modified-p)]
-    ["Save Database As..." ebib-write-database ebib--cur-db]
-    ["Close Database" ebib-close-database ebib--cur-db]
-    "--"
-    ,(append (list "BibTeX Dialect")
-             (mapcar (lambda (d)
-                       (vector (format "%s" d) `(ebib-set-dialect (quote ,d))
-                               :active 'ebib--cur-db
-                               :style 'radio
-                               :selected `(and ebib--cur-db
-                                               (eq (ebib-db-get-dialect ebib--cur-db) (quote ,d)))))
-                     bibtex-dialect-list)
-             (list ["Default" (ebib-set-dialect nil)
-                    :active ebib--cur-db :style radio :selected (and ebib--cur-db (not (ebib-db-get-dialect ebib--cur-db)))]))
-    "--"
-    ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib--keywords-new-p ebib--cur-db)]
-    ["Save All New Keywords" ebib-keywords-save-all-new (ebib--keywords-new-p)]
-    ["Save Keywords From Current Entry" ebib-keywords-save-from-entry t]
-    "--"
+    ("Database"
+     ["Open..." ebib-load-bibtex-file t]
+     ["Close" ebib-index-c :active (and ebib--cur-db (not (ebib-db-filtered-p ebib--cur-db))) :keys "\\[ebib-index-c]"]
+     ["Merge..." ebib-merge-bibtex-file (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
+     ["Reload" ebib-reload-current-database ebib--cur-db]
+     ["Reload All" ebib-reload-all-databases ebib--cur-db]
+     ["Save" ebib-save-current-database (and ebib--cur-db
+                                         (ebib-db-modified-p ebib--cur-db))]
+     ["Save All" ebib-save-all-databases (ebib--modified-p)]
+     ["Save As..." ebib-write-database ebib--cur-db])
+
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
+     ["Kill" ebib-kill-entry (ebib--get-key-at-point)]
+     ["Yank From Kill Ring" ebib-yank-entry ebib--cur-db]
      ["Delete" ebib-delete-entry (and ebib--cur-db
                                   (ebib--get-key-at-point)
-                                  (not (ebib-db-get-filter ebib--cur-db)))])
+                                  (not (ebib-db-get-filter ebib--cur-db)))]
+     "--"
+     ["Push Citation To Buffer" ebib-push-citation (ebib--get-key-at-point)]
+     "--"
+     ["Mark" ebib-mark-entry (ebib--get-key-at-point)]
+     ["Mark/Unmark All" ebib-mark-all-entries (ebib--get-key-at-point)]
+     "--"
+     ["Edit Key" ebib-edit-keyname (ebib--get-key-at-point)]
+     ["Autogenerate Key" ebib-generate-autokey (ebib--get-key-at-point)]
+     "--"
+     ["Open Note" ebib-open-note (ebib--notes-exists-note (ebib--get-key-at-point))]
+     ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
+     ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
+    ["Search" ebib-search (ebib--get-key-at-point)]
+    ("View"
+     ["Sort Ascending" ebib-index-sort-ascending ebib--cur-db]
+     ["Sort Descending" ebib-index-sort-descending ebib--cur-db]
+     ["Default Sort" ebib-index-default-sort ebib--cur-db])
+    ("Export"
+     ["Export Entries To Database" ebib-export-entries (ebib--get-key-at-point)]
+     ["Export Entries To File" (ebib-export-entries t) :active (ebib--get-key-at-point) :keys "\\[universal-argument] \\[ebib-export-entries]"]
+     ["Export Preamble To Database" ebib-export-preamble (ebib-db-get-preamble ebib--cur-db)]
+     ["Export Preamble To File" (ebib-export-preamble t) :active (ebib-db-get-preamble ebib--cur-db) :keys "\\[universal-argument] \\[ebib-export-preamble]"])
     "--"
-    ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-    ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-    ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+
+    ("Attachments"
+     ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+     ["Import Local File" ebib-import-file (ebib--get-key-at-point)]
+     ["Import File From URL" ebib-download-url (ebib--get-key-at-point)]
+     ["Create Entries For Local Files" ebib-add-file-entry ebib--cur-db])
+    ("Links"
+     ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+     ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror))])
+    "--"
+
+    ("Filters"
+     ["Create Filter" ebib-filters-logical-and (ebib--get-key-at-point)]
+     ["Rerun Current Filter" ebib-filters-reapply-filter (ebib-db-filtered-p)]
+     ["Apply Saved Filter" ebib-filters-apply-filter (ebib--get-key-at-point)]
+     ["Reapply Last Filter" ebib-filters-reapply-last-filter (ebib--get-key-at-point)]
+     ["Cancel Current Filter" ebib-filters-cancel-filter (ebib-db-filtered-p ebib--cur-db)]
+     "--"
+     ["Store Current Filter" ebib-filters-store-filter (or (ebib-db-get-filter ebib--cur-db) ebib--filters-last-filter)]
+     ["Delete Filter" ebib-filters-delete-filter ebib--filters-alist]
+     ["Delete All Filters" ebib-filters-delete-all-filters ebib--filters-alist]
+     ["Rename Filter" ebib-filters-rename-filter ebib--filters-alist]
+     "--"
+     ["Save Filters To Filters File" ebib-filters-save-filters ebib--filters-modified]
+     ["Save Filters To Alternate File" ebib-filters-write-to-file ebib--filters-alist]
+     ["Load Filters From File" ebib-filters-load-from-file ebib--cur-db]
+     "--"
+     ["View Filters" ebib-filters-view-all-filters ebib--filters-alist])
+    ("Reading List"
+     ["Create Reading List" ebib-create-reading-list (not ebib-reading-list-file)]
+     ["Add Current Entry" ebib-add-reading-list-item (and ebib-reading-list-file (ebib--get-key-at-point))]
+     ["Mark Current Entry As Done" ebib-mark-reading-list-item-as-done (ebib--reading-list-item-p (ebib--get-key-at-point))]
+     ["View Reading List" ebib-view-reading-list ebib-reading-list-file])
+    ("Keywords"
+     ["Add Keywords To Current Entry" ebib-keywords-add (ebib--get-key-at-point)]
+     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib--keywords-new-p ebib--cur-db)]
+     ["Save All New Keywords" ebib-keywords-save-all-new (ebib--keywords-new-p)]
+     ["Save Keywords From Current Entry" ebib-keywords-save-from-entry t])
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["As Index Cards" ebib-print-entries ebib--cur-db]
@@ -862,7 +909,18 @@ character ?1-?9, which is converted to the corresponding number."
      ["Print Cards on Separate Pages" ebib-toggle-print-newpage :enable t
       :style toggle :selected ebib-print-newpage])
     "--"
+
     ("Options"
+     ,(append (list "BibTeX Dialect")
+              (mapcar (lambda (d)
+                        (vector (format "%s" d) `(ebib-set-dialect (quote ,d))
+                                :active 'ebib--cur-db
+                                :style 'radio
+                                :selected `(and ebib--cur-db
+                                                (eq (ebib-db-get-dialect ebib--cur-db) (quote ,d)))))
+                      bibtex-dialect-list)
+              (list ["Default" (ebib-set-dialect nil)
+                     :active ebib--cur-db :style radio :selected (and ebib--cur-db (not (ebib-db-get-dialect ebib--cur-db)))]))
      ["Show Hidden Fields" ebib-toggle-hidden :enable t
       :style toggle :selected (not ebib--hide-hidden-fields)]
      ["Use Timestamp" ebib-toggle-timestamp :enable t
@@ -876,10 +934,10 @@ character ?1-?9, which is converted to the corresponding number."
      ["Customize Ebib" ebib-customize t])
     ["View Log Buffer" ebib-show-log t]
     ["Lower Ebib" ebib-lower t]
-    ["Quit" ebib-quit t]
+    ["Quit Ebib" ebib-quit t]
     ["Help on Ebib" ebib-info t]))
 
-(easy-menu-add ebib--index-menu ebib-index-mode-map)
+(easy-menu-add ebib-index-menu ebib-index-mode-map)
 
 (defun ebib-customize ()
   "Switch to Ebib's customisation group."
@@ -2771,6 +2829,29 @@ Primarily used to add some info to the entry buffer mode line."
   :init-value nil :lighter (:eval (ebib--format-entry-info-for-modeline))
   :global nil)
 
+(easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
+  '("Ebib"
+    ["Edit Field" ebib-edit-field t]
+    ["Edit Field As Multiline" ebib-edit-multiline-field t]
+    ["Insert @String Abbreviation" ebib-insert-abbreviation]
+    ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    "--"
+    ["Copy Field Contents" ebib-copy-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Kill Field Contents" ebib-kill-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Yank" ebib-yank-field-contents t]
+    ["Delete Field Contents" ebib-delete-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    "--"
+    ["Add Field" ebib-add-field t]
+    "--"
+    ["View File" ebib-view-file-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Browse URL" ebib-browse-url-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["View Multiline Field" ebib-view-field-as-help (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    "--"
+    ["Quit Entry Buffer" ebib-quit-entry-buffer t]
+    ["Help On Entry Buffer" ebib-entry-help t]))
+
+(easy-menu-add ebib-entry-menu ebib-entry-mode-map)
+
 (defun ebib--format-entry-info-for-modeline ()
   "Format information about the current entry for display in the mode line.
 Return a string that contains the entry key, `ebib-notes-symbol'
@@ -3281,6 +3362,21 @@ The deleted text is not put in the kill ring."
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
+
+(easy-menu-define ebib-strings-menu ebib-strings-mode-map "Ebib strings menu"
+  '("Ebib"
+    ["Add @String" ebib-add-string t]
+    ["Edit @String" ebib-edit-string t]
+    ["Copy @String" ebib-copy-string-contents (ebib--current-string)]
+    ["Delete @String" ebib-delete-string (ebib--current-string)]
+    "--"
+    ["Export @String" ebib-export-string (ebib--current-string)]
+    ["Export All @Strings" ebib-export-all-strings (ebib--current-string)]
+    "--"
+    ["Quit @Strings Buffer" ebib-quit-strings-buffer t]
+    ["Help On @Strings Buffer" ebib-strings-help t]))
+
+(easy-menu-add ebib-strings-menu ebib-strings-mode-map)
 
 (defun ebib-quit-strings-buffer ()
   "Quit editing the @String definitions."
