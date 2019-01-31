@@ -3904,7 +3904,6 @@ created containing only these entries."
 
 (defun ebib-read-entries-from-bbl ()
   "Read BibTeX entries from the .bbl file of the current buffer."
-  (interactive)
   (goto-char (point-min))
   (let (entries)
     (while (re-search-forward "\\\\\\(?:bibitem\\[\\(?:.\\|\n[^\n]\\)*]\\|entry\\){\\(.*?\\)}" nil t)
