@@ -2068,11 +2068,10 @@ indicate that the current entry is on the reading list.
    A reading list is simply an Org file with one entry (i.e., heading)
 per item.  Each entry is marked with ‘TODO’, so that the items can be
 included in the Org agenda.  If you prefer to use another todo state,
-you can customise the option ‘ebib-reading-list-todo-marker’.
-
-   You can mark an entry as done from within Ebib with the key ‘R d’.
-This will change the todo state of the item to ‘DONE’ (or whatever the
-value of ‘ebib-reading-list-done-marker’).  With ‘R v’ you can view the
+you can customise the option ‘ebib-reading-list-todo-marker’.  You can
+mark an entry as done from within Ebib with the key ‘R d’.  This will
+change the todo state of the item to ‘DONE’ (customisable through the
+option ‘ebib-reading-list-done-marker’).  With ‘R v’ you can view the
 reading list.
 
    The format of a reading list item can be customised in much the same
@@ -2089,11 +2088,11 @@ marker specified in the option ‘ebib-reading-list-todo-marker’ (by
 default ‘TODO’).
 
    If you do not wish to use an Org file for the reading list, you can
-do so.  Apart from customising the template, there are several other
-options that will need to be customised in this case.  First, the option
-‘ebib-reading-list-remove-item-function’ holds the function that marks a
-reading list item as done.  By default, it is set to
-‘ebib-reading-list-mark-item-as-done’, which simply changes the todo
+use another format.  Apart from customising the template, there are
+several other options that will need to be customised in this case.
+First, the option ‘ebib-reading-list-remove-item-function’ holds the
+function that marks a reading list item as done.  By default, it is set
+to ‘ebib-reading-list-mark-item-as-done’, which simply changes the todo
 state of the item to ‘DONE’, but you can set it to a function that does
 something else (for example, completely removing the entry from the
 list).  You will also have to customise
@@ -2865,34 +2864,34 @@ Node: Customising the notes template98847
 Ref: #customising-the-notes-template98996
 Node: Managing a reading list102042
 Ref: #managing-a-reading-list102204
-Node: Window Management105299
-Ref: #window-management105458
-Node: Creating Entry Stubs108634
-Ref: #creating-entry-stubs108796
-Node: @Preamble Definition109797
-Ref: #preamble-definition109961
-Node: @String Definitions111947
-Ref: #string-definitions112098
-Node: @Comments115614
-Ref: #comments115742
-Node: Managing Keywords116107
-Ref: #managing-keywords116252
-Node: Sorting the bib File122161
-Ref: #sorting-the-.bib-file122334
-Node: Merging and Importing125473
-Ref: #merging-and-importing125638
-Node: Exporting Entries127414
-Ref: #exporting-entries127576
-Node: Multiple Identical Fields129092
-Ref: #multiple-identical-fields129271
-Node: Multiline Edit Buffers131180
-Ref: #multiline-edit-buffers131352
-Node: The Options Menu135254
-Ref: #the-options-menu135402
-Node: Customisation136023
-Ref: #customisation136134
-Node: Modifying Key Bindings136742
-Ref: #modifying-key-bindings136869
+Node: Window Management105316
+Ref: #window-management105475
+Node: Creating Entry Stubs108651
+Ref: #creating-entry-stubs108813
+Node: @Preamble Definition109814
+Ref: #preamble-definition109978
+Node: @String Definitions111964
+Ref: #string-definitions112115
+Node: @Comments115631
+Ref: #comments115759
+Node: Managing Keywords116124
+Ref: #managing-keywords116269
+Node: Sorting the bib File122178
+Ref: #sorting-the-.bib-file122351
+Node: Merging and Importing125490
+Ref: #merging-and-importing125655
+Node: Exporting Entries127431
+Ref: #exporting-entries127593
+Node: Multiple Identical Fields129109
+Ref: #multiple-identical-fields129288
+Node: Multiline Edit Buffers131197
+Ref: #multiline-edit-buffers131369
+Node: The Options Menu135271
+Ref: #the-options-menu135419
+Node: Customisation136040
+Ref: #customisation136151
+Node: Modifying Key Bindings136759
+Ref: #modifying-key-bindings136886
 
 End Tag Table
 
