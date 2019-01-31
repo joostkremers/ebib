@@ -2652,8 +2652,17 @@ the filter."
   (define-prefix-command 'ebib-reading-list-map)
   (suppress-keymap 'ebib-reading-list-map 'no-digits)
   (define-key ebib-reading-list-map "a" #'ebib-add-reading-list-item)
+  (define-key ebib-reading-list-map "c" #'ebib-create-reading-list)
   (define-key ebib-reading-list-map "d" #'ebib-mark-reading-list-item-as-done)
   (define-key ebib-reading-list-map "v" #'ebib-view-reading-list))
+
+(defun ebib-create-reading-list ()
+  "Create a reading list.
+This function simply creates a customization buffer for the
+option `ebib-reading-list-file'."
+  (interactive)
+  (ebib-lower)
+  (customize-option 'ebib-reading-list-file))
 
 (defun ebib-add-reading-list-item ()
   "Add the current entry to the reading list.
