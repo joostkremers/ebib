@@ -2444,8 +2444,8 @@ associated with the current buffer, see
   (let* ((database-list (ebib--get-local-databases))
          (databases (if (eq database-list 'none)
                         (list ebib--cur-db)
-                      (delq nil (mapcar #'ebib--get-db-from-filename
-                                        database-list))))
+                      (seq-filter #'ebib--get-db-from-filename
+                                  database-list)))
          collection)
     (dolist (db databases collection)
       (let ((keys (ebib-db-list-keys db)))
@@ -3058,11 +3058,11 @@ If FILE is not in (a subdirectory of) one of the directories in
 `ebib-file-search-dirs', return FILE."
   ;; We first create a list of names relative to each dir in
   ;; ebib-file-search-dirs, discarding those that start with `..'
-  (let* ((names (delq nil (mapcar (lambda (dir)
-                                    (let ((rel-name (file-relative-name file dir)))
-                                      (unless (string-prefix-p ".." rel-name)
-                                        rel-name)))
-                                  ebib-file-search-dirs)))
+  (let* ((names (seq-filter (lambda (dir)
+                              (let ((rel-name (file-relative-name file dir)))
+                                (unless (string-prefix-p ".." rel-name)
+                                  rel-name)))
+                            ebib-file-search-dirs))
          ;; Then we take the shortest one...
          (name (car (sort names (lambda (x y)
                                   (< (length x) (length y)))))))
@@ -3988,10 +3988,9 @@ created containing only these entries."
                  (y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
          (when (file-exists-p bib-file)
            (delete-file bib-file t))
-         (let ((databases
-                (delq nil (mapcar (lambda (file)
-                                    (ebib--get-db-from-filename file))
-                                  ebib--local-bibtex-filenames))))
+         (let ((databases (seq-filter (lambda (file)
+                                        (ebib--get-db-from-filename file))
+                                      ebib--local-bibtex-filenames)))
            (with-temp-buffer
              (insert-file-contents bbl-file)
              (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))

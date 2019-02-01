@@ -240,11 +240,11 @@ See `ebib--filters-run-filter'.")
     (eval
      `(cl-macrolet ((contains (field regexp)
                               `(ebib--search-in-entry ,regexp ebib-entry ,(unless (cl-equalp field "any") field))))
-        (delq nil (mapcar (lambda (key)
-                            (let ((ebib-entry (ebib-db-get-entry key db 'noerror)))
-                              (when ,filter
-                                key)))
-                          (ebib-db-list-keys db)))))))
+        (seq-filter (lambda (key)
+                      (let ((ebib-entry (ebib-db-get-entry key db 'noerror)))
+                        (when ,filter
+                          key)))
+                    (ebib-db-list-keys db))))))
 
 (defun ebib--filters-pp-filter (filter)
   "Convert FILTER into a string suitable for displaying.

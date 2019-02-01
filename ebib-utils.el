@@ -714,7 +714,7 @@ this command extracts the filename."
   :type 'string)
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
-                                ("ps" . "gv"))
+                                    ("ps" . "gv"))
   "List of file associations.
 Lists file extensions together with external programs to handle
 files with those extensions.  If the program string contains a
@@ -1271,14 +1271,14 @@ ignored."
   (setq specifiers (cl-remove-if-not (lambda (elt)
                                        (string-match-p (format "%%%c" (car elt)) template))
                                      specifiers))
-  (format-spec template (delq nil (mapcar (lambda (spec)
-                                            (let* ((replacer (cdr spec))
-                                                   (replacement (if (fboundp replacer)
-                                                                    (ignore-errors (apply (cdr spec) args))
-                                                                  (symbol-value replacer))))
-                                              (if replacement
-                                                  (cons (car spec) replacement))))
-                                          specifiers))))
+  (format-spec template (seq-filter (lambda (spec)
+                                      (let* ((replacer (cdr spec))
+                                             (replacement (if (fboundp replacer)
+                                                              (ignore-errors (apply (cdr spec) args))
+                                                            (symbol-value replacer))))
+                                        (if replacement
+                                            (cons (car spec) replacement))))
+                                    specifiers)))
 
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
@@ -1655,9 +1655,9 @@ already.
 This function basically just calls `ebib-db-set-string' to do the
   real work."
   (ebib-db-set-string abbr (if (ebib-unbraced-p value)
-                           (ebib-brace value)
-                         value)
-                  db overwrite))
+                               (ebib-brace value)
+                             value)
+                      db overwrite))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced)
   "Return the value of @STRING definition ABBR in database DB.
