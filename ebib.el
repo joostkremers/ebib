@@ -62,6 +62,9 @@
 (require 'ebib-notes)
 (require 'ebib-reading-list)
 
+;; Make sure `ivy' is loaded during compilation.
+(require 'ivy nil 'noerror)
+
 ;;; Silence the byte-compiler
 (defvar pandoc-mode)
 (declare-function pandoc--get "ext:pandoc-mode-utils.el" (option &optional buffer))
