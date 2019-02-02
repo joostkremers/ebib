@@ -35,7 +35,7 @@ example Gnus is.
 * Marking Entries::
 * Printing the Database::
 * Calling a Browser::
-* Viewing Files::
+* Viewing and Importing Files::
 * Notes files::
 * Managing a reading list::
 * Window Management::
@@ -495,8 +495,8 @@ else.  You can use TAB completion in this case.  Similarly, if you edit
 the ‘crossref’ field, Ebib requires that you fill in a key from the
 database.  Here, too, you can use TAB completion.  The fields ‘keywords’
 and ‘file’ are also treated differently, see *note Managing keywords:
-#managing-keywords. and *note Viewing Files: #viewing-files,
-respectively.
+#managing-keywords. and *note Viewing Files:
+#viewing-and-importing-files, respectively.
 
    Note that if you’re adding a new entry, Ebib automatically puts you
 in the entry buffer after you’ve typed the entry key: you don’t have to
@@ -1736,7 +1736,7 @@ uses BibTeX’s standard bibliography style.  With the option “LaTeX
 Preamble” you can set your preferred bibliography style.
 
 
-File: ebib.info,  Node: Calling a Browser,  Next: Viewing Files,  Prev: Printing the Database,  Up: Top
+File: ebib.info,  Node: Calling a Browser,  Next: Viewing and Importing Files,  Prev: Printing the Database,  Up: Top
 
 13 Calling a Browser
 ********************
@@ -1785,10 +1785,10 @@ the field that Ebib takes URLs from, with the option “Standard Url
 Field”.  The same can be done for the DOI field.
 
 
-File: ebib.info,  Node: Viewing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
+File: ebib.info,  Node: Viewing and Importing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
 
-14 Viewing Files
-****************
+14 Viewing and Importing Files
+******************************
 
 If you have electronic versions of the papers in your database stored on
 your computer, or any other file associated with your entries (e.g.,
@@ -1824,44 +1824,56 @@ respectively.  You can specify further file types by their extensions
 you can of course specify the full path to the program.  There is also
 the option to open files in Emacs.  Use this if you have separate text
 files for notes, or if you want to read pdf files in Emacs with
-‘doc-view-mode’.
+‘doc-view-mode’ or ‘pdf-tools’ (http://melpa.org/#/pdf-tools).
 
-   If the ‘file’ field is empty, Ebib will search for a pdf file with a
-name based on the entry key.  By default, Ebib just appends ‘.pdf’ to
-the entry key and tries to find a file by the name thus created.  If you
-want, you can modify the file name that Ebib searches for by setting the
-option ‘ebib-name-transform-function’ to a function that performs the
-transformation.  This function takes the key of the current entry as its
-argument (as a string), and should return the file name to use (without
-‘.pdf’, which is added automatically).
+   If the ‘file’ field is empty, pressing ‘f’ causes Ebib to search for
+a pdf file with a name based on the entry key.  By default, Ebib just
+appends ‘.pdf’ to the entry key and tries to find a file by the name
+thus created.  If you want, you can modify the file name that Ebib
+searches for by setting the option ‘ebib-name-transform-function’ to a
+function that performs the transformation.  This function takes the key
+of the current entry as its argument (as a string), and should return
+the file name to use (without ‘.pdf’, which is added automatically).
+Note that you can use the function ‘ebib-get-field-value’ to access the
+values of the entry’s fields (you need to pass ‘ebib--cur-db’ for the
+‘db’ argument).
 
-   For example, if your entry keys separate authors with colons (i.e.,
-you have keys of the form ‘Hauser:Chomsky:Fitch2002’), but your pdf
-files have underscores (i.e., ‘Hauser_Chomsky_Fitch2002.pdf’), then you
-can set ‘ebib-name-transform-function’ to:
+   There are two functions that can help you to attach files to your
+database: ‘ebib-download-url’ and ‘ebib-import-file’.  By default, these
+are not bound to any keys, but they can of course be called with ‘M-x’.
+The first of these, ‘ebib-download-url’ attempts to convert the URL in
+the ‘url’ field into a URL that points to a pdf file, downloads that
+file, renames it and saves it in the first directory in
+‘ebib-file-search-dirs’.  The name under which the file is saved is
+created by applying the function in ‘ebib-name-transform-function’ to
+the entry key and adding ‘.pdf’ to it.
 
-(lambda (key) (replace-regexp-in-string ":" "_" key))
+   How a URL should be converted to a URL pointing to the pdf file
+depends on several factors, of course.  The option
+‘ebib-url-download-transformations’ is used to decide how to convert a
+particular URL. Currently, only three internet archives are supported:
+arXiv (https://arxiv.org/), lingBuzz (https://ling.auf.net/lingBuzz/)
+and JSTOR (https://www.jstor.org/).  Suggestions for other sites are of
+course welcome.
 
-   Note that you can also use ‘ebib-name-transform-function’ to add a
-subdirectory to the file name.  For example, if you store the pdf files
-in subdirectories ‘A/’ to ‘Z/’ corresponding to the first letter of the
-file name, you can use the following function:
+   The function ‘ebib-import-file’ can be used to import a file into the
+database that is stored on your computer somewhere.  It asks for the
+file name, renames the file and moves it to the first directory in
+‘ebib-file-search-dirs’.  The file name is created in the same way as
+with ‘ebib-download-url’: by applying the function in
+‘ebib-name-transform-function’ to the entry key.  The extension of the
+original file is maintained, however, so it doesn’t just work for pdf
+files.
 
-(lambda (key) (format "%c/%s" (aref key 0) key))
-
-   For the entry key ‘Chomsky1995’, this produces ‘C/Chomsky1995’, which
-is then appended with the extension ‘.pdf’.
-
-   Of course, the function in ‘ebib-name-transform-function’ does not
-have to be a lambda.  It can also be the name of a function that you’ve
-defined for the purpose.
+   Both ‘ebib-download-url’ and ‘ebib-import-file’ add the imported file
+to the ‘file’ field if it is not already there.
 
 * Menu:
 
 * Editing the file field::
 
 
-File: ebib.info,  Node: Editing the file field,  Up: Viewing Files
+File: ebib.info,  Node: Editing the file field,  Up: Viewing and Importing Files
 
 14.1 Editing the ‘file’ field
 =============================
@@ -1889,7 +1901,7 @@ this behaviour with the option ‘ebib-truncate-file-names’: if unset,
 file names are always stored as absolute paths.)
 
 
-File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Viewing Files,  Up: Top
+File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Viewing and Importing Files,  Up: Top
 
 15 Notes files
 **************
@@ -1915,10 +1927,11 @@ appending the extension ‘.org’ to it, which means that a notes file is
 an Org file.  Before creating the file name, Ebib applies the function
 in ‘ebib-notes-name-transform-function’ to it, or, if this is not set,
 the function in ‘ebib-name-transform-function’.  See *note Viewing
-Files: #viewing-files. for some examples of the changes that can be
-applied.  Note that if you do not wish to apply any changes but also do
-not want the function in ‘ebib-name-transform-function’ to be applied,
-you can set ‘ebib-notes-name-transform-function’ to ‘identity’.
+Files: #viewing-and-importing-files. for some examples of the changes
+that can be applied.  Note that if you do not wish to apply any changes
+but also do not want the function in ‘ebib-name-transform-function’ to
+be applied, you can set ‘ebib-notes-name-transform-function’ to
+‘identity’.
 
    When a new note is created, it is given a title consisting of the
 author(s), year and title of the entry.  Ebib also includes a
@@ -2055,11 +2068,10 @@ indicate that the current entry is on the reading list.
    A reading list is simply an Org file with one entry (i.e., heading)
 per item.  Each entry is marked with ‘TODO’, so that the items can be
 included in the Org agenda.  If you prefer to use another todo state,
-you can customise the option ‘ebib-reading-list-todo-marker’.
-
-   You can mark an entry as done from within Ebib with the key ‘R d’.
-This will change the todo state of the item to ‘DONE’ (or whatever the
-value of ‘ebib-reading-list-done-marker’).  With ‘R v’ you can view the
+you can customise the option ‘ebib-reading-list-todo-marker’.  You can
+mark an entry as done from within Ebib with the key ‘R d’.  This will
+change the todo state of the item to ‘DONE’ (customisable through the
+option ‘ebib-reading-list-done-marker’).  With ‘R v’ you can view the
 reading list.
 
    The format of a reading list item can be customised in much the same
@@ -2076,11 +2088,11 @@ marker specified in the option ‘ebib-reading-list-todo-marker’ (by
 default ‘TODO’).
 
    If you do not wish to use an Org file for the reading list, you can
-do so.  Apart from customising the template, there are several other
-options that will need to be customised in this case.  First, the option
-‘ebib-reading-list-remove-item-function’ holds the function that marks a
-reading list item as done.  By default, it is set to
-‘ebib-reading-list-mark-item-as-done’, which simply changes the todo
+use another format.  Apart from customising the template, there are
+several other options that will need to be customised in this case.
+First, the option ‘ebib-reading-list-remove-item-function’ holds the
+function that marks a reading list item as done.  By default, it is set
+to ‘ebib-reading-list-mark-item-as-done’, which simply changes the todo
 state of the item to ‘DONE’, but you can set it to a function that does
 something else (for example, completely removing the entry from the
 list).  You will also have to customise
@@ -2746,140 +2758,140 @@ which are rather awkward to type, can be redefined as follows:
 
 Tag Table:
 Node: Top186
-Node: News1323
-Ref: #news1413
-Node: Version 215 January 20191630
-Ref: #version-2.15-january-20191790
-Node: Version 214 December 20182243
-Ref: #version-2.14-december-20182439
-Node: Version 213 November 20182881
-Ref: #version-2.13-november-20183079
-Node: Version 2123 November 20183278
-Ref: #version-2.12.3-november-20183481
-Node: Version 2122 November 20183556
-Ref: #version-2.12.2-november-20183757
-Node: Version 212 August 20183897
-Ref: #version-2.12-august-20184087
-Node: Version 21112 July 20184367
-Ref: #version-2.11.12-july-20184524
-Node: Installation4957
-Ref: #installation5075
-Node: Package manager5169
-Ref: #package-manager5298
-Node: Debian and Ubuntu5649
-Ref: #debian-and-ubuntu5810
-Node: Manual installation5944
-Ref: #manual-installation6107
-Node: Starting Ebib6387
-Ref: #starting-ebib6512
-Node: Getting Started7420
-Ref: #getting-started7560
-Node: Opening a bib File9935
-Ref: #opening-a-.bib-file10089
-Node: Preloading bib Files11591
-Ref: #preloading-.bib-files11779
-Node: Navigating a bib File12585
-Ref: #navigating-a-.bib-file12780
-Node: Starting a New bib File16111
-Ref: #starting-a-new-.bib-file16281
-Node: Editing the Database16573
-Ref: #editing-the-database16728
-Node: Adding and Deleting Entries17106
-Ref: #adding-and-deleting-entries17283
-Node: Editing Fields Values19497
-Ref: #editing-fields-values19695
-Node: Editing Multiline Values22344
-Ref: #editing-multiline-values22537
-Node: Undefined Fields25386
-Ref: #undefined-fields25555
-Node: Hidden Fields26551
-Ref: #hidden-fields26700
-Node: Timestamps27596
-Ref: #timestamps27758
-Node: Copy Cut Kill Paste Yank and Delete29821
-Ref: #copy-cut-kill-paste-yank-and-delete30025
-Node: Saving a Database30977
-Ref: #saving-a-database31125
-Node: Using Biblatex32800
-Ref: #using-biblatex32938
-Node: Setting the BibTeX Dialect33266
-Ref: #setting-the-bibtex-dialect33435
-Node: Alias Types and Fields35475
-Ref: #alias-types-and-fields35636
-Node: The Entries List37822
-Ref: #the-entries-list37956
-Node: Searching41669
-Ref: #searching41814
-Node: Simple Searches41856
-Ref: #simple-searches41972
-Node: Filters45020
-Ref: #filters45120
-Node: Simple Selection46195
-Ref: #simple-selection46324
-Node: Complex Filters48018
-Ref: #complex-filters48180
-Node: Storing and Saving Filters52222
-Ref: #storing-and-saving-filters52405
-Node: Special Filters55284
-Ref: #special-filters55465
-Node: An Example Listing Recent Additions56845
-Ref: #an-example-listing-recent-additions57074
-Node: Properties of Filtered Databases59453
-Ref: #properties-of-filtered-databases59650
-Node: Accessing BibTeX Databases outside Ebib61308
-Ref: #accessing-bibtex-databases-outside-ebib61514
-Node: Key Bindings66435
-Ref: #key-bindings66591
-Node: Defining Citation Commands67355
-Ref: #defining-citation-commands67588
-Node: Associating a Database with a LaTeX File73504
-Ref: #associating-a-database-with-a-latex-file73744
-Node: Cross-referencing76687
-Ref: #cross-referencing76857
-Node: Marking Entries80170
-Ref: #marking-entries80318
-Node: Printing the Database81301
-Ref: #printing-the-database81461
-Node: Calling a Browser85268
-Ref: #calling-a-browser85418
-Node: Viewing Files88050
-Ref: #viewing-files88182
-Node: Editing the file field91976
-Ref: #editing-the-file-field92111
-Node: Notes files93470
-Ref: #notes-files93604
-Node: Customising the notes template97750
-Ref: #customising-the-notes-template97899
-Node: Managing a reading list100945
-Ref: #managing-a-reading-list101107
-Node: Window Management104202
-Ref: #window-management104361
-Node: Creating Entry Stubs107537
-Ref: #creating-entry-stubs107699
-Node: @Preamble Definition108700
-Ref: #preamble-definition108864
-Node: @String Definitions110850
-Ref: #string-definitions111001
-Node: @Comments114517
-Ref: #comments114645
-Node: Managing Keywords115010
-Ref: #managing-keywords115155
-Node: Sorting the bib File121064
-Ref: #sorting-the-.bib-file121237
-Node: Merging and Importing124376
-Ref: #merging-and-importing124541
-Node: Exporting Entries126317
-Ref: #exporting-entries126479
-Node: Multiple Identical Fields127995
-Ref: #multiple-identical-fields128174
-Node: Multiline Edit Buffers130083
-Ref: #multiline-edit-buffers130255
-Node: The Options Menu134157
-Ref: #the-options-menu134305
-Node: Customisation134926
-Ref: #customisation135037
-Node: Modifying Key Bindings135645
-Ref: #modifying-key-bindings135772
+Node: News1337
+Ref: #news1427
+Node: Version 215 January 20191644
+Ref: #version-2.15-january-20191804
+Node: Version 214 December 20182257
+Ref: #version-2.14-december-20182453
+Node: Version 213 November 20182895
+Ref: #version-2.13-november-20183093
+Node: Version 2123 November 20183292
+Ref: #version-2.12.3-november-20183495
+Node: Version 2122 November 20183570
+Ref: #version-2.12.2-november-20183771
+Node: Version 212 August 20183911
+Ref: #version-2.12-august-20184101
+Node: Version 21112 July 20184381
+Ref: #version-2.11.12-july-20184538
+Node: Installation4971
+Ref: #installation5089
+Node: Package manager5183
+Ref: #package-manager5312
+Node: Debian and Ubuntu5663
+Ref: #debian-and-ubuntu5824
+Node: Manual installation5958
+Ref: #manual-installation6121
+Node: Starting Ebib6401
+Ref: #starting-ebib6526
+Node: Getting Started7434
+Ref: #getting-started7574
+Node: Opening a bib File9949
+Ref: #opening-a-.bib-file10103
+Node: Preloading bib Files11605
+Ref: #preloading-.bib-files11793
+Node: Navigating a bib File12599
+Ref: #navigating-a-.bib-file12794
+Node: Starting a New bib File16125
+Ref: #starting-a-new-.bib-file16295
+Node: Editing the Database16587
+Ref: #editing-the-database16742
+Node: Adding and Deleting Entries17120
+Ref: #adding-and-deleting-entries17297
+Node: Editing Fields Values19511
+Ref: #editing-fields-values19709
+Node: Editing Multiline Values22372
+Ref: #editing-multiline-values22565
+Node: Undefined Fields25414
+Ref: #undefined-fields25583
+Node: Hidden Fields26579
+Ref: #hidden-fields26728
+Node: Timestamps27624
+Ref: #timestamps27786
+Node: Copy Cut Kill Paste Yank and Delete29849
+Ref: #copy-cut-kill-paste-yank-and-delete30053
+Node: Saving a Database31005
+Ref: #saving-a-database31153
+Node: Using Biblatex32828
+Ref: #using-biblatex32966
+Node: Setting the BibTeX Dialect33294
+Ref: #setting-the-bibtex-dialect33463
+Node: Alias Types and Fields35503
+Ref: #alias-types-and-fields35664
+Node: The Entries List37850
+Ref: #the-entries-list37984
+Node: Searching41697
+Ref: #searching41842
+Node: Simple Searches41884
+Ref: #simple-searches42000
+Node: Filters45048
+Ref: #filters45148
+Node: Simple Selection46223
+Ref: #simple-selection46352
+Node: Complex Filters48046
+Ref: #complex-filters48208
+Node: Storing and Saving Filters52250
+Ref: #storing-and-saving-filters52433
+Node: Special Filters55312
+Ref: #special-filters55493
+Node: An Example Listing Recent Additions56873
+Ref: #an-example-listing-recent-additions57102
+Node: Properties of Filtered Databases59481
+Ref: #properties-of-filtered-databases59678
+Node: Accessing BibTeX Databases outside Ebib61336
+Ref: #accessing-bibtex-databases-outside-ebib61542
+Node: Key Bindings66463
+Ref: #key-bindings66619
+Node: Defining Citation Commands67383
+Ref: #defining-citation-commands67616
+Node: Associating a Database with a LaTeX File73532
+Ref: #associating-a-database-with-a-latex-file73772
+Node: Cross-referencing76715
+Ref: #cross-referencing76885
+Node: Marking Entries80198
+Ref: #marking-entries80346
+Node: Printing the Database81329
+Ref: #printing-the-database81489
+Node: Calling a Browser85296
+Ref: #calling-a-browser85460
+Node: Viewing and Importing Files88092
+Ref: #viewing-and-importing-files88266
+Node: Editing the file field93031
+Ref: #editing-the-file-field93180
+Node: Notes files94539
+Ref: #notes-files94687
+Node: Customising the notes template98847
+Ref: #customising-the-notes-template98996
+Node: Managing a reading list102042
+Ref: #managing-a-reading-list102204
+Node: Window Management105316
+Ref: #window-management105475
+Node: Creating Entry Stubs108651
+Ref: #creating-entry-stubs108813
+Node: @Preamble Definition109814
+Ref: #preamble-definition109978
+Node: @String Definitions111964
+Ref: #string-definitions112115
+Node: @Comments115631
+Ref: #comments115759
+Node: Managing Keywords116124
+Ref: #managing-keywords116269
+Node: Sorting the bib File122178
+Ref: #sorting-the-.bib-file122351
+Node: Merging and Importing125490
+Ref: #merging-and-importing125655
+Node: Exporting Entries127431
+Ref: #exporting-entries127593
+Node: Multiple Identical Fields129109
+Ref: #multiple-identical-fields129288
+Node: Multiline Edit Buffers131197
+Ref: #multiline-edit-buffers131369
+Node: The Options Menu135271
+Ref: #the-options-menu135419
+Node: Customisation136040
+Ref: #customisation136151
+Node: Modifying Key Bindings136759
+Ref: #modifying-key-bindings136886
 
 End Tag Table
 

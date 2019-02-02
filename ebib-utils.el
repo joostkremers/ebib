@@ -667,6 +667,25 @@ possible to use the same separator in the `url' field as in the
   :group 'ebib
   :type 'string)
 
+(defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url)
+                                           ("https?://ling.auf.net/lingBuzz/" . ebib-transform-lingbuzz-url))
+  "Transformations to apply to a URL before attempting to download a pdf file.
+Each entry consists of a matcher and a transformation function.
+The matcher is a regular expression that is matched (with
+`string-match-p') against a given URL.  If the URL matches, the
+transformation function is applied to the URL."
+  :group 'Ebib
+  :type '(repeat (cons :tag "Transformation"
+                       (regexp :tag "Matcher") (function :tag "Function"))))
+
+(defun ebib-transform-arXiv-url (url)
+  "Transform an arXiv URL to the URL of its correspnoding pdf file."
+  (concat (replace-regexp-in-string (regexp-quote "/abs/") "/pdf/" url t t) ".pdf"))
+
+(defun ebib-transform-lingbuzz-url (url)
+  "Transform a lingbuzz URL to the URL of its corresponding pdf file."
+  (concat url "/current.pdf"))
+
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
 If this option is unset, Ebib uses the Emacs function
@@ -695,7 +714,7 @@ this command extracts the filename."
   :type 'string)
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
-                                ("ps" . "gv"))
+                                    ("ps" . "gv"))
   "List of file associations.
 Lists file extensions together with external programs to handle
 files with those extensions.  If the program string contains a
@@ -871,6 +890,10 @@ Currently, the following problems are marked:
 
 * Crossreferences to entry keys that do not exist.
 * Keywords that have not been saved."
+  :group 'ebib-faces)
+
+(defface ebib-link-face '((t (:inherit link)))
+  "Face used for marking links."
   :group 'ebib-faces)
 
 ;; Generic for all databases.
@@ -1072,23 +1095,6 @@ function adds a newline to the message being logged."
         (insert-file-contents filename)
         (split-string (buffer-string) "\n" 'omit-nulls))))    ; Nulls are empty lines in this case.
 
-;; We sometimes need to walk through lists.  These functions yield the element
-;; directly preceding or following ELEM in LIST.  In order to work properly,
-;; ELEM must be unique in LIST, obviously.  If ELEM is the first/last element of
-;; LIST, or if it is not contained in LIST at all, the result is nil.
-(defun ebib--next-elem (elem list)
-  "Return the element following ELEM in LIST.
-If ELEM is the last element, return nil."
-  (cadr (member elem list)))
-
-(defun ebib--prev-elem (elem list)
-  "Return the element preceding ELEM in LIST.
-If ELEM is the first element, return nil."
-  (if (or (equal elem (car list))
-          (not (member elem list)))
-      nil
-    (car (last list (1+ (length (member elem list)))))))
-
 (defun ebib--locate-bibfile (file &optional dirs)
   "Locate and/or expand FILE to an absolute filename in DIRS.
 First try to locate BibTeX file FILE with `locate-file' and with
@@ -1265,14 +1271,14 @@ ignored."
   (setq specifiers (cl-remove-if-not (lambda (elt)
                                        (string-match-p (format "%%%c" (car elt)) template))
                                      specifiers))
-  (format-spec template (delq nil (mapcar (lambda (spec)
-                                            (let* ((replacer (cdr spec))
-                                                   (replacement (if (fboundp replacer)
-                                                                    (ignore-errors (apply (cdr spec) args))
-                                                                  (symbol-value replacer))))
-                                              (if replacement
-                                                  (cons (car spec) replacement))))
-                                          specifiers))))
+  (format-spec template (seq-filter (lambda (spec)
+                                      (let* ((replacer (cdr spec))
+                                             (replacement (if (fboundp replacer)
+                                                              (ignore-errors (apply (cdr spec) args))
+                                                            (symbol-value replacer))))
+                                        (if replacement
+                                            (cons (car spec) replacement))))
+                                    specifiers)))
 
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
@@ -1453,7 +1459,8 @@ string has the text property `ebib--alias' with value t."
                    (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db))))
               (when xref-field
                 (setq value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror))))))))
-    (when (not value)                   ; Check if there is a field alias
+    (when (and (not value)
+               (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
       (setq alias (cdr (assoc-string field ebib--field-aliases 'case-fold)))
       (if alias
           (setq value (ebib-db-get-field-value alias key db 'noerror))))
@@ -1648,9 +1655,9 @@ already.
 This function basically just calls `ebib-db-set-string' to do the
   real work."
   (ebib-db-set-string abbr (if (ebib-unbraced-p value)
-                           (ebib-brace value)
-                         value)
-                  db overwrite))
+                               (ebib-brace value)
+                             value)
+                      db overwrite))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced)
   "Return the value of @STRING definition ABBR in database DB.
@@ -1906,7 +1913,7 @@ This function is mainly intended for the DOI and URL fields."
         (setq str (concat "https://dx.doi.org/" str)))
     (if str
         (propertize "www"
-                    'face '(:height 0.8 :inherit link)
+                    'face '(:height 0.8 :inherit ebib-link-face)
                     'mouse-face 'highlight
                     'help-echo str)
       (propertize "   " 'face '(:height 0.8)))))
