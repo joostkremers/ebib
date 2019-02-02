@@ -535,7 +535,7 @@ loaded, switch to it.  If KEY is given, jump to it."
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
 FILES is a list of BibTeX files in which KEY is searched,
-provided it is open in Ebib.  If FILES is `none', only the
+provided they are open in Ebib.  If FILES is `none', only the
 current database is searched."
   (when ebib--databases
     (if (eq files 'none)
