@@ -88,6 +88,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <nav id="TOC">
 <ul>
 <li><a href="#news">News</a><ul>
+<li><a href="#version-2.15-february-2019">Version 2.15, February 2019</a></li>
 <li><a href="#version-2.15-january-2019">Version 2.15, January 2019</a></li>
 <li><a href="#version-2.14-december-2018">Version 2.14, December 2018</a></li>
 <li><a href="#version-2.13-november-2018">Version 2.13, November 2018</a></li>
@@ -171,6 +172,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Ebib is a program with which you can manage BibTeX and BibLateX database files without having to edit the raw <code>.bib</code> files. It runs in GNU/Emacs, version 25.3 or higher.</p>
 <p>It should be noted that Ebib is <em>not</em> a minor or major mode for editing BibTeX files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.</p>
 <h1 id="news">News</h1>
+<h2 id="version-2.15-february-2019">Version 2.15, February 2019</h2>
+<ul>
+<li>Add command <code>ebib-download-url</code>: download pdf from a site in the <code>url</code> field.</li>
+<li>Add command <code>ebib-import-file</code>: import local file into current database.</li>
+<li>Update the menus.</li>
+<li>Change display of the <code>file</code> field in the entry buffer and make file names clickable.</li>
+<li>Bug fix: Do not look for alias fields in BibTeX databases. (Alias fields are only defined for BibLaTeX).</li>
+<li>Bug fix: <code>ebib-yank-field-contents</code> can now be repeated.</li>
+</ul>
 <h2 id="version-2.15-january-2019">Version 2.15, January 2019</h2>
 <ul>
 <li>Multiline field values can now be displayed in the entry buffer.</li>

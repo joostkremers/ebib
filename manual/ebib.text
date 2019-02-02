@@ -10,6 +10,15 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.15, February 2019 ##
+
+- Add command `ebib-download-url`: download pdf from a site in the `url` field.
+- Add command `ebib-import-file`: import local file into current database.
+- Update the menus.
+- Change display of the `file` field in the entry buffer and make file names clickable.
+- Bug fix: Do not look for alias fields in BibTeX databases. (Alias fields are only defined for BibLaTeX).
+- Bug fix: `ebib-yank-field-contents` can now be repeated.
+
 ## Version 2.15, January 2019 ##
 
 - Multiline field values can now be displayed in the entry buffer.
