@@ -507,30 +507,31 @@ user."
 Optional argument FILE is a file to load.  If FILE is already
 loaded, switch to it.  If KEY is given, jump to it."
   (interactive)
-  (let ((needs-update nil))
-    ;; Save the buffer from which Ebib is called.
-    (setq ebib--buffer-before (current-buffer))
-    ;; And set it as the buffer to push entries to.
-    (setq ebib--push-buffer (current-buffer))
-    ;; See if there are local databases.
-    (or ebib--local-bibtex-filenames
-        (setq ebib--local-bibtex-filenames (ebib--get-local-databases)))
-    ;; See if there's a key at point.
-    (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
-    ;; Initialize Ebib if required.
-    (unless ebib--initialized
-      (ebib--init)
-      (setq needs-update t))
-    ;; Set up the windows.
-    (ebib--setup-windows)
-    ;; See if we have a file.
-    (when file
-      (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
-      (setq needs-update t))
-    ;; See if we have a key.
-    (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
-      (setq needs-update t))
-    (if needs-update (ebib--update-buffers))))
+  ;; Save the buffer from which Ebib is called.
+  (setq ebib--buffer-before (current-buffer))
+  ;; And set it as the buffer to push entries to.
+  (setq ebib--push-buffer (current-buffer))
+  ;; See if there are local databases.
+  (or ebib--local-bibtex-filenames
+      (setq ebib--local-bibtex-filenames (ebib--get-local-bibfiles)))
+  ;; See if there's a key at point.
+  (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
+  ;; Initialize Ebib if required.
+  (unless ebib--initialized
+    (ebib-init)
+    (setq ebib--needs-update t))
+  ;; Set up the windows.
+  (ebib--setup-windows)
+  ;; See if we have a file.
+  (when file
+    (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
+    (setq ebib--needs-update t))
+  ;; See if we have a key.
+  (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
+    (setq ebib--needs-update t))
+  (when ebib--needs-update
+    (setq ebib--needs-update nil)
+    (ebib--update-buffers)))
 
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
@@ -563,10 +564,14 @@ CHARS is a string of characters that should not occur in the string."
       (ebib--looking-at-goto-end (concat "[^" chars "]*"))
       (buffer-substring-no-properties beg (point)))))
 
-(defun ebib--init ()
+;;;###autoload
+(defun ebib-init ()
   "Initialise Ebib.
 This function sets all variables to their initial values, creates
-the buffers and loads the files in `ebib-preload-bib-files'."
+the buffers and loads the files in `ebib-preload-bib-files'.
+
+This function can be used to open Ebib in the background, e.g.,
+in the user's init file."
   (setq ebib--saved-window-config nil)
   (ebib--create-buffers)
   (if (and ebib-keywords-file
@@ -584,7 +589,8 @@ the buffers and loads the files in `ebib-preload-bib-files'."
                                                  (expand-file-name file))))
           ebib-preload-bib-files)
     (setq ebib--cur-db (car ebib--databases))) ; Display the first database in the list.
-  (setq ebib--initialized t))
+  (setq ebib--initialized t
+        ebib--needs-update t))
 
 (defun ebib--setup-windows ()
   "Create Ebib's window configuration.
