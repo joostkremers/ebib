@@ -970,12 +970,12 @@ in the background, use `ebib--load-bibtex-file-internal'."
   "Load BibTeX file FILE.
 FILE must be a fully expanded filename.  The new database is
 returned, but it is not made current and the buffers are not
-updated.
+updated.  If FILE is already open, just return the database.
 
 This function can be used to open a BibTeX file in the
 background.  Use `ebib-open-bibtex-file' to open a BibTeX file
 interactively."
-  (or (ebib--get-db-from-filename file)                              ; FILE is already open in Ebib.
+  (or (ebib--get-db-from-filename file) ; FILE is already open in Ebib.
       (let ((new-db (ebib--create-new-database)))
         (ebib-db-set-filename file new-db)
         (setq ebib--log-error nil)         ; We haven't found any errors.
