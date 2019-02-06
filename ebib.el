@@ -586,7 +586,7 @@ in the user's init file."
   (when ebib-preload-bib-files
     (mapc (lambda (file)
             (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
-                                                 (expand-file-name file))))
+                                             (expand-file-name file))))
           ebib-preload-bib-files)
     (setq ebib--cur-db (car ebib--databases))) ; Display the first database in the list.
   (setq ebib--initialized t
