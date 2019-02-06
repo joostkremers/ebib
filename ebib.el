@@ -524,7 +524,7 @@ loaded, switch to it.  If KEY is given, jump to it."
   (ebib--setup-windows)
   ;; See if we have a file.
   (when file
-    (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory))))
+    (setq ebib--cur-db (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
     (setq ebib--needs-update t))
   ;; See if we have a key.
   (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
@@ -780,7 +780,7 @@ keywords before Emacs is killed."
     (define-key map "N" #'ebib-open-note)
     (define-key map [(control n)] #'ebib-next-entry)
     (define-key map [(meta n)] #'ebib-index-scroll-up)
-    (define-key map "o" #'ebib-load-bibtex-file)
+    (define-key map "o" #'ebib-open-bibtex-file)
     (define-key map "p" #'ebib-prev-entry)
     (define-key map [(control p)] #'ebib-prev-entry)
     (define-key map [(meta p)] #'ebib-index-scroll-down)
@@ -829,7 +829,7 @@ character ?1-?9, which is converted to the corresponding number."
 (easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
   `("Ebib"
     ("Database"
-     ["Open..." ebib-load-bibtex-file t]
+     ["Open..." ebib-open-bibtex-file t]
      ["Close" ebib-index-c :active (and ebib--cur-db (not (ebib-db-filtered-p ebib--cur-db))) :keys "\\[ebib-index-c]"]
      ["Merge..." ebib-merge-bibtex-file (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["Reload" ebib-reload-current-database ebib--cur-db]
@@ -954,36 +954,45 @@ character ?1-?9, which is converted to the corresponding number."
   (ebib-lower)
   (customize-group 'ebib))
 
-(defun ebib-load-bibtex-file (&optional file)
-  "Open the BibTeX file FILE."
+(defun ebib-open-bibtex-file (&optional file)
+  "Open the BibTeX file FILE.
+Make the new file the current database and update the buffers.
+
+This function is for interactive use only.  To load a BibTeX file
+in the background, use `ebib--load-bibtex-file-internal'."
   (interactive)
   (unless file
     (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
-  (ebib--load-bibtex-file-internal file)
+  (setq ebib--cur-db (ebib--load-bibtex-file-internal file))
   (ebib--update-buffers))
 
 (defun ebib--load-bibtex-file-internal (file)
-  "Helper function for `ebib--load-bibtex-file'.
-FILE must be a fully expanded filename."
-  (let ((db (ebib--get-db-from-filename file)))
-    (if db                              ; FILE is already open in Ebib.
-        (setq ebib--cur-db db)
-      (setq ebib--cur-db (ebib--create-new-database))
-      (ebib-db-set-filename file ebib--cur-db)
-      (setq ebib--log-error nil)         ; We haven't found any errors.
-      (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
-      (if (file-exists-p file)
-          (progn
-            (ebib--load-entries file ebib--cur-db)
-            (ebib-db-set-backup t ebib--cur-db)
-            (ebib--set-modified nil))
-        ;; If the file does not exist, we need to issue a message.
-        (ebib--log 'message "(New file)"))
-      ;; Add keywords for the new database.
-      (ebib--keywords-load-keywords ebib--cur-db)
-      (if ebib--keywords-files-alist
-          (ebib--log 'log "Using keywords from %s.\n" (ebib--keywords-get-file ebib--cur-db))
-        (ebib--log 'log "Using general keyword list.\n")))))
+  "Load BibTeX file FILE.
+FILE must be a fully expanded filename.  The new database is
+returned, but it is not made current and the buffers are not
+updated.
+
+This function can be used to open a BibTeX file in the
+background.  Use `ebib-open-bibtex-file' to open a BibTeX file
+interactively."
+  (or (ebib--get-db-from-filename file)                              ; FILE is already open in Ebib.
+      (let ((new-db (ebib--create-new-database)))
+        (ebib-db-set-filename file new-db)
+        (setq ebib--log-error nil)         ; We haven't found any errors.
+        (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
+        (if (file-exists-p file)
+            (progn
+              (ebib--load-entries file new-db)
+              (ebib-db-set-backup t new-db)
+              (ebib--set-modified nil))
+          ;; If the file does not exist, we need to issue a message.
+          (ebib--log 'message "(New file)"))
+        ;; Add keywords for the new database.
+        (ebib--keywords-load-keywords new-db)
+        (if ebib--keywords-files-alist
+            (ebib--log 'log "Using keywords from %s.\n" (ebib--keywords-get-file new-db))
+          (ebib--log 'log "Using general keyword list.\n"))
+        new-db)))
 
 (defun ebib-reload-current-database ()
   "Reload the current database from disk."
