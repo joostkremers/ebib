@@ -984,7 +984,7 @@ interactively."
             (progn
               (ebib--load-entries file new-db)
               (ebib-db-set-backup t new-db)
-              (ebib--set-modified nil))
+              (ebib-db-set-modified nil new-db))
           ;; If the file does not exist, we need to issue a message.
           (ebib--log 'message "(New file)"))
         ;; Add keywords for the new database.
@@ -1168,8 +1168,7 @@ be added.  (Whether a timestamp is actually added also depends on
     (when (string= entry-key "")
       (setq entry-key (ebib--generate-tempkey db))
       (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-    (if (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-        (ebib--set-modified t)
+    (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
       (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
     entry-key))                         ; Return the entry key.
 
@@ -1844,6 +1843,7 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
              (setq entry-key (ebib--read-entry entry-type ebib--cur-db t))
              (if entry-key
                  (progn (ebib-db-set-current-entry-key entry-key ebib--cur-db)
+                        (ebib--set-modified t)
                         (setq needs-update t)
                         (if (assoc-string entry-type (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) 'case-fold)
                             (message "[Ebib] Yanked entry.")
