@@ -513,7 +513,8 @@ loaded, switch to it.  If KEY is given, jump to it."
   (setq ebib--push-buffer (current-buffer))
   ;; See if there are local databases.
   (or ebib--local-bibtex-filenames
-      (setq ebib--local-bibtex-filenames (ebib--get-local-bibfiles)))
+      (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
+                                         'none)))
   ;; See if there's a key at point.
   (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
   ;; Initialize Ebib if required.
@@ -2454,44 +2455,30 @@ current entry."
     ((default)
      (beep))))
 
-(defun ebib--ivy-create-collection ()
+(defun ebib--create-collection-ivy (databases)
   "Create a collection for use in `ebib-ivy-insert-collection'.
-The keys for the collection are taken from the databases
-associated with the current buffer, see
-`ebib--get-local-databases' for details."
-  (let* ((database-list (ebib--get-local-databases))
-         (databases (if (eq database-list 'none)
-                        (list ebib--cur-db)
-                      (seq-filter #'ebib--get-db-from-filename
-                                  database-list)))
-         collection)
-    (dolist (db databases collection)
-      (let ((keys (ebib-db-list-keys db)))
-        (setq collection (append (mapcar (lambda (key)
-                                           (propertize (format "%s (%s) «%s»"
-                                                               (ebib--get-field-value-for-display "Author/Editor" key db)
-                                                               (ebib--get-field-value-for-display "Year" key db)
-                                                               (ebib--get-field-value-for-display "Title" key db))
-                                                       'ebib-key key
-                                                       'ebib-db db))
-                                         keys)
-                                 collection))))))
+The keys for the collection are taken from the databases listed
+in DATABASES."
+  (seq-reduce (lambda (coll db)
+                (append (mapcar (lambda (key)
+                                  (propertize (format "%s (%s) «%s»"
+                                                      (ebib--get-field-value-for-display "Author/Editor" key db)
+                                                      (ebib--get-field-value-for-display "Year" key db)
+                                                      (ebib--get-field-value-for-display "Title" key db))
+                                              'ebib-key key
+                                              'ebib-db db))
+                                (ebib-db-list-keys db))
+                        coll))
+              databases nil))
 
-;;;###autoload
-(defun ebib-ivy-insert-citation ()
+(defun ebib-insert-citation-ivy (databases)
   "Insert a citation at point using ivy.
-The user is prompted for a BibTeX key from the database(s)
-associated with the current buffer (see
-`ebib--get-local-databases' for details), or from the current
-database if the current buffer has no databases."
-  (interactive)
-  (unless (featurep 'ivy)
-    (error "[Ebib] This function requires the `ivy' package"))
+The user is prompted for a BibTeX key from DATABASES."
   (let ((minibuffer-allow-text-properties t)
         (ivy-sort-max-size (expt 256 6)))
     (setq ivy-completion-beg (point))
     (setq ivy-completion-end (point))
-    (let ((collection (ebib--ivy-create-collection)))
+    (let ((collection (ebib--create-collection-ivy databases)))
       (if collection
           (ivy-read "Select entry: " collection
                     :action (lambda (item)
@@ -2502,42 +2489,64 @@ database if the current buffer has no databases."
                                 (setq ivy-completion-end (point))))
                     :history 'ebib--citation-history
                     :sort t)
-        (error "[Ebib] Database(s) for current buffer not loaded")))))
+        (error "[Ebib] No entries found in database(s) for current file")))))
 
-(defun ebib-insert-citation-default-method ()
-  "Insert a citation at POINT using default completion.
-The user is prompted for a BibTeX key from the database(s)
+(defun ebib--create-collection-default-method (databases)
+  "Create a collection of BibTeX keys from DATABASES.
+BIBFILES is a list of bibliography files.  The collection is
+created from the keys in these files, provided they are opened in
+Ebib.  If BIBFILES is the symbol `none', the collection is
+created from the current database."
+  (seq-reduce (lambda (coll db)
+                (append (ebib-db-list-keys db) coll))
+              databases nil))
+
+(defun ebib-insert-citation-default-method (databases)
+  "Insert a citation at point using default completion.
+The user is prompted for a BibTeX key from DATABASES
 associated with the current buffer (see
-`ebib--get-local-databases' for details), or from the current
+`ebib--get-local-bibfiles' for details), or from the current
 database if the current buffer has no databases."
-  (let* ((databases (ebib--get-local-databases))
-         (collection (ebib--create-collection-from-db databases)))
-    (when collection
-      (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
-             (citation-command (ebib--create-citation major-mode (list key))))
-        (when citation-command
-          (insert (format "%s" citation-command)))))))
+  (let ((collection (ebib--create-collection-default-method databases)))
+    (if collection
+        (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
+               (citation-command (ebib--create-citation major-mode (list key))))
+          (when citation-command
+            (insert (format "%s" citation-command))))
+      (error "No BibTeX entries found"))))
+
+(defun ebib--get-or-open-db (file)
+  "Return the database for FILE.
+If no database associated with FILE is currently open, try to
+open FILE.  If no database can be found, return nil."
+  (or (ebib--get-db-from-filename file)
+      (let ((full-path (expand-file-name file)))
+        (when (file-readable-p full-path)
+          (ebib--load-bibtex-file-internal full-path)))))
 
 ;;;###autoload
 (defun ebib-insert-citation ()
   "Insert a citation at POINT.
 The user is prompted for a BibTeX key and has to choose one from
 the database(s) associated with the current buffer (see
-`ebib--get-local-databases' for details), or from the current
-database if the current buffer has no databases.
+`ebib--get-local-bibfiles' for details), or from the current
+database if the current buffer has no associated databases.
 
 This is a front-end for other citation insertion functions: if
-the `ivy' package is loaded, it calls `ebib-ivy-insert-citation',
+the `ivy' package is loaded, it calls `ebib-insert-citation-ivy',
 otherwise it calls `ebib-insert-citation-default-method', which
 uses standard Emacs completion."
   (interactive)
+  (unless ebib--initialized
+    (ebib-init))
   (ebib--execute-when
-    ((database)
-     (cond
-      ((featurep 'ivy) (ebib-ivy-insert-citation))
-      (t (ebib-insert-citation-default-method))))
-    ((default)
-     (error "[Ebib] No database loaded"))))
+    ((database) (let* ((database-files (ebib--get-local-bibfiles))
+                       (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
+                                      (list ebib--cur-db))))
+                  (cond
+                   ((featurep 'ivy) (ebib-insert-citation-ivy databases))
+                   (t (ebib-insert-citation-default-method databases)))))
+    ((default) (error "[Ebib] No database opened"))))
 
 (defun ebib-index-help ()
   "Show the info node of Ebib's index buffer."
@@ -3914,7 +3923,7 @@ or on the region if it is active."
             ebib--databases)
       nil)))
 
-(defun ebib--get-local-databases ()
+(defun ebib--get-local-bibfiles ()
   "Return a list of .bib files associated with the current buffer.
 Each element in the list is a string holding the name of the .bib
 file.  The method by which the .bib files are searched depends on
@@ -3927,7 +3936,7 @@ In buffers in which `pandoc-mode' is active, check if the current
 settings include a `bibliography' setting and use the files
 listed there.
 
-If no .bib files are found, return the symbol `none'."
+If no .bib files are found, return nil."
   (cond
    ((eq major-mode 'latex-mode)
     (let ((texfile-buffer (current-buffer))
@@ -3957,35 +3966,21 @@ If no .bib files are found, return the symbol `none'."
                 ;; If this isn't a remote resource, add it to the list.
                 (unless (and option (string-match-p "location=remote" option))
                   (push file files)))))))
-      (if files
-          (mapcar (lambda (file)
-                    (if (string= file "\\jobname.bib")
-                        (setq file (file-name-nondirectory (concat (file-name-sans-extension (buffer-file-name))
-                                                                   (car ebib-bibtex-extensions)))))
-                    ;; If a file has a directory part, we expand it, so
-                    ;; `ebib--get-db-from-filename' can match it up with a
-                    ;; database's file path.
-                    (if (file-name-directory file)
-                        (expand-file-name file)
-                      file))
-                  files)
-        'none)))
+      (when files
+        (mapcar (lambda (file)
+                  (if (string= file "\\jobname.bib")
+                      (setq file (file-name-nondirectory (concat (file-name-sans-extension (buffer-file-name))
+                                                                 (car ebib-bibtex-extensions)))))
+                  ;; If a file has a directory part, we expand it, so
+                  ;; `ebib--get-db-from-filename' can match it up with a
+                  ;; database's file path.
+                  (if (file-name-directory file)
+                      (expand-file-name file)
+                    file))
+                files))))
    ((and (boundp 'pandoc-mode) pandoc-mode)
-    (or (pandoc--get 'bibliography)
-        'none))
-   (t 'none)))
-
-(defun ebib--create-collection-from-db (bibfiles)
-  "Create a collection of BibTeX keys from BIBFILES.
-BIBFILES is a list of bibliography files.  The collection is
-created from the keys in these files, provided they are opened in
-Ebib.  If BIBFILES is the symbol `none', the collection is
-created from the current database."
-  (if (eq bibfiles 'none)
-      (sort (ebib-db-list-keys ebib--cur-db) #'string<)
-    (let (collection)
-      (dolist (file bibfiles collection)
-        (setq collection (append (ebib-db-list-keys (ebib--get-db-from-filename file)) collection))))))
+    (pandoc--get 'bibliography))
+   (t nil)))
 
 (defun ebib-create-bib-from-bbl ()
   "Create a .bib file for the current LaTeX document.
@@ -3996,7 +3991,8 @@ created containing only these entries."
   (ebib--execute-when
     ((database)
      (or ebib--local-bibtex-filenames
-         (setq ebib--local-bibtex-filenames (ebib--get-local-databases)))
+         (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
+                                            'none)))
      (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
             (bbl-file (concat filename-sans-extension ".bbl"))
             (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
@@ -4006,8 +4002,7 @@ created containing only these entries."
                  (y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
          (when (file-exists-p bib-file)
            (delete-file bib-file t))
-         (let ((databases (seq-filter (lambda (file)
-                                        (ebib--get-db-from-filename file))
+         (let ((databases (seq-filter #'ebib--get-db-from-filename
                                       ebib--local-bibtex-filenames)))
            (with-temp-buffer
              (insert-file-contents bbl-file)
