@@ -6,13 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Joost Kremers" />
   <title>Ebib Manual</title>
-  <style type="text/css">
+  <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
-  <style type="text/css">
+  <style>
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
@@ -406,7 +406,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>When you invoke <code>ebib-insert-citation</code>, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use TAB completion when typing the key. If you have the <code>ivy</code> package installed, however, Ebib uses a more sophisticated method: instead of typing just the key, you can type (parts of) the author name, publication year and title in order to find the reference you wish to cite.</p>
 <p>You can define different citation commands for each type of file that you use. That is, you can have one set of citation commands for LaTeX files, another set for Org files, etc. For LaTeX buffers, the only citation command that has been predefined is <code>cite</code>, which inserts a citation of the form <code>\cite[arg]{key}</code>. You may want to define more commands.</p>
 <p>For Markdown buffers, three commands have been predefined: <code>text</code>, which inserts a citation of the form <code>@Jones1992</code>, <code>paren</code>, which inserts a citation of the form <code>[@Jones1992]</code> and <code>year</code>, which inserts <code>[-@Jones1992]</code>. Since these are the only types of citations that Pandoc Markdown knows, you shouldn’t need to change anything.</p>
-<p>In Org buffers, citations are inserted in the form <code>[[ebib:&lt;key&gt;][&lt;description&gt;]]</code>. You are prompted for the description, which you have to provide yourself, unless you use the <code>ivy</code> package, in which case a default description is provided, which you can accept by pressing <code>ENTER</code>. If you use this type of Org link, you may want to load the <code>org-ebib</code> package, which allows you to open Ebib with <code>org-open-at-point</code> (by default bound to <code>C-c C-o</code>). This package also enables you to create Org links to Ebib entries with <code>org-store-link</code>.</p>
+<p>In Org buffers, citations are inserted in the form <code>[[ebib:&lt;key&gt;][&lt;description&gt;]]</code>. You are prompted for the description. A default description is provided, which you can accept by pressing <code>ENTER</code>. The default description is created by the function in <code>ebib-citation-description-function</code> and defaults to the combination of author name and publication year. If you use this type of Org link, you may want to load the <code>org-ebib</code> package, which allows you to open Ebib with <code>org-open-at-point</code> (by default bound to <code>C-c C-o</code>). This package also enables you to create Org links to Ebib entries with <code>org-store-link</code>.</p>
 <p>Ebib also provides a way to insert citations into a buffer from within Ebib. If you’re in the index buffer and press <code>i</code>, Ebib asks you for a buffer to insert the citation into (which defaults to the buffer you started Ebib from, or the buffer you previously inserted an entry into), a citation command and also any optional arguments, and then inserts a citation at the current cursor position in the buffer you’ve supplied.</p>
 <p>Both methods use the same sets of citation commands, which are defined in the user option <code>ebib-citation-commands</code>. You can customise this option, as discussed below, <a href="#defining-citation-commands">Defining Citation Commands</a>. For LaTeX, only the <code>\cite</code> command is set up by default, so you may want to add some commands. For example, this is what I use:</p>
 <pre><code>(setq ebib-citation-commands

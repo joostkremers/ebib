@@ -1307,13 +1307,15 @@ inserts a citation of the form ‘[@Jones1992]’ and ‘year’, which inserts
 Pandoc Markdown knows, you shouldn’t need to change anything.
 
    In Org buffers, citations are inserted in the form
-‘[[ebib:<key>][<description>]]’.  You are prompted for the description,
-which you have to provide yourself, unless you use the ‘ivy’ package, in
-which case a default description is provided, which you can accept by
-pressing ‘ENTER’.  If you use this type of Org link, you may want to
-load the ‘org-ebib’ package, which allows you to open Ebib with
-‘org-open-at-point’ (by default bound to ‘C-c C-o’).  This package also
-enables you to create Org links to Ebib entries with ‘org-store-link’.
+‘[[ebib:<key>][<description>]]’.  You are prompted for the description.
+A default description is provided, which you can accept by pressing
+‘ENTER’.  The default description is created by the function in
+‘ebib-citation-description-function’ and defaults to the combination of
+author name and publication year.  If you use this type of Org link, you
+may want to load the ‘org-ebib’ package, which allows you to open Ebib
+with ‘org-open-at-point’ (by default bound to ‘C-c C-o’).  This package
+also enables you to create Org links to Ebib entries with
+‘org-store-link’.
 
    Ebib also provides a way to insert citations into a buffer from
 within Ebib.  If you’re in the index buffer and press ‘i’, Ebib asks you
@@ -2860,58 +2862,58 @@ Node: Properties of Filtered Databases60208
 Ref: #properties-of-filtered-databases60405
 Node: Accessing BibTeX Databases outside Ebib62063
 Ref: #accessing-bibtex-databases-outside-ebib62269
-Node: Key Bindings67190
-Ref: #key-bindings67346
-Node: Defining Citation Commands68110
-Ref: #defining-citation-commands68343
-Node: Associating a Database with a LaTeX File74259
-Ref: #associating-a-database-with-a-latex-file74499
-Node: Cross-referencing77442
-Ref: #cross-referencing77612
-Node: Marking Entries80925
-Ref: #marking-entries81073
-Node: Printing the Database82056
-Ref: #printing-the-database82216
-Node: Calling a Browser86023
-Ref: #calling-a-browser86187
-Node: Viewing and Importing Files88819
-Ref: #viewing-and-importing-files88993
-Node: Editing the file field93758
-Ref: #editing-the-file-field93907
-Node: Notes files95266
-Ref: #notes-files95414
-Node: Customising the notes template99574
-Ref: #customising-the-notes-template99723
-Node: Managing a reading list102769
-Ref: #managing-a-reading-list102931
-Node: Window Management106043
-Ref: #window-management106202
-Node: Creating Entry Stubs109378
-Ref: #creating-entry-stubs109540
-Node: @Preamble Definition110541
-Ref: #preamble-definition110705
-Node: @String Definitions112691
-Ref: #string-definitions112842
-Node: @Comments116358
-Ref: #comments116486
-Node: Managing Keywords116851
-Ref: #managing-keywords116996
-Node: Sorting the bib File122905
-Ref: #sorting-the-.bib-file123078
-Node: Merging and Importing126217
-Ref: #merging-and-importing126382
-Node: Exporting Entries128158
-Ref: #exporting-entries128320
-Node: Multiple Identical Fields129836
-Ref: #multiple-identical-fields130015
-Node: Multiline Edit Buffers131924
-Ref: #multiline-edit-buffers132096
-Node: The Options Menu135998
-Ref: #the-options-menu136146
-Node: Customisation136767
-Ref: #customisation136878
-Node: Modifying Key Bindings137486
-Ref: #modifying-key-bindings137613
+Node: Key Bindings67267
+Ref: #key-bindings67423
+Node: Defining Citation Commands68187
+Ref: #defining-citation-commands68420
+Node: Associating a Database with a LaTeX File74336
+Ref: #associating-a-database-with-a-latex-file74576
+Node: Cross-referencing77519
+Ref: #cross-referencing77689
+Node: Marking Entries81002
+Ref: #marking-entries81150
+Node: Printing the Database82133
+Ref: #printing-the-database82293
+Node: Calling a Browser86100
+Ref: #calling-a-browser86264
+Node: Viewing and Importing Files88896
+Ref: #viewing-and-importing-files89070
+Node: Editing the file field93835
+Ref: #editing-the-file-field93984
+Node: Notes files95343
+Ref: #notes-files95491
+Node: Customising the notes template99651
+Ref: #customising-the-notes-template99800
+Node: Managing a reading list102846
+Ref: #managing-a-reading-list103008
+Node: Window Management106120
+Ref: #window-management106279
+Node: Creating Entry Stubs109455
+Ref: #creating-entry-stubs109617
+Node: @Preamble Definition110618
+Ref: #preamble-definition110782
+Node: @String Definitions112768
+Ref: #string-definitions112919
+Node: @Comments116435
+Ref: #comments116563
+Node: Managing Keywords116928
+Ref: #managing-keywords117073
+Node: Sorting the bib File122982
+Ref: #sorting-the-.bib-file123155
+Node: Merging and Importing126294
+Ref: #merging-and-importing126459
+Node: Exporting Entries128235
+Ref: #exporting-entries128397
+Node: Multiple Identical Fields129913
+Ref: #multiple-identical-fields130092
+Node: Multiline Edit Buffers132001
+Ref: #multiline-edit-buffers132173
+Node: The Options Menu136075
+Ref: #the-options-menu136223
+Node: Customisation136844
+Ref: #customisation136955
+Node: Modifying Key Bindings137563
+Ref: #modifying-key-bindings137690
 
 End Tag Table
 

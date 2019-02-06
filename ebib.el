@@ -2498,7 +2498,10 @@ created from the keys in these files, provided they are opened in
 Ebib.  If BIBFILES is the symbol `none', the collection is
 created from the current database."
   (seq-reduce (lambda (coll db)
-                (append (ebib-db-list-keys db) coll))
+                (append (mapcar (lambda (key)
+                                  (propertize key 'ebib-db db))
+                                (ebib-db-list-keys db))
+                        coll))
               databases nil))
 
 (defun ebib-insert-citation-default-method (databases)
@@ -2510,7 +2513,7 @@ database if the current buffer has no databases."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
-               (citation-command (ebib--create-citation major-mode (list key))))
+               (citation-command (ebib--create-citation major-mode (list key) (get-text-property 0 'ebib-db key))))
           (when citation-command
             (insert (format "%s" citation-command))))
       (error "No BibTeX entries found"))))
