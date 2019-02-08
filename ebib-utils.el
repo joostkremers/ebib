@@ -325,7 +325,28 @@ documentation for details."
   :type 'boolean)
 
 (defcustom ebib-citation-commands '((any
-                                     (("cite" "\\cite%<[%A]%>{%K}")))
+                                     (("cite"   "\\cite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("paren"  "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("foot"   "\\footcite%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("text"   "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("smart"  "\\smartcite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("super"  "\\supercite{%K}")
+                                      ("auto"   "\\autocite%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("cites"  "\\cites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("parens" "\\parencites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("foots"  "\\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+
+                                      ("texts"  "\\textcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("smarts" "\\smartcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("supers" "\\supercites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("autos"  "\\autoscites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+
+                                      ("author" "\\citeauthor%<[%A]%>[%A]{%(%K%,)}")
+                                      ("title"  "\\citetitle%<[%A]%>[%A]{%(%K%,)}")
+                                      ("year"   "\\citeyear%<[%A]%>[%A][%A]{%K}")
+                                      ("date"   "\\citedate%<[%A]%>[%A]{%(%K%,)}")))
                                     (org-mode
                                      (("ebib" "[[ebib:%K][%D]]")))
                                     (markdown-mode
