@@ -266,12 +266,12 @@ of strings."
   "Return a string for FILE-FIELD to display in the entry buffer."
   (let ((files (split-string file-field ebib-filename-separator)))
     (ebib--convert-multiline-to-string (mapcar (lambda (file)
-                                             (propertize file
-                                                         'face '(:inherit ebib-link-face)
-                                                         'mouse-face '(highlight (:inherit ebib-link-face))
-                                                         'help-echo "mouse-1: open this file"
-                                                         'ebib-file file))
-                                           files))))
+                                                 (propertize file
+                                                             'face '(:inherit ebib-link-face)
+                                                             'mouse-face '(highlight (:inherit ebib-link-face))
+                                                             'help-echo "mouse-1: open this file"
+                                                             'ebib-file file))
+                                               files))))
 
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
@@ -496,9 +496,9 @@ for completion, the database associated with the selected
 filename is returned.  PROMPT is a string used to prompt the
 user."
   (ebib--get-db-from-filename (completing-read prompt (mapcar (lambda (s)
-                                                            (ebib-db-get-filename s 'shortened))
-                                                          ebib--databases)
-                                           nil t)))
+                                                                (ebib-db-get-filename s 'shortened))
+                                                              ebib--databases)
+                                               nil t)))
 ;;; Main
 
 ;;;###autoload
@@ -514,7 +514,7 @@ loaded, switch to it.  If KEY is given, jump to it."
   ;; See if there are local databases.
   (or ebib--local-bibtex-filenames
       (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
-                                         'none)))
+                                             'none)))
   ;; See if there's a key at point.
   (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
   ;; Initialize Ebib if required.
@@ -587,7 +587,7 @@ in the user's init file."
   (when ebib-preload-bib-files
     (mapc (lambda (file)
             (ebib--load-bibtex-file-internal (or (locate-file file ebib-bib-search-dirs)
-                                             (expand-file-name file))))
+                                                 (expand-file-name file))))
           ebib-preload-bib-files)
     (setq ebib--cur-db (car ebib--databases))) ; Display the first database in the list.
   (setq ebib--initialized t
@@ -836,7 +836,7 @@ character ?1-?9, which is converted to the corresponding number."
      ["Reload" ebib-reload-current-database ebib--cur-db]
      ["Reload All" ebib-reload-all-databases ebib--cur-db]
      ["Save" ebib-save-current-database (and ebib--cur-db
-                                         (ebib-db-modified-p ebib--cur-db))]
+                                             (ebib-db-modified-p ebib--cur-db))]
      ["Save All" ebib-save-all-databases (ebib--modified-p)]
      ["Save As..." ebib-write-database ebib--cur-db])
 
@@ -846,8 +846,8 @@ character ?1-?9, which is converted to the corresponding number."
      ["Kill" ebib-kill-entry (ebib--get-key-at-point)]
      ["Yank From Kill Ring" ebib-yank-entry ebib--cur-db]
      ["Delete" ebib-delete-entry (and ebib--cur-db
-                                  (ebib--get-key-at-point)
-                                  (not (ebib-db-get-filter ebib--cur-db)))]
+                                      (ebib--get-key-at-point)
+                                      (not (ebib-db-get-filter ebib--cur-db)))]
      "--"
      ["Push Citation To Buffer" ebib-push-citation (ebib--get-key-at-point)]
      "--"
@@ -1146,7 +1146,7 @@ Return value is the string if one was read, nil otherwise."
         (if (ebib-set-string abbr string db)
             string
           (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
-                                  (line-number-at-pos) abbr)))
+                                      (line-number-at-pos) abbr)))
       (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos)))))
 
 (defun ebib--read-preamble (db)
@@ -1435,7 +1435,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
          (setq ebib--databases (delq ebib--cur-db ebib--databases))
          ;; If `new-db' is nil, we deleted the last database in the list.
          (setq ebib--cur-db (or new-db
-                            (car ebib--databases)))
+                                (car ebib--databases)))
          ;; `ebib--cur-db' may be nil at this point, but that's handled correctly by `ebib--update-buffers'.
          (ebib--update-buffers 'no-refresh)
          (kill-buffer index-buffer)
@@ -1520,8 +1520,8 @@ ORDER indicates the sort order and should be either `ascend' or
     ((real-db entries)
      (let ((cur-keyname (ebib--get-key-at-point)))
        (ebib--ifstring (new-keyname (read-string (format "Change `%s' to: " cur-keyname)
-                                             cur-keyname
-                                             'ebib--key-history))
+                                                 cur-keyname
+                                                 'ebib--key-history))
            (ebib--update-keyname new-keyname))))
     ((default)
      (beep))))
@@ -1943,12 +1943,12 @@ string, search for the previous search string instead."
   (ebib--execute-when
     ((entries)
      (ebib--ifstring (search-str (or (and arg ebib--search-string)
-                                 (read-string "Search database for: ")))
+                                     (read-string "Search database for: ")))
          (progn (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
                 (setq ebib--search-string search-str)
                 ;; First we search the current entry.
                 (if (ebib--search-in-entry ebib--search-string
-                                       (ebib-db-get-entry (ebib--get-key-at-point) ebib--cur-db))
+                                           (ebib-db-get-entry (ebib--get-key-at-point) ebib--cur-db))
                     (progn (ebib--update-entry-buffer ebib--search-string)
                            (message "Found search string in current entry.  RET for next match."))
                   ;; If the search string wasn't found in the current entry, we continue searching.
@@ -1970,7 +1970,7 @@ are searched."
        (let ((cur-search-entry (cdr (member (ebib--get-key-at-point) (ebib--list-keys)))))
          (while (and cur-search-entry
                      (null (ebib--search-in-entry ebib--search-string
-                                              (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
+                                                  (ebib-db-get-entry (car cur-search-entry) ebib--cur-db 'noerror))))
            (setq cur-search-entry (cdr cur-search-entry)))
          (if (null cur-search-entry)
              (message (format "`%s' not found.  [g] to jump to top, [left]/[right] to search previous/next database." ebib--search-string))
@@ -2162,8 +2162,8 @@ Operates either on all entries or on the marked entries."
   (ebib--execute-when
     ((real-db entries)
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
-                               ebib-print-tempfile
-                             (read-file-name "Use temp file: ")))
+                                   ebib-print-tempfile
+                                 (read-file-name "Use temp file: ")))
          (progn
            (with-temp-buffer
              (when ebib-latex-preamble
@@ -3125,8 +3125,8 @@ If FILE is not in (a subdirectory of) one of the directories in
         (setq unbraced? (ebib-unbraced-p init-contents))
         (setq init-contents (ebib-unbrace init-contents)))
       (ebib--ifstring (new-contents (read-string (format "%s: " cur-field)
-                                             (if init-contents
-                                                 (cons init-contents 0))))
+                                                 (if init-contents
+                                                     (cons init-contents 0))))
           (ebib-set-field-value cur-field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite unbraced?)
         (ebib-db-remove-field-value cur-field (ebib--get-key-at-point) ebib--cur-db))
       (ebib--redisplay-current-field)
@@ -3506,9 +3506,9 @@ When the user enters an empty string, the value is not changed."
   (let* ((string (ebib--current-string))
          (init-contents (ebib-get-string string ebib--cur-db 'noerror 'unbraced)))
     (ebib--ifstring (new-contents (read-string (format "%s: " string)
-                                           (if init-contents
-                                               (cons init-contents 0)
-                                             nil)))
+                                               (if init-contents
+                                                   (cons init-contents 0)
+                                                 nil)))
         (progn
           (ebib-set-string string new-contents ebib--cur-db 'overwrite)
           (ebib--redisplay-current-string)
@@ -3659,7 +3659,7 @@ Otherwise, create a new buffer and add it to
 STARTTEXT is a string that contains the initial text of the
 buffer."
   (ebib--pop-to-buffer (or (ebib--get-multiline-buffer info)
-                       (ebib--create-multiline-buffer info starttext))))
+                           (ebib--create-multiline-buffer info starttext))))
 
 (defun ebib--get-multiline-buffer (info)
   "Return the multiline edit buffer associated with INFO."
@@ -4009,7 +4009,7 @@ created containing only these entries."
     ((database)
      (or ebib--local-bibtex-filenames
          (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
-                                            'none)))
+                                                'none)))
      (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
             (bbl-file (concat filename-sans-extension ".bbl"))
             (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))

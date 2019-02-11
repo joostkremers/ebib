@@ -69,12 +69,12 @@ whether an entry is on the reading list or not."
   :type '(string "Reading list item template"))
 
 (defcustom ebib-reading-list-template-specifiers '((?K . ebib-reading-list-create-org-identifier)
-                                               (?T . ebib-create-org-title)
-                                               (?M . ebib-reading-list-todo-marker)
-                                               (?L . ebib-create-org-link)
-                                               (?F . ebib-create-org-file-link)
-                                               (?D . ebib-create-org-doi-link)
-                                               (?U . ebib-create-org-url-link))
+                                                   (?T . ebib-create-org-title)
+                                                   (?M . ebib-reading-list-todo-marker)
+                                                   (?L . ebib-create-org-link)
+                                                   (?F . ebib-create-org-file-link)
+                                                   (?D . ebib-create-org-doi-link)
+                                                   (?U . ebib-create-org-url-link))
   "Specifiers used in `ebib-reading-list-template'.
 Each specifier consists of a character (which is preceded by a
 percent sign in `ebib-reading-list-template') and a symbol, which

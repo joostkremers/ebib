@@ -90,15 +90,15 @@ a logical `not' is applied to the selection."
       (ebib--execute-when
         ((filtered-db)
          (ebib-db-set-filter `(,bool ,(ebib-db-get-filter ebib--cur-db)
-                                 ,(if (>= not 0)
-                                      `(contains ,field ,regexp)
-                                    `(not (contains ,field ,regexp))))
-                         ebib--cur-db))
+                                     ,(if (>= not 0)
+                                          `(contains ,field ,regexp)
+                                        `(not (contains ,field ,regexp))))
+                             ebib--cur-db))
         ((real-db)
          (ebib-db-set-filter (if (>= not 0)
-                             `(contains ,field ,regexp)
-                           `(not (contains ,field ,regexp)))
-                         ebib--cur-db))))))
+                                 `(contains ,field ,regexp)
+                               `(not (contains ,field ,regexp)))
+                             ebib--cur-db))))))
 
 ;; The filters keymap
 (eval-and-compile
