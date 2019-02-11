@@ -1774,6 +1774,20 @@ entry."
     ((default)
      (beep))))
 
+(defun ebib-copy-entry ()
+  "Copy the current entry.
+The entry is copied to the kill ring."
+  (interactive)
+  (ebib--execute-when
+    ((entries)
+     (let ((key (ebib--get-key-at-point)))
+       (with-temp-buffer
+         (ebib--format-entry key ebib--cur-db)
+         (kill-new (buffer-substring-no-properties (point-min) (point-max))))
+       (message (format "Entry `%s' copied to kill ring.  Use `y' to yank (or `C-y' outside Ebib)." key))))
+    ((default)
+     (beep))))
+
 (defun ebib-kill-entry ()
   "Kill the current entry.
 The entry is put in the kill ring."
