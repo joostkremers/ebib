@@ -1869,7 +1869,7 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
                           (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
                (message "[Ebib] Could not yank a valid entry")
                (ebib--set-modified nil)))
-            (t (message "[Ebib] No entry in kill ring: \"%s\"." entry)
+            (t (message "[Ebib] No entry in kill ring: `%s'." entry)
                (ebib--set-modified nil)))))
        (if needs-update (ebib--insert-entry-in-index-sorted entry-key t))))
     ((default)
