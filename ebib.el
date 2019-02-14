@@ -1159,19 +1159,23 @@ added to the existing one with a hash sign `#' between them."
 
 (defun ebib--read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
-Return the entry key if an entry was found, nil otherwise.
-Optional argument TIMESTAMP indicates whether a timestamp is to
-be added.  (Whether a timestamp is actually added also depends on
-`ebib-use-timestamp'.)"
+Return the entry key if an entry was found and could be stored,
+nil otherwise.  Optional argument TIMESTAMP indicates whether a
+timestamp is to be added.  (Whether a timestamp is actually added
+also depends on `ebib-use-timestamp'.)"
   (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
-         (entry (parsebib-read-entry entry-type))
-         (entry-key (cdr (assoc-string "=key=" entry))))
-    (when (string= entry-key "")
-      (setq entry-key (ebib--generate-tempkey db))
-      (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-    (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
-    entry-key))                         ; Return the entry key.
+         (entry (parsebib-read-entry entry-type)))
+    (if entry
+        (let ((entry-key (cdr (assoc-string "=key=" entry))))
+          (when (string= entry-key "")
+            (setq entry-key (ebib--generate-tempkey db))
+            (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
+          (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
+          (unless entry-key
+            (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
+          entry-key) ; Return the entry key, or nil if no entry could be stored.
+      (ebib--log 'warning "Line %d: Could not read a valid entry." (line-number-at-pos beg))
+      nil))) ; Make sure to return nil upon failure.
 
 (defun ebib-leave-ebib-windows ()
   "Leave the Ebib windows, lowering them if necessary."
