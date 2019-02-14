@@ -1871,7 +1871,9 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
                (ebib--set-modified nil)))
             (t (message "[Ebib] No entry in kill ring: `%s'." entry)
                (ebib--set-modified nil)))))
-       (if needs-update (ebib--insert-entry-in-index-sorted entry-key t))))
+       (when needs-update
+         (ebib--insert-entry-in-index-sorted entry-key t)
+         (ebib--update-entry-buffer))))
     ((default)
      (beep))))
 
