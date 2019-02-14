@@ -78,7 +78,7 @@ displaying it.  (This function should not be called if there is a
 chance the index buffer is not visible.) For any other buffer,
 find a window displaying an Ebib buffer other than the index
 buffer, switch to that window and display BUFFER.  If no window
-can be found, return NIL."
+can be found, return nil."
   (let (window)
     (cond
      ;; The index buffer can only be displayed in its dedicated window.
@@ -1082,7 +1082,7 @@ unless IGNORE-MODTIME is non-nil."
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
 first element is the number of entries found, the second the
-number of @String definitions, and the third is T or NIL,
+number of @String definitions, and the third is T or nil,
 indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
@@ -1159,7 +1159,7 @@ added to the existing one with a hash sign `#' between them."
 
 (defun ebib--read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
-Return the entry key if an entry was found, NIL otherwise.
+Return the entry key if an entry was found, nil otherwise.
 Optional argument TIMESTAMP indicates whether a timestamp is to
 be added.  (Whether a timestamp is actually added also depends on
 `ebib-use-timestamp'.)"
@@ -1180,7 +1180,7 @@ be added.  (Whether a timestamp is actually added also depends on
 
 (defun ebib-lower (&optional soft)
   "Hide the Ebib windows.
-If optional argument SOFT is non-NIL, just switch to a non-Ebib
+If optional argument SOFT is non-nil, just switch to a non-Ebib
 buffer if Ebib is not occupying the entire frame."
   (interactive)
   (if ebib--cur-db
@@ -2318,7 +2318,7 @@ argument ARG can be used to specify which file to choose."
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
 Possible values for DIALECT are those in `bibtex-dialect-list' or
-NIL, in which case the dialect is unset (and the default dialect
+nil, in which case the dialect is unset (and the default dialect
 is used)."
   (interactive (list (intern (completing-read "Dialect: " (append (mapcar #'symbol-name bibtex-dialect-list) (list "nil")) nil t))))
   (unless (or (not dialect)

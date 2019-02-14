@@ -279,7 +279,7 @@ return value is also nil."
 
 (defun ebib--filters-load-file (file &optional overwrite)
   "Load filters from FILE.
-If OVERWRITE in non-NIL, the existing filters are discarded.
+If OVERWRITE in non-nil, the existing filters are discarded.
 Otherwise the new filters are added to the existing ones, unless
 there is a name conflict."
   (when (file-readable-p file)
@@ -328,7 +328,7 @@ this file is deleted."
 (defun ebib--filters-add-filter (filter name &optional overwrite)
   "Add FILTER under NAME in `ebib--filters-alist'.
 If a filter with NAME already exists, the filter is not added,
-unless OVERWRITE is non-NIL."
+unless OVERWRITE is non-nil."
   (if (ebib--filters-exists-p name)
       (if overwrite
           (setcdr (ebib--filters-get-filter name) (list filter))
@@ -338,13 +338,13 @@ unless OVERWRITE is non-NIL."
 (defun ebib--filters-get-filter (name &optional noerror)
   "Return the filter record corresponding to NAME.
 Return a list (NAME FILTER) if found.  If there is no
-filter named NAME, raise an error, unless NOERROR is non-NIL."
+filter named NAME, raise an error, unless NOERROR is non-nil."
   (or (assoc-string name ebib--filters-alist ebib-filters-ignore-case)
       (unless noerror
         (error "[Ebib] Invalid filter %s" name))))
 
 (defun ebib--filters-exists-p (name)
-  "Return non-NIL if a filter with NAME already exists."
+  "Return non-nil if a filter with NAME already exists."
   (assoc-string name ebib--filters-alist ebib-filters-ignore-case))
 
 ;; Special filters

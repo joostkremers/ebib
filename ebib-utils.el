@@ -1550,7 +1550,7 @@ referred to by ENTRY-KEY."
     (insert (format "@Preamble{%s}\n\n" (ebib-db-get-preamble db))))
   (ebib--format-strings db)
   ;; We define two comparison functions for `sort'.  These must simply
-  ;; return non-NIL if the first element is to be sorted before the second.
+  ;; return non-nil if the first element is to be sorted before the second.
   (cl-flet
       ;; The first one is simple: if X has a crossref field, it must be
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
@@ -1752,7 +1752,7 @@ fields; `optional' means to list optional fields; `extra' means
 to list extra fields (i.e., fields defined in `ebib--extra-fields'
 and not present in ENTRY-TYPE); finally, `all' means to list all
 fields.  DIALECT is the BibTeX dialect; possible values are those
-listed in `bibtex-dialect-list' or NIL, in which case the value
+listed in `bibtex-dialect-list' or nil, in which case the value
 of `ebib-bibtex-dialect' is used.
 
 If DIALECT is `biblatex' and ENTRY-TYPE is a type alias as
@@ -1786,7 +1786,7 @@ part of the definition of ENTRY's type and also not part of the
 extra fields.
 
 DIALECT is the BibTeX dialect; possible values are those listed
-in `bibtex-dialect-list' or NIL, in which case the value of
+in `bibtex-dialect-list' or nil, in which case the value of
 `ebib-bibtex-dialect' is used."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (let ((fields (ebib--list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
@@ -1797,8 +1797,8 @@ in `bibtex-dialect-list' or NIL, in which case the value of
 (defun ebib--list-entry-types (&optional dialect include-aliases)
   "Return a list of entry types.
 This list depends on the value of DIALECT, which can have the
-values in `bibtex-dialect-list' or NIL, in which case the value
-of `ebib-bibtex-dialect' is used.  If INCLUDE-ALIASES is non-NIL,
+values in `bibtex-dialect-list' or nil, in which case the value
+of `ebib-bibtex-dialect' is used.  If INCLUDE-ALIASES is non-nil,
 include entry type aliases as defined by `ebib--type-aliases'."
   (or dialect (setq dialect ebib-bibtex-dialect))
   (append (mapcar #'car (bibtex-entry-alist dialect))
