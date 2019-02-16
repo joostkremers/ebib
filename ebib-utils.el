@@ -674,7 +674,7 @@ Each entry consists of a matcher and a transformation function.
 The matcher is a regular expression that is matched (with
 `string-match-p') against a given URL.  If the URL matches, the
 transformation function is applied to the URL."
-  :group 'Ebib
+  :group 'ebib
   :type '(repeat (cons :tag "Transformation"
                        (regexp :tag "Matcher") (function :tag "Function"))))
 
