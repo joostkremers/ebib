@@ -661,15 +661,21 @@ The first directory in the option "File Search Dirs" is used as the starting dir
 
 # Notes files #
 
-Ebib supports the `annote` (or `annotation`) field, but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it. The mode line of the entry buffer indicates whether an entry has a note associated with it by displaying the string `[N]` (customisable with `ebib-notes-symbol`).
+Ebib supports the `annote` (or `annotation`) field, but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it. The mode line of the entry buffer indicates whether an entry has a note associated with it by displaying the string `[N]` (customisable with `ebib-notes-symbol`). By default, each note is saved to its own file, but you can also use a single file to store all notes. 
 
-By default, each note is saved to its own file, but you can also use a single file to store all notes. If you wish to use separate files for each note, you need to configure the directory in which to store them by setting the option `ebib-notes-directory`. If this is not set, Ebib uses the first directory in `ebib-file-search-dirs`, (which defaults to the user's home directory).
 
-The name of a notes file is formed by taking the entry's key and appending the extension `.org` to it, which means that a notes file is an Org file. Before creating the file name, Ebib applies the function in `ebib-notes-name-transform-function` to it, or, if this is not set, the function in `ebib-name-transform-function`. See [Viewing Files](#viewing-and-importing-files) for some examples of the changes that can be applied. Note that if you do not wish to apply any changes but also do not want the function in `ebib-name-transform-function` to be applied, you can set `ebib-notes-name-transform-function` to `identity`.
+## Separate notes files ##
+
+If you wish to use separate files for each note, you need to configure the directory in which to store them by setting the option `ebib-notes-directory`. If this is not set, Ebib uses the first directory in `ebib-file-search-dirs`, (which defaults to the user's home directory).
+
+The name of a notes file is formed by taking the entry's key and appending the extension `.org` to it, which means that a notes file is (by default) an Org file. Before creating the file name, Ebib applies the function in `ebib-notes-name-transform-function` to it, or, if this is not set, the function in `ebib-name-transform-function`. See [Viewing Files](#viewing-and-importing-files) for some examples of the changes that can be applied. Note that if you do not wish to apply any changes but also do not want the function in `ebib-name-transform-function` to be applied, you can set `ebib-notes-name-transform-function` to `identity`.
 
 When a new note is created, it is given a title consisting of the author(s), year and title of the entry. Ebib also includes a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. This initial contents is based on a template, which can be customised. See below for details.
 
-As mentioned, notes files are Org files by default. This can be changed by customising the option `ebib-notes-file-extension`. If you change this, it makes sense to change `ebib-notes-template` as well, since the template is an Org template.
+As mentioned, notes files are Org files by default. This can be changed by customising the option `ebib-notes-file-extension`. If you change this option, it makes sense to change `ebib-notes-template` as well, since the template is an Org template. How to customise the template is discussed below.
+
+
+## One single notes file ##
 
 If you wish to store all notes in a single file, you must set the option `ebib-notes-use-single-file` to the notes file. In this case, the options `ebib-notes-directory` and `ebib-notes-extension` are ignored, which means that you must specify the full path and the extension of the notes file. The option `ebib-notes-name-transform-function` is also ignored.
 
@@ -686,7 +692,9 @@ All three hooks are customisable. For example, if you prefer not to narrow the b
 
 ## Customising the notes template ##
 
-By default, each note is an Org entry whose header consists of the author or editor, the year of publication and the title. The entry has a `:PROPERTIES:` block containing a `Custom_id:`. This initial contents is created on the basis of a template, which has the following form:
+By default, each note is an Org entry whose header consists of the author or editor, the year of publication and the title. The entry has a `:PROPERTIES:` block containing a `Custom_id:`. 
+
+The initial contents of a note, regardless of whether it is a separate notes file or whether it is an entry in a single notes file, is created on the basis of a template. This template can be customised, but the default form is the following:
 
 ```
 "* %T
@@ -699,9 +707,11 @@ By default, each note is an Org entry whose header consists of the author or edi
 
 This template contains two format specifiers: `%K` and `%T`. `%K` is replaced with the key of the entry prepended with the string `"Custom_id: "` in order to create an Org property. The `%T` specifier is replaced with the title of the note, which consists of the author (or editor), the year of publication and the title of the bibliography entry. The template also contains the string `">|<"`, which indicates the position of the cursor when a new note is created.
 
-It is possible to change the template by customising the option `ebib-notes-template`. Note that if you do this, the `%K` directive should not be removed. It is required in order to identify the note and connect it to its BibTeX entry. Without it, Ebib won't be able to tell whether a BibTeX entry has a note or not. The `%T` directive and the cursor indicator may be left out.
+It is possible to change the template by customising the option `ebib-notes-template`. If you use Org for your notes, you are strongly advised to keep the `:PROPERTIES:` block with the `%K` format specifier. In fact, if you use a single notes file, you **must** retain this block, because it is required in order to identify the note and connect it to its BibTeX entry. Without it, Ebib won't be able to tell whether an entry has a note or not.
 
-There are in fact a few more specifiers that may be used in the template: `%F` creates a link to the file in the BibTeX entry's `file` field, `%D` creates a link to the DOI in the entry's `doi` field, and `%U` a link to the entry's `url` field. There is also a `%L` specifier, which creates a link to the entry's file, its DOI, or its URL, whichever is found first.
+If you use a format other than Org (which is really only possible if you use a separate note file for each note), the `%K` directive may be left out: when using separate notes files, the notes are identified by their file names.
+
+The `%T` directive and the cursor indicator may be left out, they are optional. There are in fact a few more specifiers that may be used in the template: `%F` creates an Org link to the file in the BibTeX entry's `file` field, `%D` creates an Org link to the DOI in the entry's `doi` field, and `%U` an Org link to the entry's `url` field. There is also a `%L` specifier, which creates an Org link to the entry's file, its DOI, or its URL, whichever is found first.
 
 It is possible to change the strings that the specifiers produce by customising `ebib-notes-template-specifiers`. This option contains pairs of characters and functions. Each function takes two arguments, `key` and `db`, the key of the entry for which a note is created and the database in which it is stored. It should return a string (possibly empty), which replaces the specifier in the template. In order to change the string that a specifier is replaced with, write your own function and set `ebib-notes-template-specifiers` to use it.
 
