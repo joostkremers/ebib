@@ -147,7 +147,10 @@ This hook is not run when a new note is created, see
   :type 'hook)
 
 (defcustom ebib-notes-new-note-hook '(org-narrow-to-subtree)
-  "Hook run when a new note is created."
+  "Hook run when a new note is created.
+This hook is only used when notes are stored in a common notes
+file.  It can be used to prepare the note for display, position
+the cursor, etc."
   :group 'ebib-notes
   :type 'hook)
 
