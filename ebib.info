@@ -1820,9 +1820,7 @@ filename and when it finds one, calls an appropriate viewer.  And just
 as with ‘u’, you can use ‘f’ in the entry buffer as well, in which case
 it can be used on any field, not just the ‘file’ field.  It is also
 possible to have more than one filename in a field.  In that case, Ebib
-asks you which one you want to open.  If you want to open the first one
-you can just hit ENTER. Alternatively, you can provide a prefix
-argument: ‘M-2 f’ for the second file, etc.
+asks you which one you want to open.
 
    The file names in the ‘file’ field do not have to have full paths.
 You can set the option “File Search Dirs” to a list of directories that
@@ -2904,46 +2902,46 @@ Node: Calling a Browser86100
 Ref: #calling-a-browser86264
 Node: Viewing and Importing Files88896
 Ref: #viewing-and-importing-files89070
-Node: Editing the file field93835
-Ref: #editing-the-file-field93984
-Node: Notes files95343
-Ref: #notes-files95491
-Node: Separate notes files96221
-Ref: #separate-notes-files96370
-Node: One single notes file97976
-Ref: #one-single-notes-file98166
-Node: Customising the notes template100106
-Ref: #customising-the-notes-template100285
-Node: Managing a reading list103892
-Ref: #managing-a-reading-list104054
-Node: Window Management107166
-Ref: #window-management107325
-Node: Creating Entry Stubs110501
-Ref: #creating-entry-stubs110663
-Node: @Preamble Definition111664
-Ref: #preamble-definition111828
-Node: @String Definitions113814
-Ref: #string-definitions113965
-Node: @Comments117481
-Ref: #comments117609
-Node: Managing Keywords117974
-Ref: #managing-keywords118119
-Node: Sorting the bib File124028
-Ref: #sorting-the-.bib-file124201
-Node: Merging and Importing127340
-Ref: #merging-and-importing127505
-Node: Exporting Entries129281
-Ref: #exporting-entries129443
-Node: Multiple Identical Fields130959
-Ref: #multiple-identical-fields131138
-Node: Multiline Edit Buffers133047
-Ref: #multiline-edit-buffers133219
-Node: The Options Menu137121
-Ref: #the-options-menu137269
-Node: Customisation137890
-Ref: #customisation138001
-Node: Modifying Key Bindings138609
-Ref: #modifying-key-bindings138736
+Node: Editing the file field93688
+Ref: #editing-the-file-field93837
+Node: Notes files95196
+Ref: #notes-files95344
+Node: Separate notes files96074
+Ref: #separate-notes-files96223
+Node: One single notes file97829
+Ref: #one-single-notes-file98019
+Node: Customising the notes template99959
+Ref: #customising-the-notes-template100138
+Node: Managing a reading list103745
+Ref: #managing-a-reading-list103907
+Node: Window Management107019
+Ref: #window-management107178
+Node: Creating Entry Stubs110354
+Ref: #creating-entry-stubs110516
+Node: @Preamble Definition111517
+Ref: #preamble-definition111681
+Node: @String Definitions113667
+Ref: #string-definitions113818
+Node: @Comments117334
+Ref: #comments117462
+Node: Managing Keywords117827
+Ref: #managing-keywords117972
+Node: Sorting the bib File123881
+Ref: #sorting-the-.bib-file124054
+Node: Merging and Importing127193
+Ref: #merging-and-importing127358
+Node: Exporting Entries129134
+Ref: #exporting-entries129296
+Node: Multiple Identical Fields130812
+Ref: #multiple-identical-fields130991
+Node: Multiline Edit Buffers132900
+Ref: #multiline-edit-buffers133072
+Node: The Options Menu136974
+Ref: #the-options-menu137122
+Node: Customisation137743
+Ref: #customisation137854
+Node: Modifying Key Bindings138462
+Ref: #modifying-key-bindings138589
 
 End Tag Table
 
