@@ -111,7 +111,7 @@ definitions in the database.
 ## Manual
 
 The complete user manual for Ebib is available in html format
-[here](ebib-manual.html).
+[here](ebib-manual.md).
 
 
 ## Installation
