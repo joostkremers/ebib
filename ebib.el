@@ -78,7 +78,7 @@ displaying it.  (This function should not be called if there is a
 chance the index buffer is not visible.) For any other buffer,
 find a window displaying an Ebib buffer other than the index
 buffer, switch to that window and display BUFFER.  If no window
-can be found, return NIL."
+can be found, return nil."
   (let (window)
     (cond
      ;; The index buffer can only be displayed in its dedicated window.
@@ -1082,7 +1082,7 @@ unless IGNORE-MODTIME is non-nil."
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
 first element is the number of entries found, the second the
-number of @String definitions, and the third is T or NIL,
+number of @String definitions, and the third is T or nil,
 indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
@@ -1159,19 +1159,23 @@ added to the existing one with a hash sign `#' between them."
 
 (defun ebib--read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
-Return the entry key if an entry was found, NIL otherwise.
-Optional argument TIMESTAMP indicates whether a timestamp is to
-be added.  (Whether a timestamp is actually added also depends on
-`ebib-use-timestamp'.)"
+Return the entry key if an entry was found and could be stored,
+nil otherwise.  Optional argument TIMESTAMP indicates whether a
+timestamp is to be added.  (Whether a timestamp is actually added
+also depends on `ebib-use-timestamp'.)"
   (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
-         (entry (parsebib-read-entry entry-type))
-         (entry-key (cdr (assoc-string "=key=" entry))))
-    (when (string= entry-key "")
-      (setq entry-key (ebib--generate-tempkey db))
-      (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-    (unless (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror))
-      (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
-    entry-key))                         ; Return the entry key.
+         (entry (parsebib-read-entry entry-type)))
+    (if entry
+        (let ((entry-key (cdr (assoc-string "=key=" entry))))
+          (when (string= entry-key "")
+            (setq entry-key (ebib--generate-tempkey db))
+            (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
+          (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
+          (unless entry-key
+            (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
+          entry-key) ; Return the entry key, or nil if no entry could be stored.
+      (ebib--log 'warning "Line %d: Could not read a valid entry." (line-number-at-pos beg))
+      nil))) ; Make sure to return nil upon failure.
 
 (defun ebib-leave-ebib-windows ()
   "Leave the Ebib windows, lowering them if necessary."
@@ -1180,7 +1184,7 @@ be added.  (Whether a timestamp is actually added also depends on
 
 (defun ebib-lower (&optional soft)
   "Hide the Ebib windows.
-If optional argument SOFT is non-NIL, just switch to a non-Ebib
+If optional argument SOFT is non-nil, just switch to a non-Ebib
 buffer if Ebib is not occupying the entire frame."
   (interactive)
   (if ebib--cur-db
@@ -1865,9 +1869,11 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
                           (message "[Ebib] Yanked unknown entry type `%s'." entry-type)))
                (message "[Ebib] Could not yank a valid entry")
                (ebib--set-modified nil)))
-            (t (message "[Ebib] No entry in kill ring: \"%s\"." entry)
+            (t (message "[Ebib] No entry in kill ring: `%s'." entry)
                (ebib--set-modified nil)))))
-       (if needs-update (ebib--insert-entry-in-index-sorted entry-key t))))
+       (when needs-update
+         (ebib--insert-entry-in-index-sorted entry-key t)
+         (ebib--update-entry-buffer))))
     ((default)
      (beep))))
 
@@ -2318,7 +2324,7 @@ argument ARG can be used to specify which file to choose."
 (defun ebib-set-dialect (dialect)
   "Set the BibTeX dialect of the current database.
 Possible values for DIALECT are those in `bibtex-dialect-list' or
-NIL, in which case the dialect is unset (and the default dialect
+nil, in which case the dialect is unset (and the default dialect
 is used)."
   (interactive (list (intern (completing-read "Dialect: " (append (mapcar #'symbol-name bibtex-dialect-list) (list "nil")) nil t))))
   (unless (or (not dialect)

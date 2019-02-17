@@ -202,7 +202,7 @@ keywords and the third the keywords added in this session."
 
 (defun ebib--keywords-new-p (&optional db)
   "Check whether there are new keywords.
-Returns NIL if there are no new keywords, or a list containing
+Returns nil if there are no new keywords, or a list containing
 all the elements in `ebib--keywords-files-alist' that contain new
 keywords.
 
