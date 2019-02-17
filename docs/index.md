@@ -18,7 +18,7 @@ Bib(La)TeX files easier.
   - Copy/cut/paste mechanism for quickly copying field values. (This
     fully integrates with Emacs’ kill ring.)
   - Automatic loading of `.bib` files upon start-up.
-  - Extensive [user manual](ebib-manual.html).
+  - Extensive [user manual](ebib-manual.md).
 
 ### BibTeX / BibLaTeX
 
