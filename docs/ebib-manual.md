@@ -105,7 +105,9 @@ ebib`. This command is also used to return to Ebib when you have put the
 program in the background. You can bind this command to a key sequence
 by putting something like the following in Emacs’ init file:
 
-    (global-set-key "\C-ce" 'ebib)
+```
+(global-set-key "\C-ce" 'ebib)
+```
 
 You can of course choose any key combination you like. (In Emacs, key
 combinations of `C-c` `<letter>` are reserved for the user, which means
@@ -117,7 +119,9 @@ but the nice thing is that you can then provide a filename to load. So,
 provided a file `references.bib` exists in `~/Work/Papers/`, the
 following command:
 
-    ~/Work/Papers $ ebib references.bib
+```
+~/Work/Papers $ ebib references.bib
+```
 
 starts Ebib and loads the file `references.bib`.
 
@@ -913,22 +917,24 @@ variable with `(defvar ebib-entry)`. When the filter is run, the value
 of `ebib-entry` is an alist of fields and their values. These include
 the fields `=key=` and `=type=` for the entry key and type:
 
-    (("author" . "{Noam Chomsky}")
-     ("title" . "{Syntactic Structures}")
-     ("publisher" . "{The Hague: Mouton}")
-     ("year" . "{1957}")
-     ("remark" . "{copy}")
-     ("timestamp" . "{2007-12-30}")
-     ("file" . "{c/Chomsky1957.pdf}")
-     ("=type=" . "book")
-     ("=key=" . "Chomsky1957"))
+```
+(("author" . "{Noam Chomsky}")
+ ("title" . "{Syntactic Structures}")
+ ("publisher" . "{The Hague: Mouton}")
+ ("year" . "{1957}")
+ ("remark" . "{copy}")
+ ("timestamp" . "{2007-12-30}")
+ ("file" . "{c/Chomsky1957.pdf}")
+ ("=type=" . "book")
+ ("=key=" . "Chomsky1957"))
+```
 
 ### An Example: Listing Recent Additions
 
 One special filter is included with Ebib. It filters recent additions to
 the database. The command that creates the filter is `ebib-list-recent`:
 
-``` lisp
+```
 (defun ebib-list-recent (days)
   "List entries created in the last DAYS days."
   (interactive "nNumber of days: ")
@@ -958,7 +964,7 @@ the display, taking the filter into account.
 
 The function `ebib--newer-than` is defined as follows:
 
-``` lisp
+```
 (defun ebib--newer-than (date)
   "Function for use in filters.
 Return t if the entry being tested is newer than DATE.  DATE must
@@ -1062,22 +1068,24 @@ Commands](#defining-citation-commands). For LaTeX, only the `\cite`
 command is set up by default, so you may want to add some commands. For
 example, this is what I use:
 
-    (setq ebib-citation-commands
-          '((any
-             (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
-              ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
-              ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
-              ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
-              ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
-              ("posstext"    "\\posstextcite%<[%A]%>{%K}")
-              ("posscite"    "\\posscite%<[%A]%>{%K}")
-              ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
-            (org-mode
-             (("ebib"        "[[ebib:%K][%D]]")))
-            (markdown-mode
-             (("text"        "@%K%< [%A]%>")
-              ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
-              ("year"        "[-@%K%< %A%>]")))))
+```
+(setq ebib-citation-commands
+      '((any
+         (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
+          ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+          ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+          ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
+          ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
+          ("posstext"    "\\posstextcite%<[%A]%>{%K}")
+          ("posscite"    "\\posscite%<[%A]%>{%K}")
+          ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
+        (org-mode
+         (("ebib"        "[[ebib:%K][%D]]")))
+        (markdown-mode
+         (("text"        "@%K%< [%A]%>")
+          ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
+          ("year"        "[-@%K%< %A%>]")))))
+```
 
 Calling Ebib from a text mode buffer has another small advantage. If
 point is on a BibTeX key when Ebib is called, it jumps to that entry in
@@ -1169,31 +1177,41 @@ directives. Of course, it is possible to leave the arguments empty (by
 just hitting `RET`). With the format string above, this would yield the
 following citation in the LaTeX buffer:
 
-    \citet[][]{Jones1992}
+```
+\citet[][]{Jones1992}
+```
 
 The empty brackets are completely harmless, because LaTeX will simply
 ignore the empty arguments. However, you may prefer for the brackets not
 to appear if the arguments are empty. In that case, you can wrap the
 brackets and the `%A` directives in a `%<...%>` pair:
 
-    \citet%<[%A]%>%<[%A]%>{%K}
+```
+\citet%<[%A]%>%<[%A]%>{%K}
+```
 
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
 
-    \citet{Jones1992}
+```
+\citet{Jones1992}
+```
 
 Note however, that this format string is problematic. If you fill out
 the first argument but not the second, Ebib produces the wrong format
 string:
 
-    \citet[cf.]{Jones1992}
+```
+\citet[cf.]{Jones1992}
+```
 
 If only one optional argument is provided, `natbib` assumes that it is a
 postnote, while what you intended is actually a prenote. Therefore, it
 is best not to make the second argument optional:
 
-    \citet%<[%A]%>[%A]{%K}
+```
+\citet%<[%A]%>[%A]{%K}
+```
 
 This way, the second pair of brackets is always inserted, regardless of
 whether you provide a second argument or not.
@@ -1204,7 +1222,9 @@ one key, but when you’re in Ebib, you can mark multiple entry keys and
 then use `i` to insert them to a buffer. In this case, Ebib asks you for
 a separator and then inserts all keys into the position of `%K`:
 
-    \citet{Jones1992,Haddock2004}
+```
+\citet{Jones1992,Haddock2004}
+```
 
 It is, however, also possible to specify in the format string that a
 certain sequence can be repeated and how the different elements should
@@ -1213,7 +1233,9 @@ that can be repeated in a `%(...%)` pair. Normally, you’ll want to
 provide a separator, which is done by placing it between the `%` and the
 closing parenthesis:
 
-    \citet[%A][%A]{%(%K%,)}
+```
+\citet[%A][%A]{%(%K%,)}
+```
 
 This format string says that the directive `%K` can be repeated and that
 multiple keys must be separated with a comma. The advantage of this is
@@ -1223,14 +1245,18 @@ It is also possible to put `%A` directives in the repeating part. This
 is useful for `biblatex` package, which has so-called *multicite*
 commands that take the following form:
 
-    \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
+```
+\footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
+```
 
 Multicite commands can take more than one citation key in braces `{}`
 and each of those citation keys can take two optional arguments in
 brackets `[]`. In order to get such citations, you can provide the
 following format string:
 
-    \footcites%(%<[%A]%>[%A]{%K}%)
+```
+\footcites%(%<[%A]%>[%A]{%K}%)
+```
 
 Here, the entire sequence of two optional arguments and the obligatory
 citation key is wrapped in `%(...%)`, so that Ebib knows it can be
@@ -1243,7 +1269,9 @@ parts that are not repeated. In fact, that already happens in the
 previous example, because the part `\footcites` is not repeated. But the
 part that is not repeated may contain `%A` directives as well:
 
-    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+```
+\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+```
 
 Multicite commands in `biblatex` take two additional arguments
 surrounded with parentheses. These are pre- and postnotes for the entire
@@ -1685,12 +1713,14 @@ notes file or whether it is an entry in a single notes file, is created
 on the basis of a template. This template can be customised, but the
 default form is the following:
 
-    "* %T
-    :PROPERTIES:
-    %K
-    :END:
-    >|<
-    "
+```
+"* %T
+:PROPERTIES:
+%K
+:END:
+>|<
+"
+```
 
 This template contains two format specifiers: `%K` and `%T`. `%K` is
 replaced with the key of the entry prepended with the string
@@ -1741,7 +1771,9 @@ the key of the current entry and the `db` argument to the current
 database. With these arguments, it is possible to, e.g., retrieve the
 value of a specific field in the entry:
 
-    (ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
+```
+(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
+```
 
 where `<field>` is the field (as a string) whose value is to be
 retrieved.
@@ -1889,13 +1921,17 @@ suffices, because you can use the concatenation character `#` to include
 multiple TeX or LaTeX commands. So, rather than having two `@Preamble`
 definitions such as:
 
-    @Preamble{ "\newcommand{\noopsort}[1]{} " }
-    @Preamble{ "\newcommand{\singleletter}[1]{#1} " }
+```
+@Preamble{ "\newcommand{\noopsort}[1]{} " }
+@Preamble{ "\newcommand{\singleletter}[1]{#1} " }
+```
 
 you can write this in your `.bib` file:
 
-    @Preamble{ "\newcommand{\noopsort}[1]{} "
-             # "\newcommand{\singleletter}[1]{#1} " }
+```
+@Preamble{ "\newcommand{\noopsort}[1]{} "
+         # "\newcommand{\singleletter}[1]{#1} " }
+```
 
 Creating or editing a `@Preamble` definition in Ebib is done by hitting
 (uppercase) `P` in the index buffer. Ebib uses the multiline edit buffer
@@ -1910,10 +1946,11 @@ In order to create a `@Preamble` as shown above in Ebib, you only have
 to type the text between the braces. Ebib takes care of including the
 braces of the `@Preamble` command, but otherwise it saves the text
 exactly as you enter it. So in order to get the preamble above, you’d
-have to type the following in
-    Ebib:
+have to type the following in Ebib:
 
-    "\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
+```
+"\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
+```
 
 Note that when Ebib loads a `.bib` file that contains more than one
 `@Preamble` definition, it concatenates all the strings in them in the
@@ -1964,15 +2001,21 @@ Note that this also makes it possible to enter field values that are
 composed of concatenations of strings and abbreviations. The BibTeX
 documentation for example explains that if you have defined:
 
-    @String{WGA = "World Gnus Almanac"}
+```
+@String{WGA = "World Gnus Almanac"}
+```
 
 you can create a BibTeX field like this:
 
-    title = 1966 # WGA
+```
+title = 1966 # WGA
+```
 
 which will produce “1966 World Gnus Almanac”. Or you can do:
 
-    month = "1~" # jan
+```
+month = "1~" # jan
+```
 
 which will produce someting like “1 January”, assuming your bibliography
 style has defined the abbreviation `jan`. All this is possible with
@@ -2240,24 +2283,28 @@ does not retain the multiple occurrences, but it does retain the values.
 So suppose you have an entry that contains the following `keywords`
 fields:
 
-    @book{Jones1998,
-        author = {Jones, Joan},
-        year = {1998},
-        ...
-        keywords = {sleep},
-        keywords = {winter},
-        keywords = {hibernation}
-    }
+```
+@book{Jones1998,
+      author = {Jones, Joan},
+      year = {1998},
+      ...
+      keywords = {sleep},
+      keywords = {winter},
+      keywords = {hibernation}
+}
+```
 
 If you load this entry into Ebib with the option “Allow Identical
 Fields” set, you will get the following:
 
-    @book{Jones1998,
-        author = {Jones, Joan},
-        year = {1998},
-        ...
-        keywords = {sleep, winter, hibernation}
-    }
+```
+@book{Jones1998,
+      author = {Jones, Joan},
+      year = {1998},
+      ...
+      keywords = {sleep, winter, hibernation}
+}
+```
 
 # Multiline Edit Buffers
 
@@ -2321,7 +2368,7 @@ a minor mode, which restricts the available keys to combinations of
 change the key commands, if you wish. For example, you could put
 something like the following in your `~/.emacs`:
 
-``` commonlisp
+```
 (with-eval-after-load 'ebib
   (define-key ebib-multiline-mode-map
     "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
@@ -2381,7 +2428,7 @@ keywords and the reading list, respectively. Finally, there is
 As an example, the default keybindings in`ebib-multiline-mode-map`,
 which are rather awkward to type, can be redefined as follows:
 
-``` commonlisp
+```
 (with-eval-after-load 'ebib
   (define-key ebib-multiline-mode-map
     "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
