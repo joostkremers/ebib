@@ -1174,7 +1174,7 @@ contain `%A` directives:
 ```
 \citet[%A][%A]{%K}
 ```
-{% raw %}
+{% endraw %}
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
