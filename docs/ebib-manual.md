@@ -1068,6 +1068,7 @@ Commands](#defining-citation-commands). For LaTeX, only the `\cite`
 command is set up by default, so you may want to add some commands. For
 example, this is what I use:
 
+{% raw %}
 ```
 (setq ebib-citation-commands
       '((any
@@ -1086,6 +1087,7 @@ example, this is what I use:
           ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
           ("year"        "[-@%K%< %A%>]")))))
 ```
+{% endraw %}
 
 Calling Ebib from a text mode buffer has another small advantage. If
 point is on a BibTeX key when Ebib is called, it jumps to that entry in
@@ -1157,19 +1159,22 @@ directives are recognised:
     a description, for which the user is prompted. Mainly for use in Org
     citations.
 
-In the simplest case, the format string contains just a `%K` directive:
-`\cite{%K}`. In this case, `%K` is replaced with the citation key and
-the result inserted. Usually, however, citation commands allow for
-optional arguments that are formatted as pre- or postnotes to the
-citation. For example, using the `natbib` package, you have citation
-commands available of the form:
+In the simplest case, the format string contains just a `%K` directive: {% raw
+%}`\cite{%K}`{% endraw %}. In this case, `%K` is replaced with the citation key
+and the result inserted. Usually, however, citation commands allow for optional
+arguments that are formatted as pre- or postnotes to the citation. For example,
+using the `natbib` package, you have citation commands available of the form:
 
     \citet[cf.][p. 50]{Jones1992}
 
 In order to be able to insert such citations, the format string must
 contain `%A` directives:
 
-    \citet[%A][%A]{%K}
+{% raw %}
+```
+\citet[%A][%A]{%K}
+```
+{% endraw %}
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
@@ -1186,9 +1191,11 @@ ignore the empty arguments. However, you may prefer for the brackets not
 to appear if the arguments are empty. In that case, you can wrap the
 brackets and the `%A` directives in a `%<...%>` pair:
 
+{% raw %}
 ```
 \citet%<[%A]%>%<[%A]%>{%K}
 ```
+{% endraw %}
 
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
@@ -1209,9 +1216,11 @@ If only one optional argument is provided, `natbib` assumes that it is a
 postnote, while what you intended is actually a prenote. Therefore, it
 is best not to make the second argument optional:
 
+{% raw %}
 ```
 \citet%<[%A]%>[%A]{%K}
 ```
+{% endraw %}
 
 This way, the second pair of brackets is always inserted, regardless of
 whether you provide a second argument or not.
@@ -1233,9 +1242,11 @@ that can be repeated in a `%(...%)` pair. Normally, you’ll want to
 provide a separator, which is done by placing it between the `%` and the
 closing parenthesis:
 
+{% raw %}
 ```
 \citet[%A][%A]{%(%K%,)}
 ```
+{% endraw %}
 
 This format string says that the directive `%K` can be repeated and that
 multiple keys must be separated with a comma. The advantage of this is
@@ -1254,9 +1265,11 @@ and each of those citation keys can take two optional arguments in
 brackets `[]`. In order to get such citations, you can provide the
 following format string:
 
+{% raw %}
 ```
 \footcites%(%<[%A]%>[%A]{%K}%)
 ```
+{% endraw %}
 
 Here, the entire sequence of two optional arguments and the obligatory
 citation key is wrapped in `%(...%)`, so that Ebib knows it can be
@@ -1269,9 +1282,11 @@ parts that are not repeated. In fact, that already happens in the
 previous example, because the part `\footcites` is not repeated. But the
 part that is not repeated may contain `%A` directives as well:
 
+{% raw %}
 ```
 \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
 ```
+{% endraw %}
 
 Multicite commands in `biblatex` take two additional arguments
 surrounded with parentheses. These are pre- and postnotes for the entire
