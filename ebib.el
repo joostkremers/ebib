@@ -3431,11 +3431,13 @@ The deleted text is not put in the kill ring."
 (defun ebib-quit-strings-buffer ()
   "Quit editing the @String definitions."
   (interactive)
-  (if (and (eq ebib-layout 'index-only)
-           ebib-popup-entry-window)
-      (delete-window)
+  (if (eq ebib-layout 'index-only)
+      (if ebib-popup-entry-window
+          (delete-window)
+        (with-ebib-window-nondedicated (selected-window)
+          (switch-to-buffer nil t)))
     (with-ebib-window-nondedicated (selected-window)
-      (switch-to-buffer nil t)))
+      (switch-to-buffer (ebib--buffer 'entry) t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
 
 (defun ebib--current-string ()
