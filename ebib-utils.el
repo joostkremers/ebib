@@ -1279,14 +1279,14 @@ ignored."
   (setq specifiers (cl-remove-if-not (lambda (elt)
                                        (string-match-p (format "%%%c" (car elt)) template))
                                      specifiers))
-  (format-spec template (seq-filter (lambda (spec)
-                                      (let* ((replacer (cdr spec))
-                                             (replacement (if (fboundp replacer)
-                                                              (ignore-errors (apply (cdr spec) args))
-                                                            (symbol-value replacer))))
-                                        (if replacement
-                                            (cons (car spec) replacement))))
-                                    specifiers)))
+  (format-spec template (delq nil (mapcar (lambda (spec)
+                                            (let* ((replacer (cdr spec))
+                                                   (replacement (if (fboundp replacer)
+                                                                    (ignore-errors (apply (cdr spec) args))
+                                                                  (symbol-value replacer))))
+                                              (if replacement
+                                                  (cons (car spec) replacement))))
+                                          specifiers))))
 
 (defun ebib--multiline-p (string)
   "Return non-nil if STRING is multiline."
