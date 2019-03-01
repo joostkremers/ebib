@@ -3878,7 +3878,7 @@ entry key.  The file extension of the original file is retained.
 If prefix ARG is non-nil, do not delete the original file."
   (interactive "P")
   (let* ((key (ebib--get-key-at-point))
-         (file-path (expand-file-name (read-file-name "File to import: " nil nil t)))
+         (file-path (expand-file-name (read-file-name "File to import: " ebib-import-directory nil t)))
          (ext (file-name-extension file-path))
          (new-name (ebib--create-file-name-from-key key ext))
          (dest-dir (file-name-as-directory (car ebib-file-search-dirs)))

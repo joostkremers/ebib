@@ -713,6 +713,13 @@ this command extracts the filename."
   :group 'ebib
   :type 'string)
 
+(defcustom ebib-import-directory "~/Downloads"
+  "Directory to import files from.
+When using the command `ebib-import-file', this directory is
+offered as the default directory."
+  :group 'ebib
+  :type 'directory)
+
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
   "List of file associations.
