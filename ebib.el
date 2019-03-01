@@ -963,7 +963,7 @@ This function is for interactive use only.  To load a BibTeX file
 in the background, use `ebib--load-bibtex-file-internal'."
   (interactive)
   (unless file
-    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
+    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: " (car ebib-bib-search-dirs))) (car ebib-bibtex-extensions))))
   (setq ebib--cur-db (ebib--load-bibtex-file-internal file))
   (ebib--update-buffers))
 
