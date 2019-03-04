@@ -3108,11 +3108,11 @@ If FILE is not in (a subdirectory of) one of the directories in
 `ebib-file-search-dirs', return FILE."
   ;; We first create a list of names relative to each dir in
   ;; ebib-file-search-dirs, discarding those that start with `..'
-  (let* ((names (seq-filter (lambda (dir)
-                              (let ((rel-name (file-relative-name file dir)))
-                                (unless (string-prefix-p ".." rel-name)
-                                  rel-name)))
-                            ebib-file-search-dirs))
+  (let* ((names (delq nil (mapcar (lambda (dir)
+                                    (let ((rel-name (file-relative-name file dir)))
+                                      (unless (string-prefix-p ".." rel-name)
+                                        rel-name)))
+                                  ebib-file-search-dirs)))
          ;; Then we take the shortest one...
          (name (car (sort names (lambda (x y)
                                   (< (length x) (length y)))))))
