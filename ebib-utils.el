@@ -1689,7 +1689,7 @@ value are removed if UNBRACED is non-nil."
         (ebib-unbrace value)
       value)))
 
-;; EBIB-UNBRACED-P determines if STRING is enclosed in braces.  Note that we
+;; `ebib-unbraced-p' determines if STRING is enclosed in braces.  Note that we
 ;; cannot do this by simply checking whether STRING begins with { and ends with
 ;; } (or begins and ends with "), because something like "{abc} # D # {efg}"
 ;; would then be incorrectly recognised as braced.  So we need to do the
@@ -1698,22 +1698,22 @@ value are removed if UNBRACED is non-nil."
 ;; was not.
 
 ;; So we first check whether the string begins with { or ".  If not, we
-;; certainly have an unbraced string.  (EBIB-UNBRACED-P recognises this
-;; through the default clause of the COND.)  If the first character is { or ",
+;; certainly have an unbraced string.  (`ebib-unbraced-p' recognises this
+;; through the default clause of the `cond'.)  If the first character is { or ",
 ;; we first take out every occurrence of backslash-escaped { and } or ", so that
 ;; the rest of the function does not get confused over them.
 
-;; Then, if the first character is {, REMOVE-FROM-STRING takes out every
+;; Then, if the first character is {, `remove-from-string' takes out every
 ;; occurrence of the regex "{[^{]*?}", which translates to "the smallest string
 ;; that starts with { and ends with }, and does not contain another {.  IOW, it
 ;; takes out the innermost braces and their contents.  Because braces may be
 ;; embedded, we have to repeat this step until no more balanced braces are found
 ;; in the string.  (Note that it would be unwise to check for just the occurrence
-;; of { or }, because that would throw EBIB-UNBRACED-P in an infinite loop if
+;; of { or }, because that would throw `ebib-unbraced-p' in an infinite loop if
 ;; a string contains an unbalanced brace.)
 
 ;; For strings beginning with " we do the same, except that it is not
-;; necessary to repeat this in a WHILE loop, for the simple reason that
+;; necessary to repeat this in a `while' loop, for the simple reason that
 ;; strings surrounded with double quotes cannot be embedded; i.e.,
 ;; "ab"cd"ef" is not a valid (BibTeX) string, while {ab{cd}ef} is.
 
@@ -1731,17 +1731,17 @@ value are removed if UNBRACED is non-nil."
     (when (stringp string)
       (cond
        ((eq (string-to-char string) ?\{)
-        ;; first, remove all escaped { and } from the string:
+        ;; First, remove all escaped { and } from the string:
         (setq string (remove-from-string (remove-from-string string "[\\][{]")
                                          "[\\][}]"))
-        ;; then remove the innermost braces with their contents and continue until
+        ;; Then remove the innermost braces with their contents and continue until
         ;; no more braces are left.
         (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
           (setq string (remove-from-string string "{[^{]*?}")))
-        ;; if STRING is not empty, the original string contains material not in braces
+        ;; If STRING is not empty, the original string contains material not in braces.
         (> (length string) 0))
        ((eq (string-to-char string) ?\")
-        ;; remove escaped ", then remove any occurrences of balanced quotes with
+        ;; Remove escaped ", then remove any occurrences of balanced quotes with
         ;; their contents and check for the length of the remaining string.
         (> (length (remove-from-string (remove-from-string string "[\\][\"]")
                                        "\"[^\"]*?\""))
