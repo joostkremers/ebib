@@ -1153,6 +1153,12 @@ If FILE is an absolute file name, expand it with
           (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
           (expand-file-name unmod-file)))))
 
+(defun ebib--split-files (files)
+  "Split FILES (a string) into separate files.
+Return value is a list of strings.  The files in FILES should be
+separated by `ebib-filename-separator'."
+  (split-string files (regexp-quote ebib-filename-separator) t))
+
 (defun ebib--select-file (files n key)
   "Split FILES into separate files and return the Nth.
 FILES should be a string of file names separated by
@@ -1164,7 +1170,7 @@ If FILES is nil, a file name is created on the basis of KEY.  See
 the function `ebib--create-file-name-from-key' for details."
   (if (not files)
       (ebib--create-file-name-from-key key "pdf")
-    (let ((file-list (split-string files (regexp-quote ebib-filename-separator) t)))
+    (let ((file-list (ebib--split-files files)))
       (cond
        ((= (length file-list) 1)
         (setq n 1))
@@ -1173,6 +1179,17 @@ the function `ebib--create-file-name-from-key' for details."
       (unless (<= 1 n (length file-list))  ; Unless n is within range.
         (error "[Ebib] No such file (%d)" n))
       (nth (1- n) file-list))))
+
+(defun ebib--split-urls (urls)
+  "Split URLS (a string) into separate URLs.
+Return value is a list of strings.  The URLs in URLS are
+  separated using `ebib-url-regexp'."
+  (let ((start 0)
+        (result nil))
+    (while (string-match ebib-url-regexp urls start)
+      (push (match-string 0 urls) result)
+      (setq start (match-end 0)))
+    (nreverse result)))
 
 (defun ebib--select-url (urls n)
   "Select a URL from URLS.
@@ -1183,12 +1200,7 @@ one.  If URLS is nil or does not contain any valid URLs, raise an
 error."
   (unless urls
     (error "[Ebib] No URLs found"))
-  (setq urls (let ((start 0)
-                   (result nil))
-               (while (string-match ebib-url-regexp urls start)
-                 (push (match-string 0 urls) result)
-                 (setq start (match-end 0)))
-               (nreverse result)))
+  (setq urls (ebib--split-urls urls))
   (unless urls
     (error "[Ebib] No valid URLs found"))
   (cond

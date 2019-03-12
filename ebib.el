@@ -264,7 +264,7 @@ of strings."
 
 (defun ebib--display-file-field (file-field)
   "Return a string for FILE-FIELD to display in the entry buffer."
-  (let ((files (split-string file-field ebib-filename-separator)))
+  (let ((files (ebib--split-files file-field)))
     (ebib--convert-multiline-to-string (mapcar (lambda (file)
                                                  (propertize file
                                                              'face '(:inherit ebib-link-face)
@@ -272,6 +272,25 @@ of strings."
                                                              'help-echo "mouse-1: open this file"
                                                              'ebib-file file))
                                                files))))
+
+(defun ebib--display-doi-field (doi-field)
+  "Return a string for DOI-FIELD to display in the entry buffer."
+  (propertize doi-field
+              'face '(:inherit ebib-link-face)
+              'mouse-face '(highlight (:inherit ebib-link-face))
+              'help-echo "mouse-1: follow this doi"
+              'ebib-url (concat "https://dx.doi.org/" doi-field)))
+
+(defun ebib--display-url-field (url-field)
+  "Return a string for URL-FIELD to display in the entry buffer."
+  (let ((urls (ebib--split-urls url-field)))
+    (ebib--convert-multiline-to-string (mapcar (lambda (url)
+                                                 (propertize url
+                                                             'face '(:inherit ebib-link-face)
+                                                             'mouse-face '(highlight (:inherit ebib-link-face))
+                                                             'help-echo "mouse-1: follow this url"
+                                                             'ebib-url url))
+                                               urls))))
 
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
@@ -316,7 +335,11 @@ of strings."
       (when (ebib--multiline-p value)
         (cl-multiple-value-setq (value multiline) (ebib--display-multiline-field value matched)))
       (if (cl-equalp field "file")
-          (setq value (ebib--display-file-field value))))
+          (setq value (ebib--display-file-field value)))
+      (if (cl-equalp field "url")
+          (setq value (ebib--display-url-field value)))
+      (if (cl-equalp field "doi")
+          (setq value (ebib--display-doi-field value))))
     (concat raw value alias multiline)))
 
 (defun ebib--display-fields (key &optional db match-str)
@@ -3227,8 +3250,20 @@ viewed."
   (let* ((word (thing-at-point 'word))
          (file (and word
                     (get-text-property 0 'mouse-face word)
-                    (get-text-property 0 'ebib-file word))))
-    (if file (ebib--call-file-viewer file))))
+                    (get-text-property 0 'ebib-file word)))
+         (url (and word
+                   (get-text-property 0 'mouse-face word)
+                   (get-text-property 0 'ebib-url word))))
+    (cond
+     (file (ebib--call-file-viewer file))
+     (url (ebib--call-browser url)))
+    ;; Position the cursor nicely.  If no link was clicked, select the field at
+    ;; the line clicked on, or the next field.
+    (beginning-of-line)
+    (if (eobp)
+        (forward-line -1)
+      (while (ebib--outside-field-p)
+        (forward-line 1)))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring.
