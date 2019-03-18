@@ -1008,7 +1008,7 @@ and the return value of its last form is returned."
     "Helper function for `ebib--execute-when'."
     (cond
      ((eq env 'entries)
-      '(ebib-db-list-keys ebib--cur-db))
+      '(ebib-db-has-entries ebib--cur-db))
      ((eq env 'marked-entries)
       '(and ebib--cur-db
             (ebib-db-marked-entries-p ebib--cur-db)))

@@ -211,6 +211,10 @@ is suffixed, then `ab' etc."
 	(setq suffix ?a)))
     unique-key))
 
+(defun ebib-db-has-entries (db)
+  "Return non-nil if DB has entries."
+  (> (hash-table-count (ebib--db-struct-database db)) 0))
+
 (defun ebib-db-list-keys (db)
   "Return a list of keys in DB."
   (hash-table-keys (ebib--db-struct-database db)))
