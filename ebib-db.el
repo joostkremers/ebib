@@ -470,11 +470,12 @@ ENTRY is an entry key."
 ENTRY is an entry key.  ENTRY is added unconditionally, no check
 is performed to see if it is already on the list.
 
-ENTRY can also be 'all, in which case all entries are marked."
+ENTRY can also be a symbol, in which case all entries are
+marked."
   (cond
    ((stringp entry)
     (setf (ebib-db-val 'marked-entries db) (cons entry (ebib-db-val 'marked-entries db))))
-   ('all
+   (t
     (setf (ebib-db-val 'marked-entries db) (ebib-db-list-keys db)))))
 
 (defun ebib-db-unmark-entry (entry db)
