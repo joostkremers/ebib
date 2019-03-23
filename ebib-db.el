@@ -443,6 +443,11 @@ return the full path.  If DB is nil, return nil."
         (file-name-nondirectory (ebib-db-val 'filename db))
       (ebib-db-val 'filename db))))
 
+(defun ebib-db-get-master (db)
+  "Return the master database of DB.
+If DB is not a slave database, return nil."
+  (ebib-db-val 'master db))
+
 (defun ebib-db-get-modtime (db)
   "Return the mod time stored for DB."
   (ebib-db-val 'modtime db))
