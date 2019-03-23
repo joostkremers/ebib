@@ -162,7 +162,7 @@ recreated the next time DB becomes active."
   "Set KEY as the current entry of DB.
 KEY is a key in DB.  If KEY is not in DB, the current entry is
 set to nil, which signifies that a new current entry should be
-set.  It is allowed to pass a value of nil for KEY, to unset the
+set.  It is possible to pass a value of nil for KEY, to unset the
 current entry unconditionally.
 
 Return the new entry key if it could be made the new entry key,
