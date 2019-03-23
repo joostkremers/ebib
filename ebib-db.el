@@ -36,30 +36,59 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'subr-x) ; hash-table-keys
 
-;; Each database is represented by a struct.
-(cl-defstruct ebib--db-struct
-  (database (make-hash-table :test 'equal)) ; Hashtable containing the database itself.
-  (strings)                                 ; Alist with the @STRING definitions.
-  (preamble)                                ; String with the @Preamble definition.
-  (comments)                                ; List of @COMMENTS.
-  (local-vars)                              ; The file's local variable block.
-  (dialect)                                 ; The dialect of this database.
-  (buffer)                                  ; The index buffer.
-  (cur-entry)                               ; The current entry.
-  (marked-entries)                          ; List of marked entries.
-  (filter)                                  ; The active filter.
-  (sortinfo)                                ; Custom sorting.
-  (filename)                                ; Name of the BibTeX file that holds this database.
-  (modtime)                                 ; Modification time of the .bib file.
-  (modified)                                ; Flag indicating whether this database has been modified.
-  (backup))                                 ; Flag indicating whether we need to make a backup of the .bib file.
+;; Each database is represented by an alist.
+(defvar ebib-db '((entries)                             ; Hashtable containing the BibTeX entries.
+                  (strings)                             ; Alist with the @STRING definitions.
+                  (preamble)                            ; String with the @Preamble definition.
+                  (comments)                            ; List of @COMMENTS.
+                  (local-vars)                          ; The file's local variable block.
+                  (dialect)                             ; The dialect of this database.
+                  (buffer)                              ; The index buffer.
+                  (cur-entry)                           ; The current entry.
+                  (marked-entries)                      ; List of marked entries.
+                  (filter)                              ; The active filter.
+                  (sortinfo)                            ; Custom sorting.
+                  (filename)                            ; Name of the BibTeX file that holds this database.
+                  (master)                              ; The master database, or nil if this database is not a slave.
+                  (keys)                                ; The keys in the database.
+                  (modtime)                             ; Modification time of the .bib file.
+                  (modified)                            ; Flag indicating whether this database has been modified.
+                  (backup)))                            ; Flag indicating whether we need to make a backup of the .bib file.
 
-(defun ebib-db-new-database ()
-  "Create a new database instance and return it."
-  (make-ebib--db-struct))
+(defvar ebib-db-bibdata '(entries strings preamble comment local-vars dialect)
+  "Fields in `ebib-db' that contain data from the underlying .bib file.")
+
+;; Accessing the fields of the `ebib-db' alist can be done with `assq' or
+;; `alist-get', but should in most cases be done with `ebib-db-val' (which is
+;; `setf'-able), because it checks whether the database is a slave database and
+;; accesses the master database for the fields in `ebib-db-bibdata'.
+
+(defun ebib-db-val (field db)
+  "Return the value for FIELD in DB.
+If DB is a slave database and FIELD is one of the fields in
+`ebib-db-bibdata', return the value of FIELD in DB's master
+database."
+  (cdr (assq field (or (and (memq field ebib-db-bibdata)
+                            (cdr (assq 'master db)))
+                       db))))
+
+(gv-define-setter ebib-db-val (value field db)
+  `(setcdr (assq ,field (or (and (memq ,field ebib-db-bibdata)
+                                 (cdr (assq 'master ,db)))
+                            ,db))
+           ,value))
+
+(defun ebib-db-new-database (&optional master)
+  "Create a new database instance and return it.
+If MASTER is non-nil, it should be a database object, which is
+set as the master of the new database."
+  (let ((db (copy-tree ebib-db)))
+    (if master
+        (setf (ebib-db-val 'master db) master)
+      (setf (ebib-db-val 'entries db) (make-hash-table :test 'equal)))
+    db))
 
 (defun ebib-db-clear-database (db)
   "Remove all information in DB.
@@ -69,70 +98,65 @@ the relevant data in it is deleted.
 Note that the data itself is not destroyed, but may eventually be
 GC'ed, with the exception of the buffer pointed to by the buffer
 field.  This should be killed separately."
-  (clrhash (ebib--db-struct-database db))
-  (setf (ebib--db-struct-strings db) nil)
-  (setf (ebib--db-struct-preamble db) nil)
-  (setf (ebib--db-struct-comments db) nil)
-  (setf (ebib--db-struct-local-vars db) nil)
-  (setf (ebib--db-struct-dialect db) nil)
-  (setf (ebib--db-struct-buffer db) nil)
-  (setf (ebib--db-struct-cur-entry db) nil)
-  (setf (ebib--db-struct-marked-entries db) nil)
-  (setf (ebib--db-struct-filter db) nil)
-  (setf (ebib--db-struct-sortinfo db) nil)
-  (setf (ebib--db-struct-filename db) nil)
-  (setf (ebib--db-struct-modified db) nil)
-  (setf (ebib--db-struct-backup db) nil))
+  ;; We use `alist-get' here instead of `ebib-db-val' because we don't want to
+  ;; be redirected to the master database.
+  (if (not (alist-get 'master db))
+      (clrhash (alist-get 'entries db)))
+  (mapc (lambda (item)
+          (setf (alist-get item db) nil))
+        (delq 'entries (mapcar #'car db))))
 
 (defun ebib-db-count-entries (db)
   "Return the number of entries in DB."
-  (hash-table-count (ebib--db-struct-database db)))
+  (if (ebib-db-val 'master db)
+      (length (ebib-db-val 'keys db))
+    (hash-table-count (ebib-db-val 'entries db))))
 
 (defun ebib-db-get-dialect (db)
   "Return the BibTeX dialect of DB."
-  (ebib--db-struct-dialect db))
+  (ebib-db-val 'dialect db))
 
 (defun ebib-db-set-dialect (dialect db)
   "Set DIALECT as the BibTeX dialect of DB."
-  (setf (ebib--db-struct-dialect db) dialect))
+  (setf (ebib-db-val 'dialect db) dialect))
 
 (defun ebib-db-get-comments (db)
   "Return a list of @COMMENTS for DB."
-  (ebib--db-struct-comments db))
+  (ebib-db-val 'comments db))
 
 (defun ebib-db-set-comment (comment db)
   "Add COMMENT to the list of comments in DB."
-  (setf (ebib--db-struct-comments db) (append (ebib--db-struct-comments db) (list comment))))
+  (setf (ebib-db-val 'comments db) (append (ebib-db-val 'comments db) (list comment))))
+
+(defun ebib-db-get-local-vars (db)
+  "Return the local variable block of DB."
+  (ebib-db-val 'local-vars db))
 
 (defun ebib-db-set-local-vars (vars db)
   "Store VARS as the local variable block of DB.
 No check is performed to see if VARS is really a local variable block."
-  (setf (ebib--db-struct-local-vars db) vars))
-
-(defun ebib-db-get-local-vars (db)
-  "Return the local variable block of DB."
-  (ebib--db-struct-local-vars db))
+  (setf (ebib-db-val 'local-vars db) vars))
 
 (defun ebib-db-get-buffer (db)
   "Return the index buffer of DB."
-  (ebib--db-struct-buffer db))
+  (ebib-db-val 'buffer db))
 
 (defun ebib-db-set-buffer (buffer db)
   "Set BUFFER as DB's index buffer."
-  (setf (ebib--db-struct-buffer db) buffer))
+  (setf (ebib-db-val 'buffer db) buffer))
 
 (defun ebib-db-kill-buffer (db)
   "Kill the index buffer of DB.
 This function can be used when entries are added to or removed
 from DB non-interactively, to ensure that the index buffer is
 recreated the next time DB becomes active."
-  (when (ebib--db-struct-buffer db)
-    (kill-buffer (ebib--db-struct-buffer db))
-    (setf (ebib--db-struct-buffer db) nil)))
+  (when (ebib-db-val 'buffer db)
+    (kill-buffer (ebib-db-val 'buffer db))
+    (setf (ebib-db-val 'buffer db) nil)))
 
 (defun ebib--db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
-  (ebib--db-struct-cur-entry db))
+  (ebib-db-val 'cur-entry db))
 
 (defun ebib-db-set-current-entry-key (key db)
   "Set KEY as the current entry of DB.
@@ -145,8 +169,8 @@ Return the new entry key if it could be made the new entry key,
 nil otherwise."
   (if (and (stringp key)
            (ebib-db-get-entry key db 'noerror))
-      (setf (ebib--db-struct-cur-entry db) key)
-    (setf (ebib--db-struct-cur-entry db) nil)))
+      (setf (ebib-db-val 'cur-entry db) key)
+    (setf (ebib-db-val 'cur-entry db) nil)))
 
 (defun ebib-db-set-entry (key data db &optional if-exists)
   "Set KEY to DATA in database DB.
@@ -163,7 +187,7 @@ In order to delete an entry, DATA must be nil and IF-EXISTS must be
 `overwrite'.
 
 If storing/updating/deleting the entry is successful, return its key."
-  (let ((exists (gethash key (ebib--db-struct-database db))))
+  (let ((exists (gethash key (ebib-db-val 'entries db))))
     (when exists
       (cond
        ;;  If so required, make the entry unique:
@@ -178,8 +202,8 @@ If storing/updating/deleting the entry is successful, return its key."
 	(error "[Ebib] Key `%s' exists in database; cannot overwrite" key))))
     (unless exists
       (if data
-	  (puthash key data (ebib--db-struct-database db))
-	(remhash key (ebib--db-struct-database db)))
+	  (puthash key data (ebib-db-val 'entries db))
+	(remhash key (ebib-db-val 'entries db)))
       key)))
 
 (defun ebib-db-remove-entry (key db)
@@ -190,7 +214,7 @@ If storing/updating/deleting the entry is successful, return its key."
   "Return entry KEY in database DB as an alist.
 The entry is returned as an alist of (FIELD . VALUE) pairs.
 Trigger an error if KEY does not exist, unless NOERROR is T."
-  (let ((entry (gethash key (ebib--db-struct-database db))))
+  (let ((entry (gethash key (ebib-db-val 'entries db))))
     (unless (or entry noerror)
       (error "[Ebib] Entry `%s' does not exist" key))
     entry))
@@ -203,7 +227,7 @@ key is found.  If suffixing `z' does not yield a unique key, `aa'
 is suffixed, then `ab' etc."
   (let* ((suffix ?b)
 	 (unique-key (concat key (list suffix))))
-    (while (gethash unique-key (ebib--db-struct-database db))
+    (while (gethash unique-key (ebib-db-val 'entries db))
       (setq suffix (1+ suffix))
       (setq unique-key (concat key (list suffix)))
       (when (eq suffix ?z)
@@ -213,15 +237,17 @@ is suffixed, then `ab' etc."
 
 (defun ebib-db-has-entries (db)
   "Return non-nil if DB has entries."
-  (> (hash-table-count (ebib--db-struct-database db)) 0))
+  (> (hash-table-count (ebib-db-val 'entries db)) 0))
 
 (defun ebib-db-list-keys (db)
   "Return a list of keys in DB."
-  (hash-table-keys (ebib--db-struct-database db)))
+  (if (ebib-db-val 'master db)
+      (ebib-db-val 'keys db)
+    (hash-table-keys (ebib-db-val 'entries db))))
 
 (defun ebib-db-has-key (key db)
-  "Return t if KEY exists in DB."
-  (gethash key (ebib--db-struct-database db)))
+  "Return non-nil if KEY exists in DB."
+  (gethash key (ebib-db-val 'entries db)))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
   "Change entry key KEY to NEW-KEY in DB.
@@ -303,7 +329,7 @@ the symbol `error', an error is raised.
 
 In order to remove a @STRING definition, pass nil as VALUE and
 set IF-EXISTS to `overwrite'."
-  (let* ((strings-list (ebib--db-struct-strings db))
+  (let* ((strings-list (ebib-db-val 'strings db))
          (old-string (cdr (assoc abbr strings-list))))
     (if old-string
         (cond
@@ -323,7 +349,7 @@ set IF-EXISTS to `overwrite'."
       (if strings-list
           (setcdr (last strings-list) (list (cons abbr value)))
         (setq strings-list (list (cons abbr value)))))
-    (setf (ebib--db-struct-strings db) strings-list)))
+    (setf (ebib-db-val 'strings db) strings-list)))
 
 (defun ebib-db-remove-string (abbr db)
   "Remove @STRING definition ABBR ttfrom DB."
@@ -335,18 +361,18 @@ If ABBR does not exist, trigger an error, unless NOERROR is
 non-nil, in which case return nil."
   ;; I assume abbreviations should be case-sensitive, so I use assoc
   ;; instead of assoc-string here.
-  (let ((value (cdr (assoc abbr (ebib--db-struct-strings db)))))
+  (let ((value (cdr (assoc abbr (ebib-db-val 'strings db)))))
     (unless (or value noerror)
       (error "[Ebib] @STRING abbreviation `%s' does not exist" abbr))
     value))
 
 (defun ebib-db-get-all-strings (db)
   "Return the alist containing all @STRING definitions in DB."
-  (ebib--db-struct-strings db))
+  (ebib-db-val 'strings db))
 
 (defsubst ebib-db-list-strings (db)
   "Return a list of @STRING abbreviations in DB without expansions."
-  (mapcar #'car (ebib--db-struct-strings db)))
+  (mapcar #'car (ebib-db-val 'strings db)))
 
 (defun ebib-db-set-preamble (preamble db &optional if-exists)
   "Set PREAMBLE as the preamble of DB.
@@ -371,7 +397,7 @@ Return non-nil on success or nil if PREAMBLE could not be stored."
        ((eq if-exists 'overwrite)
 	(setq existing-preamble nil))))
     (if (not existing-preamble)
-	(setf (ebib--db-struct-preamble db) preamble)
+	(setf (ebib-db-val 'preamble db) preamble)
       (unless (eq if-exists 'noerror)
 	(error "[Ebib] Preamble is not empty; cannot overwrite")))))
 
@@ -382,15 +408,15 @@ Return non-nil on success or nil if PREAMBLE could not be stored."
 (defun ebib-db-get-preamble (db)
   "Return the preamble of DB.
 If DB has no preamble, return nil."
-  (ebib--db-struct-preamble db))
+  (ebib-db-val 'preamble db))
 
 (defun ebib-db-set-modified (mod db)
   "Set the modification flag of DB to MOD."
-  (setf (ebib--db-struct-modified db) mod))
+  (setf (ebib-db-val 'modified db) mod))
 
 (defun ebib-db-modified-p (db)
   "Return t if DB has been modified, nil otherwise."
-  (ebib--db-struct-modified db))
+  (ebib-db-val 'modified db))
 
 (defun ebib-db-set-filename (filename db &optional if-exists)
   "Set FILENAME as the filename of DB.
@@ -398,7 +424,7 @@ IF-EXISTS determines what to do when the database already has a
 filename.  If it is `overwrite', the filename is changed.  If
 `noerror', the filename is not changed an nil is returned.  If
 IF-EXISTS is nil, an existing filename triggers an error."
-  (let ((exists (ebib--db-struct-filename db)))
+  (let ((exists (ebib-db-val 'filename db)))
     (when exists
       (cond
        ((eq if-exists 'overwrite)
@@ -406,7 +432,7 @@ IF-EXISTS is nil, an existing filename triggers an error."
        ((not (eq if-exists 'noerror))
 	(error "[Ebib] Database has a filename; cannot overwrite"))))
     (unless exists
-      (setf (ebib--db-struct-filename db) filename))))
+      (setf (ebib-db-val 'filename db) filename))))
 
 (defun ebib-db-get-filename (db &optional shortened)
   "Return the filename of DB.
@@ -414,25 +440,25 @@ If SHORTENED is non-nil, return only the filename part, otherwise
 return the full path.  If DB is nil, return nil."
   (when db
     (if shortened
-        (file-name-nondirectory (ebib--db-struct-filename db))
-      (ebib--db-struct-filename db))))
+        (file-name-nondirectory (ebib-db-val 'filename db))
+      (ebib-db-val 'filename db))))
 
 (defun ebib-db-get-modtime (db)
   "Return the mod time stored for DB."
-  (ebib--db-struct-modtime db))
+  (ebib-db-val 'modtime db))
 
 (defun ebib-db-set-modtime (modtime db)
   "Set MODTIME of DB."
-  (setf (ebib--db-struct-modtime db) modtime))
+  (setf (ebib-db-val 'modtime db) modtime))
 
 (defun ebib-db-marked-entries-p (db)
   "Return t if there are marked enries in DB."
-  (ebib--db-struct-marked-entries db))
+  (ebib-db-val 'marked-entries db))
 
 (defun ebib-db-marked-p (entry db)
   "Return t if ENTRY is marked in DB.
 ENTRY is an entry key."
-  (member entry (ebib--db-struct-marked-entries db)))
+  (member entry (ebib-db-val 'marked-entries db)))
 
 (defun ebib-db-mark-entry (entry db)
   "Add ENTRY to the list of marked entries in DB.
@@ -442,9 +468,9 @@ is performed to see if it is already on the list.
 ENTRY can also be 'all, in which case all entries are marked."
   (cond
    ((stringp entry)
-    (setf (ebib--db-struct-marked-entries db) (cons entry (ebib--db-struct-marked-entries db))))
+    (setf (ebib-db-val 'marked-entries db) (cons entry (ebib-db-val 'marked-entries db))))
    ('all
-    (setf (ebib--db-struct-marked-entries db) (ebib-db-list-keys db)))))
+    (setf (ebib-db-val 'marked-entries db) (ebib-db-list-keys db)))))
 
 (defun ebib-db-unmark-entry (entry db)
   "Remove ENTRY from the list of marked entries in DB.
@@ -452,9 +478,9 @@ ENTRY is an entry key.  If ENTRY is 'all, all entries are
 unmarked."
   (cond
    ((stringp entry)
-    (setf (ebib--db-struct-marked-entries db) (remove entry (ebib--db-struct-marked-entries db))))
+    (setf (ebib-db-val 'marked-entries db) (remove entry (ebib-db-val 'marked-entries db))))
    ('all
-    (setf (ebib--db-struct-marked-entries db) nil))))
+    (setf (ebib-db-val 'marked-entries db) nil))))
 
 (defun ebib-db-toggle-mark (entry db)
   "Toggle the mark on ENTRY in DB."
@@ -464,48 +490,48 @@ unmarked."
 
 (defun ebib-db-list-marked-entries (db)
   "Return a list of entry keys of all marked entries in DB."
-  (copy-sequence (ebib--db-struct-marked-entries db)))
+  (copy-sequence (ebib-db-val 'marked-entries db)))
 
 (defun ebib-db-filtered-p (db)
   "Return t if a filter exists for DB."
-  (ebib--db-struct-filter db))
+  (ebib-db-val 'filter db))
 
 (defun ebib-db-set-filter (filter db)
   "Set FILTER as the filter of DB.
 The filter is set unconditionally, overwriting any existing filter."
-  (setf (ebib--db-struct-filter db) filter))
+  (setf (ebib-db-val 'filter db) filter))
 
 (defun ebib-db-get-filter (db)
   "Return the filter of DB."
-  (ebib--db-struct-filter db))
+  (ebib-db-val 'filter db))
 
 (defun ebib-db-set-sortinfo (sortinfo db)
   "Set the SORTINFO of DB.
 The sortinfo is set unconditionally, overwriting any existing
 sortinfo."
-  (setf (ebib--db-struct-sortinfo db) sortinfo))
+  (setf (ebib-db-val 'sortinfo db) sortinfo))
 
 (defun ebib-db-get-sortinfo (db)
   "Return the sort infor for DB."
-  (ebib--db-struct-sortinfo db))
+  (ebib-db-val 'sortinfo db))
 
 (defun ebib-db-get-sort-field (db)
   "Return the sort field of DB, or nil if there is none."
-  (car (ebib--db-struct-sortinfo db)))
+  (car (ebib-db-val 'sortinfo db)))
 
 (defun ebib-db-get-sort-order (db)
   "Return the sort order of DB, or nil if there is none."
-  (cdr (ebib--db-struct-sortinfo db)))
+  (cdr (ebib-db-val 'sortinfo db)))
 
 (defun ebib-db-set-backup (backup db)
   "Set BACKUP as the backup flag of DB.
 BACKUP must be either t (make backup at next save) or nil (do not
 make backup at next save)."
-  (setf (ebib--db-struct-backup db) backup))
+  (setf (ebib-db-val 'backup db) backup))
 
 (defun ebib-db-backup-p (db)
   "Return backup flag of DB."
-  (ebib--db-struct-backup db))
+  (ebib-db-val 'backup db))
 
 (provide 'ebib-db)
 
