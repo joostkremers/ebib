@@ -1035,12 +1035,13 @@ as (ENVIRONMENTS BODY).  ENVIRONMENTS is a list of symbols (not
 quoted) that specify under which conditions BODY is to be
 executed.  Valid symbols are:
 
-`entries': execute when there are entries in the database,
-`marked-entries': execute when there are marked entries in the database,
-`database': execute if there is a database,
-`no-database': execute if there is no database,
-`real-db': execute when there is a database and it is not filtered,
-`filtered-db': execute when there is a database and it is filtered,
+`entries': execute when there are entries in the database;
+`marked-entries': execute when there are marked entries in the database;
+`database': execute if there is a database;
+`no-database': execute if there is no database;
+`real-db': execute when there is a database and it is not filtered;
+`filtered-db': execute when there is a database and it is filtered;
+`slave-db': execute when there is a slave database;
 `default': execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
