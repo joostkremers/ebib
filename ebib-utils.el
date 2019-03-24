@@ -1020,6 +1020,9 @@ and the return value of its last form is returned."
      ((eq env 'filtered-db)
       '(and ebib--cur-db
             (ebib-db-get-filter ebib--cur-db)))
+     ((eq env 'slave-db)
+      '(and ebib--cur-db
+            (ebib-db-get-master ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
      (t t))))
