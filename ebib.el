@@ -428,29 +428,29 @@ fill it."
         (with-ebib-window-nondedicated (selected-window)
           (switch-to-buffer index-buffer))))
     (with-current-ebib-buffer 'index
-      (unless no-refresh
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (when ebib--cur-db
-            (let ((cur-keys-list (ebib--list-keys))
-                  (marked-entries (ebib-db-list-marked-entries ebib--cur-db))
-                  (cur-entry (ebib--db-get-current-entry-key ebib--cur-db)))
-              ;; We may call this function when there are no entries in the
-              ;; database. If so, we don't need to do this:
-              (unless (= 0 (ebib-db-count-entries ebib--cur-db))
-                ;; It may be that no entry satisfies the filter.
-                (if (not cur-keys-list)
-                    (message "No entries matching the filter")
-                  ;; Fill the buffer
-                  (dolist (entry cur-keys-list)
-                    (ebib--display-entry-key entry (member entry marked-entries)))
-                  ;; Make sure the current entry is among the visible entries.
-                  (unless (member cur-entry cur-keys-list)
-                    (setq cur-entry (car cur-keys-list)))
-                  (if cur-entry
-                      (ebib--goto-entry-in-index cur-entry)
-                    (goto-char (point-min)))
-                  (hl-line-highlight)))))))
+      (let ((cur-entry (ebib--db-get-current-entry-key ebib--cur-db)))
+        (unless no-refresh
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (when ebib--cur-db
+              (let ((cur-keys-list (ebib--list-keys))
+                    (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
+                ;; We may call this function when there are no entries in the
+                ;; database. If so, we don't need to do this:
+                (unless (= 0 (ebib-db-count-entries ebib--cur-db))
+                  ;; It may be that no entry satisfies the filter.
+                  (if (not cur-keys-list)
+                      (message "No entries matching the filter")
+                    ;; Fill the buffer
+                    (dolist (entry cur-keys-list)
+                      (ebib--display-entry-key entry (member entry marked-entries)))
+                    ;; Make sure the current entry is among the visible entries.
+                    (unless (member cur-entry cur-keys-list)
+                      (setq cur-entry (car cur-keys-list)))))))))
+        (if cur-entry
+            (ebib--goto-entry-in-index cur-entry)
+          (goto-char (point-min)))
+        (hl-line-highlight))
       (ebib--rename-index-buffer))))
 
 (defun ebib--rename-index-buffer ()
