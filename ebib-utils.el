@@ -1538,6 +1538,13 @@ formatting the entry."
           (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
 
+(defun ebib--format-master (db)
+  "Write DB's master database to the current buffer."
+  (let ((master (ebib-db-get-master db)))
+    (when master
+      (insert (format "@Comment{\nebib-master-file: %s\n}\n\n"
+                      (ebib-db-get-filename master))))))
+
 (defun ebib--format-strings (db)
   "Write the @Strings of DB into the current buffer in BibTeX format."
   (mapc (lambda (str)
@@ -1569,6 +1576,7 @@ referred to by ENTRY-KEY."
 (defun ebib--format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
   (ebib--format-comments db)
+  (ebib--format-master db)
   (when (ebib-db-get-preamble db)
     (insert (format "@Preamble{%s}\n\n" (ebib-db-get-preamble db))))
   (ebib--format-strings db)
