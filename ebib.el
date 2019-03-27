@@ -1091,30 +1091,47 @@ unless IGNORE-MODTIME is non-nil."
     (insert-file-contents file)
     (unless ignore-modtime
       (ebib-db-set-modtime (ebib--get-file-modtime file) db))
-    (unless (ebib-db-get-dialect db)
-      (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
-    (let ((result (ebib--find-bibtex-entries db nil)))
-      ;; Log the results.
-      (ebib--log 'message "%d entries, %d @Strings and %s @Preamble found in file."
-                 (car result)
-                 (cadr result)
-                 (if (nth 2 result)
-                     "a"
-                   "no"))
-      (when ebib--log-error
-        (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors")))))))
+    (if (ebib--find-master db)
+        (let ((result (ebib--find-bibtex-entries db nil)))
+          (ebib--log 'message "Loaded %d entries into slave database." (car result)))
+      ;; Opening a non-slave database.
+      (unless (ebib-db-get-dialect db)
+        (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
+      (let ((result (ebib--find-bibtex-entries db nil)))
+        (ebib--log 'message "%d entries, %d @Strings and %s @Preamble found in file."
+                   (car result)
+                   (cadr result)
+                   (if (nth 2 result) "a" "no"))))
+    (when ebib--log-error
+      (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors"))))))
+
+(defun ebib--find-master (db)
+  "Find the master file declaration in the current buffer.
+If a master file is found, make sure it is loaded and set it as
+DB's master.  If no master file is found, return nil.  If a
+master file is found but it cannot be opened, log a error."
+  (save-excursion
+    (goto-char (point-min))
+    (save-match-data
+      (if (re-search-forward "@Comment{\n[[:space:]]*ebib-master-file: \\(.*\\)\n}" nil t)
+          (let* ((master-file (match-string 1))
+                 (master (ebib--get-or-open-db master-file)))
+            (if master
+                (ebib-db-set-master master db)
+              (ebib--log 'error "Could not find master database %s" master-file)
+              nil)))))) ; Return nil because no database was found.
 
 (defun ebib--find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
 first element is the number of entries found, the second the
-number of @String definitions, and the third is T or nil,
+number of @String definitions, and the third is t or nil,
 indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry.  Note that a timestamp is only added if `ebib-use-timestamp'
-is set to T."
+is set to t."
   (let ((n-entries 0)
         (n-strings 0)
         (preamble nil)
@@ -1154,35 +1171,43 @@ identifier, an error is logged and t is returned."
 
 (defun ebib--read-comment (db)
   "Read an @Comment entry and store it in DB.
-If the @Comment is a local variable list, store it as such in
-DB."
+If the @Comment is a local variable list, store it as such in DB.
+If the @Comment defines a master database, do not store the
+comment."
   (let ((comment (parsebib-read-comment)))
     (when comment
-      (let ((lvars (ebib--local-vars-to-list comment)))
-        (if lvars
-            (ebib-db-set-local-vars lvars db)
-          (ebib-db-set-comment comment db))))))
+      (or
+       ;; Local variables.
+       (let ((lvars (ebib--local-vars-to-list comment)))
+         (if lvars
+             (ebib-db-set-local-vars lvars db)))
+       ;; Master file: do nothing (the master file was dealt with in `ebib--load-entries'.
+       (string-match-p "^[[:space:]]*ebib-master-file: \\(.*\\)$" comment)
+       ;; Otherwise, store the comment.
+       (ebib-db-set-comment comment db)))))
 
 (defun ebib--read-string (db)
   "Read an @String definition and store it in DB.
 Return value is the string if one was read, nil otherwise."
-  (let* ((def (parsebib-read-string))
-         (abbr (car def))
-         (string (cdr def)))
-    (if def
-        (if (ebib-set-string abbr string db)
-            string
-          (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
-                                      (line-number-at-pos) abbr)))
-      (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos)))))
+  (unless (ebib-db-slave-p db) ; @Strings are not stored in slave files.
+    (let* ((def (parsebib-read-string))
+           (abbr (car def))
+           (string (cdr def)))
+      (if def
+          (if (ebib-set-string abbr string db)
+              string
+            (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
+                                        (line-number-at-pos) abbr)))
+        (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
 
 (defun ebib--read-preamble (db)
   "Read a @Preamble definition and store it in DB.
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
-  (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
-    (if preamble
-        (ebib-db-set-preamble preamble db 'append))))
+  (unless (ebib-db-slave-p db) ; @Preamble is not stored in slave files.
+    (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
+      (if preamble
+          (ebib-db-set-preamble preamble db 'append)))))
 
 (defun ebib--read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
@@ -1194,13 +1219,17 @@ also depends on `ebib-use-timestamp'.)"
          (entry (parsebib-read-entry entry-type)))
     (if entry
         (let ((entry-key (cdr (assoc-string "=key=" entry))))
-          (when (string= entry-key "")
-            (setq entry-key (ebib--generate-tempkey db))
-            (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-          (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
-          (unless entry-key
-            (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
-          entry-key) ; Return the entry key, or nil if no entry could be stored.
+          (if (ebib-db-slave-p db)
+              (if (ebib-db-has-key entry-key (ebib-db-get-master db))
+                  (ebib-db-add-entries-to-slave entry-key db)
+                (ebib--log 'error "Entry key %s not found in master database" entry-key))
+            (when (string= entry-key "")
+              (setq entry-key (ebib--generate-tempkey db))
+              (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
+            (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
+            (unless entry-key
+              (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
+            entry-key)) ; Return the entry key, or nil if no entry could be stored.
       (ebib--log 'warning "Line %d: Could not read a valid entry." (line-number-at-pos beg))
       nil))) ; Make sure to return nil upon failure.
 
