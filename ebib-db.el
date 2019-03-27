@@ -272,7 +272,7 @@ is suffixed, then `ab' etc."
 (defun ebib-db-list-keys (db)
   "Return a list of keys in DB."
   (if (ebib-db-val 'master db)
-      (ebib-db-val 'keys db)
+      (copy-sequence (ebib-db-val 'keys db)) ; Use `copy-tree' because `ebib--sort-keys-list' is destructive.
     (hash-table-keys (ebib-db-val 'entries db))))
 
 (defun ebib-db-has-key (key db)
