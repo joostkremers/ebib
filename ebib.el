@@ -1004,9 +1004,9 @@ This function can be used to open a BibTeX file in the
 background.  Use `ebib-open-bibtex-file' to open a BibTeX file
 interactively."
   (or (ebib--get-db-from-filename file) ; FILE is already open in Ebib.
-      (let ((new-db (ebib--create-new-database)))
+      (let ((new-db (ebib--create-new-database))
+            (ebib--log-error nil)) ; We haven't found any errors yet.
         (ebib-db-set-filename file new-db)
-        (setq ebib--log-error nil)         ; We haven't found any errors.
         (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
         (if (file-exists-p file)
             (progn
