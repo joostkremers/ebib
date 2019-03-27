@@ -803,7 +803,7 @@ keywords before Emacs is killed."
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "l" #'ebib-show-log)
     (define-key map "m" #'ebib-mark-entry) ; prefix
-    (define-key map "M" #'ebib-mark-all-entries)
+    (define-key map "M" 'ebib-master-map)
     (define-key map "n" #'ebib-next-entry)
     (define-key map "N" #'ebib-open-note)
     (define-key map [(control n)] #'ebib-next-entry)
@@ -1602,19 +1602,23 @@ This function updates both the database and the buffer."
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
       (ebib--set-modified t))))
 
-(defun ebib-mark-entry ()
-  "Mark or unmark the current entry."
-  (interactive)
-  (ebib--execute-when
-    ((entries)
-     (with-current-ebib-buffer 'index
-       (let ((inhibit-read-only t)
-             (cur-entry (ebib--get-key-at-point)))
-         (ebib-db-toggle-mark cur-entry ebib--cur-db)
-         (ebib--display-mark (ebib-db-marked-p cur-entry ebib--cur-db)))
-       (ebib-next-entry)))
-    ((default)
-     (beep))))
+(defun ebib-mark-entry (arg)
+  "Mark or unmark the current entry.
+With prefix argument ARG, mark all entries if none are marked, or
+unmark all marked entries."
+  (interactive "P")
+  (if arg
+      (ebib-mark-all-entries)
+    (ebib--execute-when
+      ((entries)
+       (with-current-ebib-buffer 'index
+         (let ((inhibit-read-only t)
+               (cur-entry (ebib--get-key-at-point)))
+           (ebib-db-toggle-mark cur-entry ebib--cur-db)
+           (ebib--display-mark (ebib-db-marked-p cur-entry ebib--cur-db)))
+         (ebib-next-entry)))
+      ((default)
+       (beep)))))
 
 (defun ebib--display-mark (mark)
   "Highlight/unhighlight the entry at point.
@@ -1806,9 +1810,11 @@ their contents into a single field."
   "Delete the current entry from the database.
 If there are marked entries, ask the user if they want to delete
 those instead.  If the answer is negative, delete the current
-entry."
+entry.  In a slave database, execute
+`ebib-master-delete-entry' instead."
   (interactive)
   (ebib--execute-when
+    ((slave-db) (ebib-master-delete-entry))
     ((entries)
      (let ((mark (point-marker))
            (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
@@ -1851,7 +1857,8 @@ The entry is copied to the kill ring."
 
 (defun ebib-kill-entry ()
   "Kill the current entry.
-The entry is put in the kill ring."
+The entry is put in the kill ring.  In a slave database, the
+entry is not deleted from the master database."
   (interactive)
   (ebib--execute-when
     ((entries)
@@ -1862,7 +1869,9 @@ The entry is put in the kill ring."
          (kill-new (buffer-substring-no-properties (point-min) (point-max))))
        (let ((inhibit-read-only t))
          (delete-region (point-at-bol) (1+ (point-at-eol))))
-       (ebib-db-remove-entry key ebib--cur-db)
+       (if (ebib-db-slave-p ebib--cur-db)
+           (ebib-db-remove-entry-from-slave key ebib--cur-db)
+         (ebib-db-remove-entry key ebib--cur-db))
        (goto-char mark)
        (if (eobp)
            (forward-line -1))
@@ -2639,6 +2648,94 @@ uses standard Emacs completion."
   (interactive)
   (ebib-lower)
   (info "(ebib)"))
+
+;;; Master & slave databases
+
+(eval-and-compile
+  (define-prefix-command 'ebib-master-map)
+  (suppress-keymap 'ebib-master-map 'no-digits)
+  (define-key ebib-master-map "s" #'ebib-master-create-slave)
+  (define-key ebib-master-map "a" #'ebib-master-add-entry)
+  (define-key ebib-master-map "d" #'ebib-master-delete-entry))
+
+(defun ebib-master-create-slave ()
+  "Create a slave database based on the current database."
+  (interactive)
+  (ebib--execute-when
+    ((slave-db)
+     (error "Cannot create a slave database from another slave database"))
+    ((real-db)
+     (let ((file (read-file-name "Create slave database: " (car ebib-bib-search-dirs)))
+           (slave (ebib--create-new-database ebib--cur-db)))
+       (ebib-db-set-filename (expand-file-name file) slave)
+       (setq ebib--cur-db slave)
+       (ebib--update-buffers)))
+    ((default) (beep))))
+
+(defun ebib-master-add-entry ()
+  "Add an entry from the master database to a slave database.
+When called from within a slave database, the keys of the
+entries of the master database are offered for completion.  When
+called in a database that is not a slave, this function first
+checks if the database has any slave, asking the user which
+one to use if there are more than one, and then adds the current
+entry or the marked entries to the slave database."
+  (interactive)
+  (ebib--execute-when
+    ((slave-db)
+     (let* ((collection (seq-difference (ebib-db-list-keys (ebib-db-get-master ebib--cur-db)) (ebib-db-list-keys ebib--cur-db)))
+            (key (completing-read "Key to add to the current slave database: " collection nil t)))
+       (ebib-db-add-entries-to-slave key ebib--cur-db)
+       (ebib-db-set-current-entry-key key ebib--cur-db)
+       (ebib--insert-entry-in-index-sorted key t)
+       (ebib--set-modified t ebib--cur-db)
+       (ebib--update-entry-buffer)))
+    ((real-db)
+     (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
+                              (y-or-n-p "Add marked entries to slave database? ")
+                              (ebib-db-list-marked-entries ebib--cur-db))
+                         (ebib--get-key-at-point)))
+            (slave (seq-filter (lambda (db)
+                                 (eq ebib--cur-db (ebib-db-get-master db)))
+                               ebib--databases))
+            (target (cond
+                     ((null slave) (error "No slave databases associated with current database"))
+                     ((= (length slave) 1) (car slave))
+                     (t (ebib-read-database (format "Add %s to slave database: " (if (stringp entries) "entry" "entries")) slave)))))
+       (when target
+         (ebib-db-add-entries-to-slave entries target)
+         (ebib-db-set-modified t target)
+         (ebib-db-kill-buffer target)
+         (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
+
+(defun ebib-master-delete-entry ()
+  "Delete the current entry or marked entries from a slave database."
+  (interactive)
+  (ebib--execute-when
+    ((slave-db entries)
+     (let ((mark (point-marker))
+           (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
+       (if (and marked-entries
+                (y-or-n-p "Remove all marked entries from slave database? "))
+           (progn (dolist (key marked-entries)
+                    (ebib--goto-entry-in-index key)
+                    (let ((inhibit-read-only t))
+                      (delete-region (point-at-bol) (1+ (point-at-eol))))
+                    (ebib-db-remove-entry-from-slave key ebib--cur-db))
+                  (ebib-db-unmark-entry 'all ebib--cur-db) ; This works even though we already removed the entries from the database.
+                  (message "Marked entries removed."))
+         (let ((key (ebib--get-key-at-point)))
+           (when (y-or-n-p (format "Remove %s from depedent database? " key))
+             (let ((inhibit-read-only t))
+               (delete-region (point-at-bol) (1+ (point-at-eol))))
+             (ebib-db-remove-entry-from-slave key ebib--cur-db)
+             (message "Entry `%s' removed." key))))
+       (ebib--set-modified t)
+       (goto-char mark)
+       (if (eobp)
+           (forward-line -1))
+       (ebib--update-entry-buffer)))
+    ((default) (beep))))
 
 ;;; Interactive keyword functions
 
