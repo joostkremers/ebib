@@ -210,12 +210,33 @@ instead.  Use `ebib-db-add-entry-to-slave' instead."
 	(remhash key (ebib-db-val 'entries db)))
       key)))
 
+(defun ebib-db-add-entries-to-slave (entries db)
+  "Add ENTRIES to slave database DB.
+ENTRIES is either an entry key (a string) or a list of entry
+keys.  Entries that are already in DB are not added again.  This
+function does not check if DB is really a slave database, nor
+whether the entries to be added actually exist in DB's master
+database."
+  (if (stringp entries)
+      (unless (member entries (ebib-db-val 'keys db))
+        (push entries (ebib-db-val 'keys db)))
+    (setf (ebib-db-val 'keys db) (delete-dups (append entries (ebib-db-val 'keys db))))))
+
 (defun ebib-db-remove-entry (key db)
   "Remove entry KEY from DB.
 Note: do not use this function to remove an entry from a slave
 database, since the entry will be removed from its master
 instead.  Use `ebib-db-remove-entry-from-slave'."
   (ebib-db-set-entry key nil db 'overwrite))
+
+(defun ebib-db-remove-entry-from-slave (entries db)
+  "Remove ENTRIES from slave database DB.
+ENTRIES is either an entry key (a string) or a list of entry
+keys.  They are removed from DB unconditionally: no error is
+raised if the entries do not exist in DB."
+  (setf (ebib-db-val 'keys db) (if (stringp entries)
+                                   (delete entries (ebib-db-val 'keys db))
+                                 (seq-difference (ebib-db-val 'keys db) entries))))
 
 (defun ebib-db-get-entry (key db &optional noerror)
   "Return entry KEY in database DB as an alist.
