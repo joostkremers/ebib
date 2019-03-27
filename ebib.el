@@ -555,7 +555,7 @@ loaded, switch to it.  If KEY is given, jump to it."
     (setq ebib--needs-update t))
   (when ebib--needs-update
     (setq ebib--needs-update nil)
-    (ebib--update-buffers)))
+    (ebib--update-buffers 'no-refresh)))
 
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
