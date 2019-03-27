@@ -3424,7 +3424,6 @@ value from a cross-referenced entry, it is not killed."
                (stringp (get-text-property 0 'ebib--xref contents)))
           (error "Cannot kill a cross-referenced field value"))
          ((stringp contents)
-          (stringp contents)
           (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
           (kill-new contents)
           (ebib--redisplay-current-field)
