@@ -186,7 +186,11 @@ triggers an error.
 In order to delete an entry, DATA must be nil and IF-EXISTS must be
 `overwrite'.
 
-If storing/updating/deleting the entry is successful, return its key."
+If storing/updating/deleting the entry is successful, return its key.
+
+Note that this function should not be used to add an entry to a
+slave database.  The entry will be added to the master database
+instead.  Use `ebib-db-add-entry-to-slave' instead."
   (let ((exists (gethash key (ebib-db-val 'entries db))))
     (when exists
       (cond
@@ -207,7 +211,10 @@ If storing/updating/deleting the entry is successful, return its key."
       key)))
 
 (defun ebib-db-remove-entry (key db)
-  "Remove entry KEY from DB."
+  "Remove entry KEY from DB.
+Note: do not use this function to remove an entry from a slave
+database, since the entry will be removed from its master
+instead.  Use `ebib-db-remove-entry-from-slave'."
   (ebib-db-set-entry key nil db 'overwrite))
 
 (defun ebib-db-get-entry (key db &optional noerror)
