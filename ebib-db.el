@@ -265,7 +265,9 @@ is suffixed, then `ab' etc."
 
 (defun ebib-db-has-entries (db)
   "Return non-nil if DB has entries."
-  (> (hash-table-count (ebib-db-val 'entries db)) 0))
+  (if (ebib-db-val 'master db)
+      (not (null (ebib-db-val 'keys db)))
+    (> (hash-table-count (ebib-db-val 'entries db)) 0)))
 
 (defun ebib-db-list-keys (db)
   "Return a list of keys in DB."
