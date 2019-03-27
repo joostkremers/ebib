@@ -478,6 +478,14 @@ return the full path.  If DB is nil, return nil."
 If DB is not a slave database, return nil."
   (ebib-db-val 'master db))
 
+(defun ebib-db-set-master (master db)
+  "Set MASTER as the master database of DB."
+  (setf (ebib-db-val 'master db) master))
+
+(defun ebib-db-slave-p (db)
+  "Return non-nil if DB is a slave database."
+  (ebib-db-val 'master db))
+
 (defun ebib-db-get-modtime (db)
   "Return the mod time stored for DB."
   (ebib-db-val 'modtime db))
