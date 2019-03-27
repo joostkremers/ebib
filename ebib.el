@@ -474,15 +474,21 @@ the field contents."
         (ebib--display-fields (ebib--get-key-at-point) ebib--cur-db match-str)
         (goto-char (point-min))))))
 
-(defun ebib--set-modified (mod &optional db)
+(defun ebib--set-modified (mod &optional db master)
   "Set the modified flag MOD on database DB.
 MOD must be either t or nil; DB defaults to the current database.
 If DB is the current database, the mode line is redisplayed, in
-order to correctly reflect the database's modified status.  The
-return value is MOD."
+order to correctly reflect the database's modified status.
+
+If MASTER is non-nil and DB is a slave database, also set the
+modified status of DB's master database to MOD.
+
+The return value is MOD."
   (unless db
     (setq db ebib--cur-db))
   (ebib-db-set-modified mod db)
+  (when (and master (ebib-db-slave-p db))
+    (ebib-db-set-modified mod (ebib-db-get-master db)))
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
       (force-mode-line-update)))
