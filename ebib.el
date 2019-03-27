@@ -495,9 +495,10 @@ Return the first modified database, or nil if none was modified."
               (ebib-db-modified-p db))
             ebib--databases))
 
-(defun ebib--create-new-database ()
-  "Create a new database instance and return it."
-  (let ((new-db (ebib-db-new-database)))
+(defun ebib--create-new-database (&optional master)
+  "Create a new database instance and return it.
+If MASTER is non-nil, create a slave database for MASTER."
+  (let ((new-db (ebib-db-new-database master)))
     (setq ebib--databases (append ebib--databases (list new-db)))
     new-db))
 
