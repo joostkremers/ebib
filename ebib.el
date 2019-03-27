@@ -1361,6 +1361,7 @@ is replaced with a number in ascending sequence."
   "Interactively add a new entry to the database."
   (interactive)
   (ebib--execute-when
+    ((slave-db) (ebib-master-add-entry))
     ((real-db)
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
