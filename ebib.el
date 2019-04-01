@@ -1077,11 +1077,12 @@ interactively."
   "Merge a BibTeX file into the current database."
   (interactive)
   (ebib--execute-when
+    ((slave-db filtered-db) (error "[Ebib] Cannot merge into a filtered or a slave database"))
     ((real-db)
-     (let ((file (expand-file-name (read-file-name "File to merge: "))))
+     (let ((file (expand-file-name (read-file-name "File to merge: ")))
+           (ebib--log-error nil)) ; We haven't found any errors yet.
        (if (not (file-readable-p file))
            (error "[Ebib] No such file: %s" file)
-         (setq ebib--log-error nil)      ; We haven't found any errors (yet).
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
          (ebib--load-entries file ebib--cur-db 'ignore-modtime)
          (ebib--update-buffers)
