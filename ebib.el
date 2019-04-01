@@ -1084,21 +1084,23 @@ interactively."
        (if (not (file-readable-p file))
            (error "[Ebib] No such file: %s" file)
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
-         (ebib--load-entries file ebib--cur-db 'ignore-modtime)
+         (ebib--load-entries file ebib--cur-db 'ignore-modtime 'not-as-slave)
          (ebib--update-buffers)
          (ebib--set-modified t))))
     ((default) (beep))))
 
-(defun ebib--load-entries (file db &optional ignore-modtime)
+(defun ebib--load-entries (file db &optional ignore-modtime not-as-slave)
   "Load BibTeX entries from FILE into DB.
 If FILE specifies a BibTeX dialect and no dialect is set for DB,
 also set DB's dialect.  FILE's modification time is stored in DB,
-unless IGNORE-MODTIME is non-nil."
+unless IGNORE-MODTIME is non-nil.  If NOT-AS-SLAVE is non-nil, load
+FILE as a normal database, even if it is a slave database."
   (with-temp-buffer
     (insert-file-contents file)
     (unless ignore-modtime
       (ebib-db-set-modtime (ebib--get-file-modtime file) db))
-    (if (ebib--find-master db)
+    (if (and (not not-as-slave)
+             (ebib--find-master db))
         (let ((result (ebib--find-bibtex-entries db nil)))
           (ebib--log 'message "Loaded %d entries into slave database." (car result)))
       ;; Opening a non-slave database.
