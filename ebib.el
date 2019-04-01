@@ -1118,7 +1118,7 @@ FILE as a normal database, even if it is a slave database."
   "Find the master file declaration in the current buffer.
 If a master file is found, make sure it is loaded and set it as
 DB's master.  If no master file is found, return nil.  If a
-master file is found but it cannot be opened, log a error."
+master file is found but it cannot be opened, log an error."
   (save-excursion
     (goto-char (point-min))
     (save-match-data
