@@ -873,6 +873,11 @@ character ?1-?9, which is converted to the corresponding number."
      ["Save All" ebib-save-all-databases (ebib--modified-p)]
      ["Save As..." ebib-write-database ebib--cur-db])
 
+    ("Master/Slave"
+     ["Create Slave" ebib-master-create-slave (and (ebib--cur-db) (not (ebib-db-slave-p ebib--cur-db) (not (ebib-db-filtered-p ebib--cur-db))))]
+     ["Add Entry To Slave" ebib-master-add-entry]
+     ["Remove Entry From Slave" ebib-master-delete-entry (and (ebib--cur-db) (ebib-db-slave-p ebib--cur-db))])
+
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
