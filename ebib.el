@@ -1363,7 +1363,7 @@ is replaced with a number in ascending sequence."
       (push (cons "=type=" ebib-default-entry-type) fields))
     ;; Insert.
     (ebib--store-entry entry-key fields db t ebib-uniquify-keys)
-    (ebib--set-modified t)
+    (ebib--set-modified t ebib--cur-db t)
     entry-key))
 
 (defun ebib-add-entry ()
@@ -1609,7 +1609,7 @@ This function updates both the database and the buffer."
         (ebib-db-toggle-mark actual-new-key ebib--cur-db))
       (let ((inhibit-read-only t)) (delete-region (point-at-bol) (1+ (point-at-eol))))
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
-      (ebib--set-modified t))))
+      (ebib--set-modified t ebib--cur-db t))))
 
 (defun ebib-mark-entry (arg)
   "Mark or unmark the current entry.
@@ -3185,7 +3185,7 @@ was called interactively."
         (message "Field `%s' already has a value in entry `%s'" field key)
       (ebib--update-entry-buffer)
       (re-search-forward (concat "^" field))
-      (ebib--set-modified t)
+      (ebib--set-modified t ebib--cur-db t)
       (ebib-edit-field))))
 
 (defun ebib--edit-entry-type ()
@@ -3194,7 +3194,7 @@ was called interactively."
       (progn
         (ebib-set-field-value "=type=" new-type (ebib--get-key-at-point) ebib--cur-db 'overwrite 'unbraced)
         (ebib--update-entry-buffer)
-        (ebib--set-modified t))))
+        (ebib--set-modified t ebib--cur-db t))))
 
 (defun ebib--edit-crossref (field)
   "Edit cross-referencing FIELD."
@@ -3203,7 +3203,7 @@ was called interactively."
         (progn
           (ebib-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
-          (ebib--set-modified t)))))
+          (ebib--set-modified t ebib--cur-db t)))))
 
 (defun ebib--edit-keywords-field ()
   "Edit the keywords field."
@@ -3227,7 +3227,7 @@ was called interactively."
                   (unless (member keyword collection)
                     (ebib--keywords-add-keyword keyword ebib--cur-db))
                   (ebib--redisplay-current-field)
-                  (ebib--set-modified t))
+                  (ebib--set-modified t ebib--cur-db t))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--edit-file-field ()
@@ -3255,7 +3255,7 @@ otherwise they are stored as absolute paths."
                                     file-name)))
                   (ebib-set-field-value ebib-file-field new-conts (ebib--get-key-at-point) ebib--cur-db 'overwrite)
                   (ebib--redisplay-current-field)
-                  (ebib--set-modified t))
+                  (ebib--set-modified t ebib--cur-db t))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--transform-file-name-for-storing (file)
@@ -3302,7 +3302,7 @@ If FILE is not in (a subdirectory of) one of the directories in
           (ebib-set-field-value cur-field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite unbraced?)
         (ebib-db-remove-field-value cur-field (ebib--get-key-at-point) ebib--cur-db))
       (ebib--redisplay-current-field)
-      (ebib--set-modified t))))
+      (ebib--set-modified t ebib--cur-db t))))
 
 ;; `ebib-edit-field' relegates the actual editing to a number of helper functions.
 ;; These functions should return non-nil if editing was successful and they
