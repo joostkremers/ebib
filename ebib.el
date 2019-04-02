@@ -474,11 +474,11 @@ the field contents."
         (ebib--display-fields (ebib--get-key-at-point) ebib--cur-db match-str)
         (goto-char (point-min))))))
 
-(defun ebib--set-modified (mod &optional db master)
+(defun ebib--set-modified (mod db &optional master)
   "Set the modified flag MOD on database DB.
-MOD must be either t or nil; DB defaults to the current database.
-If DB is the current database, the mode line is redisplayed, in
-order to correctly reflect the database's modified status.
+MOD must be either t or nil.  If DB is the current database, the
+mode line is redisplayed, in order to correctly reflect the
+database's modified status.
 
 If MASTER is non-nil and DB is a slave database, also set the
 modified status of DB's master database to MOD.
@@ -1043,7 +1043,7 @@ interactively."
                (y-or-n-p "Reload current database from file? "))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (ebib--reload-database ebib--cur-db)
-       (ebib--set-modified nil)
+       (ebib--set-modified nil ebib--cur-db)
        (ebib--update-buffers)
        (message "Database reloaded")))
     ((default)
@@ -1091,7 +1091,7 @@ interactively."
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
          (ebib--load-entries file ebib--cur-db 'ignore-modtime 'not-as-slave)
          (ebib--update-buffers)
-         (ebib--set-modified t))))
+         (ebib--set-modified t ebib--cur-db))))
     ((default) (beep))))
 
 (defun ebib--load-entries (file db &optional ignore-modtime not-as-slave)
@@ -1740,7 +1740,7 @@ unconditionally, even if the new file already exists."
              (rename-buffer (concat (format " %d:" (1+ (- (length ebib--databases)
                                                           (length (member ebib--cur-db ebib--databases)))))
                                     (file-name-nondirectory new-filename)))
-             (ebib--set-modified nil)))))
+             (ebib--set-modified nil ebib--cur-db)))))
     ((default)
      (beep))))
 
@@ -1847,7 +1847,7 @@ entry.  In a slave database, execute
                (delete-region (point-at-bol) (1+ (point-at-eol))))
              (ebib-db-remove-entry key ebib--cur-db)
              (message "Entry `%s' deleted." key))))
-       (ebib--set-modified t)
+       (ebib--set-modified t ebib--cur-db)
        (goto-char mark)
        (if (eobp)
            (forward-line -1))
@@ -1890,7 +1890,7 @@ entry is not deleted from the master database."
        (if (eobp)
            (forward-line -1))
        (message (format "Entry `%s' killed.  Use `y' to yank (or `C-y' outside Ebib)." key))
-       (ebib--set-modified t)
+       (ebib--set-modified t ebib--cur-db)
        (ebib--update-entry-buffer)))
     ((default)
      (beep))))
@@ -2747,7 +2747,7 @@ entry or the marked entries to the slave database."
                (delete-region (point-at-bol) (1+ (point-at-eol))))
              (ebib-db-remove-entry-from-slave key ebib--cur-db)
              (message "Entry `%s' removed." key))))
-       (ebib--set-modified t)
+       (ebib--set-modified t ebib--cur-db)
        (goto-char mark)
        (if (eobp)
            (forward-line -1))
@@ -2811,7 +2811,7 @@ the current entry."
                (add-keywords (ebib--get-key-at-point) (mapconcat #'identity keywords ebib-keywords-separator)))))
           ((default)
            (beep)))
-        (ebib--set-modified t)
+        (ebib--set-modified t ebib--cur-db)
         (ebib--update-entry-buffer)))))
 
 (defun ebib-keywords-save-from-entry ()
@@ -3445,7 +3445,7 @@ value from a cross-referenced entry, it is not killed."
           (kill-new contents)
           (ebib--redisplay-current-field)
           (ebib--redisplay-index-item field)
-          (ebib--set-modified t)
+          (ebib--set-modified t ebib--cur-db)
           (message "Field contents killed."))
          (t (error "Cannot kill an empty field")))))))
 
@@ -3473,7 +3473,7 @@ Prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
           (ebib-set-field-value field new-contents (ebib--get-key-at-point) ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
           (ebib--redisplay-index-item field)
-          (ebib--set-modified t))))))
+          (ebib--set-modified t ebib--cur-db))))))
 
 (defun ebib-delete-field-contents ()
   "Delete the contents of the current field.
@@ -3486,7 +3486,7 @@ The deleted text is not put in the kill ring."
         (ebib-db-remove-field-value field (ebib--get-key-at-point) ebib--cur-db)
         (ebib--redisplay-current-field)
         (ebib--redisplay-index-item field)
-        (ebib--set-modified t)
+        (ebib--set-modified t ebib--cur-db)
         (message "Field contents deleted.")))))
 
 (defun ebib-toggle-raw ()
@@ -3503,7 +3503,7 @@ The deleted text is not put in the kill ring."
           (when contents ; We must check to make sure the user entered some value.
             (ebib-set-field-value field contents (ebib--get-key-at-point) ebib--cur-db 'overwrite (not (ebib-unbraced-p contents)))
             (ebib--redisplay-current-field)
-            (ebib--set-modified t)))))))
+            (ebib--set-modified t ebib--cur-db)))))))
 
 (defun ebib-edit-multiline-field ()
   "Edit the current field in multiline-mode."
@@ -3527,7 +3527,7 @@ The deleted text is not put in the kill ring."
             (let ((string (completing-read "Abbreviation to insert: " strings nil t)))
               (when string
                 (ebib-set-field-value field string (ebib--get-key-at-point) ebib--cur-db 'overwrite 'unbraced)
-                (ebib--set-modified t))))
+                (ebib--set-modified t ebib--cur-db))))
           (ebib--redisplay-current-field)
           (ebib-next-field))))))
 
@@ -3703,7 +3703,7 @@ When the user enters an empty string, the value is not changed."
           (ebib-set-string string new-contents ebib--cur-db 'overwrite)
           (ebib--redisplay-current-string)
           (ebib-next-string)
-          (ebib--set-modified t))
+          (ebib--set-modified t ebib--cur-db))
       (error "[Ebib] @String definition cannot be empty"))))
 
 (defun ebib-copy-string-contents ()
@@ -3723,7 +3723,7 @@ When the user enters an empty string, the value is not changed."
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
-      (ebib--set-modified t)
+      (ebib--set-modified t ebib--cur-db)
       (message "@String definition deleted."))))
 
 (defun ebib-add-string ()
@@ -3742,7 +3742,7 @@ When the user enters an empty string, the value is not changed."
               (goto-char (point-min))
               (re-search-forward new-string nil 'noerror)
               (beginning-of-line)
-              (ebib--set-modified t))))))
+              (ebib--set-modified t ebib--cur-db))))))
 
 (defun ebib-export-string (prefix)
   "Export the current @String to another database.
@@ -3948,7 +3948,7 @@ The text being edited is stored before saving the database."
               (ebib-db-remove-field-value field key db)
             (ebib-set-field-value field text key db 'overwrite)))))
       (set-buffer-modified-p nil)))
-  (ebib--set-modified t))
+  (ebib--set-modified t ebib--cur-db))
 
 (defun ebib-multiline-help ()
   "Show the info node on Ebib's multiline edit buffer."
@@ -4106,7 +4106,7 @@ or on the region if it is active."
             (insert-buffer-substring buffer)
             (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
               (ebib--update-buffers)
-              (ebib--set-modified t)
+              (ebib--set-modified t ebib--cur-db)
               (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
                                (car result)
                                (cadr result)
