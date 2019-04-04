@@ -819,6 +819,7 @@ keywords before Emacs is killed."
     (define-key map "x" #'ebib-export-entries) ; prefix
     (define-key map "\C-xb" #'ebib-leave-ebib-windows)
     (define-key map "\C-xk" #'ebib-quit)
+    (define-key map "\C-x\C-s" #'ebib-save-current-database)
     (define-key map "X" #'ebib-export-preamble)
     (define-key map "y" #'ebib-yank-entry)
     (define-key map "z" #'ebib-leave-ebib-windows)
@@ -2880,6 +2881,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
+    (define-key map "\C-x\C-s" #'ebib-save-current-database)
     (define-key map [mouse-1] #'ebib-entry-open-at-point)
     map)
   "Keymap for the Ebib entry buffer.")
@@ -3434,6 +3436,7 @@ The deleted text is not put in the kill ring."
     (define-key map "X" 'ebib-export-all-strings)
     (define-key map "\C-xb" 'ebib-quit-strings-buffer)
     (define-key map "\C-xk" 'ebib-quit-strings-buffer)
+    (define-key map "\C-x\C-s" #'ebib-save-current-database)
     map)
   "Keymap for the ebib strings buffer.")
 
