@@ -865,6 +865,14 @@ Ebib (not Emacs)."
   :type '(choice (const :tag "Hide the cursor" t)
                  (const :tag "Show the cursor" nil)))
 
+(defcustom ebib-edit-author/editor-without-completion nil
+  "Do not use completion when editing the author or editor field.
+Completion is only used if the author or editor field is empty.
+Setting this option disables completion completely."
+  :group 'ebib
+  :type '(choice (const :tag "Use completion" nil)
+                 (const :tag "Do not use completion" t)))
+
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
 (defface ebib-highlight-face '((t (:inherit highlight)))
