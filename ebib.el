@@ -3300,7 +3300,9 @@ If FILE is not in (a subdirectory of) one of the directories in
                                                                              (regexp-quote " and ") t))
                                                              (apply #'seq-concatenate 'list (mapcar (lambda (db)
                                                                                                       (hash-table-values (ebib-db-val 'entries db)))
-                                                                                                    ebib--databases)))))))
+                                                                                                    (seq-filter (lambda (db)
+                                                                                                                  (not (ebib-db-slave-p db)))
+                                                                                                                ebib--databases))))))))
 
 (defun ebib--edit-author/editor-field (field)
   "Edit the author or editor field.
@@ -3335,7 +3337,9 @@ and editors in all databases."
                                 (ebib-unbrace (alist-get field entry nil nil #'equal)))
                               (apply #'seq-concatenate 'list (mapcar (lambda (db)
                                                                        (hash-table-values (ebib-db-val 'entries db)))
-                                                                     ebib--databases))))))
+                                                                     (seq-filter (lambda (db)
+                                                                                   (not (ebib-db-slave-p db)))
+                                                                                 ebib--databases)))))))
 
 (defun ebib--edit-normal-field ()
   "Edit a field that does not require special treatment."
