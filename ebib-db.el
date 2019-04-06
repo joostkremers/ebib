@@ -190,7 +190,7 @@ If storing/updating/deleting the entry is successful, return its key.
 
 Note that this function should not be used to add an entry to a
 slave database.  The entry will be added to the master database
-instead.  Use `ebib-db-add-entry-to-slave' instead."
+instead.  Use `ebib-db-add-entries-to-slave' instead."
   (let ((exists (gethash key (ebib-db-val 'entries db))))
     (when exists
       (cond
