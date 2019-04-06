@@ -4184,7 +4184,7 @@ or on the region if it is active."
           (with-temp-buffer
             (insert-buffer-substring buffer)
             (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
-              (ebib--update-buffers)
+              (ebib--update-index-buffer)
               (ebib--set-modified t ebib--cur-db)
               (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
                                (car result)
