@@ -2576,23 +2576,27 @@ in DATABASES."
 
 (defun ebib-insert-citation-ivy (databases)
   "Insert a citation at point using ivy.
-The user is prompted for a BibTeX key from DATABASES."
+The user is prompted for a BibTeX key from DATABASES.  Return the
+key inserted into the buffer."
   (let ((minibuffer-allow-text-properties t)
-        (ivy-sort-max-size (expt 256 6)))
+        (ivy-sort-max-size (expt 256 6))
+        key)
     (setq ivy-completion-beg (point))
     (setq ivy-completion-end (point))
     (let ((collection (ebib--create-collection-ivy databases)))
-      (if collection
-          (ivy-read "Select entry: " collection
-                    :action (lambda (item)
-                              (with-ivy-window
-                                (delete-region ivy-completion-beg ivy-completion-end)
-                                (setq ivy-completion-beg (point))
-                                (insert (ebib--create-citation (buffer-local-value 'major-mode (current-buffer)) (list (get-text-property 0 'ebib-key item)) (get-text-property 0 'ebib-db item)))
-                                (setq ivy-completion-end (point))))
-                    :history 'ebib--citation-history
-                    :sort t)
-        (error "[Ebib] No entries found in database(s) for current file")))))
+      (if (not collection)
+          (error "[Ebib] No entries found in database(s) for current file")
+        (ivy-read "Select entry: " collection
+                  :action (lambda (item)
+                            (with-ivy-window
+                              (delete-region ivy-completion-beg ivy-completion-end)
+                              (setq ivy-completion-beg (point))
+                              (insert (ebib--create-citation (buffer-local-value 'major-mode (current-buffer)) (list (get-text-property 0 'ebib-key item)) (get-text-property 0 'ebib-db item)))
+                              (setq key (get-text-property 0 'ebib-key item))
+                              (setq ivy-completion-end (point))))
+                  :history 'ebib--citation-history
+                  :sort t)
+        key)))) ; Return the entry key.
 
 (defun ebib--create-collection-default-method (databases)
   "Create a collection of BibTeX keys from DATABASES.
@@ -2612,13 +2616,16 @@ created from the current database."
 The user is prompted for a BibTeX key from DATABASES
 associated with the current buffer (see
 `ebib--get-local-bibfiles' for details), or from the current
-database if the current buffer has no databases."
+database if the current buffer has no databases.
+
+Return the key inserted into the buffer."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
                (citation-command (ebib--create-citation major-mode (list key) (get-text-property 0 'ebib-db key))))
           (when citation-command
-            (insert (format "%s" citation-command))))
+            (insert (format "%s" citation-command))
+            key)) ; Return the key.
       (error "No BibTeX entries found"))))
 
 (defun ebib--get-or-open-db (file)
@@ -2638,6 +2645,11 @@ the database(s) associated with the current buffer (see
 `ebib--get-local-bibfiles' for details), or from the current
 database if the current buffer has no associated databases.
 
+If the current buffer is associated with a slave database, the
+entries of its master database are offered as completion
+candidates and the entry that is selected is added to the slave
+database if not already there.
+
 This is a front-end for other citation insertion functions: if
 the `ivy' package is loaded, it calls `ebib-insert-citation-ivy',
 otherwise it calls `ebib-insert-citation-default-method', which
@@ -2648,10 +2660,19 @@ uses standard Emacs completion."
   (ebib--execute-when
     ((database) (let* ((database-files (ebib--get-local-bibfiles))
                        (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
-                                      (list ebib--cur-db))))
-                  (cond
-                   ((featurep 'ivy) (ebib-insert-citation-ivy databases))
-                   (t (ebib-insert-citation-default-method databases)))))
+                                      (list ebib--cur-db)))
+                       slave-db)
+                  (when (and (= (length databases) 1)
+                             (ebib-db-slave-p (car databases)))
+                    (setq slave-db (car databases))
+                    (setq databases (list (ebib-db-get-master (car databases)))))
+                  (let ((entry-key (cond
+                                    ;; ((featurep 'ivy) (ebib-insert-citation-ivy databases))
+                                    (t (ebib-insert-citation-default-method databases)))))
+                    (when (and entry-key slave-db)
+                      (ebib-db-add-entries-to-slave entry-key slave-db)
+                      (ebib--update-index-buffer)
+                      (ebib--set-modified t slave-db)))))
     ((default) (error "[Ebib] No database opened"))))
 
 (defun ebib-index-help ()
