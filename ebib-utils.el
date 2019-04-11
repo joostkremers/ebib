@@ -909,6 +909,7 @@ Currently, the following problems are marked:
 (defvar ebib--initialized nil "T if Ebib has been initialized.")
 
 (defvar ebib--buffer-alist nil "Alist of Ebib buffers.")
+(defvar ebib--empty-index-buffer-name " Ebib (no file)" "Name of the empty Ebib index buffer.")
 
 ;; General bookkeeping.
 (defvar ebib--field-history nil "Minibuffer field name history.")

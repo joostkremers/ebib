@@ -460,7 +460,7 @@ fill it."
                             (concat (format " %d:" (1+ (- (length ebib--databases)
                                                           (length (member ebib--cur-db ebib--databases)))))
                                     (ebib-db-get-filename ebib--cur-db 'short)))
-                       " Ebib (no file)")
+                       ebib--empty-index-buffer-name)
                    'unique)))
 
 (defun ebib--update-entry-buffer (&optional match-str)
@@ -681,7 +681,7 @@ the new buffer."
   (let ((buffer (if db
                     (or (ebib-db-get-buffer db)
                         (get-buffer-create (ebib-db-get-filename db 'short)))
-                  (get-buffer-create " Ebib (no file)"))))
+                  (get-buffer-create ebib--empty-index-buffer-name))))
     (with-current-buffer buffer
       (ebib-index-mode)
       (if ebib-index-mode-line
