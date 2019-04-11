@@ -716,6 +716,7 @@ ask for confirmation."
             (let ((buf (ebib-db-get-buffer db)))
               (when buf (kill-buffer buf))))
           ebib--databases)
+    (kill-buffer (get-buffer ebib--empty-index-buffer-name))
     (setq ebib--databases nil
           ebib--cur-db nil
           ebib--buffer-alist nil
