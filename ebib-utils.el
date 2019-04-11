@@ -212,7 +212,7 @@ The rest of the frame is used for the entry buffer, unless
                                   ebib--mode-line-modified
                                   mode-line-buffer-identification
                                   (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
-                                  (:eval (if (and ebib--cur-db (ebib--get-key-at-point)) "     Entry %l" "     No Entries"))
+                                  (:eval (if (and ebib--cur-db (ebib--get-key-at-point)) (concat "     Entry %l    »" (ebib--get-key-at-point) "«") "     No Entries"))
                                   (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
