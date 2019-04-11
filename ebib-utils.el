@@ -1256,10 +1256,11 @@ empty string."
 The file is taken from `ebib-file-field' in the entry designated
 by KEY in the current database.  If that field contains more than
 one file name, the user is asked to select one.  If
-`ebib-file-field' is empty, create a file name based on KEY,
-using the function `ebib--create-file-name-from-key'."
+`ebib-file-field' is empty, return the empty string."
   (let ((files (ebib-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)))
-    (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))))
+    (if files
+        (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))
+      "")))
 
 (defun ebib-create-org-doi-link (key db)
   "Create an org link to the DOI in entry KEY in DB.
