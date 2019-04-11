@@ -447,7 +447,7 @@ fill it."
                     ;; Make sure the current entry is among the visible entries.
                     (unless (member cur-entry cur-keys-list)
                       (setq cur-entry (car cur-keys-list)))))))))
-        (if cur-entry
+        (if (and window cur-entry)
             (ebib--goto-entry-in-index cur-entry)
           (goto-char (point-min)))
         (hl-line-highlight))
