@@ -2832,7 +2832,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
          (error "[Ebib] Reading list file is not writable"))
        (if (ebib--reading-list-remove-item key)
            (message "Reading list item for `%s' marked as done." key)
-         (error "[Ebib] Could not create reading list item for `%s'" key))))
+         (error "[Ebib] Could not locate reading list item for `%s'" key))))
     ((default)
      (beep))))
 
