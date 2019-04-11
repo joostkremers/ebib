@@ -200,11 +200,13 @@ return nil."
 Return KEY if the item was removed.  If there is no item for KEY,
 do nothing and return nil."
   (with-current-buffer (ebib--reading-list-buffer)
-    (when (ebib--reading-list-locate-item key)
-      (funcall ebib-reading-list-remove-item-function)
-      (run-hooks 'ebib-reading-list-remove-item-hook)
-      (save-buffer)
-      key)))
+    (let ((location (ebib--reading-list-locate-item key)))
+      (when location
+        (goto-char location)
+        (funcall ebib-reading-list-remove-item-function)
+        (run-hooks 'ebib-reading-list-remove-item-hook)
+        (save-buffer)
+        key))))
 
 (defun ebib--reading-list-fill-template (key db)
   "Create the text for a reading list item for KEY in DB."
