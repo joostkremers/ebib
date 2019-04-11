@@ -2667,7 +2667,7 @@ uses standard Emacs completion."
                     (setq slave-db (car databases))
                     (setq databases (list (ebib-db-get-master (car databases)))))
                   (let ((entry-key (cond
-                                    ;; ((featurep 'ivy) (ebib-insert-citation-ivy databases))
+                                    ((featurep 'ivy) (ebib-insert-citation-ivy databases))
                                     (t (ebib-insert-citation-default-method databases)))))
                     (when (and entry-key slave-db)
                       (ebib-db-add-entries-to-slave entry-key slave-db)
