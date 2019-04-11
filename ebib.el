@@ -2827,9 +2827,9 @@ hook `ebib-reading-list-remove-item-hook' is run."
      (or ebib-reading-list-file
          ebib-reading-list-new-item-hook
          (error "[Ebib] No reading list defined"))
+     (unless (file-writable-p ebib-reading-list-file)
+       (error "[Ebib] Reading list file is not writable"))
      (let ((key (ebib--get-key-at-point)))
-       (unless (file-writable-p ebib-reading-list-file)
-         (error "[Ebib] Reading list file is not writable"))
        (if (ebib--reading-list-remove-item key)
            (message "Reading list item for `%s' marked as done." key)
          (error "[Ebib] Could not locate reading list item for `%s'" key))))
