@@ -1024,13 +1024,14 @@ and the return value of its last form is returned."
       'ebib--cur-db)
      ((eq env 'real-db)
       '(and ebib--cur-db
-            (not (ebib-db-get-filter ebib--cur-db))))
+            (not (ebib-db-get-filter ebib--cur-db))
+            (not (ebib-db-slave-p ebib--cur-db))))
      ((eq env 'filtered-db)
       '(and ebib--cur-db
             (ebib-db-get-filter ebib--cur-db)))
      ((eq env 'slave-db)
       '(and ebib--cur-db
-            (ebib-db-get-master ebib--cur-db)))
+            (ebib-db-slave-p ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
      (t t))))
@@ -1047,9 +1048,9 @@ executed.  Valid symbols are:
 `marked-entries': execute when there are marked entries in the database;
 `database': execute if there is a database;
 `no-database': execute if there is no database;
-`real-db': execute when there is a database and it is not filtered;
-`filtered-db': execute when there is a database and it is filtered;
-`slave-db': execute when there is a slave database;
+`real-db': execute if there is a database that is not filtered or a slave;
+`filtered-db': execute if there is a filtered database;
+`slave-db': execute if there is a slave database;
 `default': execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
