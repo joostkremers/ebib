@@ -2705,8 +2705,6 @@ uses standard Emacs completion."
   "Create a slave database based on the current database."
   (interactive)
   (ebib--execute-when
-    (slave-db
-     (error "Cannot create a slave database from another slave database"))
     (real-db
      (let ((file (read-file-name "Create slave database: " (car ebib-bib-search-dirs)))
            (slave (ebib--create-new-database ebib--cur-db)))
