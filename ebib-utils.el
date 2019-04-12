@@ -1034,39 +1034,46 @@ and the return value of its last form is returned."
             (ebib-db-slave-p ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
-     (t t))))
+     ((eq env 'default) t)
+     (t (error "`ebib--execute-when': malformed condition %s" env)))))
 
 (defmacro ebib--execute-when (&rest forms)
   "Macro to facilitate writing Ebib functions.
 This functions essentially like a `cond' clause: the basic format
 is (ebib--execute-when FORMS ...), where each FORM is built up
-as (ENVIRONMENTS BODY).  ENVIRONMENTS is a list of symbols (not
-quoted) that specify under which conditions BODY is to be
-executed.  Valid symbols are:
+as (CONDITION BODY).  CONDITION is a symbol (not quoted) that
+specifies under which condition BODY is to be executed.  Valid
+symbols are:
 
-`entries': execute when there are entries in the database;
-`marked-entries': execute when there are marked entries in the database;
+`entries': execute if there are entries in the database;
+`marked-entries': execute  there are marked entries in the database;
 `database': execute if there is a database;
 `no-database': execute if there is no database;
-`real-db': execute if there is a database that is not filtered or a slave;
+`real-db': execute if there is a database that is not filtered nor a slave;
 `filtered-db': execute if there is a filtered database;
 `slave-db': execute if there is a slave database;
 `default': execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
-first one that matches.  If ENVIRONMENT contains more than one
-condition, BODY is executed if they all match (i.e., the
-conditions are AND'ed.)"
+first one that matches.
+
+CONDITION can also be a list starting with `and' or `or' followed
+by two or more condition symbols."
   (declare (indent defun)
            (debug (&rest (sexp form))))
   `(cond
     ,@(mapcar (lambda (form)
-                (cons (if (= 1 (length (car form)))
-                          (ebib--execute-helper (caar form))
-                        `(and ,@(mapcar (lambda (env)
-                                          (ebib--execute-helper env))
-                                        (car form))))
-                      (cdr form)))
+                (let ((condition (car form)))
+                  (cons (cond
+                         ((symbolp condition)
+                          (ebib--execute-helper condition))
+                         ((listp condition)
+                          (unless (memq (car condition) '(and or))
+                            (error "`ebib--execute-when': malformed condition"))
+                          (cons (car condition) (mapcar (lambda (env)
+                                                          (ebib--execute-helper env))
+                                                        (cdr condition)))))
+                        (cdr form))))
               forms)))
 
 (defun ebib--mode-line-modified-p (&optional db)
