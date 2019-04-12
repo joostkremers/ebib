@@ -1753,7 +1753,7 @@ modified.  If called with \\[universal-argument] \\[universal-argument], save th
 file was modified."
   (interactive "P")
   (ebib--execute-when
-    ((real-db)
+    ((real-db slave-db)
      (if (and (not force)
               (not (ebib-db-modified-p ebib--cur-db)))
          (message "No changes need to be saved.")
