@@ -809,7 +809,7 @@ keywords before Emacs is killed."
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "l" #'ebib-show-log)
     (define-key map "m" #'ebib-mark-entry) ; prefix
-    (define-key map "M" 'ebib-master-map)
+    (define-key map "M" 'ebib-slave-map)
     (define-key map "n" #'ebib-next-entry)
     (define-key map "N" #'ebib-open-note)
     (define-key map [(control n)] #'ebib-next-entry)
@@ -874,9 +874,9 @@ character ?1-?9, which is converted to the corresponding number."
      ["Save As..." ebib-write-database ebib--cur-db])
 
     ("Master/Slave"
-     ["Create Slave" ebib-master-create-slave (and (ebib--cur-db) (not (ebib-db-slave-p ebib--cur-db) (not (ebib-db-filtered-p ebib--cur-db))))]
-     ["Add Entry To Slave" ebib-master-add-entry]
-     ["Remove Entry From Slave" ebib-master-delete-entry (and (ebib--cur-db) (ebib-db-slave-p ebib--cur-db))])
+     ["Create Slave" ebib-slave-create-slave (and (ebib--cur-db) (not (ebib-db-slave-p ebib--cur-db) (not (ebib-db-filtered-p ebib--cur-db))))]
+     ["Add Entry To Slave" ebib-slave-add-entry]
+     ["Remove Entry From Slave" ebib-slave-delete-entry (and (ebib--cur-db) (ebib-db-slave-p ebib--cur-db))])
 
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
@@ -1375,7 +1375,7 @@ is replaced with a number in ascending sequence."
   "Interactively add a new entry to the database."
   (interactive)
   (ebib--execute-when
-    (slave-db (ebib-master-add-entry))
+    (slave-db (ebib-slave-add-entry))
     (real-db
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
@@ -1824,11 +1824,11 @@ their contents into a single field."
   "Delete the current entry from the database.
 If there are marked entries, ask the user if they want to delete
 those instead.  If the answer is negative, delete the current
-entry.  In a slave database, execute
-`ebib-master-delete-entry' instead."
+entry.  In a slave database, execute `ebib-slave-delete-entry'
+instead."
   (interactive)
   (ebib--execute-when
-    (slave-db (ebib-master-delete-entry))
+    (slave-db (ebib-slave-delete-entry))
     (entries
      (let ((mark (point-marker))
            (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
@@ -2695,13 +2695,13 @@ uses standard Emacs completion."
 ;;; Master & slave databases
 
 (eval-and-compile
-  (define-prefix-command 'ebib-master-map)
-  (suppress-keymap 'ebib-master-map 'no-digits)
-  (define-key ebib-master-map "s" #'ebib-master-create-slave)
-  (define-key ebib-master-map "a" #'ebib-master-add-entry)
-  (define-key ebib-master-map "d" #'ebib-master-delete-entry))
+  (define-prefix-command 'ebib-slave-map)
+  (suppress-keymap 'ebib-slave-map 'no-digits)
+  (define-key ebib-slave-map "s" #'ebib-slave-create-slave)
+  (define-key ebib-slave-map "a" #'ebib-slave-add-entry)
+  (define-key ebib-slave-map "d" #'ebib-slave-delete-entry))
 
-(defun ebib-master-create-slave ()
+(defun ebib-slave-create-slave ()
   "Create a slave database based on the current database."
   (interactive)
   (ebib--execute-when
@@ -2715,7 +2715,7 @@ uses standard Emacs completion."
        (ebib--update-buffers)))
     (default (beep))))
 
-(defun ebib-master-add-entry ()
+(defun ebib-slave-add-entry ()
   "Add an entry from the master database to a slave database.
 When called from within a slave database, the keys of the
 entries of the master database are offered for completion.  When
@@ -2751,7 +2751,7 @@ entry or the marked entries to the slave database."
          (ebib-db-kill-buffer target)
          (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
 
-(defun ebib-master-delete-entry ()
+(defun ebib-slave-delete-entry ()
   "Delete the current entry or marked entries from a slave database."
   (interactive)
   (ebib--execute-when
