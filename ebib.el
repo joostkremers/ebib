@@ -4029,7 +4029,7 @@ The text being edited is stored before saving the database."
               (ebib-db-remove-field-value field key db)
             (ebib-set-field-value field text key db 'overwrite)))))
       (set-buffer-modified-p nil)))
-  (ebib--set-modified t ebib--cur-db))
+  (ebib--set-modified t ebib--cur-db t))
 
 (defun ebib-multiline-help ()
   "Show the info node on Ebib's multiline edit buffer."
