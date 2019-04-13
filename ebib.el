@@ -693,9 +693,7 @@ the new buffer."
                         (get-buffer-create (ebib-db-get-filename db 'short)))
                   (get-buffer-create " Ebib (no file)"))))
     (with-current-buffer buffer
-      (ebib-index-mode)
-      (if ebib-index-mode-line
-          (setq mode-line-format ebib-index-mode-line)))
+      (ebib-index-mode))
     (when db
       (ebib-db-set-buffer buffer db))
     buffer))
@@ -855,6 +853,8 @@ character ?1-?9, which is converted to the corresponding number."
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
+  (if ebib-index-mode-line
+      (setq mode-line-format ebib-index-mode-line))
   (setq truncate-lines t)
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
