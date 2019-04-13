@@ -875,8 +875,9 @@ character ?1-?9, which is converted to the corresponding number."
 
     ("Master/Slave"
      ["Create Slave" ebib-slave-create-slave (and (ebib--cur-db) (not (ebib-db-slave-p ebib--cur-db) (not (ebib-db-filtered-p ebib--cur-db))))]
-     ["Add Entry To Slave" ebib-slave-add-entry]
-     ["Remove Entry From Slave" ebib-slave-delete-entry (and (ebib--cur-db) (ebib-db-slave-p ebib--cur-db))])
+     ["Add Entry To Slave" ebib-slave-add-entry (and ebib--cur-db (ebib-db-has-entries ebib--cur-db))]
+     ["Remove Entry From Slave" ebib-slave-delete-entry (and ebib--cur-db (ebib-db-slave-p ebib--cur-db) (ebib-db-has-entries ebib--cur-db))]
+     ["Switch To Master" ebib-slave-switch-to-master (and ebib--cur-db (ebib-db-slave-p ebib--cur-db))])
 
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
