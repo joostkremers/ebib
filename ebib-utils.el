@@ -215,7 +215,7 @@ The rest of the frame is used for the entry buffer, unless
                                              (format " [%s]" (ebib-db-get-filename (ebib-db-get-master ebib--cur-db) t))))
                                   (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
                                   (:eval (if (and ebib--cur-db (ebib--get-key-at-point))
-                                             (concat "     Entry %l    »" (ebib--get-key-at-point) "«")
+                                             "     Entry %l"
                                            "     No Entries"))
                                   (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db))
                                              (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db)))
@@ -223,11 +223,20 @@ The rest of the frame is used for the entry buffer, unless
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
 information.  You can customize this information if you wish, or
-disable the Ebib-specific mode line altogether.  Note that the
-mode line of the entry buffer is not changed."
+disable the Ebib-specific mode line altogether."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
+
+(defcustom ebib-entry-mode-line '((:eval (format "  »%s«" (or (ebib--get-key-at-point) "No entry"))))
+  "The mode line for the entry buffer.
+The mode line of the entry window shows the entry key.  You can
+customize this information if you wish, or disable the
+Ebib-specific mode line altogether."
+  :group 'ebib-windows
+  :type '(choice (const :tag "Disable mode line" nil)
+                 (sexp :tag "Customize mode line")))
+
 
 (defvar ebib--mode-line-modified '(:eval (ebib--mode-line-modified-p))
   "Mode line construct for database's modified status.")

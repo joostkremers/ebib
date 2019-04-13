@@ -3074,6 +3074,8 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
+  (if ebib-entry-mode-line
+      (setq mode-line-format ebib-entry-mode-line))
   (setq truncate-lines t)
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
