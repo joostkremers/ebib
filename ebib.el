@@ -2699,7 +2699,8 @@ uses standard Emacs completion."
   (suppress-keymap 'ebib-slave-map 'no-digits)
   (define-key ebib-slave-map "c" #'ebib-slave-create-slave)
   (define-key ebib-slave-map "a" #'ebib-slave-add-entry)
-  (define-key ebib-slave-map "d" #'ebib-slave-delete-entry))
+  (define-key ebib-slave-map "d" #'ebib-slave-delete-entry)
+  (define-key ebib-slave-map "m" #'ebib-slave-switch-to-master))
 
 (defun ebib-slave-create-slave ()
   "Create a slave database based on the current database."
@@ -2778,6 +2779,14 @@ entry or the marked entries to the slave database."
        (if (eobp)
            (forward-line -1))
        (ebib--update-entry-buffer)))
+    (default (beep))))
+
+(defun ebib-slave-switch-to-master ()
+  "Switch to the master database of the current slave."
+  (interactive)
+  (ebib--execute-when
+    (slave-db (let ((master (ebib-db-get-master ebib--cur-db)))
+                (ebib-switch-to-database master)))
     (default (beep))))
 
 ;;; Interactive keyword functions
