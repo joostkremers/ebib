@@ -2697,7 +2697,7 @@ uses standard Emacs completion."
 (eval-and-compile
   (define-prefix-command 'ebib-slave-map)
   (suppress-keymap 'ebib-slave-map 'no-digits)
-  (define-key ebib-slave-map "s" #'ebib-slave-create-slave)
+  (define-key ebib-slave-map "c" #'ebib-slave-create-slave)
   (define-key ebib-slave-map "a" #'ebib-slave-add-entry)
   (define-key ebib-slave-map "d" #'ebib-slave-delete-entry))
 
