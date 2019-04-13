@@ -1149,7 +1149,10 @@ If FILE is an absolute file name, expand it with
 `expand-file-name' and return the result."
   (if (file-name-absolute-p file)
       (expand-file-name file)
-    (let* ((unmod-file (funcall ebib-file-name-mod-function file nil)))
+    (let* ((unmod-file (funcall ebib-file-name-mod-function file nil))
+           (ebib-file-search-dirs
+            (append ebib-file-search-dirs
+                    `(,(file-name-directory (ebib-db-get-filename ebib--cur-db))))))
       (or (locate-file unmod-file ebib-file-search-dirs)
           (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
           (expand-file-name unmod-file)))))
