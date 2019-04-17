@@ -88,13 +88,13 @@ a logical `not' is applied to the selection."
                     (t
                      (read-string prompt nil 'ebib--filters-history)))))
       (ebib--execute-when
-        ((filtered-db)
+        (filtered-db
          (ebib-db-set-filter `(,bool ,(ebib-db-get-filter ebib--cur-db)
                                      ,(if (>= not 0)
                                           `(contains ,field ,regexp)
                                         `(not (contains ,field ,regexp))))
                              ebib--cur-db))
-        ((real-db)
+        (real-db
          (ebib-db-set-filter (if (>= not 0)
                                  `(contains ,field ,regexp)
                                `(not (contains ,field ,regexp)))
@@ -125,10 +125,10 @@ a logical `not' is applied to the selection."
   "Display the currently active filter in the minibuffer."
   (interactive)
   (ebib--execute-when
-    ((filtered-db)
+    (filtered-db
      (message (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))))
-    ((default)
-     (error "[Ebib] No filter is active"))))
+    (default
+      (error "[Ebib] No filter is active"))))
 
 (defun ebib-filters-view-all-filters ()
   "Display all filters in a *Help* buffer."
