@@ -4179,7 +4179,7 @@ If prefix ARG is non-nil, do not delete the original file."
       (when (or (null files)
                 (not (string-match-p (regexp-quote new-name) files)))
         (ebib-set-field-value ebib-file-field new-name key ebib--cur-db ebib-filename-separator)
-        (ebib--set-modified t ebib--cur-db)
+        (ebib--set-modified t ebib--cur-db t)
         (ebib--update-entry-buffer)))))
 
 ;;; Functions for non-Ebib buffers
