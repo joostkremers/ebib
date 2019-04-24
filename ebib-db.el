@@ -226,10 +226,10 @@ database."
   "Remove entry KEY from DB.
 Note: do not use this function to remove an entry from a slave
 database, since the entry will be removed from its master
-instead.  Use `ebib-db-remove-entry-from-slave'."
+instead.  Use `ebib-db-remove-entries-from-slave'."
   (ebib-db-set-entry key nil db 'overwrite))
 
-(defun ebib-db-remove-entry-from-slave (entries db)
+(defun ebib-db-remove-entries-from-slave (entries db)
   "Remove ENTRIES from slave database DB.
 ENTRIES is either an entry key (a string) or a list of entry
 keys.  They are removed from DB unconditionally: no error is
