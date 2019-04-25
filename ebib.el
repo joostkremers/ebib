@@ -1083,7 +1083,7 @@ interactively."
   "Merge a BibTeX file into the current database."
   (interactive)
   (ebib--execute-when
-    ((and slave-db filtered-db) (error "[Ebib] Cannot merge into a filtered or a slave database"))
+    ((or slave-db filtered-db) (error "[Ebib] Cannot merge into a filtered or a slave database"))
     (real-db
      (let ((file (expand-file-name (read-file-name "File to merge: ")))
            (ebib--log-error nil))       ; We haven't found any errors yet.
