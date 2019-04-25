@@ -1806,6 +1806,12 @@ If STRING is already braced, do nothing."
       (concat "{" string "}")
     string))
 
+(defun ebib--list-slaves (database)
+  "Return a list of slave databases for DATABASE."
+  (seq-filter (lambda (db)
+                (eq (ebib-db-get-master db) database))
+              ebib--databases))
+
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list.  It is a symbol and can be
