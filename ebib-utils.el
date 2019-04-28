@@ -1806,6 +1806,12 @@ If STRING is already braced, do nothing."
       (concat "{" string "}")
     string))
 
+(defun ebib--real-database-p (db)
+  "Return non-nil if DB is a real database.
+Return nil if DB is either a filtered or a slave database."
+  (not (or (ebib-db-filtered-p db)
+           (ebib-db-slave-p db))))
+
 (defun ebib--list-slaves (database)
   "Return a list of slave databases for DATABASE."
   (seq-filter (lambda (db)
