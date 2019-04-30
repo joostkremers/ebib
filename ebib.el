@@ -2711,7 +2711,7 @@ uses standard Emacs completion."
        (let ((entry-key (cond
                          ((featurep 'ivy) (ebib-insert-citation-ivy databases))
                          (t (ebib-insert-citation-default-method databases)))))
-         (when (and entry-key slave-db)
+         (when (and entry-key slave-db (not (ebib-db-has-key entry-key slave-db)))
            (ebib-db-add-entries-to-slave entry-key slave-db)
            (ebib--update-index-buffer)
            (ebib--set-modified t slave-db)))))
