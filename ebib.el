@@ -497,7 +497,8 @@ The return value is MOD."
     (ebib-db-set-modified mod (ebib-db-get-master db)))
   (when slaves
     (mapc (lambda (slave)
-            (ebib-db-set-modified mod slave))))
+            (ebib-db-set-modified mod slave))
+          slaves))
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
       (force-mode-line-update)))
