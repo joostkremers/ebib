@@ -277,7 +277,9 @@ is suffixed, then `ab' etc."
 
 (defun ebib-db-has-key (key db)
   "Return non-nil if KEY exists in DB."
-  (gethash key (ebib-db-val 'entries db)))
+  (if (ebib-db-val 'master db)
+      (member key (ebib-db-val 'keys db))
+    (gethash key (ebib-db-val 'entries db))))
 
 (defun ebib-db-change-key (key new-key db &optional if-exists)
   "Change entry key KEY to NEW-KEY in DB.
