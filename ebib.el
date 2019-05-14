@@ -2536,6 +2536,50 @@ The user is prompted for a BibTeX key from DATABASES."
                     :sort t)
         (error "[Ebib] No entries found in database(s) for current file")))))
 
+
+(defun ebib--create-collection-helm (databases)
+  "Create a collection for use in `ebib-helm-insert-collection'.
+The keys for the collection are taken from the databases listed
+in DATABASES."
+  (seq-reduce (lambda (coll db)
+                (append (mapcar
+                         (lambda (key)
+                           (cons
+                            (concat
+                             (propertize
+                              (ebib--get-field-value-for-display "Author/Editor" key db)
+                              'face 'font-lock-keyword-face)
+                             (propertize
+                              (format " (%s) "
+                                      (ebib--get-field-value-for-display "Year" key db))
+                              'face 'font-lock-variable-name-face)
+                             (format "%s"
+                                     (ebib--get-field-value-for-display "Title" key db)))
+                            (list key db)))
+                         (ebib-db-list-keys db))
+                        coll))
+              databases nil))
+
+(defun ebib-helm-insert-citation (item)
+  "Insert the helm item at point."
+  (let ((key (nth 0 item))
+        (db (nth 1 item)))
+    (insert (ebib--create-citation
+             (buffer-local-value 'major-mode (current-buffer))
+             (list key)
+             db))))
+
+(defun ebib-insert-citation-helm (databases)
+  "Insert a citation at point using helm.
+The user is prompted for a BibTeX key from DATABASES."
+  (let ((sources (helm-build-sync-source "Select entry: "
+                   :candidates (ebib--create-collection-helm databases)
+                   :action '(("Select entry" . ebib-helm-insert-citation)))))
+    (helm :sources sources
+          :sort t
+          :buffer "*ebib-insert-citation*"
+          :prompr "Select entry: ")))
+
 (defun ebib--create-collection-default-method (databases)
   "Create a collection of BibTeX keys from DATABASES.
 BIBFILES is a list of bibliography files.  The collection is
@@ -2582,8 +2626,10 @@ database if the current buffer has no associated databases.
 
 This is a front-end for other citation insertion functions: if
 the `ivy' package is loaded, it calls `ebib-insert-citation-ivy',
-otherwise it calls `ebib-insert-citation-default-method', which
-uses standard Emacs completion."
+if the `helm' package is loaded, it calls
+`ebib-insert-citation-helm', otherwise it calls
+`ebib-insert-citation-default-method', which uses standard Emacs
+completion."
   (interactive)
   (unless ebib--initialized
     (ebib-init))
@@ -2593,6 +2639,7 @@ uses standard Emacs completion."
                                       (list ebib--cur-db))))
                   (cond
                    ((featurep 'ivy) (ebib-insert-citation-ivy databases))
+                   ((featurep 'helm) (ebib-insert-citation-helm databases))
                    (t (ebib-insert-citation-default-method databases)))))
     ((default) (error "[Ebib] No database opened"))))
 
