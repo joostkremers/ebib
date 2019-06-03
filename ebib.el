@@ -2561,7 +2561,7 @@ in DATABASES."
               databases nil))
 
 (defun ebib-helm-insert-citation (item)
-  "Insert the helm item at point."
+  "Insert the helm item ITEM at point."
   (let ((key (nth 0 item))
         (db (nth 1 item)))
     (insert (ebib--create-citation
