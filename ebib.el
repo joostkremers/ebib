@@ -62,8 +62,9 @@
 (require 'ebib-notes)
 (require 'ebib-reading-list)
 
-;; Make sure `ivy' is loaded during compilation.
+;; Make sure `ivy' & `helm' are loaded during compilation.
 (require 'ivy nil 'noerror)
+(require 'helm nil 'noerror)
 
 ;;; Silence the byte-compiler
 (defvar pandoc-mode)
