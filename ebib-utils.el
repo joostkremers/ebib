@@ -1403,10 +1403,10 @@ be added to the entry.  Note that for a timestamp to be added,
 Return ENTRY-KEY if storing the entry was succesful, nil
 otherwise.  Depending on the value of IF-EXISTS, storing an entry
 may also result in an error."
-  (let ((result (ebib-db-set-entry entry-key fields db if-exists)))
-    (when (and result timestamp ebib-use-timestamp)
-      (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) entry-key db 'overwrite))
-    result))
+  (let ((actual-key (ebib-db-set-entry entry-key fields db if-exists)))
+    (when (and actual-key timestamp ebib-use-timestamp)
+      (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) actual-key db 'overwrite))
+    actual-key))
 
 (defun ebib-set-field-value (field value key db &optional if-exists nobrace)
   "Set FIELD to VALUE in entry KEY in database DB.
