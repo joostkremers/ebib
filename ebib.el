@@ -2082,6 +2082,11 @@ string, search for the previous search string instead."
     (default
       (beep))))
 
+(defun ebib-search-repeat-last ()
+  "Continue the last search."
+  (interactive)
+  (ebib-search t))
+
 (defun ebib-search-next ()
   "Search the next occurrence of `ebib--search-string'.
 Searching starts at the entry following the current entry.  If a
