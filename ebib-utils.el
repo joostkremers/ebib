@@ -953,6 +953,7 @@ Currently, the following problems are marked:
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
 (defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
 (put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (seq-remove #'stringp v))))
+(defvar-local ebib--dirty-index-buffer nil "Non-nil if the current index buffer is no longer up-to-date.")
 
 ;; The databases.
 
@@ -990,6 +991,13 @@ BUFFER is a symbol referring to a buffer in
            (debug t))
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
+
+(defun ebib--mark-index-dirty (db)
+  "Mark the index buffer of DB as dirty.
+An index buffer is dirty if it does not reflect the contents of
+its database."
+  (with-current-buffer (ebib-db-get-buffer db)
+    (setq ebib--dirty-index-buffer t)))
 
 (defmacro with-ebib-window-nondedicated (window &rest body)
   "Execute BODY with WINDOW non-dedicated.
@@ -1655,7 +1663,7 @@ ENTRIES is a list of entry keys."
               (setq modified t)))
           entries)
     (when modified
-      (ebib-db-kill-buffer target-db)
+      (ebib--mark-index-dirty target-db)
       (ebib-db-set-modified t target-db))))
 
 (defun ebib--export-entries-to-file (entries filename source-db)

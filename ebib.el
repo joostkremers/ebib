@@ -422,6 +422,8 @@ fill it."
     (when (not index-buffer)
       (setq index-buffer (ebib--get-or-create-index-buffer ebib--cur-db))
       (setq no-refresh nil)) ; We just created the index buffer, so we need to fill it.
+    (if (buffer-local-value 'ebib--dirty-index-buffer index-buffer)
+        (setq no-refresh nil))
     (setcdr (assq 'index ebib--buffer-alist) index-buffer)
     (when window ; This function is also called from `ebib-import', in which case `window' would be nil.
       (with-selected-window window
@@ -446,7 +448,9 @@ fill it."
                       (ebib--display-entry-key entry (member entry marked-entries)))
                     ;; Make sure the current entry is among the visible entries.
                     (unless (member cur-entry cur-keys-list)
-                      (setq cur-entry (car cur-keys-list)))))))))
+                      (setq cur-entry (car cur-keys-list)))))))
+            (with-current-buffer index-buffer
+              (setq ebib--dirty-index-buffer nil))))
         (if (and window cur-entry)
             (ebib--goto-entry-in-index cur-entry)
           (goto-char (point-min)))
@@ -669,7 +673,9 @@ window and make the frame active,"
           (set-window-buffer entry-window (ebib--buffer 'entry)))
         (set-window-dedicated-p index-window t)
         (if (eq ebib-layout 'custom)
-            (set-window-dedicated-p entry-window t))))))
+            (set-window-dedicated-p entry-window t)))))
+  (if (buffer-local-value 'ebib--dirty-index-buffer (ebib--buffer 'index))
+      (setq ebib--needs-update t)))
 
 (defun ebib--create-buffers ()
   "Create the buffers for Ebib."
@@ -867,6 +873,7 @@ character ?1-?9, which is converted to the corresponding number."
       (setq mode-line-format ebib-index-mode-line))
   (setq truncate-lines t)
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
+  (setq ebib--dirty-index-buffer nil)
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
@@ -1633,7 +1640,7 @@ This function updates both the database and the buffer."
         (mapc (lambda (slave)
                 (ebib-db-remove-entries-from-slave cur-key slave)
                 (ebib-db-add-entries-to-slave actual-new-key slave)
-                (ebib-db-kill-buffer slave)
+                (ebib--mark-index-dirty slave)
                 (when (ebib-db-marked-p cur-key slave)
                   (ebib-db-unmark-entry cur-key slave)
                   (ebib-db-mark-entry actual-new-key slave)))
@@ -2719,8 +2726,8 @@ uses standard Emacs completion."
                          (t (ebib-insert-citation-default-method databases)))))
          (when (and entry-key slave-db (not (ebib-db-has-key entry-key slave-db)))
            (ebib-db-add-entries-to-slave entry-key slave-db)
-           (ebib--update-index-buffer)
-           (ebib--set-modified t slave-db)))))
+           (ebib--mark-index-dirty slave-db)
+           (ebib-db-set-modified t slave-db)))))
     (default
       (error "[Ebib] No database opened"))))
 
@@ -2793,7 +2800,7 @@ entry or the marked entries to the slave database."
        (when target
          (ebib-db-add-entries-to-slave entries target)
          (ebib-db-set-modified t target)
-         (ebib-db-kill-buffer target)
+         (ebib--mark-index-dirty target)
          (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
 
 (defun ebib-slave-delete-entry ()
@@ -4296,8 +4303,8 @@ or on the region if it is active."
            (with-temp-buffer
              (insert-buffer-substring buffer)
              (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
-               (ebib--update-index-buffer)
-               (ebib--set-modified t ebib--cur-db)
+               (ebib--mark-index-dirty ebib--cur-db)
+               (ebib-db-set-modified t ebib--cur-db)
                (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
                                 (car result)
                                 (cadr result)
