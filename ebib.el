@@ -908,7 +908,7 @@ character ?1-?9, which is converted to the corresponding number."
      ["Push Citation To Buffer" ebib-push-citation (ebib--get-key-at-point)]
      "--"
      ["Mark" ebib-mark-entry (ebib--get-key-at-point)]
-     ["Mark/Unmark All" ebib-mark-all-entries (ebib--get-key-at-point)]
+     ["Mark/Unmark All" ebib-mark-all-entries :active (ebib--get-key-at-point) :keys "\\[universal-argument] \\[ebib-mark-entry]"]
      "--"
      ["Edit Key" ebib-edit-keyname (ebib--get-key-at-point)]
      ["Autogenerate Key" ebib-generate-autokey (ebib--get-key-at-point)]
