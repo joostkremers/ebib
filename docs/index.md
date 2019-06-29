@@ -111,7 +111,7 @@ definitions in the database.
 ## Manual
 
 The complete user manual for Ebib is available in html format
-[here](ebib-manual.md).
+[here](ebib-manual.md). If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.
 
 
 ## Installation
