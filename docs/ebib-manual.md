@@ -1,3 +1,5 @@
+<article>
+
 Ebib is a program with which you can manage BibTeX and BibLateX database
 files without having to edit the raw `.bib` files. It runs in GNU/Emacs,
 version 25.1 or higher.
@@ -9,7 +11,14 @@ is.
 
 # News
 
-## Version 2.15, February 2019
+## Version 2.17, June 2019
+
+  - Create slave databases, i.e., databases that share their data with a
+    master database but which are saved as separate `.bib` files.
+  - Use completion when editing certain fields, to make it easier to
+    enter e.g., author or editor names consistently.
+
+## Version 2.16, February 2019
 
   - Add command `ebib-download-url`: download pdf from a site in the
     `url` field.
@@ -105,9 +114,7 @@ ebib`. This command is also used to return to Ebib when you have put the
 program in the background. You can bind this command to a key sequence
 by putting something like the following in Emacs’ init file:
 
-```
-(global-set-key "\C-ce" 'ebib)
-```
+    (global-set-key "\C-ce" 'ebib)
 
 You can of course choose any key combination you like. (In Emacs, key
 combinations of `C-c` `<letter>` are reserved for the user, which means
@@ -119,9 +126,7 @@ but the nice thing is that you can then provide a filename to load. So,
 provided a file `references.bib` exists in `~/Work/Papers/`, the
 following command:
 
-```
-~/Work/Papers $ ebib references.bib
-```
+    ~/Work/Papers $ ebib references.bib
 
 starts Ebib and loads the file `references.bib`.
 
@@ -331,24 +336,35 @@ between entries in the index buffer: the cursor keys `up` and `down`,
 of fields, while `PgUp` and `b` move to the previous set of fields. `g`
 and `G`, and `Home` and `End` also work as expected.
 
-Editing a field value can be done with `e`. (In fact, in the entry
-buffer, `RET` is equivalent to `e`.) For most fields, Ebib simply asks
-you for a string value in the minibuffer. (Here, `RET` confirms the
-edit, while `C-g` cancels it.) Although BibTeX requires that field
-values be surrounded by braces {} (or double quotes "", but Ebib does
-not use those, even though it can of course handle them when they are
-used in an existing `.bib` file) you do not need to type these. Ebib
-adds them when it saves the `.bib` file.
+Editing a field value can be done with `e` or `RET`. For most fields,
+Ebib simply asks you for a string value in the minibuffer. Do not put
+braces `{}` around field values, Ebib adds them when it saves the `.bib`
+file.
 
-Some fields, however, are handled in a special way. The first of these
-is the `type` field: if you edit this field, you must enter one of the
-predefined entry types. Ebib won’t allow you to enter anything else. You
-can use TAB completion in this case. Similarly, if you edit the
-`crossref` field, Ebib requires that you fill in a key from the
-database. Here, too, you can use TAB completion. The fields `keywords`
-and `file` are also treated differently, see [Managing
-keywords](#managing-keywords) and [Viewing
+With some fields, Ebib offers completion. These are the `type` field,
+the `author` and `editor` fields, the `journal` and `journaltitle`
+fields, `publisher`, `organization`, `keywords`, `crossref` and `file`.
+If you edit the `type` field, you must enter one of the predefined entry
+types. Ebib won’t allow you to enter anything else. Similarly, if you
+edit the `crossref` field, Ebib requires that you fill in a key from the
+database. The fields `keywords` and `file` also offer completion, see
+the sections [Managing keywords](#managing-keywords) and [Viewing
 Files](#viewing-and-importing-files), respectively.
+
+For the other fields that offer completion, the completion candidates
+are the values of these fields in other entries in the databases that
+you’ve opened. Offering these as completion candidates makes it easier
+to ensure that you enter these values consistently. In the author and
+editor fields, completion takes into account that these fields may
+contain more than one name. Each name is a separate completion
+candidate, and when editing these fields, you can type the individual
+names, Ebib will add the `"and"` that separates them.
+
+In the `author` and `editor` fields, completion is only offered if the
+field is empty. It is also possible to disable completion for the author
+and editor fields entirely, because if your databases are large,
+gathering the completion candidates can be a bit slow. Set the option
+`ebib-edit-author/editor-without-completion` to disable completion.
 
 Note that if you’re adding a new entry, Ebib automatically puts you in
 the entry buffer after you’ve typed the entry key: you don’t have to
@@ -366,50 +382,34 @@ index buffer. In the index buffer, however, `q` quits Ebib.)
 
 ## Editing Multiline Values
 
-Apart from the `type`, `keywords`, `file` and `crossref` fields, there
-are two other fields that Ebib handles in a special way when you edit
-its value. These are the `annote` field (or `annotation` in Biblatex),
-and the `abstract` field. Most field values normally consist of a single
-line of text. However, because the `annote`/`annotation` and `abstract`
-fields are meant for creating annotated bibliographies, it would not be
-very useful if you could only write one line of text in them. Therefore,
-when you edit one of these fields, Ebib puts you in a so-called
-*multiline edit buffer*. This is essentially a text mode buffer that
-allows you to enter as much text as you like. To store the text and
-leave the multiline edit buffer, type `C-c | q`.
+There are two other fields that Ebib handles in a special way when you
+edit their value. These are the `annote` field (or `annotation` in
+Biblatex), and the `abstract` field. Most field values normally consist
+of a single line of text. However, because the `annote`/`annotation` and
+`abstract` fields are meant for creating annotated bibliographies, it
+would not be very useful if you could only write one line of text in
+them. Therefore, when you edit one of these fields, Ebib puts you in a
+so-called *multiline edit buffer*. This is essentially a text mode
+buffer that allows you to enter as much text as you like. To store the
+text and leave the multiline edit buffer, type `C-c | q`.
 
 If you want to leave the multiline edit buffer without saving the text
 you have just typed, type `C-c | c`. This command cancels the edit and
 leaves the multiline edit buffer. The text that is stored in the field
-you were editing is not altered.
-
-Multiline values are not restricted to the `annote`/`annotation` and
-`abstract` fields. Any field (except the `type` and `crossref` fields)
-can in fact hold a multiline value. To give a field a multiline value,
-use `m` instead of `e`. You will again be put in a multiline edit
-buffer, where you can edit the value. Note that you can use `m` even if
-a field already has a single line value. Ebib will just make that the
-first line in the multiline edit buffer.
+you were editing is not altered. Multiline values are not restricted to
+the `annote`/`annotation` and `abstract` fields. Any field (except the
+`type` and `crossref` fields) can in fact hold a multiline value. To
+give a field a multiline value, use `m` instead of `e`.
 
 When a field has a multiline value, at most ten lines are shown in the
 entry buffer. If the text is longer, an ellipsis indicator `[...]` is
 added after the last line that is displayed. If you want to see the
 whole contents of a multiline field, you can use `v`: this will display
-the contents of the current field in a `*Help*` buffer. This buffer can
-be dismissed again with `q`. This is quicker than entering the multiline
-edit buffer just to read the contents of a field and it has the
-advantage that the other fields stay visible.
-
-It’s possible to customise the way a multiline value is displayed in the
-entry buffer. See the options `ebib-multiline-display-function` and
-`ebib-multiline-display-max-lines` for details.
-
-By the way, the `e` key is smart about the way an entry must be edited.
-If you press `e` on a field that already has a multiline value,
-regardless of the fact whether it is the `annote`/`annotation` or
-`abstract` field or not, Ebib puts you in a multiline edit buffer.
-Therefore, you need `m` only if you want to give a field a multiline
-value when it doesn’t have one yet.
+the contents of the current field in a `*Help*` buffer (which can be
+dismissed again with `q`). It’s possible to customise the way a
+multiline value is displayed in the entry buffer. See the options
+`ebib-multiline-display-function` and `ebib-multiline-display-max-lines`
+for details.
 
 For more details on working with multiline edit buffers, see [Multiline
 Edit Buffers](#multiline-edit-buffers).
@@ -917,24 +917,22 @@ variable with `(defvar ebib-entry)`. When the filter is run, the value
 of `ebib-entry` is an alist of fields and their values. These include
 the fields `=key=` and `=type=` for the entry key and type:
 
-```
-(("author" . "{Noam Chomsky}")
- ("title" . "{Syntactic Structures}")
- ("publisher" . "{The Hague: Mouton}")
- ("year" . "{1957}")
- ("remark" . "{copy}")
- ("timestamp" . "{2007-12-30}")
- ("file" . "{c/Chomsky1957.pdf}")
- ("=type=" . "book")
- ("=key=" . "Chomsky1957"))
-```
+    (("author" . "{Noam Chomsky}")
+     ("title" . "{Syntactic Structures}")
+     ("publisher" . "{The Hague: Mouton}")
+     ("year" . "{1957}")
+     ("remark" . "{copy}")
+     ("timestamp" . "{2007-12-30}")
+     ("file" . "{c/Chomsky1957.pdf}")
+     ("=type=" . "book")
+     ("=key=" . "Chomsky1957"))
 
 ### An Example: Listing Recent Additions
 
 One special filter is included with Ebib. It filters recent additions to
 the database. The command that creates the filter is `ebib-list-recent`:
 
-```
+``` lisp
 (defun ebib-list-recent (days)
   "List entries created in the last DAYS days."
   (interactive "nNumber of days: ")
@@ -964,7 +962,7 @@ the display, taking the filter into account.
 
 The function `ebib--newer-than` is defined as follows:
 
-```
+``` lisp
 (defun ebib--newer-than (date)
   "Function for use in filters.
 Return t if the entry being tested is newer than DATE.  DATE must
@@ -1002,7 +1000,7 @@ If a database has an active filter, the save command is disabled,
 because it would not be clear whether you want to save the entire
 database or just the filtered entries. If you want to save only the
 filtered entries to a file, you can use the command `w` (or the menu
-option “Save Database As”). This also saves the `@String`, `@Preamble`
+option “Database | Save As”). This also saves the `@String`, `@Preamble`
 and `@comments`, as well as any file-local variables, so you will have a
 self-contained `.bib` file with only the filtered entries. In order to
 save the entire database, you need to cancel the filter. After saving,
@@ -1013,7 +1011,7 @@ One final note: of all the filter-related commands, `~`, `F c`, `F r`,
 commands operate on the stored filters and can be used when no filter is
 active.
 
-# Accessing BibTeX Databases outside Ebib
+# Inserting Citations into a Text Buffer
 
 When you’re in a text buffer, you can insert a citation with the command
 `ebib-insert-citation`. This command asks for a key and inserts a
@@ -1045,8 +1043,8 @@ Markdown knows, you shouldn’t need to change anything.
 
 In Org buffers, citations are inserted in the form
 `[[ebib:<key>][<description>]]`. You are prompted for the description. A
-default description is provided, which you can accept by pressing
-`ENTER`. The default description is created by the function in
+default description is provided, which you can accept by pressing `RET`.
+The default description is created by the function in
 `ebib-citation-description-function` and defaults to the combination of
 author name and publication year. If you use this type of Org link, you
 may want to load the `org-ebib` package, which allows you to open Ebib
@@ -1068,26 +1066,22 @@ Commands](#defining-citation-commands). For LaTeX, only the `\cite`
 command is set up by default, so you may want to add some commands. For
 example, this is what I use:
 
-{% raw %}
-```
-(setq ebib-citation-commands
-      '((any
-         (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
-          ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
-          ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
-          ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
-          ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
-          ("posstext"    "\\posstextcite%<[%A]%>{%K}")
-          ("posscite"    "\\posscite%<[%A]%>{%K}")
-          ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
-        (org-mode
-         (("ebib"        "[[ebib:%K][%D]]")))
-        (markdown-mode
-         (("text"        "@%K%< [%A]%>")
-          ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
-          ("year"        "[-@%K%< %A%>]")))))
-```
-{% endraw %}
+    (setq ebib-citation-commands
+          '((any
+             (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
+              ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+              ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+              ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
+              ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
+              ("posstext"    "\\posstextcite%<[%A]%>{%K}")
+              ("posscite"    "\\posscite%<[%A]%>{%K}")
+              ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
+            (org-mode
+             (("ebib"        "[[ebib:%K][%D]]")))
+            (markdown-mode
+             (("text"        "@%K%< [%A]%>")
+              ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
+              ("year"        "[-@%K%< %A%>]")))))
 
 Calling Ebib from a text mode buffer has another small advantage. If
 point is on a BibTeX key when Ebib is called, it jumps to that entry in
@@ -1159,22 +1153,19 @@ directives are recognised:
     a description, for which the user is prompted. Mainly for use in Org
     citations.
 
-In the simplest case, the format string contains just a `%K` directive: {% raw
-%}`\cite{%K}`{% endraw %}. In this case, `%K` is replaced with the citation key
-and the result inserted. Usually, however, citation commands allow for optional
-arguments that are formatted as pre- or postnotes to the citation. For example,
-using the `natbib` package, you have citation commands available of the form:
+In the simplest case, the format string contains just a `%K` directive:
+`\cite{%K}`. In this case, `%K` is replaced with the citation key and
+the result inserted. Usually, however, citation commands allow for
+optional arguments that are formatted as pre- or postnotes to the
+citation. For example, using the `natbib` package, you have citation
+commands available of the form:
 
     \citet[cf.][p. 50]{Jones1992}
 
 In order to be able to insert such citations, the format string must
 contain `%A` directives:
 
-{% raw %}
-```
-\citet[%A][%A]{%K}
-```
-{% endraw %}
+    \citet[%A][%A]{%K}
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
@@ -1182,45 +1173,31 @@ directives. Of course, it is possible to leave the arguments empty (by
 just hitting `RET`). With the format string above, this would yield the
 following citation in the LaTeX buffer:
 
-```
-\citet[][]{Jones1992}
-```
+    \citet[][]{Jones1992}
 
 The empty brackets are completely harmless, because LaTeX will simply
 ignore the empty arguments. However, you may prefer for the brackets not
 to appear if the arguments are empty. In that case, you can wrap the
 brackets and the `%A` directives in a `%<...%>` pair:
 
-{% raw %}
-```
-\citet%<[%A]%>%<[%A]%>{%K}
-```
-{% endraw %}
+    \citet%<[%A]%>%<[%A]%>{%K}
 
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
 
-```
-\citet{Jones1992}
-```
+    \citet{Jones1992}
 
 Note however, that this format string is problematic. If you fill out
 the first argument but not the second, Ebib produces the wrong format
 string:
 
-```
-\citet[cf.]{Jones1992}
-```
+    \citet[cf.]{Jones1992}
 
 If only one optional argument is provided, `natbib` assumes that it is a
 postnote, while what you intended is actually a prenote. Therefore, it
 is best not to make the second argument optional:
 
-{% raw %}
-```
-\citet%<[%A]%>[%A]{%K}
-```
-{% endraw %}
+    \citet%<[%A]%>[%A]{%K}
 
 This way, the second pair of brackets is always inserted, regardless of
 whether you provide a second argument or not.
@@ -1231,9 +1208,7 @@ one key, but when you’re in Ebib, you can mark multiple entry keys and
 then use `i` to insert them to a buffer. In this case, Ebib asks you for
 a separator and then inserts all keys into the position of `%K`:
 
-```
-\citet{Jones1992,Haddock2004}
-```
+    \citet{Jones1992,Haddock2004}
 
 It is, however, also possible to specify in the format string that a
 certain sequence can be repeated and how the different elements should
@@ -1242,11 +1217,7 @@ that can be repeated in a `%(...%)` pair. Normally, you’ll want to
 provide a separator, which is done by placing it between the `%` and the
 closing parenthesis:
 
-{% raw %}
-```
-\citet[%A][%A]{%(%K%,)}
-```
-{% endraw %}
+    \citet[%A][%A]{%(%K%,)}
 
 This format string says that the directive `%K` can be repeated and that
 multiple keys must be separated with a comma. The advantage of this is
@@ -1256,20 +1227,14 @@ It is also possible to put `%A` directives in the repeating part. This
 is useful for `biblatex` package, which has so-called *multicite*
 commands that take the following form:
 
-```
-\footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
-```
+    \footcites[cf.][p. 50]{Jones1992}[][p. 201]{Haddock2004}
 
 Multicite commands can take more than one citation key in braces `{}`
 and each of those citation keys can take two optional arguments in
 brackets `[]`. In order to get such citations, you can provide the
 following format string:
 
-{% raw %}
-```
-\footcites%(%<[%A]%>[%A]{%K}%)
-```
-{% endraw %}
+    \footcites%(%<[%A]%>[%A]{%K}%)
 
 Here, the entire sequence of two optional arguments and the obligatory
 citation key is wrapped in `%(...%)`, so that Ebib knows it can be
@@ -1282,11 +1247,7 @@ parts that are not repeated. In fact, that already happens in the
 previous example, because the part `\footcites` is not repeated. But the
 part that is not repeated may contain `%A` directives as well:
 
-{% raw %}
-```
-\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
-```
-{% endraw %}
+    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
 
 Multicite commands in `biblatex` take two additional arguments
 surrounded with parentheses. These are pre- and postnotes for the entire
@@ -1346,6 +1307,40 @@ Pandoc Markdown files, since they do not have the equivalent of a
 bibliography command. (Note, however, that you can set
 `ebib-local-bibtex-filenames` to a list of `.bib` files in the
 file-local variable section of a file.)
+
+# Master and Slave Databases
+
+If you want to create a `.bib` file from a larger database that only
+contains the references of a particular paper, you can use a slave
+database. A slave database can only contain entries that also exist in
+its master database and all the data of the entries is shared by both
+databases. If you edit an entry in the slave database, the edit shows up
+in the master as well, and vice versa.
+
+You can create a slave database with the key sequence `M c` in the
+database that you want to be the master. Ebib asks you for a file name
+and then creates a new empty database. You can add entries to the slave
+with the key sequence `M a` in the master database. In the slave
+database, you can add new entries in the normal way with the key `a`,
+but instead of creating a new entry, this command asks for an entry from
+the master database which is then added to the slave.
+
+If you save a slave database, it is saved as a normal, standalone `.bib`
+file that can be used with BibTeX and/or Biblatex. When you reopen the
+file in Ebib, a special comment at the top of the file makes sure that
+Ebib recognises it as a slave database and loads the master database as
+well if necessary. Note that when Ebib opens a slave database, it only
+reads the entry keys from the `.bib` file. The data of each entry is
+taken from the master database. This means that if you edit a slave
+database’s `.bib` file outside of Ebib, the changes you make are ignored
+when you open the file in Ebib.
+
+If you have a text buffer that’s associated with a slave database, you
+can insert entries in the normal way with `M-x ebib-insert-citation`,
+but instead of offering only the entries in the associated (slave)
+database, Emacs will offer all entries of the master database for
+completion. If you select an entry that is not in the slave database
+yet, it is added to it.
 
 # Cross-referencing
 
@@ -1414,12 +1409,13 @@ the customisation option “Selected Face”.)
 
 Commands for which it makes sense automatically operate on all marked
 entries if there are any. Of the commands discussed so far, these are
-`d` to delete entries and `p` to push entries to a LaTeX buffer. (Note
+`d` to delete entries and `i` to insert entries to a LaTeX buffer. (Note
 that Ebib creates a single citation command with commas separating the
 entry keys.)
 
-The command `M` unmarks all entries or, if there are no marked entries,
-marks all entries in the current database.
+With a prefix argument, i.e, with `C-u m`, you can unmark all entries
+or, if there are no marked entries, mark all entries in the current
+database.
 
 # Printing the Database
 
@@ -1728,14 +1724,12 @@ notes file or whether it is an entry in a single notes file, is created
 on the basis of a template. This template can be customised, but the
 default form is the following:
 
-```
-"* %T
-:PROPERTIES:
-%K
-:END:
->|<
-"
-```
+    "* %T
+    :PROPERTIES:
+    %K
+    :END:
+    >|<
+    "
 
 This template contains two format specifiers: `%K` and `%T`. `%K` is
 replaced with the key of the entry prepended with the string
@@ -1786,9 +1780,7 @@ the key of the current entry and the `db` argument to the current
 database. With these arguments, it is possible to, e.g., retrieve the
 value of a specific field in the entry:
 
-```
-(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
-```
+    (ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
 
 where `<field>` is the field (as a string) whose value is to be
 retrieved.
@@ -1936,17 +1928,13 @@ suffices, because you can use the concatenation character `#` to include
 multiple TeX or LaTeX commands. So, rather than having two `@Preamble`
 definitions such as:
 
-```
-@Preamble{ "\newcommand{\noopsort}[1]{} " }
-@Preamble{ "\newcommand{\singleletter}[1]{#1} " }
-```
+    @Preamble{ "\newcommand{\noopsort}[1]{} " }
+    @Preamble{ "\newcommand{\singleletter}[1]{#1} " }
 
 you can write this in your `.bib` file:
 
-```
-@Preamble{ "\newcommand{\noopsort}[1]{} "
-         # "\newcommand{\singleletter}[1]{#1} " }
-```
+    @Preamble{ "\newcommand{\noopsort}[1]{} "
+             # "\newcommand{\singleletter}[1]{#1} " }
 
 Creating or editing a `@Preamble` definition in Ebib is done by hitting
 (uppercase) `P` in the index buffer. Ebib uses the multiline edit buffer
@@ -1963,9 +1951,7 @@ braces of the `@Preamble` command, but otherwise it saves the text
 exactly as you enter it. So in order to get the preamble above, you’d
 have to type the following in Ebib:
 
-```
-"\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
-```
+    "\newcommand{\noopsort}[1]{} " # "\newcommand{\singleletter}[1]{#1} "
 
 Note that when Ebib loads a `.bib` file that contains more than one
 `@Preamble` definition, it concatenates all the strings in them in the
@@ -2016,21 +2002,15 @@ Note that this also makes it possible to enter field values that are
 composed of concatenations of strings and abbreviations. The BibTeX
 documentation for example explains that if you have defined:
 
-```
-@String{WGA = "World Gnus Almanac"}
-```
+    @String{WGA = "World Gnus Almanac"}
 
 you can create a BibTeX field like this:
 
-```
-title = 1966 # WGA
-```
+    title = 1966 # WGA
 
 which will produce “1966 World Gnus Almanac”. Or you can do:
 
-```
-month = "1~" # jan
-```
+    month = "1~" # jan
 
 which will produce someting like “1 January”, assuming your bibliography
 style has defined the abbreviation `jan`. All this is possible with
@@ -2298,28 +2278,24 @@ does not retain the multiple occurrences, but it does retain the values.
 So suppose you have an entry that contains the following `keywords`
 fields:
 
-```
-@book{Jones1998,
-      author = {Jones, Joan},
-      year = {1998},
-      ...
-      keywords = {sleep},
-      keywords = {winter},
-      keywords = {hibernation}
-}
-```
+    @book{Jones1998,
+        author = {Jones, Joan},
+        year = {1998},
+        ...
+        keywords = {sleep},
+        keywords = {winter},
+        keywords = {hibernation}
+    }
 
 If you load this entry into Ebib with the option “Allow Identical
 Fields” set, you will get the following:
 
-```
-@book{Jones1998,
-      author = {Jones, Joan},
-      year = {1998},
-      ...
-      keywords = {sleep, winter, hibernation}
-}
-```
+    @book{Jones1998,
+        author = {Jones, Joan},
+        year = {1998},
+        ...
+        keywords = {sleep, winter, hibernation}
+    }
 
 # Multiline Edit Buffers
 
@@ -2383,14 +2359,14 @@ a minor mode, which restricts the available keys to combinations of
 change the key commands, if you wish. For example, you could put
 something like the following in your `~/.emacs`:
 
-```
+``` commonlisp
 (with-eval-after-load 'ebib
   (define-key ebib-multiline-mode-map
     "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
   (define-key ebib-multiline-mode-map
     "\C-c\C-q" 'ebib-cancel-multiline-buffer)
   (define-key ebib-multiline-mode-map
-    "\C-c\C-s" 'ebib-save-from-multiline-buffer)))
+    "\C-c\C-s" 'ebib-save-from-multiline-buffer))
 ```
 
 This sets up `C-c C-c`, `C-c C-q` and `C-c C-s` for use in the multiline
@@ -2443,12 +2419,14 @@ keywords and the reading list, respectively. Finally, there is
 As an example, the default keybindings in`ebib-multiline-mode-map`,
 which are rather awkward to type, can be redefined as follows:
 
-```
+``` commonlisp
 (with-eval-after-load 'ebib
   (define-key ebib-multiline-mode-map
     "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
   (define-key ebib-multiline-mode-map
     "\C-c\C-q" 'ebib-cancel-multiline-buffer)
   (define-key ebib-multiline-mode-map
-    "\C-c\C-s" 'ebib-save-from-multiline-buffer)))
+    "\C-c\C-s" 'ebib-save-from-multiline-buffer))
 ```
+
+</article>

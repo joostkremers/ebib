@@ -211,17 +211,32 @@ The rest of the frame is used for the entry buffer, unless
                                   mode-line-front-space
                                   ebib--mode-line-modified
                                   mode-line-buffer-identification
+                                  (:eval (if (and ebib--cur-db (ebib-db-slave-p ebib--cur-db))
+                                             (format " [%s]" (ebib-db-get-filename (ebib-db-get-master ebib--cur-db) t))))
                                   (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
-                                  (:eval (if (and ebib--cur-db (ebib--get-key-at-point)) "     Entry %l" "     No Entries"))
-                                  (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db)) (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db))) "")))
+                                  (:eval (if (and ebib--cur-db (ebib--get-key-at-point))
+                                             "     Entry %l"
+                                           "     No Entries"))
+                                  (:eval (if (and ebib--cur-db (ebib-db-get-filter ebib--cur-db))
+                                             (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db)))
+                                           "")))
   "The mode line for the index window.
 The mode line of the index window shows some Ebib-specific
 information.  You can customize this information if you wish, or
-disable the Ebib-specific mode line altogether.  Note that the
-mode line of the entry buffer is not changed."
+disable the Ebib-specific mode line altogether."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
+
+(defcustom ebib-entry-mode-line '((:eval (format "  »%s«" (or (ebib--get-key-at-point) "No entry"))))
+  "The mode line for the entry buffer.
+The mode line of the entry window shows the entry key.  You can
+customize this information if you wish, or disable the
+Ebib-specific mode line altogether."
+  :group 'ebib-windows
+  :type '(choice (const :tag "Disable mode line" nil)
+                 (sexp :tag "Customize mode line")))
+
 
 (defvar ebib--mode-line-modified '(:eval (ebib--mode-line-modified-p))
   "Mode line construct for database's modified status.")
@@ -865,6 +880,14 @@ Ebib (not Emacs)."
   :type '(choice (const :tag "Hide the cursor" t)
                  (const :tag "Show the cursor" nil)))
 
+(defcustom ebib-edit-author/editor-without-completion nil
+  "Do not use completion when editing the author or editor field.
+Completion is only used if the author or editor field is empty.
+Setting this option disables completion completely."
+  :group 'ebib
+  :type '(choice (const :tag "Use completion" nil)
+                 (const :tag "Do not use completion" t)))
+
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
 (defface ebib-highlight-face '((t (:inherit highlight)))
@@ -931,6 +954,7 @@ Currently, the following problems are marked:
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
 (defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
 (put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (seq-remove #'stringp v))))
+(defvar-local ebib--dirty-index-buffer nil "Non-nil if the current index buffer is no longer up-to-date.")
 
 ;; The databases.
 
@@ -968,6 +992,13 @@ BUFFER is a symbol referring to a buffer in
            (debug t))
   `(with-current-buffer (cdr (assq ,buffer ebib--buffer-alist))
      ,@body))
+
+(defun ebib--mark-index-dirty (db)
+  "Mark the index buffer of DB as dirty.
+An index buffer is dirty if it does not reflect the contents of
+its database."
+  (with-current-buffer (ebib-db-get-buffer db)
+    (setq ebib--dirty-index-buffer t)))
 
 (defmacro with-ebib-window-nondedicated (window &rest body)
   "Execute BODY with WINDOW non-dedicated.
@@ -1017,44 +1048,56 @@ and the return value of its last form is returned."
       'ebib--cur-db)
      ((eq env 'real-db)
       '(and ebib--cur-db
-            (not (ebib-db-get-filter ebib--cur-db))))
+            (not (ebib-db-get-filter ebib--cur-db))
+            (not (ebib-db-slave-p ebib--cur-db))))
      ((eq env 'filtered-db)
       '(and ebib--cur-db
             (ebib-db-get-filter ebib--cur-db)))
+     ((eq env 'slave-db)
+      '(and ebib--cur-db
+            (ebib-db-slave-p ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
-     (t t))))
+     ((eq env 'default) t)
+     (t (error "`ebib--execute-when': malformed condition %s" env)))))
 
 (defmacro ebib--execute-when (&rest forms)
   "Macro to facilitate writing Ebib functions.
 This functions essentially like a `cond' clause: the basic format
 is (ebib--execute-when FORMS ...), where each FORM is built up
-as (ENVIRONMENTS BODY).  ENVIRONMENTS is a list of symbols (not
-quoted) that specify under which conditions BODY is to be
-executed.  Valid symbols are:
+as (CONDITION BODY).  CONDITION is a symbol (not quoted) that
+specifies under which condition BODY is to be executed.  Valid
+symbols are:
 
-`entries': execute when there are entries in the database,
-`marked-entries': execute when there are marked entries in the database,
-`database': execute if there is a database,
-`no-database': execute if there is no database,
-`real-db': execute when there is a database and it is not filtered,
-`filtered-db': execute when there is a database and it is filtered,
+`entries': execute if there are entries in the database;
+`marked-entries': execute  there are marked entries in the database;
+`database': execute if there is a database;
+`no-database': execute if there is no database;
+`real-db': execute if there is a database that is not filtered nor a slave;
+`filtered-db': execute if there is a filtered database;
+`slave-db': execute if there is a slave database;
 `default': execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
-first one that matches.  If ENVIRONMENT contains more than one
-condition, BODY is executed if they all match (i.e., the
-conditions are AND'ed.)"
+first one that matches.
+
+CONDITION can also be a list starting with `and' or `or' followed
+by two or more condition symbols."
   (declare (indent defun)
            (debug (&rest (sexp form))))
   `(cond
     ,@(mapcar (lambda (form)
-                (cons (if (= 1 (length (car form)))
-                          (ebib--execute-helper (caar form))
-                        `(and ,@(mapcar (lambda (env)
-                                          (ebib--execute-helper env))
-                                        (car form))))
-                      (cdr form)))
+                (let ((condition (car form)))
+                  (cons (cond
+                         ((symbolp condition)
+                          (ebib--execute-helper condition))
+                         ((listp condition)
+                          (unless (memq (car condition) '(and or))
+                            (error "`ebib--execute-when': malformed condition"))
+                          (cons (car condition) (mapcar (lambda (env)
+                                                          (ebib--execute-helper env))
+                                                        (cdr condition)))))
+                        (cdr form))))
               forms)))
 
 (defun ebib--mode-line-modified-p (&optional db)
@@ -1538,6 +1581,13 @@ formatting the entry."
           (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
 
+(defun ebib--format-master (db)
+  "Write DB's master database to the current buffer."
+  (let ((master (ebib-db-get-master db)))
+    (when master
+      (insert (format "@Comment{\nebib-master-file: %s\n}\n\n"
+                      (ebib-db-get-filename master))))))
+
 (defun ebib--format-strings (db)
   "Write the @Strings of DB into the current buffer in BibTeX format."
   (mapc (lambda (str)
@@ -1569,6 +1619,7 @@ referred to by ENTRY-KEY."
 (defun ebib--format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
   (ebib--format-comments db)
+  (ebib--format-master db)
   (when (ebib-db-get-preamble db)
     (insert (format "@Preamble{%s}\n\n" (ebib-db-get-preamble db))))
   (ebib--format-strings db)
@@ -1616,7 +1667,7 @@ ENTRIES is a list of entry keys."
               (setq modified t)))
           entries)
     (when modified
-      (ebib-db-kill-buffer target-db)
+      (ebib--mark-index-dirty target-db)
       (ebib-db-set-modified t target-db))))
 
 (defun ebib--export-entries-to-file (entries filename source-db)
@@ -1766,6 +1817,18 @@ If STRING is already braced, do nothing."
   (if (ebib-unbraced-p string)
       (concat "{" string "}")
     string))
+
+(defun ebib--real-database-p (db)
+  "Return non-nil if DB is a real database.
+Return nil if DB is either a filtered or a slave database."
+  (not (or (ebib-db-filtered-p db)
+           (ebib-db-slave-p db))))
+
+(defun ebib--list-slaves (database)
+  "Return a list of slave databases for DATABASE."
+  (seq-filter (lambda (db)
+                (eq (ebib-db-get-master db) database))
+              ebib--databases))
 
 (defun ebib--list-fields (entry-type type dialect)
   "List the fields of ENTRY-TYPE.
