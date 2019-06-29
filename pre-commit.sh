@@ -22,7 +22,7 @@ SOURCE="manual/ebib.text"               # markdown source
 SOURCE_BBODY="manual/header.texi"       # texinfo headers
 TEXINFO="manual/ebib.texi"              # texinfo output
 INFO="ebib.info"                        # GNU info output
-HTML="docs/ebib-manual.html"            # HTML output
+MARKDOWN_GFM="docs/ebib-manual.md"      # Github-flavoured Markdown output
 
 SCRIPT=$(basename "$0")
 
@@ -67,18 +67,15 @@ function run_makeinfo
 }
 
 
-function create_html
+function create_gfm
 {
     local source="$1"
-    echo "$SCRIPT: running pandoc to create html"
+    echo "$SCRIPT: running pandoc to create gfm"
     pandoc --read=markdown \
-           --write=html \
-           --output="$HTML" \
-           --css=ebib.css \
-           --standalone \
-           --table-of-contents \
+           --write=gfm \
+           --output="$MARKDOWN_GFM" \
            "$1" && return 0
-    echo "$SCRIPT: pandoc -w html failed"
+    echo "$SCRIPT: pandoc -w gfm failed"
     let "errors++"
     return 1
 }
@@ -102,7 +99,7 @@ if [  "$INFO" -ot "$SOURCE" ] ; then
     echo "$SCRIPT: regenerating documentation files"
     git stash -q --keep-index
     create_texi "$SOURCE" && run_makeinfo "$TEXINFO" && git add "$INFO"
-    create_html "$SOURCE" && git add "$HTML"
+    create_gfm "$SOURCE" && git add "$MARKDOWN_GFM"
     git stash pop -q
 fi
 check_exit   "$errors"
