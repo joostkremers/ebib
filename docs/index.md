@@ -13,36 +13,32 @@ Bib(La)TeX files easier.
 
 ### General
 
-  - Visual representation distinguishing obligatory, optional and extra
-    fields.
-  - Copy/cut/paste mechanism for quickly copying field values. (This
-    fully integrates with Emacs’ kill ring.)
-  - Automatic loading of `.bib` files upon start-up.
-  - Extensive [user manual](ebib-manual.md).
+- Visual representation distinguishing obligatory, optional and extra fields.
+- Copy/cut/paste mechanism for quickly copying field values. (This fully
+  integrates with Emacs’ kill ring.)
+- Automatic loading of `.bib` files upon start-up.
+- Extensive [user manual](ebib-manual.md).
 
 ### BibTeX / BibLaTeX
 
-  - Support for both BibTeX and BibLaTeX files.
-  - Creating and editing `@string` and `@preamble` definitions is
-    supported (`@comment`s are kept, but are not editable).
-  - BibTeX / BibLaTeX entry and field types can be customised, allowing
-    adaptation for non-standard and personal bibliography styles.
-  - Automatic creation of entry keys (using the functionality of Emacs’
-    `bibtex-mode`).
-  - Field values containing newlines are supported, allowing the
-    creation of annotated bibliographies.
-  - Crossreferencing is supported, both BibTeX and BibLaTeX mechanisms.
-  - The database can be saved with the entries in the `.bib` file sorted
-    on user-specified fields (useful in ConTeXt).
+- Support for both BibTeX and BibLaTeX files.
+- Creating and editing `@string` and `@preamble` definitions is supported
+  (`@comment`s are kept, but are not editable).
+- BibTeX / BibLaTeX entry and field types can be customised, allowing adaptation
+  for non-standard and personal bibliography styles.
+- Automatic creation of entry keys (using the functionality of Emacs’
+  `bibtex-mode`).
+- Field values containing newlines are supported, allowing the creation of
+  annotated bibliographies.
+- Crossreferencing is supported, both BibTeX and BibLaTeX mechanisms.
+- The database can be saved with the entries in the `.bib` file sorted on
+  user-specified fields (useful in ConTeXt).
 
 ### Databases
 
-  - Multiple `.bib` files can be opened at the same time.
-  - Merging of a second `.bib` file with an already loaded database.
-  - Single or multiple entries can be exported to another file, or to
-    another open database, allowing the creation of a new specialised
-    `.bib` file from an existing one. `@preamble` and `@string`
-    definitions can also be exported.
+- Multiple `.bib` files can be opened at the same time.
+- Easily create a separate `.bib` file for a paper, article or book through a "slave" database.
+- Databases can be merged; specific entries or `@preamble` and `@string` definitions can be exported to other databases or to a `.bib`file.
 
 ### Searching
 
@@ -53,36 +49,32 @@ Bib(La)TeX files easier.
     searching only specific fields. Search queries can be saved for
     later reuse.
 
-### LaTeX integration
+### LaTeX / Org / Markdown integration
 
-  - From within a LaTeX document, it is possible to select a Bib(La)TeX
-    using TAB-completion (or [Ivy](https://github.com/abo-abo/swiper),
-    it it’s installed) and insert it key into the document. This can
-    also be set up for other document formats that support automatic
-    bibliographies: support for [Org mode](http://orgmode.org) and
-    [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown is included.
-  - Inside Ebib, it is possible to push entries to a LaTeX / Org mode /
-    Markdown buffer.
-  - Quick summary of entries into a `*Help*` buffer.
-  - Creating a `.bib` file from a `.bbl` file, allowing you to create a
-    `.bib` file for a LaTeX document containing only the references in
-    the document.
+- From within a LaTeX, Org mode or [Pandoc](https://pandoc.org) document, it is
+  possible to select a Bib(La)TeX using standard Emacs completion,
+  [Ivy](https://github.com/abo-abo/swiper), or
+  [Helm](https://github.com/emacs-helm/helm) and insert a citation into the
+  document. This can also be set up for other document formats that support
+  automatic bibliographies.
+- Inside Ebib, it is possible to push entries to a LaTeX / Org mode / Markdown
+  buffer.
+- Quick summary of entries into a `*Help*` buffer.
+- Creating a `.bib` file from a `.bbl` file, allowing you to create a `.bib`
+  file for a LaTeX document containing only the references in the document.
 
 ### Miscellaneous
 
-  - Entries can be imported from text buffers or from the `*scratch*`
-    buffer (allowing copy & paste of BibTeX entries, e.g. from the
-    Internet).
-  - A URL stored in a BibTeX field can be extracted and sent to a
-    browser.
-  - Files stored in a BibTeX field can be opened with user-configurable
-    viewers.
-  - A time stamp can be added to each new entry, allowing you to keep
-    track of new additions in the database.
-  - (Parts of) databases can be printed, either as a list of references
-    typeset by BibTeX / BibLaTeX, or directly as database entries.
-  - Keywords can be stored in a file to aid in maintaining uniformity in
-    keywords within and across `.bib` files.
+- Entries can be imported from text buffers or from the `*scratch*` buffer
+  (allowing copy & paste of BibTeX entries, e.g. from the Internet).
+- A URL stored in a BibTeX field can be extracted and sent to a browser.
+- Files stored in a BibTeX field can be opened with user-configurable viewers.
+- A time stamp can be added to each new entry, allowing you to keep track of new
+  additions in the database.
+- (Parts of) databases can be printed, either as a list of references typeset by
+  BibTeX / BibLaTeX, or directly as database entries.
+- Keywords can be stored in a file to aid in maintaining uniformity in keywords
+  within and across `.bib` files.
 
 
 ## Screenshots
@@ -121,7 +113,7 @@ The easiest way to install Ebib is to use [Melpa](http://melpa.org/).
 If you want to download the source, you can clone the [git
 repository](https://github.com/joostkremers/ebib.git) for Ebib, or get a
 tar ball from the [Github releases
-page](https://github.com/joostkremers/ebib/releases).
+page](https://github.com/joostkremers/ebib/releases). Note that Ebib depends on [parsebib](https://github.com/joostkremers/parsebib), which therefore also needs to be installed.
 
 
 ## Support
