@@ -54,7 +54,7 @@ Bib(La)TeX files easier.
 - From within a LaTeX, Org mode or [Pandoc](https://pandoc.org) document, it is
   possible to select a Bib(La)TeX key using standard Emacs completion,
   [Ivy](https://github.com/abo-abo/swiper), or
-  [Helm](https://github.com/emacs-helm/helm) and insert a citation into the
+  [Helm](https://github.com/emacs-helm/helm), and insert a citation into the
   document. This can also be set up for other document formats that support
   automatic bibliographies.
 - Inside Ebib, it is possible to push entries to a LaTeX / Org mode / Markdown
@@ -79,19 +79,19 @@ Bib(La)TeX files easier.
 
 ## Screenshots
 
-Visually, Ebib is not very spectacular. But to get an impression of what
-it looks like, you can look at the following three screenshots. The
-first shows Ebib’s standard lay-out, with the list of entry keys in the
-top window and the fields of the currently highlighted entry in the
-bottom window. The field values displayed in a greenish colour come from
-the cross-referenced entry. (The colours Ebib uses are inherited from
-the current colour theme, but they can be customised independently.)
+Visually, Ebib is not very spectacular, but to get an impression of what it
+looks like, you can look at the following three screenshots. The first shows
+Ebib’s standard lay-out, with the list of entry keys in the top window and the
+fields of the currently highlighted entry in the bottom window. The field values
+displayed in a lighter gray colour come from the cross-referenced entry. (The
+colours Ebib uses are inherited from the current colour theme, but they can be
+customised independently.)
 
-In the second image, which uses an alternative partial-frame layout, the
-string `"Geraci"` is highlighted as the result of a text search. It also
-shows a buffer with a note for the highlighted entry. The third
-screenshot shows the strings buffer, where you can edit the `@String`
-definitions in the database.
+In the second image, which uses an alternative partial-frame layout, the string
+`"Geraci"` is highlighted as the result of a text search. It also shows a buffer
+with a note for the highlighted entry. The third screenshot shows the strings
+buffer in the lower window, where you can edit the `@String` definitions in the
+database.
 
 <a href="images/Main-view.png">
 <img style="width:192px;height:106px" src="images/tn-Main-view.png" alt="screenshot 1" /></a>
