@@ -52,7 +52,7 @@ Bib(La)TeX files easier.
 ### LaTeX / Org / Markdown integration
 
 - From within a LaTeX, Org mode or [Pandoc](https://pandoc.org) document, it is
-  possible to select a Bib(La)TeX using standard Emacs completion,
+  possible to select a Bib(La)TeX key using standard Emacs completion,
   [Ivy](https://github.com/abo-abo/swiper), or
   [Helm](https://github.com/emacs-helm/helm) and insert a citation into the
   document. This can also be set up for other document formats that support
