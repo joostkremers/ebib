@@ -93,12 +93,10 @@ with a note for the highlighted entry. The third screenshot shows the strings
 buffer in the lower window, where you can edit the `@String` definitions in the
 database.
 
-<a href="images/Main-view.png">
-<img style="width:192px;height:106px" src="images/tn-Main-view.png" alt="screenshot 1" /></a>
-<a href="images/Search-view.png">
-<img style="width:192px;height:106px" src="images/tn-Search-view.png" alt="screenshot 1" /></a>
-<a href="images/Strings-buffer.png">
-<img style="width:192px;height:106px" src="images/tn-Strings-buffer.png" alt="screenshot 2" /></a>
+![Main View](images/Main-view.png)
+![Search View](images/Search-view.png)
+![Strings Buffer](images/Strings-buffer.png)
+
 
 ## Manual
 
