@@ -9,6 +9,7 @@ deleting, modifying entries), searched, and saved. Apart from the
 basics, Ebib has quite a few extra features that make managing your
 Bib(La)TeX files easier.
 
+
 ## Features
 
 ### General
@@ -75,7 +76,7 @@ Bib(La)TeX files easier.
   BibTeX / BibLaTeX, or directly as database entries.
 - Keywords can be stored in a file to aid in maintaining uniformity in keywords
   within and across `.bib` files.
-
+- No lock-in. Use any other tool Emacs provides on your `.bib` files and simply reload the file in Ebib afterwards.
 
 ## Screenshots
 
@@ -94,7 +95,9 @@ buffer in the lower window, where you can edit the `@String` definitions in the
 database.
 
 ![Main View](images/Main-view.png)
+
 ![Search View](images/Search-view.png)
+
 ![Strings Buffer](images/Strings-buffer.png)
 
 
