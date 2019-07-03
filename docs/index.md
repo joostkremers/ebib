@@ -88,15 +88,16 @@ displayed in a lighter gray colour come from the cross-referenced entry. (The
 colours Ebib uses are inherited from the current colour theme, but they can be
 customised independently.)
 
-In the second image, which uses an alternative partial-frame layout, the string
-`"Geraci"` is highlighted as the result of a text search. It also shows a buffer
-with a note for the highlighted entry. The third screenshot shows the strings
-buffer in the lower window, where you can edit the `@String` definitions in the
-database.
-
 ![Main View](images/Main-view.png)
 
+In the second image, which uses an alternative partial-frame layout, the string
+`"Geraci"` is highlighted as the result of a text search. It also shows a buffer
+with a note for the highlighted entry.
+
 ![Search View](images/Search-view.png)
+
+The third screenshot shows the strings buffer in the lower window, where you can
+edit the `@String` definitions in the database.
 
 ![Strings Buffer](images/Strings-buffer.png)
 
