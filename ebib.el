@@ -2608,7 +2608,8 @@ current entry."
            (buffer (read-buffer "Push to buffer: " ebib--push-buffer t)))
        (when buffer
          (setq ebib--push-buffer buffer)
-         (let ((citation-command (ebib--create-citation (buffer-local-value 'major-mode (get-buffer buffer)) keys ebib--cur-db)))
+         (let ((citation-command (ebib--create-citation (buffer-local-value 'major-mode (get-buffer buffer))
+                                                        keys ebib--cur-db)))
            (when citation-command
              (with-current-buffer buffer
                (insert citation-command))
@@ -2649,7 +2650,9 @@ key inserted into the buffer."
                             (with-ivy-window
                               (delete-region ivy-completion-beg ivy-completion-end)
                               (setq ivy-completion-beg (point))
-                              (insert (ebib--create-citation (buffer-local-value 'major-mode (current-buffer)) (list (get-text-property 0 'ebib-key item)) (get-text-property 0 'ebib-db item)))
+                              (insert (ebib--create-citation (buffer-local-value 'major-mode (current-buffer))
+                                                             (list (get-text-property 0 'ebib-key item))
+                                                             (get-text-property 0 'ebib-db item)))
                               (setq key (get-text-property 0 'ebib-key item))
                               (setq ivy-completion-end (point))))
                   :history 'ebib--citation-history
@@ -2662,21 +2665,17 @@ key inserted into the buffer."
 The keys for the collection are taken from the databases listed
 in DATABASES."
   (seq-reduce (lambda (coll db)
-                (append (mapcar
-                         (lambda (key)
-                           (cons
-                            (concat
-                             (propertize
-                              (ebib--get-field-value-for-display "Author/Editor" key db)
-                              'face 'font-lock-keyword-face)
-                             (propertize
-                              (format " (%s) "
-                                      (ebib--get-field-value-for-display "Year" key db))
-                              'face 'font-lock-variable-name-face)
-                             (format "%s"
-                                     (ebib--get-field-value-for-display "Title" key db)))
-                            (list key db)))
-                         (ebib-db-list-keys db))
+                (append (mapcar (lambda (key)
+                                  (cons (concat (propertize
+                                                 (ebib--get-field-value-for-display "Author/Editor" key db)
+                                                 'face 'font-lock-keyword-face)
+                                                (propertize
+                                                 (format " (%s) " (ebib--get-field-value-for-display "Year" key db))
+                                                 'face 'font-lock-variable-name-face)
+                                                (format "%s"
+                                                        (ebib--get-field-value-for-display "Title" key db)))
+                                        (list key db)))
+                                (ebib-db-list-keys db))
                         coll))
               databases nil))
 
