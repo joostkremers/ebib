@@ -23,6 +23,7 @@ SOURCE_BBODY="manual/header.texi"       # texinfo headers
 TEXINFO="manual/ebib.texi"              # texinfo output
 INFO="ebib.info"                        # GNU info output
 MARKDOWN_GFM="docs/ebib-manual.md"      # Github-flavoured Markdown output
+RAW_FILTER="manual/raw.lua"             # Filter for handling {{raw}} directives
 
 SCRIPT=$(basename "$0")
 
@@ -48,6 +49,7 @@ function create_texi
            --write=texinfo \
            --output="$TEXINFO" \
            --include-before-body="$SOURCE_BBODY" \
+           --lua-filter="$RAW_FILTER" \
            --standalone \
            --table-of-contents \
            "$1" && return 0
@@ -73,6 +75,7 @@ function create_gfm
     echo "$SCRIPT: running pandoc to create gfm"
     pandoc --read=markdown \
            --write=gfm \
+           --lua-filter="$RAW_FILTER" \
            --output="$MARKDOWN_GFM" \
            "$1" && return 0
     echo "$SCRIPT: pandoc -w gfm failed"
