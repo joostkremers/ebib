@@ -1,3 +1,5 @@
+<article>
+
 Ebib is a program with which you can manage BibTeX and BibLateX database
 files without having to edit the raw `.bib` files. It runs in GNU/Emacs,
 version 25.1 or higher.
@@ -409,9 +411,9 @@ multiline value is displayed in the entry buffer. See the options
 `ebib-multiline-display-function` and `ebib-multiline-display-max-lines`
 for details.
 
-For more details on working with multiline edit buffers, see [Multiline Edit
-Buffers](#multiline-edit-buffers). Note that the key bindings for leaving a
-multiline edit buffer can be changed. See [Modifying Key
+For more details on working with multiline edit buffers, see [Multiline
+Edit Buffers](#multiline-edit-buffers). Note that the key bindings for
+leaving a multiline edit buffer can be changed. See [Modifying Key
 Bindings](#modifying-key-bindings) for details.
 
 ## Undefined Fields
@@ -1067,24 +1069,24 @@ command is set up by default, so you may want to add some commands. For
 example, this is what I use:
 
 {% raw %}
-```
-(setq ebib-citation-commands
-      '((any
-         (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
-          ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
-          ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
-          ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
-          ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
-          ("posstext"    "\\posstextcite%<[%A]%>{%K}")
-          ("posscite"    "\\posscite%<[%A]%>{%K}")
-          ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
-        (org-mode
-         (("ebib"        "[[ebib:%K][%D]]")))
-        (markdown-mode
-         (("text"        "@%K%< [%A]%>")
-          ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
-          ("year"        "[-@%K%< %A%>]")))))
-```
+
+    (setq ebib-citation-commands
+          '((any
+             (("cite"        "\\cite%<[%A]%>[%A]{%(%K%,)}")
+              ("text"        "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+              ("paren"       "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+              ("author"      "\\citeauthor%<[%A]%>{%(%K%,)}")
+              ("possauthor"  "\\possciteauthor%<[%A]%>{%K}")
+              ("posstext"    "\\posstextcite%<[%A]%>{%K}")
+              ("posscite"    "\\posscite%<[%A]%>{%K}")
+              ("year"        "\\citeyear%<[%A]%>[%A]{%K}")))
+            (org-mode
+             (("ebib"        "[[ebib:%K][%D]]")))
+            (markdown-mode
+             (("text"        "@%K%< [%A]%>")
+              ("paren"       "[%(%<%A %>@%K%<, %A%>%; )]")
+              ("year"        "[-@%K%< %A%>]")))))
+
 {% endraw %}
 
 Calling Ebib from a text mode buffer has another small advantage. If
@@ -1157,11 +1159,12 @@ directives are recognised:
     a description, for which the user is prompted. Mainly for use in Org
     citations.
 
-In the simplest case, the format string contains just a `%K` directive: {% raw
-%}`\cite{%K}`{% endraw %}. In this case, `%K` is replaced with the citation key
-and the result inserted. Usually, however, citation commands allow for optional
-arguments that are formatted as pre- or postnotes to the citation. For example,
-using the `natbib` package, you have citation commands available of the form:
+In the simplest case, the format string contains just a `%K` directive:
+{% raw %} `\cite{%K}`. {% endraw %} In this case, `%K` is replaced with
+the citation key and the result inserted. Usually, however, citation
+commands allow for optional arguments that are formatted as pre- or
+postnotes to the citation. For example, using the `natbib` package, you
+have citation commands available of the form:
 
     \citet[cf.][p. 50]{Jones1992}
 
@@ -1169,9 +1172,9 @@ In order to be able to insert such citations, the format string must
 contain `%A` directives:
 
 {% raw %}
-```
-\citet[%A][%A]{%K}
-```
+
+    \citet[%A][%A]{%K}
+
 {% endraw %}
 
 With such a format string, Ebib asks the user to provide text for the
@@ -1188,9 +1191,9 @@ to appear if the arguments are empty. In that case, you can wrap the
 brackets and the `%A` directives in a `%<...%>` pair:
 
 {% raw %}
-```
-\citet%<[%A]%>%<[%A]%>{%K}
-```
+
+    \citet%<[%A]%>%<[%A]%>{%K}
+
 {% endraw %}
 
 Now, if you leave the arguments empty, Ebib produces the following
@@ -1209,9 +1212,9 @@ postnote, while what you intended is actually a prenote. Therefore, it
 is best not to make the second argument optional:
 
 {% raw %}
-```
-\citet%<[%A]%>[%A]{%K}
-```
+
+    \citet%<[%A]%>[%A]{%K}
+
 {% endraw %}
 
 This way, the second pair of brackets is always inserted, regardless of
@@ -1233,9 +1236,9 @@ provide a separator, which is done by placing it between the `%` and the
 closing parenthesis:
 
 {% raw %}
-```
-\citet[%A][%A]{%(%K%,)}
-```
+
+    \citet[%A][%A]{%(%K%,)}
+
 {% endraw %}
 
 This format string says that the directive `%K` can be repeated and that
@@ -1254,9 +1257,9 @@ brackets `[]`. In order to get such citations, you can provide the
 following format string:
 
 {% raw %}
-```
-\footcites%(%<[%A]%>[%A]{%K}%)
-```
+
+    \footcites%(%<[%A]%>[%A]{%K}%)
+
 {% endraw %}
 
 Here, the entire sequence of two optional arguments and the obligatory
@@ -1271,9 +1274,9 @@ previous example, because the part `\footcites` is not repeated. But the
 part that is not repeated may contain `%A` directives as well:
 
 {% raw %}
-```
-\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
-```
+
+    \footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)
+
 {% endraw %}
 
 Multicite commands in `biblatex` take two additional arguments
@@ -2456,3 +2459,4 @@ which are rather awkward to type, can be redefined as follows:
     "\C-c\C-s" 'ebib-save-from-multiline-buffer))
 ```
 
+</article>
