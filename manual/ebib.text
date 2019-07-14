@@ -189,7 +189,7 @@ If you want to leave the multiline edit buffer without saving the text you have 
 
 When a field has a multiline value, at most ten lines are shown in the entry buffer. If the text is longer, an ellipsis indicator `[...]` is added after the last line that is displayed. If you want to see the whole contents of a multiline field, you can use `v`: this will display the contents of the current field in a `*Help*` buffer (which can be dismissed again with `q`). It's possible to customise the way a multiline value is displayed in the entry buffer. See the options `ebib-multiline-display-function` and `ebib-multiline-display-max-lines` for details.
 
-For more details on working with multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers).
+For more details on working with multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers). Note that the key bindings for leaving a multiline edit buffer can be changed. See [Modifying Key Bindings](#modifying-key-bindings) for details.
 
 
 ## Undefined Fields ##
@@ -951,7 +951,7 @@ If you load this entry into Ebib with the option "Allow Identical Fields" set, y
 
 As mentioned several times before, field values that contain newlines (so-called *multiline fields*) and the `@Preamble` are edited in a so-called *multiline edit buffer*. This section discusses the details of this buffer.
 
-Ebib enters a multiline edit buffer in one of three cases: when you edit the `@Preamble` definition, when you hit `m` in the entry buffer to edit the current field as multiline, or when you hit `e` on the `annote`/`annotation` or `abstract  fields, or on a field whose value already is multiline.
+Ebib enters a multiline edit buffer in one of three cases: when you edit the `@Preamble` definition, when you hit `m` in the entry buffer to edit the current field as multiline, or when you hit `e` on the `annote`/`annotation` or `abstract`  fields, or on a field whose value already is multiline.
 
 The major mode that is used in multiline edit buffers is user-configurable. The default value is `text-mode`, but if you prefer to use some other mode, you can specify this through the customisation option `ebib-multiline-major-mode`.
 

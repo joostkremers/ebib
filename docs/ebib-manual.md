@@ -409,8 +409,10 @@ multiline value is displayed in the entry buffer. See the options
 `ebib-multiline-display-function` and `ebib-multiline-display-max-lines`
 for details.
 
-For more details on working with multiline edit buffers, see [Multiline
-Edit Buffers](#multiline-edit-buffers).
+For more details on working with multiline edit buffers, see [Multiline Edit
+Buffers](#multiline-edit-buffers). Note that the key bindings for leaving a
+multiline edit buffer can be changed. See [Modifying Key
+Bindings](#modifying-key-bindings) for details.
 
 ## Undefined Fields
 
@@ -2332,7 +2334,7 @@ this buffer.
 Ebib enters a multiline edit buffer in one of three cases: when you edit
 the `@Preamble` definition, when you hit `m` in the entry buffer to edit
 the current field as multiline, or when you hit `e` on the
-`annote`/`annotation` or \`abstract fields, or on a field whose value
+`annote`/`annotation` or `abstract` fields, or on a field whose value
 already is multiline.
 
 The major mode that is used in multiline edit buffers is
