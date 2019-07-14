@@ -1,5 +1,3 @@
-<article>
-
 Ebib is a program with which you can manage BibTeX and BibLateX database
 files without having to edit the raw `.bib` files. It runs in GNU/Emacs,
 version 25.1 or higher.
@@ -2458,5 +2456,3 @@ which are rather awkward to type, can be redefined as follows:
   (define-key ebib-multiline-mode-map
     "\C-c\C-s" 'ebib-save-from-multiline-buffer))
 ```
-
-</article>
