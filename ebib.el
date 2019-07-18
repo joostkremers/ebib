@@ -3447,8 +3447,8 @@ If FILE is not in (a subdirectory of) one of the directories in
 (defun ebib--create-author/editor-collection ()
   "Create a collection from authors and editors."
   (seq-uniq (delq nil (apply #'seq-concatenate 'list (mapcar (lambda (entry)
-                                                               (split-string (ebib-unbrace (or (alist-get "author" entry nil nil #'cl-equalp)
-                                                                                               (alist-get "editor" entry nil nil #'cl-equalp)
+                                                               (split-string (ebib-unbrace (or (cdr (assoc-string "author" entry 'case-fold))
+                                                                                               (cdr (assoc-string "editor" entry 'case-fold))
                                                                                                ""))
                                                                              (regexp-quote " and ") t))
                                                              (apply #'seq-concatenate 'list (mapcar (lambda (db)
@@ -3489,7 +3489,7 @@ and editors in all databases."
 (defun ebib--create-collection-from-field (field)
   "Create a collection from the contents of FIELD."
   (seq-uniq (delq nil (mapcar (lambda (entry)
-                                (ebib-unbrace (alist-get field entry nil nil #'equal)))
+                                (ebib-unbrace (cdr (assoc-string field entry 'case-fold))))
                               (apply #'seq-concatenate 'list (mapcar (lambda (db)
                                                                        (hash-table-values (ebib-db-val 'entries db)))
                                                                      (seq-filter (lambda (db)
