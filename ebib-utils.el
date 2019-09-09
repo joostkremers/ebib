@@ -1955,7 +1955,7 @@ or \"XXXX\" if it's empty."
   (save-match-data
     (let ((date (ebib-get-field-value "Date" key db 'noerror 'unbraced 'xref)))
       (if (and date
-               (string-match "^\\(?:\\.\\.\\)?/?\\([0-9]\\{4\\}\\)" date))
+               (string-match "^\\(?:\\.\\.\\)?/?\\(-?[0-9]\\{4\\}\\)" date))
           (match-string 1 date)
         (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref)))))
 
