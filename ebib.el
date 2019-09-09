@@ -4301,7 +4301,7 @@ is applied.  If no entry matches, URL is returned unchanged."
 
 (defun ebib-import-file (arg)
   "Import a file into the database.
-Ask the user for a file path, rename it move it to the first
+Ask the user for a file path, rename it and move it to the first
 directory in `ebib-file-search-dirs'.  The new name is created by
 applying the function in `ebib-name-transform-function' to the
 entry key.  The file extension of the original file is retained.
