@@ -1660,17 +1660,19 @@ referred to by ENTRY-KEY."
 (defun ebib--export-entries-to-db (entries target-db source-db)
   "Export ENTRIES from SOURCE-DB to TARGET-DB.
 ENTRIES is a list of entry keys."
-  (let ((target-keys-list (ebib-db-list-keys target-db))
-        (modified nil))
-    (mapc (lambda (key)
-            (if (member key target-keys-list)
-                (ebib--log 'message "Entry key `%s' already exists in database %s" key (ebib-db-get-filename target-db 'short))
-              (ebib--store-entry key (copy-tree (ebib-db-get-entry key source-db)) target-db t)
-              (setq modified t)))
-          entries)
-    (when modified
-      (ebib--mark-index-dirty target-db)
-      (ebib-db-set-modified t target-db))))
+  (if (ebib-db-slave-p target-db)
+      (error "Cannot export entries to a slave database ")
+    (let ((target-keys-list (ebib-db-list-keys target-db))
+          (modified nil))
+      (mapc (lambda (key)
+              (if (member key target-keys-list)
+                  (ebib--log 'message "Entry key `%s' already exists in database %s" key (ebib-db-get-filename target-db 'short))
+                (ebib--store-entry key (copy-tree (ebib-db-get-entry key source-db)) target-db t)
+                (setq modified t)))
+            entries)
+      (when modified
+        (ebib--mark-index-dirty target-db)
+        (ebib-db-set-modified t target-db)))))
 
 (defun ebib--export-entries-to-file (entries filename source-db)
   "Export ENTRIES from SOURCE-DB to FILENAME.
