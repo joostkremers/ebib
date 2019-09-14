@@ -194,7 +194,7 @@ instead.  Use `ebib-db-add-entries-to-slave' instead."
 	(setq exists nil))
        ;; Otherwise signal an error, if so requested:
        ((not (eq if-exists 'noerror))
-	(error "[Ebib] Key `%s' exists in database; cannot overwrite" key))))
+	(error "[Ebib] Key `%s' exists in database `%s'; cannot overwrite" key (ebib-db-get-filename db 'shortened)))))
     (unless exists
       (if data
 	  (puthash key data (ebib-db-val 'entries db))
