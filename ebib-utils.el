@@ -996,9 +996,11 @@ BUFFER is a symbol referring to a buffer in
 (defun ebib--mark-index-dirty (db)
   "Mark the index buffer of DB as dirty.
 An index buffer is dirty if it does not reflect the contents of
-its database."
-  (with-current-buffer (ebib-db-get-buffer db)
-    (setq ebib--dirty-index-buffer t)))
+its database.  If DB has no index buffer yet, do nothing."
+  (let ((buffer (ebib-db-get-buffer db)))
+    (if buffer
+        (with-current-buffer
+            (setq ebib--dirty-index-buffer t)))))
 
 (defmacro with-ebib-window-nondedicated (window &rest body)
   "Execute BODY with WINDOW non-dedicated.
