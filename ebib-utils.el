@@ -999,8 +999,8 @@ An index buffer is dirty if it does not reflect the contents of
 its database.  If DB has no index buffer yet, do nothing."
   (let ((buffer (ebib-db-get-buffer db)))
     (if buffer
-        (with-current-buffer
-            (setq ebib--dirty-index-buffer t)))))
+        (with-current-buffer buffer
+          (setq ebib--dirty-index-buffer t)))))
 
 (defmacro with-ebib-window-nondedicated (window &rest body)
   "Execute BODY with WINDOW non-dedicated.
