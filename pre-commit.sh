@@ -19,7 +19,7 @@
 # PREAMBLE
 
 SOURCE="manual/ebib.text"               # markdown source
-SOURCE_BBODY="manual/header.texi"       # texinfo headers
+SOURCE_BBODY="manual/before-body.texi"  # texinfo headers
 TEXINFO="manual/ebib.texi"              # texinfo output
 INFO="ebib.info"                        # GNU info output
 MARKDOWN_GFM="docs/ebib-manual.md"      # Github-flavoured Markdown output
