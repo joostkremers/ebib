@@ -1043,7 +1043,7 @@ interactively."
         (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
         (if (file-exists-p file)
             (progn
-              (ebib--load-entries file new-db)
+              (ebib--bib-read-entries file new-db)
               (ebib-db-set-backup t new-db)
               (ebib-db-set-modified nil new-db))
           ;; If the file does not exist, we need to issue a message.
@@ -1095,7 +1095,7 @@ interactively."
     ;; Then load the file.
     (ebib--log 'log "%s: Reloading file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") file)
     (ebib-db-set-filename file db)
-    (ebib--load-entries file db)
+    (ebib--bib-read-entries file db)
     ;; If the user makes any changes, we'll want to create a back-up.
     (ebib-db-set-backup t ebib--cur-db)
     (ebib-db-set-current-entry-key cur-key db)))
@@ -1111,12 +1111,12 @@ interactively."
        (if (not (file-readable-p file))
            (error "[Ebib] No such file: %s" file)
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
-         (ebib--load-entries file ebib--cur-db 'ignore-modtime 'not-as-slave)
+         (ebib--bib-read-entries file ebib--cur-db 'ignore-modtime 'not-as-slave)
          (ebib--update-buffers)
          (ebib--set-modified t ebib--cur-db))))
     (default (beep))))
 
-(defun ebib--load-entries (file db &optional ignore-modtime not-as-slave)
+(defun ebib--bib-read-entries (file db &optional ignore-modtime not-as-slave)
   "Load BibTeX entries from FILE into DB.
 If FILE specifies a BibTeX dialect and no dialect is set for DB,
 also set DB's dialect.  FILE's modification time is stored in DB,
@@ -1127,13 +1127,13 @@ FILE as a normal database, even if it is a slave database."
     (unless ignore-modtime
       (ebib-db-set-modtime (ebib--get-file-modtime file) db))
     (if (and (not not-as-slave)
-             (ebib--find-master db))
-        (let ((result (ebib--find-bibtex-entries db nil)))
+             (ebib--bib-find-master db))
+        (let ((result (ebib--bib-find-bibtex-entries db nil)))
           (ebib--log 'message "Loaded %d entries into slave database." (car result)))
       ;; Opening a non-slave database.
       (unless (ebib-db-get-dialect db)
         (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
-      (let ((result (ebib--find-bibtex-entries db nil)))
+      (let ((result (ebib--bib-find-bibtex-entries db nil)))
         (ebib--log 'message "%d entries, %d @Strings and %s @Preamble found in file."
                    (car result)
                    (cadr result)
@@ -1141,7 +1141,7 @@ FILE as a normal database, even if it is a slave database."
     (when ebib--log-error
       (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors"))))))
 
-(defun ebib--find-master (db)
+(defun ebib--bib-find-master (db)
   "Find the master file declaration in the current buffer.
 If a master file is found, make sure it is loaded and set it as
 DB's master.  If no master file is found, return nil.  If a
@@ -1157,7 +1157,7 @@ master file is found but it cannot be opened, log an error."
               (ebib--log 'error "Could not find master database %s" master-file)
               nil)))))) ; Return nil because no database was found.
 
-(defun ebib--find-bibtex-entries (db timestamp)
+(defun ebib--bib-find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
@@ -1173,25 +1173,25 @@ is set to t."
         (preamble nil)
         (entry-list (ebib--list-entry-types (ebib--get-dialect db))))
     (goto-char (point-min))
-    (cl-loop for entry-type = (ebib--find-next-bibtex-item)
+    (cl-loop for entry-type = (ebib--bib-find-next-bibtex-item)
              while entry-type do
              (cond
               ((cl-equalp entry-type "string") ; `cl-equalp' compares strings case-insensitively.
-               (if (ebib--read-string db)
+               (if (ebib--bib-read-string db)
                    (setq n-strings (1+ n-strings))))
               ((cl-equalp entry-type "preamble")
-               (when (ebib--read-preamble db)
+               (when (ebib--bib-read-preamble db)
                  (setq preamble t)))
               ((cl-equalp entry-type "comment")
-               (ebib--read-comment db))
+               (ebib--bib-read-comment db))
               ((stringp entry-type)
-               (when (ebib--read-entry entry-type db timestamp)
+               (when (ebib--bib-read-entry entry-type db timestamp)
                  (setq n-entries (1+ n-entries))
                  (unless (assoc-string entry-type entry-list 'case-fold)
                    (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
     (list n-entries n-strings preamble)))
 
-(defun ebib--find-next-bibtex-item ()
+(defun ebib--bib-find-next-bibtex-item ()
   "Search for the next BibTeX item in the current buffer.
 A BibTeX item is an entry, or a @Preamble, @String or @Comment
 definition.  If an item is found, point is placed right after it
@@ -1203,9 +1203,9 @@ identifier, an error is logged and t is returned."
   (condition-case err
       (parsebib-find-next-item)
     (parsebib-entry-type-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
-                               t))) ; Return t so that searching continues in ebib--find-bibtex-entries.
+                               t))) ; Return t so that searching continues in ebib--bib-find-bibtex-entries.
 
-(defun ebib--read-comment (db)
+(defun ebib--bib-read-comment (db)
   "Read an @Comment entry and store it in DB.
 If the @Comment is a local variable list, store it as such in DB.
 If the @Comment defines a master database, do not store the
@@ -1217,12 +1217,12 @@ comment."
        (let ((lvars (ebib--local-vars-to-list comment)))
          (if lvars
              (ebib-db-set-local-vars lvars db)))
-       ;; Master file: do nothing (the master file was dealt with in `ebib--load-entries'.
+       ;; Master file: do nothing (the master file was dealt with in `ebib--bib-read-entries'.
        (string-match-p "^[[:space:]]*ebib-master-file: \\(.*\\)$" comment)
        ;; Otherwise, store the comment.
        (ebib-db-set-comment comment db)))))
 
-(defun ebib--read-string (db)
+(defun ebib--bib-read-string (db)
   "Read an @String definition and store it in DB.
 Return value is the string if one was read, nil otherwise."
   (unless (ebib-db-slave-p db) ; @Strings are not stored in slave files.
@@ -1236,7 +1236,7 @@ Return value is the string if one was read, nil otherwise."
                                         (line-number-at-pos) abbr)))
         (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
 
-(defun ebib--read-preamble (db)
+(defun ebib--bib-read-preamble (db)
   "Read a @Preamble definition and store it in DB.
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
@@ -1245,7 +1245,7 @@ added to the existing one with a hash sign `#' between them."
       (if preamble
           (ebib-db-set-preamble preamble db 'append)))))
 
-(defun ebib--read-entry (entry-type db &optional timestamp)
+(defun ebib--bib-read-entry (entry-type db &optional timestamp)
   "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
 Return the entry key if an entry was found and could be stored,
 nil otherwise.  Optional argument TIMESTAMP indicates whether a
@@ -1975,22 +1975,22 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
        (with-temp-buffer
          (insert entry)
          (goto-char (point-min))
-         (let ((entry-type (ebib--find-next-bibtex-item)))
+         (let ((entry-type (ebib--bib-find-next-bibtex-item)))
            (cond
             ((cl-equalp entry-type "string") ; `cl-equalp' compares strings case-insensitively.
-             (when (ebib--read-string ebib--cur-db)
+             (when (ebib--bib-read-string ebib--cur-db)
                (setq is-modified t)
                (message "[Ebib] Yanked @String definition.")))
             ((cl-equalp entry-type "preamble")
-             (when (ebib--read-preamble ebib--cur-db)
+             (when (ebib--bib-read-preamble ebib--cur-db)
                (setq is-modified t)
                (message "[Ebib] Yanked @Preamble definition.")))
             ((cl-equalp entry-type "comment")
-             (when (ebib--read-comment ebib--cur-db)
+             (when (ebib--bib-read-comment ebib--cur-db)
                (setq is-modified t)
                (message "[Ebib] Yanked @Comment.")))
             ((stringp entry-type)
-             (setq entry-key (ebib--read-entry entry-type ebib--cur-db t))
+             (setq entry-key (ebib--bib-read-entry entry-type ebib--cur-db t))
              (if entry-key
                  (progn (ebib-db-set-current-entry-key entry-key ebib--cur-db)
                         (setq is-modified t)
@@ -4354,7 +4354,7 @@ or on the region if it is active."
          (let ((buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--find-bibtex-entries ebib--cur-db t)))
+             (let ((result (ebib--bib-find-bibtex-entries ebib--cur-db t)))
                (ebib--mark-index-dirty ebib--cur-db)
                (ebib-db-set-modified t ebib--cur-db)
                (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
