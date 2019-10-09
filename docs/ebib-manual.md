@@ -9,6 +9,11 @@ is.
 
 # News
 
+## Version 2.18, October 2019
+
+  - Add command `ebib-jump-to-entry` (bound to `j` in the index buffer):
+    quickly jump to any entry in any database using completion.
+
 ## Version 2.17, June 2019
 
   - Create slave databases, i.e., databases that share their data with a
@@ -267,6 +272,24 @@ while the first database is active, you move to the last database. If
 you are done with a database and want to close it, type `c`. This closes
 the current database. It does not leave Ebib, and all other databases
 you have open will remain so.
+
+You can quickly jump to any entry in the database with the key `j`. This
+ask you for an entry key using completion and then jumps to the
+corresponding entry. This actually works across databases: the keys that
+are offered for completion are the keys from all open databases. After
+selecting a key, Ebib changes to the corresponding database and shows
+the entry corresponding to the key.
+
+If you use `ivy` or `helm` for completion, instead of completing the
+entry key, you can type any part of the author/editor names, of the
+title and the year of the entry you want to jump to. You can also see
+the bibliography file to which the entry belongs. This is a good way to
+search for a particular entry if you’re not sure of the entry key. (In
+fact, with `ivy` or `helm`, it becomes generally unnecessary to remember
+the entry key of an entry.)
+
+You can restrict the jump candidates to the current database by using a
+prefix argument, i.e., by tying `C-u j`.
 
 ## Starting a New `.bib` File
 
@@ -679,18 +702,29 @@ customising the option `ebib-index-default-sort`.
 
 # Searching
 
+Ebib provides several ways of searching through your database(s). To
+search for a particular entry, you can use the command `j`
+(`ebib-jump-to-entry`). If you are looking for a particular string
+(regular expression), you can use `/` (`ebib-search`), which searches
+through the database entry by entry. Finally, a more powerful search
+method is offered by the filter mechanism, which allows you to filter
+your database on arbitrary criteria.
+
 ## Simple Searches
 
-Ebib provides several search methods. First of all, in the index buffer,
-the normal Emacs incremental searches, `C-s` and `C-r`, can be used to
-search entry keys. Once you’ve found the key you’re searching, you must
-hit `RET` to quit the search and again `RET` to make the entry you found
-active: Ebib does not update the entry buffer during incremental search.
-If you make frequent use of this option, you may want to make the cursor
-visible in the Ebib buffers. Unset the customisation option “Hide
-Cursor” (`ebib-hide-cursor`) to do so.
+If you want to look for a particular entry, the easiest way to do this
+is to use `j`. This command (`ebib-jump-to-entry`) asks for an entry
+key, offering completing while you type. Note that you can use this
+command to search for an entry in all open databases. If you want to
+restrict it to just the current database, use a prefix argument: `C-u
+j`.
 
-The contents of the entries can be searched with `/`. This command
+If you use `ivy` or `helm`, this method is actually very convenient,
+because the completion is more sophisticated: you can search not on
+entry key but on any part of the author/editor name and of the title.
+
+If you want to search the entire contents of your entries, not just the
+author/editor names and the titles, you can use `/`. This command
 (`ebib-search`) searches for a string (more precisely, a regular
 expression) starting from the current entry (i.e., *not* from the first
 entry) and will display the entry with the first occurrence of the
@@ -1023,8 +1057,8 @@ for the current buffer. By default, this is set up for LaTeX and
 When you invoke `ebib-insert-citation`, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
 command to use. You can use TAB completion when typing the key. If you
-have the `ivy` package installed, however, Ebib uses a more
-sophisticated method: instead of typing just the key, you can type
+have either the `ivy` or `helm` package installed, however, Ebib uses a
+more sophisticated method: instead of typing just the key, you can type
 (parts of) the author name, publication year and title in order to find
 the reference you wish to cite.
 

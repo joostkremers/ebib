@@ -8,6 +8,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing BibTeX f
 
 # News #
 
+## Version 2.18, October 2019 ##
+
+- Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion. 
+
 ## Version 2.17, June 2019 ##
 
 - Create slave databases, i.e., databases that share their data with a master database but which are saved as separate `.bib` files.
@@ -133,6 +137,12 @@ To move around in the index buffer, you can use the `up` and `down` cursor keys,
 Ebib is not restricted to opening just one `.bib` file at a time. You can open more files by just typing `o` again and entering the filename. Ebib numbers the databases: the number of each database is shown in the mode line of the index buffer, directly before the database name. The keys 1--9 provide a quick way of jumping from one database to another. Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.
 
 With the `left` and `right` cursor keys, you can move to the previous or next database. These keys wrap, so if you hit the `left` cursor key while the first database is active, you move to the last database. If you are done with a database and want to close it, type `c`. This closes the current database. It does not leave Ebib, and all other databases you have open will remain so.
+
+You can quickly jump to any entry in the database with the key `j`. This ask you for an entry key using completion and then jumps to the corresponding entry. This actually works across databases: the keys that are offered for completion are the keys from all open databases. After selecting a key, Ebib changes to the corresponding database and shows the entry corresponding to the key.
+
+If you use `ivy` or `helm` for completion, instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. (In fact, with `ivy` or `helm`, it becomes generally unnecessary to remember the entry key of an entry.)
+
+You can restrict the jump candidates to the current database by using a prefix argument, i.e., by tying `C-u j`.
 
 
 ## Starting a New `.bib` File ##
@@ -279,11 +289,16 @@ The first column defined in `ebib-index-colums` is the column on which the entri
 
 # Searching #
 
+Ebib provides several ways of searching through your database(s). To search for a particular entry, you can use the command `j` (`ebib-jump-to-entry`). If you are looking for a particular string (regular expression), you can use `/` (`ebib-search`), which searches through the database entry by entry. Finally, a more powerful search method is offered by the filter mechanism, which allows you to filter your database on arbitrary criteria.
+
+
 ## Simple Searches ##
 
-Ebib provides several search methods. First of all, in the index buffer, the normal Emacs incremental searches, `C-s` and `C-r`, can be used to search entry keys. Once you've found the key you're searching, you must hit `RET` to quit the search and again `RET` to make the entry you found active: Ebib does not update the entry buffer during incremental search. If you make frequent use of this option, you may want to make the cursor visible in the Ebib buffers. Unset the customisation option "Hide Cursor" (`ebib-hide-cursor`) to do so.
+If you want to look for a particular entry, the easiest way to do this is to use `j`. This command (`ebib-jump-to-entry`) asks for an entry key, offering completing while you type. Note that you can use this command to search for an entry in all open databases. If you want to restrict it to just the current database, use a prefix argument: `C-u j`.
 
-The contents of the entries can be searched with `/`. This command (`ebib-search`) searches for a string (more precisely, a regular expression) starting from the current entry (i.e., *not* from the first entry) and will display the entry with the first occurrence of the search string that it finds. All the occurrences of the search string in that entry are highlighted.
+If you use `ivy` or `helm`, this method is actually very convenient, because the completion is more sophisticated: you can search not on entry key but on any part of the author/editor name and of the title.
+
+If you want to search the entire contents of your entries, not just the author/editor names and the titles, you can use `/`. This command (`ebib-search`) searches for a string (more precisely, a regular expression) starting from the current entry (i.e., *not* from the first entry) and will display the entry with the first occurrence of the search string that it finds. All the occurrences of the search string in that entry are highlighted.
 
 Ebib searches all the fields of each entry. It is not possible with `/` to specify the fields to search. Note that if the search term is found in a field with a multiline value, Ebib will highlight the `+` sign that is displayed in front of the field value. When the search term is found, Ebib gives a message saying so, similarly if the search term was not found.
 
@@ -429,7 +444,7 @@ One final note: of all the filter-related commands, `~`, `F c`, `F r`, `F s` and
 
 When you're in a text buffer, you can insert a citation with the command `ebib-insert-citation`. This command asks for a key and inserts a citation with that key in a (user-selectable) form that is appropriate for the current buffer. By default, this is set up for LaTeX and  [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers, and for [Org mode](http://orgmode.org).
 
-When you invoke `ebib-insert-citation`, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use TAB completion when typing the key. If you have the `ivy` package installed, however, Ebib uses a more sophisticated method: instead of typing just the key, you can type (parts of) the author name, publication year and title in order to find the reference you wish to cite.
+When you invoke `ebib-insert-citation`, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use TAB completion when typing the key. If you have either the `ivy` or `helm` package installed, however, Ebib uses a more sophisticated method: instead of typing just the key, you can type (parts of) the author name, publication year and title in order to find the reference you wish to cite.
 
 You can define different citation commands for each type of file that you use. That is, you can have one set of citation commands for LaTeX files, another set for Org files, etc. For LaTeX buffers, the only citation command that has been predefined is `cite`, which inserts a citation of the form `\cite[arg]{key}`. You may want to define more commands.
 
