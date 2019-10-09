@@ -1701,7 +1701,7 @@ all entries are marked."
   (ebib--execute-when
     (entries
      (scroll-down)
-     (ebib--select-entry))
+     (ebib--update-entry-buffer))
     (default
       (beep))))
 
@@ -1711,7 +1711,7 @@ all entries are marked."
   (ebib--execute-when
     (entries
      (scroll-up)
-     (ebib--select-entry))
+     (ebib--update-entry-buffer))
     (default
       (beep))))
 
@@ -2016,7 +2016,7 @@ buffer and switch to it."
   (interactive)
   (ebib--execute-when
     (entries
-     (ebib--select-entry)
+     (ebib--update-entry-buffer)
      (when (eq ebib-layout 'index-only)
        ;; This makes the entry buffer visible but then switches to the
        ;; index buffer again.
@@ -2024,16 +2024,6 @@ buffer and switch to it."
        (ebib--pop-to-buffer (ebib--buffer 'index))))
     (default
       (beep))))
-
-(defun ebib--select-entry ()
-  "Make the entry at point current."
-  (beginning-of-line)
-  (let ((beg (point)))
-    (let ((key (save-excursion
-                 (skip-chars-forward "^ ")
-                 (buffer-substring-no-properties beg (point)))))
-      (ebib-db-set-current-entry-key key ebib--cur-db)
-      (ebib--update-entry-buffer))))
 
 (defun ebib-export-entries (prefix)
   "Export entries to another database.
