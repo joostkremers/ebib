@@ -926,6 +926,18 @@ Currently, the following problems are marked:
   "Face used for marking links."
   :group 'ebib-faces)
 
+(defface ebib-display-author-face '((t (:inherit font-lock-keyword-face)))
+  "Face used for the author/editor in completions."
+  :group 'ebib-faces)
+
+(defface ebib-display-year-face '((t (:inherit font-lock-variable-name-face)))
+  "Face used for the year in completions."
+  :group 'ebib-faces)
+
+(defface ebib-display-bibfile-face '((t (:inherit font-lock-comment-face)))
+  "Face used for the bibliography file in completions."
+  :group 'ebib-faces)
+
 ;; Generic for all databases.
 
 ;; Constants and variables that are set only once.

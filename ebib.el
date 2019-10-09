@@ -821,6 +821,7 @@ keywords before Emacs is killed."
     (define-key map "H" #'ebib-toggle-hidden)
     (define-key map "i" #'ebib-push-citation) ; prefix
     (define-key map "I" #'ebib-browse-doi)
+    (define-key map "j" #'ebib-jump-to-entry)
     (define-key map "J" #'ebib-switch-to-database-nth)
     (define-key map "k" #'ebib-kill-entry)
     (define-key map "K" 'ebib-keywords-map)
@@ -2025,6 +2026,141 @@ buffer and switch to it."
     (default
       (beep))))
 
+(defun ebib-jump-to-entry (arg)
+  "Jump to an entry.
+Select an entry from any open database using completion and jump
+to it.  By default, completion is performed using only the entry
+keys, but if either `ivy' or `helm' is available, completion is
+more sophisticated, allowing to select an entry using the author,
+year and title.
+
+If prefix argument ARG is non-nil, only offer selection
+candidates from the current database."
+  (interactive "P")
+  (ebib--execute-when
+    (database
+     (let* ((sources (if arg (list ebib--cur-db) ebib--databases))
+            (entry (cond
+                    ((featurep 'ivy) (ebib-read-entry-ivy sources))
+                    ((featurep 'helm) (ebib-read-entry-helm sources))
+                    (t (ebib-read-entry-default-method sources))))
+            (key (car entry))
+            (db (cdr entry)))
+       (cond
+        ((eq db ebib--cur-db)
+         (if (ebib--goto-entry-in-index key)
+             (ebib--update-entry-buffer)
+           (error "[Ebib] Could not find entry key `%s'" key)))
+        (entry
+         (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db) ; Save the current entry for the database we're jumping away from.
+         (ebib-db-set-current-entry-key key db) ; Set the current entry in the database we're jumping to.
+         (setq ebib--cur-db db)
+         (ebib--update-buffers 'no-refresh))
+        (t (error "[Ebib] Could not jump to entry")))))
+    (default
+      (error "[Ebib] No database opened"))))
+
+(defun ebib--create-collection-ivy (databases)
+  "Create a collection for use in `ebib-read-entry-ivy'.
+The keys for the collection are taken from the databases listed
+in DATABASES."
+  (seq-reduce (lambda (coll db)
+                (let ((file (propertize (ebib-db-get-filename db 'short) 'face 'ebib-display-bibfile-face)))
+                  (append (mapcar (lambda (key)
+                                    (propertize (format "%-20s  %s (%s) «%s»"
+                                                        file
+                                                        (ebib--get-field-value-for-display "Author/Editor" key db 'face 'ebib-display-author-face)
+                                                        (ebib--get-field-value-for-display "Year" key db 'face 'ebib-display-year-face)
+                                                        (ebib--get-field-value-for-display "Title" key db))
+                                                'ebib-key key
+                                                'ebib-db db))
+                                  (ebib-db-list-keys db))
+                          coll)))
+              databases nil))
+
+(defun ebib-read-entry-ivy (databases)
+  "Read an entry from the user using ivy.
+Offer the entries in DATABASES (a list of database structs) for
+completion.
+
+Return value is a cons of the key and the database containing the
+selected entry."
+  (let ((minibuffer-allow-text-properties t)
+        (ivy-sort-max-size (expt 256 6))
+        entry)
+    (let ((collection (ebib--create-collection-ivy databases)))
+      (if (not collection)
+          (error "[Ebib] No entries found in database(s)")
+        (ivy-read "Select entry: " collection
+                  :action (lambda (item)
+                            (setq entry (cons (get-text-property 0 'ebib-key item) (get-text-property 0 'ebib-db item))))
+                  :history 'ebib--citation-history
+                  :sort t)
+        entry))))
+
+(defun ebib--create-collection-helm (databases)
+  "Create a collection for use in `ebib-read-entry-helm'.
+The keys for the collection are taken from the databases listed
+in DATABASES."
+  (seq-reduce (lambda (coll db)
+                (let ((file (propertize (ebib-db-get-filename db 'short) 'face 'ebib-display-bibfile-face)))
+                  (append (mapcar (lambda (key)
+                                    (cons (format "%-20s  %s (%s) «%s»"
+                                                  file
+                                                  (ebib--get-field-value-for-display "Author/Editor" key db 'face 'ebib-display-author-face)
+                                                  (ebib--get-field-value-for-display "Year" key db 'face 'ebib-display-year-face)
+                                                  (ebib--get-field-value-for-display "Title" key db))
+                                          (list key db)))
+                                  (ebib-db-list-keys db))
+                          coll)))
+              databases nil))
+
+(defun ebib-helm-action-function (item)
+  "Return the key and database of ITEM as a cons cell."
+  (cons (nth 0 item) (nth 1 item)))
+
+(defun ebib-read-entry-helm (databases)
+  "Read an entry from the user using helm.
+Offer the entries in DATABASES (a list of database structs) for
+completion.
+
+Return value is a cons of the key and the database containing the
+selected entry."
+  (let ((sources (helm-build-sync-source "Select entry: "
+                                         :candidates (ebib--create-collection-helm databases)
+                                         :action '(("Select entry" . ebib-helm-action-function)))))
+    (helm :sources sources
+          :sort t
+          :buffer "*helm ebib*"
+          :prompt "Select entry: ")))
+
+(defun ebib--create-collection-default-method (databases)
+  "Create a collection for the default completion mechanism.
+The keys for the collection are taken from the databases listed
+in DATABASES.  Unlike with the `ivy' and `helm' counterparts, the
+collection only consists of the entry keys."
+  (seq-reduce (lambda (coll db)
+                (append (mapcar (lambda (key)
+                                  (propertize key 'ebib-db db))
+                                (ebib-db-list-keys db))
+                        coll))
+              databases nil))
+
+(defun ebib-read-entry-default-method (databases)
+  "Read an entry from the user using default completion.
+Offer the entries in DATABASES (a list of database structs) for
+completion.
+
+Return value is a cons of the key and the database containing the
+selected entry."
+  (let ((collection (ebib--create-collection-default-method databases)))
+    (if collection
+        (let* ((entry (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
+               (key (car entry))
+               (db (cdr entry)))
+          (cons key db))
+      (error "[Ebib] No BibTeX entries found"))))
+
 (defun ebib-export-entries (prefix)
   "Export entries to another database.
 With PREFIX argument, export entries to a file.  Otherwise export
@@ -2608,118 +2744,6 @@ current entry."
     (default
       (beep))))
 
-(defun ebib--create-collection-ivy (databases)
-  "Create a collection for use in `ebib-ivy-insert-collection'.
-The keys for the collection are taken from the databases listed
-in DATABASES."
-  (seq-reduce (lambda (coll db)
-                (append (mapcar (lambda (key)
-                                  (propertize (format "%s (%s) «%s»"
-                                                      (ebib--get-field-value-for-display "Author/Editor" key db)
-                                                      (ebib--get-field-value-for-display "Year" key db)
-                                                      (ebib--get-field-value-for-display "Title" key db))
-                                              'ebib-key key
-                                              'ebib-db db))
-                                (ebib-db-list-keys db))
-                        coll))
-              databases nil))
-
-(defun ebib-insert-citation-ivy (databases)
-  "Insert a citation at point using ivy.
-The user is prompted for a BibTeX key from DATABASES.  Return the
-key inserted into the buffer."
-  (let ((minibuffer-allow-text-properties t)
-        (ivy-sort-max-size (expt 256 6))
-        key)
-    (setq ivy-completion-beg (point))
-    (setq ivy-completion-end (point))
-    (let ((collection (ebib--create-collection-ivy databases)))
-      (if (not collection)
-          (error "[Ebib] No entries found in database(s) for current file")
-        (ivy-read "Select entry: " collection
-                  :action (lambda (item)
-                            (with-ivy-window
-                              (delete-region ivy-completion-beg ivy-completion-end)
-                              (setq ivy-completion-beg (point))
-                              (insert (ebib--create-citation (buffer-local-value 'major-mode (current-buffer))
-                                                             (list (get-text-property 0 'ebib-key item))
-                                                             (get-text-property 0 'ebib-db item)))
-                              (setq key (get-text-property 0 'ebib-key item))
-                              (setq ivy-completion-end (point))))
-                  :history 'ebib--citation-history
-                  :sort t)
-        key)))) ; Return the entry key.
-
-
-(defun ebib--create-collection-helm (databases)
-  "Create a collection for use in `ebib-helm-insert-collection'.
-The keys for the collection are taken from the databases listed
-in DATABASES."
-  (seq-reduce (lambda (coll db)
-                (append (mapcar (lambda (key)
-                                  (cons (concat (propertize
-                                                 (ebib--get-field-value-for-display "Author/Editor" key db)
-                                                 'face 'font-lock-keyword-face)
-                                                (propertize
-                                                 (format " (%s) " (ebib--get-field-value-for-display "Year" key db))
-                                                 'face 'font-lock-variable-name-face)
-                                                (format "%s"
-                                                        (ebib--get-field-value-for-display "Title" key db)))
-                                        (list key db)))
-                                (ebib-db-list-keys db))
-                        coll))
-              databases nil))
-
-(defun ebib-helm-insert-citation (item)
-  "Insert the helm item ITEM at point."
-  (let ((key (nth 0 item))
-        (db (nth 1 item)))
-    (insert (ebib--create-citation
-             (buffer-local-value 'major-mode (current-buffer))
-             (list key)
-             db))))
-
-(defun ebib-insert-citation-helm (databases)
-  "Insert a citation at point using helm.
-The user is prompted for a BibTeX key from DATABASES."
-  (let ((sources (helm-build-sync-source "Select entry: "
-                   :candidates (ebib--create-collection-helm databases)
-                   :action '(("Select entry" . ebib-helm-insert-citation)))))
-    (helm :sources sources
-          :sort t
-          :buffer "*ebib-insert-citation*"
-          :prompr "Select entry: ")))
-
-(defun ebib--create-collection-default-method (databases)
-  "Create a collection of BibTeX keys from DATABASES.
-BIBFILES is a list of bibliography files.  The collection is
-created from the keys in these files, provided they are opened in
-Ebib.  If BIBFILES is the symbol `none', the collection is
-created from the current database."
-  (seq-reduce (lambda (coll db)
-                (append (mapcar (lambda (key)
-                                  (propertize key 'ebib-db db))
-                                (ebib-db-list-keys db))
-                        coll))
-              databases nil))
-
-(defun ebib-insert-citation-default-method (databases)
-  "Insert a citation at point using default completion.
-The user is prompted for a BibTeX key from DATABASES
-associated with the current buffer (see
-`ebib--get-local-bibfiles' for details), or from the current
-database if the current buffer has no databases.
-
-Return the key inserted into the buffer."
-  (let ((collection (ebib--create-collection-default-method databases)))
-    (if collection
-        (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
-               (citation-command (ebib--create-citation major-mode (list key) (get-text-property 0 'ebib-db key))))
-          (when citation-command
-            (insert (format "%s" citation-command))
-            key)) ; Return the key.
-      (error "No BibTeX entries found"))))
-
 (defun ebib--get-or-open-db (file)
   "Return the database for FILE.
 If no database associated with FILE is currently open, try to
@@ -2761,12 +2785,17 @@ completion."
                   (ebib-db-slave-p (car databases)))
          (setq slave-db (car databases))
          (setq databases (list (ebib-db-get-master (car databases)))))
-       (let ((entry-key (cond
-                         ((featurep 'ivy) (ebib-insert-citation-ivy databases))
-                         ((featurep 'helm) (ebib-insert-citation-helm databases))
-                         (t (ebib-insert-citation-default-method databases)))))
-         (when (and entry-key slave-db (not (ebib-db-has-key entry-key slave-db)))
-           (ebib-db-add-entries-to-slave entry-key slave-db)
+       (let* ((entry (cond
+                      ((featurep 'ivy) (ebib-read-entry-ivy databases))
+                      ((featurep 'helm) (ebib-read-entry-helm databases))
+                      (t (ebib-read-entry-default-method databases))))
+              (key (car entry))
+              (db (cdr entry))
+              (citation (ebib--create-citation major-mode (list key) db)))
+         (if citation
+             (insert (format "%s" citation)))
+         (when (and key slave-db (not (ebib-db-has-key key slave-db)))
+           (ebib-db-add-entries-to-slave key slave-db)
            (ebib--mark-index-dirty slave-db)
            (ebib-db-set-modified t slave-db)))))
     (default
