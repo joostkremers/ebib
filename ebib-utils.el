@@ -1913,7 +1913,7 @@ Possible values for DIALECT are those listed in
         (push (cons dialect fields) ebib--unique-field-alist)
         fields)))
 
-(defun ebib--get-field-value-for-display (field key db)
+(defun ebib--get-field-value-for-display (field key db &rest properties)
   "Return the value of FIELD in entry KEY in DB for display.
 This function returns a value for FIELD in such a way that it can
 be used to display to the user.  If FIELD is found in
@@ -1935,18 +1935,24 @@ overridden by adding an appropriate transformation function to
 If FIELD is not found in `ebib-field-transformation-functions'
 and is not one of the special fields listed above, the field
 value is returned.  If a field value is empty, the return value
-is the string \"(No <FIELD>)\"."
-  (cond
-   ((assoc-string field ebib-field-transformation-functions 'case-fold)
-    (funcall (cdr (assoc field ebib-field-transformation-functions)) field key db))
-   ((cl-equalp field "Entry Key")
-    key)
-   ((cl-equalp field "Author/Editor")
-    (or (ebib-get-field-value "Author" key db 'noerror 'unbraced 'xref)
-        (ebib-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
-   ((cl-equalp field "Year")
-    (ebib-get-year-for-display key db))
-   (t (ebib-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref))))
+is the string \"(No <FIELD>)\".
+
+PROPERTIES are text properties that are added to the resulting
+string using `propertize'."
+  (let ((result (cond
+                 ((assoc-string field ebib-field-transformation-functions 'case-fold)
+                  (funcall (cdr (assoc field ebib-field-transformation-functions)) field key db))
+                 ((cl-equalp field "Entry Key")
+                  key)
+                 ((cl-equalp field "Author/Editor")
+                  (or (ebib-get-field-value "Author" key db 'noerror 'unbraced 'xref)
+                      (ebib-get-field-value "Editor" key db "(No Author/Editor)" 'unbraced 'xref)))
+                 ((cl-equalp field "Year")
+                  (ebib-get-year-for-display key db))
+                 (t (ebib-get-field-value field key db (format "(No %s)" (capitalize field)) 'unbraced 'xref)))))
+    (if properties
+        (apply #'propertize result properties)
+      result)))
 
 (defun ebib-get-year-for-display (key db)
   "Return the year for entry KEY in DB.
