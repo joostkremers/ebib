@@ -93,7 +93,7 @@ is.
 The easiest way to install Ebib is to use Emacs’ package manager. Ebib
 is available as a package from the [Melpa package
 archive](http://melpa.org/). If you add the Melpa archive to your
-`package-archive` list, you can install Ebib from the package manager.
+`package-archives` list, you can install Ebib from the package manager.
 This will also install the Info file so you can access the Ebib manual
 within Emacs.
 
@@ -156,9 +156,10 @@ This manual first describes Ebib’s basic functionality, so that you can
 get started with it. At times, reference will be made to later sections,
 where more specific functions are described.
 
-Ebib has a menu through which most functions can be accessed.
-(Especially some of the lesser used functions can only be accessed
-through the menu, unless you assign key shortcuts to them, of course.)
+Ebib has a menu through which all of its functionality can be accessed.
+Most functions are also bound to keys, but especially some of the lesser
+used ones can (by default) only be accessed through the menu, though you
+can always assign them to keys, if you prefer.
 
 You can start Ebib with the command `M-x ebib`. Entering this command
 hides all the windows in the current Emacs frame and replaces them with
@@ -280,13 +281,14 @@ are offered for completion are the keys from all open databases. After
 selecting a key, Ebib changes to the corresponding database and shows
 the entry corresponding to the key.
 
-If you use `ivy` or `helm` for completion, instead of completing the
-entry key, you can type any part of the author/editor names, of the
-title and the year of the entry you want to jump to. You can also see
-the bibliography file to which the entry belongs. This is a good way to
-search for a particular entry if you’re not sure of the entry key. (In
-fact, with `ivy` or `helm`, it becomes generally unnecessary to remember
-the entry key of an entry.)
+If you use [ivy](https://github.com/abo-abo/swiper) or
+[helm](https://github.com/emacs-helm/helm) for completion, instead of
+completing the entry key, you can type any part of the author/editor
+names, of the title and the year of the entry you want to jump to. You
+can also see the bibliography file to which the entry belongs. This is a
+good way to search for a particular entry if you’re not sure of the
+entry key. (In fact, with `ivy` or `helm`, it becomes generally
+unnecessary to remember the entry key of an entry.)
 
 You can restrict the jump candidates to the current database by using a
 prefix argument, i.e., by tying `C-u j`.
@@ -368,9 +370,9 @@ fields, `publisher`, `organization`, `keywords`, `crossref` and `file`.
 If you edit the `type` field, you must enter one of the predefined entry
 types. Ebib won’t allow you to enter anything else. Similarly, if you
 edit the `crossref` field, Ebib requires that you fill in a key from the
-database. The fields `keywords` and `file` also offer completion, see
-the sections [Managing keywords](#managing-keywords) and [Viewing
-Files](#viewing-and-importing-files), respectively.
+databases currently open. The fields `keywords` and `file` also offer
+completion, see the sections [Managing Keywords](#managing-keywords) and
+[Viewing Files](#viewing-and-importing-files), respectively.
 
 For the other fields that offer completion, the completion candidates
 are the values of these fields in other entries in the databases that
@@ -386,14 +388,6 @@ field is empty. It is also possible to disable completion for the author
 and editor fields entirely, because if your databases are large,
 gathering the completion candidates can be a bit slow. Set the option
 `ebib-edit-author/editor-without-completion` to disable completion.
-
-Note that if you’re adding a new entry, Ebib automatically puts you in
-the entry buffer after you’ve typed the entry key: you don’t have to
-type `e` to move to the entry buffer. When creating a new entry, you
-should set the `type` field first, because the `type` field determines
-which other fields are available for an entry. After editing a field,
-Ebib puts you on the next field. This is convenient if you’re creating a
-new entry and need to fill out several fields in a row.
 
 If you’re done editing the fields of the entry, type `q` to move focus
 back to the index buffer. (Note: keys may have different functions in
@@ -411,16 +405,18 @@ of a single line of text. However, because the `annote`/`annotation` and
 would not be very useful if you could only write one line of text in
 them. Therefore, when you edit one of these fields, Ebib puts you in a
 so-called *multiline edit buffer*. This is essentially a text mode
-buffer that allows you to enter as much text as you like. To store the
-text and leave the multiline edit buffer, type `C-c | q`.
+buffer that allows you to enter as much text as you like.
 
+To store the text and leave the multiline edit buffer, type `C-c | q`.
 If you want to leave the multiline edit buffer without saving the text
 you have just typed, type `C-c | c`. This command cancels the edit and
 leaves the multiline edit buffer. The text that is stored in the field
-you were editing is not altered. Multiline values are not restricted to
-the `annote`/`annotation` and `abstract` fields. Any field (except the
-`type` and `crossref` fields) can in fact hold a multiline value. To
-give a field a multiline value, use `m` instead of `e`.
+you were editing is not altered.
+
+Multiline values are not restricted to the `annote`/`annotation` and
+`abstract` fields. Any field (except the `type` and `crossref` fields)
+can in fact hold a multiline value. To give a field a multiline value,
+use `m` instead of `e`.
 
 When a field has a multiline value, at most ten lines are shown in the
 entry buffer. If the text is longer, an ellipsis indicator `[...]` is
@@ -677,15 +673,15 @@ optional arguments) and by displaying the arguments of `\emph`,
 clickable string `"www"`. Clicking on `"www"` takes you to the relevant
 web page.
 
-The final predefined column label is “Note”. This does not, as might be
-expected, display the contents of the note field. Rather, it checks
-whether the entry in question has a note associated with it in Ebib’s
-own notes system, discussed in [Notes Files](#notes-files). For those
-entries that have a note, the `"Note"` column will display a (clickable)
-`"N"`. Keep in mind, though, that if you keep your notes in a single
-file, adding this column to the index display can slow down the creation
-of the index buffer (and thus Ebib’s start-up). If you wish to use this
-column, it is probably best to keep notes in separate files.
+The final predefined column label is `"Note"`. This does not, however,
+display the contents of the note field. Rather, it checks whether the
+entry in question has an external annotation (see [Notes
+Files](#notes-files)). For those entries that have an annotation, the
+`"Note"` column will display a (clickable) `"N"`. Keep in mind, though,
+that if you keep your notes in a single file, adding this column to the
+index display can slow down the creation of the index buffer (and thus
+Ebib’s start-up). If you wish to use this column, it is probably best to
+keep notes in separate files.
 
 You can define new column labels and redefine the existing ones by
 customising the option `ebib-field-transformation-functions`. Note that
@@ -719,9 +715,11 @@ command to search for an entry in all open databases. If you want to
 restrict it to just the current database, use a prefix argument: `C-u
 j`.
 
-If you use `ivy` or `helm`, this method is actually very convenient,
-because the completion is more sophisticated: you can search not on
-entry key but on any part of the author/editor name and of the title.
+If you use [ivy](https://github.com/abo-abo/swiper) or
+[helm](https://github.com/emacs-helm/helm), this method is actually very
+convenient, because the completion is more sophisticated: you can search
+not on entry key but on any part of the author/editor name and of the
+title.
 
 If you want to search the entire contents of your entries, not just the
 author/editor names and the titles, you can use `/`. This command
@@ -733,10 +731,10 @@ that entry are highlighted.
 
 Ebib searches all the fields of each entry. It is not possible with `/`
 to specify the fields to search. Note that if the search term is found
-in a field with a multiline value, Ebib will highlight the `+` sign that
-is displayed in front of the field value. When the search term is found,
-Ebib gives a message saying so, similarly if the search term was not
-found.
+in a field with a multiline value, Ebib will highlight the ellipsis
+symbol `[...]` that is displayed after the last line of the field value.
+When the search term is found, Ebib gives a message saying so, similarly
+if the search term was not found.
 
 A search term may of course appear more than once in the database. To
 search for the next occurrence, type `RET`. This continues searching for
@@ -792,7 +790,8 @@ regexp to filter on. Ebib then runs this filter on the database, and
 only shows those entries that match the filter. To indicate that a
 filter is active, the active filter is displayed in the mode line of
 index buffer. (The filter can be displayed in Lisp form, if you prefer:
-customise “Filters Display As Lisp” to do so.)
+customise “Filters Display As Lisp” `ebib-filters-display-as-lisp` to do
+so.)
 
 If you don’t want to filter on one specific field but rather want to
 select all entries that match a certain regexp in any field, you can
@@ -893,11 +892,11 @@ filters, you have to name them. You can store the currently active
 filter or the last used filter with `F s`. Ebib will ask you for a name
 for the filter in order to identify it later. By default, filter names
 are case-insensitive, but if you prefer to use case-sensitive filter
-names, you can unset the option “Filters Ignore Case”. When Ebib is
-closed, all stored filters are saved to a file and they’re automatically
-reloaded when you open Ebib again. Stored filters are not associated
-with a particular database: once a filter is stored, it is available to
-all databases.
+names, you can unset the option “Filters Ignore Case”
+(`ebib-filters-ignore-case`). When Ebib is closed, all stored filters
+are saved to a file and they’re automatically reloaded when you open
+Ebib again. Stored filters are not associated with a particular
+database: once a filter is stored, it is available to all databases.
 
 You can apply a stored filter with `F a`. This will ask for the name of
 a filter and apply it to the current database. You can extend the filter
@@ -908,10 +907,10 @@ a new name, which will store it as a new filter, keeping the old one.
 
 The file that Ebib uses to store filters is `~/.emacs.d/ebib-filters`,
 although that can of course be customised (see the option “Filters
-Default File”). As mentioned, stored filters are saved automatically
-when Ebib closes, but you can also save them manually with `F S`. Note
-that if there are no stored filters when Ebib is closed (or when you
-press `F S`), the file is deleted.
+Default File”, `ebib-filters-default-file`). As mentioned, stored
+filters are saved automatically when Ebib closes, but you can also save
+them manually with `F S`. Note that if there are no stored filters when
+Ebib is closed (or when you press `F S`), the file is deleted.
 
 You can also save your filters to a different file with `F w`. Such a
 filter file can be reloaded later with `F l`. If you load filters from a
@@ -949,13 +948,12 @@ is not passed as an argument. Rather, it is a dynamic variable, which
 means that the file that defines the filter function should declare the
 variable with `(defvar ebib-entry)`. When the filter is run, the value
 of `ebib-entry` is an alist of fields and their values. These include
-the fields `=key=` and `=type=` for the entry key and type:
+the fields `=key=` and `=type=` for the entry key and type. For example:
 
     (("author" . "{Noam Chomsky}")
      ("title" . "{Syntactic Structures}")
      ("publisher" . "{The Hague: Mouton}")
      ("year" . "{1957}")
-     ("remark" . "{copy}")
      ("timestamp" . "{2007-12-30}")
      ("file" . "{c/Chomsky1957.pdf}")
      ("=type=" . "book")
@@ -1027,8 +1025,8 @@ from view. For that, you need to reapply the filter with `F r`.
 
 It is also possible to mark entries. Marked entries stay marked when you
 cancel the filter, so in order to do something with all the entries
-matching a filter, you can mark them all in the filter view with `M`,
-then cancel the filter and perform an action on them.
+matching a filter, you can mark them all in the filter view with `C-u
+m`, then cancel the filter and perform an action on them.
 
 If a database has an active filter, the save command is disabled,
 because it would not be clear whether you want to save the entire
@@ -1037,8 +1035,8 @@ filtered entries to a file, you can use the command `w` (or the menu
 option “Database | Save As”). This also saves the `@String`, `@Preamble`
 and `@comments`, as well as any file-local variables, so you will have a
 self-contained `.bib` file with only the filtered entries. In order to
-save the entire database, you need to cancel the filter. After saving,
-you can reapply the filter with `F L`, of course.
+save the entire database, you need to cancel the filter. (After saving,
+you can reapply the filter with `F L`, of course.)
 
 One final note: of all the filter-related commands, `~`, `F c`, `F r`,
 `F s` and `F v` are only available when a filter is active. The other
@@ -1047,9 +1045,10 @@ active.
 
 # Inserting Citations into a Text Buffer
 
-When you’re in a text buffer, you can insert a citation with the command
-`ebib-insert-citation`. This command asks for a key and inserts a
-citation with that key in a (user-selectable) form that is appropriate
+When you’re in a text buffer and you have Ebib open in the background
+(i.e., you lowered Ebib with `z`), you can insert a citation with the
+command `ebib-insert-citation`. This command asks for a key and inserts
+a citation with that key in a (user-selectable) form that is appropriate
 for the current buffer. By default, this is set up for LaTeX and
 [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers, and for
 [Org mode](http://orgmode.org).
@@ -1057,10 +1056,11 @@ for the current buffer. By default, this is set up for LaTeX and
 When you invoke `ebib-insert-citation`, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
 command to use. You can use TAB completion when typing the key. If you
-have either the `ivy` or `helm` package installed, however, Ebib uses a
-more sophisticated method: instead of typing just the key, you can type
-(parts of) the author name, publication year and title in order to find
-the reference you wish to cite.
+have [ivy](https://github.com/abo-abo/swiper) or
+[helm](https://github.com/emacs-helm/helm) installed, however, Ebib uses
+a more sophisticated method: instead of typing just the key, you can
+type (parts of) the author name, publication year and title in order to
+find the reference you wish to cite.
 
 You can define different citation commands for each type of file that
 you use. That is, you can have one set of citation commands for LaTeX
