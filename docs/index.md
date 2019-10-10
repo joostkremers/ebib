@@ -43,12 +43,14 @@ Bib(La)TeX files easier.
 
 ### Searching
 
-  - Simple regexp searches can be performed on a database, searching the
-    contents of all fields of each entry.
-  - Complex search queries with logical `and`, `or` and `not` operators,
-    built up interactively, can be performed, with the possibility of
-    searching only specific fields. Search queries can be saved for
-    later reuse.
+- Quick jump to any entry in any database using completion (especially useful when using [Ivy](https://github.com/abo-abo/swiper) or
+  [Helm](https://github.com/emacs-helm/helm)).
+- Simple regexp searches can be performed on a database, searching the
+  contents of all fields of each entry.
+- Complex search queries with logical `and`, `or` and `not` operators,
+  built up interactively, can be performed, with the possibility of
+  searching only specific fields. Search queries can be saved for
+  later reuse.
 
 ### LaTeX / Org / Markdown integration
 
@@ -70,12 +72,15 @@ Bib(La)TeX files easier.
   (allowing copy & paste of BibTeX entries, e.g. from the Internet).
 - A URL stored in a BibTeX field can be extracted and sent to a browser.
 - Files stored in a BibTeX field can be opened with user-configurable viewers.
+- Support for maintaining an Org-based reading list that can be integrated with
+  the user's Org agenda.
+- Support for keeping annotations in a separate notes file or notes directory.
+- A list of possible keywords can be stored in a file to aid in maintaining
+  uniformity in keywords within and across `.bib` files.
 - A time stamp can be added to each new entry, allowing you to keep track of new
   additions in the database.
 - (Parts of) databases can be printed, either as a list of references typeset by
   BibTeX / BibLaTeX, or directly as database entries.
-- Keywords can be stored in a file to aid in maintaining uniformity in keywords
-  within and across `.bib` files.
 - No lock-in. Use any other tool Emacs provides on your `.bib` files and simply reload the file in Ebib afterwards.
 
 ## Screenshots
