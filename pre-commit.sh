@@ -98,7 +98,7 @@ errors=0
 confirm_file "$SOURCE"
 confirm_file "$INFO"
 check_exit   "$errors"
-if [  "$INFO" -ot "$SOURCE" ] ; then
+if [ "$(git status --porcelain manual/ebib.text)" == 'M  manual/ebib.text' ] ; then
     echo "$SCRIPT: regenerating documentation files"
     git stash -q --keep-index
     create_texi "$SOURCE" && run_makeinfo "$TEXINFO" && git add "$INFO"
