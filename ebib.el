@@ -910,6 +910,8 @@ character ?1-?9, which is converted to the corresponding number."
                                       (ebib--get-key-at-point)
                                       (not (ebib-db-get-filter ebib--cur-db)))]
      "--"
+     ["Jump to Entry" ebib-jump-to-entry (and ebib--cur-db (ebib--get-key-at-point))]
+     "--"
      ["Push Citation To Buffer" ebib-push-citation (ebib--get-key-at-point)]
      "--"
      ["Mark" ebib-mark-entry (ebib--get-key-at-point)]
