@@ -43,7 +43,8 @@ Bib(La)TeX files easier.
 
 ### Searching
 
-- Quick jump to any entry in any database using completion (especially useful when using [Ivy](https://github.com/abo-abo/swiper) or
+- Quickly jump to any entry in any database using completion (especially useful
+  when using [Ivy](https://github.com/abo-abo/swiper) or
   [Helm](https://github.com/emacs-helm/helm)).
 - Simple regexp searches can be performed on a database, searching the
   contents of all fields of each entry.
