@@ -426,7 +426,7 @@ fill it."
     (if (buffer-local-value 'ebib--dirty-index-buffer index-buffer)
         (setq no-refresh nil))
     (setcdr (assq 'index ebib--buffer-alist) index-buffer)
-    (when window ; This function is also called from `ebib-import', in which case `window' would be nil.
+    (when window ; Just to be sure, but `window' shouldn't be nil.
       (with-selected-window window
         (with-ebib-window-nondedicated (selected-window)
           (switch-to-buffer index-buffer))))
@@ -444,7 +444,7 @@ fill it."
                   ;; It may be that no entry satisfies the filter.
                   (if (not cur-keys-list)
                       (message "No entries matching the filter")
-                    ;; Fill the buffer
+                    ;; Fill the buffer.
                     (dolist (entry cur-keys-list)
                       (ebib--display-entry-key entry (member entry marked-entries)))
                     ;; Make sure the current entry is among the visible entries.
