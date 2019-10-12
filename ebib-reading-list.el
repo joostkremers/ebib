@@ -105,6 +105,20 @@ can be used in an org :PROPERTIES: block."
   :group 'ebib-reading-list
   :type '(string :tag "Done marker"))
 
+(defcustom ebib-reading-list-add-item-function 'ebib-reading-list-move-point-default
+  "Function to run when adding an item to the reading list.
+This function is run with point at the beginning of the buffer
+and should move point to the correct position in the buffer.
+
+The default function simply moves point to the end of the buffer."
+  :group 'ebib-reading-list
+  :type 'function)
+
+(defun ebib-reading-list-move-point-default ()
+  "Default value for `ebib-reading-list-add-item-function'.
+This function just moves point to the end of the buffer."
+  (goto-char (point-max)))
+
 (defcustom ebib-reading-list-remove-item-function 'ebib-reading-list-mark-item-as-done
   "Function to run when removing an item from the reading list.
 This function is run with point positioned after the item's
@@ -189,7 +203,7 @@ Return KEY.  If there is already an item for KEY, do nothing and
 return nil."
   (with-current-buffer (ebib--reading-list-buffer)
     (unless (ebib--reading-list-locate-item key)
-      (goto-char (point-max))
+      (funcall ebib-reading-list-add-item-function)
       (insert (ebib--reading-list-fill-template key db))
       (run-hooks 'ebib-reading-list-new-item-hook)
       (save-buffer)
