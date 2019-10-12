@@ -2217,20 +2217,20 @@ Furthermore, the reading list template accepts a specifier ‘%M’, which
 is replaced with the todo marker specified in the option
 ‘ebib-reading-list-todo-marker’ (by default ‘TODO’).
 
-If you do not wish to use an Org file for the reading list, you can use
-another format.  Apart from customising the template, there are several
-other options that will need to be customised in this case.  First, the
-option ‘ebib-reading-list-remove-item-function’ holds the function that
-marks a reading list item as done.  By default, it is set to
-‘ebib-reading-list-mark-item-as-done’, which simply changes the todo
-state of the item to ‘DONE’, but you can set it to a function that does
-something else (for example, completely removing the entry from the
-list).  You will also have to customise
-‘ebib-reading-list-item-active-function’, which holds a function that
-should return ‘t’ if the current entry is on the reading list (and still
-active).  The default function simply checks if the entry’s todo state
-is equal to ‘ebib-reading-list-todo-marker’, but if you don’t use an Org
-file, you will need a different function, obviously.
+Most aspects of the reading list can be customised.  First, the option
+‘ebib-reading-list-add-item-function’ holds a function that places point
+where the new item should be inserted.  By default, it puts point at the
+end of the buffer.  Second, ‘ebib-reading-list-remove-item-function’
+holds the function that marks a reading list item as done.  By default,
+it is set to ‘ebib-reading-list-mark-item-as-done’, which simply changes
+the todo state of the item to ‘DONE’, but you can set it to a function
+that does something else (for example, completely removing the entry
+from the list).
+
+The option ‘ebib-reading-list-item-active-function’ holds a function
+that should return ‘t’ if the current entry is on the reading list and
+is still active.  The default function simply checks if the entry’s todo
+state is equal to ‘ebib-reading-list-todo-marker’.
 
 Lastly, there are two hooks, ‘ebib-reading-list-new-item-hook’ and
 ‘ebib-reading-list-remove-item-hook’.  The former is run immediately
@@ -3006,34 +3006,34 @@ Node: Customising the notes template103892
 Ref: #customising-the-notes-template104071
 Node: Managing a reading list107648
 Ref: #managing-a-reading-list107810
-Node: Window Management110909
-Ref: #window-management111068
-Node: Creating Entry Stubs114227
-Ref: #creating-entry-stubs114389
-Node: @Preamble Definition115387
-Ref: #preamble-definition115551
-Node: @String Definitions117523
-Ref: #string-definitions117674
-Node: @Comments121161
-Ref: #comments121289
-Node: Managing Keywords121654
-Ref: #managing-keywords121799
-Node: Sorting the bib File127673
-Ref: #sorting-the-.bib-file127846
-Node: Merging and Importing130965
-Ref: #merging-and-importing131130
-Node: Exporting Entries132897
-Ref: #exporting-entries133059
-Node: Multiple Identical Fields134569
-Ref: #multiple-identical-fields134748
-Node: Multiline Edit Buffers136648
-Ref: #multiline-edit-buffers136820
-Node: The Options Menu140697
-Ref: #the-options-menu140845
-Node: Customisation141463
-Ref: #customisation141574
-Node: Modifying Key Bindings142182
-Ref: #modifying-key-bindings142309
+Node: Window Management110825
+Ref: #window-management110984
+Node: Creating Entry Stubs114143
+Ref: #creating-entry-stubs114305
+Node: @Preamble Definition115303
+Ref: #preamble-definition115467
+Node: @String Definitions117439
+Ref: #string-definitions117590
+Node: @Comments121077
+Ref: #comments121205
+Node: Managing Keywords121570
+Ref: #managing-keywords121715
+Node: Sorting the bib File127589
+Ref: #sorting-the-.bib-file127762
+Node: Merging and Importing130881
+Ref: #merging-and-importing131046
+Node: Exporting Entries132813
+Ref: #exporting-entries132975
+Node: Multiple Identical Fields134485
+Ref: #multiple-identical-fields134664
+Node: Multiline Edit Buffers136564
+Ref: #multiline-edit-buffers136736
+Node: The Options Menu140613
+Ref: #the-options-menu140761
+Node: Customisation141379
+Ref: #customisation141490
+Node: Modifying Key Bindings142098
+Ref: #modifying-key-bindings142225
 
 End Tag Table
 

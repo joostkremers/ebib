@@ -1880,20 +1880,20 @@ Furthermore, the reading list template accepts a specifier `%M`, which
 is replaced with the todo marker specified in the option
 `ebib-reading-list-todo-marker` (by default `TODO`).
 
-If you do not wish to use an Org file for the reading list, you can use
-another format. Apart from customising the template, there are several
-other options that will need to be customised in this case. First, the
-option `ebib-reading-list-remove-item-function` holds the function that
-marks a reading list item as done. By default, it is set to
-`ebib-reading-list-mark-item-as-done`, which simply changes the todo
-state of the item to `DONE`, but you can set it to a function that does
-something else (for example, completely removing the entry from the
-list). You will also have to customise
-`ebib-reading-list-item-active-function`, which holds a function that
-should return `t` if the current entry is on the reading list (and still
-active). The default function simply checks if the entry’s todo state is
-equal to `ebib-reading-list-todo-marker`, but if you don’t use an Org
-file, you will need a different function, obviously.
+Most aspects of the reading list can be customised. First, the option
+`ebib-reading-list-add-item-function` holds a function that places point
+where the new item should be inserted. By default, it puts point at the
+end of the buffer. Second, `ebib-reading-list-remove-item-function`
+holds the function that marks a reading list item as done. By default,
+it is set to `ebib-reading-list-mark-item-as-done`, which simply changes
+the todo state of the item to `DONE`, but you can set it to a function
+that does something else (for example, completely removing the entry
+from the list).
+
+The option `ebib-reading-list-item-active-function` holds a function
+that should return `t` if the current entry is on the reading list and
+is still active. The default function simply checks if the entry’s todo
+state is equal to `ebib-reading-list-todo-marker`.
 
 Lastly, there are two hooks, `ebib-reading-list-new-item-hook` and
 `ebib-reading-list-remove-item-hook`. The former is run immediately
