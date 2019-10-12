@@ -1191,10 +1191,15 @@ dot."
 (defun ebib--create-file-name-from-key (key ext)
   "Create a filename from KEY and EXT.
 KEY is modified as per `ebib-name-transform-function'.  EXT is
-the extension and should not contain a dot."
-  (concat (funcall ebib-name-transform-function key)
-          "."
-          ext))
+the extension and should not contain a dot.
+
+If KEY matches the regexp \"<new-entry[0-9]+>\", an error is
+raised."
+  (if (string-match-p "<new-entry[0-9]+>" key)
+      (error "Cannot create file name from temporary key")
+    (concat (funcall ebib-name-transform-function key)
+            "."
+            ext)))
 
 (defun ebib--expand-file-name (file)
   "Search and expand FILE.
