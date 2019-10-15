@@ -225,7 +225,7 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 MULTILINES is a list of strings.  The resulting string is
 suitable for display in the entry buffer: each string in
 MULTILINES corresponds to a line in the resulting string, and all
-lines except the first one are prependen with 19 spaces."
+lines except the first one are prepended with 19 spaces."
   (let ((first-line (car multilines))
         (rest-lines (mapcar (lambda (line)
                               (concat (make-string 19 ?\s) line))
