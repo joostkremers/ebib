@@ -97,20 +97,20 @@ when it is first saved.  Note that Ebib uses
   :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
-(defcustom ebib-extra-fields '((BibTeX "crossref"
+(defcustom ebib-extra-fields '((biblatex "crossref"
+                                         "annotation"
+                                         "abstract"
+                                         "keywords"
+                                         "file"
+                                         "timestamp")
+                               (BibTeX "crossref"
                                        "annote"
                                        "abstract"
                                        "keywords"
                                        "file"
                                        "timestamp"
                                        "url"
-                                       "doi")
-                               (biblatex "crossref"
-                                         "annotation"
-                                         "abstract"
-                                         "keywords"
-                                         "file"
-                                         "timestamp"))
+                                       "doi"))
   "List of the extra fields for BibTeX entries.
 Extra fields are fields that are available for all entry types.
 Depending on the bibliography style, the value of these fields
@@ -121,11 +121,8 @@ Note, before adding fields to this list, check if the field you
 want to add is among the fields that are hidden by default.  See
 the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
   :group 'ebib
-  :type '(repeat (cons (choice :tag "Choose BibTeX dialect"
-                               (const BibTeX)
-                               (const biblatex)
-                               (symbol :tag "Other"))
-                       (repeat :tag "Extra fields" (string :tag "Field")))))
+  :type '(set (cons :tag "Dialect" (const biblatex) (repeat :tag "Extra fields" (string :tag "Field")))
+              (cons :tag "Dialect" (const BibTeX) (repeat :tag "Extra fields" (string :tag "Field")))))
 
 (defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
                                 "booksubtitle" "booktitleaddon" "chapter" "commentator"
