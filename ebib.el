@@ -3186,7 +3186,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "q" 'ebib-quit-entry-buffer)
     (define-key map "r" 'ebib-toggle-raw)
     (define-key map "s" 'ebib-insert-abbreviation)
-    (define-key map "u" 'ebib-browse-url-in-field)
+    (define-key map "u" 'ebib-browse-url)
     (define-key map "v" 'ebib-view-field-as-help)
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
@@ -3231,7 +3231,7 @@ Primarily used to add some info to the entry buffer mode line."
     ["Add Field" ebib-add-field t]
     "--"
     ["View File" ebib-view-file-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
-    ["Browse URL" ebib-browse-url-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Browse URL" ebib-browse-url (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["View Multiline Field" ebib-view-field-as-help (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Quit Entry Buffer" ebib-quit-entry-buffer t]
@@ -3608,17 +3608,6 @@ prefix argument has no meaning."
               (inhibit-read-only t))
           (delete-region (point-at-bol) (1+ (point-at-eol)))
           (ebib--insert-entry-in-index-sorted key t)))))
-
-(defun ebib-browse-url-in-field (arg)
-  "Browse a URL in the current field.
-If the field contains multiple URLs (as defined by
-`ebib-url-regexp'), the user is asked which one to open.
-Altertanively, a numeric prefix argument ARG can be passed."
-  (interactive "P")
-  (let ((urls (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-    (if urls
-        (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
-      (error "[Ebib] No URL found in `%s' field" (ebib--current-field)))))
 
 (defun ebib-view-file-in-field (arg)
   "View a file in the current field.
