@@ -2545,9 +2545,11 @@ contain only one DOI.  The DOI is combined with the URL
   (ebib--execute-when
     (entries
      (let ((doi (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (if doi
-           (ebib--call-browser (concat "http://dx.doi.org/" doi))
-         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))))
+       (unless doi
+         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))
+       (ebib--call-browser (if (string-match-p "^https?://dx.doi.org/" doi)
+                               doi
+                             (concat "https://dx.doi.org/" doi)))))
     (default
       (beep))))
 
