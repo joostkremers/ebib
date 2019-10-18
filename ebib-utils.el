@@ -137,7 +137,7 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                 "volumes")
   "List of fields that are not displayed.
 The fields in this list are not displayed by default.  Since
-Biblatex defines a large number of fields, it is not practical to
+biblatex defines a large number of fields, it is not practical to
 display them all in the entry buffer.  You can make these fields
 temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
 or through the menu."
