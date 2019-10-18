@@ -2430,9 +2430,8 @@ Either prints the entire database, or the marked entries."
     (default
       (beep))))
 
-;; TODO We should account for biblatex here.
 (defun ebib-latex-entries ()
-  "Create a LaTeX file that \\nocites entries from the database.
+  "Create a LaTeX file that \\nocites entries from the current database.
 Operates either on all entries or on the marked entries."
   (interactive)
   (ebib--execute-when
@@ -2440,18 +2439,23 @@ Operates either on all entries or on the marked entries."
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                    ebib-print-tempfile
                                  (read-file-name "Use temp file: ")))
-         (progn
+         (let* ((dialect (ebib--get-dialect ebib--cur-db))
+                (preamble (alist-get dialect ebib-latex-preamble)))
            (with-temp-buffer
-             (when ebib-latex-preamble
-               (mapc (lambda (string)
-                       (insert (format "%s\n" string)))
-                     ebib-latex-preamble))
+             (when preamble
+               (mapc (lambda (line)
+                       (insert (format "%s\n" line)))
+                     preamble))
+             (if (eq dialect 'biblatex)
+                 (insert (format "\n\\addbibresource{%s}\n" (expand-file-name (ebib-db-get-filename ebib--cur-db)))))
              (insert "\n\\begin{document}\n\n")
              (if (ebib-db-marked-entries-p ebib--cur-db)
                  (dolist (entry (ebib--sort-keys-list (ebib-db-list-marked-entries ebib--cur-db) ebib--cur-db))
                    (insert (format "\\nocite{%s}\n" entry)))
                (insert "\\nocite{*}\n"))
-             (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))
+             (pcase dialect
+               ('biblatex (insert "\n\\printbibliography\n\n"))
+               ('BibTeX (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))))
              (insert "\\end{document}\n")
              (write-region (point-min) (point-max) tempfile))
            (ebib-lower)

@@ -862,10 +862,14 @@ excluded, which saves space."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-latex-preamble '("\\documentclass{article}" "\\bibliographystyle{plain}")
-  "Preamble for the LaTeX file for BibTeXing the database."
+(defcustom ebib-latex-preamble '((biblatex "\\documentclass{article}"
+                                           "\\usepackage[style=authoryear-comp,sortlocale=auto]{biblatex}")
+                                 (BibTeX "\\documentclass{article}"
+                                         "\\bibliographystyle{plain}"))
+  "Preamble for the LaTeX file used for BibTeXing the database."
   :group 'ebib
-  :type '(repeat (string :tag "Add to preamble")))
+  :type '(set (cons :tag "Dialect" (const biblatex) (repeat :tag "Preamble" (string :tag "Line")))
+              (cons :tag "Dialect" (const BibTeX) (repeat :tag "Preamble" (string :tag "Line")))))
 
 (defcustom ebib-print-tempfile ""
   "Temporary file for printing the database.
