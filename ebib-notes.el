@@ -45,9 +45,7 @@
   "Name of the notes file.
 To use a single file for all notes, set this variable to the full
 path of the notes file.  If this variable is nil, Ebib creates
-one file per note, using the options `ebib-notes-directory',
-`ebib-notes-file-extension' and
-`ebib-notes-name-transform-function'."
+one file per note, provided `ebib-notes-directory' is set."
   :group 'ebib-notes
   :type '(choice (const :tag "Use multiple notes files" nil)
                  (file :tag "Notes File")))
@@ -64,8 +62,14 @@ key."
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
-If this is nil, the first directory in `ebib-file-search-dirs' is
-used.  This option is ignored if `ebib-notes-use-single-file' is set."
+Ebib creates notes files based on the entry key using the options
+`ebib-notes-directory', `ebib-notes-file-extension' and
+`ebib-notes-name-transform-function'.
+
+If this option is nil, the first directory in `ebib-file-search-dirs' is
+used.
+
+Note that this option is ignored if `ebib-notes-use-single-file' is set."
   :group 'ebib-notes
   :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
                  (directory :tag "Specify directory")))
