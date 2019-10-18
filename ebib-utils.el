@@ -346,7 +346,9 @@ documentation for details."
                                       ("author" "\\citeauthor%<[%A]%>[%A]{%(%K%,)}")
                                       ("title"  "\\citetitle%<[%A]%>[%A]{%(%K%,)}")
                                       ("year"   "\\citeyear%<[%A]%>[%A][%A]{%K}")
-                                      ("date"   "\\citedate%<[%A]%>[%A]{%(%K%,)}")))
+                                      ("date"   "\\citedate%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("full"   "\\fullcite%<[%A]%>[%A]{%(%K%,)}")))
                                     (org-mode
                                      (("ebib" "[[ebib:%K][%D]]")))
                                     (markdown-mode
@@ -363,9 +365,7 @@ inserted in the buffer.
 
 The major mode can also be specified as `any', which defines
 citation commands that are available in buffers that do not have
-any of the major modes listed in this option.  By default, this
-is used for LaTeX citations, so as to cover all TeX and LaTeX
-modes.
+any of the major modes listed in this option.
 
 The format string template can contain a number of formatting
 directives:
