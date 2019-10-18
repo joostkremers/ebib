@@ -324,7 +324,7 @@ documentation for details."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-citation-commands '((any
+(defcustom ebib-citation-commands '((latex-mode
                                      (("cite"   "\\cite%<[%A]%>[%A]{%(%K%,)}")
                                       ("paren"  "\\parencite%<[%A]%>[%A]{%(%K%,)}")
                                       ("foot"   "\\footcite%<[%A]%>[%A]{%(%K%,)}")
