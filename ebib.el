@@ -2543,8 +2543,9 @@ argument ARG."
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
 The stardard DOI field (see user option `ebib-doi-field') may
-contain only one DOI.  The DOI is combined with the URL
-\"http://dx.doi.org/\" before being sent to the browser."
+contain only one DOI.  If necessary, the DOI is prepended with
+the URL \"https://dx.doi.org/\" before being sent to the
+browser."
   (interactive)
   (ebib--execute-when
     (entries
