@@ -2552,7 +2552,7 @@ browser."
      (let ((doi (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
        (unless doi
          (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))
-       (ebib--call-browser (if (string-match-p "^https?://dx.doi.org/" doi)
+       (ebib--call-browser (if (string-match-p "^[[:space:]*https?://dx.doi.org/" doi)
                                doi
                              (concat "https://dx.doi.org/" doi)))))
     (default
