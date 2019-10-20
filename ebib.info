@@ -1865,8 +1865,8 @@ See the option “Url Regexp” for details.
 Similarly, with the key ‘I’ in the index buffer you can send a DOI to a
 browser.  The DOI must be stored in the ‘doi’ field.  Unlike URLs, there
 can only be one DOI in this field.  The whole contents of the field is
-assumed to be the DOI and is sent to the browser, prepending the string
-‘https://dx.doi.org/’ if necessary.
+assumed to be the DOI and is sent to the browser, prepended with the
+string ‘https://dx.doi.org/’ if necessary.
 
 Ebib uses the Emacs function ‘browse-url’ to call the default browser on
 the system.  If you prefer to use another browser, however, you can
@@ -2973,48 +2973,48 @@ Node: Printing the Database85830
 Ref: #printing-the-database85990
 Node: Calling a Browser89459
 Ref: #calling-a-browser89623
-Node: Viewing and Importing Files92071
-Ref: #viewing-and-importing-files92245
-Node: Editing the file field96812
-Ref: #editing-the-file-field96961
-Node: Notes files98332
-Ref: #notes-files98480
-Node: Separate notes files99225
-Ref: #separate-notes-files99374
-Node: One single notes file100971
-Ref: #one-single-notes-file101161
-Node: Customising the notes template103086
-Ref: #customising-the-notes-template103265
-Node: Managing a reading list106842
-Ref: #managing-a-reading-list107004
-Node: Window Management110019
-Ref: #window-management110178
-Node: Creating Entry Stubs113337
-Ref: #creating-entry-stubs113499
-Node: @Preamble Definition114497
-Ref: #preamble-definition114661
-Node: @String Definitions116633
-Ref: #string-definitions116784
-Node: @Comments120277
-Ref: #comments120405
-Node: Managing Keywords120770
-Ref: #managing-keywords120915
-Node: Sorting the bib File126816
-Ref: #sorting-the-.bib-file126989
-Node: Merging and Importing130108
-Ref: #merging-and-importing130273
-Node: Exporting Entries132043
-Ref: #exporting-entries132205
-Node: Multiple Identical Fields133721
-Ref: #multiple-identical-fields133900
-Node: Multiline Edit Buffers135828
-Ref: #multiline-edit-buffers136000
-Node: The Options Menu139877
-Ref: #the-options-menu140025
-Node: Customisation140643
-Ref: #customisation140754
-Node: Modifying Key Bindings141362
-Ref: #modifying-key-bindings141489
+Node: Viewing and Importing Files92075
+Ref: #viewing-and-importing-files92249
+Node: Editing the file field96816
+Ref: #editing-the-file-field96965
+Node: Notes files98336
+Ref: #notes-files98484
+Node: Separate notes files99229
+Ref: #separate-notes-files99378
+Node: One single notes file100975
+Ref: #one-single-notes-file101165
+Node: Customising the notes template103090
+Ref: #customising-the-notes-template103269
+Node: Managing a reading list106846
+Ref: #managing-a-reading-list107008
+Node: Window Management110023
+Ref: #window-management110182
+Node: Creating Entry Stubs113341
+Ref: #creating-entry-stubs113503
+Node: @Preamble Definition114501
+Ref: #preamble-definition114665
+Node: @String Definitions116637
+Ref: #string-definitions116788
+Node: @Comments120281
+Ref: #comments120409
+Node: Managing Keywords120774
+Ref: #managing-keywords120919
+Node: Sorting the bib File126820
+Ref: #sorting-the-.bib-file126993
+Node: Merging and Importing130112
+Ref: #merging-and-importing130277
+Node: Exporting Entries132047
+Ref: #exporting-entries132209
+Node: Multiple Identical Fields133725
+Ref: #multiple-identical-fields133904
+Node: Multiline Edit Buffers135832
+Ref: #multiline-edit-buffers136004
+Node: The Options Menu139881
+Ref: #the-options-menu140029
+Node: Customisation140647
+Ref: #customisation140758
+Node: Modifying Key Bindings141366
+Ref: #modifying-key-bindings141493
 
 End Tag Table
 

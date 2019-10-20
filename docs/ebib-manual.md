@@ -1562,8 +1562,8 @@ See the option “Url Regexp” for details.
 Similarly, with the key `I` in the index buffer you can send a DOI to a
 browser. The DOI must be stored in the `doi` field. Unlike URLs, there
 can only be one DOI in this field. The whole contents of the field is
-assumed to be the DOI and is sent to the browser, prepending the string
-`https://dx.doi.org/` if necessary.
+assumed to be the DOI and is sent to the browser, prepended with the
+string `https://dx.doi.org/` if necessary.
 
 Ebib uses the Emacs function `browse-url` to call the default browser on
 the system. If you prefer to use another browser, however, you can
