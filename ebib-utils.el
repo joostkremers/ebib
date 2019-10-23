@@ -1424,7 +1424,7 @@ MATCH acts just like the argument to MATCH-END, and defaults to
 
 (defun ebib--special-field-p (field)
   "Return t if FIELD is a special field.
-Speciald fields are those whose names start and end with an equal sign."
+Special fields are those whose names start and end with an equal sign."
   (string-match-p "\\`=[[:alpha:]]*=\\'" field))
 
 (defun ebib--local-vars-to-list (str)
