@@ -109,11 +109,11 @@ note."
   :type '(string :tag "Note template"))
 
 (defcustom ebib-notes-template-specifiers '((?K . ebib-create-org-identifier)
-                                        (?T . ebib-create-org-title)
-                                        (?L . ebib-create-org-link)
-                                        (?F . ebib-create-org-file-link)
-                                        (?D . ebib-create-org-doi-link)
-                                        (?U . ebib-create-org-url-link))
+                                            (?T . ebib-create-org-title)
+                                            (?L . ebib-create-org-link)
+                                            (?F . ebib-create-org-file-link)
+                                            (?D . ebib-create-org-doi-link)
+                                            (?U . ebib-create-org-url-link))
   "Specifiers used in `ebib-notes-template'.
 Each specifier consists of a character (which is preceded by a
 percent sign in `ebib-notes-template') and a symbol, which
