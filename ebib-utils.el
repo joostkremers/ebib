@@ -510,7 +510,7 @@ This option is described in the manual/info file in the section
                                ("WWW" . "Online"))
   "List of entry type aliases for Biblatex.")
 
-(defcustom ebib-bibtex-dialect 'biblatex
+(defcustom ebib-bibtex-dialect 'BibTeX
   "The default BibTeX dialect.
 A `.bib' file/database without explicit dialect setting is
 assumed to use this dialect.  Possible values are those listed in

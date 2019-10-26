@@ -10,7 +10,6 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 ## Version 2.18, October 2019 ##
 
-- Make `biblatex`the default BibTeX dialect.
 - Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion. 
 
 ## Version 2.17, June 2019 ##
@@ -113,7 +112,7 @@ Loading a `.bib` file into Ebib is done with the command `o`. Ebib reads the fil
 
 Every time Ebib reads a `.bib` file, it produces a few log messages. These are written into a special buffer `*Ebib-log*`. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged. If Ebib finds something that it cannot parse, it will log an error. If warnings and/or errors occurred during loading, Ebib will issue a message when it finishes loading the `.bib` and direct you to the log buffer.
 
-In order to parse `.bib` files, Ebib uses the entry type definitions of `bibtex.el`, which is fairly complete, but if you use non-standard entry types, you may need to customise `bibtex-biblatex-entry-alist` or `bibtex-bibtex-entry-alist`, depending on which of the two you use. If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this may happen is when you load a BibTeX file without letting Ebib know the file is BibTeX-specific. By default, Ebib assumes that a `.bib` file it loads is a `biblatex` file. If you intend to use BibTeX files, make sure to read the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
+In order to parse `.bib` files, Ebib uses the entry type definitions of `bibtex.el`, which is fairly complete, but if you use non-standard entry types, you may need to customise `bibtex-biblatex-entry-alist` or `bibtex-bibtex-entry-alist`, depending on which of the two you use. If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this may happen is when you load a BibTeX file without letting Ebib know the file is BibTeX-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use `biblatex` files, make sure to read the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
 
 
 ## Preloading `.bib` Files ##
@@ -252,12 +251,12 @@ If you have multiple databases open, have made changes in more than one of them,
 
 BibTeX has long been a core part of the TeX ecosystem, but it has not received any substantial update since 1988(!) and it has next to no support for languages other than English. Compared to BibTeX, `biblatex` has an expanded set of entry types allowing for more diverse types of references, a larger number of fields, and a much more sophisticated system of field value inheritances. Most importantly, however, `biblatex` (and its back-end `Biber`) has proper Unicode support.
 
-For these reasons, the use of `biblatex` is highly recommended for anyone using LaTeX, and Ebib uses it as its default format. Nonetheless, Ebib can of course handle traditional BibTeX files, provided it is set up for the right “dialect”.
+For these reasons, the use of `biblatex` is highly recommended for anyone using LaTeX. Still, for historical reasons, BibTeX is still the default dialect, so if you intend to use `biblatex` files, you need to configure Ebib.
 
 
 ## Setting the BibTeX Dialect ##
 
-`Biblatex` files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a `biblatex` file is determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`, the default being `biblatex`. (These values are taken from the variable `bibtex-dialect-list`.)
+`Biblatex` files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a `biblatex` file is determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`, the default being `BibTeX`. (These values are taken from the variable `bibtex-dialect-list`.)
 
 The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of “Illegal entry type” errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs’ `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
 

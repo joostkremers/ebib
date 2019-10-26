@@ -11,7 +11,6 @@ is.
 
 ## Version 2.18, October 2019
 
-  - Make `biblatex`the default BibTeX dialect.
   - Add command `ebib-jump-to-entry` (bound to `j` in the index buffer):
     quickly jump to any entry in any database using completion.
 
@@ -193,7 +192,7 @@ entries will still be loaded, but their entry type is displayed using
 Emacs’ `error` face. The most likely case in which this may happen is
 when you load a BibTeX file without letting Ebib know the file is
 BibTeX-specific. By default, Ebib assumes that a `.bib` file it loads is
-a `biblatex` file. If you intend to use BibTeX files, make sure to read
+a BibTeX file. If you intend to use `biblatex` files, make sure to read
 the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
 
 ## Preloading `.bib` Files
@@ -568,9 +567,9 @@ system of field value inheritances. Most importantly, however,
 `biblatex` (and its back-end `Biber`) has proper Unicode support.
 
 For these reasons, the use of `biblatex` is highly recommended for
-anyone using LaTeX, and Ebib uses it as its default format. Nonetheless,
-Ebib can of course handle traditional BibTeX files, provided it is set
-up for the right “dialect”.
+anyone using LaTeX. Still, for historical reasons, BibTeX is still the
+default dialect, so if you intend to use `biblatex` files, you need to
+configure Ebib.
 
 ## Setting the BibTeX Dialect
 
@@ -578,7 +577,7 @@ up for the right “dialect”.
 Whether Ebib interprets a file as a BibTeX or a `biblatex` file is
 determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`).
 Possible values for this option are `BibTeX` and `biblatex`, the default
-being `biblatex`. (These values are taken from the variable
+being `BibTeX`. (These values are taken from the variable
 `bibtex-dialect-list`.)
 
 The dialect specified determines which entry types Ebib recognises and
