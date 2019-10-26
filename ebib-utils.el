@@ -225,7 +225,7 @@ disable the Ebib-specific mode line altogether."
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
 
-(defcustom ebib-entry-mode-line '((:eval (format "  »%s«" (or (ebib--get-key-at-point) "No entry"))))
+(defcustom ebib-entry-mode-line '((:eval (ebib--format-entry-info-for-modeline)))
   "The mode line for the entry buffer.
 The mode line of the entry window shows the entry key.  You can
 customize this information if you wish, or disable the

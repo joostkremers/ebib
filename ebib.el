@@ -3214,14 +3214,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (setq truncate-lines t)
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
-  (hl-line-mode 1)
-  (ebib-entry-minor-mode 1))
-
-(define-minor-mode ebib-entry-minor-mode
-  "Ebib entry minor mode.
-Primarily used to add some info to the entry buffer mode line."
-  :init-value nil :lighter (:eval (ebib--format-entry-info-for-modeline))
-  :global nil)
+  (hl-line-mode 1))
 
 (easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
   '("Ebib"
