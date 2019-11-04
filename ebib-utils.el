@@ -684,7 +684,8 @@ possible to use the same separator in the `url' field as in the
 
 (defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url)
                                                ("https?://ling.auf.net/lingBuzz/" . ebib-transform-lingbuzz-url)
-                                               ("https?://www.jstor.org/" . ebib-transform-jstor-url))
+                                               ("https?://www.jstor.org/" . ebib-transform-jstor-url)
+                                               ("https?://link.aps.org/" . ebib-transform-aps-url))
   "Transformations to apply to a URL before attempting to download a pdf file.
 Each entry consists of a matcher and a transformation function.
 The matcher is a regular expression that is matched (with
@@ -707,6 +708,39 @@ transformation function is applied to the URL."
   (save-match-data
     (string-match "\\(https?://www.jstor.org/stable/\\)\\([0-9]*\\)" url)
     (format "%spdf/%s.pdf" (match-string 1 url) (match-string 2 url))))
+
+(defun ebib-transform-aps-url (url)
+  "Transform an APS URL to the URL of its corresponding pdf file."
+  (save-match-data
+    (cond
+     ((string-match (regexp-quote "PhysRevA") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/pra/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevB") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prb/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevC") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prc/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevD") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prd/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevE") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/pre/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevFluids") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prfluids/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevLett") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prl/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevAccelBeams") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prab/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevApplied") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prapplied/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevMaterials") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prmaterials/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevResearch") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prresearch/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevX") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prx/pdf/" url t t))
+     ((string-match (regexp-quote "RevModPhys") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/rmp/pdf/" url t t))
+     ((string-match (regexp-quote "PhysRevPhysEducRes") url)
+      (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prper/pdf/" url t t)))))
 
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
