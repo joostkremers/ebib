@@ -8,9 +8,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 # News #
 
-## Version 2.18, October 2019 ##
+## Version 2.19, November 2019 ##
 
 - Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion. 
+- Allow a full URL in the `doi` field: when passing the DOI to a browser, `"https://dx.doi.org/"` is only added if the contents of the `doi` field does not start with `"http://"` `"https://"`.
 
 ## Version 2.17, June 2019 ##
 

@@ -61,7 +61,7 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
-* Version 218 October 2019::
+* Version 219 November 2019::
 * Version 217 June 2019::
 * Version 216 February 2019::
 * Version 215 January 2019::
@@ -73,17 +73,20 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 * Version 21112 July 2018::
 
 
-File: ebib.info,  Node: Version 218 October 2019,  Next: Version 217 June 2019,  Up: News
+File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,  Up: News
 
-1.1 Version 2.18, October 2019
-==============================
+1.1 Version 2.19, November 2019
+===============================
 
    • Add command ‘ebib-jump-to-entry’ (bound to ‘j’ in the index
      buffer): quickly jump to any entry in any database using
      completion.
+   • Allow a full URL in the ‘doi’ field: when passing the DOI to a
+     browser, ‘"https://dx.doi.org/"’ is only added if the contents of
+     the ‘doi’ field does not start with ‘"http://"’ ‘"https://"’.
 
 
-File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,  Prev: Version 218 October 2019,  Up: News
+File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,  Prev: Version 219 November 2019,  Up: News
 
 1.2 Version 2.17, June 2019
 ===========================
@@ -2870,150 +2873,150 @@ Tag Table:
 Node: Top186
 Node: News1378
 Ref: #news1468
-Node: Version 218 October 20191770
-Ref: #version-2.18-october-20191926
-Node: Version 217 June 20192081
-Ref: #version-2.17-june-20192265
-Node: Version 216 February 20192539
-Ref: #version-2.16-february-20192731
-Node: Version 215 January 20193238
-Ref: #version-2.15-january-20193432
-Node: Version 214 December 20183902
-Ref: #version-2.14-december-20184098
-Node: Version 213 November 20184540
-Ref: #version-2.13-november-20184738
-Node: Version 2123 November 20184937
-Ref: #version-2.12.3-november-20185140
-Node: Version 2122 November 20185215
-Ref: #version-2.12.2-november-20185416
-Node: Version 212 August 20185556
-Ref: #version-2.12-august-20185746
-Node: Version 21112 July 20186026
-Ref: #version-2.11.12-july-20186185
-Node: Installation6624
-Ref: #installation6742
-Node: Package manager6836
-Ref: #package-manager6965
-Node: Debian and Ubuntu7317
-Ref: #debian-and-ubuntu7478
-Node: Manual installation7612
-Ref: #manual-installation7775
-Node: Starting Ebib8055
-Ref: #starting-ebib8180
-Node: Getting Started9065
-Ref: #getting-started9205
-Node: Opening a bib File11198
-Ref: #opening-a-.bib-file11352
-Node: Preloading bib Files12851
-Ref: #preloading-.bib-files13039
-Node: Navigating a bib File13843
-Ref: #navigating-a-.bib-file14038
-Node: Starting a New bib File18545
-Ref: #starting-a-new-.bib-file18715
-Node: Editing the Database19007
-Ref: #editing-the-database19162
-Node: Adding and Deleting Entries19540
-Ref: #adding-and-deleting-entries19717
-Node: Editing Fields Values21928
-Ref: #editing-fields-values22126
-Node: Editing Multiline Values25033
-Ref: #editing-multiline-values25226
-Node: Undefined Fields27423
-Ref: #undefined-fields27592
-Node: Hidden Fields28481
-Ref: #hidden-fields28630
-Node: Timestamps29700
-Ref: #timestamps29862
-Node: Copy Cut Kill Paste Yank and Delete31913
-Ref: #copy-cut-kill-paste-yank-and-delete32117
-Node: Saving a Database33063
-Ref: #saving-a-database33215
-Node: Biblatex vs BibTeX34863
-Ref: #biblatex-vs.-bibtex35023
-Node: Setting the BibTeX Dialect35820
-Ref: #setting-the-bibtex-dialect35993
-Node: Alias Types and Fields38036
-Ref: #alias-types-and-fields38201
-Node: The Entries List40246
-Ref: #the-entries-list40384
-Node: Searching44125
-Ref: #searching44269
-Node: Simple Searches44772
-Ref: #simple-searches44888
-Node: Filters48093
-Ref: #filters48193
-Node: Simple Selection49268
-Ref: #simple-selection49397
-Node: Complex Filters51106
-Ref: #complex-filters51268
-Node: Storing and Saving Filters55343
-Ref: #storing-and-saving-filters55526
-Node: Special Filters58381
-Ref: #special-filters58562
-Node: An Example Listing Recent Additions59930
-Ref: #an-example-listing-recent-additions60159
-Node: Properties of Filtered Databases62529
-Ref: #properties-of-filtered-databases62726
-Node: Inserting Citations into a Text Buffer64381
-Ref: #inserting-citations-into-a-text-buffer64593
-Node: Key Bindings68740
-Ref: #key-bindings68895
-Node: Defining Citation Commands69653
-Ref: #defining-citation-commands69884
-Node: Associating a Database with a Text File75774
-Ref: #associating-a-database-with-a-text-file76010
-Node: Master and Slave Databases78969
-Ref: #master-and-slave-databases79167
-Node: Cross-referencing81051
-Ref: #cross-referencing81208
-Node: Marking Entries84735
-Ref: #marking-entries84883
-Node: Printing the Database85760
-Ref: #printing-the-database85920
-Node: Calling a Browser89389
-Ref: #calling-a-browser89553
-Node: Viewing and Importing Files92005
-Ref: #viewing-and-importing-files92179
-Node: Editing the file field96746
-Ref: #editing-the-file-field96895
-Node: Notes files98266
-Ref: #notes-files98414
-Node: Separate notes files99159
-Ref: #separate-notes-files99308
-Node: One single notes file100905
-Ref: #one-single-notes-file101095
-Node: Customising the notes template103020
-Ref: #customising-the-notes-template103199
-Node: Managing a reading list106776
-Ref: #managing-a-reading-list106938
-Node: Window Management109953
-Ref: #window-management110112
-Node: Creating Entry Stubs113271
-Ref: #creating-entry-stubs113433
-Node: @Preamble Definition114431
-Ref: #preamble-definition114595
-Node: @String Definitions116567
-Ref: #string-definitions116718
-Node: @Comments120211
-Ref: #comments120339
-Node: Managing Keywords120704
-Ref: #managing-keywords120849
-Node: Sorting the bib File126750
-Ref: #sorting-the-.bib-file126923
-Node: Merging and Importing130042
-Ref: #merging-and-importing130207
-Node: Exporting Entries131977
-Ref: #exporting-entries132139
-Node: Multiple Identical Fields133655
-Ref: #multiple-identical-fields133834
-Node: Multiline Edit Buffers135762
-Ref: #multiline-edit-buffers135934
-Node: The Options Menu139811
-Ref: #the-options-menu139959
-Node: Customisation140577
-Ref: #customisation140688
-Node: Modifying Key Bindings141296
-Ref: #modifying-key-bindings141423
+Node: Version 219 November 20191771
+Ref: #version-2.19-november-20191930
+Node: Version 217 June 20192313
+Ref: #version-2.17-june-20192498
+Node: Version 216 February 20192772
+Ref: #version-2.16-february-20192964
+Node: Version 215 January 20193471
+Ref: #version-2.15-january-20193665
+Node: Version 214 December 20184135
+Ref: #version-2.14-december-20184331
+Node: Version 213 November 20184773
+Ref: #version-2.13-november-20184971
+Node: Version 2123 November 20185170
+Ref: #version-2.12.3-november-20185373
+Node: Version 2122 November 20185448
+Ref: #version-2.12.2-november-20185649
+Node: Version 212 August 20185789
+Ref: #version-2.12-august-20185979
+Node: Version 21112 July 20186259
+Ref: #version-2.11.12-july-20186418
+Node: Installation6857
+Ref: #installation6975
+Node: Package manager7069
+Ref: #package-manager7198
+Node: Debian and Ubuntu7550
+Ref: #debian-and-ubuntu7711
+Node: Manual installation7845
+Ref: #manual-installation8008
+Node: Starting Ebib8288
+Ref: #starting-ebib8413
+Node: Getting Started9298
+Ref: #getting-started9438
+Node: Opening a bib File11431
+Ref: #opening-a-.bib-file11585
+Node: Preloading bib Files13084
+Ref: #preloading-.bib-files13272
+Node: Navigating a bib File14076
+Ref: #navigating-a-.bib-file14271
+Node: Starting a New bib File18778
+Ref: #starting-a-new-.bib-file18948
+Node: Editing the Database19240
+Ref: #editing-the-database19395
+Node: Adding and Deleting Entries19773
+Ref: #adding-and-deleting-entries19950
+Node: Editing Fields Values22161
+Ref: #editing-fields-values22359
+Node: Editing Multiline Values25266
+Ref: #editing-multiline-values25459
+Node: Undefined Fields27656
+Ref: #undefined-fields27825
+Node: Hidden Fields28714
+Ref: #hidden-fields28863
+Node: Timestamps29933
+Ref: #timestamps30095
+Node: Copy Cut Kill Paste Yank and Delete32146
+Ref: #copy-cut-kill-paste-yank-and-delete32350
+Node: Saving a Database33296
+Ref: #saving-a-database33448
+Node: Biblatex vs BibTeX35096
+Ref: #biblatex-vs.-bibtex35256
+Node: Setting the BibTeX Dialect36053
+Ref: #setting-the-bibtex-dialect36226
+Node: Alias Types and Fields38269
+Ref: #alias-types-and-fields38434
+Node: The Entries List40479
+Ref: #the-entries-list40617
+Node: Searching44358
+Ref: #searching44502
+Node: Simple Searches45005
+Ref: #simple-searches45121
+Node: Filters48326
+Ref: #filters48426
+Node: Simple Selection49501
+Ref: #simple-selection49630
+Node: Complex Filters51339
+Ref: #complex-filters51501
+Node: Storing and Saving Filters55576
+Ref: #storing-and-saving-filters55759
+Node: Special Filters58614
+Ref: #special-filters58795
+Node: An Example Listing Recent Additions60163
+Ref: #an-example-listing-recent-additions60392
+Node: Properties of Filtered Databases62762
+Ref: #properties-of-filtered-databases62959
+Node: Inserting Citations into a Text Buffer64614
+Ref: #inserting-citations-into-a-text-buffer64826
+Node: Key Bindings68973
+Ref: #key-bindings69128
+Node: Defining Citation Commands69886
+Ref: #defining-citation-commands70117
+Node: Associating a Database with a Text File76007
+Ref: #associating-a-database-with-a-text-file76243
+Node: Master and Slave Databases79202
+Ref: #master-and-slave-databases79400
+Node: Cross-referencing81284
+Ref: #cross-referencing81441
+Node: Marking Entries84968
+Ref: #marking-entries85116
+Node: Printing the Database85993
+Ref: #printing-the-database86153
+Node: Calling a Browser89622
+Ref: #calling-a-browser89786
+Node: Viewing and Importing Files92238
+Ref: #viewing-and-importing-files92412
+Node: Editing the file field96979
+Ref: #editing-the-file-field97128
+Node: Notes files98499
+Ref: #notes-files98647
+Node: Separate notes files99392
+Ref: #separate-notes-files99541
+Node: One single notes file101138
+Ref: #one-single-notes-file101328
+Node: Customising the notes template103253
+Ref: #customising-the-notes-template103432
+Node: Managing a reading list107009
+Ref: #managing-a-reading-list107171
+Node: Window Management110186
+Ref: #window-management110345
+Node: Creating Entry Stubs113504
+Ref: #creating-entry-stubs113666
+Node: @Preamble Definition114664
+Ref: #preamble-definition114828
+Node: @String Definitions116800
+Ref: #string-definitions116951
+Node: @Comments120444
+Ref: #comments120572
+Node: Managing Keywords120937
+Ref: #managing-keywords121082
+Node: Sorting the bib File126983
+Ref: #sorting-the-.bib-file127156
+Node: Merging and Importing130275
+Ref: #merging-and-importing130440
+Node: Exporting Entries132210
+Ref: #exporting-entries132372
+Node: Multiple Identical Fields133888
+Ref: #multiple-identical-fields134067
+Node: Multiline Edit Buffers135995
+Ref: #multiline-edit-buffers136167
+Node: The Options Menu140044
+Ref: #the-options-menu140192
+Node: Customisation140810
+Ref: #customisation140921
+Node: Modifying Key Bindings141529
+Ref: #modifying-key-bindings141656
 
 End Tag Table
 
