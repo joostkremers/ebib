@@ -2430,9 +2430,8 @@ Either prints the entire database, or the marked entries."
     (default
       (beep))))
 
-;; TODO We should account for biblatex here.
 (defun ebib-latex-entries ()
-  "Create a LaTeX file that \\nocites entries from the database.
+  "Create a LaTeX file that \\nocites entries from the current database.
 Operates either on all entries or on the marked entries."
   (interactive)
   (ebib--execute-when
@@ -2440,18 +2439,23 @@ Operates either on all entries or on the marked entries."
      (ebib--ifstring (tempfile (if (not (string= "" ebib-print-tempfile))
                                    ebib-print-tempfile
                                  (read-file-name "Use temp file: ")))
-         (progn
+         (let* ((dialect (ebib--get-dialect ebib--cur-db))
+                (preamble (alist-get dialect ebib-latex-preamble)))
            (with-temp-buffer
-             (when ebib-latex-preamble
-               (mapc (lambda (string)
-                       (insert (format "%s\n" string)))
-                     ebib-latex-preamble))
+             (when preamble
+               (mapc (lambda (line)
+                       (insert (format "%s\n" line)))
+                     preamble))
+             (if (eq dialect 'biblatex)
+                 (insert (format "\n\\addbibresource{%s}\n" (expand-file-name (ebib-db-get-filename ebib--cur-db)))))
              (insert "\n\\begin{document}\n\n")
              (if (ebib-db-marked-entries-p ebib--cur-db)
                  (dolist (entry (ebib--sort-keys-list (ebib-db-list-marked-entries ebib--cur-db) ebib--cur-db))
                    (insert (format "\\nocite{%s}\n" entry)))
                (insert "\\nocite{*}\n"))
-             (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))
+             (pcase dialect
+               ('biblatex (insert "\n\\printbibliography\n\n"))
+               ('BibTeX (insert (format "\n\\bibliography{%s}\n\n" (expand-file-name (ebib-db-get-filename ebib--cur-db))))))
              (insert "\\end{document}\n")
              (write-region (point-min) (point-max) tempfile))
            (ebib-lower)
@@ -2539,15 +2543,18 @@ argument ARG."
 (defun ebib-browse-doi ()
   "Open the DOI in the standard DOI field in a browser.
 The stardard DOI field (see user option `ebib-doi-field') may
-contain only one DOI.  The DOI is combined with the URL
-\"http://dx.doi.org/\" before being sent to the browser."
+contain only one DOI.  If necessary, the DOI is prepended with
+the URL \"https://dx.doi.org/\" before being sent to the
+browser."
   (interactive)
   (ebib--execute-when
     (entries
      (let ((doi (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (if doi
-           (ebib--call-browser (concat "http://dx.doi.org/" doi))
-         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))))
+       (unless doi
+         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))
+       (ebib--call-browser (if (string-match-p "^[[:space:]]*https?://dx.doi.org/" doi)
+                               doi
+                             (concat "https://dx.doi.org/" doi)))))
     (default
       (beep))))
 
@@ -3186,7 +3193,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "q" 'ebib-quit-entry-buffer)
     (define-key map "r" 'ebib-toggle-raw)
     (define-key map "s" 'ebib-insert-abbreviation)
-    (define-key map "u" 'ebib-browse-url-in-field)
+    (define-key map "u" 'ebib-browse-url)
     (define-key map "v" 'ebib-view-field-as-help)
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
@@ -3207,14 +3214,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (setq truncate-lines t)
   (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
-  (hl-line-mode 1)
-  (ebib-entry-minor-mode 1))
-
-(define-minor-mode ebib-entry-minor-mode
-  "Ebib entry minor mode.
-Primarily used to add some info to the entry buffer mode line."
-  :init-value nil :lighter (:eval (ebib--format-entry-info-for-modeline))
-  :global nil)
+  (hl-line-mode 1))
 
 (easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
   '("Ebib"
@@ -3231,7 +3231,7 @@ Primarily used to add some info to the entry buffer mode line."
     ["Add Field" ebib-add-field t]
     "--"
     ["View File" ebib-view-file-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
-    ["Browse URL" ebib-browse-url-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Browse URL" ebib-browse-url (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["View Multiline Field" ebib-view-field-as-help (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Quit Entry Buffer" ebib-quit-entry-buffer t]
@@ -3608,17 +3608,6 @@ prefix argument has no meaning."
               (inhibit-read-only t))
           (delete-region (point-at-bol) (1+ (point-at-eol)))
           (ebib--insert-entry-in-index-sorted key t)))))
-
-(defun ebib-browse-url-in-field (arg)
-  "Browse a URL in the current field.
-If the field contains multiple URLs (as defined by
-`ebib-url-regexp'), the user is asked which one to open.
-Altertanively, a numeric prefix argument ARG can be passed."
-  (interactive "P")
-  (let ((urls (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-    (if urls
-        (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
-      (error "[Ebib] No URL found in `%s' field" (ebib--current-field)))))
 
 (defun ebib-view-file-in-field (arg)
   "View a file in the current field.

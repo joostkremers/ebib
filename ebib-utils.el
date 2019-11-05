@@ -97,20 +97,20 @@ when it is first saved.  Note that Ebib uses
   :type '(choice (const :tag "Create backups" t)
                  (const :tag "Do not create backups" nil)))
 
-(defcustom ebib-extra-fields '((BibTeX "crossref"
+(defcustom ebib-extra-fields '((biblatex "crossref"
+                                         "annotation"
+                                         "abstract"
+                                         "keywords"
+                                         "file"
+                                         "timestamp")
+                               (BibTeX "crossref"
                                        "annote"
                                        "abstract"
                                        "keywords"
                                        "file"
                                        "timestamp"
                                        "url"
-                                       "doi")
-                               (biblatex "crossref"
-                                         "annotation"
-                                         "abstract"
-                                         "keywords"
-                                         "file"
-                                         "timestamp"))
+                                       "doi"))
   "List of the extra fields for BibTeX entries.
 Extra fields are fields that are available for all entry types.
 Depending on the bibliography style, the value of these fields
@@ -121,11 +121,8 @@ Note, before adding fields to this list, check if the field you
 want to add is among the fields that are hidden by default.  See
 the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
   :group 'ebib
-  :type '(repeat (cons (choice :tag "Choose BibTeX dialect"
-                               (const BibTeX)
-                               (const biblatex)
-                               (symbol :tag "Other"))
-                       (repeat :tag "Extra fields" (string :tag "Field")))))
+  :type '(set (cons :tag "Dialect" (const biblatex) (repeat :tag "Extra fields" (string :tag "Field")))
+              (cons :tag "Dialect" (const BibTeX) (repeat :tag "Extra fields" (string :tag "Field")))))
 
 (defcustom ebib-hidden-fields '("addendum" "afterword" "annotator" "bookauthor"
                                 "booksubtitle" "booktitleaddon" "chapter" "commentator"
@@ -140,7 +137,7 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                 "volumes")
   "List of fields that are not displayed.
 The fields in this list are not displayed by default.  Since
-Biblatex defines a large number of fields, it is not practical to
+biblatex defines a large number of fields, it is not practical to
 display them all in the entry buffer.  You can make these fields
 temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
 or through the menu."
@@ -228,7 +225,7 @@ disable the Ebib-specific mode line altogether."
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
 
-(defcustom ebib-entry-mode-line '((:eval (format "  »%s«" (or (ebib--get-key-at-point) "No entry"))))
+(defcustom ebib-entry-mode-line '((:eval (ebib--format-entry-info-for-modeline)))
   "The mode line for the entry buffer.
 The mode line of the entry window shows the entry key.  You can
 customize this information if you wish, or disable the
@@ -324,8 +321,31 @@ documentation for details."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-citation-commands '((any
-                                     (("cite" "\\cite%<[%A]%>{%K}")))
+(defcustom ebib-citation-commands '((latex-mode
+                                     (("cite"   "\\cite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("paren"  "\\parencite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("foot"   "\\footcite%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("text"   "\\textcite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("smart"  "\\smartcite%<[%A]%>[%A]{%(%K%,)}")
+                                      ("super"  "\\supercite{%K}")
+                                      ("auto"   "\\autocite%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("cites"  "\\cites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("parens" "\\parencites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("foots"  "\\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+
+                                      ("texts"  "\\textcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("smarts" "\\smartcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("supers" "\\supercites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                                      ("autos"  "\\autoscites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+
+                                      ("author" "\\citeauthor%<[%A]%>[%A]{%(%K%,)}")
+                                      ("title"  "\\citetitle%<[%A]%>[%A]{%(%K%,)}")
+                                      ("year"   "\\citeyear%<[%A]%>[%A][%A]{%K}")
+                                      ("date"   "\\citedate%<[%A]%>[%A]{%(%K%,)}")
+
+                                      ("full"   "\\fullcite%<[%A]%>[%A]{%(%K%,)}")))
                                     (org-mode
                                      (("ebib" "[[ebib:%K][%D]]")))
                                     (markdown-mode
@@ -342,9 +362,7 @@ inserted in the buffer.
 
 The major mode can also be specified as `any', which defines
 citation commands that are available in buffers that do not have
-any of the major modes listed in this option.  By default, this
-is used for LaTeX citations, so as to cover all TeX and LaTeX
-modes.
+any of the major modes listed in this option.
 
 The format string template can contain a number of formatting
 directives:
@@ -875,10 +893,14 @@ excluded, which saves space."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-latex-preamble '("\\documentclass{article}" "\\bibliographystyle{plain}")
-  "Preamble for the LaTeX file for BibTeXing the database."
+(defcustom ebib-latex-preamble '((biblatex "\\documentclass{article}"
+                                           "\\usepackage[style=authoryear-comp,sortlocale=auto]{biblatex}")
+                                 (BibTeX "\\documentclass{article}"
+                                         "\\bibliographystyle{plain}"))
+  "Preamble for the LaTeX file used for BibTeXing the database."
   :group 'ebib
-  :type '(repeat (string :tag "Add to preamble")))
+  :type '(set (cons :tag "Dialect" (const biblatex) (repeat :tag "Preamble" (string :tag "Line")))
+              (cons :tag "Dialect" (const BibTeX) (repeat :tag "Preamble" (string :tag "Line")))))
 
 (defcustom ebib-print-tempfile ""
   "Temporary file for printing the database.
@@ -1436,7 +1458,7 @@ MATCH acts just like the argument to MATCH-END, and defaults to
 
 (defun ebib--special-field-p (field)
   "Return t if FIELD is a special field.
-Speciald fields are those whose names start and end with an equal sign."
+Special fields are those whose names start and end with an equal sign."
   (string-match-p "\\`=[[:alpha:]]*=\\'" field))
 
 (defun ebib--local-vars-to-list (str)
