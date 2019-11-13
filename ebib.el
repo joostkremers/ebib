@@ -4341,7 +4341,7 @@ If prefix ARG is non-nil, do not delete the original file."
     (let ((files (ebib-get-field-value ebib-file-field key ebib--cur-db 'noerror 'unbraced)))
       (when (or (null files)
                 (not (string-match-p (regexp-quote new-name) files)))
-        (ebib-set-field-value ebib-file-field new-name key ebib--cur-db ebib-filename-separator)
+        (ebib-set-field-value ebib-file-field (ebib--transform-file-name-for-storing dest-path) key ebib--cur-db ebib-filename-separator)
         (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
                                                            (ebib-db-has-key key slave))
                                                          (ebib--list-slaves ebib--cur-db)))
