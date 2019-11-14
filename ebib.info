@@ -2053,11 +2053,10 @@ File: ebib.info,  Node: One single notes file,  Next: Customising the notes temp
 ==========================
 
 If you wish to store all notes in a single file, you must set the option
-‘ebib-notes-use-single-file’ to the notes file.  In this case, the
-options ‘ebib-notes-directory’ and ‘ebib-notes-extension’ are ignored,
-which means that you must specify the full path and the extension of the
-notes file.  The option ‘ebib-notes-name-transform-function’ is also
-ignored.
+‘ebib-notes-file’ to the notes file.  In this case, the options
+‘ebib-notes-directory’ and ‘ebib-notes-extension’ are ignored, which
+means that you must specify the full path and the extension of the notes
+file.  The option ‘ebib-notes-name-transform-function’ is also ignored.
 
 Ebib assumes that the notes file is an Org file and creates notes using
 the template in ‘ebib-notes-template’, but the Org format is not
@@ -2985,38 +2984,38 @@ Node: Separate notes files99392
 Ref: #separate-notes-files99541
 Node: One single notes file101138
 Ref: #one-single-notes-file101328
-Node: Customising the notes template103253
-Ref: #customising-the-notes-template103432
-Node: Managing a reading list107009
-Ref: #managing-a-reading-list107171
-Node: Window Management110186
-Ref: #window-management110345
-Node: Creating Entry Stubs113504
-Ref: #creating-entry-stubs113666
-Node: @Preamble Definition114664
-Ref: #preamble-definition114828
-Node: @String Definitions116800
-Ref: #string-definitions116951
-Node: @Comments120444
-Ref: #comments120572
-Node: Managing Keywords120937
-Ref: #managing-keywords121082
-Node: Sorting the bib File126983
-Ref: #sorting-the-.bib-file127156
-Node: Merging and Importing130275
-Ref: #merging-and-importing130440
-Node: Exporting Entries132210
-Ref: #exporting-entries132372
-Node: Multiple Identical Fields133888
-Ref: #multiple-identical-fields134067
-Node: Multiline Edit Buffers135995
-Ref: #multiline-edit-buffers136167
-Node: The Options Menu140044
-Ref: #the-options-menu140192
-Node: Customisation140810
-Ref: #customisation140921
-Node: Modifying Key Bindings141529
-Ref: #modifying-key-bindings141656
+Node: Customising the notes template103242
+Ref: #customising-the-notes-template103421
+Node: Managing a reading list106998
+Ref: #managing-a-reading-list107160
+Node: Window Management110175
+Ref: #window-management110334
+Node: Creating Entry Stubs113493
+Ref: #creating-entry-stubs113655
+Node: @Preamble Definition114653
+Ref: #preamble-definition114817
+Node: @String Definitions116789
+Ref: #string-definitions116940
+Node: @Comments120433
+Ref: #comments120561
+Node: Managing Keywords120926
+Ref: #managing-keywords121071
+Node: Sorting the bib File126972
+Ref: #sorting-the-.bib-file127145
+Node: Merging and Importing130264
+Ref: #merging-and-importing130429
+Node: Exporting Entries132199
+Ref: #exporting-entries132361
+Node: Multiple Identical Fields133877
+Ref: #multiple-identical-fields134056
+Node: Multiline Edit Buffers135984
+Ref: #multiline-edit-buffers136156
+Node: The Options Menu140033
+Ref: #the-options-menu140181
+Node: Customisation140799
+Ref: #customisation140910
+Node: Modifying Key Bindings141518
+Ref: #modifying-key-bindings141645
 
 End Tag Table
 

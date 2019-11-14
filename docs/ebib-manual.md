@@ -1719,11 +1719,10 @@ discussed below.
 ## One single notes file
 
 If you wish to store all notes in a single file, you must set the option
-`ebib-notes-use-single-file` to the notes file. In this case, the
-options `ebib-notes-directory` and `ebib-notes-extension` are ignored,
-which means that you must specify the full path and the extension of the
-notes file. The option `ebib-notes-name-transform-function` is also
-ignored.
+`ebib-notes-file` to the notes file. In this case, the options
+`ebib-notes-directory` and `ebib-notes-extension` are ignored, which
+means that you must specify the full path and the extension of the notes
+file. The option `ebib-notes-name-transform-function` is also ignored.
 
 Ebib assumes that the notes file is an Org file and creates notes using
 the template in `ebib-notes-template`, but the Org format is not

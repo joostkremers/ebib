@@ -1353,12 +1353,12 @@ interactively."
   "Open or create a note for the current entry."
   (interactive)
   (ebib--execute-when
-    (entries
-     (if ebib-notes-use-single-file
-         (ebib--notes-open-common-notes-file (ebib--get-key-at-point) ebib--cur-db)
-       (ebib--notes-open-notes-file-for-entry (ebib--get-key-at-point) ebib--cur-db)))
-    (default
-      (beep))))
+   (entries
+    (if ebib-notes-file
+        (ebib--notes-open-common-notes-file (ebib--get-key-at-point) ebib--cur-db)
+      (ebib--notes-open-notes-file-for-entry (ebib--get-key-at-point) ebib--cur-db)))
+   (default
+     (beep))))
 
 (defun ebib--add-entry-stub (&optional entry db)
   "Add ENTRY to DB in the form of a stub.

@@ -41,7 +41,7 @@
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 
-(defcustom ebib-notes-use-single-file nil
+(defcustom ebib-notes-file nil
   "Name of the notes file.
 To use a single file for all notes, set this variable to the full
 path of the notes file.  If this variable is nil, Ebib creates
@@ -49,6 +49,8 @@ one file per note, provided `ebib-notes-directory' is set."
   :group 'ebib-notes
   :type '(choice (const :tag "Use multiple notes files" nil)
                  (file :tag "Notes File")))
+
+(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-file)
 
 (defcustom ebib-notes-symbol "N"
   "Symbol used to indicate the presence of a note for the current entry.
@@ -69,7 +71,7 @@ Ebib creates notes files based on the entry key using the options
 If this option is nil, the first directory in `ebib-file-search-dirs' is
 used.
 
-Note that this option is ignored if `ebib-notes-use-single-file' is set."
+Note that this option is ignored if `ebib-notes-file' is set."
   :group 'ebib-notes
   :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
                  (directory :tag "Specify directory")))
@@ -78,7 +80,7 @@ Note that this option is ignored if `ebib-notes-use-single-file' is set."
   "Extension used for notes files.
 The extension should be specified without a dot.  Note that this
 option is only used for multiple notes files, i.e., when
-`ebib-notes-use-single-file' is unset."
+`ebib-notes-file' is unset."
   :group 'ebib-notes
   :type '(string :tag "Extension"))
 
@@ -171,8 +173,8 @@ string where point should be located."
 
 (defun ebib--notes-exists-note (key)
   "Return t if a note exists for KEY."
-  (if ebib-notes-use-single-file
-      (if (file-writable-p ebib-notes-use-single-file)
+  (if ebib-notes-file
+      (if (file-writable-p ebib-notes-file)
           (with-current-buffer (ebib--notes-buffer)
             (ebib--notes-locate-note key)))
     (file-readable-p (ebib--create-notes-file-name key))))
@@ -221,14 +223,14 @@ name is fully qualified by prepending the directory in
   "Return the buffer containing the notes file.
 If the file has not been opened yet, open it, creating it if
 necessary.  Note that this function assumes that
-`ebib-notes-use-single-file' is set.  An error is raised if it is
+`ebib-notes-file' is set.  An error is raised if it is
 not.  An error is also raised if the location for the notes file
 is not accessible to the user."
-  (unless ebib-notes-use-single-file
+  (unless ebib-notes-file
     (error "[Ebib] No notes file defined"))
-  (unless (file-writable-p ebib-notes-use-single-file)
+  (unless (file-writable-p ebib-notes-file)
     (error "[Ebib] Cannot read or create notes file"))
-  (find-file-noselect ebib-notes-use-single-file))
+  (find-file-noselect ebib-notes-file))
 
 (defun ebib--notes-locate-note (key)
   "Locate the note identified by KEY.
