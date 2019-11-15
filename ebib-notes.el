@@ -39,6 +39,8 @@
 (require 'ebib-utils)
 (require 'ebib-db)
 
+(require 'org-element nil t) ; Load org-element.el if available.
+
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 
 (defcustom ebib-notes-file nil
@@ -160,6 +162,20 @@ the cursor, etc."
   :group 'ebib-notes
   :type 'hook)
 
+(defcustom ebib-notes-get-ids-function #'ebib-notes-extract-org-ids
+  "Function to extract all entry keys for which a note exists.
+This function is run once on the common notes file (see
+`ebib-notes-file' to extract all the keys of the entries for
+which a note exists in the file."
+  :group 'ebib-notes
+  :type 'function)
+
+(defun ebib-notes-extract-org-ids ()
+  "Return a list of all Org CUSTOM_IDs in the current buffer."
+  (org-element-map (org-element-parse-buffer) 'headline
+    (lambda (headline)
+      (org-element-property :CUSTOM_ID headline))))
+
 (defun ebib--notes-fill-template (key db)
   "Create a new note for KEY in DB.
 Return a cons of the new note as a string and a position in this
@@ -171,17 +187,18 @@ string where point should be located."
       (setq point 0))
     (cons note point)))
 
-(defun ebib--notes-exists-note (key)
-  "Return t if a note exists for KEY."
-  (if ebib-notes-file
-      (if (file-writable-p ebib-notes-file)
-          (with-current-buffer (ebib--notes-buffer)
-            (ebib--notes-locate-note key)))
-    (file-readable-p (ebib--create-notes-file-name key))))
+(defvar ebib--notes-list nil "List of entry keys for which a note exists.")
+
+(defun ebib--notes-has-note (key)
+  "Return non-nil if entry KEY has an associated note."
+  (or (member key ebib--notes-list)
+      (if ebib-notes-file
+          (ebib--notes-has-note-entry key)
+        (ebib--notes-has-note-file key))))
 
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return the note symbol for displaying if a note exists for KEY."
-  (if (ebib--notes-exists-note key)
+  (if (ebib--notes-has-note key)
       (propertize ebib-notes-symbol
                   'face '(:height 0.8 :inherit ebib-link-face)
                   'mouse-face 'highlight)
@@ -215,7 +232,15 @@ name is fully qualified by prepending the directory in
         (let ((note (ebib--notes-fill-template key db)))
           (insert (car note))
           (goto-char (point-min))
-          (forward-char (cdr note))))))
+          (forward-char (cdr note))
+          (push key ebib--notes-list)))))
+
+(defun ebib--notes-has-note-file (key)
+  "Check if KEY has an associated notes file.
+If it does, add KEY to `ebib--notes-list' and return the new
+list, otherwise return nil."
+  (if (file-readable-p (ebib--create-notes-file-name key))
+      (cl-pushnew key ebib--notes-list)))
 
 ;;; Common notes file.
 
@@ -261,9 +286,20 @@ This function also runs `ebib-notes-search-note-before-hook'."
                 (beg (point)))
             (insert (car new-note))
             (goto-char (+ beg (cdr new-note)))
-            (run-hooks 'ebib-notes-new-note-hook)))))
+            (run-hooks 'ebib-notes-new-note-hook)
+            (push key ebib--notes-list)))))
     (ebib-lower)
     (switch-to-buffer buf)))
+
+(defun ebib--notes-has-note-entry (key)
+  "Return non-nil if there is an entry in `ebib-notes-file' for KEY."
+  (unless ebib--notes-list
+    ;; We need to initialize `ebib--notes-list'.
+    (if (not (file-writable-p ebib-notes-file))
+        (ebib--log 'error "Could not open the notes file %s" ebib-notes-file)
+      (with-current-buffer (ebib--notes-buffer)
+        (setq ebib--notes-list (funcall ebib-notes-get-ids-function)))))
+  (member key ebib--notes-list))
 
 (provide 'ebib-notes)
 

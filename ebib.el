@@ -751,6 +751,7 @@ ask for confirmation."
           ebib--export-filename nil
           ebib--window-before nil
           ebib--buffer-before nil
+          ebib--notes-list nil
           ebib--keywords-files-alist nil
           ebib--keywords-list-per-session nil
           ebib--filters-alist nil
@@ -920,7 +921,7 @@ character ?1-?9, which is converted to the corresponding number."
      ["Edit Key" ebib-edit-keyname (ebib--get-key-at-point)]
      ["Autogenerate Key" ebib-generate-autokey (ebib--get-key-at-point)]
      "--"
-     ["Open Note" ebib-open-note (ebib--notes-exists-note (ebib--get-key-at-point))]
+     ["Open Note" ebib-open-note (ebib--notes-has-note (ebib--get-key-at-point))]
      ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
      ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
@@ -3246,7 +3247,7 @@ if the current entry has a note and `ebib-reading-list-symbol' if
 the current entry is on the reading list.  The latter two symbols
 are enclosed in braces."
   (let* ((key (ebib--get-key-at-point))
-         (info (concat (if (ebib--notes-exists-note key) ebib-notes-symbol "")
+         (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
                        (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
     (if (not (string= info ""))
         (setq info (concat " [" info "] ")))
