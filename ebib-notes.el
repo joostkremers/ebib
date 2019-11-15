@@ -222,7 +222,8 @@ name is fully qualified by prepending the directory in
   (format "%s/%s.%s"
           (or ebib-notes-directory (car ebib-file-search-dirs))
           (funcall (or ebib-notes-name-transform-function
-                       ebib-name-transform-function)
+                       ebib-name-transform-function
+                       #'identity)
                    key)
           ebib-notes-file-extension))
 
