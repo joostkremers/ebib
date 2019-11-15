@@ -1355,7 +1355,7 @@ interactively."
   (interactive)
   (ebib--execute-when
     (entries
-     (ebib-open-note (ebib--get-key-at-point) ebib--cur-db))
+     (ebib--notes-open-note (ebib--get-key-at-point) ebib--cur-db))
     (default
       (beep))))
 
