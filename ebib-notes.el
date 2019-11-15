@@ -251,18 +251,21 @@ list, otherwise return nil."
 
 ;;; Common notes file.
 
-(defun ebib--notes-buffer ()
-  "Return the buffer containing the notes file.
+(let (notes-buffer)
+  (defun ebib--notes-buffer ()
+    "Return the buffer containing the notes file.
 If the file has not been opened yet, open it, creating it if
 necessary.  Note that this function assumes that
 `ebib-notes-file' is set.  An error is raised if it is
 not.  An error is also raised if the location for the notes file
 is not accessible to the user."
-  (unless ebib-notes-file
-    (error "[Ebib] No notes file defined"))
-  (unless (file-writable-p ebib-notes-file)
-    (error "[Ebib] Cannot read or create notes file"))
-  (find-file-noselect ebib-notes-file))
+    (if (buffer-live-p notes-buffer)
+        notes-buffer
+      (unless ebib-notes-file
+        (error "[Ebib] No notes file defined"))
+      (unless (file-writable-p ebib-notes-file)
+        (error "[Ebib] Cannot read or create notes file"))
+      (setq notes-buffer (find-file-noselect ebib-notes-file)))))
 
 (defun ebib--notes-locate-note (key)
   "Locate the note identified by KEY.
