@@ -196,6 +196,12 @@ string where point should be located."
           (ebib--notes-has-note-entry key)
         (ebib--notes-has-note-file key))))
 
+(defun ebib--notes-open-note (key db)
+  "Open the note for KEY in DB or create a new note if none exists."
+  (if ebib-notes-file
+      (ebib--notes-open-note-location key db)
+    (ebib--notes-open-note-file key db)))
+
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return the note symbol for displaying if a note exists for KEY."
   (if (ebib--notes-has-note key)
@@ -220,8 +226,8 @@ name is fully qualified by prepending the directory in
                    key)
           ebib-notes-file-extension))
 
-(defun ebib--notes-open-notes-file-for-entry (key db)
-  "Open or create a notes file for KEY in DB."
+(defun ebib--notes-open-note-file (key db)
+  "Open or create a note file for KEY in DB."
   (let* ((filename (expand-file-name (ebib--create-notes-file-name key)))
          (new (not (file-exists-p filename))))
     (if (not (file-writable-p filename))
@@ -272,8 +278,9 @@ This function also runs `ebib-notes-search-note-before-hook'."
     (goto-char (point-min))
     (re-search-forward (concat (regexp-quote (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil)) "$") nil t)))
 
-(defun ebib--notes-open-common-notes-file (key db)
-  "Open the notes file for entry KEY in DB or create a new note."
+(defun ebib--notes-open-note-location (key db)
+  "Open the note for entry KEY in DB in the common notes file.
+If there is no such note, create a new one."
   (let ((buf (ebib--notes-buffer)))
     (with-current-buffer buf
       (let ((location (ebib--notes-locate-note key)))
