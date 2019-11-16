@@ -467,7 +467,7 @@ modifications are made."
 
 (defun ebib-multiline-display-paragraph (string)
   "Reduce the multiline text STRING.
-The text is filled to account for the posibility that the
+The text is filled to account for the possibility that the
 original text is meant to be used with `visual-line-mode'.
 Return a list of strings, each a single line."
   (split-string (with-temp-buffer
