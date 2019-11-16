@@ -176,31 +176,127 @@ which a note exists in the file."
     (lambda (headline)
       (org-element-property :CUSTOM_ID headline))))
 
+(defcustom ebib-notes-extract-text-function #'ebib-notes-extract-text-org
+  "Function to extract the text from a notes file.
+The function is called after positioning point at the custom ID
+identifying the note, (i.e., the identifier created by the `%K'
+directive in `ebib-notes-template'."
+  :group 'ebib-notes
+  :type 'function)
+
+(defun ebib-notes-extract-text-org ()
+  "Extract the text of the note point is in.
+The note is assumed to be an Org entry.  Only the first section
+of the text is returned, with any property drawers removed.
+Before parsing the contents of the entry, the buffer is narrowed
+to the heading point is in."
+  (save-restriction
+    (org-narrow-to-subtree)
+    (let ((contents (org-element-map (org-element-parse-buffer)
+                        'section #'identity nil t)))
+      (org-element-map contents 'property-drawer
+        (lambda (drawer)
+          (org-element-extract-element drawer)))
+      (org-element-interpret-data contents))))
+
 (defun ebib--notes-fill-template (key db)
-  "Create a new note for KEY in DB.
+  "Fill out `ebib-notes-template' for KEY in DB.
 Return a cons of the new note as a string and a position in this
 string where point should be located."
   (let* ((note (ebib-format-template ebib-notes-template ebib-notes-template-specifiers key db))
-         (point (string-match-p ">|<" note)))
-    (if point
+         (pos (string-match-p ">|<" note)))
+    (if pos
         (setq note (replace-regexp-in-string ">|<" "" note))
-      (setq point 0))
-    (cons note point)))
+      (setq pos 0))
+    (cons note pos)))
+
+(defun ebib--notes-locate-note (key)
+  "Locate the note identified by KEY in the current buffer.
+Convert KEY into an identifier using the function associated with
+`%K' in `ebib-notes-template-specifiers' and search this
+identifier.  If found, return its location as a buffer position,
+otherwise return nil.  The search is performed in the current
+buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward (concat (regexp-quote (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil)) "$") nil t)))
 
 (defvar ebib--notes-list nil "List of entry keys for which a note exists.")
 
 (defun ebib--notes-has-note (key)
   "Return non-nil if entry KEY has an associated note."
   (or (member key ebib--notes-list)
-      (if ebib-notes-file
-          (ebib--notes-has-note-entry key)
-        (ebib--notes-has-note-file key))))
+      (cond
+       (ebib-notes-file
+        (unless ebib--notes-list
+          ;; We need to initialize `ebib--notes-list'.
+          (if (not (file-writable-p ebib-notes-file))
+              (ebib--log 'error "Could not open the notes file %s" ebib-notes-file)
+            (with-current-buffer (ebib--notes-buffer)
+              (setq ebib--notes-list (funcall ebib-notes-get-ids-function)))))
+        (member key ebib--notes-list))
+       ((not ebib-notes-file)
+        (if (file-readable-p (ebib--create-notes-file-name key))
+            (cl-pushnew key ebib--notes-list))))))
 
-(defun ebib--notes-open-note (key db)
-  "Open the note for KEY in DB or create a new note if none exists."
-  (if ebib-notes-file
-      (ebib--notes-open-note-location key db)
-    (ebib--notes-open-note-file key db)))
+(defun ebib--notes-goto-note (key)
+  "Find or create a buffer containing the note for KEY.
+If `ebib-notes-file' is set, run
+`ebib-notes-search-note-before-hook' before locating the note.
+Otherwise just open the note file for KEY.
+
+Return a cons of the buffer and the position of the note in the
+buffer: in `ebib-notes-file', this is the position of the
+Custom_ID of the note; if each note has its own file, the
+position is simply 1.
+
+If KEY has no note, return nil."
+  (cond
+   (ebib-notes-file
+    (with-current-buffer (ebib--notes-buffer)
+      (run-hooks 'ebib-notes-search-note-before-hook)
+      (let ((location (ebib--notes-locate-note key)))
+        (when location
+          (cons (current-buffer) location)))))
+   ((not ebib-notes-file)
+    (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
+      (when (file-readable-p filename)
+        (cons (find-file-noselect filename) 1))))))
+
+(defun ebib--notes-create-new-note (key db)
+  "Create a note for KEY in DB and .
+If `ebib-notes-file' is set, add an entry to the bottom of this
+file and leave point there.  Otherwise, create a new note file in
+`ebib-notes-directory'.
+
+Return a cons of the buffer in which the new note is created and
+the position where point should be placed."
+  (let (buf pos)
+    (cond
+     (ebib-notes-file
+      (setq buf (ebib--notes-buffer)
+            pos (1+ (buffer-size buf))))
+     ((not ebib-notes-file)
+      (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
+        (if (file-writable-p filename)
+            (setq buf (find-file-noselect filename)
+                  pos 1)
+          (error "[Ebib] Could not create note file `%s' " filename)))))
+    (let ((note (ebib--notes-fill-template key db)))
+      (with-current-buffer buf
+        (goto-char pos)
+        (insert (car note))
+        (setq pos (+ pos (cdr note)))
+        (push key ebib--notes-list)))
+    (cons buf pos)))
+
+(defun ebib--notes-extract-text (key)
+  "Extract the text of the note for entry KEY.
+If KEY has no associated note, return nil."
+  (let ((buffer (ebib--notes-goto-note key)))
+    (if buffer
+        (with-current-buffer buffer
+          (funcall ebib-notes-extract-text-function)))))
 
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return the note symbol for displaying if a note exists for KEY."
@@ -227,28 +323,6 @@ name is fully qualified by prepending the directory in
                    key)
           ebib-notes-file-extension))
 
-(defun ebib--notes-open-note-file (key db)
-  "Open or create a note file for KEY in DB."
-  (let* ((filename (expand-file-name (ebib--create-notes-file-name key)))
-         (new (not (file-exists-p filename))))
-    (if (not (file-writable-p filename))
-        (error "[Ebib] Could not create file `%s' " filename))
-    (ebib-lower)
-    (find-file filename)
-    (if new
-        (let ((note (ebib--notes-fill-template key db)))
-          (insert (car note))
-          (goto-char (point-min))
-          (forward-char (cdr note))
-          (push key ebib--notes-list)))))
-
-(defun ebib--notes-has-note-file (key)
-  "Check if KEY has an associated notes file.
-If it does, add KEY to `ebib--notes-list' and return the new
-list, otherwise return nil."
-  (if (file-readable-p (ebib--create-notes-file-name key))
-      (cl-pushnew key ebib--notes-list)))
-
 ;;; Common notes file.
 
 (let (notes-buffer)
@@ -266,51 +340,6 @@ is not accessible to the user."
       (unless (file-writable-p ebib-notes-file)
         (error "[Ebib] Cannot read or create notes file"))
       (setq notes-buffer (find-file-noselect ebib-notes-file)))))
-
-(defun ebib--notes-locate-note (key)
-  "Locate the note identified by KEY.
-Convert KEY into an identifier using the function associated with
-`%K' in `ebib-notes-template-specifiers' and search this
-identifier.  If found, return its location as a buffer position,
-otherwise return nil.  The search is performed in the current
-buffer, so the notes buffer must be made active before calling
-this function.
-
-This function also runs `ebib-notes-search-note-before-hook'."
-  (run-hooks 'ebib-notes-search-note-before-hook)
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward (concat (regexp-quote (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil)) "$") nil t)))
-
-(defun ebib--notes-open-note-location (key db)
-  "Open the note for entry KEY in DB in the common notes file.
-If there is no such note, create a new one."
-  (let ((buf (ebib--notes-buffer)))
-    (with-current-buffer buf
-      (let ((location (ebib--notes-locate-note key)))
-        (if location
-            (progn
-              (goto-char location)
-              (run-hooks 'ebib-notes-open-note-after-hook))
-          (goto-char (point-max))
-          (let ((new-note (ebib--notes-fill-template key db))
-                (beg (point)))
-            (insert (car new-note))
-            (goto-char (+ beg (cdr new-note)))
-            (run-hooks 'ebib-notes-new-note-hook)
-            (push key ebib--notes-list)))))
-    (ebib-lower)
-    (switch-to-buffer buf)))
-
-(defun ebib--notes-has-note-entry (key)
-  "Return non-nil if there is an entry in `ebib-notes-file' for KEY."
-  (unless ebib--notes-list
-    ;; We need to initialize `ebib--notes-list'.
-    (if (not (file-writable-p ebib-notes-file))
-        (ebib--log 'error "Could not open the notes file %s" ebib-notes-file)
-      (with-current-buffer (ebib--notes-buffer)
-        (setq ebib--notes-list (funcall ebib-notes-get-ids-function)))))
-  (member key ebib--notes-list))
 
 (provide 'ebib-notes)
 

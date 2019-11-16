@@ -921,7 +921,7 @@ character ?1-?9, which is converted to the corresponding number."
      ["Edit Key" ebib-edit-keyname (ebib--get-key-at-point)]
      ["Autogenerate Key" ebib-generate-autokey (ebib--get-key-at-point)]
      "--"
-     ["Open Note" ebib-open-note (ebib--notes-has-note (ebib--get-key-at-point))]
+     ["Open Note" ebib-open-note (ebib--get-key-at-point)]
      ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
      ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
@@ -1351,11 +1351,23 @@ interactively."
           (princ "[No annotation]"))))))
 
 (defun ebib-open-note ()
-  "Open or create a note for the current entry."
+  "Open the note for the current entry or create a new one if none exists.
+If `ebib-notes-file' is set, this function runs
+`ebib-notes-open-note-after-hook' for an existing note or
+`ebib-notes-new-note-hook' for a new note."
   (interactive)
   (ebib--execute-when
     (entries
-     (ebib--notes-open-note (ebib--get-key-at-point) ebib--cur-db))
+     (let ((buf (ebib--notes-goto-note (ebib--get-key-at-point)))
+           (hook 'ebib-notes-open-note-after-hook))
+       (when (not buf)
+         (setq buf (ebib--notes-create-new-note (ebib--get-key-at-point) ebib--cur-db)
+               hook 'ebib-notes-new-note-hook))
+       (ebib-lower)
+       (switch-to-buffer (car buf))
+       (goto-char (cdr buf))
+       (when ebib-notes-file
+         (run-hooks hook))))
     (default
       (beep))))
 
