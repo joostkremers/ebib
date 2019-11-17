@@ -1363,8 +1363,7 @@ If `ebib-notes-file' is set, this function runs
        (when (not buf)
          (setq buf (ebib--notes-create-new-note (ebib--get-key-at-point) ebib--cur-db)
                hook 'ebib-notes-new-note-hook))
-       (ebib-lower)
-       (switch-to-buffer (car buf))
+       (pop-to-buffer (car buf))
        (goto-char (cdr buf))
        (when ebib-notes-file
          (run-hooks hook))))
