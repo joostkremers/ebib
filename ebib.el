@@ -475,7 +475,8 @@ fill it."
 MATCH-STR is a regexp that will be highlighted when it occurs in
 the field contents."
   (when ebib--note-window
-    (delete-window ebib--note-window)
+    (if (window-live-p ebib--note-window)
+        (delete-window ebib--note-window))
     (setq ebib--note-window nil))
   (with-current-ebib-buffer 'entry
     (let ((inhibit-read-only t)
