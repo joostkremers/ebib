@@ -178,7 +178,7 @@ which a note exists in the file."
 
 (defcustom ebib-notes-display-max-lines 10
   "The number of lines to show of a note in the entry buffer."
-  :group ebib-notes
+  :group 'ebib-notes
   :type 'integer)
 
 (defcustom ebib-notes-extract-text-function #'ebib-notes-extract-text-org
