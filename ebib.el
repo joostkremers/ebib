@@ -468,16 +468,24 @@ fill it."
                        ebib--empty-index-buffer-name)
                    'unique)))
 
+(defvar ebib--note-window nil "Window showing the current entry's note.")
+
 (defun ebib--update-entry-buffer (&optional match-str)
   "Fill the entry buffer with the fields of the current entry.
 MATCH-STR is a regexp that will be highlighted when it occurs in
 the field contents."
+  (when ebib--note-window
+    (delete-window ebib--note-window)
+    (setq ebib--note-window nil))
   (with-current-ebib-buffer 'entry
-    (let ((inhibit-read-only t))
+    (let ((inhibit-read-only t)
+          (key (ebib--get-key-at-point)))
       (erase-buffer)
-      (when (ebib--get-key-at-point)   ; Are there entries being displayed?
-        (ebib--display-fields (ebib--get-key-at-point) ebib--cur-db match-str)
-        (goto-char (point-min))))))
+      (when key   ; Are there entries being displayed?
+        (ebib--display-fields key ebib--cur-db match-str)
+        (goto-char (point-min))
+        (if (ebib--notes-has-note key)
+            (setq ebib--note-window (display-buffer (ebib-open-note t))))))))
 
 (defun ebib--set-modified (mod db &optional master slaves)
   "Set the modified flag MOD on database DB.
@@ -1350,23 +1358,33 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
-(defun ebib-open-note ()
+(defun ebib-open-note (&optional do-not-show)
   "Open the note for the current entry or create a new one if none exists.
+Return the buffer containing the entry.  If DO-NOT-SHOW is nil,
+select the note buffer (using `pop-to-buffer'), otherwise just
+return the buffer.  DO-NOT-SHOW non-nil also inhibits the
+creation of a new note.
+
 If `ebib-notes-file' is set, this function runs
 `ebib-notes-open-note-after-hook' for an existing note or
 `ebib-notes-new-note-hook' for a new note."
-  (interactive)
+  (interactive "P")
   (ebib--execute-when
     (entries
      (let ((buf (ebib--notes-goto-note (ebib--get-key-at-point)))
            (hook 'ebib-notes-open-note-after-hook))
-       (when (not buf)
+       (when (and (not buf)
+                  (not do-not-show))
          (setq buf (ebib--notes-create-new-note (ebib--get-key-at-point) ebib--cur-db)
                hook 'ebib-notes-new-note-hook))
-       (pop-to-buffer (car buf))
-       (goto-char (cdr buf))
-       (when ebib-notes-file
-         (run-hooks hook))))
+       (when buf
+         (with-current-buffer (car buf)
+           (goto-char (cdr buf))
+           (when ebib-notes-file
+             (run-hooks hook)))
+         (unless do-not-show
+           (pop-to-buffer (car buf)))
+         (car buf))))
     (default
       (beep))))
 
