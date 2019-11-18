@@ -176,6 +176,11 @@ which a note exists in the file."
     (lambda (headline)
       (org-element-property :CUSTOM_ID headline))))
 
+(defcustom ebib-notes-display-max-lines 10
+  "The number of lines to show of a note in the entry buffer."
+  :group ebib-notes
+  :type 'integer)
+
 (defcustom ebib-notes-extract-text-function #'ebib-notes-extract-text-org
   "Function to extract the text from a notes file.
 The function is called after positioning point at the custom ID
@@ -184,20 +189,37 @@ directive in `ebib-notes-template'."
   :group 'ebib-notes
   :type 'function)
 
-(defun ebib-notes-extract-text-org ()
+(defun ebib-notes-extract-text-org (buffer)
   "Extract the text of the note point is in.
-The note is assumed to be an Org entry.  Only the first section
-of the text is returned, with any property drawers removed.
+BUFFER is the buffer containing the note.  The note is assumed to
+be an Org entry.
+
+Only the first `ebib-notes-display-max-lines' are returned, with
+the header line and property block removed.  If the text is
+
 Before parsing the contents of the entry, the buffer is narrowed
-to the heading point is in."
-  (save-restriction
-    (org-narrow-to-subtree)
-    (let ((contents (org-element-map (org-element-parse-buffer)
-                        'section #'identity nil t)))
-      (org-element-map contents 'property-drawer
-        (lambda (drawer)
-          (org-element-extract-element drawer)))
-      (org-element-interpret-data contents))))
+to the subtree point is in."
+  (split-string (with-temp-buffer
+                  (insert (with-current-buffer buffer
+                            (save-restriction
+                              (org-narrow-to-subtree)
+                              (let ((contents (org-element-parse-buffer)))
+                                (org-element-map contents 'property-drawer
+                                  (lambda (drawer)
+                                    (org-element-extract-element drawer)))
+                                (org-element-interpret-data contents)))))
+                  (let* ((beg (progn
+                                (goto-char (point-min))
+                                (forward-line 1)
+                                (point)))
+                         (end (progn
+                                (goto-char (point-min))
+                                (forward-line (1+ ebib-notes-display-max-lines))
+                                (point)))
+                         (string (buffer-substring-no-properties beg end)))
+                    (if (< end (point-max))
+                        (setq string (concat string "[...]\n")))))
+                "\n"))
 
 (defun ebib--notes-fill-template (key db)
   "Fill out `ebib-notes-template' for KEY in DB.
