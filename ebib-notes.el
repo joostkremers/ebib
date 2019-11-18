@@ -194,8 +194,9 @@ directive in `ebib-notes-template'."
 BUFFER is the buffer containing the note.  The note is assumed to
 be an Org entry.
 
-Only the first `ebib-notes-display-max-lines' are returned, with
-the header line and property block removed.  If the text is
+The note is truncated at `ebib-notes-display-max-lines' lines.
+If the original text is longer than that, an ellipsis marker
+\"[...]\" is added.
 
 Before parsing the contents of the entry, the buffer is narrowed
 to the subtree point is in."
