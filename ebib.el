@@ -381,7 +381,18 @@ it is highlighted.  DB defaults to the current database."
                                 ;; a field.
                                 (propertize "\n" 'ebib-field-end t))))
                     fields)))
-          (list req-fields opt-fields extra-fields undef-fields))))
+          (list req-fields opt-fields extra-fields undef-fields))
+    (when (and (eq ebib-notes-show-note-method 'top-lines)
+               (ebib--notes-has-note key))
+      (let* ((buf (ebib-open-note key 'do-not-show))
+             (note (funcall ebib-notes-extract-text-function buf)))
+        (insert "\n"
+                (format "%-18s %s"
+                        (propertize "external note" 'face 'ebib-field-face)
+                        (ebib--convert-multiline-to-string note))
+                (propertize "\n" 'ebib-field-end t))
+        (unless ebib-notes-file
+          (kill-buffer buf))))))
 
 (defun ebib--key-in-index-p (key)
   "Return t if the entry for KEY is listed in the index buffer."
@@ -478,7 +489,11 @@ MATCH-STR is a regexp that will be highlighted when it occurs in
 the field contents."
   (when ebib--note-window
     (if (window-live-p ebib--note-window)
-        (delete-window ebib--note-window))
+        (let ((buf (window-buffer ebib--note-window)))
+          (delete-window ebib--note-window)
+          (unless ebib-notes-file
+            (kill-buffer buf))
+          (setq ebib--needs-update nil))) ; See below.
     (setq ebib--note-window nil))
   (with-current-ebib-buffer 'entry
     (let ((inhibit-read-only t)
@@ -487,8 +502,16 @@ the field contents."
       (when key   ; Are there entries being displayed?
         (ebib--display-fields key ebib--cur-db match-str)
         (goto-char (point-min))
-        (if (ebib--notes-has-note key)
-            (setq ebib--note-window (display-buffer (ebib-open-note t))))))))
+        (if (and (eq ebib-notes-show-note-method 'all)
+                 (eq ebib-layout 'full)
+                 (ebib--notes-has-note key))
+            (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point) t))
+                  ;; If Ebib is lowered and then reopened, we need to redisplay
+                  ;; the entry buffer, because otherwise the notes buffer isn't
+                  ;; redisplayed. So we set the variable `ebib--needs-update' to
+                  ;; t, which then causes the command `ebib' to redisplay the
+                  ;; buffers. This is a hack, but the simplest way to do it.
+                  ebib--needs-update t))))))
 
 (defun ebib--set-modified (mod db &optional master slaves)
   "Set the modified flag MOD on database DB.
@@ -1361,24 +1384,24 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
-(defun ebib-open-note (&optional do-not-show)
-  "Open the note for the current entry or create a new one if none exists.
-Return the buffer containing the entry.  If DO-NOT-SHOW is nil,
-select the note buffer (using `pop-to-buffer'), otherwise just
-return the buffer.  DO-NOT-SHOW non-nil also inhibits the
-creation of a new note.
+(defun ebib-open-note (key &optional do-not-show)
+  "Open the note for KEY or create a new one if none exists.
+KEY defaults to the current entry's key.  Return the buffer
+containing the entry.  If DO-NOT-SHOW is nil, select the note
+buffer (using `pop-to-buffer'), otherwise just return the buffer.
+DO-NOT-SHOW non-nil also inhibits the creation of a new note.
 
 If `ebib-notes-file' is set, this function runs
 `ebib-notes-open-note-after-hook' for an existing note or
 `ebib-notes-new-note-hook' for a new note."
-  (interactive "P")
+  (interactive (list (ebib--get-key-at-point) current-prefix-arg))
   (ebib--execute-when
     (entries
-     (let ((buf (ebib--notes-goto-note (ebib--get-key-at-point)))
+     (let ((buf (ebib--notes-goto-note key))
            (hook 'ebib-notes-open-note-after-hook))
        (when (and (not buf)
                   (not do-not-show))
-         (setq buf (ebib--notes-create-new-note (ebib--get-key-at-point) ebib--cur-db)
+         (setq buf (ebib--notes-create-new-note key ebib--cur-db)
                hook 'ebib-notes-new-note-hook))
        (when buf
          (with-current-buffer (car buf)
@@ -2553,7 +2576,7 @@ new database."
                      (string-equal word ebib-notes-symbol))))
     (cond
      (link (ebib--call-browser link))
-     (notep (ebib-open-note))
+     (notep (ebib-open-note (ebib--get-key-at-point)))
      (t (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (arg)
