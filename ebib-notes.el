@@ -313,14 +313,6 @@ the position where point should be placed."
         (push key ebib--notes-list)))
     (cons buf pos)))
 
-(defun ebib--notes-extract-text (key)
-  "Extract the text of the note for entry KEY.
-If KEY has no associated note, return nil."
-  (let ((buffer (ebib--notes-goto-note key)))
-    (if buffer
-        (with-current-buffer buffer
-          (funcall ebib-notes-extract-text-function)))))
-
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return the note symbol for displaying if a note exists for KEY."
   (if (ebib--notes-has-note key)
