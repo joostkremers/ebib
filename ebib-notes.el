@@ -219,7 +219,8 @@ to the subtree point is in."
                                 (point)))
                          (string (buffer-substring-no-properties beg end)))
                     (if (< end (point-max))
-                        (setq string (concat string "[...]\n")))))
+                        (setq string (concat string "[...]\n"))
+                      string)))
                 "\n"))
 
 (defun ebib--notes-fill-template (key db)
