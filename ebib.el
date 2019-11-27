@@ -201,11 +201,10 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
             (ebib--update-entry-buffer)
             (re-search-forward "^crossref"))
         (let ((inhibit-read-only t))
-          (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field))
-          (insert (propertize (format "%-17s %s"
-                                      (propertize field 'face 'ebib-field-face)
-                                      (ebib--get-field-highlighted field (ebib--get-key-at-point)))
-                              'ebib-field t))
+          (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field-end))
+          (insert (format "%-17s %s"
+                          (propertize field 'face 'ebib-field-face)
+                          (ebib--get-field-highlighted field (ebib--get-key-at-point))))
           (beginning-of-line))))))
 
 (defun ebib--redisplay-current-string ()
@@ -357,7 +356,7 @@ it is highlighted.  DB defaults to the current database."
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
          (undef-fields (seq-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key db) dialect)))))
-    (insert (format "%-18s %s%s\n"
+    (insert (format "%-18s %s%s"
                     (propertize "type" 'face 'ebib-field-face)
                     (if (assoc-string entry-type (ebib--list-entry-types dialect t) 'case-fold)
                         entry-type
@@ -365,7 +364,8 @@ it is highlighted.  DB defaults to the current database."
                     (if (and (eq dialect 'biblatex)
                              (assoc-string entry-type ebib--type-aliases 'case-fold))
                         (propertize (format "  [==> %s]" (cdr (assoc-string entry-type ebib--type-aliases 'case-fold))) 'face 'ebib-alias-face)
-                      "")))
+                      ""))
+            (propertize "\n" 'ebib-field-end t))
     (mapc (lambda (fields)
             (when fields ; If one of the sets is empty, we don't want an extra empty line.
               (insert "\n")
@@ -373,11 +373,13 @@ it is highlighted.  DB defaults to the current database."
                       (unless (and (not (assoc-string field entry 'case-fold))
                                    (member-ignore-case field ebib-hidden-fields)
                                    ebib--hide-hidden-fields)
-                        (insert (propertize (format "%-17s %s"
-                                                    (propertize field 'face 'ebib-field-face)
-                                                    (ebib--get-field-highlighted field key db match-str))
-                                            'ebib-field t)
-                                "\n")))
+                        (insert (format "%-17s %s"
+                                        (propertize field 'face 'ebib-field-face)
+                                        (ebib--get-field-highlighted field key db match-str))
+                                ;; The final newline gets a special text
+                                ;; property, so we can easily detect the end of
+                                ;; a field.
+                                (propertize "\n" 'ebib-field-end t))))
                     fields)))
           (list req-fields opt-fields extra-fields undef-fields))))
 
@@ -3336,13 +3338,13 @@ otherwise."
 The prefix argument PFX is used to determine whether the command
 was called interactively."
   (interactive "p")
-  (forward-line)
-  (when (eobp)                     ; If we ended up at the empty line below
-    (if pfx                        ; the last field, beep and adjust.
-        (beep))
-    (forward-line -1))
-  (while (ebib--outside-field-p)                         ; If we're at an empty line,
-    (forward-line)))                    ; move down until we're not.
+  (let ((field-end (next-single-property-change (point) 'ebib-field-end)))
+    (if (= (1+ field-end) (point-max))  ; If we would end up at the empty line
+        (if pfx                         ; below the last field, beep.
+            (beep))
+      (goto-char (1+ field-end))        ; Otherwise move point.
+      (while (ebib--outside-field-p)    ; And see if we need to adjust.
+        (forward-line 1)))))
 
 (defun ebib-goto-first-field ()
   "Move to the first field."
