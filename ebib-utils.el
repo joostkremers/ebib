@@ -146,14 +146,20 @@ or through the menu."
 
 (defcustom ebib-layout 'full
   "Ebib window layout.
-This option defines how Ebib displays the buffers it uses.  By
-default, Ebib takes over the entire frame and creates two windows
-to display the index and the entry buffer.  Alternatively, Ebib
-can use just the right part of the frame (the width can be
-specified with the option `ebib-width').  A third option is to
-display only the index window upon startup.  The entry buffer will
-be displayed when you edit an entry of if you press
-\\[ebib-select-and-popup-entry]."
+This option defines how Ebib displays the buffers it uses.  Possible values are:
+
+- `full' (default): Use the entire frame.  The existing windows
+  are hidden and reappear when Ebib is lowered.
+
+- `window': Use the current window.  This window is split up to
+  display the index and entry buffers.
+
+- `custom': Use part of the current frame.  The width of the Ebib
+  windows can be set with the option `ebib-width'.
+
+- `index-only': Display only the index window.  The entry buffer
+  is displayed when the user edits an entry or after pressing
+  \\<ebib-index-mode-map>\\[ebib-select-and-popup-entry]."
   :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
                  (const :tag "Use current window" window)
