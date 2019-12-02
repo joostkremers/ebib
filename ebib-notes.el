@@ -258,7 +258,7 @@ If KEY has no note, return nil."
    ((not ebib-notes-file)
     (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
       (when (file-readable-p filename)
-        (cons (find-file-noselect filename) 1))))))
+        (cons (ebib--notes-open-single-note-file filename) 1))))))
 
 (defun ebib--notes-create-new-note (key db)
   "Create a note for KEY in DB and .
@@ -276,7 +276,7 @@ the position where point should be placed."
      ((not ebib-notes-file)
       (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
         (if (file-writable-p filename)
-            (setq buf (find-file-noselect filename)
+            (setq buf (ebib--notes-open-single-note-file filename)
                   pos 1)
           (error "[Ebib] Could not create note file `%s' " filename)))))
     (let ((note (ebib--notes-fill-template key db)))
@@ -312,6 +312,14 @@ name is fully qualified by prepending the directory in
                    key)
           ebib-notes-file-extension))
 
+(defun ebib--notes-open-single-note-file (file)
+  "Open the note file for FILE.
+Return the buffer but do not select it."
+  (let ((buf (find-file-noselect file)))
+    (with-current-buffer buf
+      (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t))
+    buf))
+
 ;;; Common notes file.
 
 (let (notes-buffer)
@@ -328,7 +336,9 @@ is not accessible to the user."
         (error "[Ebib] No notes file defined"))
       (unless (file-writable-p ebib-notes-file)
         (error "[Ebib] Cannot read or create notes file"))
-      (setq notes-buffer (find-file-noselect ebib-notes-file)))))
+      (setq notes-buffer (find-file-noselect ebib-notes-file))
+      (with-current-buffer notes-buffer
+        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t)))))
 
 (provide 'ebib-notes)
 
