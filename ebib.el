@@ -292,6 +292,73 @@ of strings."
                                                              'ebib-url url))
                                                urls))))
 
+(defun ebib--extract-note-text (key)
+  "Extract the text of the note for KEY.
+The note must be an Org entry under its own headline.
+
+The note is truncated at `ebib-notes-display-max-lines' lines.
+If the original text is longer than that, an ellipsis marker
+\"[...]\" is added.
+
+The return value is a list of strings, each a separate line,
+which can be passed to `ebib--display-multiline-field'."
+  (with-temp-buffer
+    (cond
+     (ebib-notes-file
+      (let (beg end)
+        (with-current-buffer (ebib--notes-buffer)
+          (run-hooks 'ebib-notes-search-note-before-hook)
+          (let ((location (ebib--notes-locate-note key)))
+            (when location
+              (save-mark-and-excursion
+                (goto-char location)
+                (org-mark-subtree)
+                (setq beg (region-beginning)
+                      end (region-end))))))
+        (insert-buffer-substring (ebib--notes-buffer) beg end)))
+     ((not ebib-notes-file)
+      (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
+        (when (file-readable-p filename)
+          (insert-file-contents filename)))))
+    (split-string (ebib--extract-note-text-1) "\n")))
+
+(defun ebib--extract-note-text-1 ()
+  "Helper function for `ebib--extract-note-text'."
+  (let ((truncated nil))
+    ;; First reduce the size of the text we need to pass to
+    ;; `org-element-parse-buffer', since this function can be slow if the note
+    ;; is long.
+    (let ((max (progn
+                 (goto-char (point-min))
+                 (point-at-bol (* 2 ebib-notes-display-max-lines)))))
+      (when (< max (point-max))
+        (setq truncated t)
+        (delete-region max (point-max))))
+
+    ;; Extract any property drawers.
+    (let ((contents (org-element-parse-buffer)))
+      (org-element-map contents 'property-drawer
+        (lambda (drawer)
+          (org-element-extract-element drawer)))
+      (erase-buffer)
+      (insert (org-element-interpret-data contents)))
+
+    ;; Then take the first `ebib-notes-display-max-lines' lines, omitting the
+    ;; headline.
+    (let* ((beg (progn
+                  (goto-char (point-min))
+                  (forward-line 1) ; Skip the headline.
+                  (point)))
+           (end (progn
+                  (goto-char (point-min))
+                  (forward-line (1+ ebib-notes-display-max-lines))
+                  (point)))
+           (string (buffer-substring-no-properties beg end)))
+      (if (or truncated
+              (< end (point-max)))
+          (setq string (concat string "[...]\n"))
+        string))))
+
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
   (or db (setq db ebib--cur-db))
@@ -384,15 +451,12 @@ it is highlighted.  DB defaults to the current database."
           (list req-fields opt-fields extra-fields undef-fields))
     (when (and (eq ebib-notes-show-note-method 'top-lines)
                (ebib--notes-has-note key))
-      (let* ((buf (ebib-open-note key 'do-not-show))
-             (note (funcall ebib-notes-extract-text-function buf)))
+      (let ((note (ebib--extract-note-text key)))
         (insert "\n"
                 (format "%-18s %s"
                         (propertize "external note" 'face 'ebib-field-face)
                         (ebib--convert-multiline-to-string note))
-                (propertize "\n" 'ebib-field-end t))
-        (unless ebib-notes-file
-          (kill-buffer buf))))))
+                (propertize "\n" 'ebib-field-end t))))))
 
 (defun ebib--key-in-index-p (key)
   "Return t if the entry for KEY is listed in the index buffer."
@@ -502,7 +566,8 @@ the field contents."
       (when key   ; Are there entries being displayed?
         (ebib--display-fields key ebib--cur-db match-str)
         (goto-char (point-min))
-        (if (and (eq ebib-notes-show-note-method 'all)
+        (if (and (get-buffer-window (ebib--buffer 'entry))
+                 (eq ebib-notes-show-note-method 'all)
                  (eq ebib-layout 'full)
                  (ebib--notes-has-note key))
             (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point) t))
@@ -1384,12 +1449,12 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
-(defun ebib-open-note (key &optional do-not-show)
+(defun ebib-open-note (key &optional no-select)
   "Open the note for KEY or create a new one if none exists.
 KEY defaults to the current entry's key.  Return the buffer
-containing the entry.  If DO-NOT-SHOW is nil, select the note
+containing the entry.  If NO-SELECT is nil, select the note
 buffer (using `pop-to-buffer'), otherwise just return the buffer.
-DO-NOT-SHOW non-nil also inhibits the creation of a new note.
+NO-SELECT non-nil also inhibits the creation of a new note.
 
 If `ebib-notes-file' is set, this function runs
 `ebib-notes-open-note-after-hook' for an existing note or
@@ -1400,7 +1465,7 @@ If `ebib-notes-file' is set, this function runs
      (let ((buf (ebib--notes-goto-note key))
            (hook 'ebib-notes-open-note-after-hook))
        (when (and (not buf)
-                  (not do-not-show))
+                  (not no-select))
          (setq buf (ebib--notes-create-new-note key ebib--cur-db)
                hook 'ebib-notes-new-note-hook))
        (when buf
@@ -1408,7 +1473,7 @@ If `ebib-notes-file' is set, this function runs
            (goto-char (cdr buf))
            (when ebib-notes-file
              (run-hooks hook)))
-         (unless do-not-show
+         (unless no-select
            (pop-to-buffer (car buf)))
          (car buf))))
     (default
@@ -3641,6 +3706,12 @@ prefix argument has no meaning."
                    ;; this point.) for this reason, we return `nil', so
                    ;; `ebib-next-field' below isn't called.
                    (ebib-edit-multiline-field)
+                   nil)
+                  ;; The field is called "external note", but
+                  ;; `ebib--current-field0' only reads up to the first space, so
+                  ;; it just returns "external".
+                  ((string= field "external")
+                   (ebib-open-note (ebib--get-key-at-point))
                    nil)
                   (t (ebib--edit-normal-field)))))
     ;; When the edit returns, see if we need to move to the next field and
