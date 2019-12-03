@@ -703,7 +703,7 @@ possible to use the same separator in the `url' field as in the
 (defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url)
                                                ("https?://ling.auf.net/lingBuzz/" . ebib-transform-lingbuzz-url)
                                                ("https?://www.jstor.org/" . ebib-transform-jstor-url)
-                                               ("https?://(www.)?aclweb.org/anthology/" . ebib-transform-aclanthology-url)
+                                               ("https?://\\(www.\\)?aclweb.org/anthology/" . ebib-transform-aclanthology-url)
                                                ("https?://link.aps.org/" . ebib-transform-aps-url))
   "Transformations to apply to a URL before attempting to download a pdf file.
 Each entry consists of a matcher and a transformation function.
