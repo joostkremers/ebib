@@ -1852,13 +1852,13 @@ few lines in the entry buffer does not have this limitation, as it just
 reads the text of the note from the file, it does not visit the file in
 a buffer.)
 
-Note also the default value of this option is only possible with Org
-files, so your notes must use Org mode for it to work. Showing the
-entire note in a separate buffer can be done with any format, but only
-works if you have set `ebib-layout` to `full` (the default, see the
-section [Window Management](#window-management)), because that is the
-only window layout that ensures that the note can be displayed without
-getting in the way.
+Note also displaying the note inline in the entry buffer is only
+possible with Org files, so your notes must use Org mode for it to work.
+Showing the entire note in a separate buffer can be done with any
+format, but only works if you use Ebib’s default window layout (see the
+section [Window Management](#window-management) for details), because
+that is the only window layout that ensures that the note can be
+displayed without getting in the way.
 
 # Managing a reading list
 

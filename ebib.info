@@ -2200,13 +2200,13 @@ first few lines in the entry buffer does not have this limitation, as it
 just reads the text of the note from the file, it does not visit the
 file in a buffer.)
 
-Note also the default value of this option is only possible with Org
-files, so your notes must use Org mode for it to work.  Showing the
-entire note in a separate buffer can be done with any format, but only
-works if you have set ‘ebib-layout’ to ‘full’ (the default, see the
-section *note Window Management: #window-management.), because that is
-the only window layout that ensures that the note can be displayed
-without getting in the way.
+Note also displaying the note inline in the entry buffer is only
+possible with Org files, so your notes must use Org mode for it to work.
+Showing the entire note in a separate buffer can be done with any
+format, but only works if you use Ebib’s default window layout (see the
+section *note Window Management: #window-management. for details),
+because that is the only window layout that ensures that the note can be
+displayed without getting in the way.
 
 
 File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev: Notes files,  Up: Top
@@ -3032,36 +3032,36 @@ Node: Customising the notes file format103744
 Ref: #customising-the-notes-file-format103957
 Node: Displaying notes107552
 Ref: #displaying-notes107701
-Node: Managing a reading list109032
-Ref: #managing-a-reading-list109194
-Node: Window Management112209
-Ref: #window-management112368
-Node: Creating Entry Stubs115527
-Ref: #creating-entry-stubs115689
-Node: @Preamble Definition116687
-Ref: #preamble-definition116851
-Node: @String Definitions118823
-Ref: #string-definitions118974
-Node: @Comments122467
-Ref: #comments122595
-Node: Managing Keywords122960
-Ref: #managing-keywords123105
-Node: Sorting the bib File129006
-Ref: #sorting-the-.bib-file129179
-Node: Merging and Importing132298
-Ref: #merging-and-importing132463
-Node: Exporting Entries134233
-Ref: #exporting-entries134395
-Node: Multiple Identical Fields135911
-Ref: #multiple-identical-fields136090
-Node: Multiline Edit Buffers138018
-Ref: #multiline-edit-buffers138190
-Node: The Options Menu142067
-Ref: #the-options-menu142215
-Node: Customisation142833
-Ref: #customisation142944
-Node: Modifying Key Bindings143552
-Ref: #modifying-key-bindings143679
+Node: Managing a reading list109038
+Ref: #managing-a-reading-list109200
+Node: Window Management112215
+Ref: #window-management112374
+Node: Creating Entry Stubs115533
+Ref: #creating-entry-stubs115695
+Node: @Preamble Definition116693
+Ref: #preamble-definition116857
+Node: @String Definitions118829
+Ref: #string-definitions118980
+Node: @Comments122473
+Ref: #comments122601
+Node: Managing Keywords122966
+Ref: #managing-keywords123111
+Node: Sorting the bib File129012
+Ref: #sorting-the-.bib-file129185
+Node: Merging and Importing132304
+Ref: #merging-and-importing132469
+Node: Exporting Entries134239
+Ref: #exporting-entries134401
+Node: Multiple Identical Fields135917
+Ref: #multiple-identical-fields136096
+Node: Multiline Edit Buffers138024
+Ref: #multiline-edit-buffers138196
+Node: The Options Menu142073
+Ref: #the-options-menu142221
+Node: Customisation142839
+Ref: #customisation142950
+Node: Modifying Key Bindings143558
+Ref: #modifying-key-bindings143685
 
 End Tag Table
 
