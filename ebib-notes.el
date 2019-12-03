@@ -176,7 +176,7 @@ which a note exists in the file."
     (lambda (headline)
       (org-element-property :CUSTOM_ID headline))))
 
-(defcustom ebib-notes-show-note-method 'all
+(defcustom ebib-notes-show-note-method 'top-lines
   "Method for showing the note of an entry.
 This option controls how the contents of an external note is
 shown in the entry buffer.  Possible values are `all' (default),
@@ -187,8 +187,8 @@ that the value `all' can only be used when `ebib-layout' is set
 to `full', whereas the value `top-lines' requires the note file
 to be in Org format."
   :group 'ebib-notes
-  :type '(choice (const :tag "Show entire note" all)
-                 (const :tag "Show first few lines" top-lines)
+  :type '(choice (const :tag "Show first few lines" top-lines)
+                 (const :tag "Show entire note" all)
                  (const :tag "Do not show note" nil)))
 
 (defcustom ebib-notes-display-max-lines 10
