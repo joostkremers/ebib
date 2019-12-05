@@ -709,6 +709,7 @@ possible to use the same separator in the `url' field as in the
 (defcustom ebib-url-download-transformations '(("https?://arxiv.org/abs/" . ebib-transform-arXiv-url)
                                                ("https?://ling.auf.net/lingBuzz/" . ebib-transform-lingbuzz-url)
                                                ("https?://www.jstor.org/" . ebib-transform-jstor-url)
+                                               ("https?://\\(www.\\)?aclweb.org/anthology/" . ebib-transform-aclanthology-url)
                                                ("https?://link.aps.org/" . ebib-transform-aps-url))
   "Transformations to apply to a URL before attempting to download a pdf file.
 Each entry consists of a matcher and a transformation function.
@@ -765,6 +766,12 @@ transformation function is applied to the URL."
       (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/rmp/pdf/" url t t))
      ((string-match (regexp-quote "PhysRevPhysEducRes") url)
       (replace-regexp-in-string (regexp-quote "/link.aps.org/doi/") "/journals.aps.org/prper/pdf/" url t t)))))
+
+(defun ebib-transform-aclanthology-url (url)
+  "Transform an ACL anthology URL to the URL of its correspnoding pdf file."
+  (if (string-match-p "\\.pdf$" url)
+	  url
+	(concat (string-remove-suffix "/" url) ".pdf")))
 
 (defcustom ebib-browser-command nil
   "Command to call the browser with.
