@@ -9,6 +9,11 @@ is.
 
 # News
 
+## Version 2.21, December 2019
+
+  - New option `ebib-default-dir`: control the directory that Ebib uses
+    as its default directory.
+
 ## Version 2.20, December 2019
 
   - Display the contents of an external note when the current entry has
@@ -205,6 +210,12 @@ when you load a BibTeX file without letting Ebib know the file is
 loads is a BibTeX file. If you intend to use `biblatex` files, make sure
 to read the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
 
+When you open a `.bib` file, the directory in which you started Ebib is
+the start directory for file name completion. If you always want Ebib to
+assume a specific default directory, regardless of the directory in
+which Ebib is actually started, you can customize the option “Default
+Directory” (`ebib-default-directory`).
+
 ## Preloading `.bib` Files
 
 Chances are that you will be doing most of your work with one or a few
@@ -214,12 +225,11 @@ specific `.bib` files on startup. To do this, specify the files in
 Ebib’s customisation buffer, under the option “Preload Bib Files”
 (`ebib-preload-bib-files`).
 
-By default, `.bib` files are searched for in your home directory. Since
-this is most likely not where you keep the files, you need to specify
-either the file’s full path or a relative path starting from your home
-directory. Alternatively, you can customise the option “Bib Search Dirs”
-(`ebib-bib-search-dirs`) to specify one or more directories in which
-Ebib should search the `.bib` files.
+Files listed in `ebib-preload-bib-files` that do not have a full path
+specification are searched for in the directories listed in the option
+“Bib Search Dirs” (`ebib-bib-search-dirs`). By default, this option
+only lists your home directory. Since this is most likely not where you
+keep your `.bib` files, it makes sense to customize this option.
 
 ## Navigating a `.bib` File
 

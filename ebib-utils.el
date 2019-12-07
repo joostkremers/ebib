@@ -88,6 +88,20 @@ name (e.g., from an Eshell command line)."
   :group 'ebib
   :type '(repeat :tag "Search directories for BibTeX files" (string :tag "Directory")))
 
+(defcustom ebib-default-directory nil
+  "The default directory for Ebib.
+This mainly determines which directory is the default directory
+when reading a file name from the user.  Possible values are nil,
+which means to use the directory Ebib is started in, the symbol
+`first-bib-dir', which means to use the first directory listed in
+`ebib-bib-serch-dirs', or a directory path.
+
+In order for this option to take effect, you need to restart Ebib."
+  :group 'ebib
+  :type '(choice (const :tag "Use Ebib startup directory" nil)
+                 (const :tag "Use first .bib directory" first-bib-dir)
+                 (directory :tag "Use a specific directory")))
+
 (defcustom ebib-create-backups t
   "Create a backup file.
 The first time a BibTeX file is saved, a backup file is created

@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.20
+;; Version: 2.21
 ;; Keywords: text bibtex
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
 
@@ -968,6 +968,17 @@ character ?1-?9, which is converted to the corresponding number."
           'ebib-switch-to-database-key))
       '(1 2 3 4 5 6 7 8 9))
 
+(defun ebib-set-default-dir ()
+  "Set the default directory of the current buffer.
+The default directory is set according to `ebib-default-directory', see
+there for details."
+  (cond
+   ((eq ebib-default-directory 'first-bib-dir)
+    (setq default-directory (car ebib-bib-search-dirs)))
+   ((stringp ebib-default-directory) ; No check is made if `ebib-default-directory' really is a directory and whether it exists.
+    (setq default-directory ebib-default-directory))
+   (t nil))) ; Leave the default directory as is.
+
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
   "Major mode for the Ebib index buffer."
@@ -977,7 +988,7 @@ character ?1-?9, which is converted to the corresponding number."
   (if ebib-index-mode-line
       (setq mode-line-format ebib-index-mode-line))
   (setq truncate-lines t)
-  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
+  (ebib-set-default-dir)
   (setq ebib--dirty-index-buffer nil)
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
@@ -1126,7 +1137,7 @@ This function is for interactive use only.  To load a BibTeX file
 in the background, use `ebib--load-bibtex-file-internal'."
   (interactive)
   (unless file
-    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: " (car ebib-bib-search-dirs))) (car ebib-bibtex-extensions))))
+    (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
   (setq ebib--cur-db (ebib--load-bibtex-file-internal file))
   (ebib--update-buffers))
 
@@ -1566,7 +1577,7 @@ case add new entry stubs for each file anyway."
                            (error "[Ebib] Invalid file %s" fp)))))
       ;; Prompt for file.
       (if (and (null filepath) (null disable-prompt))
-          (setq filepath (read-file-name "Add file or directory: " (file-name-as-directory (car ebib-file-search-dirs)))))
+          (setq filepath (read-file-name "Add file or directory: ")))
       ;; Collect all file paths from db entries into single list.
       (unless allow-duplicates
         (cl-dolist (entry-key (ebib-db-list-keys db))
@@ -2958,7 +2969,7 @@ completion."
     ((or slave-db filtered-db)
      (error "Cannot create slave database from another slave or from a filtered database"))
     (real-db
-     (let ((file (read-file-name "Create slave database: " (car ebib-bib-search-dirs)))
+     (let ((file (read-file-name "Create slave database: "))
            (slave (ebib--create-new-database ebib--cur-db)))
        (ebib-db-set-filename (expand-file-name file) slave)
        (setq ebib--cur-db slave)
@@ -3331,7 +3342,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (if ebib-entry-mode-line
       (setq mode-line-format ebib-entry-mode-line))
   (setq truncate-lines t)
-  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
+  (ebib-set-default-dir)
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
@@ -3959,7 +3970,7 @@ The deleted text is not put in the kill ring."
   (if ebib-hide-cursor
       (setq cursor-type nil))
   (setq truncate-lines t)
-  (setq default-directory "~/") ; Make sure Ebib always thinks it's in $HOME.
+  (ebib-set-default-dir)
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
   (hl-line-mode 1))
 
@@ -4354,7 +4365,7 @@ The text being edited is stored before saving the database."
   "Major mode for the Ebib log buffer."
   (local-set-key "\C-xb" 'ebib-quit-log-buffer)
   (local-set-key "\C-xk" 'ebib-quit-log-buffer)
-  (setq default-directory "~/")) ; Make sure Ebib always thinks it's in $HOME.
+  (ebib-set-default-dir))
 
 (defun ebib-quit-log-buffer ()
   "Exit the log buffer."
