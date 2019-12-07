@@ -201,9 +201,9 @@ Ebib finds entry types in a `.bib` file that are not defined, those
 entries will still be loaded, but their entry type is displayed using
 Emacs’ `error` face. The most likely case in which this may happen is
 when you load a BibTeX file without letting Ebib know the file is
-BibTeX-specific. By default, Ebib assumes that a `.bib` file it loads is
-a BibTeX file. If you intend to use `biblatex` files, make sure to read
-the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
+`biblatex`-specific. By default, Ebib assumes that a `.bib` file it
+loads is a BibTeX file. If you intend to use `biblatex` files, make sure
+to read the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
 
 ## Preloading `.bib` Files
 
