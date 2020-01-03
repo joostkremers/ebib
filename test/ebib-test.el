@@ -51,11 +51,16 @@
 
 (ert-deftest ebib-citation-with-a-key-and-arguments-should-accept-spaces-in-args ()
   (let ((unread-command-events (listify-key-sequence (kbd "liz SPC ard RET sna SPC ke RET"))))
-    (should (ert--explain-equal-rec (ebib--process-citation-template "%A%k%A" "key")
-                     "liz ardkeysna ke"))))
+    (should (equal(ebib--process-citation-template "%A%k%A" "key")
+                  "liz ardkeysna ke"))))
+
+
+;; TODO: Add tests for
+;; `ebib-citation-show-format-string-when-prompting-for-arguments`
+;; which is what this branch is about anyway.
 
 ;; TODO: A bit of integration testing here would be nice, say to grab some
-;; of the defined templates from the format and pushing a bit more
+;; of the defined templates from e.g. MarkDown format and pushing a bit more
 ;; realistic arguments through them, e.g. "c.f." and "pp. 22-25".
 
 ;;; ebib-test.el ends here
