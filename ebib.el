@@ -2770,6 +2770,11 @@ optional material both before and after %A.  If the user supplies
 an empty string for such an argument, the optional material
 surrounding it is not included in the citation command.
 
+If variable
+`ebib-citation-show-format-string-when-prompting-for-arguments`
+is set, the entire FORMAT-STRING will be displayed in the prompt
+for user to see.
+
 FORMAT-STRING may also contain a %D directive.  This is replaced
 with a description, for which the user is prompted, although a
 default value is provided, which the user can accept by hitting
@@ -2790,7 +2795,7 @@ data for entry KEY in DB."
                   (prompt (format "%s%s%s%s%s: "
                                   arg-prompt
                                   (if (string= arg-prompt "Argument") (format " %s" n) "")
-                                  (concat " in «" format-string "»")
+                                  (if ebib-citation-show-format-string-when-prompting-for-arguments (concat " in «" format-string "»") "")
                                   (if key (concat " for " key) "")
                                   (if default (concat " (default: «" default "»)") "")))
                   (replacement (ebib--ifstring (argument (read-string prompt nil nil default))

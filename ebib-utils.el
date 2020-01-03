@@ -401,6 +401,12 @@ a description as used in Org-mode links.  The user is prompted
 for this description, but if possible a default is provided,
 which can be accepted by hitting RET.
 
+If
+`ebib-citation-show-format-string-when-prompting-for-arguments`
+is set, the entire format string is included in the prompt for
+arguments for the citation command so that the user can see what
+the arguments will be used for.  It defaults to nil.
+
 Optional material around %A is only included if the user provides
 some string for %A.  If not, the optional material is omitted.
 
@@ -420,6 +426,15 @@ provided, the user is prompted to supply one."
                        (repeat (list :tag "Citation command"
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
+
+(defcustom ebib-citation-show-format-string-when-prompting-for-arguments nil
+  "Whether to display the format string template when prompting for arguments.
+If the format string template includes arguments to prompt from
+the user, ie. contains %A, then show the full format string
+template to the user so that they can see how the arguments will
+be used."
+  :group 'ebib
+  :type 'boolean)
 
 (defcustom ebib-citation-description-function 'ebib-author-year-description
   "Function for creating a description to be used in citations.
