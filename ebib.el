@@ -2787,9 +2787,10 @@ data for entry KEY in DB."
                   (arg-prompt (if (string= arg-type "%D") "Description" "Argument"))
                   (default (when (and key db (string= arg-type "%D"))
                              (funcall ebib-citation-description-function key db)))
-                  (prompt (format "%s%s%s%s: "
+                  (prompt (format "%s%s%s%s%s: "
                                   arg-prompt
                                   (if (string= arg-prompt "Argument") (format " %s" n) "")
+                                  (concat " in «" format-string "»")
                                   (if key (concat " for " key) "")
                                   (if default (concat " (default: «" default "»)") "")))
                   (replacement (ebib--ifstring (argument (read-string prompt nil nil default))
