@@ -978,6 +978,17 @@ Setting this option disables completion completely."
   :type '(choice (const :tag "Use completion" nil)
                  (const :tag "Do not use completion" t)))
 
+(defcustom ebib-save-slave-after-citation t
+  "Save a slave database after `ebib-insert-citation'.
+Calling `ebib-insert-citation' in a text buffer associated with a
+slave database may insert a citation from the master database and
+add this citation to the slave database.  In such a case, the
+database needs to be saved before running (e.g.) LaTeX on the
+file.  If this option is set, the database is automatically saved."
+  :group 'ebib
+  :type '(choice (const :tag "Save slave database after citation" t)
+                 (const :tag "Only save slave databases manually" nil)))
+
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
 (defface ebib-highlight-face '((t (:inherit highlight)))

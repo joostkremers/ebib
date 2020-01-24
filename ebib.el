@@ -2936,7 +2936,9 @@ completion."
          (when (and key slave-db (not (ebib-db-has-key key slave-db)))
            (ebib-db-add-entries-to-slave key slave-db)
            (ebib--mark-index-dirty slave-db)
-           (ebib-db-set-modified t slave-db)))))
+           (if ebib-save-slave-after-citation
+               (ebib--save-database slave-db)
+             (ebib-db-set-modified t slave-db))))))
     (default
       (error "[Ebib] No database opened"))))
 
