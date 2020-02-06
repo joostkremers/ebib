@@ -338,7 +338,8 @@ is not accessible to the user."
         (error "[Ebib] Cannot read or create notes file"))
       (setq notes-buffer (find-file-noselect ebib-notes-file))
       (with-current-buffer notes-buffer
-        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t)))))
+        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t))
+      notes-buffer)))
 
 (provide 'ebib-notes)
 
