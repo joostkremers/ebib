@@ -2553,6 +2553,10 @@ per-directory keyword files, the files have the same name in each
 directory.  The default name is ‘ebib-keywords.txt’, but you can change
 that if you like, of course.
 
+Note that after setting or changing this option, you need to restart
+Ebib for the change to take effect.  If you do not, Ebib will not be
+able to save your keywords.
+
 Keywords that have not been made permanent are marked as such in the
 entry buffer in ‘ebib-warning-face’, (usually a red foreground colour,
 but this can be customised).  If you run into such keywords and want to
@@ -3064,22 +3068,22 @@ Node: @Comments123109
 Ref: #comments123237
 Node: Managing Keywords123602
 Ref: #managing-keywords123747
-Node: Sorting the bib File129648
-Ref: #sorting-the-.bib-file129821
-Node: Merging and Importing132940
-Ref: #merging-and-importing133105
-Node: Exporting Entries134875
-Ref: #exporting-entries135037
-Node: Multiple Identical Fields136553
-Ref: #multiple-identical-fields136732
-Node: Multiline Edit Buffers138660
-Ref: #multiline-edit-buffers138832
-Node: The Options Menu142709
-Ref: #the-options-menu142857
-Node: Customisation143475
-Ref: #customisation143586
-Node: Modifying Key Bindings144194
-Ref: #modifying-key-bindings144321
+Node: Sorting the bib File129815
+Ref: #sorting-the-.bib-file129988
+Node: Merging and Importing133107
+Ref: #merging-and-importing133272
+Node: Exporting Entries135042
+Ref: #exporting-entries135204
+Node: Multiple Identical Fields136720
+Ref: #multiple-identical-fields136899
+Node: Multiline Edit Buffers138827
+Ref: #multiline-edit-buffers138999
+Node: The Options Menu142876
+Ref: #the-options-menu143024
+Node: Customisation143642
+Ref: #customisation143753
+Node: Modifying Key Bindings144361
+Ref: #modifying-key-bindings144488
 
 End Tag Table
 

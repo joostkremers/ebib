@@ -2171,6 +2171,10 @@ per-directory keyword files, the files have the same name in each
 directory. The default name is `ebib-keywords.txt`, but you can change
 that if you like, of course.
 
+Note that after setting or changing this option, you need to restart
+Ebib for the change to take effect. If you do not, Ebib will not be able
+to save your keywords.
+
 Keywords that have not been made permanent are marked as such in the
 entry buffer in `ebib-warning-face`, (usually a red foreground colour,
 but this can be customised). If you run into such keywords and want to

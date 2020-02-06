@@ -59,7 +59,10 @@ fields, since those are most likely keyword fields."
 Keywords can be stored in a single keywords file, which is used
 for all BibTeX files, or in per-directory keywords files located in
 the same directories as the BibTeX files.  In the latter case, the
-keywords file should specify just the generic name and no path."
+keywords file should specify just the generic name and no path.
+
+Note: setting or changing this option will not take effect until
+Ebib is restarted."
   :group 'ebib-keywords
   :type '(choice (const :tag "Do not use keywords file" nil)
                  (file :tag "Use single keywords file")
@@ -121,9 +124,12 @@ Also automatically remove duplicates."
   "Add KEYWORD to the list of keywords for DB."
   (if (not ebib-keywords-file)        ; only the general list exists
       (push keyword ebib--keywords-list-per-session)
-    (let ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
-                   (file-name-directory (ebib-db-get-filename db)))))    ; per-directory keywords files
-      (push keyword (cl-third (assoc dir ebib--keywords-files-alist))))))
+    (let* ((dir (or (file-name-directory ebib-keywords-file)      ; a single keywords file
+                    (file-name-directory (ebib-db-get-filename db))))     ; per-directory keywords files
+           (entry (assoc dir ebib--keywords-files-alist)))
+      (if entry
+          (push keyword (cl-third entry))
+        (error "The option `ebib-keywords-file' seems to have been changed.  Restart Ebib for it to take effect")))))
 
 (defsubst ebib--keywords-to-list (str)
   "Convert STR to a list of keywords.
@@ -157,7 +163,9 @@ When the keywords come from a file, add the keywords in
     (let* ((dir (or (file-name-directory ebib-keywords-file)     ; A single keywords file.
                     (file-name-directory (ebib-db-get-filename db))))    ; Per-directory keywords files.
            (lst (assoc dir ebib--keywords-files-alist)))
-      (append (cl-second lst) (cl-third lst)))))
+      (if lst
+          (append (cl-second lst) (cl-third lst))
+        (error "The option `ebib-keywords-file' seems to have been changed.  Restart Ebib for it to take effect")))))
 
 (defun ebib--keywords-get-file (db)
   "Return the name of the keywords file for DB."
