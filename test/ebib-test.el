@@ -56,7 +56,7 @@
 
 
 ;; TODO: Add tests for
-;; `ebib-citation-show-format-string-when-prompting-for-arguments`
+;; `ebib-citation-prompt-with-format-string`
 ;; which is what this branch is about anyway.
 
 ;; TODO: A bit of integration testing here would be nice, say to grab some

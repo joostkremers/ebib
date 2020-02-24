@@ -2771,7 +2771,7 @@ an empty string for such an argument, the optional material
 surrounding it is not included in the citation command.
 
 If variable
-`ebib-citation-show-format-string-when-prompting-for-arguments`
+`ebib-citation-prompt-with-format-string`
 is set, the entire FORMAT-STRING will be displayed in the prompt
 for user to see.
 
@@ -2795,7 +2795,7 @@ data for entry KEY in DB."
                   (prompt (format "%s%s%s%s%s: "
                                   arg-prompt
                                   (if (string= arg-prompt "Argument") (format " %s" n) "")
-                                  (if ebib-citation-show-format-string-when-prompting-for-arguments (concat " in «" format-string "»") "")
+                                  (if ebib-citation-prompt-with-format-string (concat " in «" format-string "»") "")
                                   (if key (concat " for " key) "")
                                   (if default (concat " (default: «" default "»)") "")))
                   (replacement (ebib--ifstring (argument (read-string prompt nil nil default))

@@ -1209,9 +1209,11 @@ contain `%A` directives:
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
-directives. Of course, it is possible to leave the arguments empty (by
-just hitting `RET`). With the format string above, this would yield the
-following citation in the LaTeX buffer:
+directives. If `ebib-citation-prompt-with-format-string` is set, the
+format string is included in its entirety in the prompt. Of course, it
+is possible to leave the arguments empty (by just hitting `RET`). With
+the format string above, this would yield the following citation in the
+LaTeX buffer:
 
     \textcite[][]{Jones1992}
 
@@ -1312,6 +1314,11 @@ part that is not repeated may contain `%A` directives as well:
 Multicite commands in `biblatex` take two additional arguments
 surrounded with parentheses. These are pre- and postnotes for the entire
 sequence of citations. They can be accommodated as shown.
+
+If `ebib-citation-prompt-with-format-string` is set the format string is
+displayed when prompting the user for arguments for a citation (with the
+`%A` directive), so that they can see what the argument will be used
+for.
 
 Lastly, a citation command can also contain a `%D` directive. This is
 mainly for use in Org citations, which take the form
