@@ -426,15 +426,6 @@ provided, the user is prompted to supply one."
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
 
-(defcustom ebib-citation-insert-multiple nil
-  "Allow insertion of multiple citations.
-If set, use `ebib-read-entry-multiple' in `ebib-insert-citation'.
-This allows inserting multiple citations at once but has the
-disadvantage that it is not possible to provide a default
-description for citations in Org buffers."
-  :group 'ebib
-  :type 'boolean)
-
 (defcustom ebib-citation-prompt-with-format-string t
   "Display the format string template when prompting for arguments.
 If the format string template includes arguments to prompt from
