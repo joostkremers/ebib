@@ -1519,10 +1519,10 @@ contain ‘%A’ directives:
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
 directives.  If ‘ebib-citation-prompt-with-format-string’ is set, the
-format string is included in its entirety in the prompt.  Of course, it
-is possible to leave the arguments empty (by just hitting ‘RET’).  With
-the format string above, this would yield the following citation in the
-LaTeX buffer:
+format string is included in the prompt.  Of course, it is possible to
+leave the arguments empty (by just hitting ‘RET’).  With the format
+string above, this would yield the following citation in the LaTeX
+buffer:
 
 \textcite[][]{Jones1992}
 
@@ -3035,62 +3035,62 @@ Node: Key Bindings70087
 Ref: #key-bindings70242
 Node: Defining Citation Commands71000
 Ref: #defining-citation-commands71231
-Node: Associating a Database with a Text File77469
-Ref: #associating-a-database-with-a-text-file77705
-Node: Master and Slave Databases80664
-Ref: #master-and-slave-databases80862
-Node: Cross-referencing82746
-Ref: #cross-referencing82903
-Node: Marking Entries86430
-Ref: #marking-entries86578
-Node: Printing the Database87455
-Ref: #printing-the-database87615
-Node: Calling a Browser91084
-Ref: #calling-a-browser91248
-Node: Viewing and Importing Files93700
-Ref: #viewing-and-importing-files93874
-Node: Editing the file field98441
-Ref: #editing-the-file-field98590
-Node: Notes files99961
-Ref: #notes-files100109
-Node: Separate notes files100878
-Ref: #separate-notes-files101027
-Node: One single notes file102618
-Ref: #one-single-notes-file102811
-Node: Customising the notes file format104728
-Ref: #customising-the-notes-file-format104941
-Node: Displaying notes108536
-Ref: #displaying-notes108685
-Node: Managing a reading list110022
-Ref: #managing-a-reading-list110184
-Node: Window Management113199
-Ref: #window-management113358
-Node: Creating Entry Stubs116517
-Ref: #creating-entry-stubs116679
-Node: @Preamble Definition117677
-Ref: #preamble-definition117841
-Node: @String Definitions119813
-Ref: #string-definitions119964
-Node: @Comments123457
-Ref: #comments123585
-Node: Managing Keywords123950
-Ref: #managing-keywords124095
-Node: Sorting the bib File130163
-Ref: #sorting-the-.bib-file130336
-Node: Merging and Importing133455
-Ref: #merging-and-importing133620
-Node: Exporting Entries135390
-Ref: #exporting-entries135552
-Node: Multiple Identical Fields137068
-Ref: #multiple-identical-fields137247
-Node: Multiline Edit Buffers139175
-Ref: #multiline-edit-buffers139347
-Node: The Options Menu143224
-Ref: #the-options-menu143372
-Node: Customisation143990
-Ref: #customisation144101
-Node: Modifying Key Bindings144709
-Ref: #modifying-key-bindings144836
+Node: Associating a Database with a Text File77453
+Ref: #associating-a-database-with-a-text-file77689
+Node: Master and Slave Databases80648
+Ref: #master-and-slave-databases80846
+Node: Cross-referencing82730
+Ref: #cross-referencing82887
+Node: Marking Entries86414
+Ref: #marking-entries86562
+Node: Printing the Database87439
+Ref: #printing-the-database87599
+Node: Calling a Browser91068
+Ref: #calling-a-browser91232
+Node: Viewing and Importing Files93684
+Ref: #viewing-and-importing-files93858
+Node: Editing the file field98425
+Ref: #editing-the-file-field98574
+Node: Notes files99945
+Ref: #notes-files100093
+Node: Separate notes files100862
+Ref: #separate-notes-files101011
+Node: One single notes file102602
+Ref: #one-single-notes-file102795
+Node: Customising the notes file format104712
+Ref: #customising-the-notes-file-format104925
+Node: Displaying notes108520
+Ref: #displaying-notes108669
+Node: Managing a reading list110006
+Ref: #managing-a-reading-list110168
+Node: Window Management113183
+Ref: #window-management113342
+Node: Creating Entry Stubs116501
+Ref: #creating-entry-stubs116663
+Node: @Preamble Definition117661
+Ref: #preamble-definition117825
+Node: @String Definitions119797
+Ref: #string-definitions119948
+Node: @Comments123441
+Ref: #comments123569
+Node: Managing Keywords123934
+Ref: #managing-keywords124079
+Node: Sorting the bib File130147
+Ref: #sorting-the-.bib-file130320
+Node: Merging and Importing133439
+Ref: #merging-and-importing133604
+Node: Exporting Entries135374
+Ref: #exporting-entries135536
+Node: Multiple Identical Fields137052
+Ref: #multiple-identical-fields137231
+Node: Multiline Edit Buffers139159
+Ref: #multiline-edit-buffers139331
+Node: The Options Menu143208
+Ref: #the-options-menu143356
+Node: Customisation143974
+Ref: #customisation144085
+Node: Modifying Key Bindings144693
+Ref: #modifying-key-bindings144820
 
 End Tag Table
 

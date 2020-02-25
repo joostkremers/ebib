@@ -1210,10 +1210,10 @@ contain `%A` directives:
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
 directives. If `ebib-citation-prompt-with-format-string` is set, the
-format string is included in its entirety in the prompt. Of course, it
-is possible to leave the arguments empty (by just hitting `RET`). With
-the format string above, this would yield the following citation in the
-LaTeX buffer:
+format string is included in the prompt. Of course, it is possible to
+leave the arguments empty (by just hitting `RET`). With the format
+string above, this would yield the following citation in the LaTeX
+buffer:
 
     \textcite[][]{Jones1992}
 
