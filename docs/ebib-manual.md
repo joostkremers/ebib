@@ -1120,23 +1120,30 @@ started Ebib from, or the buffer you previously inserted an entry into),
 a citation command and also any optional arguments, and then inserts a
 citation at the current cursor position in the buffer you’ve supplied.
 
-Calling Ebib from a text mode buffer has another small advantage. If
-point is on a BibTeX key when Ebib is called, it jumps to that entry in
-your database. This allows you to quickly check a reference in your
-text. Ebib will search the entry in the current database, or, if you’re
-calling Ebib from a LaTeX file and there is a `\bibliography` or
-`\addbibresource` command in the file, in the databases in these
-commands, if they are opened in Ebib. See [Associating a Database with a
-Text File](#associating-a-database-with-a-text-file) below for details.
+## Citations with multiple keys
 
-There is one more command that can be useful: `ebib-create-bib-from-bbl`
-creates a `.bib` file from the `.bbl` file associated with the LaTeX
-document in the current buffer. This makes it easy to create a `.bib`
-file containing just the BibTeX entries that are used in the document.
-Note, however, that this command does not add cross-referenced entries
-to the newly created `.bib` file, nor does it add `@String` definitions
-and the `@Preamble`. So make sure to add those after using
-`ebib-create-bib-from-bbl`.
+Most citation commands in LaTeX can take multiple keys. In the index
+buffer in Ebib, you can mark multiple the entries with `m` and then
+insert them into a single citation command with `i`. The same is
+possible from within a text buffer: if you use ivy or helm, the standard
+method that these packages provide for selecting and acting on multiple
+candidates can be used. Emacs’ built-in completion method only allows
+selecting one candidate, so by default you cannot select multiple
+entries with it.
+
+Emacs does offer a simple way of selecting multiple candidates from a
+candidate list. You can activate it in Ebib by setting the option
+`ebib-citations-insert-multiple`. With this option set,
+`ebib-insert-citation` allows you to select multiple keys: start typing
+a key, complete it with `TAB`, type `SPC` and start typing the next key,
+again with the ability to complete it with `TAB`. When you have entered
+all the keys you wish to select, press `RET`.
+
+This method of multiple selection is somewhat cumbersome and it has the
+additional disadvantage that it is no longer possible to provide a
+default description for citations in Org mode buffers. For these
+reasons, it is not enabled by default, but it is there if you want to
+use it.
 
 ## Key Bindings
 
