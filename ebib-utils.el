@@ -426,7 +426,7 @@ provided, the user is prompted to supply one."
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
 
-(defcustom ebib-citation-prompt-with-format-string t
+(defcustom ebib-citation-prompt-with-format-string nil
   "Display the format string template when prompting for arguments.
 If the format string template includes arguments to prompt from
 the user, ie. contains %A, then show the full format string
