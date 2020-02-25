@@ -1,6 +1,6 @@
 ;;; ebib.el --- a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2019 Joost Kremers
+;; Copyright (c) 2003-2020 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
