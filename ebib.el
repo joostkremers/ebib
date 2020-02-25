@@ -52,6 +52,7 @@
 (require 'easymenu)
 (require 'bibtex)
 (require 'seq)
+(require 'crm)
 (require 'pp)
 (require 'hl-line)
 (require 'parsebib)
