@@ -2232,7 +2232,10 @@ databases containing them."
           (error "[Ebib] No entries found in database(s)")
         (ivy-read "Select entry: " collection
                   :action (lambda (item)
-                            (push (cons (get-text-property 0 'ebib-key item) (get-text-property 0 'ebib-db item)) entries))
+                            (let ((key (get-text-property 0 'ebib-key item))
+                                  (db (get-text-property 0 'ebib-db item)))
+                              (unless (cl-find key entries :key #'car)
+                                (push (cons key db) entries))))
                   :history 'ebib--citation-history
                   :sort t)
         (nreverse entries)))))
