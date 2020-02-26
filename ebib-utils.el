@@ -401,11 +401,6 @@ a description as used in Org-mode links.  The user is prompted
 for this description, but if possible a default is provided,
 which can be accepted by hitting RET.
 
-If `ebib-citation-prompt-with-format-string` is set, the entire
-format string is included in the prompt for arguments for the
-citation command so that the user can see what the arguments will
-be used for.
-
 Optional material around %A is only included if the user provides
 some string for %A.  If not, the optional material is omitted.
 
