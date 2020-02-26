@@ -2937,7 +2937,11 @@ completion."
            (ebib-db-add-entries-to-slave key slave-db)
            (ebib--mark-index-dirty slave-db)
            (if ebib-save-slave-after-citation
-               (ebib--save-database slave-db)
+               (condition-case err
+                   (ebib--save-database slave-db)
+                 ;; If an error occurs, make sure to mark the database as modified.
+                 (error (ebib-db-set-modified t slave-db)
+                        (signal (car err) (cdr err))))
              (ebib-db-set-modified t slave-db))))))
     (default
       (error "[Ebib] No database opened"))))
