@@ -1,6 +1,6 @@
 ;;; ebib-utils.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2019 Joost Kremers
+;; Copyright (c) 2003-2020 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -420,6 +420,24 @@ provided, the user is prompted to supply one."
                        (repeat (list :tag "Citation command"
                                      (string :tag "Identifier")
                                      (string :tag "Format string"))))))
+
+(defcustom ebib-citation-insert-multiple nil
+  "Allow insertion of multiple citations.
+If set, use `ebib-read-entry-multiple' in `ebib-insert-citation'.
+This allows inserting multiple keys in one citation command but
+has the disadvantage that it is not possible to provide a default
+description for citations in Org buffers."
+  :group 'ebib
+  :type 'boolean)
+
+(defcustom ebib-citation-prompt-with-format-string nil
+  "Display the format string template when prompting for arguments.
+If the format string template includes arguments to prompt from
+the user, ie. contains %A, then show the full format string
+template to the user so that they can see how the arguments will
+be used."
+  :group 'ebib
+  :type 'boolean)
 
 (defcustom ebib-citation-description-function 'ebib-author-year-description
   "Function for creating a description to be used in citations.

@@ -1413,35 +1413,46 @@ started Ebib from, or the buffer you previously inserted an entry into),
 a citation command and also any optional arguments, and then inserts a
 citation at the current cursor position in the buffer you’ve supplied.
 
-Calling Ebib from a text mode buffer has another small advantage.  If
-point is on a BibTeX key when Ebib is called, it jumps to that entry in
-your database.  This allows you to quickly check a reference in your
-text.  Ebib will search the entry in the current database, or, if you’re
-calling Ebib from a LaTeX file and there is a ‘\bibliography’ or
-‘\addbibresource’ command in the file, in the databases in these
-commands, if they are opened in Ebib.  See *note Associating a Database
-with a Text File: #associating-a-database-with-a-text-file. below for
-details.
-
-There is one more command that can be useful: ‘ebib-create-bib-from-bbl’
-creates a ‘.bib’ file from the ‘.bbl’ file associated with the LaTeX
-document in the current buffer.  This makes it easy to create a ‘.bib’
-file containing just the BibTeX entries that are used in the document.
-Note, however, that this command does not add cross-referenced entries
-to the newly created ‘.bib’ file, nor does it add ‘@String’ definitions
-and the ‘@Preamble’.  So make sure to add those after using
-‘ebib-create-bib-from-bbl’.
-
 * Menu:
 
+* Citations with multiple keys::
 * Key Bindings::
 * Defining Citation Commands::
 * Associating a Database with a Text File::
 
 
-File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
+File: ebib.info,  Node: Citations with multiple keys,  Next: Key Bindings,  Up: Inserting Citations into a Text Buffer
 
-9.1 Key Bindings
+9.1 Citations with multiple keys
+================================
+
+Most citation commands in LaTeX can take multiple keys.  In the index
+buffer in Ebib, you can mark multiple the entries with ‘m’ and then
+insert them into a single citation command with ‘i’.  The same is
+possible from within a text buffer: if you use ivy or helm, the standard
+method that these packages provide for selecting and acting on multiple
+candidates can be used.  Emacs’ built-in completion method only allows
+selecting one candidate, so by default you cannot select multiple
+entries with it.
+
+Emacs does offer a simple way of selecting multiple candidates from a
+candidate list.  You can activate it in Ebib by setting the option
+‘ebib-citations-insert-multiple’.  With this option set,
+‘ebib-insert-citation’ allows you to select multiple keys: start typing
+a key, complete it with ‘TAB’, type ‘SPC’ and start typing the next key,
+again with the ability to complete it with ‘TAB’.  When you have entered
+all the keys you wish to select, press ‘RET’.
+
+This method of multiple selection is somewhat cumbersome and it has the
+additional disadvantage that it is no longer possible to provide a
+default description for citations in Org mode buffers.  For these
+reasons, it is not enabled by default, but it is there if you want to
+use it.
+
+
+File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
+
+9.2 Key Bindings
 ================
 
 Of course, the easiest way to use the commands discussed here is to bind
@@ -1463,7 +1474,7 @@ will do the right thing.
 
 File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a Text File,  Prev: Key Bindings,  Up: Inserting Citations into a Text Buffer
 
-9.2 Defining Citation Commands
+9.3 Defining Citation Commands
 ==============================
 
 Citation commands are defined for specific major modes.  Ebib defines
@@ -1518,9 +1529,11 @@ contain ‘%A’ directives:
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
-directives.  Of course, it is possible to leave the arguments empty (by
-just hitting ‘RET’).  With the format string above, this would yield the
-following citation in the LaTeX buffer:
+directives.  If ‘ebib-citation-prompt-with-format-string’ is set, the
+format string is included in the prompt.  Of course, it is possible to
+leave the arguments empty (by just hitting ‘RET’).  With the format
+string above, this would yield the following citation in the LaTeX
+buffer:
 
 \textcite[][]{Jones1992}
 
@@ -1534,13 +1547,13 @@ the brackets and the ‘%A’ directives in a ‘%<...%>’ pair:
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
 
-\citet{Jones1992}
+\textcite{Jones1992}
 
 Note however, that this format string is problematic.  If you fill out
 the first argument but not the second, Ebib produces the wrong format
 string:
 
-\citet[cf.]{Jones1992}
+\textcite[cf.]{Jones1992}
 
 If only one optional argument is provided, ‘biblatex’ assumes that it is
 a postnote, while what you intended is actually a prenote.  Therefore,
@@ -1602,6 +1615,11 @@ Multicite commands in ‘biblatex’ take two additional arguments
 surrounded with parentheses.  These are pre- and postnotes for the
 entire sequence of citations.  They can be accommodated as shown.
 
+If ‘ebib-citation-prompt-with-format-string’ is set the format string is
+displayed when prompting the user for arguments for a citation (with the
+‘%A’ directive), so that they can see what the argument will be used
+for.
+
 Lastly, a citation command can also contain a ‘%D’ directive.  This is
 mainly for use in Org citations, which take the form
 ‘[[ebib:<key>][<description>]]’.  The description is not an argument to
@@ -1611,7 +1629,7 @@ buffer.
 
 File: ebib.info,  Node: Associating a Database with a Text File,  Prev: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
 
-9.3 Associating a Database with a Text File
+9.4 Associating a Database with a Text File
 ===========================================
 
 The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
@@ -2553,6 +2571,10 @@ per-directory keyword files, the files have the same name in each
 directory.  The default name is ‘ebib-keywords.txt’, but you can change
 that if you like, of course.
 
+Note that after setting or changing this option, you need to restart
+Ebib for the change to take effect.  If you do not, Ebib will not be
+able to save your keywords.
+
 Keywords that have not been made permanent are marked as such in the
 entry buffer in ‘ebib-warning-face’, (usually a red foreground colour,
 but this can be customised).  If you run into such keywords and want to
@@ -3020,66 +3042,68 @@ Node: Properties of Filtered Databases63876
 Ref: #properties-of-filtered-databases64073
 Node: Inserting Citations into a Text Buffer65728
 Ref: #inserting-citations-into-a-text-buffer65940
-Node: Key Bindings70087
-Ref: #key-bindings70242
-Node: Defining Citation Commands71000
-Ref: #defining-citation-commands71231
-Node: Associating a Database with a Text File77121
-Ref: #associating-a-database-with-a-text-file77357
-Node: Master and Slave Databases80316
-Ref: #master-and-slave-databases80514
-Node: Cross-referencing82398
-Ref: #cross-referencing82555
-Node: Marking Entries86082
-Ref: #marking-entries86230
-Node: Printing the Database87107
-Ref: #printing-the-database87267
-Node: Calling a Browser90736
-Ref: #calling-a-browser90900
-Node: Viewing and Importing Files93352
-Ref: #viewing-and-importing-files93526
-Node: Editing the file field98093
-Ref: #editing-the-file-field98242
-Node: Notes files99613
-Ref: #notes-files99761
-Node: Separate notes files100530
-Ref: #separate-notes-files100679
-Node: One single notes file102270
-Ref: #one-single-notes-file102463
-Node: Customising the notes file format104380
-Ref: #customising-the-notes-file-format104593
-Node: Displaying notes108188
-Ref: #displaying-notes108337
-Node: Managing a reading list109674
-Ref: #managing-a-reading-list109836
-Node: Window Management112851
-Ref: #window-management113010
-Node: Creating Entry Stubs116169
-Ref: #creating-entry-stubs116331
-Node: @Preamble Definition117329
-Ref: #preamble-definition117493
-Node: @String Definitions119465
-Ref: #string-definitions119616
-Node: @Comments123109
-Ref: #comments123237
-Node: Managing Keywords123602
-Ref: #managing-keywords123747
-Node: Sorting the bib File129648
-Ref: #sorting-the-.bib-file129821
-Node: Merging and Importing132940
-Ref: #merging-and-importing133105
-Node: Exporting Entries134875
-Ref: #exporting-entries135037
-Node: Multiple Identical Fields136553
-Ref: #multiple-identical-fields136732
-Node: Multiline Edit Buffers138660
-Ref: #multiline-edit-buffers138832
-Node: The Options Menu142709
-Ref: #the-options-menu142857
-Node: Customisation143475
-Ref: #customisation143586
-Node: Modifying Key Bindings144194
-Ref: #modifying-key-bindings144321
+Node: Citations with multiple keys68996
+Ref: #citations-with-multiple-keys69185
+Node: Key Bindings70466
+Ref: #key-bindings70658
+Node: Defining Citation Commands71416
+Ref: #defining-citation-commands71647
+Node: Associating a Database with a Text File77875
+Ref: #associating-a-database-with-a-text-file78111
+Node: Master and Slave Databases81070
+Ref: #master-and-slave-databases81268
+Node: Cross-referencing83152
+Ref: #cross-referencing83309
+Node: Marking Entries86836
+Ref: #marking-entries86984
+Node: Printing the Database87861
+Ref: #printing-the-database88021
+Node: Calling a Browser91490
+Ref: #calling-a-browser91654
+Node: Viewing and Importing Files94106
+Ref: #viewing-and-importing-files94280
+Node: Editing the file field98847
+Ref: #editing-the-file-field98996
+Node: Notes files100367
+Ref: #notes-files100515
+Node: Separate notes files101284
+Ref: #separate-notes-files101433
+Node: One single notes file103024
+Ref: #one-single-notes-file103217
+Node: Customising the notes file format105134
+Ref: #customising-the-notes-file-format105347
+Node: Displaying notes108942
+Ref: #displaying-notes109091
+Node: Managing a reading list110428
+Ref: #managing-a-reading-list110590
+Node: Window Management113605
+Ref: #window-management113764
+Node: Creating Entry Stubs116923
+Ref: #creating-entry-stubs117085
+Node: @Preamble Definition118083
+Ref: #preamble-definition118247
+Node: @String Definitions120219
+Ref: #string-definitions120370
+Node: @Comments123863
+Ref: #comments123991
+Node: Managing Keywords124356
+Ref: #managing-keywords124501
+Node: Sorting the bib File130569
+Ref: #sorting-the-.bib-file130742
+Node: Merging and Importing133861
+Ref: #merging-and-importing134026
+Node: Exporting Entries135796
+Ref: #exporting-entries135958
+Node: Multiple Identical Fields137474
+Ref: #multiple-identical-fields137653
+Node: Multiline Edit Buffers139581
+Ref: #multiline-edit-buffers139753
+Node: The Options Menu143630
+Ref: #the-options-menu143778
+Node: Customisation144396
+Ref: #customisation144507
+Node: Modifying Key Bindings145115
+Ref: #modifying-key-bindings145242
 
 End Tag Table
 

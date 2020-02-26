@@ -1120,23 +1120,30 @@ started Ebib from, or the buffer you previously inserted an entry into),
 a citation command and also any optional arguments, and then inserts a
 citation at the current cursor position in the buffer you’ve supplied.
 
-Calling Ebib from a text mode buffer has another small advantage. If
-point is on a BibTeX key when Ebib is called, it jumps to that entry in
-your database. This allows you to quickly check a reference in your
-text. Ebib will search the entry in the current database, or, if you’re
-calling Ebib from a LaTeX file and there is a `\bibliography` or
-`\addbibresource` command in the file, in the databases in these
-commands, if they are opened in Ebib. See [Associating a Database with a
-Text File](#associating-a-database-with-a-text-file) below for details.
+## Citations with multiple keys
 
-There is one more command that can be useful: `ebib-create-bib-from-bbl`
-creates a `.bib` file from the `.bbl` file associated with the LaTeX
-document in the current buffer. This makes it easy to create a `.bib`
-file containing just the BibTeX entries that are used in the document.
-Note, however, that this command does not add cross-referenced entries
-to the newly created `.bib` file, nor does it add `@String` definitions
-and the `@Preamble`. So make sure to add those after using
-`ebib-create-bib-from-bbl`.
+Most citation commands in LaTeX can take multiple keys. In the index
+buffer in Ebib, you can mark multiple the entries with `m` and then
+insert them into a single citation command with `i`. The same is
+possible from within a text buffer: if you use ivy or helm, the standard
+method that these packages provide for selecting and acting on multiple
+candidates can be used. Emacs’ built-in completion method only allows
+selecting one candidate, so by default you cannot select multiple
+entries with it.
+
+Emacs does offer a simple way of selecting multiple candidates from a
+candidate list. You can activate it in Ebib by setting the option
+`ebib-citations-insert-multiple`. With this option set,
+`ebib-insert-citation` allows you to select multiple keys: start typing
+a key, complete it with `TAB`, type `SPC` and start typing the next key,
+again with the ability to complete it with `TAB`. When you have entered
+all the keys you wish to select, press `RET`.
+
+This method of multiple selection is somewhat cumbersome and it has the
+additional disadvantage that it is no longer possible to provide a
+default description for citations in Org mode buffers. For these
+reasons, it is not enabled by default, but it is there if you want to
+use it.
 
 ## Key Bindings
 
@@ -1209,9 +1216,11 @@ contain `%A` directives:
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
-directives. Of course, it is possible to leave the arguments empty (by
-just hitting `RET`). With the format string above, this would yield the
-following citation in the LaTeX buffer:
+directives. If `ebib-citation-prompt-with-format-string` is set, the
+format string is included in the prompt. Of course, it is possible to
+leave the arguments empty (by just hitting `RET`). With the format
+string above, this would yield the following citation in the LaTeX
+buffer:
 
     \textcite[][]{Jones1992}
 
@@ -1229,13 +1238,13 @@ brackets and the `%A` directives in a `%<...%>` pair:
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
 
-    \citet{Jones1992}
+    \textcite{Jones1992}
 
 Note however, that this format string is problematic. If you fill out
 the first argument but not the second, Ebib produces the wrong format
 string:
 
-    \citet[cf.]{Jones1992}
+    \textcite[cf.]{Jones1992}
 
 If only one optional argument is provided, `biblatex` assumes that it is
 a postnote, while what you intended is actually a prenote. Therefore, it
@@ -1312,6 +1321,11 @@ part that is not repeated may contain `%A` directives as well:
 Multicite commands in `biblatex` take two additional arguments
 surrounded with parentheses. These are pre- and postnotes for the entire
 sequence of citations. They can be accommodated as shown.
+
+If `ebib-citation-prompt-with-format-string` is set the format string is
+displayed when prompting the user for arguments for a citation (with the
+`%A` directive), so that they can see what the argument will be used
+for.
 
 Lastly, a citation command can also contain a `%D` directive. This is
 mainly for use in Org citations, which take the form
@@ -2170,6 +2184,10 @@ must provide a filename without a path. That is, if you use
 per-directory keyword files, the files have the same name in each
 directory. The default name is `ebib-keywords.txt`, but you can change
 that if you like, of course.
+
+Note that after setting or changing this option, you need to restart
+Ebib for the change to take effect. If you do not, Ebib will not be able
+to save your keywords.
 
 Keywords that have not been made permanent are marked as such in the
 entry buffer in `ebib-warning-face`, (usually a red foreground colour,

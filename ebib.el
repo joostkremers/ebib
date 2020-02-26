@@ -1,6 +1,6 @@
 ;;; ebib.el --- a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2019 Joost Kremers
+;; Copyright (c) 2003-2020 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -52,6 +52,7 @@
 (require 'easymenu)
 (require 'bibtex)
 (require 'seq)
+(require 'crm)
 (require 'pp)
 (require 'hl-line)
 (require 'parsebib)
@@ -2172,18 +2173,21 @@ candidates from the current database."
   (ebib--execute-when
     (database
      (let* ((sources (if arg (list ebib--cur-db) ebib--databases))
-            (entry (cond
-                    ((featurep 'ivy) (ebib-read-entry-ivy sources))
-                    ((featurep 'helm) (ebib-read-entry-helm sources))
-                    (t (ebib-read-entry-default-method sources))))
-            (key (car entry))
-            (db (cdr entry)))
+            (entries (cond
+                      ((featurep 'ivy) (ebib-read-entry-ivy sources))
+                      ((featurep 'helm) (ebib-read-entry-helm sources))
+                      (t (ebib-read-entry-single sources))))
+            ;; The `ebib-read-entry-*' functions return a list of selected
+            ;; entries. We can only jump to one of them, obviously. Jumping to
+            ;; the last one makes the most sense.
+            (key (caar (last entries)))
+            (db (cdar (last entries))))
        (cond
         ((eq db ebib--cur-db)
          (if (ebib--goto-entry-in-index key)
              (ebib--update-entry-buffer)
            (error "[Ebib] Could not find entry key `%s'" key)))
-        (entry
+        (entries
          (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db) ; Save the current entry for the database we're jumping away from.
          (ebib-db-set-current-entry-key key db) ; Set the current entry in the database we're jumping to.
          (setq ebib--cur-db db)
@@ -2215,20 +2219,23 @@ in DATABASES."
 Offer the entries in DATABASES (a list of database structs) for
 completion.
 
-Return value is a cons of the key and the database containing the
-selected entry."
+It is possible to select multiple entries either by using
+`ivy-call' or by marking them with `ivy-mark'.
+
+Return value is a list of cons cells of the selected keys and the
+databases containing them."
   (let ((minibuffer-allow-text-properties t)
         (ivy-sort-max-size (expt 256 6))
-        entry)
+        entries)
     (let ((collection (ebib--create-collection-ivy databases)))
       (if (not collection)
           (error "[Ebib] No entries found in database(s)")
         (ivy-read "Select entry: " collection
                   :action (lambda (item)
-                            (setq entry (cons (get-text-property 0 'ebib-key item) (get-text-property 0 'ebib-db item))))
+                            (push (cons (get-text-property 0 'ebib-key item) (get-text-property 0 'ebib-db item)) entries))
                   :history 'ebib--citation-history
                   :sort t)
-        entry))))
+        (nreverse entries)))))
 
 (defun ebib--create-collection-helm (databases)
   "Create a collection for use in `ebib-read-entry-helm'.
@@ -2247,17 +2254,21 @@ in DATABASES."
                           coll)))
               databases nil))
 
-(defun ebib-helm-action-function (item)
-  "Return the key and database of ITEM as a cons cell."
-  (cons (nth 0 item) (nth 1 item)))
+(defun ebib-helm-action-function (_)
+  "Return a list of cons cells of the selected candidates and the databases that contain them."
+  (mapcar (lambda (item)
+            (cons (nth 0 item) (nth 1 item)))
+          (helm-marked-candidates)))
 
 (defun ebib-read-entry-helm (databases)
   "Read an entry from the user using helm.
 Offer the entries in DATABASES (a list of database structs) for
 completion.
 
-Return value is a cons of the key and the database containing the
-selected entry."
+It is possible to select multiple entries in the helm buffer.
+
+Return value is a list of cons cells of the selected keys and the
+databases containing them."
   (let ((sources (helm-build-sync-source "Select entry: "
                                          :candidates (ebib--create-collection-helm databases)
                                          :action '(("Select entry" . ebib-helm-action-function)))))
@@ -2278,19 +2289,43 @@ collection only consists of the entry keys."
                         coll))
               databases nil))
 
-(defun ebib-read-entry-default-method (databases)
+(defun ebib-read-entry-single (databases)
   "Read an entry from the user using default completion.
 Offer the entries in DATABASES (a list of database structs) for
 completion.
 
-Return value is a cons of the key and the database containing the
-selected entry."
+For compatibility with the other `ebib-read-entry-*' functions,
+the return value is a list with a single cons cell of the key and
+the database containing the selected entry."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
         (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
                (db (get-text-property 0 'ebib-db key)))
           (set-text-properties 0 (length key) nil key)
-          (cons key db))
+          (list (cons key db)))
+      (error "[Ebib] No BibTeX entries found"))))
+
+(defun ebib-read-entry-multiple (databases)
+  "Read a list of entries from the user using default completion.
+Offer the entries in DATABASES (a list of database structs) for
+completion.
+
+For compatibility with the other `ebib-read-entry-*' functions,
+the return value is a list of cons cells of the key and
+nil (i.e., ((\"key1\") (\"key2\")...)."
+  (let ((collection (ebib--create-collection-default-method databases)))
+    (if collection
+        (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+               (crm-separator "[ \t]+" )
+               (keys (completing-read-multiple "Keys to insert: " collection nil t nil 'ebib--key-history)))
+          ;; `completing-read-multiple' doesn't return the actual strings in
+          ;; `collection', rather it returns the strings entered by the
+          ;; user. This means we cannot access the text properties of the
+          ;; original strings, so we don't have the database. Instead, we just
+          ;; return `nil' as the cdr of the cons cells:
+          (mapcar (lambda (key)
+                    (cons key nil))
+                  keys))
       (error "[Ebib] No BibTeX entries found"))))
 
 (defun ebib-export-entries (prefix)
@@ -2770,6 +2805,11 @@ optional material both before and after %A.  If the user supplies
 an empty string for such an argument, the optional material
 surrounding it is not included in the citation command.
 
+If variable
+`ebib-citation-prompt-with-format-string`
+is set, the entire FORMAT-STRING will be displayed in the prompt
+for user to see.
+
 FORMAT-STRING may also contain a %D directive.  This is replaced
 with a description, for which the user is prompted, although a
 default value is provided, which the user can accept by hitting
@@ -2787,9 +2827,10 @@ data for entry KEY in DB."
                   (arg-prompt (if (string= arg-type "%D") "Description" "Argument"))
                   (default (when (and key db (string= arg-type "%D"))
                              (funcall ebib-citation-description-function key db)))
-                  (prompt (format "%s%s%s%s: "
+                  (prompt (format "%s%s%s%s%s: "
                                   arg-prompt
                                   (if (string= arg-prompt "Argument") (format " %s" n) "")
+                                  (if ebib-citation-prompt-with-format-string (concat " in «" format-string "»") "")
                                   (if key (concat " for " key) "")
                                   (if default (concat " (default: «" default "»)") "")))
                   (replacement (ebib--ifstring (argument (read-string prompt nil nil default))
@@ -2924,25 +2965,30 @@ completion."
                   (ebib-db-slave-p (car databases)))
          (setq slave-db (car databases))
          (setq databases (list (ebib-db-get-master (car databases)))))
-       (let* ((entry (cond
-                      ((featurep 'ivy) (ebib-read-entry-ivy databases))
-                      ((featurep 'helm) (ebib-read-entry-helm databases))
-                      (t (ebib-read-entry-default-method databases))))
-              (key (car entry))
-              (db (cdr entry))
-              (citation (ebib--create-citation major-mode (list key) db)))
+       (let* ((entries (cond
+                        ((featurep 'ivy) (ebib-read-entry-ivy databases))
+                        ((featurep 'helm) (ebib-read-entry-helm databases))
+                        (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
+                        (t (ebib-read-entry-single databases))))
+              (keys (mapcar #'car entries))
+              (db (cdar entries)) ; We only take the database of the first entry.
+              (citation (ebib--create-citation major-mode keys db)))
          (if citation
              (insert (format "%s" citation)))
-         (when (and key slave-db (not (ebib-db-has-key key slave-db)))
-           (ebib-db-add-entries-to-slave key slave-db)
-           (ebib--mark-index-dirty slave-db)
-           (if ebib-save-slave-after-citation
-               (condition-case err
-                   (ebib--save-database slave-db)
-                 ;; If an error occurs, make sure to mark the database as modified.
-                 (error (ebib-db-set-modified t slave-db)
-                        (signal (car err) (cdr err))))
-             (ebib-db-set-modified t slave-db))))))
+         (when slave-db
+           (dolist (key keys)
+             (unless (ebib-db-has-key key slave-db)
+               (ebib-db-add-entries-to-slave key slave-db)
+               (ebib-db-set-modified t slave-db)))
+           (when (ebib-db-modified-p slave-db)
+             (ebib--mark-index-dirty slave-db)
+             (if ebib-save-slave-after-citation
+                 (condition-case err
+                     (ebib--save-database slave-db)
+                   ;; If an error occurs, make sure to mark the database as modified.
+                   (error (ebib-db-set-modified t slave-db)
+                          (signal (car err) (cdr err))))
+               (ebib-db-set-modified t slave-db)))))))
     (default
       (error "[Ebib] No database opened"))))
 

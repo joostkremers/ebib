@@ -1,6 +1,6 @@
 ;;; ebib-notes.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2019 Joost Kremers
+;; Copyright (c) 2003-2020 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -338,7 +338,8 @@ is not accessible to the user."
         (error "[Ebib] Cannot read or create notes file"))
       (setq notes-buffer (find-file-noselect ebib-notes-file))
       (with-current-buffer notes-buffer
-        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t)))))
+        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t))
+      notes-buffer)))
 
 (provide 'ebib-notes)
 
