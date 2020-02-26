@@ -1238,13 +1238,13 @@ brackets and the `%A` directives in a `%<...%>` pair:
 Now, if you leave the arguments empty, Ebib produces the following
 citation:
 
-    \citet{Jones1992}
+    \textcite{Jones1992}
 
 Note however, that this format string is problematic. If you fill out
 the first argument but not the second, Ebib produces the wrong format
 string:
 
-    \citet[cf.]{Jones1992}
+    \textcite[cf.]{Jones1992}
 
 If only one optional argument is provided, `biblatex` assumes that it is
 a postnote, while what you intended is actually a prenote. Therefore, it
