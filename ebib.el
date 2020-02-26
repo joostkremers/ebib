@@ -2232,7 +2232,10 @@ databases containing them."
           (error "[Ebib] No entries found in database(s)")
         (ivy-read "Select entry: " collection
                   :action (lambda (item)
-                            (push (cons (get-text-property 0 'ebib-key item) (get-text-property 0 'ebib-db item)) entries))
+                            (let ((key (get-text-property 0 'ebib-key item))
+                                  (db (get-text-property 0 'ebib-db item)))
+                              (unless (cl-find key entries :key #'car)
+                                (push (cons key db) entries))))
                   :history 'ebib--citation-history
                   :sort t)
         (nreverse entries)))))
@@ -2979,7 +2982,15 @@ completion."
            (dolist (key keys)
              (unless (ebib-db-has-key key slave-db)
                (ebib-db-add-entries-to-slave key slave-db)
-               (ebib--mark-index-dirty slave-db)
+               (ebib-db-set-modified t slave-db)))
+           (when (ebib-db-modified-p slave-db)
+             (ebib--mark-index-dirty slave-db)
+             (if ebib-save-slave-after-citation
+                 (condition-case err
+                     (ebib--save-database slave-db)
+                   ;; If an error occurs, make sure to mark the database as modified.
+                   (error (ebib-db-set-modified t slave-db)
+                          (signal (car err) (cdr err))))
                (ebib-db-set-modified t slave-db)))))))
     (default
       (error "[Ebib] No database opened"))))
