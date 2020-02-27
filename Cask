@@ -5,4 +5,5 @@
 
 (development
   (depends-on "ert-runner")
+  (depends-on "with-simulated-input")
   (depends-on "parsebib"))

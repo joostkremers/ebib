@@ -6,53 +6,49 @@
 ;;; Code:
 
 (require 'ebib)
+(require 'with-simulated-input)
 
 ;; Test the citation template processing logic.
 (ert-deftest ebib-citation-with-empty-template-should-come-through ()
-  (should (equal (ebib--process-citation-template "" "key")
-                   "")))
+  (should (equal (ebib--process-citation-template "" "Abney1987")
+                 "")))
 
 (ert-deftest ebib-citation-with-no-directives-in-template-should-come-through ()
-  (should (equal (ebib--process-citation-template "nodirectiveshere" "key")
-                   "nodirectiveshere")))
+  (should (equal (ebib--process-citation-template "nodirectiveshere" "Abney1987")
+                 "nodirectiveshere")))
 
 (ert-deftest ebib-citation-with-key-directive-should-catch-the-key ()
-  (should (equal (ebib--process-citation-template "%K" "key")
-                   "key")))
+  (should (equal (ebib--process-citation-template "%K" "Abney1987")
+                 "Abney1987")))
 
 (ert-deftest ebib-citation-with-key-directive-and-surrounding-material-should-get-key-with-the-surrounded-material ()
-  (should (equal (ebib--process-citation-template "before%Kafter" "key")
-                   "beforekeyafter")))
+  (should (equal (ebib--process-citation-template "before %K after" "Abney1987")
+                 "before Abney1987 after")))
 
 (ert-deftest ebib-citation-with-argument-directive-should-prompt-the-user ()
-  (let ((unread-command-events (listify-key-sequence (kbd "lizard RET"))))
-    (should (equal (ebib--process-citation-template "%A" "key")
-                     "lizard"))))
+  (should (equal (with-simulated-input "cf. RET"
+                   (ebib--process-citation-template "%A" "Abney1987"))
+                 "cf.")))
 
 (ert-deftest ebib-citation-with-argument-directive-should-accept-spaces-in-args ()
-  (let ((unread-command-events (listify-key-sequence (kbd "lizard SPC snake RET"))))
-    (should (equal (ebib--process-citation-template "%A" "key")
-                     "lizard snake"))))
+  (should (equal (with-simulated-input "cf. SPC also RET"
+                   (ebib--process-citation-template "%A" "Abney1987"))
+                 "cf. also")))
 
 (ert-deftest ebib-citation-with-key-and-argument-directives-should-prompt-the-user ()
-  (let ((unread-command-events (listify-key-sequence (kbd "lizard RET"))))
-    (should (equal (ebib--process-citation-template "%k %A" "key")
-                     "key lizard"))))
+  (should (equal (with-simulated-input "p. SPC 20 RET"
+                   (ebib--process-citation-template "%K %A" "Abney1987"))
+                 "Abney1987 p. 20")))
 
 (ert-deftest ebib-citation-with-argument-and-key-directives-should-prompt-the-user ()
-  (let ((unread-command-events (listify-key-sequence (kbd "lizard RET"))))
-    (should (equal (ebib--process-citation-template "%A%k" "key")
-                     "lizardkey"))))
+  (should (equal (with-simulated-input "cf. RET"
+                   (ebib--process-citation-template "%A %K" "Abney1987"))
+                 "cf. Abney1987")))
 
 (ert-deftest ebib-citation-with-argument-and-key-and-argument-directives-should-prompt-the-user ()
-  (let ((unread-command-events (listify-key-sequence (kbd "lizard RET snake RET"))))
-    (should (equal (ebib--process-citation-template "%A%k%A" "key")
-                     "lizardkeysnake"))))
-
-(ert-deftest ebib-citation-with-a-key-and-arguments-should-accept-spaces-in-args ()
-  (let ((unread-command-events (listify-key-sequence (kbd "liz SPC ard RET sna SPC ke RET"))))
-    (should (equal(ebib--process-citation-template "%A%k%A" "key")
-                  "liz ardkeysna ke"))))
+  (should (equal (with-simulated-input "cf. RET p. SPC 20 RET"
+                   (ebib--process-citation-template "%A %K %A" "Abney1987"))
+                 "cf. Abney1987 p. 20")))
 
 
 ;; TODO: Add tests for
