@@ -2953,7 +2953,7 @@ This is a front-end for other citation insertion functions: if
 the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
 the `helm' package is loaded, it calls `ebib-read-entry-helm'.
 If `ebib-citation-insert-multiple' is non-nil, it calls
-`ebib-read-entry-multiple', which uses `completing-read-multip'.
+`ebib-read-entry-multiple', which uses `completing-read-multiple'.
 Otherwise, it calls `ebib-read-entry-single', which uses standard
 Emacs completion."
   (interactive)
