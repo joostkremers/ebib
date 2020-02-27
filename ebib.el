@@ -2950,11 +2950,12 @@ candidates and the entry that is selected is added to the slave
 database if not already there.
 
 This is a front-end for other citation insertion functions: if
-the `ivy' package is loaded, it calls `ebib-insert-citation-ivy',
-if the `helm' package is loaded, it calls
-`ebib-insert-citation-helm', otherwise it calls
-`ebib-insert-citation-default-method', which uses standard Emacs
-completion."
+the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
+the `helm' package is loaded, it calls `ebib-read-entry-helm'.
+If `ebib-citation-insert-multiple' is non-nil, it calls
+`ebib-read-entry-multiple', which uses `completing-read-multip'.
+Otherwise, it calls `ebib-read-entry-single', which uses standard
+Emacs completion."
   (interactive)
   (unless ebib--initialized
     (ebib-init))
