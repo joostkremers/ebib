@@ -1426,22 +1426,19 @@ File: ebib.info,  Node: Citations with multiple keys,  Next: Key Bindings,  Up: 
 9.1 Citations with multiple keys
 ================================
 
-Most citation commands in LaTeX can take multiple keys.  In the index
-buffer in Ebib, you can mark multiple the entries with ‘m’ and then
-insert them into a single citation command with ‘i’.  The same is
-possible from within a text buffer: if you use ivy or helm, the standard
-method that these packages provide for selecting and acting on multiple
-candidates can be used.  Emacs’ built-in completion method only allows
-selecting one candidate, so by default you cannot select multiple
-entries with it.
-
-Emacs does offer a simple way of selecting multiple candidates from a
-candidate list.  You can activate it in Ebib by setting the option
-‘ebib-citations-insert-multiple’.  With this option set,
-‘ebib-insert-citation’ allows you to select multiple keys: start typing
-a key, complete it with ‘TAB’, type ‘SPC’ and start typing the next key,
-again with the ability to complete it with ‘TAB’.  When you have entered
-all the keys you wish to select, press ‘RET’.
+Most citation commands in LaTeX can take multiple keys.  To add more
+than one key to a citation, you can mark them in Ebib’s index buffer
+with ‘m’ and then insert them into a text buffer with ‘i’.  If you use
+ivy or helm, the standard method that these packages provide for
+selecting and acting on multiple candidates can be used if you insert a
+citation from within your text buffer with ‘ebib-insert-citation’.  If
+you use Emacs’ built-in completion method, you can enable selection of
+multiple keys by setting the option ‘ebib-citations-insert-multiple’.
+With this option set, you can select multiple keys when calling
+‘ebib-insert-citation’ in the following way: start typing a key,
+complete it with ‘TAB’, type ‘SPC’ and start typing the next key, again
+with the ability to complete it with ‘TAB’.  When you have entered all
+the keys you wish to select, press ‘RET’.
 
 This method of multiple selection is somewhat cumbersome and it has the
 additional disadvantage that it is no longer possible to provide a
@@ -3044,66 +3041,66 @@ Node: Inserting Citations into a Text Buffer65728
 Ref: #inserting-citations-into-a-text-buffer65940
 Node: Citations with multiple keys68996
 Ref: #citations-with-multiple-keys69185
-Node: Key Bindings70466
-Ref: #key-bindings70658
-Node: Defining Citation Commands71416
-Ref: #defining-citation-commands71647
-Node: Associating a Database with a Text File77875
-Ref: #associating-a-database-with-a-text-file78111
-Node: Master and Slave Databases81070
-Ref: #master-and-slave-databases81268
-Node: Cross-referencing83152
-Ref: #cross-referencing83309
-Node: Marking Entries86836
-Ref: #marking-entries86984
-Node: Printing the Database87861
-Ref: #printing-the-database88021
-Node: Calling a Browser91490
-Ref: #calling-a-browser91654
-Node: Viewing and Importing Files94106
-Ref: #viewing-and-importing-files94280
-Node: Editing the file field98847
-Ref: #editing-the-file-field98996
-Node: Notes files100367
-Ref: #notes-files100515
-Node: Separate notes files101284
-Ref: #separate-notes-files101433
-Node: One single notes file103024
-Ref: #one-single-notes-file103217
-Node: Customising the notes file format105134
-Ref: #customising-the-notes-file-format105347
-Node: Displaying notes108942
-Ref: #displaying-notes109091
-Node: Managing a reading list110428
-Ref: #managing-a-reading-list110590
-Node: Window Management113605
-Ref: #window-management113764
-Node: Creating Entry Stubs116923
-Ref: #creating-entry-stubs117085
-Node: @Preamble Definition118083
-Ref: #preamble-definition118247
-Node: @String Definitions120219
-Ref: #string-definitions120370
-Node: @Comments123863
-Ref: #comments123991
-Node: Managing Keywords124356
-Ref: #managing-keywords124501
-Node: Sorting the bib File130569
-Ref: #sorting-the-.bib-file130742
-Node: Merging and Importing133861
-Ref: #merging-and-importing134026
-Node: Exporting Entries135796
-Ref: #exporting-entries135958
-Node: Multiple Identical Fields137474
-Ref: #multiple-identical-fields137653
-Node: Multiline Edit Buffers139581
-Ref: #multiline-edit-buffers139753
-Node: The Options Menu143630
-Ref: #the-options-menu143778
-Node: Customisation144396
-Ref: #customisation144507
-Node: Modifying Key Bindings145115
-Ref: #modifying-key-bindings145242
+Node: Key Bindings70382
+Ref: #key-bindings70574
+Node: Defining Citation Commands71332
+Ref: #defining-citation-commands71563
+Node: Associating a Database with a Text File77791
+Ref: #associating-a-database-with-a-text-file78027
+Node: Master and Slave Databases80986
+Ref: #master-and-slave-databases81184
+Node: Cross-referencing83068
+Ref: #cross-referencing83225
+Node: Marking Entries86752
+Ref: #marking-entries86900
+Node: Printing the Database87777
+Ref: #printing-the-database87937
+Node: Calling a Browser91406
+Ref: #calling-a-browser91570
+Node: Viewing and Importing Files94022
+Ref: #viewing-and-importing-files94196
+Node: Editing the file field98763
+Ref: #editing-the-file-field98912
+Node: Notes files100283
+Ref: #notes-files100431
+Node: Separate notes files101200
+Ref: #separate-notes-files101349
+Node: One single notes file102940
+Ref: #one-single-notes-file103133
+Node: Customising the notes file format105050
+Ref: #customising-the-notes-file-format105263
+Node: Displaying notes108858
+Ref: #displaying-notes109007
+Node: Managing a reading list110344
+Ref: #managing-a-reading-list110506
+Node: Window Management113521
+Ref: #window-management113680
+Node: Creating Entry Stubs116839
+Ref: #creating-entry-stubs117001
+Node: @Preamble Definition117999
+Ref: #preamble-definition118163
+Node: @String Definitions120135
+Ref: #string-definitions120286
+Node: @Comments123779
+Ref: #comments123907
+Node: Managing Keywords124272
+Ref: #managing-keywords124417
+Node: Sorting the bib File130485
+Ref: #sorting-the-.bib-file130658
+Node: Merging and Importing133777
+Ref: #merging-and-importing133942
+Node: Exporting Entries135712
+Ref: #exporting-entries135874
+Node: Multiple Identical Fields137390
+Ref: #multiple-identical-fields137569
+Node: Multiline Edit Buffers139497
+Ref: #multiline-edit-buffers139669
+Node: The Options Menu143546
+Ref: #the-options-menu143694
+Node: Customisation144312
+Ref: #customisation144423
+Node: Modifying Key Bindings145031
+Ref: #modifying-key-bindings145158
 
 End Tag Table
 

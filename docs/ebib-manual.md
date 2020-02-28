@@ -1122,22 +1122,19 @@ citation at the current cursor position in the buffer you’ve supplied.
 
 ## Citations with multiple keys
 
-Most citation commands in LaTeX can take multiple keys. In the index
-buffer in Ebib, you can mark multiple the entries with `m` and then
-insert them into a single citation command with `i`. The same is
-possible from within a text buffer: if you use ivy or helm, the standard
-method that these packages provide for selecting and acting on multiple
-candidates can be used. Emacs’ built-in completion method only allows
-selecting one candidate, so by default you cannot select multiple
-entries with it.
-
-Emacs does offer a simple way of selecting multiple candidates from a
-candidate list. You can activate it in Ebib by setting the option
-`ebib-citations-insert-multiple`. With this option set,
-`ebib-insert-citation` allows you to select multiple keys: start typing
-a key, complete it with `TAB`, type `SPC` and start typing the next key,
-again with the ability to complete it with `TAB`. When you have entered
-all the keys you wish to select, press `RET`.
+Most citation commands in LaTeX can take multiple keys. To add more than
+one key to a citation, you can mark them in Ebib’s index buffer with `m`
+and then insert them into a text buffer with `i`. If you use ivy or
+helm, the standard method that these packages provide for selecting and
+acting on multiple candidates can be used if you insert a citation from
+within your text buffer with `ebib-insert-citation`. If you use Emacs’
+built-in completion method, you can enable selection of multiple keys by
+setting the option `ebib-citations-insert-multiple`. With this option
+set, you can select multiple keys when calling `ebib-insert-citation` in
+the following way: start typing a key, complete it with `TAB`, type
+`SPC` and start typing the next key, again with the ability to complete
+it with `TAB`. When you have entered all the keys you wish to select,
+press `RET`.
 
 This method of multiple selection is somewhat cumbersome and it has the
 additional disadvantage that it is no longer possible to provide a
