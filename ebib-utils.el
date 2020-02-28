@@ -430,15 +430,6 @@ description for citations in Org buffers."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-citation-prompt-with-format-string nil
-  "Display the format string template when prompting for arguments.
-If the format string template includes arguments to prompt from
-the user, ie. contains %A, then show the full format string
-template to the user so that they can see how the arguments will
-be used."
-  :group 'ebib
-  :type 'boolean)
-
 (defcustom ebib-citation-description-function 'ebib-author-year-description
   "Function for creating a description to be used in citations.
 This function is called to provide a description to substitute

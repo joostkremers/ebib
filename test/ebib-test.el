@@ -8,7 +8,52 @@
 (require 'ebib)
 (require 'with-simulated-input)
 
-;; Test the citation template processing logic.
+;; Test `ebib--split-citation-string'
+(ert-deftest ebib--split-citation-without-repeater ()
+  (should (equal (ebib--split-citation-string "\\textcite%<[%A]%>%<[%A]%>{%K}")
+                 '("\\textcite%<[%A]%>%<[%A]%>{"
+                   "%K"
+                   nil
+                   "}"))))
+
+(ert-deftest ebib--split-citation-with-repeater ()
+  (should (equal (ebib--split-citation-string "\\textcite[%A][%A]{%(%K%,)}")
+                 '("\\textcite[%A][%A]{"
+                   "%K"
+                   ","
+                   "}"))))
+
+(ert-deftest ebib--split-citation-with-repeater-with-arguments ()
+  (should (equal (ebib--split-citation-string  "\\footcites%<(%A)%>(%A)%(%<[%A]%>[%A]{%K}%)")
+                 '("\\footcites%<(%A)%>(%A)"
+                   "%<[%A]%>[%A]{%K}"
+                   ""
+                   ""))))
+
+;; Test `ebib--create-citation'
+(ert-deftest ebib--create-citation-with-repeater ()
+  (should (equal (with-simulated-input "cite RET cf. RET RET"
+                   (ebib--create-citation 'latex-mode '("Chomsky1965" "Abney1987")))
+                 "\\cite[cf.][]{Chomsky1965,Abney1987}")))
+
+(ert-deftest ebib--create-citation-with-repeater-with-empty-arguments ()
+  (should (equal (with-simulated-input "foots RET RET RET RET RET cf. RET a.o. RET"
+                   (ebib--create-citation 'latex-mode '("Chomsky1965" "Abney1987")))
+                 "\\footcites(cf.)(a.o.)[]{Chomsky1965}[]{Abney1987}")))
+
+(ert-deftest ebib--create-citation-with-repeater-with-arguments ()
+  (should (equal (with-simulated-input "foots RET RET p. SPC 40 RET RET RET cf. RET a.o. RET"
+                   (ebib--create-citation 'latex-mode '("Chomsky1965" "Abney1987")))
+                 "\\footcites(cf.)(a.o.)[p. 40]{Chomsky1965}[]{Abney1987}")))
+
+(ert-deftest ebib--create-citation-org-mode ()
+  (should (equal (with-simulated-input "ebib RET RET"
+                   (let ((ebib-citation-description-function (lambda (_ _)
+                                                               "Abney (1987)")))
+                     (ebib--create-citation 'org-mode '("Abney1987") t)))
+                 "[[ebib:Abney1987][Abney (1987)]]")))
+
+;; Test `ebib--process-citation'.
 (ert-deftest ebib-citation-with-empty-template-should-come-through ()
   (should (equal (ebib--process-citation-template "" "Abney1987")
                  "")))

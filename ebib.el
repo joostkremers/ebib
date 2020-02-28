@@ -2793,7 +2793,13 @@ is used)."
   (interactive)
   (ebib--pop-to-buffer (ebib--buffer 'log)))
 
-(defun ebib--process-citation-template (format-string &optional key db)
+(defun ebib--colorize-substring (str beg end)
+  "Return a copy of STR with `ebib-warning-face' added from BEG to END."
+  (let ((new-str (copy-sequence str)))
+    (add-text-properties beg end '(face ebib-warning-face) new-str)
+    new-str))
+
+(defun ebib--process-citation-template (format-string &optional key db prompt)
   "Create a citation command using FORMAT-STRING.
 If FORMAT-STRING contains a %K directive, it is replaced with
 KEY.  DB is the database that contains KEY.  Return value is the
@@ -2808,10 +2814,10 @@ optional material both before and after %A.  If the user supplies
 an empty string for such an argument, the optional material
 surrounding it is not included in the citation command.
 
-If variable
-`ebib-citation-prompt-with-format-string`
-is set, the entire FORMAT-STRING will be displayed in the prompt
-for user to see.
+When prompting for an argument, FORMAT-STRING is included in the
+prompt.  PROMPT, if non-nil, is a plist with a `:before' and
+`:after' string (possibly nil), which are included in the prompt
+before and after FORMAT-STRING.
 
 FORMAT-STRING may also contain a %D directive.  This is replaced
 with a description, for which the user is prompted, although a
@@ -2827,14 +2833,19 @@ data for entry KEY in DB."
            do
            (let* ((data (match-data))
                   (arg-type (match-string 0 format-string))
+                  (beg (match-beginning 0))
+                  (end (match-end 0))
                   (arg-prompt (if (string= arg-type "%D") "Description" "Argument"))
                   (default (when (and key db (string= arg-type "%D"))
-                             (funcall ebib-citation-description-function key db)))
-                  (prompt (format "%s%s%s%s%s: "
+                             (funcall ebib-citation-description-function key db))) ; This may destroy the match data.
+                  (prompt (format "%s%s%s%s: "
                                   arg-prompt
                                   (if (string= arg-prompt "Argument") (format " %s" n) "")
-                                  (if ebib-citation-prompt-with-format-string (concat " in «" format-string "»") "")
-                                  (if key (concat " for " key) "")
+                                  (concat " in «"
+                                          (plist-get prompt :before)
+                                          (ebib--colorize-substring format-string beg end)
+                                          (plist-get prompt :after)
+                                          "»")
                                   (if default (concat " (default: «" default "»)") "")))
                   (replacement (ebib--ifstring (argument (read-string prompt nil nil default))
                                    (concat "\\1" argument "\\2")
@@ -2891,12 +2902,13 @@ for which the user is prompted."
         (cl-multiple-value-bind (before repeater separator after) (ebib--split-citation-string template)
           (when (and (not separator) (> (length keys) 1))
             (setq separator (read-string "Separator: ")))
-          (concat (ebib--process-citation-template before (car keys) db) ; We pass a key and DB in case BEFORE contains %D.
-                  (mapconcat (lambda (key) ; Deal with the entries one by one.
-                               (ebib--process-citation-template repeater key db))
-                             keys
-                             separator)
-                  (ebib--process-citation-template after (car keys) db)))
+          (let* ((formatted-keys (mapconcat (lambda (key)
+                                              (ebib--process-citation-template repeater key db))
+                                            keys
+                                            separator))
+                 (formatted-before (ebib--process-citation-template before (car keys) db `(:after ,(concat formatted-keys after))))
+                 (formatted-after (ebib--process-citation-template after (car keys) db `(:before ,(concat formatted-before formatted-keys)))))
+            (concat formatted-before formatted-keys formatted-after)))
       ;; If the user doesn't provide a command, we just insert the entry key or keys:
       (string-join keys (if (> (length keys) 1) (read-string "Separator: "))))))
 
