@@ -61,6 +61,7 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
+* Version 222 February 2020::
 * Version 221 December 2019::
 * Version 220 December 2019::
 * Version 219 November 2019::
@@ -75,9 +76,21 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 * Version 21112 July 2018::
 
 
-File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2019,  Up: News
+File: ebib.info,  Node: Version 222 February 2020,  Next: Version 221 December 2019,  Up: News
 
-1.1 Version 2.21, December 2019
+1.1 Version 2.22, February 2020
+===============================
+
+   • Improve prompting when inserting citations.
+   • Allow selecting multiple entries when inserting a citation in a
+     text buffer.
+   • Automatically save a slave database when an entry is added that is
+     being inserted into a text buffer.
+
+
+File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2019,  Prev: Version 222 February 2020,  Up: News
+
+1.2 Version 2.21, December 2019
 ===============================
 
    • New option ‘ebib-default-dir’: control the directory that Ebib uses
@@ -86,7 +99,7 @@ File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2
 
 File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2019,  Prev: Version 221 December 2019,  Up: News
 
-1.2 Version 2.20, December 2019
+1.3 Version 2.20, December 2019
 ===============================
 
    • Display the contents of an external note when the current entry has
@@ -97,7 +110,7 @@ File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2
 
 File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,  Prev: Version 220 December 2019,  Up: News
 
-1.3 Version 2.19, November 2019
+1.4 Version 2.19, November 2019
 ===============================
 
    • Add command ‘ebib-jump-to-entry’ (bound to ‘j’ in the index
@@ -110,7 +123,7 @@ File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,
 
 File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,  Prev: Version 219 November 2019,  Up: News
 
-1.4 Version 2.17, June 2019
+1.5 Version 2.17, June 2019
 ===========================
 
    • Create slave databases, i.e., databases that share their data with
@@ -121,7 +134,7 @@ File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,
 
 File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 2019,  Prev: Version 217 June 2019,  Up: News
 
-1.5 Version 2.16, February 2019
+1.6 Version 2.16, February 2019
 ===============================
 
    • Add command ‘ebib-download-url’: download pdf from a site in the
@@ -138,7 +151,7 @@ File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 20
 
 File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 2018,  Prev: Version 216 February 2019,  Up: News
 
-1.6 Version 2.15, January 2019
+1.7 Version 2.15, January 2019
 ==============================
 
    • Multiline field values can now be displayed in the entry buffer.
@@ -153,7 +166,7 @@ File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 20
 
 File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2018,  Prev: Version 215 January 2019,  Up: News
 
-1.7 Version 2.14, December 2018
+1.8 Version 2.14, December 2018
 ===============================
 
    • Change the user interface of the export functions.  Calling one of
@@ -167,7 +180,7 @@ File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2
 
 File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 2018,  Prev: Version 214 December 2018,  Up: News
 
-1.8 Version 2.13, November 2018
+1.9 Version 2.13, November 2018
 ===============================
 
    • Use a separate index buffer for each open ‘.bib’ file.  Filling the
@@ -177,15 +190,15 @@ File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 
 
 File: ebib.info,  Node: Version 2123 November 2018,  Next: Version 2122 November 2018,  Prev: Version 213 November 2018,  Up: News
 
-1.9 Version 2.12.3, November 2018
-=================================
+1.10 Version 2.12.3, November 2018
+==================================
 
    • Bug fix: when searching the database, only search visible entries.
 
 
 File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 2018,  Prev: Version 2123 November 2018,  Up: News
 
-1.10 Version 2.12.2, November 2018
+1.11 Version 2.12.2, November 2018
 ==================================
 
    • Bug fix: when editing the ‘crossref’ field, offer keys from all
@@ -194,7 +207,7 @@ File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 20
 
 File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,  Prev: Version 2122 November 2018,  Up: News
 
-1.11 Version 2.12, August 2018
+1.12 Version 2.12, August 2018
 ==============================
 
    • Add an option to specify the default sort field and direction.  It
@@ -205,7 +218,7 @@ File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,
 
 File: ebib.info,  Node: Version 21112 July 2018,  Prev: Version 212 August 2018,  Up: News
 
-1.12 Version 2.11.12, July 2018
+1.13 Version 2.11.12, July 2018
 ===============================
 
    • Use ‘biblatex’’s ‘Date’ field, if present, for displaying the year.
@@ -1526,11 +1539,9 @@ contain ‘%A’ directives:
 
 With such a format string, Ebib asks the user to provide text for the
 two arguments and inserts it at the locations specified by the
-directives.  If ‘ebib-citation-prompt-with-format-string’ is set, the
-format string is included in the prompt.  Of course, it is possible to
-leave the arguments empty (by just hitting ‘RET’).  With the format
-string above, this would yield the following citation in the LaTeX
-buffer:
+directives.  Of course, it is possible to leave the arguments empty (by
+just hitting ‘RET’).  With the format string above, this would yield the
+following citation in the LaTeX buffer:
 
 \textcite[][]{Jones1992}
 
@@ -1611,11 +1622,6 @@ the part that is not repeated may contain ‘%A’ directives as well:
 Multicite commands in ‘biblatex’ take two additional arguments
 surrounded with parentheses.  These are pre- and postnotes for the
 entire sequence of citations.  They can be accommodated as shown.
-
-If ‘ebib-citation-prompt-with-format-string’ is set the format string is
-displayed when prompting the user for arguments for a citation (with the
-‘%A’ directive), so that they can see what the argument will be used
-for.
 
 Lastly, a citation command can also contain a ‘%D’ directive.  This is
 mainly for use in Org citations, which take the form
@@ -2949,158 +2955,160 @@ Tag Table:
 Node: Top186
 Node: News1378
 Ref: #news1468
-Node: Version 221 December 20191831
-Ref: #version-2.21-december-20191994
-Node: Version 220 December 20192105
-Ref: #version-2.20-december-20192302
-Node: Version 219 November 20192551
-Ref: #version-2.19-november-20192744
-Node: Version 217 June 20193127
-Ref: #version-2.17-june-20193312
-Node: Version 216 February 20193586
-Ref: #version-2.16-february-20193778
-Node: Version 215 January 20194285
-Ref: #version-2.15-january-20194479
-Node: Version 214 December 20184949
-Ref: #version-2.14-december-20185145
-Node: Version 213 November 20185587
-Ref: #version-2.13-november-20185785
-Node: Version 2123 November 20185984
-Ref: #version-2.12.3-november-20186187
-Node: Version 2122 November 20186262
-Ref: #version-2.12.2-november-20186465
-Node: Version 212 August 20186605
-Ref: #version-2.12-august-20186797
-Node: Version 21112 July 20187077
-Ref: #version-2.11.12-july-20187236
-Node: Installation7675
-Ref: #installation7793
-Node: Package manager7887
-Ref: #package-manager8016
-Node: Debian and Ubuntu8368
-Ref: #debian-and-ubuntu8529
-Node: Manual installation8663
-Ref: #manual-installation8826
-Node: Starting Ebib9106
-Ref: #starting-ebib9231
-Node: Getting Started10116
-Ref: #getting-started10256
-Node: Opening a bib File12249
-Ref: #opening-a-.bib-file12403
-Node: Preloading bib Files14246
-Ref: #preloading-.bib-files14434
-Node: Navigating a bib File15190
-Ref: #navigating-a-.bib-file15385
-Node: Starting a New bib File19892
-Ref: #starting-a-new-.bib-file20062
-Node: Editing the Database20354
-Ref: #editing-the-database20509
-Node: Adding and Deleting Entries20887
-Ref: #adding-and-deleting-entries21064
-Node: Editing Fields Values23275
-Ref: #editing-fields-values23473
-Node: Editing Multiline Values26380
-Ref: #editing-multiline-values26573
-Node: Undefined Fields28770
-Ref: #undefined-fields28939
-Node: Hidden Fields29828
-Ref: #hidden-fields29977
-Node: Timestamps31047
-Ref: #timestamps31209
-Node: Copy Cut Kill Paste Yank and Delete33260
-Ref: #copy-cut-kill-paste-yank-and-delete33464
-Node: Saving a Database34410
-Ref: #saving-a-database34562
-Node: Biblatex vs BibTeX36210
-Ref: #biblatex-vs.-bibtex36370
-Node: Setting the BibTeX Dialect37167
-Ref: #setting-the-bibtex-dialect37340
-Node: Alias Types and Fields39383
-Ref: #alias-types-and-fields39548
-Node: The Entries List41593
-Ref: #the-entries-list41731
-Node: Searching45472
-Ref: #searching45616
-Node: Simple Searches46119
-Ref: #simple-searches46235
-Node: Filters49440
-Ref: #filters49540
-Node: Simple Selection50615
-Ref: #simple-selection50744
-Node: Complex Filters52453
-Ref: #complex-filters52615
-Node: Storing and Saving Filters56690
-Ref: #storing-and-saving-filters56873
-Node: Special Filters59728
-Ref: #special-filters59909
-Node: An Example Listing Recent Additions61277
-Ref: #an-example-listing-recent-additions61506
-Node: Properties of Filtered Databases63876
-Ref: #properties-of-filtered-databases64073
-Node: Inserting Citations into a Text Buffer65728
-Ref: #inserting-citations-into-a-text-buffer65940
-Node: Citations with multiple keys68996
-Ref: #citations-with-multiple-keys69185
-Node: Key Bindings70382
-Ref: #key-bindings70574
-Node: Defining Citation Commands71332
-Ref: #defining-citation-commands71563
-Node: Associating a Database with a Text File77791
-Ref: #associating-a-database-with-a-text-file78027
-Node: Master and Slave Databases80986
-Ref: #master-and-slave-databases81184
-Node: Cross-referencing83068
-Ref: #cross-referencing83225
-Node: Marking Entries86752
-Ref: #marking-entries86900
-Node: Printing the Database87777
-Ref: #printing-the-database87937
-Node: Calling a Browser91406
-Ref: #calling-a-browser91570
-Node: Viewing and Importing Files94022
-Ref: #viewing-and-importing-files94196
-Node: Editing the file field98763
-Ref: #editing-the-file-field98912
-Node: Notes files100283
-Ref: #notes-files100431
-Node: Separate notes files101200
-Ref: #separate-notes-files101349
-Node: One single notes file102940
-Ref: #one-single-notes-file103133
-Node: Customising the notes file format105050
-Ref: #customising-the-notes-file-format105263
-Node: Displaying notes108858
-Ref: #displaying-notes109007
-Node: Managing a reading list110344
-Ref: #managing-a-reading-list110506
-Node: Window Management113521
-Ref: #window-management113680
-Node: Creating Entry Stubs116839
-Ref: #creating-entry-stubs117001
-Node: @Preamble Definition117999
-Ref: #preamble-definition118163
-Node: @String Definitions120135
-Ref: #string-definitions120286
-Node: @Comments123779
-Ref: #comments123907
-Node: Managing Keywords124272
-Ref: #managing-keywords124417
-Node: Sorting the bib File130485
-Ref: #sorting-the-.bib-file130658
-Node: Merging and Importing133777
-Ref: #merging-and-importing133942
-Node: Exporting Entries135712
-Ref: #exporting-entries135874
-Node: Multiple Identical Fields137390
-Ref: #multiple-identical-fields137569
-Node: Multiline Edit Buffers139497
-Ref: #multiline-edit-buffers139669
-Node: The Options Menu143546
-Ref: #the-options-menu143694
-Node: Customisation144312
-Ref: #customisation144423
-Node: Modifying Key Bindings145031
-Ref: #modifying-key-bindings145158
+Node: Version 222 February 20201861
+Ref: #version-2.22-february-20202024
+Node: Version 221 December 20192279
+Ref: #version-2.21-december-20192476
+Node: Version 220 December 20192587
+Ref: #version-2.20-december-20192784
+Node: Version 219 November 20193033
+Ref: #version-2.19-november-20193226
+Node: Version 217 June 20193609
+Ref: #version-2.17-june-20193794
+Node: Version 216 February 20194068
+Ref: #version-2.16-february-20194260
+Node: Version 215 January 20194767
+Ref: #version-2.15-january-20194961
+Node: Version 214 December 20185431
+Ref: #version-2.14-december-20185627
+Node: Version 213 November 20186069
+Ref: #version-2.13-november-20186267
+Node: Version 2123 November 20186466
+Ref: #version-2.12.3-november-20186671
+Node: Version 2122 November 20186746
+Ref: #version-2.12.2-november-20186949
+Node: Version 212 August 20187089
+Ref: #version-2.12-august-20187281
+Node: Version 21112 July 20187561
+Ref: #version-2.11.12-july-20187720
+Node: Installation8159
+Ref: #installation8277
+Node: Package manager8371
+Ref: #package-manager8500
+Node: Debian and Ubuntu8852
+Ref: #debian-and-ubuntu9013
+Node: Manual installation9147
+Ref: #manual-installation9310
+Node: Starting Ebib9590
+Ref: #starting-ebib9715
+Node: Getting Started10600
+Ref: #getting-started10740
+Node: Opening a bib File12733
+Ref: #opening-a-.bib-file12887
+Node: Preloading bib Files14730
+Ref: #preloading-.bib-files14918
+Node: Navigating a bib File15674
+Ref: #navigating-a-.bib-file15869
+Node: Starting a New bib File20376
+Ref: #starting-a-new-.bib-file20546
+Node: Editing the Database20838
+Ref: #editing-the-database20993
+Node: Adding and Deleting Entries21371
+Ref: #adding-and-deleting-entries21548
+Node: Editing Fields Values23759
+Ref: #editing-fields-values23957
+Node: Editing Multiline Values26864
+Ref: #editing-multiline-values27057
+Node: Undefined Fields29254
+Ref: #undefined-fields29423
+Node: Hidden Fields30312
+Ref: #hidden-fields30461
+Node: Timestamps31531
+Ref: #timestamps31693
+Node: Copy Cut Kill Paste Yank and Delete33744
+Ref: #copy-cut-kill-paste-yank-and-delete33948
+Node: Saving a Database34894
+Ref: #saving-a-database35046
+Node: Biblatex vs BibTeX36694
+Ref: #biblatex-vs.-bibtex36854
+Node: Setting the BibTeX Dialect37651
+Ref: #setting-the-bibtex-dialect37824
+Node: Alias Types and Fields39867
+Ref: #alias-types-and-fields40032
+Node: The Entries List42077
+Ref: #the-entries-list42215
+Node: Searching45956
+Ref: #searching46100
+Node: Simple Searches46603
+Ref: #simple-searches46719
+Node: Filters49924
+Ref: #filters50024
+Node: Simple Selection51099
+Ref: #simple-selection51228
+Node: Complex Filters52937
+Ref: #complex-filters53099
+Node: Storing and Saving Filters57174
+Ref: #storing-and-saving-filters57357
+Node: Special Filters60212
+Ref: #special-filters60393
+Node: An Example Listing Recent Additions61761
+Ref: #an-example-listing-recent-additions61990
+Node: Properties of Filtered Databases64360
+Ref: #properties-of-filtered-databases64557
+Node: Inserting Citations into a Text Buffer66212
+Ref: #inserting-citations-into-a-text-buffer66424
+Node: Citations with multiple keys69480
+Ref: #citations-with-multiple-keys69669
+Node: Key Bindings70866
+Ref: #key-bindings71058
+Node: Defining Citation Commands71816
+Ref: #defining-citation-commands72047
+Node: Associating a Database with a Text File77943
+Ref: #associating-a-database-with-a-text-file78179
+Node: Master and Slave Databases81138
+Ref: #master-and-slave-databases81336
+Node: Cross-referencing83220
+Ref: #cross-referencing83377
+Node: Marking Entries86904
+Ref: #marking-entries87052
+Node: Printing the Database87929
+Ref: #printing-the-database88089
+Node: Calling a Browser91558
+Ref: #calling-a-browser91722
+Node: Viewing and Importing Files94174
+Ref: #viewing-and-importing-files94348
+Node: Editing the file field98915
+Ref: #editing-the-file-field99064
+Node: Notes files100435
+Ref: #notes-files100583
+Node: Separate notes files101352
+Ref: #separate-notes-files101501
+Node: One single notes file103092
+Ref: #one-single-notes-file103285
+Node: Customising the notes file format105202
+Ref: #customising-the-notes-file-format105415
+Node: Displaying notes109010
+Ref: #displaying-notes109159
+Node: Managing a reading list110496
+Ref: #managing-a-reading-list110658
+Node: Window Management113673
+Ref: #window-management113832
+Node: Creating Entry Stubs116991
+Ref: #creating-entry-stubs117153
+Node: @Preamble Definition118151
+Ref: #preamble-definition118315
+Node: @String Definitions120287
+Ref: #string-definitions120438
+Node: @Comments123931
+Ref: #comments124059
+Node: Managing Keywords124424
+Ref: #managing-keywords124569
+Node: Sorting the bib File130637
+Ref: #sorting-the-.bib-file130810
+Node: Merging and Importing133929
+Ref: #merging-and-importing134094
+Node: Exporting Entries135864
+Ref: #exporting-entries136026
+Node: Multiple Identical Fields137542
+Ref: #multiple-identical-fields137721
+Node: Multiline Edit Buffers139649
+Ref: #multiline-edit-buffers139821
+Node: The Options Menu143698
+Ref: #the-options-menu143846
+Node: Customisation144464
+Ref: #customisation144575
+Node: Modifying Key Bindings145183
+Ref: #modifying-key-bindings145310
 
 End Tag Table
 
