@@ -4346,7 +4346,7 @@ inserted as initial text."
   (message "Text stored."))
 
 (defun ebib-cancel-multiline-buffer ()
-  "Quit the multiline edit buffer and discard the changes.
+  "Quit the multiline edit buffer without saving.
 If the buffer has been modified, ask for confirmation."
   (interactive)
   (catch 'no-cancel
