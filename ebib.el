@@ -8,6 +8,7 @@
 ;; Created: 2003
 ;; Version: 2.22
 ;; Keywords: text bibtex
+;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
 
 ;; Redistribution and use in source and binary forms, with or without
