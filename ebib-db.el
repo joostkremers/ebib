@@ -36,6 +36,7 @@
 
 ;;; Code:
 
+(require 'seq)
 (require 'subr-x) ; hash-table-keys
 
 ;; Each database is represented by an alist.

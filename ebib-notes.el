@@ -43,6 +43,8 @@
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 
+(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-file)
+
 (defcustom ebib-notes-file nil
   "Name of the notes file.
 To use a single file for all notes, set this variable to the full
@@ -52,7 +54,7 @@ one file per note, provided `ebib-notes-directory' is set."
   :type '(choice (const :tag "Use multiple notes files" nil)
                  (file :tag "Notes File")))
 
-(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-file)
+(define-obsolete-variable-alias 'ebib-notes-file-symbol 'ebib-notes-symbol)
 
 (defcustom ebib-notes-symbol "N"
   "Symbol used to indicate the presence of a note for the current entry.
@@ -61,8 +63,6 @@ displayed in the mode line of the entry buffer after the entry
 key."
   :group 'ebib-notes
   :type '(string :tag "Note file symbol"))
-
-(define-obsolete-variable-alias 'ebib-notes-file-symbol 'ebib-notes-symbol)
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
@@ -317,7 +317,7 @@ name is fully qualified by prepending the directory in
 Return the buffer but do not select it."
   (let ((buf (find-file-noselect file)))
     (with-current-buffer buf
-      (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t))
+      (add-hook 'after-save-hook 'ebib--update-entry-buffer nil t))
     buf))
 
 ;;; Common notes file.
@@ -338,7 +338,7 @@ is not accessible to the user."
         (error "[Ebib] Cannot read or create notes file"))
       (setq notes-buffer (find-file-noselect ebib-notes-file))
       (with-current-buffer notes-buffer
-        (add-hook 'after-save-hook #'ebib--update-entry-buffer nil t))
+        (add-hook 'after-save-hook 'ebib--update-entry-buffer nil t))
       notes-buffer)))
 
 (provide 'ebib-notes)

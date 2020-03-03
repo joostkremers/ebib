@@ -323,7 +323,7 @@ transformation function returns something that can be displayed."
   "Create unique keys.
 When adding new entries to the database, Ebib does not allow
 duplicate keys.  By setting this option, you can tell Ebib to
-automatically create a unique key by adding `b', `c', etc. to it.
+automatically create a unique key by adding `b', `c'... to it.
 This applies when Ebib automatically generates keys for new
 entries (see `ebib-autogenerate-keys'), when merging `.bib'
 files, and when changing a key."
@@ -497,8 +497,8 @@ modifications are made."
 (defun ebib-multiline-display-paragraph (string)
   "Reduce the multiline text STRING.
 The text is filled to account for the possibility that the
-original text is meant to be used with `visual-line-mode'.
-Return a list of strings, each a single line."
+original text is unfilled.  Return value is a list of strings,
+each a single line."
   (split-string (with-temp-buffer
                   (insert string)
                   (goto-char (point-min))
@@ -836,7 +836,7 @@ offered as the default directory."
 Lists file extensions together with external programs to handle
 files with those extensions.  If the program string contains a
 literal `%s', it is replaced with the name of the file being
-opened, allowing the use of command-line options.  Otherwise, the
+opened, allowing the use of command line options.  Otherwise, the
 string is treated as an executable, searched for in `exec-path'.
 
 When you open a file for which no external program is defined,
@@ -1485,7 +1485,7 @@ ignored."
   (car (split-string string "\n")))
 
 (defun ebib--match-all-in-string (match-str string)
-  "Highlight all the matches of MATCH-STR in STRING.
+  "Highlight all the occurrences of MATCH-STR in STRING.
 The return value is a list of two elements: the first is the
 modified string, the second either t or nil, indicating whether a
 match was found at all."
