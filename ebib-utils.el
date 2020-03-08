@@ -1666,9 +1666,9 @@ string has the text property `ebib--alias' with value t."
       (when unbraced
         (setq value (ebib-unbrace value)))
       (when alias
-        (add-text-properties 0 1 '(ebib--alias t) value))
+        (add-text-properties 0 (length value) '(ebib--alias t) value))
       (when xref
-        (add-text-properties 0 1 `(ebib--xref ,xref-key) value)))
+        (add-text-properties 0 (length value) `(ebib--xref ,xref-key) value)))
     (when (and (not value)
                (stringp noerror))
       (setq value noerror))
