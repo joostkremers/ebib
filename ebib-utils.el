@@ -1000,8 +1000,13 @@ file.  If this option is set, the database is automatically saved."
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
+(defface ebib-highlight-extend-face `((t (:inherit highlight
+                                                   ,@(and (>= emacs-major-version 27) '(:extend t)))))
+  "Face used for highlighting lines."
+  :group 'ebib-faces)
+
 (defface ebib-highlight-face '((t (:inherit highlight)))
-  "Face used for the highlights."
+  "Face used for highlighting things."
   :group 'ebib-faces)
 
 (defface ebib-crossref-face '((t (:inherit font-lock-comment-face)))
