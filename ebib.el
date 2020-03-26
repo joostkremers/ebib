@@ -992,7 +992,7 @@ there for details."
   (setq truncate-lines t)
   (ebib-set-default-dir)
   (setq ebib--dirty-index-buffer nil)
-  (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
+  (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
 (easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
@@ -3412,7 +3412,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
       (setq mode-line-format ebib-entry-mode-line))
   (setq truncate-lines t)
   (ebib-set-default-dir)
-  (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
+  (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
 (easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
@@ -4041,7 +4041,7 @@ The deleted text is not put in the kill ring."
       (setq cursor-type nil))
   (setq truncate-lines t)
   (ebib-set-default-dir)
-  (set (make-local-variable 'hl-line-face) 'ebib-highlight-face)
+  (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
 (easy-menu-define ebib-strings-menu ebib-strings-mode-map "Ebib strings menu"
