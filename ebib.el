@@ -3461,7 +3461,7 @@ If the key of the current entry matches the pattern
   (cond
    ((and ebib-popup-entry-window
          (eq ebib-layout 'index-only))
-    (delete-window))
+    (quit-window))
    ((eq ebib-layout 'index-only)
     (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index))
@@ -4063,7 +4063,7 @@ The deleted text is not put in the kill ring."
   (interactive)
   (if (eq ebib-layout 'index-only)
       (if ebib-popup-entry-window
-          (delete-window)
+          (quit-window)
         (with-ebib-window-nondedicated (selected-window)
           (switch-to-buffer nil t)))
     (with-ebib-window-nondedicated (selected-window)
@@ -4366,7 +4366,7 @@ Also return focus to the index or entry buffer."
     ;; Put the buffer out of sight.
     (if (and (eq ebib-layout 'index-only)
              ebib-popup-entry-window)
-        (delete-window)
+        (quit-window)
       (switch-to-buffer nil t))
     ;; Return to the index or entry window.
     (cond
@@ -4441,7 +4441,7 @@ The text being edited is stored before saving the database."
   (interactive)
   (if (and (eq ebib-layout 'index-only)
            ebib-popup-entry-window)
-      (delete-window)
+      (quit-window)
     (with-ebib-window-nondedicated (selected-window)
       (switch-to-buffer nil t)))
   (ebib--pop-to-buffer (ebib--buffer 'index)))
