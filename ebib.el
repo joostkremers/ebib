@@ -3730,11 +3730,12 @@ and editors in all databases."
         (setq init-contents (ebib-unbrace init-contents)))
       (ebib--ifstring (new-contents (cond
                                      ((member-ignore-case cur-field '("journal" "journaltitle" "publisher" "organization"))
-                                      (completing-read (format "%s: " cur-field)
-                                                       (ebib--create-collection-from-field cur-field)
-                                                       nil nil
-                                                       (if init-contents
-                                                           (cons init-contents 0))))
+                                      (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
+                                        (completing-read (format "%s: " cur-field)
+                                                         (ebib--create-collection-from-field cur-field)
+                                                         nil nil
+                                                         (if init-contents
+                                                             (cons init-contents 0)))))
                                      (t (read-string (format "%s: " cur-field)
                                                      (if init-contents
                                                          (cons init-contents 0))))))
