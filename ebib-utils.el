@@ -1402,7 +1402,15 @@ can be used in a :PROPERTIES: block."
   (format ":Custom_id: %s" key))
 
 (defun ebib-create-org-title (key db)
-  "Return a title for an orgmode note for KEY in DB.
+  "Return a title for an Org mode note for KEY in DB.
+The title is formed from the title of the entry.  Newlines are
+removed from the resulting string."
+  (ebib--ifstring (title (ebib-clean-TeX-markup "title" key db))
+      (remove ?\n (format "%s" title))
+    "(No Title)"))
+
+(defun ebib-create-org-description (key db)
+  "Return a description for an Org mode note for KEY in DB.
 The title is formed from the author(s) or editor(s) of the entry,
 its year and its title.  Newlines are removed from the resulting
 string."
@@ -1413,6 +1421,10 @@ string."
         (title (or (ebib-get-field-value "title" key db 'noerror 'unbraced 'xref)
                    "(No Title)")))
     (remove ?\n (format "%s (%s): %s" author year title))))
+
+(defun ebib-create-org-cite (key _db)
+  "Return a citation for an Org mode note for KEY in DB."
+  (format "cite:%s" key))
 
 (defun ebib-create-org-link (key db)
   "Create an org link for KEY in DB.
