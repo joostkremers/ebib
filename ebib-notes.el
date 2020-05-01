@@ -113,7 +113,9 @@ note."
   :type '(string :tag "Note template"))
 
 (defcustom ebib-notes-template-specifiers '((?K . ebib-create-org-identifier)
-                                            (?T . ebib-create-org-title)
+					    (?T . ebib-create-org-description)
+                                            (?X . ebib-create-org-title)
+					    (?C . ebib-create-org-cite)
                                             (?L . ebib-create-org-link)
                                             (?F . ebib-create-org-file-link)
                                             (?D . ebib-create-org-doi-link)
