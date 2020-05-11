@@ -2976,7 +2976,7 @@ Emacs completion."
     (database
      (let* ((database-files (ebib--get-local-bibfiles))
             (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
-                           (list ebib--cur-db)))
+                           ebib--databases))
             slave-db)
        (when (and (= (length databases) 1)
                   (ebib-db-slave-p (car databases)))
