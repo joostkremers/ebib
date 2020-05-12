@@ -78,6 +78,17 @@ line.  You can complete a partial filename with `M-TAB`."
   :group 'ebib
   :type '(repeat (file :must-match t)))
 
+(defcustom ebib-local-bibfiles t
+  "List of a buffer's .bib file(s).
+A value of t means that this variable has not been initialized
+yet in the relevant buffer.  A value of nil means that there are
+no local .bib files.  This variable can be used as a file-local
+variable."
+  :group 'ebib
+  :type '(choice (const :tag "Use `ebib-preload-bib-files'" t)
+		 (repeat :tag "Specify .bib files" (file :must-match t))))
+(put 'ebib-local-bibfiles 'safe-local-variable (lambda (v) (null (seq-remove #'stringp v))))
+
 (defcustom ebib-bib-search-dirs '("~")
   "List of directories to search for BibTeX files.
 This is a list of directories Ebib searches for `.bib' files to
@@ -1079,8 +1090,6 @@ Currently, the following problems are marked:
 (defvar ebib--multiline-buffer-list nil "List of multiline edit buffers.")
 (defvar-local ebib--multiline-info nil "Information about the multiline text being edited.")
 (defvar ebib--log-error nil "Indicates whether an error was logged.")
-(defvar-local ebib--local-bibtex-filenames nil "A list of a buffer's .bib file(s)")
-(put 'ebib--local-bibtex-filenames 'safe-local-variable (lambda (v) (null (seq-remove #'stringp v))))
 (defvar-local ebib--dirty-index-buffer nil "Non-nil if the current index buffer is no longer up-to-date.")
 
 ;; The databases.

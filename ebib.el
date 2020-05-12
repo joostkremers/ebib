@@ -661,9 +661,7 @@ loaded, switch to it.  If KEY is given, jump to it."
   ;; And set it as the buffer to push entries to.
   (setq ebib--push-buffer (current-buffer))
   ;; See if there are local databases.
-  (or ebib--local-bibtex-filenames
-      (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
-                                             'none)))
+  (ebib--get-local-bibfiles)
   ;; See if there's a key at point.
   (or key (setq key (ebib--read-string-at-point "][^\"@\\&$#%',={} \t\n\f")))
   ;; Initialize Ebib if required.
@@ -677,7 +675,7 @@ loaded, switch to it.  If KEY is given, jump to it."
     (setq ebib--cur-db (ebib--load-bibtex-file-internal (ebib--locate-bibfile file (append ebib-bib-search-dirs (list default-directory)))))
     (setq ebib--needs-update t))
   ;; See if we have a key.
-  (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib--local-bibtex-filenames ebib--buffer-before)))
+  (when (and key (ebib--find-and-set-key key (buffer-local-value 'ebib-local-bibfiles ebib--buffer-before)))
     (setq ebib--needs-update t))
   (when ebib--needs-update
     (setq ebib--needs-update nil)
@@ -686,10 +684,10 @@ loaded, switch to it.  If KEY is given, jump to it."
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
 FILES is a list of BibTeX files in which KEY is searched,
-provided they are open in Ebib.  If FILES is `none', only the
+provided they are open in Ebib.  If FILES is nil, only the
 current database is searched."
   (when ebib--databases
-    (if (eq files 'none)
+    (if (null files)
         (unless (member key (ebib-db-list-keys ebib--cur-db))
           (setq key nil))
       (let ((database (catch 'found
@@ -4601,61 +4599,74 @@ or on the region if it is active."
 (defun ebib--get-local-bibfiles ()
   "Return a list of .bib files associated with the current buffer.
 Each element in the list is a string holding the name of the .bib
-file.  The method by which the .bib files are searched depends on
-the major mode of the buffer.  In LaTeX buffers, this function
-searches the current buffer or the buffer file's master file for
-a `\\bibliography' or `\\addbibresource' command and returns the
-file(s) given in its argument.
+file.
+
+If the file-local variable `ebib-local-bibfiles' is set to a
+list, return its value, otherwise try to find the .bib files for
+the current buffer.  The method by which the .bib files are
+searched depends on the buffer's major mode.  In LaTeX buffers,
+this function searches the current buffer or the buffer file's
+master file for a `\\bibliography' or `\\addbibresource' command
+and returns the file(s) given in its argument.
 
 In buffers in which `pandoc-mode' is active, check if the current
 settings include a `bibliography' setting and use the files
 listed there.
 
 If no .bib files are found, return nil."
-  (cond
-   ((eq major-mode 'latex-mode)
-    (let ((texfile-buffer (current-buffer))
-          texfile
-          files)
-      ;; If AucTeX's TeX-master is used and set to a string, we must
-      ;; search that file for a \bibliography command, as it's more
-      ;; likely to be in there than in the file we're in.
-      (and (boundp 'TeX-master)
-           (stringp TeX-master)
-           (setq texfile (ebib--ensure-extension TeX-master ".tex")))
-      (with-temp-buffer
-        (if (and texfile (file-readable-p texfile))
-            (insert-file-contents texfile)
-          (insert-buffer-substring texfile-buffer))
-        (save-match-data
-          (goto-char (point-min))
-          ;; First search for a \bibliography command:
-          (if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
-              (setq files (mapcar (lambda (file)
-                                    (ebib--ensure-extension file ".bib"))
-                                  (split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
-            ;; If we didn't find a \bibliography command, search for \addbibresource commands:
-            (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
-              (let ((option (match-string 1))
-                    (file (match-string-no-properties 2)))
-                ;; If this isn't a remote resource, add it to the list.
-                (unless (and option (string-match-p "location=remote" option))
-                  (push file files)))))))
-      (when files
-        (mapcar (lambda (file)
-                  (if (string= file "\\jobname.bib")
-                      (setq file (file-name-nondirectory (concat (file-name-sans-extension (buffer-file-name))
-                                                                 (car ebib-bibtex-extensions)))))
-                  ;; If a file has a directory part, we expand it, so
-                  ;; `ebib--get-db-from-filename' can match it up with a
-                  ;; database's file path.
-                  (if (file-name-directory file)
-                      (expand-file-name file)
-                    file))
-                files))))
-   ((and (boundp 'pandoc-mode) pandoc-mode)
-    (pandoc--get 'bibliography))
-   (t nil)))
+  (if (listp ebib-local-bibfiles)
+      ebib-local-bibfiles
+    (setq-local ebib-local-bibfiles
+		(cond
+		 ((eq major-mode 'latex-mode)
+		  (ebib--get-local-bibfiles-latex))
+		 ((and (boundp 'pandoc-mode) pandoc-mode)
+		  (pandoc--get 'bibliography))
+		 (t nil)))))
+
+(defun ebib--get-local-bibfiles-latex ()
+  "Return a list of .bib files associated with the current buffer.
+The current buffer should be a LaTeX buffer.  See
+`ebib--get-local-bibfiles' for details."
+  (let ((texfile-buffer (current-buffer))
+	texfile
+	files)
+    ;; If AucTeX's TeX-master is used and set to a string, we must
+    ;; search that file for a \bibliography command, as it's more
+    ;; likely to be in there than in the file we're in.
+    (and (boundp 'TeX-master)
+	 (stringp TeX-master)
+	 (setq texfile (ebib--ensure-extension TeX-master ".tex")))
+    (with-temp-buffer
+      (if (and texfile (file-readable-p texfile))
+	  (insert-file-contents texfile)
+	(insert-buffer-substring texfile-buffer))
+      (save-match-data
+	(goto-char (point-min))
+	;; First search for a \bibliography command:
+	(if (re-search-forward "\\\\\\(?:no\\)*bibliography{\\(.*?\\)}" nil t)
+	    (setq files (mapcar (lambda (file)
+				  (ebib--ensure-extension file ".bib"))
+				(split-string (buffer-substring-no-properties (match-beginning 1) (match-end 1)) ",[ ]*")))
+	  ;; If we didn't find a \bibliography command, search for \addbibresource commands:
+	  (while (re-search-forward "\\\\addbibresource\\(\\[.*?\\]\\)?{\\(.*?\\)}" nil t)
+	    (let ((option (match-string 1))
+		  (file (match-string-no-properties 2)))
+	      ;; If this isn't a remote resource, add it to the list.
+	      (unless (and option (string-match-p "location=remote" option))
+		(push file files)))))))
+    (when files
+      (mapcar (lambda (file)
+		(if (string= file "\\jobname.bib")
+		    (setq file (file-name-nondirectory (concat (file-name-sans-extension (buffer-file-name))
+							       (car ebib-bibtex-extensions)))))
+		;; If a file has a directory part, we expand it, so
+		;; `ebib--get-db-from-filename' can match it up with a
+		;; database's file path.
+		(if (file-name-directory file)
+		    (expand-file-name file)
+		  file))
+	      files))))
 
 (defun ebib-create-bib-from-bbl ()
   "Create a .bib file for the current LaTeX document.
@@ -4664,26 +4675,25 @@ bibitems are extracted from this file and a new .bib file is
 created containing only these entries."
   (interactive)
   (ebib--execute-when
-    (database
-     (or ebib--local-bibtex-filenames
-         (setq ebib--local-bibtex-filenames (or (ebib--get-local-bibfiles)
-                                                'none)))
-     (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
-            (bbl-file (concat filename-sans-extension ".bbl"))
-            (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
-       (unless (file-exists-p bbl-file)
-         (error "[Ebib] No .bbl file exists.  Run BibTeX first"))
-       (when (or (not (file-exists-p bib-file))
-                 (y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
-         (when (file-exists-p bib-file)
-           (delete-file bib-file t))
-         (let ((databases (seq-filter #'ebib--get-db-from-filename
-                                      ebib--local-bibtex-filenames)))
-           (with-temp-buffer
-             (insert-file-contents bbl-file)
-             (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))
-    (default
-      (beep))))
+   (database
+    (or ebib-local-bibfiles
+	(setq ebib-local-bibfiles (ebib--get-local-bibfiles)))
+    (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
+	   (bbl-file (concat filename-sans-extension ".bbl"))
+	   (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
+      (unless (file-exists-p bbl-file)
+	(error "[Ebib] No .bbl file exists.  Run BibTeX first"))
+      (when (or (not (file-exists-p bib-file))
+		(y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
+	(when (file-exists-p bib-file)
+	  (delete-file bib-file t))
+	(let ((databases (seq-filter #'ebib--get-db-from-filename
+				     ebib-local-bibfiles)))
+	  (with-temp-buffer
+	    (insert-file-contents bbl-file)
+	    (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))
+   (default
+     (beep))))
 
 (defun ebib-read-entries-from-bbl ()
   "Read BibTeX entries from the .bbl file of the current buffer."

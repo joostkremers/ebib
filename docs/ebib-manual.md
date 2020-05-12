@@ -1335,50 +1335,31 @@ buffer.
 
 The commands `ebib-insert-citation` and `ebib-entry-summary` must
 consult the database or databases loaded in Ebib, and Ebib tries to be
-smart about which database(s) to consult. A LaTeX file has one or more
-`\addbibresource` commands in the preamble, which names the `.bib` file
-or files that contain the bibliography entries. For BibTeX, there will
-be a `\bibliography` command toward the end of the file. If you consult
-a BibTeX database from within a LaTeX file, Ebib first looks for one of
-these commands, reads the names of the `.bib` file(s) from it, and then
-sees if those files happen to be open. If they are, Ebib uses them to
-let you pick an entry key (in the case of `ebib-insert-entry-key`) or to
-search for the entry (in the case of `ebib-entry-summary`).
+smart about which database(s) to consult. How Ebib decides which
+databases to consult depends on the major mode of the text buffer.
 
-Of course, it may be the case that the LaTeX file is actually part of a
-bigger project, and that only the master file contains a
-`\addbibresource` or `\bibliography` command. To accommodate for this,
-Ebib checks whether the (buffer-local) variable `TeX-master` is set to a
-filename. If it is, it reads that file and tries to find the relevant
-command there. (Note: `TeX-master` is an AUCTeX variable, which is used
-to keep track of multi-file projects. If you don’t use AUCTeX, this
-functionality doesn’t work, and Ebib will only check the current file
-for a `\addbibresource` or `\bibliography` command.)
+In a LaTeX buffer, Ebib looks for `\addbibresource` commands or a
+`\bibliography` command and uses the files specified in them. If the
+variable `TeX-master` is set (which is used by AUCTeX to keep track of a
+file’s master file), the master file is searched instead.
 
-Note that if one of the `.bib` files in the `\addbibresource` or
-`\bibliography` command isn’t loaded, Ebib issues a warning message
-about this, and continues to check for the next `.bib` file. These
-warning messages appear in the minibuffer, but are probably directly
-overwritten again by further messages or prompts Ebib produces, so check
-the `*Messages*` buffer if Ebib doesn’t seem to be able to find an entry
-that you’re sure is in one of your databases.
+In non-LaTeX buffers, Ebib first checks if `pandoc-mode` is active; if
+it is, Ebib uses the value of the `bibliography` option. If
+`pandoc-mode` is not used, Ebib uses the current database (i.e., the one
+that was visible before lowering Ebib).
 
-Another thing to keep in mind is that Ebib only looks for a
-`\addbibresource` or `\bibliography` command once: the first time either
+Keep in mind is that Ebib only looks for a `\addbibresource` or
+`\bibliography` command once: the first time either
 `ebib-insert-bibtex-entry` or `ebib-entry-summary` is called. It stores
-the result of this search and uses it th;e next time either of these
-commands is used. Therefore, if you make a change to the bibliography
-command, you must reload the file (use `M-x revert-buffer` or `C-x C-v
-RET`) to make sure Ebib rereads the bibliography command.
+the result of this search and uses it the next time either of these
+commands is used. Therefore, if you add, rename or remove bibliography
+files in your project, you’ll need to reload the file (use `M-x
+revert-buffer` or `C-x C-v RET`).
 
-If no `\addbibresource` or `\bibliography` command is found at all,
-either in the LaTeX file itself, or in the master file, Ebib simply
-consults the current database, i.e. the database that was active when
-Ebib was lowered with `z`. This is also what Ebib does for Org mode or
-Pandoc Markdown files, since they do not have the equivalent of a
-bibliography command. (Note, however, that you can set
-`ebib-local-bibtex-filenames` to a list of `.bib` files in the
-file-local variable section of a file.)
+You can override Ebib’s automatic association of `.bib` files to a
+buffer by setting the variable `ebib-local-bibfiles` to a list of files.
+This can be done as a file-local or a directory-local variable, or as a
+customisable option. .
 
 # Master and Slave Databases
 
