@@ -1637,50 +1637,31 @@ File: ebib.info,  Node: Associating a Database with a Text File,  Prev: Defining
 
 The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
 consult the database or databases loaded in Ebib, and Ebib tries to be
-smart about which database(s) to consult.  A LaTeX file has one or more
-‘\addbibresource’ commands in the preamble, which names the ‘.bib’ file
-or files that contain the bibliography entries.  For BibTeX, there will
-be a ‘\bibliography’ command toward the end of the file.  If you consult
-a BibTeX database from within a LaTeX file, Ebib first looks for one of
-these commands, reads the names of the ‘.bib’ file(s) from it, and then
-sees if those files happen to be open.  If they are, Ebib uses them to
-let you pick an entry key (in the case of ‘ebib-insert-entry-key’) or to
-search for the entry (in the case of ‘ebib-entry-summary’).
+smart about which database(s) to consult.  How Ebib decides which
+databases to consult depends on the major mode of the text buffer.
 
-Of course, it may be the case that the LaTeX file is actually part of a
-bigger project, and that only the master file contains a
-‘\addbibresource’ or ‘\bibliography’ command.  To accommodate for this,
-Ebib checks whether the (buffer-local) variable ‘TeX-master’ is set to a
-filename.  If it is, it reads that file and tries to find the relevant
-command there.  (Note: ‘TeX-master’ is an AUCTeX variable, which is used
-to keep track of multi-file projects.  If you don’t use AUCTeX, this
-functionality doesn’t work, and Ebib will only check the current file
-for a ‘\addbibresource’ or ‘\bibliography’ command.)
+In a LaTeX buffer, Ebib looks for ‘\addbibresource’ commands or a
+‘\bibliography’ command and uses the files specified in them.  If the
+variable ‘TeX-master’ is set (which is used by AUCTeX to keep track of a
+file’s master file), the master file is searched instead.
 
-Note that if one of the ‘.bib’ files in the ‘\addbibresource’ or
-‘\bibliography’ command isn’t loaded, Ebib issues a warning message
-about this, and continues to check for the next ‘.bib’ file.  These
-warning messages appear in the minibuffer, but are probably directly
-overwritten again by further messages or prompts Ebib produces, so check
-the ‘*Messages*’ buffer if Ebib doesn’t seem to be able to find an entry
-that you’re sure is in one of your databases.
+In non-LaTeX buffers, Ebib first checks if ‘pandoc-mode’ is active; if
+it is, Ebib uses the value of the ‘bibliography’ option.  If
+‘pandoc-mode’ is not used, Ebib uses the current database (i.e., the one
+that was visible before lowering Ebib).
 
-Another thing to keep in mind is that Ebib only looks for a
-‘\addbibresource’ or ‘\bibliography’ command once: the first time either
+Keep in mind is that Ebib only looks for a ‘\addbibresource’ or
+‘\bibliography’ command once: the first time either
 ‘ebib-insert-bibtex-entry’ or ‘ebib-entry-summary’ is called.  It stores
-the result of this search and uses it th;e next time either of these
-commands is used.  Therefore, if you make a change to the bibliography
-command, you must reload the file (use ‘M-x revert-buffer’ or ‘C-x C-v
-RET’) to make sure Ebib rereads the bibliography command.
+the result of this search and uses it the next time either of these
+commands is used.  Therefore, if you add, rename or remove bibliography
+files in your project, you’ll need to reload the file (use ‘M-x
+revert-buffer’ or ‘C-x C-v RET’).
 
-If no ‘\addbibresource’ or ‘\bibliography’ command is found at all,
-either in the LaTeX file itself, or in the master file, Ebib simply
-consults the current database, i.e. the database that was active when
-Ebib was lowered with ‘z’.  This is also what Ebib does for Org mode or
-Pandoc Markdown files, since they do not have the equivalent of a
-bibliography command.  (Note, however, that you can set
-‘ebib-local-bibtex-filenames’ to a list of ‘.bib’ files in the
-file-local variable section of a file.)
+You can override Ebib’s automatic association of ‘.bib’ files to a
+buffer by setting the variable ‘ebib-local-bibfiles’ to a list of files.
+This can be done as a file-local or a directory-local variable, or as a
+customisable option.  .
 
 
 File: ebib.info,  Node: Master and Slave Databases,  Next: Cross-referencing,  Prev: Inserting Citations into a Text Buffer,  Up: Top
@@ -3055,60 +3036,60 @@ Node: Defining Citation Commands71816
 Ref: #defining-citation-commands72047
 Node: Associating a Database with a Text File77943
 Ref: #associating-a-database-with-a-text-file78179
-Node: Master and Slave Databases81138
-Ref: #master-and-slave-databases81336
-Node: Cross-referencing83220
-Ref: #cross-referencing83377
-Node: Marking Entries86904
-Ref: #marking-entries87052
-Node: Printing the Database87929
-Ref: #printing-the-database88089
-Node: Calling a Browser91558
-Ref: #calling-a-browser91722
-Node: Viewing and Importing Files94174
-Ref: #viewing-and-importing-files94348
-Node: Editing the file field98915
-Ref: #editing-the-file-field99064
-Node: Notes files100435
-Ref: #notes-files100583
-Node: Separate notes files101352
-Ref: #separate-notes-files101501
-Node: One single notes file103092
-Ref: #one-single-notes-file103285
-Node: Customising the notes file format105202
-Ref: #customising-the-notes-file-format105415
-Node: Displaying notes109010
-Ref: #displaying-notes109159
-Node: Managing a reading list110496
-Ref: #managing-a-reading-list110658
-Node: Window Management113673
-Ref: #window-management113832
-Node: Creating Entry Stubs116991
-Ref: #creating-entry-stubs117153
-Node: @Preamble Definition118151
-Ref: #preamble-definition118315
-Node: @String Definitions120287
-Ref: #string-definitions120438
-Node: @Comments123931
-Ref: #comments124059
-Node: Managing Keywords124424
-Ref: #managing-keywords124569
-Node: Sorting the bib File130637
-Ref: #sorting-the-.bib-file130810
-Node: Merging and Importing133929
-Ref: #merging-and-importing134094
-Node: Exporting Entries135864
-Ref: #exporting-entries136026
-Node: Multiple Identical Fields137542
-Ref: #multiple-identical-fields137721
-Node: Multiline Edit Buffers139649
-Ref: #multiline-edit-buffers139821
-Node: The Options Menu143698
-Ref: #the-options-menu143846
-Node: Customisation144464
-Ref: #customisation144575
-Node: Modifying Key Bindings145183
-Ref: #modifying-key-bindings145310
+Node: Master and Slave Databases79699
+Ref: #master-and-slave-databases79897
+Node: Cross-referencing81781
+Ref: #cross-referencing81938
+Node: Marking Entries85465
+Ref: #marking-entries85613
+Node: Printing the Database86490
+Ref: #printing-the-database86650
+Node: Calling a Browser90119
+Ref: #calling-a-browser90283
+Node: Viewing and Importing Files92735
+Ref: #viewing-and-importing-files92909
+Node: Editing the file field97476
+Ref: #editing-the-file-field97625
+Node: Notes files98996
+Ref: #notes-files99144
+Node: Separate notes files99913
+Ref: #separate-notes-files100062
+Node: One single notes file101653
+Ref: #one-single-notes-file101846
+Node: Customising the notes file format103763
+Ref: #customising-the-notes-file-format103976
+Node: Displaying notes107571
+Ref: #displaying-notes107720
+Node: Managing a reading list109057
+Ref: #managing-a-reading-list109219
+Node: Window Management112234
+Ref: #window-management112393
+Node: Creating Entry Stubs115552
+Ref: #creating-entry-stubs115714
+Node: @Preamble Definition116712
+Ref: #preamble-definition116876
+Node: @String Definitions118848
+Ref: #string-definitions118999
+Node: @Comments122492
+Ref: #comments122620
+Node: Managing Keywords122985
+Ref: #managing-keywords123130
+Node: Sorting the bib File129198
+Ref: #sorting-the-.bib-file129371
+Node: Merging and Importing132490
+Ref: #merging-and-importing132655
+Node: Exporting Entries134425
+Ref: #exporting-entries134587
+Node: Multiple Identical Fields136103
+Ref: #multiple-identical-fields136282
+Node: Multiline Edit Buffers138210
+Ref: #multiline-edit-buffers138382
+Node: The Options Menu142259
+Ref: #the-options-menu142407
+Node: Customisation143025
+Ref: #customisation143136
+Node: Modifying Key Bindings143744
+Ref: #modifying-key-bindings143871
 
 End Tag Table
 
