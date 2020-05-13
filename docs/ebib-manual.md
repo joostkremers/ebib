@@ -9,6 +9,11 @@ is.
 
 # News
 
+## Version 2.23, May 2020
+
+  - Allow specifying .bib files with a file-local variable (esp. for
+    non-LaTeX files).
+
 ## Version 2.22, February 2020
 
   - Improve prompting when inserting citations.
