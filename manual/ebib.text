@@ -600,18 +600,18 @@ Multicite commands in `biblatex` take two additional arguments surrounded with p
 Lastly, a citation command can also contain a `%D` directive. This is mainly for use in Org citations, which take the form `[[ebib:<key>][<description>]]`. The description is not an argument to the citation command but the string that will be displayed in the Org buffer.
 
 
-## Associating a Database with a Text File ##
+## Associating a Database with a Text Buffer ##
 
 The commands `ebib-insert-citation` and `ebib-entry-summary` must consult the database or databases loaded in Ebib, and Ebib tries to be smart about which database(s) to consult. How Ebib decides which databases to consult depends on the major mode of the text buffer.
 
 In a LaTeX buffer, Ebib looks for `\addbibresource` commands or a `\bibliography` command and uses the files specified in them. If the variable `TeX-master` is set (which is used by AUCTeX to keep track of a file's master file), the master file is searched instead.
 
-In non-LaTeX buffers, Ebib first checks if `pandoc-mode` is active; if it is, Ebib uses the value of the `bibliography` option. If `pandoc-mode` is not used, Ebib uses the current database (i.e., the one that was visible before lowering Ebib).
+In non-LaTeX buffers, Ebib first checks if `pandoc-mode` is active; if it is, Ebib uses the value of the `bibliography` option. If `pandoc-mode` is not used, Ebib simply uses all databases that are currently open.
 
-Keep in mind is that Ebib only looks for a `\addbibresource` or `\bibliography` command once: the first time either `ebib-insert-bibtex-entry` or `ebib-entry-summary` is called. It stores the result of this search and uses it the next time either of these commands is used. Therefore, if you add, rename or remove bibliography files in your project, you'll need to reload the file (use `M-x revert-buffer` or `C-x C-v RET`).
+Keep in mind that Ebib tries to determine the relevant databases only once per buffer. It stores the result of this search and uses it the next time either of these commands is used. Therefore, if you add, rename or remove bibliography files in your project, you may need to reload the file (use `M-x revert-buffer` or `C-x C-v RET`).
 
 You can override Ebib's automatic association of `.bib` files to a buffer by setting the variable `ebib-local-bibfiles` to a list of files. This can be done as a file-local or a directory-local variable, or as a customisable option.
-.
+
 
 # Master and Slave Databases #
 
@@ -619,7 +619,7 @@ If you want to create a `.bib` file from a larger database that only contains th
 
 You can create a slave database with the key sequence `M c` in the database that you want to be the master. Ebib asks you for a file name and then creates a new empty database. You can add entries to the slave with the key sequence `M a` in the master database. In the slave database, you can add new entries in the normal way with the key `a`, but instead of creating a new entry, this command asks for an entry from the master database which is then added to the slave.
 
-If you save a slave database, it is saved as a normal, standalone `.bib` file that can be used with BibTeX and/or `biblatex`. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a slave database and loads the master database as well if necessary. Note that when Ebib opens a slave database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the master database. This means that if you edit a slave database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
+If you save a slave database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a slave database and loads the master database as well if necessary. Note that when Ebib opens a slave database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the master database. This means that if you edit a slave database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
 
 If you have a text buffer that's associated with a slave database, you can insert entries in the normal way with `M-x ebib-insert-citation`, but instead of offering only the entries in the associated (slave) database, Emacs will offer all entries of the master database for completion. If you select an entry that is not in the slave database yet, it is added to it.
 
@@ -630,7 +630,7 @@ If you have a text buffer that's associated with a slave database, you can inser
 
 When you fill in the `crossref` field in Ebib, Ebib displays the values of the cross-referenced entry in the entry buffer. To indicate that they are just inherited values, they are marked with `ebib-crossref-face`, which by default inherits from `font-lock-comment-face`. (You can customise it, of course.) These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).
 
-`Biblatex`'s inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `InBook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `MVBook`, and a `booktitle` field if the cross-referenced entry is of type `Book`. The inheritance scheme for `biblatex` is defined by the option `ebib-biblatex-Inheritances`, which is set up with the default inheritance relations defined by `biblatex`, but which can be customised if needed.
+`Biblatex`'s inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `InBook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `MVBook`, and a `booktitle` field if the cross-referenced entry is of type `Book`. The inheritance scheme for `biblatex` is defined by the option `ebib-biblatex-inheritances`, which is set up with the default inheritance relations defined by `biblatex`, but which can be customised if needed.
 
 BibTeX's inheritance mechanism is much more simplistic. A field without a value in a cross-referencing entry simply inherits the value of the same-name field in the  cross-referenced entry. There is no way to specify that the `title` field should inherit from e.g., the `booktitle` field. Therefore, Ebib does not provide a way to customise inheritance in BibTeX files.
 

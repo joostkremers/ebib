@@ -1331,7 +1331,7 @@ mainly for use in Org citations, which take the form
 the citation command but the string that will be displayed in the Org
 buffer.
 
-## Associating a Database with a Text File
+## Associating a Database with a Text Buffer
 
 The commands `ebib-insert-citation` and `ebib-entry-summary` must
 consult the database or databases loaded in Ebib, and Ebib tries to be
@@ -1345,21 +1345,19 @@ file’s master file), the master file is searched instead.
 
 In non-LaTeX buffers, Ebib first checks if `pandoc-mode` is active; if
 it is, Ebib uses the value of the `bibliography` option. If
-`pandoc-mode` is not used, Ebib uses the current database (i.e., the one
-that was visible before lowering Ebib).
+`pandoc-mode` is not used, Ebib simply uses all databases that are
+currently open.
 
-Keep in mind is that Ebib only looks for a `\addbibresource` or
-`\bibliography` command once: the first time either
-`ebib-insert-bibtex-entry` or `ebib-entry-summary` is called. It stores
-the result of this search and uses it the next time either of these
-commands is used. Therefore, if you add, rename or remove bibliography
-files in your project, you’ll need to reload the file (use `M-x
-revert-buffer` or `C-x C-v RET`).
+Keep in mind that Ebib tries to determine the relevant databases only
+once per buffer. It stores the result of this search and uses it the
+next time either of these commands is used. Therefore, if you add,
+rename or remove bibliography files in your project, you may need to
+reload the file (use `M-x revert-buffer` or `C-x C-v RET`).
 
 You can override Ebib’s automatic association of `.bib` files to a
 buffer by setting the variable `ebib-local-bibfiles` to a list of files.
 This can be done as a file-local or a directory-local variable, or as a
-customisable option. .
+customisable option.
 
 # Master and Slave Databases
 
@@ -1379,7 +1377,7 @@ but instead of creating a new entry, this command asks for an entry from
 the master database which is then added to the slave.
 
 If you save a slave database, it is saved as a normal, standalone `.bib`
-file that can be used with BibTeX and/or `biblatex`. When you reopen the
+file that can be used with `biblatex` or BibTeX. When you reopen the
 file in Ebib, a special comment at the top of the file makes sure that
 Ebib recognises it as a slave database and loads the master database as
 well if necessary. Note that when Ebib opens a slave database, it only
@@ -1422,7 +1420,7 @@ possible to specify that the `InBook` entry type can inherit a
 `maintitle` field from the `title` field if the cross-referenced entry
 is of type `MVBook`, and a `booktitle` field if the cross-referenced
 entry is of type `Book`. The inheritance scheme for `biblatex` is
-defined by the option `ebib-biblatex-Inheritances`, which is set up with
+defined by the option `ebib-biblatex-inheritances`, which is set up with
 the default inheritance relations defined by `biblatex`, but which can
 be customised if needed.
 

@@ -1431,7 +1431,7 @@ citation at the current cursor position in the buffer you’ve supplied.
 * Citations with multiple keys::
 * Key Bindings::
 * Defining Citation Commands::
-* Associating a Database with a Text File::
+* Associating a Database with a Text Buffer::
 
 
 File: ebib.info,  Node: Citations with multiple keys,  Next: Key Bindings,  Up: Inserting Citations into a Text Buffer
@@ -1482,7 +1482,7 @@ same key sequence in every text mode in which you use citations and Ebib
 will do the right thing.
 
 
-File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a Text File,  Prev: Key Bindings,  Up: Inserting Citations into a Text Buffer
+File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a Text Buffer,  Prev: Key Bindings,  Up: Inserting Citations into a Text Buffer
 
 9.3 Defining Citation Commands
 ==============================
@@ -1630,10 +1630,10 @@ the citation command but the string that will be displayed in the Org
 buffer.
 
 
-File: ebib.info,  Node: Associating a Database with a Text File,  Prev: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
+File: ebib.info,  Node: Associating a Database with a Text Buffer,  Prev: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
 
-9.4 Associating a Database with a Text File
-===========================================
+9.4 Associating a Database with a Text Buffer
+=============================================
 
 The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
 consult the database or databases loaded in Ebib, and Ebib tries to be
@@ -1647,21 +1647,19 @@ file’s master file), the master file is searched instead.
 
 In non-LaTeX buffers, Ebib first checks if ‘pandoc-mode’ is active; if
 it is, Ebib uses the value of the ‘bibliography’ option.  If
-‘pandoc-mode’ is not used, Ebib uses the current database (i.e., the one
-that was visible before lowering Ebib).
+‘pandoc-mode’ is not used, Ebib simply uses all databases that are
+currently open.
 
-Keep in mind is that Ebib only looks for a ‘\addbibresource’ or
-‘\bibliography’ command once: the first time either
-‘ebib-insert-bibtex-entry’ or ‘ebib-entry-summary’ is called.  It stores
-the result of this search and uses it the next time either of these
-commands is used.  Therefore, if you add, rename or remove bibliography
-files in your project, you’ll need to reload the file (use ‘M-x
-revert-buffer’ or ‘C-x C-v RET’).
+Keep in mind that Ebib tries to determine the relevant databases only
+once per buffer.  It stores the result of this search and uses it the
+next time either of these commands is used.  Therefore, if you add,
+rename or remove bibliography files in your project, you may need to
+reload the file (use ‘M-x revert-buffer’ or ‘C-x C-v RET’).
 
 You can override Ebib’s automatic association of ‘.bib’ files to a
 buffer by setting the variable ‘ebib-local-bibfiles’ to a list of files.
 This can be done as a file-local or a directory-local variable, or as a
-customisable option.  .
+customisable option.
 
 
 File: ebib.info,  Node: Master and Slave Databases,  Next: Cross-referencing,  Prev: Inserting Citations into a Text Buffer,  Up: Top
@@ -1685,14 +1683,14 @@ but instead of creating a new entry, this command asks for an entry from
 the master database which is then added to the slave.
 
 If you save a slave database, it is saved as a normal, standalone ‘.bib’
-file that can be used with BibTeX and/or ‘biblatex’.  When you reopen
-the file in Ebib, a special comment at the top of the file makes sure
-that Ebib recognises it as a slave database and loads the master
-database as well if necessary.  Note that when Ebib opens a slave
-database, it only reads the entry keys from the ‘.bib’ file.  The data
-of each entry is taken from the master database.  This means that if you
-edit a slave database’s ‘.bib’ file outside of Ebib, the changes you
-make are ignored when you open the file in Ebib.
+file that can be used with ‘biblatex’ or BibTeX. When you reopen the
+file in Ebib, a special comment at the top of the file makes sure that
+Ebib recognises it as a slave database and loads the master database as
+well if necessary.  Note that when Ebib opens a slave database, it only
+reads the entry keys from the ‘.bib’ file.  The data of each entry is
+taken from the master database.  This means that if you edit a slave
+database’s ‘.bib’ file outside of Ebib, the changes you make are ignored
+when you open the file in Ebib.
 
 If you have a text buffer that’s associated with a slave database, you
 can insert entries in the normal way with ‘M-x ebib-insert-citation’,
@@ -1733,7 +1731,7 @@ possible to specify that the ‘InBook’ entry type can inherit a
 ‘maintitle’ field from the ‘title’ field if the cross-referenced entry
 is of type ‘MVBook’, and a ‘booktitle’ field if the cross-referenced
 entry is of type ‘Book’.  The inheritance scheme for ‘biblatex’ is
-defined by the option ‘ebib-biblatex-Inheritances’, which is set up with
+defined by the option ‘ebib-biblatex-inheritances’, which is set up with
 the default inheritance relations defined by ‘biblatex’, but which can
 be customised if needed.
 
@@ -3028,68 +3026,68 @@ Node: Properties of Filtered Databases64360
 Ref: #properties-of-filtered-databases64557
 Node: Inserting Citations into a Text Buffer66212
 Ref: #inserting-citations-into-a-text-buffer66424
-Node: Citations with multiple keys69480
-Ref: #citations-with-multiple-keys69669
-Node: Key Bindings70866
-Ref: #key-bindings71058
-Node: Defining Citation Commands71816
-Ref: #defining-citation-commands72047
-Node: Associating a Database with a Text File77943
-Ref: #associating-a-database-with-a-text-file78179
-Node: Master and Slave Databases79699
-Ref: #master-and-slave-databases79897
-Node: Cross-referencing81781
-Ref: #cross-referencing81938
-Node: Marking Entries85465
-Ref: #marking-entries85613
-Node: Printing the Database86490
-Ref: #printing-the-database86650
-Node: Calling a Browser90119
-Ref: #calling-a-browser90283
-Node: Viewing and Importing Files92735
-Ref: #viewing-and-importing-files92909
-Node: Editing the file field97476
-Ref: #editing-the-file-field97625
-Node: Notes files98996
-Ref: #notes-files99144
-Node: Separate notes files99913
-Ref: #separate-notes-files100062
-Node: One single notes file101653
-Ref: #one-single-notes-file101846
-Node: Customising the notes file format103763
-Ref: #customising-the-notes-file-format103976
-Node: Displaying notes107571
-Ref: #displaying-notes107720
-Node: Managing a reading list109057
-Ref: #managing-a-reading-list109219
-Node: Window Management112234
-Ref: #window-management112393
-Node: Creating Entry Stubs115552
-Ref: #creating-entry-stubs115714
-Node: @Preamble Definition116712
-Ref: #preamble-definition116876
-Node: @String Definitions118848
-Ref: #string-definitions118999
-Node: @Comments122492
-Ref: #comments122620
-Node: Managing Keywords122985
-Ref: #managing-keywords123130
-Node: Sorting the bib File129198
-Ref: #sorting-the-.bib-file129371
-Node: Merging and Importing132490
-Ref: #merging-and-importing132655
-Node: Exporting Entries134425
-Ref: #exporting-entries134587
-Node: Multiple Identical Fields136103
-Ref: #multiple-identical-fields136282
-Node: Multiline Edit Buffers138210
-Ref: #multiline-edit-buffers138382
-Node: The Options Menu142259
-Ref: #the-options-menu142407
-Node: Customisation143025
-Ref: #customisation143136
-Node: Modifying Key Bindings143744
-Ref: #modifying-key-bindings143871
+Node: Citations with multiple keys69482
+Ref: #citations-with-multiple-keys69671
+Node: Key Bindings70868
+Ref: #key-bindings71060
+Node: Defining Citation Commands71818
+Ref: #defining-citation-commands72051
+Node: Associating a Database with a Text Buffer77947
+Ref: #associating-a-database-with-a-text-buffer78189
+Node: Master and Slave Databases79568
+Ref: #master-and-slave-databases79766
+Node: Cross-referencing81645
+Ref: #cross-referencing81802
+Node: Marking Entries85329
+Ref: #marking-entries85477
+Node: Printing the Database86354
+Ref: #printing-the-database86514
+Node: Calling a Browser89983
+Ref: #calling-a-browser90147
+Node: Viewing and Importing Files92599
+Ref: #viewing-and-importing-files92773
+Node: Editing the file field97340
+Ref: #editing-the-file-field97489
+Node: Notes files98860
+Ref: #notes-files99008
+Node: Separate notes files99777
+Ref: #separate-notes-files99926
+Node: One single notes file101517
+Ref: #one-single-notes-file101710
+Node: Customising the notes file format103627
+Ref: #customising-the-notes-file-format103840
+Node: Displaying notes107435
+Ref: #displaying-notes107584
+Node: Managing a reading list108921
+Ref: #managing-a-reading-list109083
+Node: Window Management112098
+Ref: #window-management112257
+Node: Creating Entry Stubs115416
+Ref: #creating-entry-stubs115578
+Node: @Preamble Definition116576
+Ref: #preamble-definition116740
+Node: @String Definitions118712
+Ref: #string-definitions118863
+Node: @Comments122356
+Ref: #comments122484
+Node: Managing Keywords122849
+Ref: #managing-keywords122994
+Node: Sorting the bib File129062
+Ref: #sorting-the-.bib-file129235
+Node: Merging and Importing132354
+Ref: #merging-and-importing132519
+Node: Exporting Entries134289
+Ref: #exporting-entries134451
+Node: Multiple Identical Fields135967
+Ref: #multiple-identical-fields136146
+Node: Multiline Edit Buffers138074
+Ref: #multiline-edit-buffers138246
+Node: The Options Menu142123
+Ref: #the-options-menu142271
+Node: Customisation142889
+Ref: #customisation143000
+Node: Modifying Key Bindings143608
+Ref: #modifying-key-bindings143735
 
 End Tag Table
 
