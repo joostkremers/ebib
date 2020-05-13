@@ -806,7 +806,7 @@ nil, get or create a buffer named \" Ebib (no file)\".  Return
 the new buffer."
   (let ((buffer (if db
                     (or (ebib-db-get-buffer db)
-                        (get-buffer-create (ebib-db-get-filename db 'short)))
+                        (generate-new-buffer (ebib-db-get-filename db 'short)))
                   (get-buffer-create ebib--empty-index-buffer-name))))
     (with-current-buffer buffer
       (ebib-index-mode))
