@@ -648,7 +648,7 @@ user."
                                                               databases)
                                                nil t)))
 
-(defun ebib--finish-completion-key (command)
+(defun ebib--completion-finish-key (command)
   "Return the key binding that finishes a completion command.
 COMMAND is the command to finish, one of the symbols
 `completing-read' or `read-file-name'."
@@ -3143,7 +3143,7 @@ entry or the marked entries to the slave database."
 Return the keywords entered as a list.  Any keywords not in
 COLLECTION are added to the current database's keywords list.  If
 no keywords are entered, the return value is nil."
-  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--finish-completion-key 'completing-read)))
+  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--completion-finish-key 'completing-read)))
 	 (keywords (cl-loop for keyword = (completing-read (format prompt (mapconcat #'identity keywords " "))
 							   collection nil nil nil 'ebib--keywords-history)
                             until (string= keyword "")
@@ -3596,7 +3596,7 @@ was called interactively."
   (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
         (collection (ebib--keywords-for-database ebib--cur-db))
         (key (ebib--get-key-at-point))
-	(prompt (format "Add a new keyword (%s to finish): " (ebib--finish-completion-key 'completing-read))))
+	(prompt (format "Add a new keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
     (cl-loop for keyword = (completing-read prompt collection nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
              do (let* ((conts (ebib-get-field-value "keywords" key ebib--cur-db 'noerror 'unbraced))
@@ -3628,7 +3628,7 @@ relative to the directories listed in `ebib-file-search-dirs',
 otherwise they are stored as absolute paths."
   (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs)))
         (key (ebib--get-key-at-point))
-	(prompt (format "Add file (%s to finish): " (ebib--finish-completion-key 'read-file-name))))
+	(prompt (format "Add file (%s to finish): " (ebib--completion-finish-key 'read-file-name))))
     (cl-loop for file = (expand-file-name (read-file-name prompt start-dir nil 'confirm-after-completion) start-dir)
              until (or (string= file "")
                        ;; When using Ivy, the return value of
@@ -3705,7 +3705,7 @@ and editors in all databases."
     ;; can unbind <SPC>, since authors and editors contain spaces.
     (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
           (collection (ebib--create-author/editor-collection))
-          (prompt (format "Add a new %s (%s to finish): " field (ebib--finish-completion-key 'completing-read)))
+          (prompt (format "Add a new %s (%s to finish): " field (ebib--completion-finish-key 'completing-read)))
           (key (ebib--get-key-at-point)))
       (cl-loop for author = (completing-read prompt collection)
                until (string= author "")
