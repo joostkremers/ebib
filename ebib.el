@@ -2184,8 +2184,8 @@ candidates from the current database."
     (database
      (let* ((sources (if arg (list ebib--cur-db) ebib--databases))
             (entries (cond
-                      ((featurep 'ivy) (ebib-read-entry-ivy sources))
-                      ((featurep 'helm) (ebib-read-entry-helm sources))
+                      ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy sources))
+                      ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm sources))
                       (t (ebib-read-entry-single sources))))
             ;; The `ebib-read-entry-*' functions return a list of selected
             ;; entries. We can only jump to one of them, obviously. Jumping to
@@ -2992,8 +2992,8 @@ Emacs completion."
          (setq slave-db (car databases))
          (setq databases (list (ebib-db-get-master (car databases)))))
        (let* ((entries (cond
-                        ((featurep 'ivy) (ebib-read-entry-ivy databases))
-                        ((featurep 'helm) (ebib-read-entry-helm databases))
+                        ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
+                        ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
                         (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
                         (t (ebib-read-entry-single databases))))
               (keys (mapcar #'car entries))
