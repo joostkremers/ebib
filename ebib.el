@@ -654,9 +654,8 @@ COMMAND is the command to finish, one of the symbols
 `completing-read' or `read-file-name'."
   (cond
    ((and (boundp 'ivy-mode) ivy-mode) (key-description (where-is-internal 'ivy-immediate-done (list ivy-minibuffer-map) 'non-ascii)))
-   ((and (boundp 'helm-mode) helm-mode) (let ((map (if (eq command 'completing-read)
-						       helm-comp-read-map
-						     helm-read-file-map)))
+   ((and (boundp 'helm-mode) helm-mode) (let ((map (symbol-value (alist-get command '((completing-read . helm-comp-read-map)
+										      (read-file-name . helm-read-file-map))))))
 					  (key-description (where-is-internal 'helm-cr-empty-string (list map) 'non-ascii))))
    (t (key-description [return]))))
 
