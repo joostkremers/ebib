@@ -3856,7 +3856,7 @@ viewed."
     (beginning-of-line)
     (if (eobp)
         (forward-line -1)
-      (while (ebib--outside-field-p)
+      (while (and (not (eobp)) (ebib--outside-field-p))
         (forward-line 1)))))
 
 (defun ebib-copy-field-contents ()
