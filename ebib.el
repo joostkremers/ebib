@@ -3841,23 +3841,21 @@ viewed."
 (defun ebib-entry-open-at-point ()
   "Open file at point."
   (interactive)
-  (let* ((word (thing-at-point 'word))
-         (file (and word
-                    (get-text-property 0 'mouse-face word)
-                    (get-text-property 0 'ebib-file word)))
-         (url (and word
-                   (get-text-property 0 'mouse-face word)
-                   (get-text-property 0 'ebib-url word))))
-    (cond
-     (file (ebib--call-file-viewer file))
-     (url (ebib--call-browser url)))
-    ;; Position the cursor nicely.  If no link was clicked, select the field at
-    ;; the line clicked on, or the next field.
+  (unwind-protect
+      (let* ((word (thing-at-point 'word))
+             (file (and word
+                        (get-text-property 0 'mouse-face word)
+                        (get-text-property 0 'ebib-file word)))
+             (url (and word
+                       (get-text-property 0 'mouse-face word)
+                       (get-text-property 0 'ebib-url word))))
+        (cond
+         (file (ebib--call-file-viewer file))
+         (url (ebib--call-browser url))))
+    ;; Position the cursor nicely.
     (beginning-of-line)
-    (if (eobp)
-        (forward-line -1)
-      (while (ebib--outside-field-p)
-        (forward-line 1)))))
+    (while (ebib--outside-field-p)
+      (forward-line -1))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring.
