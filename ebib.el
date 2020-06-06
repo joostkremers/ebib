@@ -3497,7 +3497,7 @@ the beginning of the current line."
             (buffer-substring-no-properties beg end)))))))
 
 (defun ebib--outside-field-p ()
-  "Return t if point is at an empty line in the entry buffer.
+  "Return t if point is outside a field in the entry buffer.
 Return t if point is on an empty line or on a line that starts
 with spaces (which is part of a multiline value).  Return nil
 otherwise."
