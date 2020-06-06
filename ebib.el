@@ -3802,7 +3802,7 @@ prefix argument has no meaning."
                    (ebib-edit-multiline-field)
                    nil)
                   ;; The field is called "external note", but
-                  ;; `ebib--current-field0' only reads up to the first space, so
+                  ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
                   ((string= field "external")
                    (ebib-open-note (ebib--get-key-at-point))
@@ -3852,7 +3852,7 @@ viewed."
         (cond
          (file (ebib--call-file-viewer file))
          (url (ebib--call-browser url))))
-    ;; Position the cursor nicely.
+    ;; Properly position the cursor.
     (beginning-of-line)
     (while (ebib--outside-field-p)
       (forward-line -1))))
