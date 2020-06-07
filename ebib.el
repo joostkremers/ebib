@@ -3496,21 +3496,37 @@ the beginning of the current line."
                        (point))))
             (buffer-substring-no-properties beg end)))))))
 
-(defun ebib--outside-field-p ()
-  "Return t if point is outside a field in the entry buffer.
-Return t if point is on an empty line or on a line that starts
-with spaces (which is part of a multiline value).  Return nil
-otherwise."
-  (or (eolp)
-      (looking-at-p "[[:space:]]")))
+(defun ebib--line-at-point ()
+  "Return the type of line in the entry buffer that point is on.
+If point is on an empty line between fields, return the symbol
+`empty-line'.  If point is on the line below the last
+field (i.e., at the end of the buffer), return `final-line'.  If
+point is on a line that is part of a multi-line value (except its
+first line), return `multi-line'.
+
+If point is on a line with a field name, return nil.  This return
+value makes it easier to move point in a `while' loop until it
+has reached a field name.
+
+Point should be at the beginning of the line, but this is not
+checked.  This function also does not check if the entry buffer
+is indeed active."
+  ;; We don't call `beginning-of-line' here, because we use this function in
+  ;; `while' loops, which means calling `beginning-of-line' would be wasteful.
+  (cond
+   ((eobp) 'final-line)
+   ((eolp) 'empty-line)
+   ((looking-at-p "[[:space:]]") 'multi-line)
+   (t nil)))
 
 (defun ebib-prev-field ()
   "Move to the previous field."
   (interactive)
-  (if (= (forward-line -1) -1)
-      (beep) ; We're at the first field already.
-    (while (ebib--outside-field-p) ; If we're at an empty line,
-      (forward-line -1)))) ; move up until we're not.
+  (if (bobp)                           ; Don't move if we're on the first field already.
+      (beep)
+    (forward-line -1)
+    (while (ebib--line-at-point)       ; Move up to the line with the field name.
+      (forward-line -1))))
 
 (defun ebib-next-field (&optional pfx)
   "Move to the next field.
@@ -3522,7 +3538,7 @@ was called interactively."
         (if pfx                         ; below the last field, beep.
             (beep))
       (goto-char (1+ field-end))        ; Otherwise move point.
-      (while (ebib--outside-field-p)    ; And see if we need to adjust.
+      (while (ebib--line-at-point)      ; And see if we need to adjust.
         (forward-line 1)))))
 
 (defun ebib-goto-first-field ()
@@ -3534,7 +3550,7 @@ was called interactively."
   "Move to the last field."
   (interactive)
   (goto-char (point-max))
-  (while (ebib--outside-field-p)                 ; Move up as long as we're at an empty line.
+  (while (ebib--line-at-point)           ; Move up as long as we're not at a field.
     (forward-line -1)))
 
 (defun ebib-goto-next-set ()
@@ -3551,11 +3567,14 @@ was called interactively."
   "Move to the previous set of fields."
   (interactive)
   (beginning-of-line)
-  (if (bobp)                  ; If we're at the =type= field, we don't move
+  (if (bobp)                  ; If we're at the =type= field, we don't move.
       (beep)
-    (while (not (eolp))          ; Otherwise just find the first empty line
+    ;; First move up to the next-higher empty line.
+    (while (not (eq (ebib--line-at-point) 'empty-line))
       (forward-line -1))
-    (forward-line -1)))                   ; and move beyond it.
+    ;; Then move to the field name.
+    (while (ebib--line-at-point)
+      (forward-line -1))))
 
 (defun ebib-add-field (field)
   "Add FIELD to the current entry."
@@ -3854,8 +3873,13 @@ viewed."
          (url (ebib--call-browser url))))
     ;; Properly position the cursor.
     (beginning-of-line)
-    (while (ebib--outside-field-p)
-      (forward-line -1))))
+    (let ((direction (alist-get (ebib--line-at-point)
+                                '((last-line . -1) ; Move up.
+                                  (multi-line . -1)
+                                  (empty-line . 1))))) ; Move down.
+      (when direction
+        (while (ebib--line-at-point)
+          (forward-line direction))))))
 
 (defun ebib-copy-field-contents ()
   "Copy the contents of the current field to the kill ring.
