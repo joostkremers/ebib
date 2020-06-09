@@ -3475,7 +3475,8 @@ If the key of the current entry matches the pattern
     (quit-window))
    ((eq ebib-layout 'index-only)
     (switch-to-buffer nil t)))
-  (ebib--pop-to-buffer (ebib--buffer 'index))
+  (unless (ebib--pop-to-buffer (ebib--buffer 'index))
+    (call-interactively (global-key-binding "\C-xb"))) ; If the index buffer isn't visible, call `switch-to-buffer'.
   (if (string-match-p "<new-entry[0-9]+>" (ebib--get-key-at-point))
       (ebib-generate-autokey)))
 
@@ -4104,7 +4105,8 @@ The deleted text is not put in the kill ring."
           (switch-to-buffer nil t)))
     (with-ebib-window-nondedicated (selected-window)
       (switch-to-buffer (ebib--buffer 'entry) t)))
-  (ebib--pop-to-buffer (ebib--buffer 'index)))
+  (unless (ebib--pop-to-buffer (ebib--buffer 'index))
+    (call-interactively (global-key-binding "\C-xb"))))  ; If the index buffer isn't visible, call `switch-to-buffer'.
 
 (defun ebib--current-string ()
   "Return the currently selected string.
@@ -4480,7 +4482,8 @@ The text being edited is stored before saving the database."
       (quit-window)
     (with-ebib-window-nondedicated (selected-window)
       (switch-to-buffer nil t)))
-  (ebib--pop-to-buffer (ebib--buffer 'index)))
+  (unless (ebib--pop-to-buffer (ebib--buffer 'index))
+    (call-interactively (global-key-binding "\C-xb"))))  ; If the index buffer isn't visible, call `switch-to-buffer'.
 
 ;;; Functions for downloading additional data
 
