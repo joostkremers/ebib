@@ -298,6 +298,11 @@ the position where point should be placed."
     (propertize (make-string (string-width ebib-notes-symbol) ?\s)
                 'face '(:height 0.8))))
 
+(defun ebib--notes-maybe-update-entry-buffer ()
+  "Update the entry buffer if it exists."
+  (if (ebib--buffer 'entry)
+      (ebib--update-entry-buffer)))
+
 ;;; One file per note.
 
 (defun ebib--create-notes-file-name (key)
@@ -319,7 +324,7 @@ name is fully qualified by prepending the directory in
 Return the buffer but do not select it."
   (let ((buf (find-file-noselect file)))
     (with-current-buffer buf
-      (add-hook 'after-save-hook 'ebib--update-entry-buffer nil t))
+      (add-hook 'after-save-hook 'ebib--notes-maybe-update-entry-buffer nil t))
     buf))
 
 ;;; Common notes file.
@@ -340,7 +345,7 @@ is not accessible to the user."
         (error "[Ebib] Cannot read or create notes file"))
       (setq notes-buffer (find-file-noselect ebib-notes-file))
       (with-current-buffer notes-buffer
-        (add-hook 'after-save-hook 'ebib--update-entry-buffer nil t))
+        (add-hook 'after-save-hook 'ebib--notes-maybe-update-entry-buffer nil t))
       notes-buffer)))
 
 (provide 'ebib-notes)
