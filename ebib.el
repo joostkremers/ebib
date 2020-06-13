@@ -2701,7 +2701,9 @@ new database."
     (cond
      (link (ebib--call-browser link))
      (notep (ebib-open-note (ebib--get-key-at-point)))
-     (t (ebib-select-and-popup-entry)))))
+     (t (when (eobp)
+          (forward-line -1))
+        (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (arg)
   "Browse the URL in the standard URL field.
