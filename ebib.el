@@ -580,34 +580,34 @@ the field contents."
                   ;; buffers. This is a hack, but the simplest way to do it.
                   ebib--needs-update t))))))
 
-(defun ebib--set-modified (mod db &optional master slaves)
+(defun ebib--set-modified (mod db &optional main dependents)
   "Set the modified flag MOD on database DB.
 MOD must be either t or nil.  If DB is the current database, the
 mode line is redisplayed, in order to correctly reflect the
 database's modified status.
 
-If MASTER is non-nil and DB is a slave database, also set the
-modified status of DB's master database to MOD.  If SLAVES is
-non-nil, it should be a list of slave databases, whose modified
-status is also set to MOD.  Note: it is ok to have MASTER set to
-t if DB is not a slave database: in such a case, MASTER has no
-effect.  The SLAVES are set to MOD unconditionally, however,
-without checking to see if they are really slaves of DB, or even
-slaves at all.
+If MAIN is non-nil and DB is a dependent database, also set the
+modified status of DB's main database to MOD.  If DEPENDENTS is
+non-nil, it should be a list of dependent databases, whose
+modified status is also set to MOD.  Note: it is ok to have MAIN
+set to t if DB is not a dependent database: in such a case, MAIN
+has no effect.  The DEPENDENTS are set to MOD unconditionally,
+however, without checking to see if they are really dependents of
+DB, or even dependents at all.
 
 The return value is MOD."
   (unless db
     (setq db ebib--cur-db))
   (ebib-db-set-modified mod db)
-  (when (and master (ebib-db-slave-p db))
-    (ebib-db-set-modified mod (ebib-db-get-master db)))
-  (when slaves
-    (mapc (lambda (slave)
-            (ebib-db-set-modified mod slave))
-          slaves))
+  (when (and main (ebib-db-dependent-p db))
+    (ebib-db-set-modified mod (ebib-db-get-main db)))
+  (when dependents
+    (mapc (lambda (dependent)
+            (ebib-db-set-modified mod dependent))
+          dependents))
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
-      (force-mode-line-update)))
+                              (force-mode-line-update)))
   mod)
 
 (defun ebib--modified-p ()
@@ -617,10 +617,10 @@ Return the first modified database, or nil if none was modified."
               (ebib-db-modified-p db))
             ebib--databases))
 
-(defun ebib--create-new-database (&optional master)
+(defun ebib--create-new-database (&optional main)
   "Create a new database instance and return it.
-If MASTER is non-nil, create a slave database for MASTER."
-  (let ((new-db (ebib-db-new-database master)))
+If MAIN is non-nil, create a dependent database for MAIN."
+  (let ((new-db (ebib-db-new-database main)))
     (setq ebib--databases (append ebib--databases (list new-db)))
     new-db))
 
@@ -938,7 +938,7 @@ keywords before Emacs is killed."
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "l" #'ebib-show-log)
     (define-key map "m" #'ebib-mark-entry) ; prefix
-    (define-key map "M" 'ebib-slave-map)
+    (define-key map "M" 'ebib-dependent-map)
     (define-key map "n" #'ebib-next-entry)
     (define-key map "N" #'ebib-open-note)
     (define-key map [(control n)] #'ebib-next-entry)
@@ -1017,11 +1017,11 @@ there for details."
      ["Save All" ebib-save-all-databases (ebib--modified-p)]
      ["Save As..." ebib-write-database ebib--cur-db])
 
-    ("Master/Slave"
-     ["Create Slave" ebib-slave-create-slave (and ebib--cur-db (not (ebib-db-slave-p ebib--cur-db)) (not (ebib-db-filtered-p ebib--cur-db)))]
-     ["Add Entry To Slave" ebib-slave-add-entry (and ebib--cur-db (ebib-db-has-entries ebib--cur-db))]
-     ["Remove Entry From Slave" ebib-slave-delete-entry (and ebib--cur-db (ebib-db-slave-p ebib--cur-db) (ebib-db-has-entries ebib--cur-db))]
-     ["Switch To Master" ebib-slave-switch-to-master (and ebib--cur-db (ebib-db-slave-p ebib--cur-db))])
+    ("Main/Dependent"
+     ["Create Dependent" ebib-dependent-create-dependent (and ebib--cur-db (not (ebib-db-dependent-p ebib--cur-db)) (not (ebib-db-filtered-p ebib--cur-db)))]
+     ["Add Entry To Dependent" ebib-dependent-add-entry (and ebib--cur-db (ebib-db-has-entries ebib--cur-db))]
+     ["Remove Entry From Dependent" ebib-dependent-delete-entry (and ebib--cur-db (ebib-db-dependent-p ebib--cur-db) (ebib-db-has-entries ebib--cur-db))]
+     ["Switch To Main" ebib-dependent-switch-to-main (and ebib--cur-db (ebib-db-dependent-p ebib--cur-db))])
 
     ("Entry"
      ["Add" ebib-add-entry (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
@@ -1229,33 +1229,34 @@ interactively."
   "Merge a BibTeX file into the current database."
   (interactive)
   (ebib--execute-when
-    ((or slave-db filtered-db) (error "[Ebib] Cannot merge into a filtered or a slave database"))
+    ((or dependent-db filtered-db) (error "[Ebib] Cannot merge into a filtered or a dependent database"))
     (real-db
      (let ((file (expand-file-name (read-file-name "File to merge: ")))
            (ebib--log-error nil))       ; We haven't found any errors yet.
        (if (not (file-readable-p file))
            (error "[Ebib] No such file: %s" file)
          (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
-         (ebib--bib-read-entries file ebib--cur-db 'ignore-modtime 'not-as-slave)
+         (ebib--bib-read-entries file ebib--cur-db 'ignore-modtime 'not-as-dependent)
          (ebib--update-buffers)
          (ebib--set-modified t ebib--cur-db))))
     (default (beep))))
 
-(defun ebib--bib-read-entries (file db &optional ignore-modtime not-as-slave)
+(defun ebib--bib-read-entries (file db &optional ignore-modtime not-as-dependent)
   "Load BibTeX entries from FILE into DB.
 If FILE specifies a BibTeX dialect and no dialect is set for DB,
 also set DB's dialect.  FILE's modification time is stored in DB,
-unless IGNORE-MODTIME is non-nil.  If NOT-AS-SLAVE is non-nil, load
-FILE as a normal database, even if it is a slave database."
+unless IGNORE-MODTIME is non-nil.  If NOT-AS-DEPENDENT is
+non-nil, load FILE as a normal database, even if it is a
+dependent database."
   (with-temp-buffer
     (insert-file-contents file)
     (unless ignore-modtime
       (ebib-db-set-modtime (ebib--get-file-modtime file) db))
-    (if (and (not not-as-slave)
-             (ebib--bib-find-master db))
+    (if (and (not not-as-dependent)
+             (ebib--bib-find-main db))
         (let ((result (ebib--bib-find-bibtex-entries db nil)))
-          (ebib--log 'message "Loaded %d entries into slave database." (car result)))
-      ;; Opening a non-slave database.
+          (ebib--log 'message "Loaded %d entries into dependent database." (car result)))
+      ;; Opening a non-dependent database.
       (unless (ebib-db-get-dialect db)
         (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
       (let ((result (ebib--bib-find-bibtex-entries db nil)))
@@ -1266,20 +1267,20 @@ FILE as a normal database, even if it is a slave database."
     (when ebib--log-error
       (message "%s found! Press `l' to check Ebib log buffer." (nth ebib--log-error '("Warnings" "Errors"))))))
 
-(defun ebib--bib-find-master (db)
-  "Find the master file declaration in the current buffer.
-If a master file is found, make sure it is loaded and set it as
-DB's master.  If no master file is found, return nil.  If a
-master file is found but it cannot be opened, log an error."
+(defun ebib--bib-find-main (db)
+  "Find the \"main database\" declaration in the current buffer.
+If a main database is found, make sure it is loaded and set it as
+DB's main.  If no main database is found, return nil.  If a main
+database is found but it cannot be opened, log an error."
   (save-excursion
     (goto-char (point-min))
     (save-match-data
-      (if (re-search-forward "@Comment{\n[[:space:]]*ebib-master-file: \\(.*\\)\n}" nil t)
-          (let* ((master-file (match-string 1))
-                 (master (ebib--get-or-open-db master-file)))
-            (if master
-                (ebib-db-set-master master db)
-              (ebib--log 'error "Could not find master database %s" master-file)
+      (if (re-search-forward "@Comment{\n[[:space:]]*ebib-\\(?:main\\|master\\)-file: \\(.*\\)\n}" nil t)
+          (let* ((main-file (match-string 1))
+                 (main (ebib--get-or-open-db main-file)))
+            (if main
+                (ebib-db-set-main main db)
+              (ebib--log 'error "Could not find main database %s" main-file)
               nil)))))) ; Return nil because no database was found.
 
 (defun ebib--bib-find-bibtex-entries (db timestamp)
@@ -1333,7 +1334,7 @@ identifier, an error is logged and t is returned."
 (defun ebib--bib-read-comment (db)
   "Read an @Comment entry and store it in DB.
 If the @Comment is a local variable list, store it as such in DB.
-If the @Comment defines a master database, do not store the
+If the @Comment defines a main database, do not store the
 comment."
   (let ((comment (parsebib-read-comment)))
     (when comment
@@ -1342,15 +1343,15 @@ comment."
        (let ((lvars (ebib--local-vars-to-list comment)))
          (if lvars
              (ebib-db-set-local-vars lvars db)))
-       ;; Master file: do nothing (the master file was dealt with in `ebib--bib-read-entries'.
-       (string-match-p "^[[:space:]]*ebib-master-file: \\(.*\\)$" comment)
+       ;; Main file: do nothing (the main file was dealt with in `ebib--bib-read-entries'.
+       (string-match-p "^[[:space:]]*ebib-\\(?:main\\|master\\)-file: \\(.*\\)$" comment)
        ;; Otherwise, store the comment.
        (ebib-db-set-comment comment db)))))
 
 (defun ebib--bib-read-string (db)
   "Read an @String definition and store it in DB.
 Return value is the string if one was read, nil otherwise."
-  (unless (ebib-db-slave-p db) ; @Strings are not stored in slave files.
+  (unless (ebib-db-dependent-p db) ; @Strings are not stored in dependent files.
     (let* ((def (parsebib-read-string))
            (abbr (car def))
            (string (cdr def)))
@@ -1365,7 +1366,7 @@ Return value is the string if one was read, nil otherwise."
   "Read a @Preamble definition and store it in DB.
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
-  (unless (ebib-db-slave-p db) ; @Preamble is not stored in slave files.
+  (unless (ebib-db-dependent-p db) ; @Preamble is not stored in dependent files.
     (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
       (if preamble
           (ebib-db-set-preamble preamble db 'append)))))
@@ -1380,10 +1381,10 @@ also depends on `ebib-use-timestamp'.)"
          (entry (parsebib-read-entry entry-type)))
     (if entry
         (let ((entry-key (cdr (assoc-string "=key=" entry))))
-          (if (ebib-db-slave-p db)
-              (if (ebib-db-has-key entry-key (ebib-db-get-master db))
-                  (ebib-db-add-entries-to-slave entry-key db)
-                (ebib--log 'error "Entry key %s not found in master database" entry-key))
+          (if (ebib-db-dependent-p db)
+              (if (ebib-db-has-key entry-key (ebib-db-get-main db))
+                  (ebib-db-add-entries-to-dependent entry-key db)
+                (ebib--log 'error "Entry key %s not found in main database" entry-key))
             (when (string= entry-key "")
               (setq entry-key (ebib--generate-tempkey db))
               (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
@@ -1541,7 +1542,7 @@ is replaced with a number in ascending sequence."
   "Interactively add a new entry to the database."
   (interactive)
   (ebib--execute-when
-    (slave-db (ebib-slave-add-entry))
+    (dependent-db (ebib-dependent-add-entry))
     (real-db
      (let ((entry-alist (list)))
        (unless ebib-autogenerate-keys
@@ -1781,19 +1782,19 @@ This function updates both the database and the buffer."
       (let ((inhibit-read-only t))
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
-      ;; Also update slave databases.
-      (let ((slaves (seq-filter (lambda (db)
+      ;; Also update dependent databases.
+      (let ((dependents (seq-filter (lambda (db)
                                   (ebib-db-has-key cur-key db))
-                                (ebib--list-slaves ebib--cur-db))))
-        (mapc (lambda (slave)
-                (ebib-db-remove-entries-from-slave cur-key slave)
-                (ebib-db-add-entries-to-slave actual-new-key slave)
-                (ebib--mark-index-dirty slave)
-                (when (ebib-db-marked-p cur-key slave)
-                  (ebib-db-unmark-entry cur-key slave)
-                  (ebib-db-mark-entry actual-new-key slave)))
-              slaves)
-        (ebib--set-modified t ebib--cur-db nil slaves)))))
+                                (ebib--list-dependents ebib--cur-db))))
+        (mapc (lambda (dependent)
+                (ebib-db-remove-entries-from-dependent cur-key dependent)
+                (ebib-db-add-entries-to-dependent actual-new-key dependent)
+                (ebib--mark-index-dirty dependent)
+                (when (ebib-db-marked-p cur-key dependent)
+                  (ebib-db-unmark-entry cur-key dependent)
+                  (ebib-db-mark-entry actual-new-key dependent)))
+              dependents)
+        (ebib--set-modified t ebib--cur-db nil dependents)))))
 
 (defun ebib-mark-entry (arg)
   "Mark or unmark the current entry.
@@ -1932,7 +1933,7 @@ modified.  If called with \\[universal-argument] \\[universal-argument], save th
 file was modified."
   (interactive "P")
   (ebib--execute-when
-    ((or real-db slave-db)
+    ((or real-db dependent-db)
      (if (and (not force)
               (not (ebib-db-modified-p ebib--cur-db)))
          (message "No changes need to be saved.")
@@ -2003,11 +2004,13 @@ their contents into a single field."
   "Delete the current entry from the database.
 If there are marked entries, ask the user if they want to delete
 those instead.  If the answer is negative, delete the current
-entry.  In a slave database, execute `ebib-slave-delete-entry'
+entry.
+
+In a dependent database, call `ebib-dependent-delete-entry'
 instead."
   (interactive)
   (ebib--execute-when
-    (slave-db (ebib-slave-delete-entry))
+    (dependent-db (ebib-dependent-delete-entry))
     (entries
      (let* ((mark (point-marker))
             (marked-entries (ebib-db-list-marked-entries ebib--cur-db))
@@ -2033,13 +2036,13 @@ instead."
        (if (eobp)
            (forward-line -1))
        (ebib--update-entry-buffer)
-       ;; Update slave databases.
-       (mapc (lambda (slave)
-               (let ((n-entries (ebib-db-count-entries slave)))
-                 (ebib-db-remove-entries-from-slave to-be-deleted slave)
-                 (when (> n-entries (ebib-db-count-entries slave)) ; If any entries were removed.
-                   (ebib-db-set-modified t slave))))
-             (ebib--list-slaves ebib--cur-db))))
+       ;; Update dependent databases.
+       (mapc (lambda (dependent)
+               (let ((n-entries (ebib-db-count-entries dependent)))
+                 (ebib-db-remove-entries-from-dependent to-be-deleted dependent)
+                 (when (> n-entries (ebib-db-count-entries dependent)) ; If any entries were removed.
+                   (ebib-db-set-modified t dependent))))
+             (ebib--list-dependents ebib--cur-db))))
     (default
       (beep))))
 
@@ -2059,8 +2062,8 @@ The entry is copied to the kill ring."
 
 (defun ebib-kill-entry ()
   "Kill the current entry.
-The entry is put in the kill ring.  In a slave database, the
-entry is not deleted from the master database."
+The entry is put in the kill ring.  In a dependent database, the
+entry is not deleted from the main database."
   (interactive)
   (ebib--execute-when
     (entries
@@ -2071,14 +2074,14 @@ entry is not deleted from the master database."
          (kill-new (buffer-substring-no-properties (point-min) (point-max))))
        (let ((inhibit-read-only t))
          (delete-region (point-at-bol) (1+ (point-at-eol))))
-       (if (ebib-db-slave-p ebib--cur-db)
-           (ebib-db-remove-entries-from-slave key ebib--cur-db)
+       (if (ebib-db-dependent-p ebib--cur-db)
+           (ebib-db-remove-entries-from-dependent key ebib--cur-db)
          (ebib-db-remove-entry key ebib--cur-db)
-         (mapc (lambda (slave)
-                 (when (ebib-db-has-key key slave)
-                   (ebib-db-remove-entries-from-slave key slave)
-                   (ebib-db-set-modified t slave)))
-               (ebib--list-slaves ebib--cur-db)))
+         (mapc (lambda (dependent)
+                 (when (ebib-db-has-key key dependent)
+                   (ebib-db-remove-entries-from-dependent key dependent)
+                   (ebib-db-set-modified t dependent)))
+               (ebib--list-dependents ebib--cur-db)))
        (goto-char mark)
        (if (eobp)
            (forward-line -1))
@@ -2554,7 +2557,7 @@ appended to it."
          (unless target-db
            (error "[Ebib] Could not export @Preamble"))
          (if (not (ebib--real-database-p target-db))
-             (error "[Ebib] Cannot export to filtered or slave database"))
+             (error "[Ebib] Cannot export to filtered or dependent database"))
          (ebib-db-set-preamble (ebib-db-get-preamble ebib--cur-db) target-db 'append)
          (ebib-db-set-modified t target-db))))
     (default
@@ -2793,7 +2796,7 @@ is used)."
                        (ebib--local-vars-add-dialect lvars dialect 'overwrite)
                      (ebib--local-vars-delete-dialect lvars)))
        (ebib-db-set-local-vars lvars ebib--cur-db))
-     (ebib--set-modified t ebib--cur-db t (ebib--list-slaves ebib--cur-db))
+     (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
      (ebib--update-entry-buffer))
     (default
       (beep))))
@@ -2966,10 +2969,10 @@ the database(s) associated with the current buffer (see
 `ebib--get-local-bibfiles' for details), or from the current
 database if the current buffer has no associated databases.
 
-If the current buffer is associated with a slave database, the
-entries of its master database are offered as completion
-candidates and the entry that is selected is added to the slave
-database if not already there.
+If the current buffer is associated with a dependent database,
+the entries of its main database are offered as completion
+candidates and the entry that is selected is added to the
+dependent database if not already there.
 
 This is a front-end for other citation insertion functions: if
 the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
@@ -2986,11 +2989,11 @@ Emacs completion."
      (let* ((database-files (ebib--get-local-bibfiles))
             (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
                            ebib--databases))
-            slave-db)
+            dependent-db)
        (when (and (= (length databases) 1)
-                  (ebib-db-slave-p (car databases)))
-         (setq slave-db (car databases))
-         (setq databases (list (ebib-db-get-master (car databases)))))
+                  (ebib-db-dependent-p (car databases)))
+         (setq dependent-db (car databases))
+         (setq databases (list (ebib-db-get-main (car databases)))))
        (let* ((entries (cond
                         ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
                         ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
@@ -3001,20 +3004,20 @@ Emacs completion."
               (citation (ebib--create-citation major-mode keys db)))
          (if citation
              (insert (format "%s" citation)))
-         (when slave-db
+         (when dependent-db
            (dolist (key keys)
-             (unless (ebib-db-has-key key slave-db)
-               (ebib-db-add-entries-to-slave key slave-db)
-               (ebib-db-set-modified t slave-db)))
-           (when (ebib-db-modified-p slave-db)
-             (ebib--mark-index-dirty slave-db)
-             (if ebib-save-slave-after-citation
+             (unless (ebib-db-has-key key dependent-db)
+               (ebib-db-add-entries-to-dependent key dependent-db)
+               (ebib-db-set-modified t dependent-db)))
+           (when (ebib-db-modified-p dependent-db)
+             (ebib--mark-index-dirty dependent-db)
+             (if ebib-save-dependent-after-citation
                  (condition-case err
-                     (ebib--save-database slave-db)
+                     (ebib--save-database dependent-db)
                    ;; If an error occurs, make sure to mark the database as modified.
-                   (error (ebib-db-set-modified t slave-db)
+                   (error (ebib-db-set-modified t dependent-db)
                           (signal (car err) (cdr err))))
-               (ebib-db-set-modified t slave-db)))))))
+               (ebib-db-set-modified t dependent-db)))))))
     (default
       (error "[Ebib] No database opened"))))
 
@@ -3030,87 +3033,87 @@ Emacs completion."
   (ebib-lower)
   (info "(ebib)"))
 
-;;; Master & slave databases
+;;; Main & dependent databases
 
 (eval-and-compile
-  (define-prefix-command 'ebib-slave-map)
-  (suppress-keymap 'ebib-slave-map 'no-digits)
-  (define-key ebib-slave-map "c" #'ebib-slave-create-slave)
-  (define-key ebib-slave-map "a" #'ebib-slave-add-entry)
-  (define-key ebib-slave-map "d" #'ebib-slave-delete-entry)
-  (define-key ebib-slave-map "m" #'ebib-slave-switch-to-master))
+  (define-prefix-command 'ebib-dependent-map)
+  (suppress-keymap 'ebib-dependent-map 'no-digits)
+  (define-key ebib-dependent-map "c" #'ebib-dependent-create-dependent)
+  (define-key ebib-dependent-map "a" #'ebib-dependent-add-entry)
+  (define-key ebib-dependent-map "d" #'ebib-dependent-delete-entry)
+  (define-key ebib-dependent-map "m" #'ebib-dependent-switch-to-main))
 
-(defun ebib-slave-create-slave ()
-  "Create a slave database based on the current database."
+(defun ebib-dependent-create-dependent ()
+  "Create a dependent database based on the current database."
   (interactive)
   (ebib--execute-when
-    ((or slave-db filtered-db)
-     (error "Cannot create slave database from another slave or from a filtered database"))
+    ((or dependent-db filtered-db)
+     (error "Cannot create dependent database from another dependent or from a filtered database"))
     (real-db
-     (let ((file (read-file-name "Create slave database: "))
-           (slave (ebib--create-new-database ebib--cur-db)))
-       (ebib-db-set-filename (expand-file-name file) slave)
-       (setq ebib--cur-db slave)
+     (let ((file (read-file-name "Create dependent database: "))
+           (dependent (ebib--create-new-database ebib--cur-db)))
+       (ebib-db-set-filename (expand-file-name file) dependent)
+       (setq ebib--cur-db dependent)
        (ebib--update-buffers)))
     (default (beep))))
 
-(defun ebib-slave-add-entry ()
-  "Add an entry from the master database to a slave database.
-When called from within a slave database, the keys of the
-entries of the master database are offered for completion.  When
-called in a database that is not a slave, this function first
-checks if the database has any slave, asking the user which
+(defun ebib-dependent-add-entry ()
+  "Add an entry from the main database to a dependent database.
+When called from within a dependent database, the keys of the
+entries of the main database are offered for completion.  When
+called in a database that is not a dependent, this function first
+checks if the database has any dependent, asking the user which
 one to use if there are more than one, and then adds the current
-entry or the marked entries to the slave database."
+entry or the marked entries to the dependent database."
   (interactive)
   (ebib--execute-when
-    (slave-db
-     (let* ((collection (seq-difference (ebib-db-list-keys (ebib-db-get-master ebib--cur-db)) (ebib-db-list-keys ebib--cur-db)))
-            (key (completing-read "Key to add to the current slave database: " collection nil t)))
-       (ebib-db-add-entries-to-slave key ebib--cur-db)
-       (ebib-db-set-current-entry-key key ebib--cur-db)
-       (ebib--insert-entry-in-index-sorted key t)
-       (ebib--set-modified t ebib--cur-db)
-       (ebib--update-entry-buffer)))
-    (real-db
-     (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
-                              (y-or-n-p "Add marked entries to slave database? ")
-                              (ebib-db-list-marked-entries ebib--cur-db))
-                         (ebib--get-key-at-point)))
-            (slave (seq-filter (lambda (db)
-                                 (eq ebib--cur-db (ebib-db-get-master db)))
-                               ebib--databases))
-            (target (cond
-                     ((null slave) (error "No slave databases associated with current database"))
-                     ((= (length slave) 1) (car slave))
-                     (t (ebib-read-database (format "Add %s to slave database: " (if (stringp entries) "entry" "entries")) slave)))))
-       (when target
-         (ebib-db-add-entries-to-slave entries target)
-         (ebib-db-set-modified t target)
-         (ebib--mark-index-dirty target)
-         (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
+   (dependent-db
+    (let* ((collection (seq-difference (ebib-db-list-keys (ebib-db-get-main ebib--cur-db)) (ebib-db-list-keys ebib--cur-db)))
+           (key (completing-read "Key to add to the current dependent database: " collection nil t)))
+      (ebib-db-add-entries-to-dependent key ebib--cur-db)
+      (ebib-db-set-current-entry-key key ebib--cur-db)
+      (ebib--insert-entry-in-index-sorted key t)
+      (ebib--set-modified t ebib--cur-db)
+      (ebib--update-entry-buffer)))
+   (real-db
+    (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
+                             (y-or-n-p "Add marked entries to dependent database? ")
+                             (ebib-db-list-marked-entries ebib--cur-db))
+                        (ebib--get-key-at-point)))
+           (dependent (seq-filter (lambda (db)
+                                    (eq ebib--cur-db (ebib-db-get-main db)))
+                                  ebib--databases))
+           (target (cond
+                    ((null dependent) (error "No dependent databases associated with current database"))
+                    ((= (length dependent) 1) (car dependent))
+                    (t (ebib-read-database (format "Add %s to dependent database: " (if (stringp entries) "entry" "entries")) dependent)))))
+      (when target
+        (ebib-db-add-entries-to-dependent entries target)
+        (ebib-db-set-modified t target)
+        (ebib--mark-index-dirty target)
+        (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
 
-(defun ebib-slave-delete-entry ()
-  "Delete the current entry or marked entries from a slave database."
+(defun ebib-dependent-delete-entry ()
+  "Delete the current entry or marked entries from a dependent database."
   (interactive)
   (ebib--execute-when
-    ((and slave-db entries)
+    ((and dependent-db entries)
      (let ((mark (point-marker))
            (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
        (if (and marked-entries
-                (y-or-n-p "Remove all marked entries from slave database? "))
+                (y-or-n-p "Remove all marked entries from dependent database? "))
            (progn (dolist (key marked-entries)
                     (ebib--goto-entry-in-index key)
                     (let ((inhibit-read-only t))
                       (delete-region (point-at-bol) (1+ (point-at-eol))))
-                    (ebib-db-remove-entries-from-slave key ebib--cur-db))
+                    (ebib-db-remove-entries-from-dependent key ebib--cur-db))
                   (ebib-db-unmark-entry 'all ebib--cur-db) ; This works even though we already removed the entries from the database.
                   (message "Marked entries removed."))
          (let ((key (ebib--get-key-at-point)))
            (when (y-or-n-p (format "Remove %s from depedent database? " key))
              (let ((inhibit-read-only t))
                (delete-region (point-at-bol) (1+ (point-at-eol))))
-             (ebib-db-remove-entries-from-slave key ebib--cur-db)
+             (ebib-db-remove-entries-from-dependent key ebib--cur-db)
              (message "Entry `%s' removed." key))))
        (ebib--set-modified t ebib--cur-db)
        (goto-char mark)
@@ -3119,13 +3122,13 @@ entry or the marked entries to the slave database."
        (ebib--update-entry-buffer)))
     (default (beep))))
 
-(defun ebib-slave-switch-to-master ()
-  "Switch to the master database of the current slave."
+(defun ebib-dependent-switch-to-main ()
+  "Switch to the main database of the current dependent database."
   (interactive)
   (ebib--execute-when
-    (slave-db (let ((master (ebib-db-get-master ebib--cur-db)))
-                (ebib-switch-to-database master)))
-    (default (beep))))
+   (dependent-db (let ((main (ebib-db-get-main ebib--cur-db)))
+                   (ebib-switch-to-database main)))
+   (default (beep))))
 
 ;;; Interactive keyword functions
 
@@ -3186,10 +3189,10 @@ the current entry."
                    (message "Keywords added to marked entries."))
                (add-keywords to-be-modified (mapconcat #'identity keywords ebib-keywords-separator))
                (setq to-be-modified (list to-be-modified))) ; So we can use it in `seq-difference' below.
-             (ebib--set-modified t ebib--cur-db (seq-filter (lambda (slave)
-                                                              (= (ebib-db-count-entries slave)
-                                                                 (length (seq-difference (ebib-db-list-keys slave) to-be-modified))))
-                                                            (ebib--list-slaves ebib--cur-db)))))
+             (ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
+                                                              (= (ebib-db-count-entries dependent)
+                                                                 (length (seq-difference (ebib-db-list-keys dependent) to-be-modified))))
+                                                            (ebib--list-dependents ebib--cur-db)))))
           (default
             (beep)))
         (ebib--update-entry-buffer)))))
@@ -3594,9 +3597,9 @@ was called interactively."
       (let ((key (ebib--get-key-at-point)))
         (ebib-set-field-value "=type=" new-type key ebib--cur-db 'overwrite 'unbraced)
         (ebib--update-entry-buffer)
-        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                           (ebib-db-has-key key slave))
-                                                         (ebib--list-slaves ebib--cur-db))))))
+        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                           (ebib-db-has-key key dependent))
+                                                         (ebib--list-dependents ebib--cur-db))))))
 
 (defun ebib--edit-crossref (field)
   "Edit cross-referencing FIELD."
@@ -3605,9 +3608,9 @@ was called interactively."
         (progn
           (ebib-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
-          (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                             (ebib-db-has-key (ebib--get-key-at-point) slave))
-                                                           (ebib--list-slaves ebib--cur-db)))))))
+          (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                             (ebib-db-has-key (ebib--get-key-at-point) dependent))
+                                                           (ebib--list-dependents ebib--cur-db)))))))
 
 (defun ebib--edit-keywords-field ()
   "Edit the keywords field."
@@ -3633,9 +3636,9 @@ was called interactively."
                   (unless (member keyword collection)
                     (ebib--keywords-add-keyword keyword ebib--cur-db))
                   (ebib--redisplay-current-field)
-                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                                     (ebib-db-has-key key slave))
-                                                                   (ebib--list-slaves ebib--cur-db))))
+                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                     (ebib-db-has-key key dependent))
+                                                                   (ebib--list-dependents ebib--cur-db))))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--edit-file-field ()
@@ -3665,9 +3668,9 @@ otherwise they are stored as absolute paths."
                                     file-name)))
                   (ebib-set-field-value ebib-file-field new-conts key ebib--cur-db 'overwrite)
                   (ebib--redisplay-current-field)
-                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                                     (ebib-db-has-key key slave))
-                                                                   (ebib--list-slaves ebib--cur-db))))
+                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                     (ebib-db-has-key key dependent))
+                                                                   (ebib--list-dependents ebib--cur-db))))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--transform-file-name-for-storing (file)
@@ -3708,7 +3711,7 @@ If FILE is not in (a subdirectory of) one of the directories in
                                                              (apply #'seq-concatenate 'list (mapcar (lambda (db)
                                                                                                       (hash-table-values (ebib-db-val 'entries db)))
                                                                                                     (seq-filter (lambda (db)
-                                                                                                                  (not (ebib-db-slave-p db)))
+                                                                                                                  (not (ebib-db-dependent-p db)))
                                                                                                                 ebib--databases))))))))
 
 (defun ebib--edit-author/editor-field (field)
@@ -3735,9 +3738,9 @@ and editors in all databases."
                                       author)))
                     (ebib-set-field-value field new-conts key ebib--cur-db 'overwrite)
                     (ebib--redisplay-current-field)
-                    (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                                       (ebib-db-has-key key slave))
-                                                                     (ebib--list-slaves ebib--cur-db))))
+                    (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                       (ebib-db-has-key key dependent))
+                                                                     (ebib--list-dependents ebib--cur-db))))
                finally return (ebib-db-modified-p ebib--cur-db)))))
 
 (defun ebib--create-collection-from-field (field)
@@ -3747,7 +3750,7 @@ and editors in all databases."
                               (apply #'seq-concatenate 'list (mapcar (lambda (db)
                                                                        (hash-table-values (ebib-db-val 'entries db)))
                                                                      (seq-filter (lambda (db)
-                                                                                   (not (ebib-db-slave-p db)))
+                                                                                   (not (ebib-db-dependent-p db)))
                                                                                  ebib--databases)))))))
 
 (defun ebib--edit-normal-field ()
@@ -3775,9 +3778,9 @@ and editors in all databases."
           (ebib-set-field-value cur-field new-contents key ebib--cur-db 'overwrite unbraced?)
         (ebib-db-remove-field-value cur-field key ebib--cur-db))
       (ebib--redisplay-current-field)
-      (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                         (ebib-db-has-key key slave))
-                                                       (ebib--list-slaves ebib--cur-db))))))
+      (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                         (ebib-db-has-key key dependent))
+                                                       (ebib--list-dependents ebib--cur-db))))))
 
 ;; `ebib-edit-field' relegates the actual editing to a number of helper functions.
 ;; These functions should return non-nil if editing was successful and they
@@ -3915,9 +3918,9 @@ value from a cross-referenced entry, it is not killed."
           (kill-new contents)
           (ebib--redisplay-current-field)
           (ebib--redisplay-index-item field)
-          (ebib--set-modified t ebib--cur-db (seq-filter (lambda (slave)
-                                                           (ebib-db-has-key key slave))
-                                                         (ebib--list-slaves ebib--cur-db)))
+          (ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
+                                                           (ebib-db-has-key key dependent))
+                                                         (ebib--list-dependents ebib--cur-db)))
           (message "Field contents killed."))
          (t (error "Cannot kill an empty field")))))))
 
@@ -3946,9 +3949,9 @@ Prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
           (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite)
           (ebib--redisplay-current-field)
           (ebib--redisplay-index-item field)
-          (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                             (ebib-db-has-key key slave))
-                                                           (ebib--list-slaves ebib--cur-db))))))))
+          (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                             (ebib-db-has-key key dependent))
+                                                           (ebib--list-dependents ebib--cur-db))))))))
 
 (defun ebib-delete-field-contents ()
   "Delete the contents of the current field.
@@ -3962,9 +3965,9 @@ The deleted text is not put in the kill ring."
         (ebib-db-remove-field-value field key ebib--cur-db)
         (ebib--redisplay-current-field)
         (ebib--redisplay-index-item field)
-        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                           (ebib-db-has-key key slave))
-                                                         (ebib--list-slaves ebib--cur-db)))
+        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                           (ebib-db-has-key key dependent))
+                                                         (ebib--list-dependents ebib--cur-db)))
         (message "Field contents deleted.")))))
 
 (defun ebib-toggle-raw ()
@@ -3982,9 +3985,9 @@ The deleted text is not put in the kill ring."
           (when contents ; We must check to make sure the user entered some value.
             (ebib-set-field-value field contents key ebib--cur-db 'overwrite (not (ebib-unbraced-p contents)))
             (ebib--redisplay-current-field)
-            (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                               (ebib-db-has-key key slave))
-                                                             (ebib--list-slaves ebib--cur-db)))))))))
+            (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                               (ebib-db-has-key key dependent))
+                                                             (ebib--list-dependents ebib--cur-db)))))))))
 
 (defun ebib-edit-multiline-field ()
   "Edit the current field in multiline-mode."
@@ -4009,9 +4012,9 @@ The deleted text is not put in the kill ring."
             (let ((string (completing-read "Abbreviation to insert: " strings nil t)))
               (when string
                 (ebib-set-field-value field string key ebib--cur-db 'overwrite 'unbraced)
-                (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                                   (ebib-db-has-key key slave))
-                                                                 (ebib--list-slaves ebib--cur-db))))))
+                (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                   (ebib-db-has-key key dependent))
+                                                                 (ebib--list-dependents ebib--cur-db))))))
           (ebib--redisplay-current-field)
           (ebib-next-field))))))
 
@@ -4189,7 +4192,7 @@ When the user enters an empty string, the value is not changed."
           (ebib-set-string string new-contents ebib--cur-db 'overwrite)
           (ebib--redisplay-current-string)
           (ebib-next-string)
-          (ebib--set-modified t ebib--cur-db t (ebib--list-slaves ebib--cur-db)))
+          (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))
       (error "[Ebib] @String definition cannot be empty"))))
 
 (defun ebib-copy-string-contents ()
@@ -4209,7 +4212,7 @@ When the user enters an empty string, the value is not changed."
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
-      (ebib--set-modified t ebib--cur-db t (ebib--list-slaves ebib--cur-db))
+      (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
       (message "@String definition deleted."))))
 
 (defun ebib-add-string ()
@@ -4228,7 +4231,7 @@ When the user enters an empty string, the value is not changed."
               (goto-char (point-min))
               (re-search-forward new-string nil 'noerror)
               (beginning-of-line)
-              (ebib--set-modified t ebib--cur-db t (ebib--list-slaves ebib--cur-db)))))))
+              (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))))))
 
 (defun ebib-export-string (prefix)
   "Export the current @String to another database.
@@ -4253,15 +4256,15 @@ or database to export the @String to."
         (unless target-db
           (error "[Ebib] Could not export @Strings"))
         (unless (or (ebib-db-filtered-p target-db)
-                    (ebib-db-slave-p target-db))
-          (error "[Ebib] Cannot export to filtered or slave database"))
+                    (ebib-db-dependent-p target-db))
+          (error "[Ebib] Cannot export to filtered or dependent database"))
         (if (member string (ebib-db-list-strings target-db))
             (ebib--log 'message "@String `%s' already exists in database %d" string (ebib-db-get-filename target-db 'short))
           (ebib-set-string string (ebib-db-get-string string ebib--cur-db) target-db 'error)
           (ebib-db-set-modified t target-db)
-          (mapc (lambda (slave)
-                  (ebib-db-set-modified t slave))
-                (ebib--list-slaves target-db)))))))
+          (mapc (lambda (dependent)
+                  (ebib-db-set-modified t dependent))
+                (ebib--list-dependents target-db)))))))
 
 (defun ebib-export-all-strings (prefix)
   "Export all @String definitions to another database.
@@ -4289,8 +4292,8 @@ the @String definitions to."
         (unless target-db
           (error "[Ebib] Could not export @Strings"))
         (unless (or (ebib-db-filtered-p target-db)
-                    (ebib-db-slave-p target-db))
-          (error "[Ebib] Cannot export to filtered or slave database"))
+                    (ebib-db-dependent-p target-db))
+          (error "[Ebib] Cannot export to filtered or dependent database"))
         (let ((modified nil)
               (target-strings (ebib-db-list-strings target-db)))
           (mapc (lambda (string)
@@ -4301,9 +4304,9 @@ the @String definitions to."
                 strings)
           (when modified
             (ebib-db-set-modified t target-db)
-            (mapc (lambda (slave)
-                    (ebib-db-set-modified t slave))
-                  (ebib--list-slaves target-db))))))))
+            (mapc (lambda (dependent)
+                    (ebib-db-set-modified t dependent))
+                  (ebib--list-dependents target-db))))))))
 
 (defun ebib-strings-help ()
   "Show the info node on Ebib's strings buffer."
@@ -4446,9 +4449,9 @@ The text being edited is stored before saving the database."
               (ebib-db-remove-field-value field key db)
             (ebib-set-field-value field text key db 'overwrite)))))
       (set-buffer-modified-p nil)
-      (ebib--set-modified t db t (seq-filter (lambda (slave)
-                                               (ebib-db-has-key key slave))
-                                             (ebib--list-slaves db))))))
+      (ebib--set-modified t db t (seq-filter (lambda (dependent)
+                                               (ebib-db-has-key key dependent))
+                                             (ebib--list-dependents db))))))
 
 (defun ebib-multiline-help ()
   "Show the info node on Ebib's multiline edit buffer."
@@ -4504,43 +4507,43 @@ pdf.  The file name is created by applying the function in
 \".pdf\" to it."
   (interactive "P")
   (ebib--execute-when
-    (entries
-     (let* ((key (ebib--get-key-at-point))
-            (urls (ebib-get-field-value ebib-url-field key ebib--cur-db 'noerror 'unbraced)))
-       (if urls
-           (let* ((fname (ebib--create-file-name-from-key key "pdf"))
-                  (fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname))
-                  (urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
-                  (pdfurl (ebib--transform-url urlvalue))
-                  (overwrite nil))
-             (if (not (file-writable-p fullpath))
-                 (error "[Ebib] File %s cannot be written to" fullpath))
-             (if (not (string-match-p "\\.pdf\\'" pdfurl))
-                 (let ((choice (read-char-choice (format "URL %s does not seem to be a pdf paper; (d)ownload anyway / (m)odify URL / (c)ancel? " pdfurl) '(?d ?m ?c ?q))))
-                   (cl-case choice
-                     ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
-                     (?m (setq pdfurl (read-string "New URL: " pdfurl))))))
-             (while (and (file-exists-p fullpath)
-                         (not overwrite))
-               (let ((choice (read-char-choice (format "File %s already exists; (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c ?q))))
-                 (cl-case choice
-                   ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
-                   (?r (setq fname (read-string (format "Change `%s' to: " fname) fname))
-                       (setq fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname)))
-                   (?o (setq overwrite t)))))
-             (url-copy-file pdfurl fullpath t)
-             (message "[Ebib] Downloaded URL %s to %s" pdfurl fullpath)
-             (let ((files (ebib-get-field-value ebib-file-field key ebib--cur-db 'noerror 'unbraced)))
-               (when (or (null files)
-                         (not (string-match-p (regexp-quote fname) files)))
-                 (ebib-set-field-value ebib-file-field fname key ebib--cur-db ebib-filename-separator)
-                 (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                                    (ebib-db-has-key key slave))
-                                                                  (ebib--list-slaves ebib--cur-db)))
-                 (ebib--update-entry-buffer))))
-         (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
-    (default
-      (beep))))
+   (entries
+    (let* ((key (ebib--get-key-at-point))
+           (urls (ebib-get-field-value ebib-url-field key ebib--cur-db 'noerror 'unbraced)))
+      (if urls
+          (let* ((fname (ebib--create-file-name-from-key key "pdf"))
+                 (fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname))
+                 (urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
+                 (pdfurl (ebib--transform-url urlvalue))
+                 (overwrite nil))
+            (if (not (file-writable-p fullpath))
+                (error "[Ebib] File %s cannot be written to" fullpath))
+            (if (not (string-match-p "\\.pdf\\'" pdfurl))
+                (let ((choice (read-char-choice (format "URL %s does not seem to be a pdf paper; (d)ownload anyway / (m)odify URL / (c)ancel? " pdfurl) '(?d ?m ?c ?q))))
+                  (cl-case choice
+                    ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
+                    (?m (setq pdfurl (read-string "New URL: " pdfurl))))))
+            (while (and (file-exists-p fullpath)
+                        (not overwrite))
+              (let ((choice (read-char-choice (format "File %s already exists; (o)verwrite / (r)ename / (c)ancel? " fname) '(?o ?r ?c ?q))))
+                (cl-case choice
+                  ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
+                  (?r (setq fname (read-string (format "Change `%s' to: " fname) fname))
+                      (setq fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname)))
+                  (?o (setq overwrite t)))))
+            (url-copy-file pdfurl fullpath t)
+            (message "[Ebib] Downloaded URL %s to %s" pdfurl fullpath)
+            (let ((files (ebib-get-field-value ebib-file-field key ebib--cur-db 'noerror 'unbraced)))
+              (when (or (null files)
+                        (not (string-match-p (regexp-quote fname) files)))
+                (ebib-set-field-value ebib-file-field fname key ebib--cur-db ebib-filename-separator)
+                (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                   (ebib-db-has-key key dependent))
+                                                                 (ebib--list-dependents ebib--cur-db)))
+                (ebib--update-entry-buffer))))
+        (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
+   (default
+     (beep))))
 
 (defun ebib--transform-url (url)
   "Transform URL by applying `ebib-url-download-transformations' to it.
@@ -4586,9 +4589,9 @@ If prefix ARG is non-nil, do not delete the original file."
       (when (or (null files)
                 (not (string-match-p (regexp-quote new-name) files)))
         (ebib-set-field-value ebib-file-field (ebib--transform-file-name-for-storing (expand-file-name dest-path)) key ebib--cur-db ebib-filename-separator)
-        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (slave)
-                                                           (ebib-db-has-key key slave))
-                                                         (ebib--list-slaves ebib--cur-db)))
+        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                           (ebib-db-has-key key dependent))
+                                                         (ebib--list-dependents ebib--cur-db)))
         (ebib--update-entry-buffer)))))
 
 ;;; Functions for non-Ebib buffers

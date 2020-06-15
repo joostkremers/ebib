@@ -239,8 +239,8 @@ The rest of the frame is used for the entry buffer, unless
                                   mode-line-front-space
                                   ebib--mode-line-modified
                                   mode-line-buffer-identification
-                                  (:eval (if (and ebib--cur-db (ebib-db-slave-p ebib--cur-db))
-                                             (format " [%s]" (ebib-db-get-filename (ebib-db-get-master ebib--cur-db) t))))
+                                  (:eval (if (and ebib--cur-db (ebib-db-dependent-p ebib--cur-db))
+                                             (format " [%s]" (ebib-db-get-filename (ebib-db-get-main ebib--cur-db) t))))
                                   (:eval (format "  (%s)" (ebib--get-dialect ebib--cur-db)))
                                   (:eval (if (and ebib--cur-db (ebib--get-key-at-point))
                                              "     Entry %l"
@@ -848,7 +848,8 @@ Lists file extensions together with external programs to handle
 files with those extensions.  If the program string contains a
 literal `%s', it is replaced with the name of the file being
 opened, allowing the use of command line options.  Otherwise, the
-string is treated as an executable, searched for in `exec-path'.
+string is treated as an executable, searched for in the variable
+`exec-path'.
 
 When you open a file for which no external program is defined,
 the file is opened in Emacs."
@@ -998,16 +999,16 @@ Setting this option disables completion completely."
   :type '(choice (const :tag "Use completion" nil)
                  (const :tag "Do not use completion" t)))
 
-(defcustom ebib-save-slave-after-citation t
-  "Save a slave database after `ebib-insert-citation'.
+(defcustom ebib-save-dependent-after-citation t
+  "Save a dependent database after `ebib-insert-citation'.
 Calling `ebib-insert-citation' in a text buffer associated with a
-slave database may insert a citation from the master database and
-add this citation to the slave database.  In such a case, the
+dependent database may insert a citation from the main database and
+add this citation to the dependent database.  In such a case, the
 database needs to be saved before running (e.g.) LaTeX on the
 file.  If this option is set, the database is automatically saved."
   :group 'ebib
-  :type '(choice (const :tag "Save slave database after citation" t)
-                 (const :tag "Only save slave databases manually" nil)))
+  :type '(choice (const :tag "Save dependent database after citation" t)
+                 (const :tag "Only save dependent databases manually" nil)))
 
 (defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
 
@@ -1187,13 +1188,13 @@ and the return value of its last form is returned."
      ((eq env 'real-db)
       '(and ebib--cur-db
             (not (ebib-db-get-filter ebib--cur-db))
-            (not (ebib-db-slave-p ebib--cur-db))))
+            (not (ebib-db-dependent-p ebib--cur-db))))
      ((eq env 'filtered-db)
       '(and ebib--cur-db
             (ebib-db-get-filter ebib--cur-db)))
-     ((eq env 'slave-db)
+     ((eq env 'dependent-db)
       '(and ebib--cur-db
-            (ebib-db-slave-p ebib--cur-db)))
+            (ebib-db-dependent-p ebib--cur-db)))
      ((eq env 'no-database)
       '(not ebib--cur-db))
      ((eq env 'default) t)
@@ -1211,9 +1212,9 @@ symbols are:
 `marked-entries': execute  there are marked entries in the database;
 `database': execute if there is a database;
 `no-database': execute if there is no database;
-`real-db': execute if there is a database that is not filtered nor a slave;
+`real-db': execute if there is a database that is not filtered nor a dependent;
 `filtered-db': execute if there is a filtered database;
-`slave-db': execute if there is a slave database;
+`dependent-db': execute if there is a dependent database;
 `default': execute if all else fails.
 
 Just like with `cond', only one form is actually executed, the
@@ -1520,7 +1521,7 @@ match was found at all."
     (add-text-properties (match-beginning 0) (match-end 0) '(face ebib-highlight-face) string)))
 
 (defun ebib--looking-at-goto-end (regexp &optional match)
-  "Return t if text after point matches REGEXP and move point.
+  "Return non-nil if text after point matches REGEXP and move point.
 MATCH acts just like the argument to MATCH-END, and defaults to
 0."
   (or match (setq match 0))
@@ -1735,12 +1736,12 @@ formatting the entry."
           (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
 
-(defun ebib--format-master (db)
-  "Write DB's master database to the current buffer."
-  (let ((master (ebib-db-get-master db)))
-    (when master
-      (insert (format "@Comment{\nebib-master-file: %s\n}\n\n"
-                      (ebib-db-get-filename master))))))
+(defun ebib--format-main (db)
+  "Write DB's main database to the current buffer."
+  (let ((main (ebib-db-get-main db)))
+    (when main
+      (insert (format "@Comment{\nebib-main-file: %s\n}\n\n"
+                      (ebib-db-get-filename main))))))
 
 (defun ebib--format-strings (db)
   "Write the @Strings of DB into the current buffer in BibTeX format."
@@ -1773,7 +1774,7 @@ referred to by ENTRY-KEY."
 (defun ebib--format-database-as-bibtex (db)
   "Write database DB into the current buffer in BibTeX format."
   (ebib--format-comments db)
-  (ebib--format-master db)
+  (ebib--format-main db)
   (when (ebib-db-get-preamble db)
     (insert (format "@Preamble{%s}\n\n" (ebib-db-get-preamble db))))
   (ebib--format-strings db)
@@ -1812,8 +1813,8 @@ referred to by ENTRY-KEY."
 (defun ebib--export-entries-to-db (entries target-db source-db)
   "Export ENTRIES from SOURCE-DB to TARGET-DB.
 ENTRIES is a list of entry keys."
-  (if (ebib-db-slave-p target-db)
-      (error "Cannot export entries to a slave database ")
+  (if (ebib-db-dependent-p target-db)
+      (error "Cannot export entries to a dependent database ")
     (let ((target-keys-list (ebib-db-list-keys target-db))
           (modified nil))
       (mapc (lambda (key)
@@ -1976,14 +1977,14 @@ If STRING is already braced, do nothing."
 
 (defun ebib--real-database-p (db)
   "Return non-nil if DB is a real database.
-Return nil if DB is either a filtered or a slave database."
+Return nil if DB is either a filtered or a dependent database."
   (not (or (ebib-db-filtered-p db)
-           (ebib-db-slave-p db))))
+           (ebib-db-dependent-p db))))
 
-(defun ebib--list-slaves (database)
-  "Return a list of slave databases for DATABASE."
+(defun ebib--list-dependents (database)
+  "Return a list of dependent databases for DATABASE."
   (seq-filter (lambda (db)
-                (eq (ebib-db-get-master db) database))
+                (eq (ebib-db-get-main db) database))
               ebib--databases))
 
 (defun ebib--list-fields (entry-type type dialect)
