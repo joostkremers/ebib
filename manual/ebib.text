@@ -8,6 +8,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 # News #
 
+## Version 2.24, June 2020 ##
+
+- Rename master/slave databases to main/dependent databases.
+
 ## Version 2.23, May 2020 ##
 
 - Allow specifying .bib files with a file-local variable (esp. for non-LaTeX files).
@@ -16,7 +20,7 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 - Improve prompting when inserting citations.
 - Allow selecting multiple entries when inserting a citation in a text buffer.
-- Automatically save a slave database when an entry is added that is being inserted into a text buffer.
+- Automatically save a dependent database when an entry is added that is being inserted into a text buffer.
 
 ## Version 2.21, December 2019 ##
 
@@ -34,7 +38,7 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 ## Version 2.17, June 2019 ##
 
-- Create slave databases, i.e., databases that share their data with a master database but which are saved as separate `.bib` files.
+- Create dependent databases, i.e., databases that share their data with a main database but which are saved as separate `.bib` files.
 - Use completion when editing certain fields, to make it easier to enter e.g., author or editor names consistently.
 
 ## Version 2.16, February 2019 ##
@@ -617,15 +621,15 @@ Keep in mind that Ebib tries to determine the relevant databases only once per b
 You can override Ebib's automatic association of `.bib` files to a buffer by setting the variable `ebib-local-bibfiles` to a list of files. This can be done as a file-local or a directory-local variable, or as a customisable option.
 
 
-# Master and Slave Databases #
+# Main and Dependent Databases #
 
-If you want to create a `.bib` file from a larger database that only contains the references of a particular paper, you can use a slave database. A slave database can only contain entries that also exist in its master database and all the data of the entries is shared by both databases. If you edit an entry in the slave database, the edit shows up in the master as well, and vice versa.
+If you want to create a `.bib` file from a larger database that only contains the references of a particular paper, you can use a dependent database. A dependent database, as the name suggests, depends on another, real database that is called it "main" database. The dependent database can only contain entries that also exist in its main database and all the data of the entries is shared by both databases. If you edit an entry in the dependent database, the edit shows up in the main one as well, and vice versa.
 
-You can create a slave database with the key sequence `M c` in the database that you want to be the master. Ebib asks you for a file name and then creates a new empty database. You can add entries to the slave with the key sequence `M a` in the master database. In the slave database, you can add new entries in the normal way with the key `a`, but instead of creating a new entry, this command asks for an entry from the master database which is then added to the slave.
+You can create a dependent database with the key sequence `M c` in the database that you want to be its main database. Ebib asks you for a file name and then creates a new empty database. You can add entries to the dependent with the key sequence `M a` in the main database. In the dependent database, you can add new entries in the normal way with the key `a`, but instead of creating a new entry, this command asks for an entry from the main database which is then added to the dependent.
 
-If you save a slave database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a slave database and loads the master database as well if necessary. Note that when Ebib opens a slave database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the master database. This means that if you edit a slave database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
+If you save a dependent database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a dependent database and loads the main database as well if necessary. Note that when Ebib opens a dependent database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the main database. This means that if you edit a dependent database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
 
-If you have a text buffer that's associated with a slave database, you can insert entries in the normal way with `M-x ebib-insert-citation`, but instead of offering only the entries in the associated (slave) database, Emacs will offer all entries of the master database for completion. If you select an entry that is not in the slave database yet, it is added to it.
+If you have a text buffer that's associated with a dependent database, you can insert entries in the normal way with `M-x ebib-insert-citation`, but instead of offering only the entries in the associated (dependent) database, Emacs will offer all entries of the main database for completion. If you select an entry that is not in the dependent database yet, it is added to it.
 
 
 # Cross-referencing #
