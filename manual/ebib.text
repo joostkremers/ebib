@@ -99,7 +99,7 @@ Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's
 
 ## Manual installation ##
 
-It's also possible to install Ebib manually. If you prefer this method, then you probably know what you're doing so detailed instructions are omitted here. Just be sure to also install the [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib depends on.
+It's also possible to install Ebib manually. If you prefer this method, then you probably know what you're doing, so detailed instructions are omitted here. Just be sure to also install the [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib depends on.
 
 
 ## Starting Ebib ##
@@ -119,7 +119,7 @@ starts Ebib and loads the file `references.bib`.
 
 # Getting Started #
 
-A BibTeX database is somewhat of a free-form database. A BibTeX entry consists of a set of field-value pairs. Furthermore, each entry is known by a unique key. The way that Ebib navigates this database is by having two windows, one that contains a list of all the entry keys in the database, and one that contains the fields and values of the currently highlighted entry.
+A BibTeX database is somewhat of a free-form database. A BibTeX entry consists of a set of field-value pairs. Furthermore, each entry is known by a unique key. The way that Ebib navigates this database is by having two windows, one that contains a list of all the entries in the database, and one that contains the fields and values of the currently highlighted entry.
 
 When Ebib is started (with `M-x ebib`), the current windows in Emacs are hidden and the Emacs frame is divided into two windows. The top one contains a buffer that is called the *index buffer*, while the lower window shows the *entry buffer*. When a database is loaded, the index buffer holds a list of all the keys in the database plus some additional information for each entry: the author or editor, its year of publication, and the title. You can move through the entries with the cursor keys. In the entry buffer, the fields of the currently highlighted entry are shown, with their values.
 

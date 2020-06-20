@@ -137,7 +137,7 @@ distro’s package manager: `apt-get install elpa-ebib`.
 ## Manual installation
 
 It’s also possible to install Ebib manually. If you prefer this method,
-then you probably know what you’re doing so detailed instructions are
+then you probably know what you’re doing, so detailed instructions are
 omitted here. Just be sure to also install the
 [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib
 depends on.
@@ -170,7 +170,7 @@ starts Ebib and loads the file `references.bib`.
 A BibTeX database is somewhat of a free-form database. A BibTeX entry
 consists of a set of field-value pairs. Furthermore, each entry is known
 by a unique key. The way that Ebib navigates this database is by having
-two windows, one that contains a list of all the entry keys in the
+two windows, one that contains a list of all the entries in the
 database, and one that contains the fields and values of the currently
 highlighted entry.
 
