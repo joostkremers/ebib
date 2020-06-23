@@ -2315,7 +2315,7 @@ the return value is a list with a single cons cell of the key and
 the database containing the selected entry."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
-        (let* ((key (completing-read "Key to insert: " collection nil t nil 'ebib--key-history))
+        (let* ((key (completing-read "Select entry: " collection nil t nil 'ebib--key-history))
                (db (get-text-property 0 'ebib-db key)))
           (set-text-properties 0 (length key) nil key)
           (list (cons key db)))
