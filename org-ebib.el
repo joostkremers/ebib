@@ -74,7 +74,9 @@ is separated from the key with an ampersand."
       (ebib db key))))
 
 (defun org-ebib-store-link ()
-  "Store a link to an Ebib entry."
+  "Store a link to an Ebib entry.
+This function is called when executing `org-store-link' in Ebib's
+entry buffer."
   (when (memq major-mode '(ebib-index-mode ebib-entry-mode))
     ;; This is an Ebib entry
     (let* ((key (ebib--get-key-at-point))
