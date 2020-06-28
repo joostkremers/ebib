@@ -49,19 +49,39 @@ Must NOT contain %l.  See the variable `reftex-cite-format' for
 possible percent escapes."
   :group 'ebib
   :type 'string)
+
+(defcustom org-ebib-link-type 'key
+  "Type of link created by `org-ebib-store-link'.
+This can be `key', which creates a link with the key of the
+entry, `key+filename', which adds the file name of the `.bib'
+file containing the key, or `key+filepath', which adds the full
+path to the `.bib' file.  If the file name or path is added, it
+is separated from the key with an ampersand."
+  :group 'ebib
+  :type '(choice (const :tag "Key only" 'key)
+                 (const :tag "Key and file name" 'key+filename)
+                 (const :tag "Key and file path" 'key+filepath)))
+
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
 ;;;###autoload
-(defun org-ebib-open (key)
-  "Open Ebib and jump to KEY."
-  (ebib nil key))
+(defun org-ebib-open (entry)
+  "Open Ebib and jump to ENTRY."
+  (save-match-data
+    (string-match "^\\(.*?\\)\\(?:@\\(.*?\\)\\)?$" entry)
+    (let ((key (match-string 1 entry))
+          (db (match-string 2 entry)))
+      (ebib db key))))
 
 (defun org-ebib-store-link ()
   "Store a link to an Ebib entry."
   (when (memq major-mode '(ebib-index-mode ebib-entry-mode))
     ;; This is an Ebib entry
     (let* ((key (ebib--get-key-at-point))
-           (link (concat "ebib:" key))
+           (link (concat "ebib:" (pcase org-ebib-link-type
+                                        ('key key)
+                                        ('key+filename (format "%s@%s" key (ebib-db-get-filename ebib--cur-db :shortened)))
+                                        ('key+filepath (format "%s@%s" key (ebib-db-get-filename ebib--cur-db))))))
            (description (ignore-errors (funcall ebib-citation-description-function key ebib--cur-db))))
       (org-store-link-props :type "ebib"
                             :link link
