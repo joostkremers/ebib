@@ -36,13 +36,22 @@
 (defvar ebib--databases)
 (defvar ebib-citation-description-function)
 (defvar ebib-citation-insert-multiple)
-(defvar reftex-cite-punctuation)
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
+(declare-function ebib--get-local-bibfiles "ebib" ())
+(declare-function ebib--get-or-open-db "ebib" file)
+(declare-function ebib-read-entry-ivy "ebib" databases)
+(declare-function ebib-read-entry-helm "ebib" databases)
+(declare-function ebib-read-entry-multiple "ebib" databases)
+(declare-function ebib-read-entry-single "ebib" databases)
+(declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
+(declare-function ebib-db-get-filename "ebib-db" (db &optional shortened))
+
 (declare-function org-link-set-parameters "org" (type &rest parameters))
 (declare-function org-element-context "org-element" (&optional element))
 (declare-function org-element-property "org-element" (property element))
-(declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
+
+(defvar reftex-cite-punctuation)
 (declare-function reftex-format-citation "reftex-cite" (entry format))
 
 (defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
