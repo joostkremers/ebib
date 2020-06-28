@@ -43,6 +43,12 @@
 (declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
 (declare-function reftex-format-citation "reftex-cite" (entry format))
 
+(defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
+  "Citation format used to display citation info in the message area.
+Must NOT contain %l.  See the variable `reftex-cite-format' for
+possible percent escapes."
+  :group 'ebib
+  :type 'string)
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
 ;;;###autoload
@@ -88,13 +94,6 @@ position in the relevant buffer."
                     "," t)
                    "\n"))
        (t "Not a link?")))))
-
-(defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
-  "Citation format used to display citation info in the message area.
-Must NOT contain %l.  See the variable `reftex-cite-format' for
-possible percent escapes."
-  :group 'ebib
-  :type 'string)
 
 (defun org-ebib-make-help-echo-string (key &optional format)
   "Return the citation string of KEY according to FORMAT.
