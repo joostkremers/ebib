@@ -33,7 +33,9 @@
 
 ;; This is to silence the byte-compiler and flycheck.
 (defvar ebib--cur-db)
+(defvar ebib--databases)
 (defvar ebib-citation-description-function)
+(defvar ebib-citation-insert-multiple)
 (defvar reftex-cite-punctuation)
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
@@ -88,6 +90,31 @@ entry buffer."
       (org-store-link-props :type "ebib"
                             :link link
                             :description description))))
+
+(defun org-ebib-insert-link ()
+  "Insert a link to an Ebib entry.
+This function can be called in an Org mode buffer to insert a
+link to an Ebib entry."
+  (interactive)
+  (let* ((database-files (ebib--get-local-bibfiles))
+         (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
+                        ebib--databases))
+         (entries (cond
+                   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
+                   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
+                   (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
+                   (t (ebib-read-entry-single databases))))
+         (separator (if (> (length entries) 1)
+                        (read-string "Separator: ")
+                      "")))
+    (mapc (lambda (entry)
+            (let ((link (pcase org-ebib-link-type
+                          ('key (car entry))
+                          ('key+filename (format "%s@%s" (car entry) (ebib-db-get-filename (cdr entry) :shortened)))
+                          ('key+filepath (format "%s@%s" (car entry) (ebib-db-get-filename (cdr entry))))))
+                  (description (ignore-errors (funcall ebib-citation-description-function (car entry) ebib--cur-db))))
+              (insert (format "[[ebib:%s][%s]]%s" link description separator))))
+          entries)))
 
 (with-eval-after-load "reftex-cite"
   (org-link-set-parameters "ebib" :help-echo #'org-ebib-show-citation-info))
