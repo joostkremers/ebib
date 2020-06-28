@@ -1,6 +1,6 @@
 ;;; org-ebib.el --- Support for links to Ebib entries in Org  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2014-2016 Grégoire Jadi, Joost Kremers
+;; Copyright (c) 2014-2020 Grégoire Jadi, Joost Kremers
 ;; Al rights reserved
 
 ;; Author: Grégoire Jadi <daimrod@gmail.com>
