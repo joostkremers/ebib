@@ -31,6 +31,7 @@ is.
 * The Entries List::
 * Searching::
 * Inserting Citations into a Text Buffer::
+* Links and Citations in Org buffers::
 * Main and Dependent Databases::
 * Cross-referencing::
 * Marking Entries::
@@ -61,6 +62,7 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
+* Version 225 June 2020::
 * Version 224 June 2020::
 * Version 223 May 2020::
 * Version 222 February 2020::
@@ -78,9 +80,19 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 * Version 21112 July 2018::
 
 
-File: ebib.info,  Node: Version 224 June 2020,  Next: Version 223 May 2020,  Up: News
+File: ebib.info,  Node: Version 225 June 2020,  Next: Version 224 June 2020,  Up: News
 
-1.1 Version 2.24, June 2020
+1.1 Version 2.25, June 2020
+===========================
+
+   • Allow adding the ‘.bib’ file to Org mode links.  The option
+     ‘org-ebib-link-type’ determines which kinds of Org links are
+     created when doing ‘org-add-link’ in an Ebib index buffer.
+
+
+File: ebib.info,  Node: Version 224 June 2020,  Next: Version 223 May 2020,  Prev: Version 225 June 2020,  Up: News
+
+1.2 Version 2.24, June 2020
 ===========================
 
    • Rename master/slave databases to main/dependent databases.
@@ -88,7 +100,7 @@ File: ebib.info,  Node: Version 224 June 2020,  Next: Version 223 May 2020,  Up:
 
 File: ebib.info,  Node: Version 223 May 2020,  Next: Version 222 February 2020,  Prev: Version 224 June 2020,  Up: News
 
-1.2 Version 2.23, May 2020
+1.3 Version 2.23, May 2020
 ==========================
 
    • Allow specifying .bib files with a file-local variable (esp. for
@@ -97,7 +109,7 @@ File: ebib.info,  Node: Version 223 May 2020,  Next: Version 222 February 2020, 
 
 File: ebib.info,  Node: Version 222 February 2020,  Next: Version 221 December 2019,  Prev: Version 223 May 2020,  Up: News
 
-1.3 Version 2.22, February 2020
+1.4 Version 2.22, February 2020
 ===============================
 
    • Improve prompting when inserting citations.
@@ -109,7 +121,7 @@ File: ebib.info,  Node: Version 222 February 2020,  Next: Version 221 December 2
 
 File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2019,  Prev: Version 222 February 2020,  Up: News
 
-1.4 Version 2.21, December 2019
+1.5 Version 2.21, December 2019
 ===============================
 
    • New option ‘ebib-default-dir’: control the directory that Ebib uses
@@ -118,7 +130,7 @@ File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2
 
 File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2019,  Prev: Version 221 December 2019,  Up: News
 
-1.5 Version 2.20, December 2019
+1.6 Version 2.20, December 2019
 ===============================
 
    • Display the contents of an external note when the current entry has
@@ -129,7 +141,7 @@ File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2
 
 File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,  Prev: Version 220 December 2019,  Up: News
 
-1.6 Version 2.19, November 2019
+1.7 Version 2.19, November 2019
 ===============================
 
    • Add command ‘ebib-jump-to-entry’ (bound to ‘j’ in the index
@@ -142,7 +154,7 @@ File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,
 
 File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,  Prev: Version 219 November 2019,  Up: News
 
-1.7 Version 2.17, June 2019
+1.8 Version 2.17, June 2019
 ===========================
 
    • Create dependent databases, i.e., databases that share their data
@@ -153,7 +165,7 @@ File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,
 
 File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 2019,  Prev: Version 217 June 2019,  Up: News
 
-1.8 Version 2.16, February 2019
+1.9 Version 2.16, February 2019
 ===============================
 
    • Add command ‘ebib-download-url’: download pdf from a site in the
@@ -170,8 +182,8 @@ File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 20
 
 File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 2018,  Prev: Version 216 February 2019,  Up: News
 
-1.9 Version 2.15, January 2019
-==============================
+1.10 Version 2.15, January 2019
+===============================
 
    • Multiline field values can now be displayed in the entry buffer.
    • Do not warn about aliased entry types when loading ‘biblatex’
@@ -185,7 +197,7 @@ File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 20
 
 File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2018,  Prev: Version 215 January 2019,  Up: News
 
-1.10 Version 2.14, December 2018
+1.11 Version 2.14, December 2018
 ================================
 
    • Change the user interface of the export functions.  Calling one of
@@ -199,7 +211,7 @@ File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2
 
 File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 2018,  Prev: Version 214 December 2018,  Up: News
 
-1.11 Version 2.13, November 2018
+1.12 Version 2.13, November 2018
 ================================
 
    • Use a separate index buffer for each open ‘.bib’ file.  Filling the
@@ -209,7 +221,7 @@ File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 
 
 File: ebib.info,  Node: Version 2123 November 2018,  Next: Version 2122 November 2018,  Prev: Version 213 November 2018,  Up: News
 
-1.12 Version 2.12.3, November 2018
+1.13 Version 2.12.3, November 2018
 ==================================
 
    • Bug fix: when searching the database, only search visible entries.
@@ -217,7 +229,7 @@ File: ebib.info,  Node: Version 2123 November 2018,  Next: Version 2122 November
 
 File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 2018,  Prev: Version 2123 November 2018,  Up: News
 
-1.13 Version 2.12.2, November 2018
+1.14 Version 2.12.2, November 2018
 ==================================
 
    • Bug fix: when editing the ‘crossref’ field, offer keys from all
@@ -226,7 +238,7 @@ File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 20
 
 File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,  Prev: Version 2122 November 2018,  Up: News
 
-1.14 Version 2.12, August 2018
+1.15 Version 2.12, August 2018
 ==============================
 
    • Add an option to specify the default sort field and direction.  It
@@ -237,7 +249,7 @@ File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,
 
 File: ebib.info,  Node: Version 21112 July 2018,  Prev: Version 212 August 2018,  Up: News
 
-1.15 Version 2.11.12, July 2018
+1.16 Version 2.11.12, July 2018
 ===============================
 
    • Use ‘biblatex’’s ‘Date’ field, if present, for displaying the year.
@@ -1391,7 +1403,7 @@ commands operate on the stored filters and can be used when no filter is
 active.
 
 
-File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Main and Dependent Databases,  Prev: Searching,  Up: Top
+File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Links and Citations in Org buffers,  Prev: Searching,  Up: Top
 
 9 Inserting Citations into a Text Buffer
 ****************************************
@@ -1401,8 +1413,8 @@ When you’re in a text buffer and you have Ebib open in the background
 command ‘ebib-insert-citation’.  This command asks for a key and inserts
 a citation with that key in a (user-selectable) form that is appropriate
 for the current buffer.  By default, this is set up for LaTeX and Pandoc
-(http://johnmacfarlane.net/pandoc/) Markdown buffers, and for Org mode
-(http://orgmode.org).
+(http://johnmacfarlane.net/pandoc/) Markdown buffers.  There is some
+support for Org mode (http://orgmode.org) as well, as discussed below.
 
 When you invoke ‘ebib-insert-citation’, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
@@ -1426,17 +1438,6 @@ inserts a citation of the form ‘@Jones1992’, ‘paren’, which inserts a
 citation of the form ‘[@Jones1992]’ and ‘year’, which inserts
 ‘[-@Jones1992]’.  Since these are the only types of citations that
 Pandoc Markdown knows, you shouldn’t need to change anything.
-
-In Org buffers, citations are inserted in the form
-‘[[ebib:<key>][<description>]]’.  You are prompted for the description.
-A default description is provided, which you can accept by pressing
-‘RET’.  The default description is created by the function in
-‘ebib-citation-description-function’ and defaults to the combination of
-author name and publication year.  If you use this type of Org link, you
-may want to load the ‘org-ebib’ package, which allows you to open Ebib
-with ‘org-open-at-point’ (by default bound to ‘C-c C-o’).  This package
-also enables you to create Org links to Ebib entries with
-‘org-store-link’.
 
 Ebib also provides a way to insert citations into a buffer from within
 Ebib.  If you’re in the index buffer and press ‘i’, Ebib asks you for a
@@ -1681,9 +1682,41 @@ This can be done as a file-local or a directory-local variable, or as a
 customisable option.
 
 
-File: ebib.info,  Node: Main and Dependent Databases,  Next: Cross-referencing,  Prev: Inserting Citations into a Text Buffer,  Up: Top
+File: ebib.info,  Node: Links and Citations in Org buffers,  Next: Main and Dependent Databases,  Prev: Inserting Citations into a Text Buffer,  Up: Top
 
-10 Main and Dependent Databases
+10 Links and Citations in Org buffers
+*************************************
+
+Currently, Org mode does not have real support for citations (though
+support is planned for a future release).  Ebib provides a way to add
+links to BibTeX entries to an Org file which, with some coaxing, can be
+used as citations.
+
+If you call ‘ebib-insert-citation’ in an Org buffer, you can add a link
+to an entry in a ‘.bib’ file that’s open in Ebib.  The link has the form
+‘[[ebib:<key>][<description>]]’.  The description is user-provided
+string, which you are prompted for, but a default description is
+provided, which you can accept by pressing ‘RET’.  This default
+description is created by the function in
+‘ebib-citation-description-function’ which uses the author name and
+publication year to create a description.
+
+If you use this type of Org link, you may want to load the ‘org-ebib’
+package, which allows you to open Ebib with ‘org-open-at-point’ (by
+default bound to ‘C-c C-o’), taking you to the entry in the link
+(provided its database is opened in Ebib).
+
+The ‘org-ebib’ package also allows you to create Org links to Ebib
+entries with ‘org-store-link’ when you’re in the entry buffer.  Links
+created in this way have the same form, but they can also specify the
+‘.bib’ file containing the entry by adding an ‘@’ sign after the key and
+the name or full path of the file.  Which type of link is produced is
+controlled by the user option ‘org-ebib-link-type’.
+
+
+File: ebib.info,  Node: Main and Dependent Databases,  Next: Cross-referencing,  Prev: Links and Citations in Org buffers,  Up: Top
+
+11 Main and Dependent Databases
 *******************************
 
 If you want to create a ‘.bib’ file from a larger database that only
@@ -1723,7 +1756,7 @@ dependent database yet, it is added to it.
 
 File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Main and Dependent Databases,  Up: Top
 
-11 Cross-referencing
+12 Cross-referencing
 ********************
 
 ‘Biblatex’ has a sophisticated cross-referencing facility that Ebib
@@ -1787,7 +1820,7 @@ cross-referencing will not work reliably.
 
 File: ebib.info,  Node: Marking Entries,  Next: Printing the Database,  Prev: Cross-referencing,  Up: Top
 
-12 Marking Entries
+13 Marking Entries
 ******************
 
 Commands in the index buffer generally operate on one single entry.  For
@@ -1810,7 +1843,7 @@ database.
 
 File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser,  Prev: Marking Entries,  Up: Top
 
-13 Printing the Database
+14 Printing the Database
 ************************
 
 Sometimes it may be useful to have a ‘.pdf’ file or print-out of your
@@ -1880,7 +1913,7 @@ the preamble of the LaTeX file that is created.
 
 File: ebib.info,  Node: Calling a Browser,  Next: Viewing and Importing Files,  Prev: Printing the Database,  Up: Top
 
-14 Calling a Browser
+15 Calling a Browser
 ********************
 
 With most scientific literature nowadays being available on-line, it is
@@ -1928,7 +1961,7 @@ Field”.  The same can be done for the DOI field.
 
 File: ebib.info,  Node: Viewing and Importing Files,  Next: Notes files,  Prev: Calling a Browser,  Up: Top
 
-15 Viewing and Importing Files
+16 Viewing and Importing Files
 ******************************
 
 If you have electronic versions of the papers in your database stored on
@@ -2013,7 +2046,7 @@ the ‘file’ field if it is not already there.
 
 File: ebib.info,  Node: Editing the file field,  Up: Viewing and Importing Files
 
-15.1 Editing the ‘file’ field
+16.1 Editing the ‘file’ field
 =============================
 
 As mentioned above, editing the ‘file’ field is a bit different from
@@ -2041,7 +2074,7 @@ file names are always stored as absolute paths.)
 
 File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Viewing and Importing Files,  Up: Top
 
-16 Notes files
+17 Notes files
 **************
 
 Ebib supports the ‘annotation’ field (or ‘annote’ field in BibTeX), but
@@ -2064,7 +2097,7 @@ but you can also use a single file to store all notes.
 
 File: ebib.info,  Node: Separate notes files,  Next: One single notes file,  Up: Notes files
 
-16.1 Separate notes files
+17.1 Separate notes files
 =========================
 
 If you wish to use separate files for each note, you need to configure
@@ -2099,7 +2132,7 @@ discussed below.
 
 File: ebib.info,  Node: One single notes file,  Next: Customising the notes file format,  Prev: Separate notes files,  Up: Notes files
 
-16.2 One single notes file
+17.2 One single notes file
 ==========================
 
 If you wish to store all notes in a single file, you must set the option
@@ -2140,7 +2173,7 @@ hooks.
 
 File: ebib.info,  Node: Customising the notes file format,  Next: Displaying notes,  Prev: One single notes file,  Up: Notes files
 
-16.3 Customising the notes file format
+17.3 Customising the notes file format
 ======================================
 
 If you do not want to use Org mode to write your notes files, you can do
@@ -2220,7 +2253,7 @@ value is then used to replace the specifier.
 
 File: ebib.info,  Node: Displaying notes,  Prev: Customising the notes file format,  Up: Notes files
 
-16.4 Displaying notes
+17.4 Displaying notes
 =====================
 
 If an entry has an external note, the first few lines are shown in the
@@ -2248,7 +2281,7 @@ displayed without getting in the way.
 
 File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev: Notes files,  Up: Top
 
-17 Managing a reading list
+18 Managing a reading list
 **************************
 
 Ebib offers the ability to manage a reading list as an Org file.  In
@@ -2304,7 +2337,7 @@ buffer).  By default, these hooks are empty.
 
 File: ebib.info,  Node: Window Management,  Next: Creating Entry Stubs,  Prev: Managing a reading list,  Up: Top
 
-18 Window Management
+19 Window Management
 ********************
 
 By default, Ebib takes over the entire Emacs frame it is started in,
@@ -2364,7 +2397,7 @@ at the top or on the left of the frame.)
 
 File: ebib.info,  Node: Creating Entry Stubs,  Next: @Preamble Definition,  Prev: Window Management,  Up: Top
 
-19 Creating Entry Stubs
+20 Creating Entry Stubs
 ***********************
 
 If you have a directory full of (pdf) files of articles that you want to
@@ -2387,7 +2420,7 @@ pressing ‘E’ in the index buffer.
 
 File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Creating Entry Stubs,  Up: Top
 
-20 @Preamble Definition
+21 @Preamble Definition
 ***********************
 
 Apart from database entries, BibTeX allows three more types of elements
@@ -2433,7 +2466,7 @@ manner just described and saves them in one ‘@Preamble’ definition.
 
 File: ebib.info,  Node: @String Definitions,  Next: @Comments,  Prev: @Preamble Definition,  Up: Top
 
-21 @String Definitions
+22 @String Definitions
 **********************
 
 If you press (uppercase) ‘S’ in the index buffer, Ebib hides the entry
@@ -2505,7 +2538,7 @@ completion to complete a partial string.
 
 File: ebib.info,  Node: @Comments,  Next: Managing Keywords,  Prev: @String Definitions,  Up: Top
 
-22 @Comments
+23 @Comments
 ************
 
 If Ebib finds a ‘@comment’ in a ‘.bib’ file, it will read it and store
@@ -2517,7 +2550,7 @@ where in the ‘.bib’ file a comment is placed, but they won’t be lost.
 
 File: ebib.info,  Node: Managing Keywords,  Next: Sorting the bib File,  Prev: @Comments,  Up: Top
 
-23 Managing Keywords
+24 Managing Keywords
 ********************
 
 Ebib provides some special functionality for handling keywords.  By
@@ -2626,7 +2659,7 @@ it to the separator.
 
 File: ebib.info,  Node: Sorting the bib File,  Next: Merging and Importing,  Prev: Managing Keywords,  Up: Top
 
-24 Sorting the ‘.bib’ File
+25 Sorting the ‘.bib’ File
 **************************
 
 By default, the entries in the database are saved to the ‘.bib’ file in
@@ -2687,7 +2720,7 @@ set by default, you need to unset if you set “Sort Order”.
 
 File: ebib.info,  Node: Merging and Importing,  Next: Exporting Entries,  Prev: Sorting the bib File,  Up: Top
 
-25 Merging and Importing
+26 Merging and Importing
 ************************
 
 As described in the previous chapter, adding entries to a database can
@@ -2723,7 +2756,7 @@ you edit them.  See the option “Autogenerate Keys” for details.
 
 File: ebib.info,  Node: Exporting Entries,  Next: Multiple Identical Fields,  Prev: Merging and Importing,  Up: Top
 
-26 Exporting Entries
+27 Exporting Entries
 ********************
 
 Sometimes it can be useful to copy entries from one database to another,
@@ -2754,7 +2787,7 @@ that file.
 
 File: ebib.info,  Node: Multiple Identical Fields,  Next: Multiline Edit Buffers,  Prev: Exporting Entries,  Up: Top
 
-27 Multiple Identical Fields
+28 Multiple Identical Fields
 ****************************
 
 Under normal circumstances, a BibTeX entry only contains one occurrence
@@ -2804,7 +2837,7 @@ Fields” set, you will get the following:
 
 File: ebib.info,  Node: Multiline Edit Buffers,  Next: The Options Menu,  Prev: Multiple Identical Fields,  Up: Top
 
-28 Multiline Edit Buffers
+29 Multiline Edit Buffers
 *************************
 
 As mentioned several times before, field values that contain newlines
@@ -2883,7 +2916,7 @@ Emacs user, you are free to do as you like, of course.
 
 File: ebib.info,  Node: The Options Menu,  Next: Customisation,  Prev: Multiline Edit Buffers,  Up: Top
 
-29 The Options Menu
+30 The Options Menu
 *******************
 
 In the index buffer, Ebib’s menu has an Options submenu.  This menu
@@ -2901,7 +2934,7 @@ customisation buffer do not change.
 
 File: ebib.info,  Node: Customisation,  Prev: The Options Menu,  Up: Top
 
-30 Customisation
+31 Customisation
 ****************
 
 Ebib can be customised through Emacs’ standard customisation interface.
@@ -2920,7 +2953,7 @@ using the menu «Ebib | Options | Customize Ebib».
 
 File: ebib.info,  Node: Modifying Key Bindings,  Up: Customisation
 
-30.1 Modifying Key Bindings
+31.1 Modifying Key Bindings
 ===========================
 
 If you would like to change Ebib’s standard key bindings, or if you
@@ -2953,166 +2986,170 @@ which are rather awkward to type, can be redefined as follows:
 
 Tag Table:
 Node: Top186
-Node: News1380
-Ref: #news1470
-Node: Version 224 June 20201914
-Ref: #version-2.24-june-20202060
-Node: Version 223 May 20202127
-Ref: #version-2.23-may-20202305
-Node: Version 222 February 20202401
-Ref: #version-2.22-february-20202593
-Node: Version 221 December 20192852
-Ref: #version-2.21-december-20193049
-Node: Version 220 December 20193160
-Ref: #version-2.20-december-20193357
-Node: Version 219 November 20193606
-Ref: #version-2.19-november-20193799
-Node: Version 217 June 20194182
-Ref: #version-2.17-june-20194367
-Node: Version 216 February 20194643
-Ref: #version-2.16-february-20194835
-Node: Version 215 January 20195342
-Ref: #version-2.15-january-20195536
-Node: Version 214 December 20186006
-Ref: #version-2.14-december-20186204
-Node: Version 213 November 20186646
-Ref: #version-2.13-november-20186846
-Node: Version 2123 November 20187045
-Ref: #version-2.12.3-november-20187250
-Node: Version 2122 November 20187325
-Ref: #version-2.12.2-november-20187528
-Node: Version 212 August 20187668
-Ref: #version-2.12-august-20187860
-Node: Version 21112 July 20188140
-Ref: #version-2.11.12-july-20188299
-Node: Installation8738
-Ref: #installation8856
-Node: Package manager8950
-Ref: #package-manager9079
-Node: Debian and Ubuntu9431
-Ref: #debian-and-ubuntu9592
-Node: Manual installation9726
-Ref: #manual-installation9889
-Node: Starting Ebib10170
-Ref: #starting-ebib10295
-Node: Getting Started11180
-Ref: #getting-started11320
-Node: Opening a bib File13310
-Ref: #opening-a-.bib-file13464
-Node: Preloading bib Files15307
-Ref: #preloading-.bib-files15495
-Node: Navigating a bib File16251
-Ref: #navigating-a-.bib-file16446
-Node: Starting a New bib File20953
-Ref: #starting-a-new-.bib-file21123
-Node: Editing the Database21415
-Ref: #editing-the-database21570
-Node: Adding and Deleting Entries21948
-Ref: #adding-and-deleting-entries22125
-Node: Editing Fields Values24336
-Ref: #editing-fields-values24534
-Node: Editing Multiline Values27441
-Ref: #editing-multiline-values27634
-Node: Undefined Fields29831
-Ref: #undefined-fields30000
-Node: Hidden Fields30889
-Ref: #hidden-fields31038
-Node: Timestamps32108
-Ref: #timestamps32270
-Node: Copy Cut Kill Paste Yank and Delete34321
-Ref: #copy-cut-kill-paste-yank-and-delete34525
-Node: Saving a Database35471
-Ref: #saving-a-database35623
-Node: Biblatex vs BibTeX37271
-Ref: #biblatex-vs.-bibtex37431
-Node: Setting the BibTeX Dialect38228
-Ref: #setting-the-bibtex-dialect38401
-Node: Alias Types and Fields40444
-Ref: #alias-types-and-fields40609
-Node: The Entries List42654
-Ref: #the-entries-list42792
-Node: Searching46533
-Ref: #searching46677
-Node: Simple Searches47180
-Ref: #simple-searches47296
-Node: Filters50501
-Ref: #filters50601
-Node: Simple Selection51676
-Ref: #simple-selection51805
-Node: Complex Filters53514
-Ref: #complex-filters53676
-Node: Storing and Saving Filters57751
-Ref: #storing-and-saving-filters57934
-Node: Special Filters60789
-Ref: #special-filters60970
-Node: An Example Listing Recent Additions62338
-Ref: #an-example-listing-recent-additions62567
-Node: Properties of Filtered Databases64937
-Ref: #properties-of-filtered-databases65134
-Node: Inserting Citations into a Text Buffer66789
-Ref: #inserting-citations-into-a-text-buffer67003
-Node: Citations with multiple keys70061
-Ref: #citations-with-multiple-keys70250
-Node: Key Bindings71447
-Ref: #key-bindings71639
-Node: Defining Citation Commands72397
-Ref: #defining-citation-commands72630
-Node: Associating a Database with a Text Buffer78526
-Ref: #associating-a-database-with-a-text-buffer78768
-Node: Main and Dependent Databases80147
-Ref: #main-and-dependent-databases80351
-Node: Cross-referencing82403
-Ref: #cross-referencing82562
-Node: Marking Entries86089
-Ref: #marking-entries86237
-Node: Printing the Database87114
-Ref: #printing-the-database87274
-Node: Calling a Browser90743
-Ref: #calling-a-browser90907
-Node: Viewing and Importing Files93359
-Ref: #viewing-and-importing-files93533
-Node: Editing the file field98100
-Ref: #editing-the-file-field98249
-Node: Notes files99620
-Ref: #notes-files99768
-Node: Separate notes files100537
-Ref: #separate-notes-files100686
-Node: One single notes file102277
-Ref: #one-single-notes-file102470
-Node: Customising the notes file format104387
-Ref: #customising-the-notes-file-format104600
-Node: Displaying notes108195
-Ref: #displaying-notes108344
-Node: Managing a reading list109681
-Ref: #managing-a-reading-list109843
-Node: Window Management112858
-Ref: #window-management113017
-Node: Creating Entry Stubs116176
-Ref: #creating-entry-stubs116338
-Node: @Preamble Definition117336
-Ref: #preamble-definition117500
-Node: @String Definitions119472
-Ref: #string-definitions119623
-Node: @Comments123116
-Ref: #comments123244
-Node: Managing Keywords123609
-Ref: #managing-keywords123754
-Node: Sorting the bib File129822
-Ref: #sorting-the-.bib-file129995
-Node: Merging and Importing133114
-Ref: #merging-and-importing133279
-Node: Exporting Entries135049
-Ref: #exporting-entries135211
-Node: Multiple Identical Fields136727
-Ref: #multiple-identical-fields136906
-Node: Multiline Edit Buffers138834
-Ref: #multiline-edit-buffers139006
-Node: The Options Menu142883
-Ref: #the-options-menu143031
-Node: Customisation143649
-Ref: #customisation143760
-Node: Modifying Key Bindings144368
-Ref: #modifying-key-bindings144495
+Node: News1419
+Ref: #news1509
+Node: Version 225 June 20201979
+Ref: #version-2.25-june-20202126
+Node: Version 224 June 20202336
+Ref: #version-2.24-june-20202512
+Node: Version 223 May 20202579
+Ref: #version-2.23-may-20202757
+Node: Version 222 February 20202853
+Ref: #version-2.22-february-20203045
+Node: Version 221 December 20193304
+Ref: #version-2.21-december-20193501
+Node: Version 220 December 20193612
+Ref: #version-2.20-december-20193809
+Node: Version 219 November 20194058
+Ref: #version-2.19-november-20194251
+Node: Version 217 June 20194634
+Ref: #version-2.17-june-20194819
+Node: Version 216 February 20195095
+Ref: #version-2.16-february-20195287
+Node: Version 215 January 20195794
+Ref: #version-2.15-january-20195990
+Node: Version 214 December 20186460
+Ref: #version-2.14-december-20186658
+Node: Version 213 November 20187100
+Ref: #version-2.13-november-20187300
+Node: Version 2123 November 20187499
+Ref: #version-2.12.3-november-20187704
+Node: Version 2122 November 20187779
+Ref: #version-2.12.2-november-20187982
+Node: Version 212 August 20188122
+Ref: #version-2.12-august-20188314
+Node: Version 21112 July 20188594
+Ref: #version-2.11.12-july-20188753
+Node: Installation9192
+Ref: #installation9310
+Node: Package manager9404
+Ref: #package-manager9533
+Node: Debian and Ubuntu9885
+Ref: #debian-and-ubuntu10046
+Node: Manual installation10180
+Ref: #manual-installation10343
+Node: Starting Ebib10624
+Ref: #starting-ebib10749
+Node: Getting Started11634
+Ref: #getting-started11774
+Node: Opening a bib File13764
+Ref: #opening-a-.bib-file13918
+Node: Preloading bib Files15761
+Ref: #preloading-.bib-files15949
+Node: Navigating a bib File16705
+Ref: #navigating-a-.bib-file16900
+Node: Starting a New bib File21407
+Ref: #starting-a-new-.bib-file21577
+Node: Editing the Database21869
+Ref: #editing-the-database22024
+Node: Adding and Deleting Entries22402
+Ref: #adding-and-deleting-entries22579
+Node: Editing Fields Values24790
+Ref: #editing-fields-values24988
+Node: Editing Multiline Values27895
+Ref: #editing-multiline-values28088
+Node: Undefined Fields30285
+Ref: #undefined-fields30454
+Node: Hidden Fields31343
+Ref: #hidden-fields31492
+Node: Timestamps32562
+Ref: #timestamps32724
+Node: Copy Cut Kill Paste Yank and Delete34775
+Ref: #copy-cut-kill-paste-yank-and-delete34979
+Node: Saving a Database35925
+Ref: #saving-a-database36077
+Node: Biblatex vs BibTeX37725
+Ref: #biblatex-vs.-bibtex37885
+Node: Setting the BibTeX Dialect38682
+Ref: #setting-the-bibtex-dialect38855
+Node: Alias Types and Fields40898
+Ref: #alias-types-and-fields41063
+Node: The Entries List43108
+Ref: #the-entries-list43246
+Node: Searching46987
+Ref: #searching47131
+Node: Simple Searches47634
+Ref: #simple-searches47750
+Node: Filters50955
+Ref: #filters51055
+Node: Simple Selection52130
+Ref: #simple-selection52259
+Node: Complex Filters53968
+Ref: #complex-filters54130
+Node: Storing and Saving Filters58205
+Ref: #storing-and-saving-filters58388
+Node: Special Filters61243
+Ref: #special-filters61424
+Node: An Example Listing Recent Additions62792
+Ref: #an-example-listing-recent-additions63021
+Node: Properties of Filtered Databases65391
+Ref: #properties-of-filtered-databases65588
+Node: Inserting Citations into a Text Buffer67243
+Ref: #inserting-citations-into-a-text-buffer67463
+Node: Citations with multiple keys69922
+Ref: #citations-with-multiple-keys70111
+Node: Key Bindings71308
+Ref: #key-bindings71500
+Node: Defining Citation Commands72258
+Ref: #defining-citation-commands72491
+Node: Associating a Database with a Text Buffer78387
+Ref: #associating-a-database-with-a-text-buffer78629
+Node: Links and Citations in Org buffers80008
+Ref: #links-and-citations-in-org-buffers80241
+Node: Main and Dependent Databases81672
+Ref: #main-and-dependent-databases81872
+Node: Cross-referencing83924
+Ref: #cross-referencing84083
+Node: Marking Entries87610
+Ref: #marking-entries87758
+Node: Printing the Database88635
+Ref: #printing-the-database88795
+Node: Calling a Browser92264
+Ref: #calling-a-browser92428
+Node: Viewing and Importing Files94880
+Ref: #viewing-and-importing-files95054
+Node: Editing the file field99621
+Ref: #editing-the-file-field99770
+Node: Notes files101141
+Ref: #notes-files101289
+Node: Separate notes files102058
+Ref: #separate-notes-files102207
+Node: One single notes file103798
+Ref: #one-single-notes-file103991
+Node: Customising the notes file format105908
+Ref: #customising-the-notes-file-format106121
+Node: Displaying notes109716
+Ref: #displaying-notes109865
+Node: Managing a reading list111202
+Ref: #managing-a-reading-list111364
+Node: Window Management114379
+Ref: #window-management114538
+Node: Creating Entry Stubs117697
+Ref: #creating-entry-stubs117859
+Node: @Preamble Definition118857
+Ref: #preamble-definition119021
+Node: @String Definitions120993
+Ref: #string-definitions121144
+Node: @Comments124637
+Ref: #comments124765
+Node: Managing Keywords125130
+Ref: #managing-keywords125275
+Node: Sorting the bib File131343
+Ref: #sorting-the-.bib-file131516
+Node: Merging and Importing134635
+Ref: #merging-and-importing134800
+Node: Exporting Entries136570
+Ref: #exporting-entries136732
+Node: Multiple Identical Fields138248
+Ref: #multiple-identical-fields138427
+Node: Multiline Edit Buffers140355
+Ref: #multiline-edit-buffers140527
+Node: The Options Menu144404
+Ref: #the-options-menu144552
+Node: Customisation145170
+Ref: #customisation145281
+Node: Modifying Key Bindings145889
+Ref: #modifying-key-bindings146016
 
 End Tag Table
 

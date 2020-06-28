@@ -9,6 +9,12 @@ is.
 
 # News
 
+## Version 2.25, June 2020
+
+  - Allow adding the `.bib` file to Org mode links. The option
+    `org-ebib-link-type` determines which kinds of Org links are created
+    when doing `org-add-link` in an Ebib index buffer.
+
 ## Version 2.24, June 2020
 
   - Rename master/slave databases to main/dependent databases.
@@ -1093,8 +1099,9 @@ When you’re in a text buffer and you have Ebib open in the background
 command `ebib-insert-citation`. This command asks for a key and inserts
 a citation with that key in a (user-selectable) form that is appropriate
 for the current buffer. By default, this is set up for LaTeX and
-[Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers, and for
-[Org mode](http://orgmode.org).
+[Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers. There is
+some support for [Org mode](http://orgmode.org) as well, as discussed
+below.
 
 When you invoke `ebib-insert-citation`, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
@@ -1118,17 +1125,6 @@ inserts a citation of the form `@Jones1992`, `paren`, which inserts a
 citation of the form `[@Jones1992]` and `year`, which inserts
 `[-@Jones1992]`. Since these are the only types of citations that Pandoc
 Markdown knows, you shouldn’t need to change anything.
-
-In Org buffers, citations are inserted in the form
-`[[ebib:<key>][<description>]]`. You are prompted for the description. A
-default description is provided, which you can accept by pressing `RET`.
-The default description is created by the function in
-`ebib-citation-description-function` and defaults to the combination of
-author name and publication year. If you use this type of Org link, you
-may want to load the `org-ebib` package, which allows you to open Ebib
-with `org-open-at-point` (by default bound to `C-c C-o`). This package
-also enables you to create Org links to Ebib entries with
-`org-store-link`.
 
 Ebib also provides a way to insert citations into a buffer from within
 Ebib. If you’re in the index buffer and press `i`, Ebib asks you for a
@@ -1367,6 +1363,34 @@ You can override Ebib’s automatic association of `.bib` files to a
 buffer by setting the variable `ebib-local-bibfiles` to a list of files.
 This can be done as a file-local or a directory-local variable, or as a
 customisable option.
+
+# Links and Citations in Org buffers
+
+Currently, Org mode does not have real support for citations (though
+support is planned for a future release). Ebib provides a way to add
+links to BibTeX entries to an Org file which, with some coaxing, can be
+used as citations.
+
+If you call `ebib-insert-citation` in an Org buffer, you can add a link
+to an entry in a `.bib` file that’s open in Ebib. The link has the form
+`[[ebib:<key>][<description>]]`. The description is user-provided
+string, which you are prompted for, but a default description is
+provided, which you can accept by pressing `RET`. This default
+description is created by the function in
+`ebib-citation-description-function` which uses the author name and
+publication year to create a description.
+
+If you use this type of Org link, you may want to load the `org-ebib`
+package, which allows you to open Ebib with `org-open-at-point` (by
+default bound to `C-c C-o`), taking you to the entry in the link
+(provided its database is opened in Ebib).
+
+The `org-ebib` package also allows you to create Org links to Ebib
+entries with `org-store-link` when you’re in the entry buffer. Links
+created in this way have the same form, but they can also specify the
+`.bib` file containing the entry by adding an `@` sign after the key and
+the name or full path of the file. Which type of link is produced is
+controlled by the user option `org-ebib-link-type`.
 
 # Main and Dependent Databases
 
