@@ -1771,45 +1771,6 @@ referred to by ENTRY-KEY."
                       ebib-local-variable-indentation "End:\n"
                       "}\n\n")))))
 
-(defun ebib--format-database-as-bibtex (db)
-  "Write database DB into the current buffer in BibTeX format."
-  (ebib--format-comments db)
-  (ebib--format-main db)
-  (when (ebib-db-get-preamble db)
-    (insert (format "@Preamble{%s}\n\n" (ebib-db-get-preamble db))))
-  (ebib--format-strings db)
-  ;; We define two comparison functions for `sort'.  These must simply
-  ;; return non-nil if the first element is to be sorted before the second.
-  (cl-flet
-      ;; The first one is simple: if X has a crossref field, it must be
-      ;; sorted before Y (or at least *can* be, if Y also has a crossref
-      ;; field).
-      ((compare-xrefs (x _)
-                      (ebib-get-field-value "crossref" x db 'noerror))
-       ;; This one's a bit trickier.  We iterate over the lists of fields in
-       ;; `ebib-sort-order'.  For each level, `ebib--get-sortstring' then returns the
-       ;; string that can be used for sorting.  If all fails, sorting is done on
-       ;; the basis of the entry key.
-       (entry< (x y)
-               (let (sortstring-x sortstring-y)
-                 (cl-loop for sort-list in ebib-sort-order do
-                          (setq sortstring-x (ebib--get-sortstring x sort-list db))
-                          (setq sortstring-y (ebib--get-sortstring y sort-list db))
-                          while (cl-equalp sortstring-x sortstring-y))
-                 (if (and sortstring-x sortstring-y)
-                     (string< sortstring-x sortstring-y)
-                   (string< x y)))))    ; compare entry keys
-    ;; Only entries in visible the index buffer are saved, in case we're writing
-    ;; a filtered db to a new file.
-    (let ((sorted-list (sort (ebib-db-list-keys ebib--cur-db) #'string<)))
-      (cond
-       (ebib-save-xrefs-first
-        (setq sorted-list (sort sorted-list #'compare-xrefs)))
-       (ebib-sort-order
-        (setq sorted-list (sort sorted-list #'entry<))))
-      (mapc (lambda (key) (ebib--format-entry key db nil)) sorted-list))
-    (ebib--format-local-vars db)))
-
 (defun ebib--export-entries-to-db (entries target-db source-db)
   "Export ENTRIES from SOURCE-DB to TARGET-DB.
 ENTRIES is a list of entry keys."
