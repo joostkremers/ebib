@@ -497,28 +497,27 @@ If DB is not a dependent database, return nil."
 ENTRY is an entry key."
   (member entry (ebib-db-val 'marked-entries db)))
 
-(defun ebib-db-mark-entry (entry db)
-  "Add ENTRY to the list of marked entries in DB.
-ENTRY is an entry key.  ENTRY is added unconditionally, no check
-is performed to see if it is already on the list.
-
-ENTRY can also be a symbol, in which case all entries are
-marked."
+(defun ebib-db-mark-entry (entries db)
+  "Add ENTRIES to the list of marked entries in DB.
+ENTRIES is an entry key or a list of entry keys."
+  ;; We do not check if `entries' is already in the list of marked entries,
+  ;; because when we unmark an entries, we use `remove', which removes all
+  ;; occurrences anyway.
   (cond
-   ((stringp entry)
-    (setf (ebib-db-val 'marked-entries db) (cons entry (ebib-db-val 'marked-entries db))))
-   (t
-    (setf (ebib-db-val 'marked-entries db) (ebib-db-list-keys db)))))
+   ((stringp entries)
+    (setf (ebib-db-val 'marked-entries db) (cons entries (ebib-db-val 'marked-entries db))))
+   ((listp entries)
+    (setf (ebib-db-val 'marked-entries db) (append entries (ebib-db-val 'marked-entries db))))))
 
-(defun ebib-db-unmark-entry (entry db)
-  "Remove ENTRY from the list of marked entries in DB.
-ENTRY is an entry key.  If ENTRY is 'all, all entries are
-unmarked."
+(defun ebib-db-unmark-entry (entries db)
+  "Remove ENTRIES from the list of marked entries in DB.
+ENTRIES is an entry key or a list of entry keys."
+  ;; Use `remove' here to ensure that *all* occurrences of `entries' are removed.
   (cond
-   ((stringp entry)
-    (setf (ebib-db-val 'marked-entries db) (remove entry (ebib-db-val 'marked-entries db))))
-   ('all
-    (setf (ebib-db-val 'marked-entries db) nil))))
+   ((stringp entries)
+    (setf (ebib-db-val 'marked-entries db) (remove entries (ebib-db-val 'marked-entries db))))
+   ((listp entries)
+    (setf (ebib-db-val 'marked-entries db) (seq-difference (ebib-db-val 'marked-entries db) entries)))))
 
 (defun ebib-db-toggle-mark (entry db)
   "Toggle the mark on ENTRY in DB."

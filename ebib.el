@@ -1784,8 +1784,8 @@ This function updates both the database and the buffer."
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
       ;; Also update dependent databases.
       (let ((dependents (seq-filter (lambda (db)
-                                  (ebib-db-has-key cur-key db))
-                                (ebib--list-dependents ebib--cur-db))))
+                                      (ebib-db-has-key cur-key db))
+                                    (ebib--list-dependents ebib--cur-db))))
         (mapc (lambda (dependent)
                 (ebib-db-remove-entries-from-dependent cur-key dependent)
                 (ebib-db-add-entries-to-dependent actual-new-key dependent)
@@ -1825,16 +1825,17 @@ If MARK is t, `ebib-marked-face is added, if nil, it is removed."
 
 (defun ebib-mark-all-entries ()
   "Mark or unark all entries.
-If there are marked entries, all entries are unmarked.  Otherwise,
-all entries are marked."
+If there are marked entries, all entries are unmarked.
+Otherwise, all entries are marked.  If the database is filtered,
+only the visible entries are marked or unmarked."
   (interactive)
   (ebib--execute-when
     (marked-entries
-     (ebib-db-unmark-entry 'all ebib--cur-db)
+     (ebib-db-unmark-entry (ebib--list-keys ebib--cur-db) ebib--cur-db)
      (ebib--update-index-buffer)
      (message "All entries unmarked"))
     (entries
-     (ebib-db-mark-entry 'all ebib--cur-db)
+     (ebib-db-mark-entry (ebib--list-keys ebib--cur-db) ebib--cur-db)
      (ebib--update-index-buffer)
      (message "All entries marked"))
     (default
@@ -2063,7 +2064,7 @@ instead."
                     (let ((inhibit-read-only t))
                       (delete-region (point-at-bol) (1+ (point-at-eol))))
                     (ebib-db-remove-entry key ebib--cur-db))
-                  (ebib-db-unmark-entry 'all ebib--cur-db) ; This works even though we already removed the entries from the database.
+                  (ebib-db-unmark-entry to-be-deleted ebib--cur-db) ; This works even though we already removed the entries from the database.
                   (message "Marked entries deleted."))
          (when (y-or-n-p (format "Delete %s? " to-be-deleted))
            (let ((inhibit-read-only t))
@@ -3148,7 +3149,7 @@ entry or the marked entries to the dependent database."
                     (let ((inhibit-read-only t))
                       (delete-region (point-at-bol) (1+ (point-at-eol))))
                     (ebib-db-remove-entries-from-dependent key ebib--cur-db))
-                  (ebib-db-unmark-entry 'all ebib--cur-db) ; This works even though we already removed the entries from the database.
+                  (ebib-db-unmark-entry marked-entries ebib--cur-db) ; This works even though we already removed the entries from the database.
                   (message "Marked entries removed."))
          (let ((key (ebib--get-key-at-point)))
            (when (y-or-n-p (format "Remove %s from depedent database? " key))
