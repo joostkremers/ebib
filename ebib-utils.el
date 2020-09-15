@@ -1209,7 +1209,7 @@ specifies under which condition BODY is to be executed.  Valid
 symbols are:
 
 `entries': execute if there are entries in the database;
-`marked-entries': execute  there are marked entries in the database;
+`marked-entries': execute if there are marked entries in the database;
 `database': execute if there is a database;
 `no-database': execute if there is no database;
 `real-db': execute if there is a database that is not filtered nor a dependent;
