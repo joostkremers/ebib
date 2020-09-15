@@ -141,9 +141,8 @@ is applied to the item."
         (let ((width (cadr (nth n ebib-index-columns)))
               (item (nth n (cadr data))))
           (insert (bidi-string-mark-left-to-right
-                   (format
-                    (concat "%-" (int-to-string width) "s")
-                    (truncate-string-to-width item width nil nil t)))
+                   (format (concat "%-" (int-to-string width) "s")
+                           (truncate-string-to-width item width nil nil t)))
                   ebib-index-column-separator))
         (cl-incf n))
       ;; The last item isn't truncated.
