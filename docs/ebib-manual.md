@@ -9,6 +9,11 @@ is.
 
 # News
 
+## Version 2.26, September 2020
+
+  - Copy key, entry, reference or citation to the kill ring (and system
+    clipboard), for easy pasting to other buffers or applications.
+
 ## Version 2.25, June 2020
 
   - Allow adding the `.bib` file to Org mode links. The option
@@ -1391,6 +1396,63 @@ created in this way have the same form, but they can also specify the
 `.bib` file containing the entry by adding an `@` sign after the key and
 the name or full path of the file. Which type of link is produced is
 controlled by the user option `org-ebib-link-type`.
+
+# Copying Entries to the Kill Ring and System Clipboard
+
+Ebib offers several ways to copy an entry to the kill ring (and the
+system clipboard), which you can then insert into another buffer or
+another application. You can copy the entry key (`C k`), the entire
+BibTeX entry (`C e`), a full reference as would appear in a list of
+references (`C r`) or a citation, by default of the Author-Year type (`C
+c`).
+
+The functions that copy a reference or citation make use of templates
+that specify how such a reference/citation should be formatted. These
+templates can be customised: the relevant options are
+`ebib-reference-templates` and `ebib-citation-template`. (The latter
+should not be confused with `ebib-citation-commands`, which defines
+templates for inserting citation commands into a LaTeX / Markdown / etc.
+buffer.)
+
+These templates are strings that contain directives for inserting
+specific fields from the entry being copied. As an example, a simple
+template for an author-year citation would be the following:
+
+“{Author} ({Year})”
+
+The directives are marked by braces {} around a field name. In the
+resulting citation, they are replaced by the contents of the fields.
+(The field names are case-insensitive, they could also be written as
+`"{author} ({year})."`)
+
+Alternative fields can be separated by a pipe bar `|`:
+
+    "{Author|Editor} ({Date|Year})"
+
+This template uses the `Author` field unless it’s empty, in which case
+the `Editor` field is used. Similarly for the year: first the contents
+of the `Date` field is checked. The `Year` field is used if the `Date`
+field is empty.
+
+If none of the fields in a directive has any contents, the directive is
+discarded completely. Most reference templates for example include a
+directive for the `Doi` or `Url` field:
+
+    "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
+
+If the `Doi` and `Url` fields are both empty, the directive is simply
+ignored.
+
+A directive may contain punctuation before or after the field name (or
+sequence of field names), which is dropped if the field is empty. The
+`{Doi|Url.}` directive in the previous example contains a full stop,
+which is only included in the reference if the `Doi` or `Url` field is
+present.
+
+The contents of the fields is used literally, with two exceptions: the
+`Date` field may contain a full date+time specification or even a date
+range, but only the year (or the year of the first date in a date range)
+is used. Similarly, the `Title` field is stripped of LaTeX markup.
 
 # Main and Dependent Databases
 

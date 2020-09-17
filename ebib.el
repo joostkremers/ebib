@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.25
+;; Version: 2.26
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
@@ -921,7 +921,7 @@ keywords before Emacs is killed."
     (define-key map "A" #'ebib-show-annotation)
     (define-key map "b" #'ebib-index-scroll-down)
     (define-key map "c" #'ebib-index-c)
-    (define-key map "C" #'ebib-follow-crossref)
+    (define-key map "C" 'ebib-copy-map)
     (define-key map "d" #'ebib-delete-entry) ; prefix
     (define-key map "e" #'ebib-edit-entry)
     (define-key map "E" #'ebib-edit-keyname)
@@ -1034,6 +1034,7 @@ there for details."
                                       (not (ebib-db-get-filter ebib--cur-db)))]
      "--"
      ["Jump to Entry" ebib-jump-to-entry (and ebib--cur-db (ebib--get-key-at-point))]
+     ["Follow Cross-Reference" ebib-follow-crossref (and ebib--cur-db (ebib--get-key-at-point))]
      "--"
      ["Push Citation To Buffer" ebib-push-citation (ebib--get-key-at-point)]
      "--"
@@ -1053,6 +1054,11 @@ there for details."
      ["Sort Ascending" ebib-index-sort-ascending ebib--cur-db]
      ["Sort Descending" ebib-index-sort-descending ebib--cur-db]
      ["Default Sort" ebib-index-default-sort ebib--cur-db])
+    ("Copy"
+     ["Key" ebib-copy-key-as-kill (ebib--get-key-at-point)]
+     ["Entry" ebib-copy-entry-as-kill (ebib--get-key-at-point)]
+     ["Citation" ebib-copy-citation-as-kill (ebib--get-key-at-point)]
+     ["Reference" ebib-copy-reference-as-kill (ebib--get-key-at-point)])
     ("Export"
      ["Export Entries To Database" ebib-export-entries (ebib--get-key-at-point)]
      ["Export Entries To File" (ebib-export-entries t) :active (ebib--get-key-at-point) :keys "\\[universal-argument] \\[ebib-export-entries]"]
@@ -2087,20 +2093,6 @@ instead."
     (default
       (beep))))
 
-(defun ebib-copy-entry ()
-  "Copy the current entry.
-The entry is copied to the kill ring."
-  (interactive)
-  (ebib--execute-when
-    (entries
-     (let ((key (ebib--get-key-at-point)))
-       (with-temp-buffer
-         (ebib--format-entry key ebib--cur-db)
-         (kill-new (buffer-substring-no-properties (point-min) (point-max))))
-       (message (format "Entry `%s' copied to kill ring.  Use `y' to yank (or `C-y' outside Ebib)." key))))
-    (default
-      (beep))))
-
 (defun ebib-kill-entry ()
   "Kill the current entry.
 The entry is put in the kill ring.  In a dependent database, the
@@ -3075,6 +3067,53 @@ Emacs completion."
   (interactive)
   (ebib-lower)
   (info "(ebib)"))
+
+;; Copying stuff to the kill ring.
+
+(eval-and-compile
+  (define-prefix-command 'ebib-copy-map)
+  (suppress-keymap 'ebib-copy-map 'no-digits)
+  (define-key ebib-copy-map "c" #'ebib-copy-citation-as-kill)
+  (define-key ebib-copy-map "e" #'ebib-copy-entry-as-kill)
+  (define-key ebib-copy-map "k" #'ebib-copy-key-as-kill)
+  (define-key ebib-copy-map "r" #'ebib-copy-reference-as-kill))
+
+(defun ebib-copy-citation-as-kill ()
+  "Create a citation from the current entry and copy it to the kill ring."
+  (interactive)
+  (kill-new (ebib--process-reference-template ebib-citation-template (ebib--get-key-at-point) ebib--cur-db)))
+
+(defun ebib-copy-entry-as-kill ()
+  "Copy the current entry.
+The entry is copied to the kill ring."
+  (interactive)
+  (ebib--execute-when
+    (entries
+     (let ((key (ebib--get-key-at-point)))
+       (with-temp-buffer
+         (ebib--format-entry key ebib--cur-db)
+         (kill-new (buffer-substring-no-properties (point-min) (point-max))))
+       (message (format "Entry `%s' copied to kill ring.  Use `y' to yank (or `C-y' outside Ebib)." key))))
+    (default
+      (beep))))
+
+(defalias 'ebib-copy-entry 'ebib-copy-entry-as-kill)
+
+(defun ebib-copy-key-as-kill ()
+  "Copy the key of the current entry to the kill ring."
+  (interactive)
+  (kill-new (ebib--get-key-at-point)))
+
+(defun ebib-copy-reference-as-kill ()
+  "Create a reference for the current entry and copy it to the kill ring."
+  (interactive)
+  (ebib--execute-when
+    (entries
+     (let* ((key (ebib--get-key-at-point))
+            (type (ebib-db-get-field-value "=type=" key ebib--cur-db 'noerror))
+            (template (or (alist-get type ebib-reference-templates nil nil #'cl-equalp)
+                          "{Author|Editor}, ({Date|Year}). {\"Title\"}. {Doi|Url.}")))
+       (kill-new (ebib--process-reference-template template key ebib--cur-db))))))
 
 ;;; Main & dependent databases
 

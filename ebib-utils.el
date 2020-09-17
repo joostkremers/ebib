@@ -313,7 +313,7 @@ not change the default sort."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-field-transformation-functions '(("Title" . ebib-clean-TeX-markup)
+(defcustom ebib-field-transformation-functions '(("Title" . ebib-clean-TeX-markup-from-entry)
                                                  ("Doi" . ebib-display-www-link)
                                                  ("Url" . ebib-display-www-link)
                                                  ("Note" . ebib-notes-display-note-symbol))
@@ -351,6 +351,60 @@ number of user-customizable options.  See that function's
 documentation for details."
   :group 'ebib
   :type 'boolean)
+
+(defcustom ebib-reference-templates '(("Book"         . "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}")
+                                      ("Article"      . "{Author} ({Date|Year}). {\"Title\"}. {Journaltitle|Journal}, {Volume}{:Issue}, {Pages}. {Doi|Url.}")
+                                      ("Collection"   . "{Editor|Author} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}")
+                                      ("InCollection" . "{Author} ({Date|Year}). {\"Title\"}. In: {Editor}, {\"Booktitle\"}. {Publisher}. {Pages}. {Doi|Url.}")
+                                      )
+  "Templates for copying references to the kill ring.
+Each template is a string containing literal text and directives
+in braces {}.  A directive should contain a field name and is
+replaced with the contents of that field.  A directive may
+contain multiple fields separated by a pipe bar | (meaning
+\"or\"), in which case the contents of the first non-empty field
+replaces the directive.  If all fields are empty, the directive
+is simply discarded.
+
+A directive may additionally contain punctuation before or after
+the field name (or multiple field names).  If the directive is
+discarded because its field is empty, any punctuation inside the
+braces is discarded as well."
+  :group 'ebib
+  :type '(repeat (cons (string :tag "Entry type")
+                       (string :tag "Template string"))))
+
+(defcustom ebib-citation-template "{Author|Editor} ({Date|Year})"
+  "Template used for copying a citation to the kill ring.
+For details of the template format, see the user option
+`ebib-reference-templates'."
+  :group 'ebib
+  :type '(string :tag "Template"))
+
+(defun ebib--process-reference-template (template key db)
+  "Process TEMPLATE for KEY in DB.
+TEMPLATE is a reference template (see the option
+`ebib-reference-templates').  Fields in the template are replaced
+with the contents of the corresponding fields in the entry KEY in
+database DB."
+  ;; Define some transformations; Perhaps these should be user-customizable.
+  (let ((transformations '(("Title" . ebib-clean-TeX-markup)
+                           ("Date" . ebib-biblatex-date-to-year))))
+    (cl-flet ((create-replacements (match)
+                                   (save-match-data
+                                     (string-match "{\\([^A-Za-z]*\\)\\([A-Za-z|]+\\)\\([^A-Za-z]*\\)}" match)
+                                     (let* ((pre (match-string 1 match))
+                                            (fields (match-string 2 match))
+                                            (post (match-string 3 match))
+                                            (field (seq-find (lambda (field)
+                                                               (ebib-get-field-value field key db 'noerror nil 'xref))
+                                                             (split-string fields "|" t)))
+                                            (value (if field (ebib-get-field-value field key db 'noerror 'unbraced 'xref))))
+                                       (if value (concat pre
+                                                         (funcall (alist-get field transformations #'identity nil #'cl-equalp) value)
+                                                         post)
+                                         "")))))
+      (replace-regexp-in-string "{.*?}" #'create-replacements template nil nil))))
 
 (defcustom ebib-citation-commands '((latex-mode
                                      (("cite"   "\\cite%<[%A]%>[%A]{%(%K%,)}")
@@ -1415,7 +1469,7 @@ can be used in a :PROPERTIES: block."
   "Return a title for an Org mode note for KEY in DB.
 The title is formed from the title of the entry.  Newlines are
 removed from the resulting string."
-  (ebib--ifstring (title (ebib-clean-TeX-markup "title" key db))
+  (ebib--ifstring (title (ebib-clean-TeX-markup-from-entry "title" key db))
       (remove ?\n (format "%s" title))
     "(No Title)"))
 
@@ -2078,28 +2132,39 @@ found in the Date field, the value of the Year field is returned,
 or \"XXXX\" if it's empty."
   (save-match-data
     (let ((date (ebib-get-field-value "Date" key db 'noerror 'unbraced 'xref)))
-      (if (and date
-               (string-match "^[[:space:]]*\\(?:\\.\\.\\)?/?\\(-?[0-9]\\{4\\}\\)" date))
-          (match-string 1 date)
-        (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref)))))
+      (or (and date (ebib-biblatex-date-to-year date))
+          (ebib-get-field-value "Year" key db "XXXX" 'unbraced 'xref)))))
 
-(defun ebib-clean-TeX-markup (field key db)
-  "Return the contents of FIELD from KEY in DB without TeX markups."
-  (let ((str (ebib-get-field-value field key db "" 'unbraced 'xref)))
-    ;; First replace TeX commands with their arguments and do some
-    ;; transformations, i.e., \textsc{cls} ==> CLS.  Note that optional
-    ;; arguments are also removed.
-    (save-match-data
-      (let ((case-fold-search t))
-        (while (string-match "\\\\\\([a-zA-Z*]*\\)\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" str)
-          (let ((arg (copy-sequence (match-string 2 str))))
-            (pcase (match-string 1 str)
-              ((or "emph" "textit") (setq arg (propertize arg 'face '(italic))))
-              ("textbf" (setq arg (propertize arg 'face '(bold))))
-              ("textsc" (setq arg (upcase arg))))
-            (setq str (replace-match arg t t str))))))
+(defun ebib-biblatex-date-to-year (date)
+  "Extract the year from DATE.
+DATE is a string conforming to a biblatex date specification.  If
+it is a single date, the year is returned.  If DATE is a date
+range, the year of the start of the range is returned.  If no
+year can be extracted from DATE, return nil."
+  (save-match-data
+    (if (string-match "^[[:space:]]*\\(?:\\.\\.\\)?/?\\(-?[0-9]\\{4\\}\\)" date)
+        (match-string 1 date))))
+
+(defun ebib-clean-TeX-markup-from-entry (field key db)
+  "Return the contents of FIELD from KEY in DB without TeX markup."
+  (ebib-clean-TeX-markup (ebib-get-field-value field key db "" 'unbraced 'xref)))
+
+(defun ebib-clean-TeX-markup (string)
+  "Return STRING without TeX markup."
+  (save-match-data
+    (let ((case-fold-search t))
+      ;; First replace TeX commands with their arguments and do some
+      ;; transformations, i.e., \textsc{cls} ==> CLS.  Note that optional
+      ;; arguments are also removed.
+      (while (string-match "\\\\\\([a-zA-Z*]*\\)\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" string)
+        (let ((arg (copy-sequence (match-string 2 string))))
+          (pcase (match-string 1 string)
+            ((or "emph" "textit") (setq arg (propertize arg 'face '(italic))))
+            ("textbf" (setq arg (propertize arg 'face '(bold))))
+            ("textsc" (setq arg (upcase arg))))
+          (setq string (replace-match arg t t string)))))
     ;; Now replace all remaining braces. This also takes care of nested braces.
-    (replace-regexp-in-string "[{}]" "" str)))
+    (replace-regexp-in-string "[{}]" "" string)))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
