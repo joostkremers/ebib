@@ -352,11 +352,20 @@ documentation for details."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-reference-templates '(("Book"         . "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}")
-                                      ("Article"      . "{Author} ({Date|Year}). {\"Title\"}. {Journaltitle|Journal}, {Volume}{:Issue}, {Pages}. {Doi|Url.}")
-                                      ("Collection"   . "{Editor|Author} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}")
-                                      ("InCollection" . "{Author} ({Date|Year}). {\"Title\"}. In: {Editor}, {\"Booktitle\"}. {Publisher}. {Pages}. {Doi|Url.}")
-                                      )
+(defcustom ebib-reference-templates '(("Article"       . "{Author} ({Date|Year}). {\"Title\".} {Journaltitle|Journal}, {Volume}{:Issue}, {Pages}. {Doi|Url.}")
+                                      ("Book"          . "{Author|Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
+                                      ("MvBook"        . "{Author|Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
+                                      ("InBook"        . "{Author} ({Date|Year}). {\"Title\".} In: {Editor}, {\"Booktitle\"}. {Publisher.} {Pages.} {Doi|Url.}")
+                                      ("Collection"    . "{Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
+                                      ("MvCollection"  . "{Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
+                                      ("InCollection"  . "{Author} ({Date|Year}). {\"Title\".} In: {Editor}, {\"Booktitle\"}. {Publisher.} {Pages.} {Doi|Url.}")
+                                      ("Misc"          . "{Author|Editor) ({Date|Year}). {\"Title\".} {Howpublished.}")
+                                      ("Online"        . "{Author|Editor} {(Date|Year}). {\"Title\".} {Doi|Url.}")
+                                      ("Proceedings"   . "{Editor} {(Date|Year}). {\"Title\".} {Organization.}")
+                                      ("MvProceedings" . "{Editor} {(Date|Year}). {\"Title\".} {Organization.}")
+                                      ("InProceedings" . "{Author} ({Date|Year}). {\"Title\".} In: {Editor}, {\"Booktitle\"}. {Publisher.} {Pages.} {Doi|Url.}")
+                                      ("Thesis"        . "{Author} ({Date|Year}). {\"Title\".} {Type,} {Institution.} ")
+                                      ("Unpublished"   . "{Author} ({Date|Year}). {\"Title\".} {Howpublished.} {Note.}"))
   "Templates for copying references to the kill ring.
 Each template is a string containing literal text and directives
 in braces {}.  A directive should contain a field name and is
