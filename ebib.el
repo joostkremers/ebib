@@ -3081,7 +3081,8 @@ Emacs completion."
 (defun ebib-copy-citation-as-kill ()
   "Create a citation from the current entry and copy it to the kill ring."
   (interactive)
-  (kill-new (ebib--process-reference-template ebib-citation-template (ebib--get-key-at-point) ebib--cur-db)))
+  (kill-new (ebib--process-reference-template ebib-citation-template (ebib--get-key-at-point) ebib--cur-db))
+  (message "Citation copied to kill ring."))
 
 (defun ebib-copy-entry-as-kill ()
   "Copy the current entry.
@@ -3102,7 +3103,8 @@ The entry is copied to the kill ring."
 (defun ebib-copy-key-as-kill ()
   "Copy the key of the current entry to the kill ring."
   (interactive)
-  (kill-new (ebib--get-key-at-point)))
+  (kill-new (ebib--get-key-at-point))
+  (message "Entry key copied to kill ring."))
 
 (defun ebib-copy-reference-as-kill ()
   "Create a reference for the current entry and copy it to the kill ring."
@@ -3112,8 +3114,9 @@ The entry is copied to the kill ring."
      (let* ((key (ebib--get-key-at-point))
             (type (ebib-db-get-field-value "=type=" key ebib--cur-db 'noerror))
             (template (or (alist-get type ebib-reference-templates nil nil #'cl-equalp)
-                          "{Author|Editor}, ({Date|Year}). {\"Title\"}. {Doi|Url.}")))
-       (kill-new (ebib--process-reference-template template key ebib--cur-db))))))
+                          "{Author|Editor}, ({Date|Year}). {\"Title\".} {Doi|Url.}")))
+       (kill-new (ebib--process-reference-template template key ebib--cur-db))
+       (message "Reference copied to kill ring.")))))
 
 ;;; Main & dependent databases
 
