@@ -2058,7 +2058,8 @@ in `bibtex-dialect-list' or nil, in which case the value of
   (or dialect (setq dialect ebib-bibtex-dialect))
   (let ((fields (ebib--list-fields (cdr (assoc "=type=" entry)) 'all dialect)))
     (seq-remove (lambda (elt)
-                  (member-ignore-case (car elt) (cons "=type=" fields)))
+                  (or (member-ignore-case (car elt) fields)
+                      (null (cdr elt))))
                 entry)))
 
 (defun ebib--list-entry-types (&optional dialect include-aliases)
