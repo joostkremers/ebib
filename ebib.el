@@ -3668,13 +3668,21 @@ was called interactively."
 (defun ebib-add-field (field)
   "Add FIELD to the current entry."
   (interactive "sField: ")
-  ;; We store the field with a nil value and then let the user edit it.
   (let ((key (ebib--get-key-at-point)))
-    (if (not (ebib-set-field-value field nil key ebib--cur-db 'noerror))
-        (message "Field `%s' already has a value in entry `%s'" field key)
+    (if (ebib-get-field-value field key ebib--cur-db 'noerror)
+        (error "[Ebib] Field `%s' already has a value in entry `%s'" field key)
+      ;; We store the field with an empty string as value and then let the user
+      ;; edit it. (We cannot pass nil as a value because
+      ;; `ebib--update-entry-buffer' ignores hidden or undefined fields with a
+      ;; nil value.
+      (ebib-set-field-value field "" key ebib--cur-db 'noerror)
       (ebib--update-entry-buffer)
       (re-search-forward (concat "^" field))
-      (ebib-edit-field))))
+      (condition-case err
+          (ebib-edit-field) ; If the user quits the edit, we must remove the field again.
+        (quit (ebib-set-field-value field nil key ebib--cur-db 'overwrite)
+              (ebib--update-entry-buffer))
+        (error (signal (car err) (cdr err)))))))
 
 (defun ebib--edit-entry-type ()
   "Edit the entry type."
