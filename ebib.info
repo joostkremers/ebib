@@ -1794,36 +1794,45 @@ File: ebib.info,  Node: Main and Dependent Databases,  Next: Cross-referencing, 
 If you want to create a ‘.bib’ file from a larger database that only
 contains the references of a particular paper, you can use a dependent
 database.  A dependent database, as the name suggests, depends on
-another, real database that is called it “main” database.  The dependent
+another, real database that is called its main database.  The dependent
 database can only contain entries that also exist in its main database
 and all the data of the entries is shared by both databases.  If you
 edit an entry in the dependent database, the edit shows up in the main
 one as well, and vice versa.
 
+Furthermore, if you have a text buffer that’s associated with a
+dependent database, inserting an entry with ‘M-x ebib-insert-citation’
+offers all entries of the main database for completion, not just the
+ones that are already in the dependent database.  If you select an entry
+that is not in the dependent database yet, it is added to it.  This way,
+creating a separate database for a paper is easy: just create a
+dependent database and associate it with the relevant text buffer.  Then
+insert citation commands as usual.
+
 You can create a dependent database with the key sequence ‘M c’ in the
 database that you want to be its main database.  Ebib asks you for a
-file name and then creates a new empty database.  You can add entries to
-the dependent with the key sequence ‘M a’ in the main database.  In the
-dependent database, you can add new entries in the normal way with the
-key ‘a’, but instead of creating a new entry, this command asks for an
-entry from the main database which is then added to the dependent.
+file name and then creates a new empty database.
+
+Adding new entries to a dependent database can be done as described, by
+inserting citations in a text buffer.  It’s also possible to add entries
+in the usual way, i.e., by pressing ‘a’ in Ebib’s index buffer.  If you
+do this in a dependent database, instead of creating a new entry, you
+are prompted for an entry from the main database to add to the dependent
+one.
+
+A database can serve as the main database for more than one dependent
+databases, but the reverse is not possible: each dependent database can
+only have one main database.
 
 If you save a dependent database, it is saved as a normal, standalone
 ‘.bib’ file that can be used with ‘biblatex’ or BibTeX. When you reopen
 the file in Ebib, a special comment at the top of the file makes sure
 that Ebib recognises it as a dependent database and loads the main
-database as well if necessary.  Note that when Ebib opens a dependent
+database as well, if necessary.  Note that when Ebib opens a dependent
 database, it only reads the entry keys from the ‘.bib’ file.  The data
 of each entry is taken from the main database.  This means that if you
 edit a dependent database’s ‘.bib’ file outside of Ebib, the changes you
 make are ignored when you open the file in Ebib.
-
-If you have a text buffer that’s associated with a dependent database,
-you can insert entries in the normal way with ‘M-x
-ebib-insert-citation’, but instead of offering only the entries in the
-associated (dependent) database, Emacs will offer all entries of the
-main database for completion.  If you select an entry that is not in the
-dependent database yet, it is added to it.
 
 
 File: ebib.info,  Node: Cross-referencing,  Next: Marking Entries,  Prev: Main and Dependent Databases,  Up: Top
@@ -3174,58 +3183,58 @@ Node: Copying Entries to the Kill Ring and System Clipboard82129
 Ref: #copying-entries-to-the-kill-ring-and-system-clipboard82415
 Node: Main and Dependent Databases84962
 Ref: #main-and-dependent-databases85181
-Node: Cross-referencing87233
-Ref: #cross-referencing87392
-Node: Marking Entries90919
-Ref: #marking-entries91067
-Node: Printing the Database91944
-Ref: #printing-the-database92104
-Node: Calling a Browser95573
-Ref: #calling-a-browser95737
-Node: Viewing and Importing Files98189
-Ref: #viewing-and-importing-files98363
-Node: Editing the file field102930
-Ref: #editing-the-file-field103079
-Node: Notes files104450
-Ref: #notes-files104598
-Node: Separate notes files105367
-Ref: #separate-notes-files105516
-Node: One single notes file107107
-Ref: #one-single-notes-file107300
-Node: Customising the notes file format109217
-Ref: #customising-the-notes-file-format109430
-Node: Displaying notes113025
-Ref: #displaying-notes113174
-Node: Managing a reading list114511
-Ref: #managing-a-reading-list114673
-Node: Window Management117688
-Ref: #window-management117847
-Node: Creating Entry Stubs121006
-Ref: #creating-entry-stubs121168
-Node: @Preamble Definition122166
-Ref: #preamble-definition122330
-Node: @String Definitions124302
-Ref: #string-definitions124453
-Node: @Comments127946
-Ref: #comments128074
-Node: Managing Keywords128439
-Ref: #managing-keywords128584
-Node: Sorting the bib File134652
-Ref: #sorting-the-.bib-file134825
-Node: Merging and Importing137944
-Ref: #merging-and-importing138109
-Node: Exporting Entries139879
-Ref: #exporting-entries140041
-Node: Multiple Identical Fields141557
-Ref: #multiple-identical-fields141736
-Node: Multiline Edit Buffers143664
-Ref: #multiline-edit-buffers143836
-Node: The Options Menu147713
-Ref: #the-options-menu147861
-Node: Customisation148479
-Ref: #customisation148590
-Node: Modifying Key Bindings149198
-Ref: #modifying-key-bindings149325
+Node: Cross-referencing87606
+Ref: #cross-referencing87765
+Node: Marking Entries91292
+Ref: #marking-entries91440
+Node: Printing the Database92317
+Ref: #printing-the-database92477
+Node: Calling a Browser95946
+Ref: #calling-a-browser96110
+Node: Viewing and Importing Files98562
+Ref: #viewing-and-importing-files98736
+Node: Editing the file field103303
+Ref: #editing-the-file-field103452
+Node: Notes files104823
+Ref: #notes-files104971
+Node: Separate notes files105740
+Ref: #separate-notes-files105889
+Node: One single notes file107480
+Ref: #one-single-notes-file107673
+Node: Customising the notes file format109590
+Ref: #customising-the-notes-file-format109803
+Node: Displaying notes113398
+Ref: #displaying-notes113547
+Node: Managing a reading list114884
+Ref: #managing-a-reading-list115046
+Node: Window Management118061
+Ref: #window-management118220
+Node: Creating Entry Stubs121379
+Ref: #creating-entry-stubs121541
+Node: @Preamble Definition122539
+Ref: #preamble-definition122703
+Node: @String Definitions124675
+Ref: #string-definitions124826
+Node: @Comments128319
+Ref: #comments128447
+Node: Managing Keywords128812
+Ref: #managing-keywords128957
+Node: Sorting the bib File135025
+Ref: #sorting-the-.bib-file135198
+Node: Merging and Importing138317
+Ref: #merging-and-importing138482
+Node: Exporting Entries140252
+Ref: #exporting-entries140414
+Node: Multiple Identical Fields141930
+Ref: #multiple-identical-fields142109
+Node: Multiline Edit Buffers144037
+Ref: #multiline-edit-buffers144209
+Node: The Options Menu148086
+Ref: #the-options-menu148234
+Node: Customisation148852
+Ref: #customisation148963
+Node: Modifying Key Bindings149571
+Ref: #modifying-key-bindings149698
 
 End Tag Table
 

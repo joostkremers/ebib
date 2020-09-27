@@ -1459,36 +1459,45 @@ is used. Similarly, the `Title` field is stripped of LaTeX markup.
 If you want to create a `.bib` file from a larger database that only
 contains the references of a particular paper, you can use a dependent
 database. A dependent database, as the name suggests, depends on
-another, real database that is called it “main” database. The dependent
+another, real database that is called its main database. The dependent
 database can only contain entries that also exist in its main database
 and all the data of the entries is shared by both databases. If you edit
 an entry in the dependent database, the edit shows up in the main one as
 well, and vice versa.
 
+Furthermore, if you have a text buffer that’s associated with a
+dependent database, inserting an entry with `M-x ebib-insert-citation`
+offers all entries of the main database for completion, not just the
+ones that are already in the dependent database. If you select an entry
+that is not in the dependent database yet, it is added to it. This way,
+creating a separate database for a paper is easy: just create a
+dependent database and associate it with the relevant text buffer. Then
+insert citation commands as usual.
+
 You can create a dependent database with the key sequence `M c` in the
 database that you want to be its main database. Ebib asks you for a file
-name and then creates a new empty database. You can add entries to the
-dependent with the key sequence `M a` in the main database. In the
-dependent database, you can add new entries in the normal way with the
-key `a`, but instead of creating a new entry, this command asks for an
-entry from the main database which is then added to the dependent.
+name and then creates a new empty database.
+
+Adding new entries to a dependent database can be done as described, by
+inserting citations in a text buffer. It’s also possible to add entries
+in the usual way, i.e., by pressing `a` in Ebib’s index buffer. If you
+do this in a dependent database, instead of creating a new entry, you
+are prompted for an entry from the main database to add to the dependent
+one.
+
+A database can serve as the main database for more than one dependent
+databases, but the reverse is not possible: each dependent database can
+only have one main database.
 
 If you save a dependent database, it is saved as a normal, standalone
 `.bib` file that can be used with `biblatex` or BibTeX. When you reopen
 the file in Ebib, a special comment at the top of the file makes sure
 that Ebib recognises it as a dependent database and loads the main
-database as well if necessary. Note that when Ebib opens a dependent
+database as well, if necessary. Note that when Ebib opens a dependent
 database, it only reads the entry keys from the `.bib` file. The data of
 each entry is taken from the main database. This means that if you edit
 a dependent database’s `.bib` file outside of Ebib, the changes you make
 are ignored when you open the file in Ebib.
-
-If you have a text buffer that’s associated with a dependent database,
-you can insert entries in the normal way with `M-x
-ebib-insert-citation`, but instead of offering only the entries in the
-associated (dependent) database, Emacs will offer all entries of the
-main database for completion. If you select an entry that is not in the
-dependent database yet, it is added to it.
 
 # Cross-referencing
 
