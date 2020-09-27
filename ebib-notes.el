@@ -259,12 +259,14 @@ If KEY has no note, return nil."
           (cons (current-buffer) location)))))
    ((not ebib-notes-file)
     (let* ((filename (expand-file-name (ebib--create-notes-file-name key)))
-           (buf (if (file-readable-p filename)
-                    (ebib--notes-open-single-note-file filename)
-                  ;; In case the user created the note already but didn't save
-                  ;; the file yet, check if there's a buffer visiting the note
-                  ;; file.
-                  (get-file-buffer filename))))
+           (buf (or
+                 ;; In case the user created the note already but didn't save
+                 ;; the file yet, check if there's a buffer visiting the note
+                 ;; file.
+                 (get-file-buffer filename)
+                 ;; Otherwise try and open the file.
+                 (and (file-readable-p filename)
+                      (ebib--notes-open-single-note-file filename)))))
       (when buf (cons buf 1))))))
 
 (defun ebib--notes-create-new-note (key db)
