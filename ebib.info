@@ -1820,6 +1820,17 @@ do this in a dependent database, instead of creating a new entry, you
 are prompted for an entry from the main database to add to the dependent
 one.
 
+It’s also possible to add entries to a dependent database from its main
+database with the command ‘M a’.  This command also works on marked
+entries, making it possible to add multiple entries to a dependent
+database in one go.
+
+Deleting an entry in a dependent database only removes it from the
+dependent database, not from the main database.  If you delete an entry
+from the main database that is also present in a dependent database, it
+is removed from both, given that a dependent database can only have
+entries that also exist in the main database.
+
 A database can serve as the main database for more than one dependent
 databases, but the reverse is not possible: each dependent database can
 only have one main database.
@@ -3183,58 +3194,58 @@ Node: Copying Entries to the Kill Ring and System Clipboard82129
 Ref: #copying-entries-to-the-kill-ring-and-system-clipboard82415
 Node: Main and Dependent Databases84962
 Ref: #main-and-dependent-databases85181
-Node: Cross-referencing87606
-Ref: #cross-referencing87765
-Node: Marking Entries91292
-Ref: #marking-entries91440
-Node: Printing the Database92317
-Ref: #printing-the-database92477
-Node: Calling a Browser95946
-Ref: #calling-a-browser96110
-Node: Viewing and Importing Files98562
-Ref: #viewing-and-importing-files98736
-Node: Editing the file field103303
-Ref: #editing-the-file-field103452
-Node: Notes files104823
-Ref: #notes-files104971
-Node: Separate notes files105740
-Ref: #separate-notes-files105889
-Node: One single notes file107480
-Ref: #one-single-notes-file107673
-Node: Customising the notes file format109590
-Ref: #customising-the-notes-file-format109803
-Node: Displaying notes113398
-Ref: #displaying-notes113547
-Node: Managing a reading list114884
-Ref: #managing-a-reading-list115046
-Node: Window Management118061
-Ref: #window-management118220
-Node: Creating Entry Stubs121379
-Ref: #creating-entry-stubs121541
-Node: @Preamble Definition122539
-Ref: #preamble-definition122703
-Node: @String Definitions124675
-Ref: #string-definitions124826
-Node: @Comments128319
-Ref: #comments128447
-Node: Managing Keywords128812
-Ref: #managing-keywords128957
-Node: Sorting the bib File135025
-Ref: #sorting-the-.bib-file135198
-Node: Merging and Importing138317
-Ref: #merging-and-importing138482
-Node: Exporting Entries140252
-Ref: #exporting-entries140414
-Node: Multiple Identical Fields141930
-Ref: #multiple-identical-fields142109
-Node: Multiline Edit Buffers144037
-Ref: #multiline-edit-buffers144209
-Node: The Options Menu148086
-Ref: #the-options-menu148234
-Node: Customisation148852
-Ref: #customisation148963
-Node: Modifying Key Bindings149571
-Ref: #modifying-key-bindings149698
+Node: Cross-referencing88166
+Ref: #cross-referencing88325
+Node: Marking Entries91852
+Ref: #marking-entries92000
+Node: Printing the Database92877
+Ref: #printing-the-database93037
+Node: Calling a Browser96506
+Ref: #calling-a-browser96670
+Node: Viewing and Importing Files99122
+Ref: #viewing-and-importing-files99296
+Node: Editing the file field103863
+Ref: #editing-the-file-field104012
+Node: Notes files105383
+Ref: #notes-files105531
+Node: Separate notes files106300
+Ref: #separate-notes-files106449
+Node: One single notes file108040
+Ref: #one-single-notes-file108233
+Node: Customising the notes file format110150
+Ref: #customising-the-notes-file-format110363
+Node: Displaying notes113958
+Ref: #displaying-notes114107
+Node: Managing a reading list115444
+Ref: #managing-a-reading-list115606
+Node: Window Management118621
+Ref: #window-management118780
+Node: Creating Entry Stubs121939
+Ref: #creating-entry-stubs122101
+Node: @Preamble Definition123099
+Ref: #preamble-definition123263
+Node: @String Definitions125235
+Ref: #string-definitions125386
+Node: @Comments128879
+Ref: #comments129007
+Node: Managing Keywords129372
+Ref: #managing-keywords129517
+Node: Sorting the bib File135585
+Ref: #sorting-the-.bib-file135758
+Node: Merging and Importing138877
+Ref: #merging-and-importing139042
+Node: Exporting Entries140812
+Ref: #exporting-entries140974
+Node: Multiple Identical Fields142490
+Ref: #multiple-identical-fields142669
+Node: Multiline Edit Buffers144597
+Ref: #multiline-edit-buffers144769
+Node: The Options Menu148646
+Ref: #the-options-menu148794
+Node: Customisation149412
+Ref: #customisation149523
+Node: Modifying Key Bindings150131
+Ref: #modifying-key-bindings150258
 
 End Tag Table
 

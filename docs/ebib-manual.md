@@ -1485,6 +1485,17 @@ do this in a dependent database, instead of creating a new entry, you
 are prompted for an entry from the main database to add to the dependent
 one.
 
+It’s also possible to add entries to a dependent database from its main
+database with the command `M a`. This command also works on marked
+entries, making it possible to add multiple entries to a dependent
+database in one go.
+
+Deleting an entry in a dependent database only removes it from the
+dependent database, not from the main database. If you delete an entry
+from the main database that is also present in a dependent database, it
+is removed from both, given that a dependent database can only have
+entries that also exist in the main database.
+
 A database can serve as the main database for more than one dependent
 databases, but the reverse is not possible: each dependent database can
 only have one main database.
