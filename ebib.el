@@ -3679,8 +3679,8 @@ was called interactively."
       (ebib--update-entry-buffer)
       (re-search-forward (concat "^" field))
       (condition-case err
-          (ebib-edit-field) ; If the user quits the edit, we must remove the field again.
-        (quit (ebib-set-field-value field nil key ebib--cur-db 'overwrite)
+          (ebib-edit-field)
+        (quit (ebib-set-field-value field nil key ebib--cur-db 'overwrite)  ; If the user quits the edit, we must remove the field again.
               (ebib--update-entry-buffer))
         (error (signal (car err) (cdr err)))))))
 
