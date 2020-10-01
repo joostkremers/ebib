@@ -356,7 +356,7 @@ documentation for details."
                                       ("Collection"    . "{Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
                                       ("MvCollection"  . "{Editor} ({Date|Year}). {\"Title\".} {Publisher.} {Doi|Url.}")
                                       ("InCollection"  . "{Author} ({Date|Year}). {\"Title\".} In: {Editor}, {\"Booktitle\"}. {Publisher.} {Pages.} {Doi|Url.}")
-                                      ("Misc"          . "{Author|Editor) ({Date|Year}). {\"Title\".} {Howpublished.}")
+                                      ("Misc"          . "{Author|Editor} ({Date|Year}). {\"Title\".} {Howpublished.}")
                                       ("Online"        . "{Author|Editor} {(Date|Year}). {\"Title\".} {Doi|Url.}")
                                       ("Proceedings"   . "{Editor} {(Date|Year}). {\"Title\".} {Organization.}")
                                       ("MvProceedings" . "{Editor} {(Date|Year}). {\"Title\".} {Organization.}")
