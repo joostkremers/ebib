@@ -2349,8 +2349,7 @@ the database containing the selected entry."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
         (let* ((key (completing-read "Select entry: " collection nil t nil 'ebib--key-history))
-               (db (get-text-property 0 'ebib-db key)))
-          (set-text-properties 0 (length key) nil key)
+               (db (get-text-property 0 'ebib-db (assoc-string key collection))))
           (list (cons key db)))
       (error "[Ebib] No BibTeX entries found"))))
 
