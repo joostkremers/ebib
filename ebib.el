@@ -3686,7 +3686,7 @@ was called interactively."
 
 (defun ebib--edit-entry-type ()
   "Edit the entry type."
-  (ebib--ifstring (new-type (completing-read "type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
+  (ebib--ifstring (new-type (completing-read "Type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
       (let ((key (ebib--get-key-at-point)))
         (ebib-set-field-value "=type=" new-type key ebib--cur-db 'overwrite 'unbraced)
         (ebib--update-entry-buffer)
