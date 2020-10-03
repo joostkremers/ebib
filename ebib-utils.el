@@ -1062,6 +1062,16 @@ Setting this option disables completion completely."
   :type '(choice (const :tag "Use completion" nil)
                  (const :tag "Do not use completion" t)))
 
+(defcustom ebib-multiline-fields '("annote" "annotation" "abstract")
+  "Fields that are edited as multiline fields by default."
+  :group 'ebib
+  :type '(repeat (string :tag "Field")))
+
+(defcustom ebib-fields-with-completion '("journal" "journaltitle" "publisher" "organization")
+  "Fields that are edited using completion by default."
+  :group 'ebib
+  :type '(repeat (string :tag "Field")))
+
 (defcustom ebib-save-dependent-after-citation t
   "Save a dependent database after `ebib-insert-citation'.
 Calling `ebib-insert-citation' in a text buffer associated with a

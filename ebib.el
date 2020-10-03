@@ -3840,39 +3840,39 @@ all other authors and editors in all databases."
                                                                                    (not (ebib-db-dependent-p db)))
                                                                                  ebib--databases)))))))
 
-(defun ebib--edit-normal-field ()
-  "Edit a field that does not require special treatment."
-  (let* ((cur-field (ebib--current-field))
-         (init-contents (ebib-get-field-value cur-field (ebib--get-key-at-point) ebib--cur-db 'noerror))
-         (unbraced? nil)
+(defun ebib--edit-normal-field (field init-contents &optional complete)
+  "Edit a field as a string.
+Do not offer completion or any other editing assistance.  FIELD
+is the field being edited, INIT-CONTENTS is its initial contents.
+If COMPLETE is non-nil, offer completion, the list of completion
+candidates being composed of the contents of FIELD in all entries
+of the database."
+  (let* ((unbraced? nil)
          (key (ebib--get-key-at-point)))
-    (if (ebib--multiline-p init-contents)
-        (ebib-edit-multiline-field)     ; This always returns nil.
-      (when init-contents
-        (setq unbraced? (ebib-unbraced-p init-contents))
-        (setq init-contents (ebib-unbrace init-contents)))
-      (ebib--ifstring (new-contents (cond
-                                     ((member-ignore-case cur-field '("journal" "journaltitle" "publisher" "organization"))
+    (when init-contents
+      (setq unbraced? (ebib-unbraced-p init-contents))
+      (setq init-contents (ebib-unbrace init-contents)))
+    (ebib--ifstring (new-contents (if complete
                                       (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
-                                        (completing-read (format "%s: " cur-field)
-                                                         (ebib--create-collection-from-field cur-field)
+                                        (completing-read (format "%s: " field)
+                                                         (ebib--create-collection-from-field field)
                                                          nil nil
                                                          (if init-contents
-                                                             (cons init-contents 0)))))
-                                     (t (read-string (format "%s: " cur-field)
-                                                     (if init-contents
-                                                         (cons init-contents 0))))))
-          (ebib-set-field-value cur-field new-contents key ebib--cur-db 'overwrite unbraced?)
-        (ebib-db-remove-field-value cur-field key ebib--cur-db))
-      (ebib--redisplay-current-field)
-      (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                         (ebib-db-has-key key dependent))
-                                                       (ebib--list-dependents ebib--cur-db))))))
+                                                             (cons init-contents 0))))
+                                    (read-string (format "%s: " field)
+                                                 (if init-contents
+                                                     (cons init-contents 0)))))
+                    (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite unbraced?)
+                    (ebib-db-remove-field-value field key ebib--cur-db))
+    (ebib--redisplay-current-field)
+    (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                       (ebib-db-has-key key dependent))
+                                                     (ebib--list-dependents ebib--cur-db)))))
 
-;; `ebib-edit-field' relegates the actual editing to a number of helper functions.
-;; These functions should return non-nil if editing was successful and they
-;; should ensure that the field being edited is redisplayed and that database's
-;; modified flag is set.
+;; `ebib-edit-field' relegates the actual editing to a number of helper
+;; functions.  These functions should return non-nil if editing was successful
+;; and they should ensure that the field being edited is redisplayed and that
+;; the database's modified flag is set.
 
 (defun ebib-edit-field (&optional pfx)
   "Edit a field of a BibTeX entry.
@@ -3885,43 +3885,50 @@ field in `ebib-file-field' uses filename completion and shortens
 filenames if they are in (a subdirectory of) one of the
 directories in `ebib-file-search-dirs'.
 
-With a prefix argument PFX, the `keywords' field and the field in
-`ebib-file-field' can be edited directly.  For other fields, the
-prefix argument has no meaning."
-  (interactive "p")
+With a prefix argument PFX, edit the current field directly,
+without any special treatment.  Exceptions are the \"type\" field
+and any field with a multiline value, which are always edited in
+a special manner."
+  (interactive "P")
   (let* ((field (ebib--current-field))
-         ;; We save the result of editing the field, so we can take some action
-         ;; if the edit wasn't aborted.
+         (init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror))
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
-                  ((member-ignore-case field '("author" "editor")) (ebib--edit-author/editor-field field))
-                  ((member-ignore-case field '("crossref" "xref" "related")) (ebib--edit-crossref field))
-                  ((and (cl-equalp field "keywords")
-                        (= 1 pfx))
-                   (ebib--edit-keywords-field))
-                  ((and (cl-equalp field ebib-file-field)
-                        (= 1 pfx))
-                   (ebib--edit-file-field))
-                  ((member-ignore-case field '("annote" "annotation" "abstract"))
-                   ;; A multiline edit differs from the other ones, because
+                  ((ebib--multiline-p init-contents)
+                   (ebib-edit-multiline-field field init-contents)
+                   ;; A multiline edit differs from the other fields, because
                    ;; the edit isn't done when `ebib-edit-multiline-field'
-                   ;; returns. This means we cannot move to the next field.
-                   ;; (in fact, the entry buffer isn't even displayed at
-                   ;; this point.) for this reason, we return `nil', so
-                   ;; `ebib-next-field' below isn't called.
-                   (ebib-edit-multiline-field)
+                   ;; returns. This means we cannot move to the next field.  For
+                   ;; this reason, we return `nil', so we know below not to take
+                   ;; any further action.
                    nil)
+                  (pfx (ebib--edit-normal-field field init-contents))
+                  ((and (member-ignore-case field '("author" "editor"))
+                        (not ebib-edit-author/editor-without-completion)
+                        (not init-contents))
+                   (ebib--edit-author/editor-field field))
+                  ((member-ignore-case field '("crossref" "xref" "related"))
+                   (ebib--edit-crossref field))
+                  ((cl-equalp field "keywords")
+                   (ebib--edit-keywords-field))
+                  ((cl-equalp field ebib-file-field)
+                   (ebib--edit-file-field))
+                  ((member-ignore-case field ebib-fields-with-completion)
+                   (ebib--edit-normal-field field init-contents :complete))
+                  ((member-ignore-case field ebib-multiline-fields)
+                   (ebib-edit-multiline-field field init-contents)
+                   nil) ; See above.
                   ;; The field is called "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
                   ((string= field "external")
                    (ebib-open-note (ebib--get-key-at-point))
-                   nil)
-                  (t (ebib--edit-normal-field)))))
+                   nil) ; See above.
+                  (t (ebib--edit-normal-field field init-contents (member-ignore-case field ebib-fields-with-completion))))))
     ;; When the edit returns, see if we need to move to the next field and
     ;; check whether we need to update the index display.
     (when result
-      (when pfx
+      (when (called-interactively-p 'any)
         (ebib-next-field))
       (ebib--redisplay-index-item field))))
 
@@ -4064,7 +4071,7 @@ The deleted text is not put in the kill ring."
         (field (ebib--current-field)))
     (unless (member-ignore-case field '("=type=" "crossref" "xref" "related" "keywords"))
       (let ((contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
-        (if (ebib--multiline-p contents) ; multiline fields cannot be special
+        (if (ebib--multiline-p contents) ; Multiline fields cannot be raw.
             (beep)
           (unless contents  ; If there is no value, the user can enter one,
             (ebib-edit-field)   ; which we must then store unbraced.
@@ -4076,15 +4083,18 @@ The deleted text is not put in the kill ring."
                                                                (ebib-db-has-key key dependent))
                                                              (ebib--list-dependents ebib--cur-db)))))))))
 
-(defun ebib-edit-multiline-field ()
-  "Edit the current field in multiline-mode."
-  (interactive)
-  (let ((field (ebib--current-field)))
-    (unless (member-ignore-case field '("=type=" "crossref" "xref" "related"))
-      (let ((text (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
-        (if (ebib-unbraced-p text) ; Unbraced fields cannot be multiline.
-            (beep)
-          (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-unbrace text)))))))
+(defun ebib-edit-multiline-field (field init-contents)
+  "Edit the current field in multiline-mode.
+FIELD is the field being edited, INIT-CONTENTS is its initial content."
+  (interactive (let* ((field (ebib--current-field))
+                      (value (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+                 (list field value)))
+  (cond
+   ((member-ignore-case field '("=type=" "crossref" "xref" "related"))
+    (error "[Ebib] Cannot edit `%s' field as multiline" field))
+   ((ebib-unbraced-p init-contents)
+    (error "[Ebib] Cannot edit a raw field as multiline"))
+   (t (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-unbrace init-contents)))))
 
 (defun ebib-insert-abbreviation ()
   "Insert an abbreviation from the ones defined in the database."
