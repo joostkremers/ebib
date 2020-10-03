@@ -3781,7 +3781,7 @@ relative to `ebib-file-search-dirs'.  Subsequently,
 If FILE is not in (a subdirectory of) one of the directories in
 `ebib-file-search-dirs', return FILE."
   ;; We first create a list of names relative to each dir in
-  ;; ebib-file-search-dirs, discarding those that start with `..'
+  ;; `ebib-file-search-dirs', discarding those that start with `..'
   (let* ((names (delq nil (mapcar (lambda (dir)
                                     (let ((rel-name (file-relative-name file dir)))
                                       (unless (string-prefix-p ".." rel-name)
