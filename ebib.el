@@ -3712,7 +3712,7 @@ was called interactively."
   (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
         (collection (ebib--keywords-for-database ebib--cur-db))
         (key (ebib--get-key-at-point))
-	(prompt (format "Add a new keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
+	(prompt (format "New keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
     (cl-loop for keyword = (completing-read prompt collection nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
              do (let* ((conts (ebib-get-field-value "keywords" key ebib--cur-db 'noerror 'unbraced))
