@@ -3809,32 +3809,26 @@ If FILE is not in (a subdirectory of) one of the directories in
 
 (defun ebib--edit-author/editor-field (field)
   "Edit the author or editor field.
-FIELD should be \"author\" or \"editor\".  If the author or
-editor field already contains a value, or if the user option
-`ebib-edit-author/editor-without-completion' is set, edit it as a
-normal field.  Otherwise, offer completion on all other authors
-and editors in all databases."
-  (if (or ebib-edit-author/editor-without-completion
-          (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror))
-      (ebib--edit-normal-field)
-    ;; We shadow the binding of `minibuffer-local-completion-map' so that we
-    ;; can unbind <SPC>, since authors and editors contain spaces.
-    (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-          (collection (ebib--create-author/editor-collection))
-          (prompt (format "Add a new %s (%s to finish): " field (ebib--completion-finish-key 'completing-read)))
-          (key (ebib--get-key-at-point)))
-      (cl-loop for author = (completing-read prompt collection)
-               until (string= author "")
-               do (let* ((conts (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced))
-                         (new-conts (if conts
-                                        (concat conts " and " author)
-                                      author)))
-                    (ebib-set-field-value field new-conts key ebib--cur-db 'overwrite)
-                    (ebib--redisplay-current-field)
-                    (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                                       (ebib-db-has-key key dependent))
-                                                                     (ebib--list-dependents ebib--cur-db))))
-               finally return (ebib-db-modified-p ebib--cur-db)))))
+FIELD should be \"Author\" or \"Editor\".  Offer completion on
+all other authors and editors in all databases."
+  ;; We shadow the binding of `minibuffer-local-completion-map' so that we
+  ;; can unbind <SPC>, since authors and editors contain spaces.
+  (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
+        (collection (ebib--create-author/editor-collection))
+        (prompt (format "Add a new %s (%s to finish): " field (ebib--completion-finish-key 'completing-read)))
+        (key (ebib--get-key-at-point)))
+    (cl-loop for author = (completing-read prompt collection)
+             until (string= author "")
+             do (let* ((conts (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced))
+                       (new-conts (if conts
+                                      (concat conts " and " author)
+                                    author)))
+                  (ebib-set-field-value field new-conts key ebib--cur-db 'overwrite)
+                  (ebib--redisplay-current-field)
+                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                     (ebib-db-has-key key dependent))
+                                                                   (ebib--list-dependents ebib--cur-db))))
+             finally return (ebib-db-modified-p ebib--cur-db))))
 
 (defun ebib--create-collection-from-field (field)
   "Create a collection from the contents of FIELD."
