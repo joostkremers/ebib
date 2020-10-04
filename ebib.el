@@ -3869,11 +3869,6 @@ string in the minibuffer."
                                                        (ebib-db-has-key key dependent))
                                                      (ebib--list-dependents ebib--cur-db)))))
 
-;; `ebib-edit-field' relegates the actual editing to a number of helper
-;; functions.  These functions should return non-nil if editing was successful
-;; and they should ensure that the field being edited is redisplayed and that
-;; the database's modified flag is set.
-
 (defun ebib-edit-field (&optional pfx)
   "Edit a field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
@@ -3892,6 +3887,10 @@ a special manner."
   (interactive "P")
   (let* ((field (ebib--current-field))
          (init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror))
+         ;; We relegate the actual editing to a number of helper functions.
+         ;; These functions should return non-nil if editing was successful.
+         ;; They should also ensure that the field being edited is redisplayed
+         ;; and that the database's modified flag is set.
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
                   ((ebib--multiline-p init-contents)
