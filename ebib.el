@@ -3862,8 +3862,8 @@ string in the minibuffer."
                                     (read-string (format "%s: " field)
                                                  (if init-contents
                                                      (cons init-contents 0)))))
-                    (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite unbraced?)
-                    (ebib-db-remove-field-value field key ebib--cur-db))
+        (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite unbraced?)
+      (ebib-db-remove-field-value field key ebib--cur-db))
     (ebib--redisplay-current-field)
     (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                        (ebib-db-has-key key dependent))
