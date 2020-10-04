@@ -3842,11 +3842,11 @@ all other authors and editors in all databases."
 
 (defun ebib--edit-normal-field (field init-contents &optional complete)
   "Edit a field as a string.
-Do not offer completion or any other editing assistance.  FIELD
-is the field being edited, INIT-CONTENTS is its initial contents.
-If COMPLETE is non-nil, offer completion, the list of completion
-candidates being composed of the contents of FIELD in all entries
-of the database."
+FIELD is the field being edited, INIT-CONTENTS is its initial
+contents.  If COMPLETE is non-nil, offer completion, the list of
+completion candidates being composed of the contents of FIELD in
+all entries of the database.  If COMPLETE is nil, just ask for a
+string in the minibuffer."
   (let* ((unbraced? nil)
          (key (ebib--get-key-at-point)))
     (when init-contents
