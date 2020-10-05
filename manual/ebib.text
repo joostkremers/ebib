@@ -733,7 +733,7 @@ Note that both print options operate on all entries of the database or on the se
 The option "Print Preamble" and "LaTeX Preamble" allow you to customize the preamble of the LaTeX file that is created.
 
 
-# Calling a Browser #
+# Calling a Browser for URLs and DOIs #
 
 With most scientific literature nowadays being available on-line, it is common to store URLs and DOIs in a BibTeX database. `Biblatex` has standardised fields for this information, for BibTeX, Ebib adds these fields to each entry.
 
