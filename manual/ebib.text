@@ -8,6 +8,12 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 # News #
 
+## Version 2.27, October 2020 ##
+
+- Add customisation options `ebib-multiline-fields` and `ebib-fields-with-completion`.
+- Remove customisation option `ebib-edit-author/editor-without-completion` (use `ebib-fields-with-completion` instead).
+- Remove customisation options `ebib-file-field`, `ebib-url-field` and `ebib-doi-field`. There is no point in customising these fields, because `biblatex` expects these fields to contain their intended values.
+
 ## Version 2.26, September 2020 ##
 
 - Copy key, entry, reference or citation to the kill ring (and system clipboard), for easy pasting to other buffers or applications.

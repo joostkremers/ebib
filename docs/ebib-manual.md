@@ -9,6 +9,18 @@ is.
 
 # News
 
+## Version 2.27, October 2020
+
+  - Add customisation options `ebib-multiline-fields` and
+    `ebib-fields-with-completion`.
+  - Remove customisation option
+    `ebib-edit-author/editor-without-completion` (use
+    `ebib-fields-with-completion` instead).
+  - Remove customisation options `ebib-file-field`, `ebib-url-field` and
+    `ebib-doi-field`. There is no point in customising these fields,
+    because `biblatex` expects these fields to contain their intended
+    values.
+
 ## Version 2.26, September 2020
 
   - Copy key, entry, reference or citation to the kill ring (and system
@@ -389,7 +401,7 @@ buffer or copying one from an outside source (e.g., a website) is also
 possible. Furthermore, yanking also works with `@Preamble`, `@String`
 and `@Comment` definitions.
 
-## Editing Fields Values
+## Editing Field Values
 
 Editing the field values for an entry is done in the lower of the two
 Ebib buffers, the so-called entry buffer. You can move focus to the
@@ -400,44 +412,50 @@ You can move between fields with the same keys that you use to move
 between entries in the index buffer: the cursor keys `up` and `down`,
 `p` and `n` or `C-p` and `C-n`. `Space` and `PgDn` move to the next set
 of fields, while `PgUp` and `b` move to the previous set of fields. `g`
-and `G`, and `Home` and `End` also work as expected.
+and `G`, and `Home` and `End` also work as expected. To finish editing
+fields and move focus back to the index window, use `q`.
 
 Editing a field value can be done with `e` or `RET`. For most fields,
-Ebib simply asks you for a string value in the minibuffer. Do not put
-braces `{}` around field values, Ebib adds them when it saves the `.bib`
-file.
+Ebib simply asks you for a string value in the minibuffer. There is no
+need to put braces `{}` around field values, Ebib adds them when it
+saves the `.bib` file.
 
-With some fields, Ebib offers completion. These are the `type` field,
-the `author` and `editor` fields, the `journal` and `journaltitle`
-fields, `publisher`, `organization`, `keywords`, `crossref` and `file`.
-If you edit the `type` field, you must enter one of the predefined entry
-types. Ebib won’t allow you to enter anything else. Similarly, if you
-edit the `crossref` field, Ebib requires that you fill in a key from the
-databases currently open. The fields `keywords` and `file` also offer
-completion, see the sections [Managing Keywords](#managing-keywords) and
-[Viewing Files](#viewing-and-importing-files), respectively.
+Fields for which it makes sense offer completion when you edit them. For
+example, when you edit the `type` field, completion is offered on all
+predefined entry types . Similarly, if you edit the `crossref` field,
+Ebib offers completion on the keys in the databases currently open. Both
+these fields require that you select one of the completion candidates.
 
-For the other fields that offer completion, the completion candidates
-are the values of these fields in other entries in the databases that
-you’ve opened. Offering these as completion candidates makes it easier
-to ensure that you enter these values consistently. In the author and
-editor fields, completion takes into account that these fields may
-contain more than one name. Each name is a separate completion
-candidate, and when editing these fields, you can type the individual
-names, Ebib will add the `"and"` that separates them.
+The `keywords` field offers completion on all configured keywords (see
+the section [Managing Keywords](#managing-keywords)) and the `file`
+field offers file name completion (see [Viewing
+Files](#viewing-and-importing-files)). Unlike the `type` and `crossref`
+fields, however, they do not require that you select one of the
+completion candidates.
 
-In the `author` and `editor` fields, completion is only offered if the
-field is empty. If it is not, editing the field gives you a normal
-minibuffer prompt. It is also possible to disable completion for the
-author and editor fields entirely, because if your databases are large,
-gathering the completion candidates can be a bit slow. Set the option
-`ebib-edit-author/editor-without-completion` to disable completion.
+For other fields that offer completion, the completion candidates are
+the values of these fields in other entries in the databases that you’ve
+opened. Offering these as completion candidates makes it easier to
+ensure that you enter these values consistently. This of course mainly
+makes sense for fields that have values that will occur more than once.
+By default, apart from the fields already mentioned, completion is
+offered for the `author`, `editor`, `journal`, `journaltitle`,
+`organization` and `publisher` fields.
 
-If you’re done editing the fields of the entry, type `q` to move focus
-back to the index buffer. (Note: keys may have different functions in
-the index buffer and the entry buffer. `q` is a typical example: in the
-entry buffer, it quits editing the entry and moves focus back to the
-index buffer. In the index buffer, however, `q` quits Ebib.)
+In the `author` and `editor` fields, completion takes into account that
+these fields may contain more than one name. Each name is a separate
+completion candidate, and when editing these fields, you can type the
+individual names, Ebib will add the `"and"` that separates them.
+
+If you want to edit a field value directly, without completion, you can
+use a prefix argument: `C-u e` will let you edit a field as a plain
+string. If you wish to disable completion permanently for particular
+fields, or if you want to enable completion for other other fields, you
+can customise the user option `ebib-fields-with-completion`. Note that
+if this option contains the `author` field (which it does by default),
+completion is also enabled for the `editor` field. Similarly, if it
+contains the `crossref` field, completion is also enabled for the `xref`
+and `related` fields.
 
 ## Editing Multiline Values
 
@@ -1369,7 +1387,7 @@ buffer by setting the variable `ebib-local-bibfiles` to a list of files.
 This can be done as a file-local or a directory-local variable, or as a
 customisable option.
 
-# Links and Citations in Org buffers
+## Links and Citations in Org buffers
 
 Currently, Org mode does not have real support for citations (though
 support is planned for a future release). Ebib provides a way to add
@@ -1654,7 +1672,7 @@ on the selected entries.
 The option “Print Preamble” and “LaTeX Preamble” allow you to customize
 the preamble of the LaTeX file that is created.
 
-# Calling a Browser
+# Calling a Browser for URLs and DOIs
 
 With most scientific literature nowadays being available on-line, it is
 common to store URLs and DOIs in a BibTeX database. `Biblatex` has
@@ -1694,9 +1712,7 @@ string `https://dx.doi.org/` if necessary.
 
 Ebib uses the Emacs function `browse-url` to call the default browser on
 the system. If you prefer to use another browser, however, you can
-specify this with the option “Browser Command”. You can also customise
-the field that Ebib takes URLs from, with the option “Standard Url
-Field”. The same can be done for the DOI field.
+specify this with the option “Browser Command”.
 
 # Viewing and Importing Files
 
