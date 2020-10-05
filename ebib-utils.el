@@ -1033,21 +1033,21 @@ Ebib (not Emacs)."
   :type '(choice (const :tag "Hide the cursor" t)
                  (const :tag "Show the cursor" nil)))
 
-(defcustom ebib-edit-author/editor-without-completion nil
-  "Do not use completion when editing the author or editor field.
-Completion is only used if the author or editor field is empty.
-Setting this option disables completion completely."
-  :group 'ebib
-  :type '(choice (const :tag "Use completion" nil)
-                 (const :tag "Do not use completion" t)))
+(make-obsolete-variable 'ebib-edit-author/editor-without-completion 'ebib-fields-with-completion "Ebib 2.27")
 
-(defcustom ebib-multiline-fields '("annote" "annotation" "abstract")
-  "Fields that are edited as multiline fields by default."
+(defcustom ebib-fields-with-completion '("author" "crossref" "file" "keywords" "journal" "journaltitle" "organization" "publisher")
+  "Fields that are edited using completion.
+When editing a field in this list, Ebib offers a sensible set of
+possible completion candidates (see the manual for details).
+
+Note that the \"author\" field also implies the \"editor\" field
+and that \"crossref\" also implies the \"xref\" and \"related\"
+fields."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
-(defcustom ebib-fields-with-completion '("journal" "journaltitle" "publisher" "organization")
-  "Fields that are edited using completion by default."
+(defcustom ebib-multiline-fields '("annote" "annotation" "abstract")
+  "Fields that are edited as multiline fields by default."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 

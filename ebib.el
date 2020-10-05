@@ -3883,7 +3883,7 @@ With a prefix argument PFX, edit the current field directly,
 without any special treatment.  Exceptions are the \"type\" field
 and any field with a multiline value, which are always edited in
 a special manner."
-  (interactive "P")
+  (interactive "p")
   (let* ((field (ebib--current-field))
          (init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror))
          ;; We relegate the actual editing to a number of helper functions.
@@ -3900,34 +3900,43 @@ a special manner."
                    ;; this reason, we return `nil', so we know below not to take
                    ;; any further action.
                    nil)
-                  (pfx (ebib--edit-normal-field field init-contents))
+                  ;; A prefix argument means the user wants to edit the field as
+                  ;; a string, without any form of completion.  We use a numeric
+                  ;; prefix argument (see below), so we must check whether `pfx'
+                  ;; is unequal to 1.
+                  ((/= pfx 1) (ebib--edit-normal-field field init-contents))
                   ((and (member-ignore-case field '("author" "editor"))
-                        (not ebib-edit-author/editor-without-completion)
-                        (not init-contents))
+                        (member-ignore-case "author" ebib-fields-with-completion))
                    (ebib--edit-author/editor-field field))
-                  ((member-ignore-case field '("crossref" "xref" "related"))
+                  ((and (member-ignore-case field '("crossref" "xref" "related"))
+                        (member-ignore-case "crossref" ebib-fields-with-completion))
                    (ebib--edit-crossref field))
-                  ((cl-equalp field "keywords")
+                  ((and (cl-equalp field "keywords")
+                        (member-ignore-case "keywords" ebib-fields-with-completion))
                    (ebib--edit-keywords-field))
-                  ((cl-equalp field ebib-file-field)
+                  ((and (cl-equalp field "file")
+                        (member-ignore-case "file" ebib-fields-with-completion))
                    (ebib--edit-file-field))
                   ((member-ignore-case field ebib-fields-with-completion)
                    (ebib--edit-normal-field field init-contents :complete))
                   ((member-ignore-case field ebib-multiline-fields)
                    (ebib-edit-multiline-field field init-contents)
                    nil) ; See above.
-                  ;; The field is called "external note", but
+                  ;; An external note is shown in the field "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
                   ((string= field "external")
                    (ebib-open-note (ebib--get-key-at-point))
                    nil) ; See above.
-                  (t (ebib--edit-normal-field field init-contents (member-ignore-case field ebib-fields-with-completion))))))
+                  ;; The catch-all edits a field without completion.
+                  (t (ebib--edit-normal-field field init-contents)))))
     ;; When the edit returns, see if we need to move to the next field and
     ;; check whether we need to update the index display.
     (when result
-      (when (called-interactively-p 'any)
-        (ebib-next-field))
+      ;; A numeric prefix argument is always non-nil when a command is called
+      ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
+      ;; from Lisp code.
+      (when pfx (ebib-next-field))
       (ebib--redisplay-index-item field))))
 
 (defun ebib--redisplay-index-item (field)
