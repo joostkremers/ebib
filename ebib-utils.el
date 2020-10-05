@@ -43,13 +43,10 @@
 (require 'ebib-db)
 
 ;; Make a bunch of variables obsolete.
-(make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "24.4")
-(make-obsolete-variable 'ebib-default-entry 'ebib-default-entry-type "24.4")
-(make-obsolete-variable 'ebib-additional-fields 'ebib-extra-fields "24.4")
-(make-obsolete-variable 'ebib-biblatex-inheritance 'ebib-biblatex-inheritances "24.4")
-(make-obsolete-variable 'ebib-standard-url-field 'ebib-url-field "24.4")
-(make-obsolete-variable 'ebib-standard-file-field 'ebib-file-field "24.4")
-(make-obsolete-variable 'ebib-standard-doi-field 'ebib-doi-field "24.4")
+(make-obsolete-variable 'ebib-entry-types "The variabale `ebib-entry-types' is obsolete; see the manual for details." "Ebib 2.5.4")
+(make-obsolete-variable 'ebib-default-entry 'ebib-default-entry-type "Ebib 2.5.4")
+(make-obsolete-variable 'ebib-additional-fields 'ebib-extra-fields "Ebib 2.5.4")
+(make-obsolete-variable 'ebib-biblatex-inheritance 'ebib-biblatex-inheritances "Ebib 2.5.4")
 
 ;; Make sure we can call bibtex-generate-autokey.
 (declare-function bibtex-generate-autokey "bibtex" nil)
@@ -781,13 +778,7 @@ documentation for details on customizing the format string."
   :group 'ebib
   :type 'string)
 
-(defcustom ebib-url-field "url"
-  "Standard field to store URLs in.
-In the index buffer, the command \\[ebib--browse-url] can be used to
-send a URL to a browser.  This option sets the field from which
-this command extracts the URL."
-  :group 'ebib
-  :type 'string)
+(make-obsolete-variable 'ebib-url-field "The default URL field can no longer be customized" "Ebib 2.27")
 
 (defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
   "Regular expression to extract URLs from a field.
@@ -881,21 +872,9 @@ to handle a URL on the command line."
   :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
 
-(defcustom ebib-doi-field "doi"
-  "Standard field to store a DOI (digital object identifier) in.
-In the index buffer, the command ebib--browse-doi can be used to
-send a suitable URL to a browser.  This option sets the field from
-which this command extracts the doi."
-  :group 'ebib
-  :type 'string)
+(make-obsolete-variable 'ebib-doi-field "The default DOI field can no longer be customized" "Ebib 2.27")
 
-(defcustom ebib-file-field "file"
-  "Standard field to store filenames in.
-In the index buffer, the command ebib--view-file can be used to
-view a file externally.  This option sets the field from which
-this command extracts the filename."
-  :group 'ebib
-  :type 'string)
+(make-obsolete-variable 'ebib-file-field "The standard file field can no longer be customized" "Ebib 2.27")
 
 (defcustom ebib-import-directory "~/Downloads"
   "Directory to import files from.
@@ -923,7 +902,7 @@ the file is opened in Emacs."
                                (string :tag "Run external command")))))
 
 (defcustom ebib-filename-separator "; "
-  "Separator for filenames in `ebib-file-field'.
+  "Separator for filenames in the \"file\" field'.
 The contents of the file field is split up using this separator,
 each chunk is assumed to be a filename.
 
@@ -1516,40 +1495,40 @@ a URL (in that order) and use the first element found to create
 an org link.  If none of these elements is found, return the
 empty string."
   (cond
-   ((ebib-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)
     (ebib-create-org-file-link key db))
-   ((ebib-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value "doi" key db 'noerror 'unbraced 'xref)
     (ebib-create-org-doi-link key db))
-   ((ebib-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref)
+   ((ebib-get-field-value "url" key db 'noerror 'unbraced 'xref)
     (ebib-create-org-url-link key db))
    (t "")))
 
 (defun ebib-create-org-file-link (key db)
   "Create an org link to the file in entry KEY in DB.
-The file is taken from `ebib-file-field' in the entry designated
+The file is taken from the \"file\" filed in the entry designated
 by KEY in the current database.  If that field contains more than
 one file name, the user is asked to select one.  If
-`ebib-file-field' is empty, return the empty string."
-  (let ((files (ebib-get-field-value ebib-file-field key db 'noerror 'unbraced 'xref)))
+the \"file\" field is empty, return the empty string."
+  (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
         (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))
       "")))
 
 (defun ebib-create-org-doi-link (key db)
   "Create an org link to the DOI in entry KEY in DB.
-The file is taken from `ebib-doi-field' in the entry designated
-by KEY in the current database.  If `ebib-doi-field' is empty,
-return the empty string."
-  (let ((doi (ebib-get-field-value ebib-doi-field key db 'noerror 'unbraced 'xref)))
+The file is taken from the \"doi\" in the entry designated by KEY
+in the current database.  If the \"doi\" field is empty, return
+the empty string."
+  (let ((doi (ebib-get-field-value "doi" key db 'noerror 'unbraced 'xref)))
     (if doi (format "[[doi:%s]]" doi) "")))
 
 (defun ebib-create-org-url-link (key db)
   "Create an org link to the URL in entry KEY in DB.
-The URL is taken from `ebib-url-field' in the entry designated by
-KEY in the current database.  If that field contains more than
-one url, the user is asked to select one.  If `ebib-url-field' is
-empty, return the empty string."
-  (let* ((urls (ebib-get-field-value ebib-url-field key db 'noerror 'unbraced 'xref))
+The URL is taken from \"url\" in the entry designated by KEY in
+the current database.  If that field contains more than one url,
+the user is asked to select one.  If \"url\" is empty, return the
+empty string."
+  (let* ((urls (ebib-get-field-value "url" key db 'noerror 'unbraced 'xref))
          (url (ebib--select-url urls nil)))
     (if url (format "[[%s]]" url) "")))
 

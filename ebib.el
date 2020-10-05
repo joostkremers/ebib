@@ -1067,13 +1067,13 @@ there for details."
     "--"
 
     ("Attachments"
-     ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+     ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value "file" (ebib--get-key-at-point) ebib--cur-db 'noerror))]
      ["Import Local File" ebib-import-file (ebib--get-key-at-point)]
      ["Import File From URL" ebib-download-url (ebib--get-key-at-point)]
      ["Create Entries For Local Files" ebib-add-file-entry ebib--cur-db])
     ("Links"
-     ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-     ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror))])
+     ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value "url" (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+     ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value "doi" (ebib--get-key-at-point) ebib--cur-db 'noerror))])
     "--"
 
     ("Filters"
@@ -1530,9 +1530,9 @@ is replaced with a number in ascending sequence."
         (setq entry-key (cdr props)))
        ((string= (car props) "=type=")   ; The =type= field should not be braced.
         (push props fields))
-       ((cl-equalp (car props) ebib-file-field)
+       ((cl-equalp (car props) "file")
         (let ((short-file (ebib--file-relative-name (expand-file-name (cdr props)))))
-          (push (cons ebib-file-field (ebib-brace short-file)) fields)))
+          (push (cons "file" (ebib-brace short-file)) fields)))
        (t
         (push (cons (car props) (ebib-brace (cdr props))) fields))))
     ;; Check for required.
@@ -1590,7 +1590,7 @@ case add new entry stubs for each file anyway."
                           ((file-exists-p fp)
                            (if (and (null allow-duplicates) (file-exists-in-db-p fp))
                                (message "File %s already exists in db, skipping" fp)
-                             (ebib--add-entry-stub (list (cons ebib-file-field fp)) db)
+                             (ebib--add-entry-stub (list (cons "file" fp)) db)
                              (message "Adding file %s" fp)))
                           (t
                            (error "[Ebib] Invalid file %s" fp)))))
@@ -1600,7 +1600,7 @@ case add new entry stubs for each file anyway."
       ;; Collect all file paths from db entries into single list.
       (unless allow-duplicates
         (cl-dolist (entry-key (ebib-db-list-keys db))
-          (let ((entry-files (ebib-get-field-value ebib-file-field entry-key db 'noerror 'unbraced)))
+          (let ((entry-files (ebib-get-field-value "file" entry-key db 'noerror 'unbraced)))
             (if entry-files
                 (cl-dolist (fp (split-string entry-files (regexp-quote ebib-filename-separator)))
                   (push (locate-file fp ebib-file-search-dirs) all-entry-files))))))
@@ -2742,32 +2742,31 @@ new database."
         (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (arg)
-  "Browse the URL in the standard URL field.
-If this field contains more than one URL, ask the user which one
-to open.  Alternatively, the user can provide a numeric prefix
-argument ARG."
+  "Browse the URL in the \"url\" field.
+If the \"url\" field contains more than one URL, ask the user
+which one to open.  Alternatively, the user can provide a numeric
+prefix argument ARG."
   (interactive "P")
   (ebib--execute-when
     (entries
-     (let ((urls (ebib-get-field-value ebib-url-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+     (let ((urls (ebib-get-field-value "url" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
        (if urls
            (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
-         (error "[Ebib] No URL found in `%s' field" ebib-url-field))))
+         (error "[Ebib] No URL found in url field"))))
     (default
       (beep))))
 
 (defun ebib-browse-doi ()
-  "Open the DOI in the standard DOI field in a browser.
-The stardard DOI field (see user option `ebib-doi-field') may
-contain only one DOI.  If necessary, the DOI is prepended with
-the URL \"https://dx.doi.org/\" before being sent to the
-browser."
+  "Open the DOI in the \"doi\" field in a browser.
+The \"doi\" field may contain only one DOI.  If necessary, the
+DOI is prepended with the URL \"https://dx.doi.org/\" before
+being sent to the browser."
   (interactive)
   (ebib--execute-when
     (entries
-     (let ((doi (ebib-get-field-value ebib-doi-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+     (let ((doi (ebib-get-field-value "doi" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
        (unless doi
-         (error "[Ebib] No DOI found in `%s' field" ebib-doi-field))
+         (error "[Ebib] No DOI found in doi field"))
        (ebib--call-browser (if (string-match-p "^[[:space:]]*https?://dx.doi.org/" doi)
                                doi
                              (concat "https://dx.doi.org/" doi)))))
@@ -2784,14 +2783,14 @@ browser."
     (browse-url url)))
 
 (defun ebib-view-file (arg)
-  "View a file in the standard file field.
-The standard file field (see option `ebib-file-field') may
-contain more than one filename.  In that case, a numeric prefix
-argument ARG can be used to specify which file to choose."
+  "View a file in the \"file\" field.
+The \"file\" field may contain more than one filename.  In that
+case, a numeric prefix argument ARG can be used to specify which
+file to choose."
   (interactive "P")
   (ebib--execute-when
     (entries
-     (let ((file (ebib-get-field-value ebib-file-field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
+     (let ((file (ebib-get-field-value "file" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
            (num (if (numberp arg) arg nil)))
        (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
     (default
@@ -3735,7 +3734,7 @@ was called interactively."
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
 (defun ebib--edit-file-field ()
-  "Edit the `ebib-file-field'.
+  "Edit the \"file\" field'.
 Filenames are added to the standard file field separated by
 `ebib-filename-separator'.  The first directory in
 `ebib-file-search-dirs' is used as the start directory.  If
@@ -3755,11 +3754,11 @@ otherwise they are stored as absolute paths."
                        (string= (directory-file-name file)
                                 (directory-file-name (expand-file-name start-dir))))
              do (let* ((file-name (ebib--transform-file-name-for-storing file))
-                       (conts (ebib-get-field-value ebib-file-field key ebib--cur-db 'noerror 'unbraced))
+                       (conts (ebib-get-field-value "file" key ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
                                       (concat conts ebib-filename-separator file-name)
                                     file-name)))
-                  (ebib-set-field-value ebib-file-field new-conts key ebib--cur-db 'overwrite)
+                  (ebib-set-field-value "file" new-conts key ebib--cur-db 'overwrite)
                   (ebib--redisplay-current-field)
                   (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                                      (ebib-db-has-key key dependent))
@@ -3876,9 +3875,9 @@ are handled specially: the `type' `crossref', `xref' and
 `related' fields offer completion, the `annote', `annotation' and
 `abstract' fields is edited as a multiline field, the `keywords'
 field adds keywords one by one, also allowing completion, and the
-field in `ebib-file-field' uses filename completion and shortens
-filenames if they are in (a subdirectory of) one of the
-directories in `ebib-file-search-dirs'.
+\"file\" field uses filename completion and shortens filenames if
+they are in (a subdirectory of) one of the directories in
+`ebib-file-search-dirs'.
 
 With a prefix argument PFX, edit the current field directly,
 without any special treatment.  Exceptions are the \"type\" field
@@ -4681,10 +4680,10 @@ If prefix ARG is non-nil, do not delete the original file."
     (copy-file file-path dest-path)
     (unless arg
       (delete-file file-path t))
-    (let ((files (ebib-get-field-value ebib-file-field key ebib--cur-db 'noerror 'unbraced)))
+    (let ((files (ebib-get-field-value "file" key ebib--cur-db 'noerror 'unbraced)))
       (when (or (null files)
                 (not (string-match-p (regexp-quote new-name) files)))
-        (ebib-set-field-value ebib-file-field (ebib--transform-file-name-for-storing (expand-file-name dest-path)) key ebib--cur-db ebib-filename-separator)
+        (ebib-set-field-value "file" (ebib--transform-file-name-for-storing (expand-file-name dest-path)) key ebib--cur-db ebib-filename-separator)
         (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                            (ebib-db-has-key key dependent))
                                                          (ebib--list-dependents ebib--cur-db)))
