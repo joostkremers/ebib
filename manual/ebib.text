@@ -626,7 +626,7 @@ Keep in mind that Ebib tries to determine the relevant databases only once per b
 
 You can override Ebib's automatic association of `.bib` files to a buffer by setting the variable `ebib-local-bibfiles` to a list of files. This can be done as a file-local or a directory-local variable, or as a customisable option.
 
-# Links and Citations in Org buffers #
+## Links and Citations in Org buffers ##
 
 Currently, Org mode does not have real support for citations (though support is planned for a future release). Ebib provides a way to add links to BibTeX entries to an Org file which, with some coaxing, can be used as citations.
 
