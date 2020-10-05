@@ -202,21 +202,23 @@ The key `y` lets you yank an entry from the kill ring into the current database.
 In order for `y` to add a BibTeX entry to the database, the kill ring item to be yanked must be a string that constitutes a properly formatted BibTeX entry. Killing an entry from a database will result in such a string (so you can easily move entries from one database to another by killing and then yanking them), but killing a BibTeX entry from another buffer or copying one from an outside source (e.g., a website) is also possible. Furthermore, yanking also works with `@Preamble`, `@String` and `@Comment` definitions.
 
 
-## Editing Fields Values ##
+## Editing Field Values ##
 
 Editing the field values for an entry is done in the lower of the two Ebib buffers, the so-called entry buffer. You can move focus to the entry buffer and start editing field values by typing the command `e` in the index buffer.
 
-You can move between fields with the same keys that you use to move between entries in the index buffer: the cursor keys `up` and `down`, `p` and `n` or `C-p` and `C-n`. `Space` and `PgDn` move to the next set of fields, while `PgUp` and `b` move to the previous set of fields. `g` and `G`, and `Home` and `End` also work as expected.
+You can move between fields with the same keys that you use to move between entries in the index buffer: the cursor keys `up` and `down`, `p` and `n` or `C-p` and `C-n`. `Space` and `PgDn` move to the next set of fields, while `PgUp` and `b` move to the previous set of fields. `g` and `G`, and `Home` and `End` also work as expected. To finish editing fields and move focus back to the index window, use `q`.
 
-Editing a field value can be done with `e` or `RET`. For most fields, Ebib simply asks you for a string value in the minibuffer. Do not put braces `{}` around field values, Ebib adds them when it saves the `.bib` file.
+Editing a field value can be done with `e` or `RET`. For most fields, Ebib simply asks you for a string value in the minibuffer. There is no need to put braces `{}` around field values, Ebib adds them when it saves the `.bib` file.
 
-With some fields, Ebib offers completion. These are the `type` field, the `author` and `editor`  fields, the `journal` and `journaltitle` fields, `publisher`, `organization`, `keywords`, `crossref` and `file`. If you edit the `type` field, you must enter one of the predefined entry types. Ebib won't allow you to enter anything else. Similarly, if you edit the `crossref` field, Ebib requires that you fill in a key from the databases currently open. The fields `keywords` and `file` also offer completion, see the sections [Managing Keywords](#managing-keywords) and [Viewing Files](#viewing-and-importing-files), respectively.
+Fields for which it makes sense offer completion when you edit them. For example, when you edit the `type` field, completion is offered on all predefined entry types . Similarly, if you edit the `crossref` field, Ebib offers completion on the keys in the databases currently open. Both these fields require that you select one of the completion candidates.
 
-For the other fields that offer completion, the completion candidates are the values of these fields in other entries in the databases that you've opened. Offering these as completion candidates makes it easier to ensure that you enter these values consistently. In the author and editor fields, completion takes into account that these fields may contain more than one name. Each name is a separate completion candidate, and when editing these fields, you can type the individual names, Ebib will add the `"and"` that separates them.
+The `keywords` field offers completion on all configured keywords (see the section [Managing Keywords](#managing-keywords)) and the `file` field offers file name completion (see [Viewing Files](#viewing-and-importing-files)). Unlike the `type` and `crossref` fields, however, they do not require that you select one of the completion candidates.
 
-In the `author` and `editor` fields, completion is only offered if the field is empty. If it is not, editing the field gives you a normal minibuffer prompt. It is also possible to disable completion for the author and editor fields entirely, because if your databases are large, gathering the completion candidates can be a bit slow. Set the option `ebib-edit-author/editor-without-completion` to disable completion.
+For other fields that offer completion, the completion candidates are the values of these fields in other entries in the databases that you've opened. Offering these as completion candidates makes it easier to ensure that you enter these values consistently. This of course mainly makes sense for fields that have values that will occur more than once. By default, apart from the fields already mentioned, completion is offered for the `author`, `editor`, `journal`, `journaltitle`, `organization` and `publisher` fields.
 
-If you're done editing the fields of the entry, type `q` to move focus back to the index buffer. (Note: keys may have different functions in the index buffer and the entry buffer. `q` is a typical example: in the entry buffer, it quits editing the entry and moves focus back to the index buffer. In the index buffer, however, `q` quits Ebib.)
+In the `author` and `editor` fields, completion takes into account that these fields may contain more than one name. Each name is a separate completion candidate, and when editing these fields, you can type the individual names, Ebib will add the `"and"` that separates them.
+
+If you want to edit a field value directly, without completion, you can use a prefix argument: `C-u e` will let you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other other fields, you can customise the user option `ebib-fields-with-completion`. Note that if this option contains the `author` field (which it does by default), completion is also enabled for the `editor` field. Similarly, if it contains the `crossref` field, completion is also enabled for the `xref` and `related` fields.
 
 
 ## Editing Multiline Values ##
