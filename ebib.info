@@ -2105,10 +2105,21 @@ you to specify which programs to call for which types of files.  By
 default, ‘.pdf’ and ‘.ps’ files are handled, by ‘xpdf’ and ‘gv’,
 respectively.  You can specify further file types by their extensions
 (do not include the dot).  The program is searched for in ‘PATH’, but
-you can of course specify the full path to the program.  There is also
-the option to open files in Emacs.  Use this if you have separate text
-files for notes, or if you want to read pdf files in Emacs with
-‘doc-view-mode’ or ‘pdf-tools’ (https://github.com/politza/pdf-tools).
+you can of course specify the full path to the program.  You can also
+specify further command line arguments, but if you do this, you should
+include the directive ‘%s’ in the string, which will be replaced with
+the full path to the file you are opening.  (There is no need to put
+‘%s’ in double quotes in order to handle possible spaces in the file
+name, Ebib takes care of this.)
+
+There is also the option to open files in Emacs.  Use this if you want
+to read pdf files in Emacs, for example, with ‘doc-view-mode’ or
+‘pdf-tools’ (https://github.com/politza/pdf-tools).  In the
+customisation buffer, you can choose the option “Open in Emacs”, in your
+init file (the variable is called ‘ebib-file-associations’), you can
+simply leave the file association empty, or remove the relevant entry
+entirely.  If Ebib doesn’t find a program to use for a specific file
+type, it opens the relevant file in Emacs.
 
 If the ‘file’ field is empty, pressing ‘f’ causes Ebib to search for a
 pdf file with a name based on the entry key.  By default, Ebib just
@@ -3227,48 +3238,48 @@ Node: Calling a Browser for URLs and DOIs97555
 Ref: #calling-a-browser-for-urls-and-dois97773
 Node: Viewing and Importing Files100081
 Ref: #viewing-and-importing-files100273
-Node: Editing the file field104840
-Ref: #editing-the-file-field104989
-Node: Notes files106360
-Ref: #notes-files106508
-Node: Separate notes files107277
-Ref: #separate-notes-files107426
-Node: One single notes file109017
-Ref: #one-single-notes-file109210
-Node: Customising the notes file format111127
-Ref: #customising-the-notes-file-format111340
-Node: Displaying notes114935
-Ref: #displaying-notes115084
-Node: Managing a reading list116421
-Ref: #managing-a-reading-list116583
-Node: Window Management119598
-Ref: #window-management119757
-Node: Creating Entry Stubs122916
-Ref: #creating-entry-stubs123078
-Node: @Preamble Definition124076
-Ref: #preamble-definition124240
-Node: @String Definitions126212
-Ref: #string-definitions126363
-Node: @Comments129856
-Ref: #comments129984
-Node: Managing Keywords130349
-Ref: #managing-keywords130494
-Node: Sorting the bib File136562
-Ref: #sorting-the-.bib-file136735
-Node: Merging and Importing139854
-Ref: #merging-and-importing140019
-Node: Exporting Entries141789
-Ref: #exporting-entries141951
-Node: Multiple Identical Fields143467
-Ref: #multiple-identical-fields143646
-Node: Multiline Edit Buffers145574
-Ref: #multiline-edit-buffers145746
-Node: The Options Menu149623
-Ref: #the-options-menu149771
-Node: Customisation150389
-Ref: #customisation150500
-Node: Modifying Key Bindings151108
-Ref: #modifying-key-bindings151235
+Node: Editing the file field105483
+Ref: #editing-the-file-field105632
+Node: Notes files107003
+Ref: #notes-files107151
+Node: Separate notes files107920
+Ref: #separate-notes-files108069
+Node: One single notes file109660
+Ref: #one-single-notes-file109853
+Node: Customising the notes file format111770
+Ref: #customising-the-notes-file-format111983
+Node: Displaying notes115578
+Ref: #displaying-notes115727
+Node: Managing a reading list117064
+Ref: #managing-a-reading-list117226
+Node: Window Management120241
+Ref: #window-management120400
+Node: Creating Entry Stubs123559
+Ref: #creating-entry-stubs123721
+Node: @Preamble Definition124719
+Ref: #preamble-definition124883
+Node: @String Definitions126855
+Ref: #string-definitions127006
+Node: @Comments130499
+Ref: #comments130627
+Node: Managing Keywords130992
+Ref: #managing-keywords131137
+Node: Sorting the bib File137205
+Ref: #sorting-the-.bib-file137378
+Node: Merging and Importing140497
+Ref: #merging-and-importing140662
+Node: Exporting Entries142432
+Ref: #exporting-entries142594
+Node: Multiple Identical Fields144110
+Ref: #multiple-identical-fields144289
+Node: Multiline Edit Buffers146217
+Ref: #multiline-edit-buffers146389
+Node: The Options Menu150266
+Ref: #the-options-menu150414
+Node: Customisation151032
+Ref: #customisation151143
+Node: Modifying Key Bindings151751
+Ref: #modifying-key-bindings151878
 
 End Tag Table
 

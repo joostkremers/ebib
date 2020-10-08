@@ -1744,10 +1744,21 @@ you to specify which programs to call for which types of files. By
 default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`,
 respectively. You can specify further file types by their extensions (do
 not include the dot). The program is searched for in `PATH`, but you can
-of course specify the full path to the program. There is also the option
-to open files in Emacs. Use this if you have separate text files for
-notes, or if you want to read pdf files in Emacs with `doc-view-mode` or
-[`pdf-tools`](https://github.com/politza/pdf-tools).
+of course specify the full path to the program. You can also specify
+further command line arguments, but if you do this, you should include
+the directive `%s` in the string, which will be replaced with the full
+path to the file you are opening. (There is no need to put `%s` in
+double quotes in order to handle possible spaces in the file name, Ebib
+takes care of this.)
+
+There is also the option to open files in Emacs. Use this if you want to
+read pdf files in Emacs, for example, with `doc-view-mode` or
+[`pdf-tools`](https://github.com/politza/pdf-tools). In the
+customisation buffer, you can choose the option “Open in Emacs”, in your
+init file (the variable is called `ebib-file-associations`), you can
+simply leave the file association empty, or remove the relevant entry
+entirely. If Ebib doesn’t find a program to use for a specific file
+type, it opens the relevant file in Emacs.
 
 If the `file` field is empty, pressing `f` causes Ebib to search for a
 pdf file with a name based on the entry key. By default, Ebib just
