@@ -2803,7 +2803,7 @@ file to choose."
         (let ((ext (file-name-extension file-full-path)))
           (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
               (if (string-match (regexp-quote "%s") viewer)
-                  (let* ((viewer-arg-list (split-string-and-unquote (format viewer file-full-path))))
+                  (let* ((viewer-arg-list (split-string-and-unquote (format viewer (shell-quote-argument file-full-path)))))
                     (message "Executing `%s'" (string-join viewer-arg-list " "))
                     (apply 'start-process (concat "ebib " ext " viewer process") nil viewer-arg-list))
                 (message "Executing `%s %s'" viewer file-full-path)
