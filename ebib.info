@@ -1507,11 +1507,10 @@ complete it with ‘TAB’, type ‘SPC’ and start typing the next key, again
 with the ability to complete it with ‘TAB’.  When you have entered all
 the keys you wish to select, press ‘RET’.
 
-This method of multiple selection is somewhat cumbersome and it has the
-additional disadvantage that it is no longer possible to provide a
-default description for citations in Org mode buffers.  For these
-reasons, it is not enabled by default, but it is there if you want to
-use it.
+This method of multiple selection is somewhat cumbersome and it does not
+use Emacs’ standard completion function ‘completing-read’, so it is
+likely unfamiliar to most users.  For these reasons, it is not enabled
+by default, but it is there if you want to use it.
 
 
 File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
@@ -3216,70 +3215,70 @@ Node: Inserting Citations into a Text Buffer68623
 Ref: #inserting-citations-into-a-text-buffer68862
 Node: Citations with multiple keys71360
 Ref: #citations-with-multiple-keys71549
-Node: Key Bindings72746
-Ref: #key-bindings72938
-Node: Defining Citation Commands73696
-Ref: #defining-citation-commands73929
-Node: Associating a Database with a Text Buffer79825
-Ref: #associating-a-database-with-a-text-buffer80110
-Node: Links and Citations in Org buffers81489
-Ref: #links-and-citations-in-org-buffers81725
-Node: Copying Entries to the Kill Ring and System Clipboard83156
-Ref: #copying-entries-to-the-kill-ring-and-system-clipboard83446
-Node: Main and Dependent Databases85993
-Ref: #main-and-dependent-databases86212
-Node: Cross-referencing89197
-Ref: #cross-referencing89356
-Node: Marking Entries92883
-Ref: #marking-entries93031
-Node: Printing the Database93908
-Ref: #printing-the-database94086
-Node: Calling a Browser for URLs and DOIs97555
-Ref: #calling-a-browser-for-urls-and-dois97773
-Node: Viewing and Importing Files100081
-Ref: #viewing-and-importing-files100273
-Node: Editing the file field105483
-Ref: #editing-the-file-field105632
-Node: Notes files107003
-Ref: #notes-files107151
-Node: Separate notes files107920
-Ref: #separate-notes-files108069
-Node: One single notes file109660
-Ref: #one-single-notes-file109853
-Node: Customising the notes file format111770
-Ref: #customising-the-notes-file-format111983
-Node: Displaying notes115578
-Ref: #displaying-notes115727
-Node: Managing a reading list117064
-Ref: #managing-a-reading-list117226
-Node: Window Management120241
-Ref: #window-management120400
-Node: Creating Entry Stubs123559
-Ref: #creating-entry-stubs123721
-Node: @Preamble Definition124719
-Ref: #preamble-definition124883
-Node: @String Definitions126855
-Ref: #string-definitions127006
-Node: @Comments130499
-Ref: #comments130627
-Node: Managing Keywords130992
-Ref: #managing-keywords131137
-Node: Sorting the bib File137205
-Ref: #sorting-the-.bib-file137378
-Node: Merging and Importing140497
-Ref: #merging-and-importing140662
-Node: Exporting Entries142432
-Ref: #exporting-entries142594
-Node: Multiple Identical Fields144110
-Ref: #multiple-identical-fields144289
-Node: Multiline Edit Buffers146217
-Ref: #multiline-edit-buffers146389
-Node: The Options Menu150266
-Ref: #the-options-menu150414
-Node: Customisation151032
-Ref: #customisation151143
-Node: Modifying Key Bindings151751
-Ref: #modifying-key-bindings151878
+Node: Key Bindings72732
+Ref: #key-bindings72924
+Node: Defining Citation Commands73682
+Ref: #defining-citation-commands73915
+Node: Associating a Database with a Text Buffer79811
+Ref: #associating-a-database-with-a-text-buffer80096
+Node: Links and Citations in Org buffers81475
+Ref: #links-and-citations-in-org-buffers81711
+Node: Copying Entries to the Kill Ring and System Clipboard83142
+Ref: #copying-entries-to-the-kill-ring-and-system-clipboard83432
+Node: Main and Dependent Databases85979
+Ref: #main-and-dependent-databases86198
+Node: Cross-referencing89183
+Ref: #cross-referencing89342
+Node: Marking Entries92869
+Ref: #marking-entries93017
+Node: Printing the Database93894
+Ref: #printing-the-database94072
+Node: Calling a Browser for URLs and DOIs97541
+Ref: #calling-a-browser-for-urls-and-dois97759
+Node: Viewing and Importing Files100067
+Ref: #viewing-and-importing-files100259
+Node: Editing the file field105469
+Ref: #editing-the-file-field105618
+Node: Notes files106989
+Ref: #notes-files107137
+Node: Separate notes files107906
+Ref: #separate-notes-files108055
+Node: One single notes file109646
+Ref: #one-single-notes-file109839
+Node: Customising the notes file format111756
+Ref: #customising-the-notes-file-format111969
+Node: Displaying notes115564
+Ref: #displaying-notes115713
+Node: Managing a reading list117050
+Ref: #managing-a-reading-list117212
+Node: Window Management120227
+Ref: #window-management120386
+Node: Creating Entry Stubs123545
+Ref: #creating-entry-stubs123707
+Node: @Preamble Definition124705
+Ref: #preamble-definition124869
+Node: @String Definitions126841
+Ref: #string-definitions126992
+Node: @Comments130485
+Ref: #comments130613
+Node: Managing Keywords130978
+Ref: #managing-keywords131123
+Node: Sorting the bib File137191
+Ref: #sorting-the-.bib-file137364
+Node: Merging and Importing140483
+Ref: #merging-and-importing140648
+Node: Exporting Entries142418
+Ref: #exporting-entries142580
+Node: Multiple Identical Fields144096
+Ref: #multiple-identical-fields144275
+Node: Multiline Edit Buffers146203
+Ref: #multiline-edit-buffers146375
+Node: The Options Menu150252
+Ref: #the-options-menu150400
+Node: Customisation151018
+Ref: #customisation151129
+Node: Modifying Key Bindings151737
+Ref: #modifying-key-bindings151864
 
 End Tag Table
 

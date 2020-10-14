@@ -2358,21 +2358,15 @@ the database containing the selected entry."
 Offer the entries in DATABASES (a list of database structs) for
 completion.
 
-For compatibility with the other `ebib-read-entry-*' functions,
-the return value is a list of cons cells of the key and
-nil (i.e., ((\"key1\") (\"key2\")...)."
+Return value is a list of cons cells of the selected keys and the
+databases containing them."
   (let ((collection (ebib--create-collection-default-method databases)))
     (if collection
         (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
                (crm-separator "[ \t]+" )
                (keys (completing-read-multiple "Keys to insert: " collection nil t nil 'ebib--key-history)))
-          ;; `completing-read-multiple' doesn't return the actual strings in
-          ;; `collection', rather it returns the strings entered by the
-          ;; user. This means we cannot access the text properties of the
-          ;; original strings, so we don't have the database. Instead, we just
-          ;; return `nil' as the cdr of the cons cells:
           (mapcar (lambda (key)
-                    (cons key nil))
+                    (cons key (get-text-property 0 'ebib-db (assoc-string key collection))))
                   keys))
       (error "[Ebib] No BibTeX entries found"))))
 

@@ -1172,11 +1172,10 @@ the following way: start typing a key, complete it with `TAB`, type
 it with `TAB`. When you have entered all the keys you wish to select,
 press `RET`.
 
-This method of multiple selection is somewhat cumbersome and it has the
-additional disadvantage that it is no longer possible to provide a
-default description for citations in Org mode buffers. For these
-reasons, it is not enabled by default, but it is there if you want to
-use it.
+This method of multiple selection is somewhat cumbersome and it does not
+use Emacs’ standard completion function `completing-read`, so it is
+likely unfamiliar to most users. For these reasons, it is not enabled by
+default, but it is there if you want to use it.
 
 ## Key Bindings
 
