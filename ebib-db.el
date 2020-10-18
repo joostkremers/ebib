@@ -505,7 +505,7 @@ ENTRIES is an entry key or a list of entry keys."
   ;; occurrences anyway.
   (cond
    ((stringp entries)
-    (setf (ebib-db-val 'marked-entries db) (cons entries (ebib-db-val 'marked-entries db))))
+    (push entries (ebib-db-val 'marked-entries db)))
    ((listp entries)
     (setf (ebib-db-val 'marked-entries db) (append entries (ebib-db-val 'marked-entries db))))))
 
