@@ -1314,7 +1314,8 @@ to 1. The latter two can be used to signal the user to check the
 log for warnings or errors.
 
 FORMAT-STRING and ARGS function as in `format'.  Note that this
-function adds a newline to the message being logged."
+function adds a newline to the message being logged.  The return
+value is always nil."
   (with-current-ebib-buffer 'log
     (cond
      ((eq type 'warning)
