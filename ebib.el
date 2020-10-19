@@ -842,7 +842,7 @@ ask for confirmation."
              (or (eq ebib-keywords-save-on-exit 'always)
                  (and (eq ebib-keywords-save-on-exit 'ask)
                       (y-or-n-p "[Ebib] Canonical keywords list changed.  Save? "))))
-        (ebib--keywords-save))
+        (ebib--keywords-save-canonical-list))
     (ebib--filters-update-filters-file)
     (mapc (lambda (x)
             (kill-buffer (cdr x)))
@@ -883,7 +883,7 @@ keywords before Emacs is killed."
     (when (and ebib-keywords
                (get 'ebib--keywords-completion-list :modified)
                (y-or-n-p "Save modified keywords list? "))
-      (ebib--keywords-save))
+      (ebib--keywords-save-canonical-list))
     t))
 
 (defun ebib--kill-multiline-query-function ()
@@ -3352,7 +3352,7 @@ should be added, do so.  KEYWORDS is a list of keywords."
   (when (or (get 'ebib--keywords-completion-list :modified)
             (and (not ebib-keywords)
                  (y-or-n-p "[Ebib] Save the current list of keywords as the canonical list? ")))
-    (ebib--keywords-save)
+    (ebib--keywords-save-canonical-list)
     (put 'ebib--keywords-completion-list :modified nil)
     (message "[Ebib] list of canonical keywords saved.")))
 
