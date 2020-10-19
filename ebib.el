@@ -3203,9 +3203,9 @@ entry or the marked entries to the dependent database."
   "Switch to the main database of the current dependent database."
   (interactive)
   (ebib--execute-when
-   (dependent-db (let ((main (ebib-db-get-main ebib--cur-db)))
-                   (ebib-switch-to-database main)))
-   (default (beep))))
+    (dependent-db (let ((main (ebib-db-get-main ebib--cur-db)))
+                    (ebib-switch-to-database main)))
+    (default (beep))))
 
 ;;; Interactive keyword functions
 
