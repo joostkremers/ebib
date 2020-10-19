@@ -1651,9 +1651,11 @@ be added to the entry.  Note that for a timestamp to be added,
 `ebib-use-timestamp' must also be set to T. IF-EXISTS is as for
 `ebib-db-set-entry'.
 
-Return ENTRY-KEY if storing the entry was succesful, nil
-otherwise.  Depending on the value of IF-EXISTS, storing an entry
-may also result in an error."
+If storing the entry was successful, return the key under which
+the entry is actually stored (which, if IF-EXISTS is `uniquify',
+may differ from ENTRY-KEY); otherwise return nil.  Depending on
+the value of IF-EXISTS, storing an entry may also result in an
+error."
   (let ((actual-key (ebib-db-set-entry entry-key fields db if-exists)))
     (when (and actual-key timestamp ebib-use-timestamp)
       (ebib-set-field-value "timestamp" (format-time-string ebib-timestamp-format) actual-key db 'overwrite))
