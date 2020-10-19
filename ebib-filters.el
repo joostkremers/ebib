@@ -84,7 +84,7 @@ a logical `not' is applied to the selection."
                     ((string= field "=type=")
                      (completing-read prompt (ebib--list-entry-types dialect t) nil t nil 'ebib--filters-history))
                     ((cl-equalp field "keywords")
-                     (completing-read prompt (ebib--keywords-for-database ebib--cur-db)  nil nil nil 'ebib--keywords-history))
+                     (completing-read prompt ebib--keywords-completion-list  nil nil nil 'ebib--keywords-history))
                     (t
                      (read-string prompt nil 'ebib--filters-history)))))
       (ebib--execute-when

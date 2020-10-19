@@ -385,16 +385,14 @@ which can be passed to `ebib--display-multiline-field'."
                (not (ebib--find-db-for-key (ebib-unbrace value) ebib--cur-db)))
           (setq value (propertize value 'face 'ebib-warning-face)))
       (if (cl-equalp field "keywords")
-          (let* ((unbraced (ebib-unbraced-p value))
-                 (keywords (ebib--keywords-to-list (ebib-unbrace value)))
-                 (new-keywords (ebib--keywords-remove-existing keywords ebib--cur-db))
+          (let* ((keywords (ebib--keywords-to-list (ebib-unbrace value)))
                  (new-value (mapconcat (lambda (keyword)
-                                         (if (member-ignore-case keyword new-keywords)
+                                         (if (not (member-ignore-case keyword ebib--keywords-completion-list))
                                              (propertize keyword 'face 'ebib-warning-face)
                                            keyword))
                                        keywords
                                        ebib-keywords-separator)))
-            (setq value (if unbraced
+            (setq value (if (ebib-unbraced-p value)
                             new-value
                           (ebib-brace new-value)))))
       (if (ebib-unbraced-p value)
@@ -734,12 +732,8 @@ This function can be used to open Ebib in the background, e.g.,
 in the user's init file."
   (setq ebib--saved-window-config nil)
   (ebib--create-buffers)
-  (if (and ebib-keywords-file
-           (file-name-directory ebib-keywords-file)) ; Returns nil if there is no directory part.
-      (push (list (file-name-directory ebib-keywords-file)
-                  (ebib--read-file-to-list ebib-keywords-file) nil)
-            ebib--keywords-files-alist))
-  (setq ebib--keywords-list-per-session (copy-tree ebib-keywords-list))
+  (if ebib-keywords
+      (ebib--keywords-load-canonical-list))
   (ebib--filters-load-file ebib-filters-default-file)
   (add-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
   (add-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
@@ -843,7 +837,12 @@ ask for confirmation."
   (when (if (ebib--modified-p)
             (yes-or-no-p "There are modified databases. Quit anyway? ")
           (or force-quit (y-or-n-p "Quit Ebib? ")))
-    (ebib-keywords-save-all-new)
+    (if (and ebib-keywords
+             (get 'ebib--keywords-completion-list :modified)
+             (or (eq ebib-keywords-save-on-exit 'always)
+                 (and (eq ebib-keywords-save-on-exit 'ask)
+                      (y-or-n-p "[Ebib] Canonical keywords list changed.  Save? "))))
+        (ebib--keywords-save))
     (ebib--filters-update-filters-file)
     (mapc (lambda (x)
             (kill-buffer (cdr x)))
@@ -863,8 +862,7 @@ ask for confirmation."
           ebib--window-before nil
           ebib--buffer-before nil
           ebib--notes-list nil
-          ebib--keywords-files-alist nil
-          ebib--keywords-list-per-session nil
+          ebib--keywords-completion-list nil
           ebib--filters-alist nil
           ebib--filters-modified nil)
     (set-window-configuration ebib--saved-window-config)
@@ -882,7 +880,10 @@ keywords before Emacs is killed."
                   (ebib-save-all-databases)
                   t)
               (yes-or-no-p "Ebib holds modified databases. Kill anyway? ")))
-    (ebib-keywords-save-all-new)
+    (when (and ebib-keywords
+               (get 'ebib--keywords-completion-list :modified)
+               (y-or-n-p "Save modified keywords list? "))
+      (ebib--keywords-save))
     t))
 
 (defun ebib--kill-multiline-query-function ()
@@ -1099,10 +1100,11 @@ there for details."
      ["Mark Current Entry As Done" ebib-mark-reading-list-item-as-done (ebib--reading-list-item-p (ebib--get-key-at-point))]
      ["View Reading List" ebib-view-reading-list ebib-reading-list-file])
     ("Keywords"
-     ["Add Keywords To Current Entry" ebib-keywords-add (ebib--get-key-at-point)]
-     ["Save New Keywords For Database" ebib-keywords-save-cur-db (ebib--keywords-new-p ebib--cur-db)]
-     ["Save All New Keywords" ebib-keywords-save-all-new (ebib--keywords-new-p)]
-     ["Save Keywords From Current Entry" ebib-keywords-save-from-entry t])
+     ["Add Keywords To Current Entry" ebib-add-keywords-to-entry (ebib--get-key-at-point)]
+     ["Add Keyword To Canonical List" ebib-add-canonical-keyword t]
+     ["Add All Keywords To Canonical List" ebib-add-all-keywords-to-canonical-list t]
+     ["Purge Keywords Field" ebib-purge-keywords-field t]
+     ["Save New Keywords" ebib-canonical-keywords-list (get 'ebib--keywords-completion-list :modified)])
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["As Index Cards" ebib-print-entries ebib--cur-db]
@@ -1180,11 +1182,6 @@ interactively."
               (ebib-db-set-modified nil new-db))
           ;; If the file does not exist, we need to issue a message.
           (ebib--log 'message "(New file)"))
-        ;; Add keywords for the new database.
-        (ebib--keywords-load-keywords new-db)
-        (if ebib--keywords-files-alist
-            (ebib--log 'log "Using keywords from %s.\n" (ebib--keywords-get-file new-db))
-          (ebib--log 'log "Using general keyword list.\n"))
         new-db)))
 
 (defun ebib-reload-current-database ()
@@ -1396,6 +1393,9 @@ also depends on `ebib-use-timestamp'.)"
               (setq entry-key (ebib--generate-tempkey db))
               (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
             (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
+            (when (and entry-key (not ebib-keywords))
+              (if-let ((keywords (ebib-unbrace (cdr (assoc-string "keywords" entry 'case-fold)))))
+                  (mapc #'ebib--keywords-add-to-completion-list (ebib--keywords-to-list keywords))))
             (unless entry-key
               (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
             entry-key)) ; Return the entry key, or nil if no entry could be stored.
@@ -1674,9 +1674,6 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
                            (string= (ebib-db-get-filename ebib--cur-db)
                                     (cl-second (buffer-local-value 'ebib--multiline-info elt))))
                          ebib--multiline-buffer-list))
-
-       ;; Save keywords.
-       (ebib--keywords-save-new-keywords ebib--cur-db)
 
        ;; Remove the database from `ebib--databases', redisplay and kill the index buffer.
        (let ((new-db (cadr (member ebib--cur-db ebib--databases)))
@@ -3242,46 +3239,43 @@ entry or the marked entries to the dependent database."
 (eval-and-compile
   (define-prefix-command 'ebib-keywords-map)
   (suppress-keymap 'ebib-keywords-map 'no-digits)
-  (define-key ebib-keywords-map "a" #'ebib-keywords-add)
-  (define-key ebib-keywords-map "s" #'ebib-keywords-save-from-entry)
-  (define-key ebib-keywords-map "S" #'ebib-keywords-save-cur-db))
+  (define-key ebib-keywords-map "a" #'ebib-add-keywords-to-entry)
+  (define-key ebib-keywords-map "c" #'ebib-add-all-keywords-to-canonical-list)
+  (define-key ebib-keywords-map "p" #'ebib-purge-keywords-field)
+  (define-key ebib-keywords-map "s" #'ebib-add-canonical-keyword)
+  (define-key ebib-keywords-map "S" #'ebib-save-canonical-keywords-list))
 
 (defun ebib--completing-read-keywords (collection)
   "Read keywords with completion from COLLECTION.
-Return the keywords entered as a list.  Any keywords not in
-COLLECTION are added to the current database's keywords list.  If
-no keywords are entered, the return value is nil."
-  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--completion-finish-key 'completing-read)))
-	 (keywords (cl-loop for keyword = (completing-read (format prompt (mapconcat #'identity keywords " "))
-							   collection nil nil nil 'ebib--keywords-history)
-                            until (string= keyword "")
-                            collecting keyword into keywords
-                            finally return keywords)))
-    ;; Save any new keywords the user may have added.  Note that `mapc'
-    ;; returns its SEQUENCE argument, which is exactly what we want here.
-    (mapc (lambda (keyword) (unless (member keyword collection)
-                              (ebib--keywords-add-keyword keyword ebib--cur-db)))
-          keywords)))
+Return the keywords entered as a list.  If no keywords are
+entered, the return value is nil."
+  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--completion-finish-key 'completing-read))))
+    (cl-loop for keyword = (completing-read (format prompt (mapconcat #'identity keywords " "))
+					    collection nil nil nil 'ebib--keywords-history)
+             until (string= keyword "")
+             collecting keyword into keywords
+             finally return keywords)))
 
-(defun ebib-keywords-add ()
+(defun ebib-add-keywords-to-entry ()
   "Add keywords to the current entry.
 If there are marked entries, the user is asked if they wish to
 add keywords to all of them.  If not, the keywords are added to
 the current entry."
   (interactive)
   (cl-flet ((add-keywords (entry-key keywords)
+                          ;; KEYWORDS is a list of keywords to be added to entry ENTRY-KEY.
                           (let* ((conts (ebib-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
                                  (new-conts (if conts
-                                                (concat conts ebib-keywords-separator keywords)
+                                                (concat conts ebib-keywords-separator (mapconcat #'identity keywords ebib-keywords-separator))
                                               keywords)))
                             (ebib-set-field-value "keywords"
                                                   (if ebib-keywords-field-keep-sorted
                                                       (ebib--keywords-sort new-conts)
                                                     new-conts)
-                                                  entry-key ebib--cur-db 'overwrite))))
+                                                  entry-key ebib--cur-db 'overwrite)
+                            (mapc #'ebib--maybe-add-keywords-to-canonical-list keywords))))
     (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-           (collection (ebib--keywords-for-database ebib--cur-db))
-           (keywords (ebib--completing-read-keywords collection)))
+           (keywords (ebib--completing-read-keywords ebib--keywords-completion-list)))
       (when keywords
         (ebib--execute-when
           (entries
@@ -3290,9 +3284,9 @@ the current entry."
              (if (and (listp to-be-modified) (y-or-n-p "Add keywords to all marked entries? "))
                  (progn
                    (dolist (entry to-be-modified)
-                     (add-keywords entry (mapconcat #'identity keywords ebib-keywords-separator)))
+                     (add-keywords entry keywords))
                    (message "Keywords added to marked entries."))
-               (add-keywords to-be-modified (mapconcat #'identity keywords ebib-keywords-separator))
+               (add-keywords to-be-modified keywords)
                (setq to-be-modified (list to-be-modified))) ; So we can use it in `seq-difference' below.
              (ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
                                                               (= (ebib-db-count-entries dependent)
@@ -3302,17 +3296,65 @@ the current entry."
             (beep)))
         (ebib--update-entry-buffer)))))
 
-(defun ebib-keywords-save-from-entry ()
-  "Save the keywords in the current entry.
-Check the keywords of the current entry and save those that have
-not been saved yet."
-  (interactive)
-  (let* ((keywords (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
-         (new-keywords (ebib--keywords-remove-existing (ebib--keywords-to-list keywords) ebib--cur-db)))
-    (mapc (lambda (k)
-            (ebib--keywords-add-keyword k ebib--cur-db))
-          new-keywords))
+(defun ebib-add-canonical-keyword (pfx)
+  "Add a keyword in the current entry to the list of canonical keywords.
+With prefix argument PFX, add all keywords to the list of
+canonical keywords."
+  (interactive "P")
+  ;; What this really does is add the keyword to the keyword completion list
+  ;; (`ebib--keywords-completion-list') and mark this list as modified.  If the
+  ;; user uses a canonical keywords list, this completion list will be saved as
+  ;; the canonical list at the end of the session.  Hence the name of this
+  ;; function, which is technically misleading.
+  (let ((keywords (ebib--keywords-to-list (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))))
+    (if pfx
+        (mapc #'ebib--keywords-add-to-completion-list
+              keywords)
+      (let ((collection (seq-difference keywords ebib--keywords-completion-list)))
+        (ebib--ifstring (keyword (completing-read "Add keyword to canonical list: " collection))
+            (ebib--keywords-add-to-completion-list keyword)))))
   (ebib--update-entry-buffer))
+
+(defun ebib-add-all-keywords-to-canonical-list ()
+  "Add all keywords of the current entry to the list of canonical keywords."
+  (interactive)
+  (ebib-add-canonical-keyword t))
+
+(defun ebib--maybe-add-keywords-to-canonical-list (keywords)
+  "Conditionally add KEYWORDS to the canonical list.
+If there is a list of canonical keywords and if new keywords
+should be added, do so.  KEYWORDS is a list of keywords."
+  ;; See comment in `ebib-add-canonical-keyword'.
+  (if (and ebib-keywords ebib-keywords-add-new-to-canonical)
+      (mapc #'ebib--keywords-add-to-completion-list keywords)))
+
+(defun ebib-purge-keywords-field ()
+  "Remove keywords in the current entry that are not on the list of canonical keywords."
+  (interactive)
+  (let* ((keywords (ebib--keywords-to-list (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+         (canonical (seq-intersection keywords ebib--keywords-completion-list)))
+    (unless (= (length keywords) (length canonical))
+      (ebib-db-set-field-value "keywords"
+                               ;; `mapconcat' on an empty list returns an empty
+                               ;; string, but if `canonical' is empty, we want to
+                               ;; store nil, not "":
+                               (if canonical
+                                   (mapconcat #'identity canonical ebib-keywords-separator))
+                               (ebib--get-key-at-point)
+                               ebib--cur-db
+                               'overwrite)
+      (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
+      (ebib--update-entry-buffer))))
+
+(defun ebib-save-canonical-keywords-list ()
+  "Save the list of canonical keywords."
+  (interactive)
+  (when (or (get 'ebib--keywords-completion-list :modified)
+            (and (not ebib-keywords)
+                 (y-or-n-p "[Ebib] Save the current list of keywords as the canonical list? ")))
+    (ebib--keywords-save)
+    (put 'ebib--keywords-completion-list :modified nil)
+    (message "[Ebib] list of canonical keywords saved.")))
 
 ;;; Interactive filter functions
 
@@ -3501,6 +3543,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "G" 'ebib-goto-last-field)
     (define-key map "h" 'ebib-entry-help)
     (define-key map "k" 'ebib-kill-field-contents)
+    (define-key map "K" 'ebib-keywords-map)
     (define-key map "m" 'ebib-edit-multiline-field)
     (define-key map "n" 'ebib-next-field)
     (define-key map [(control n)] 'ebib-next-field)
@@ -3730,10 +3773,9 @@ was called interactively."
   ;; We shadow the binding of `minibuffer-local-completion-map' so that we
   ;; can unbind <SPC>, since keywords may contain spaces.
   (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-        (collection (ebib--keywords-for-database ebib--cur-db))
         (key (ebib--get-key-at-point))
 	(prompt (format "New keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
-    (cl-loop for keyword = (completing-read prompt collection nil nil nil 'ebib--keywords-history)
+    (cl-loop for keyword = (completing-read prompt ebib--keywords-completion-list nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
              do (let* ((conts (ebib-get-field-value "keywords" key ebib--cur-db 'noerror 'unbraced))
                        (new-conts (if conts
@@ -3746,8 +3788,7 @@ was called interactively."
                                         key
                                         ebib--cur-db
                                         'overwrite)
-                  (unless (member keyword collection)
-                    (ebib--keywords-add-keyword keyword ebib--cur-db))
+                  (ebib--maybe-add-keywords-to-canonical-list (list keyword))
                   (ebib--redisplay-current-field)
                   (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                                      (ebib-db-has-key key dependent))
