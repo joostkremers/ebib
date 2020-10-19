@@ -1104,7 +1104,7 @@ there for details."
      ["Add Keyword To Canonical List" ebib-add-canonical-keyword t]
      ["Add All Keywords To Canonical List" ebib-add-all-keywords-to-canonical-list t]
      ["Purge Keywords Field" ebib-purge-keywords-field t]
-     ["Save New Keywords" ebib-canonical-keywords-list (get 'ebib--keywords-completion-list :modified)])
+     ["Save New Keywords" ebib-save-canonical-keywords-list (get 'ebib--keywords-completion-list :modified)])
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["As Index Cards" ebib-print-entries ebib--cur-db]
