@@ -3354,7 +3354,7 @@ should be added, do so.  KEYWORDS is a list of keywords."
                  (y-or-n-p "[Ebib] Save the current list of keywords as the canonical list? ")))
     (ebib--keywords-save-canonical-list)
     (put 'ebib--keywords-completion-list :modified nil)
-    (message "[Ebib] list of canonical keywords saved.")))
+    (message "[Ebib] List of canonical keywords saved.")))
 
 ;;; Interactive filter functions
 
