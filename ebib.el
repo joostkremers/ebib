@@ -841,7 +841,7 @@ ask for confirmation."
              (get 'ebib--keywords-completion-list :modified)
              (or (eq ebib-keywords-save-on-exit 'always)
                  (and (eq ebib-keywords-save-on-exit 'ask)
-                      (y-or-n-p "[Ebib] Canonical keywords list changed.  Save? "))))
+                      (y-or-n-p "Canonical keywords list changed.  Save? "))))
         (ebib--keywords-save-canonical-list))
     (ebib--filters-update-filters-file)
     (mapc (lambda (x)
