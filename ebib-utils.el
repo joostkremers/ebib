@@ -1325,7 +1325,7 @@ well.  The return value is always nil."
       (setq ebib--log-error 1))
      ((eq type 'message)
       (apply #'message format-string args)))
-    (insert "%s: " (format-time-string "%d %b %Y, %H:%M:%S"))
+    (insert (format "%s: " (format-time-string "%d %b %Y, %H:%M:%S")))
     (insert (apply #'format (concat (if (eq type 'error)
                                         (propertize format-string 'face 'font-lock-warning-face)
                                       format-string)
