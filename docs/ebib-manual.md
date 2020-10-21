@@ -2138,7 +2138,7 @@ pressing `E` in the index buffer.
 # @Preamble Definition
 
 Apart from database entries, BibTeX allows three more types of elements
-to appear in a `.bib` file. These are `@comment`, `@Preamble` and
+to appear in a `.bib` file. These are `@Comment`, `@Preamble` and
 `@String` definitions. Ebib provides facilities to handle these, which
 are discussed here and in the following sections.
 
@@ -2247,11 +2247,13 @@ completion to complete a partial string.
 
 # @Comments
 
-If Ebib finds a `@comment` in a `.bib` file, it will read it and store
-it in the database. When the database is saved, all the `@comment`s will
-be saved with it, at the top of the file (right after the `@Preamble`.)
-There is no way to edit comments, nor can you specify where in the
-`.bib` file a comment is placed, but they won’t be lost.
+If Ebib finds a `@Comment` in a `.bib` file, it will read it and store
+it in the database. When the database is saved, all the `@Comment`s will
+be saved with it, at the top of the file, immediately after the
+`@Preamble` (with the exception of a `@Comment` surrounding a `Local
+Variables:` block, which is saved at the end of the file). There is no
+way to edit comments, nor can you specify where in the `.bib` file a
+comment is placed, but they won’t be lost.
 
 # Managing Keywords
 
@@ -2264,7 +2266,7 @@ editing this field.
 Ebib keeps a list of keywords used in your database(s) and offers these
 for completion when you edit the `keywords` field. You can enter a
 keyword and accept it with `RET`, after which you will be asked for the
-next keyword. Just hitting `RET` without any input finished the edit and
+next keyword. Just hitting `RET` without any input finishes the edit and
 returns focus to the entry buffer. (With `ivy` or `helm` the key binding
 to finish editing the `keywords` field is different; the prompt will
 indicate what key to press). You can, of course, also enter a keyword
@@ -2273,25 +2275,25 @@ list.
 
 If you need to edit a keyword or remove one from the list, you need to
 edit the `keywords` field directly. To do this, use a prefix argument:
-`C-u RET` instead of just `RET` to edit the field. Note that this does
-not update the completion list.
+`C-u RET` instead of just `RET` to edit the field. Note, though, that
+this does not update the completion list.
 
 The keywords completion list is composed of the keywords in all the
 `.bib` files you have open and is available in every database. If you
 open another `.bib` file, its keywords are added to the completion list.
 (Note that if you close a database, its keywords are not removed from
 the completion list, since Ebib does not keep track of which keywords
-are used in which database.) The completion list therefore does not
-contain keywords that are not used in any of your `.bib` files.
+are used in which database.)
 
 ## Using a Canonical Keywords List
 
-If you wish to use a set of canonical keywords that are always offered
-for completion, regardless of whether they are used in a currently
-opened `.bib` file or not, you can set the option “Keywords”
-(`ebib-keywords`). This can be a list of keywords or the name of a file
-containing the keywords. If it is a file name, the file should be a
-simple text file with one keyword per line.
+By default, the completion list does not contain keywords that are not
+used in any of your `.bib` files. If you wish to use a set of canonical
+keywords that are always offered for completion, regardless of whether
+they are used in a currently opened `.bib` file or not, you can set the
+option “Keywords” (`ebib-keywords`). This can be a list of keywords or
+the name of a file containing the keywords. If it is a file name, the
+file should be a simple text file with one keyword per line.
 
 If you set this option, keywords in a database that are not in the
 canonical list are displayed in Ebib’s warning face
