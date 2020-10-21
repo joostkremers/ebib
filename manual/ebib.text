@@ -904,7 +904,7 @@ Note that the entry keys for the stubs are temporary keys. They will be replaced
 
 # @Preamble Definition #
 
-Apart from database entries, BibTeX allows three more types of elements to appear in a `.bib` file. These are `@comment`, `@Preamble` and `@String` definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.
+Apart from database entries, BibTeX allows three more types of elements to appear in a `.bib` file. These are `@Comment`, `@Preamble` and `@String` definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.
 
 Ebib allows you to add one `@Preamble` definition to the database. In principle, BibTeX allows more than one such definition, but really one suffices, because you can use the concatenation character `#` to include multiple TeX or LaTeX commands. So, rather than having two `@Preamble` definitions such as:
 
@@ -958,7 +958,7 @@ An easy way to enter a `@String` abbreviation as a field value is to use the key
 
 # @Comments #
 
-If Ebib finds a `@comment` in  a `.bib` file, it will read it and store it in the database. When the database is saved, all the `@comment`s will be saved with it, at the top of the file (right after the `@Preamble`.) There is no way to edit comments, nor can you specify where in the `.bib` file a comment is placed, but they won't be lost.
+If Ebib finds a `@Comment` in  a `.bib` file, it will read it and store it in the database. When the database is saved, all the `@Comment`s will be saved with it, at the top of the file, immediately after the `@Preamble` (with the exception of a `@Comment` surrounding a `Local Variables:` block, which is saved at the end of the file). There is no way to edit comments, nor can you specify where in the `.bib` file a comment is placed, but they won't be lost.
 
 
 # Managing Keywords #

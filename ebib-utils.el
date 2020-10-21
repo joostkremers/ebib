@@ -1151,7 +1151,7 @@ Currently, the following problems are marked:
 (defvar ebib--databases nil "List of structs containing the databases.")
 (defvar ebib--cur-db nil "The database that is currently active.")
 
-;; Bookkeeping required when editing field values or @STRING definitions.
+;; Bookkeeping required when editing field values or @String definitions.
 
 (defvar ebib--hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
@@ -1786,7 +1786,7 @@ formatting the entry."
       (insert "\n}\n\n"))))
 
 (defun ebib--format-comments (db)
-  "Write the @COMMENTS of DB into the current buffer in BibTeX format."
+  "Write the @Comments of DB into the current buffer in BibTeX format."
   (mapc (lambda (c)
           (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
@@ -1880,7 +1880,7 @@ This function basically just calls `ebib-db-set-string' to do the
                       db overwrite))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced)
-  "Return the value of @STRING definition ABBR in database DB.
+  "Return the value of @String definition ABBR in database DB.
 NOERROR functions as in `ebib-db-get-string', which this
 functions calls to get the actual value.  The braces around the
 value are removed if UNBRACED is non-nil."

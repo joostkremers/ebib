@@ -41,9 +41,9 @@
 
 ;; Each database is represented by an alist.
 (defvar ebib-db '((entries)                             ; Hashtable containing the BibTeX entries.
-                  (strings)                             ; Alist with the @STRING definitions.
+                  (strings)                             ; Alist with the @String definitions.
                   (preamble)                            ; String with the @Preamble definition.
-                  (comments)                            ; List of @COMMENTS.
+                  (comments)                            ; List of @Comments.
                   (local-vars)                          ; The file's local variable block.
                   (dialect)                             ; The dialect of this database.
                   (buffer)                              ; The index buffer.
@@ -122,7 +122,7 @@ field.  This should be killed separately."
   (setf (ebib-db-val 'dialect db) dialect))
 
 (defun ebib-db-get-comments (db)
-  "Return a list of @COMMENTS for DB."
+  "Return a list of @Comments for DB."
   (ebib-db-val 'comments db))
 
 (defun ebib-db-set-comment (comment db)
@@ -351,14 +351,14 @@ is t, the new string replaces the existing one.  If it is nil,
 the string is not stored and the function returns nil.  If it is
 the symbol `error', an error is raised.
 
-In order to remove a @STRING definition, pass nil as VALUE and
+In order to remove a @String definition, pass nil as VALUE and
 set IF-EXISTS to `overwrite'."
   (let* ((strings-list (ebib-db-val 'strings db))
          (old-string (cdr (assoc abbr strings-list))))
     (if old-string
         (cond
          ((eq overwrite 'error)
-          (error "[Ebib] @STRING abbreviation `%s' exists in database %s"
+          (error "[Ebib] @String abbreviation `%s' exists in database %s"
                  abbr (ebib-db-get-filename db 'short)))
          ((and overwrite value)
           (setcdr (assoc-string abbr strings-list) value)
@@ -376,26 +376,26 @@ set IF-EXISTS to `overwrite'."
     (setf (ebib-db-val 'strings db) strings-list)))
 
 (defun ebib-db-remove-string (abbr db)
-  "Remove @STRING definition ABBR ttfrom DB."
+  "Remove @String definition ABBR ttfrom DB."
   (ebib-db-set-string abbr nil db 'overwrite))
 
 (defun ebib-db-get-string (abbr db &optional noerror)
-  "Return the value of @STRING definition ABBR in database DB.
+  "Return the value of @String definition ABBR in database DB.
 If ABBR does not exist, trigger an error, unless NOERROR is
 non-nil, in which case return nil."
   ;; I assume abbreviations should be case-sensitive, so I use assoc
   ;; instead of assoc-string here.
   (let ((value (cdr (assoc abbr (ebib-db-val 'strings db)))))
     (unless (or value noerror)
-      (error "[Ebib] @STRING abbreviation `%s' does not exist" abbr))
+      (error "[Ebib] @String abbreviation `%s' does not exist" abbr))
     value))
 
 (defun ebib-db-get-all-strings (db)
-  "Return the alist containing all @STRING definitions in DB."
+  "Return the alist containing all @String definitions in DB."
   (ebib-db-val 'strings db))
 
 (defsubst ebib-db-list-strings (db)
-  "Return a list of @STRING abbreviations in DB without expansions."
+  "Return a list of @String abbreviations in DB without expansions."
   (mapcar #'car (ebib-db-val 'strings db)))
 
 (defun ebib-db-set-preamble (preamble db &optional if-exists)
