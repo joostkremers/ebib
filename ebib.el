@@ -1285,8 +1285,7 @@ error and return nil."
                  (main (ebib--get-or-open-db main-file)))
             (if main
                 (ebib-db-set-main main db)
-              (ebib--log 'error "Could not find main database `%s'" main-file)
-              nil)))))) ; Return nil because no database was found.
+              (ebib--log 'error "Could not find main database `%s'" main-file))))))) ; This returns nil.
 
 (defun ebib--bib-find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
