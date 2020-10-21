@@ -1388,7 +1388,7 @@ also depends on `ebib-use-timestamp'.)"
           (if (ebib-db-dependent-p db)
               (if (ebib-db-has-key entry-key (ebib-db-get-main db))
                   (ebib-db-add-entries-to-dependent entry-key db)
-                (ebib--log 'error "Entry key %s not found in main database" entry-key))
+                (ebib--log 'error "Entry key `%s' not found in main database" entry-key))
             (when (string= entry-key "")
               (setq entry-key (ebib--generate-tempkey db))
               (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
