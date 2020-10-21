@@ -290,8 +290,8 @@ there is a name conflict."
                      (forward-char -1)
                      (read (current-buffer)))))
         (if (not (listp flist))
-            (ebib--log 'warning "No filters found in %s\n" file)
-          (ebib--log 'log "Loading filters from file %s.\n" file)
+            (ebib--log 'warning "No filters found in `%s'\n" file)
+          (ebib--log 'log "Loading filters from file `%s'.\n" file)
           (if overwrite
               (setq ebib--filters-alist nil))
           (mapc (lambda (filter)
@@ -332,7 +332,7 @@ unless OVERWRITE is non-nil."
   (if (ebib--filters-exists-p name)
       (if overwrite
           (setcdr (ebib--filters-get-filter name) (list filter))
-        (ebib--log 'message "Filter name conflict: \"%s\".\n" name))
+        (ebib--log 'message "Filter name conflict: `%s'.\n" name))
     (push (list name filter) ebib--filters-alist)))
 
 (defun ebib--filters-get-filter (name &optional noerror)

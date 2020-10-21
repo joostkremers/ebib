@@ -230,7 +230,7 @@ buffer."
         (unless ebib--notes-list
           ;; We need to initialize `ebib--notes-list'.
           (if (not (file-writable-p ebib-notes-file))
-              (ebib--log 'error "Could not open the notes file %s" ebib-notes-file)
+              (ebib--log 'error "Could not open the notes file `%s'" ebib-notes-file)
             (with-current-buffer (ebib--notes-buffer)
               (setq ebib--notes-list (funcall ebib-notes-get-ids-function)))))
         (member key ebib--notes-list))
