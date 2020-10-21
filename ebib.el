@@ -875,14 +875,14 @@ ask for confirmation."
 Ask if the user wants to save any modified databases and added
 keywords before Emacs is killed."
   (when (or (not (ebib--modified-p))
-            (if (y-or-n-p "Save all unsaved Ebib databases? ")
+            (if (y-or-n-p "[Ebib] Save all unsaved databases? ")
                 (progn
                   (ebib-save-all-databases)
                   t)
-              (yes-or-no-p "Ebib holds modified databases. Kill anyway? ")))
+              (yes-or-no-p "[Ebib] There are modified databases. Kill anyway? ")))
     (when (and ebib-keywords
                (get 'ebib--keywords-completion-list :modified)
-               (y-or-n-p "Save modified keywords list? "))
+               (y-or-n-p "[Ebib] Save modified keywords list? "))
       (ebib--keywords-save-canonical-list))
     t))
 
@@ -891,7 +891,7 @@ keywords before Emacs is killed."
   (if (and (with-no-warnings ; `ebib-multiline-mode' is not defined yet.
              ebib-multiline-mode)
            (buffer-modified-p))
-      (yes-or-no-p (format "Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
+      (yes-or-no-p (format "[Ebib] Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
     t))
 
 ;;; index-mode
