@@ -1273,9 +1273,10 @@ dependent database."
 
 (defun ebib--bib-find-main (db)
   "Find the \"main database\" declaration in the current buffer.
-If a main database is found, make sure it is loaded and set it as
-DB's main.  If no main database is found, return nil.  If a main
-database is found but it cannot be opened, log an error."
+If a main database is found, make sure it is loaded, set it as
+DB's main and return it.  If no main database is found, return
+nil.  If a main database is found but it cannot be opened, log an
+error and return nil."
   (save-excursion
     (goto-char (point-min))
     (save-match-data
