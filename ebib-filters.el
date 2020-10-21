@@ -291,7 +291,7 @@ there is a name conflict."
                      (read (current-buffer)))))
         (if (not (listp flist))
             (ebib--log 'warning "No filters found in %s\n" file)
-          (ebib--log 'log "%s: Loading filters from file %s.\n" (format-time-string "%d %b %Y, %H:%M:%S") file)
+          (ebib--log 'log "Loading filters from file %s.\n" file)
           (if overwrite
               (setq ebib--filters-alist nil))
           (mapc (lambda (filter)

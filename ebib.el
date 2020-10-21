@@ -1174,7 +1174,7 @@ interactively."
       (let ((new-db (ebib--create-new-database))
             (ebib--log-error nil)) ; We haven't found any errors yet.
         (ebib-db-set-filename file new-db)
-        (ebib--log 'log "%s: Opening file %s" (format-time-string "%d %b %Y, %H:%M:%S") file)
+        (ebib--log 'log "Opening file %s" file)
         (if (file-exists-p file)
             (progn
               (ebib--bib-read-entries file new-db)
@@ -1222,7 +1222,7 @@ interactively."
       (ebib-db-clear-database db)
       (ebib-db-set-buffer buffer db))
     ;; Then load the file.
-    (ebib--log 'log "%s: Reloading file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") file)
+    (ebib--log 'log "Reloading file %s" file)
     (ebib-db-set-filename file db)
     (ebib--bib-read-entries file db)
     ;; If the user makes any changes, we'll want to create a back-up.
@@ -1239,7 +1239,7 @@ interactively."
            (ebib--log-error nil))       ; We haven't found any errors yet.
        (if (not (file-readable-p file))
            (error "[Ebib] No such file: %s" file)
-         (ebib--log 'log "%s: Merging file %s" (format-time-string "%d-%b-%Y: %H:%M:%S") (ebib-db-get-filename ebib--cur-db))
+         (ebib--log 'log "Merging file %s" (ebib-db-get-filename ebib--cur-db))
          (ebib--bib-read-entries file ebib--cur-db 'ignore-modtime 'not-as-dependent)
          (ebib--update-buffers)
          (ebib--set-modified t ebib--cur-db))))

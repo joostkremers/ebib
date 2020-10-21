@@ -1313,9 +1313,9 @@ the message and sets the variable `ebib--log-error' to 0; finally,
 to 1. The latter two can be used to signal the user to check the
 log for warnings or errors.
 
-FORMAT-STRING and ARGS function as in `format'.  Note that this
-function adds a newline to the message being logged.  The return
-value is always nil."
+FORMAT-STRING and ARGS function as in `format'.  A time stamp is
+inserted with the log message and a final newline is added as
+well.  The return value is always nil."
   (with-current-ebib-buffer 'log
     (cond
      ((eq type 'warning)
@@ -1325,6 +1325,7 @@ value is always nil."
       (setq ebib--log-error 1))
      ((eq type 'message)
       (apply #'message format-string args)))
+    (insert "%s: " (format-time-string "%d %b %Y, %H:%M:%S"))
     (insert (apply #'format (concat (if (eq type 'error)
                                         (propertize format-string 'face 'font-lock-warning-face)
                                       format-string)
