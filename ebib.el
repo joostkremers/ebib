@@ -1048,18 +1048,22 @@ there for details."
      ["Open Note" ebib-open-note (ebib--get-key-at-point)]
      ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
      ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
+
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Search" ebib-search (ebib--get-key-at-point)]
+
     ("View"
      ["Sort Ascending" ebib-index-sort-ascending ebib--cur-db]
      ["Sort Descending" ebib-index-sort-descending ebib--cur-db]
      ["Default Sort" ebib-index-default-sort ebib--cur-db])
+
     ("Copy"
      ["Key" ebib-copy-key-as-kill (ebib--get-key-at-point)]
      ["Entry" ebib-copy-entry-as-kill (ebib--get-key-at-point)]
      ["Citation" ebib-copy-citation-as-kill (ebib--get-key-at-point)]
      ["Reference" ebib-copy-reference-as-kill (ebib--get-key-at-point)])
+
     ("Export"
      ["Export Entries To Database" ebib-export-entries (ebib--get-key-at-point)]
      ["Export Entries To File" (ebib-export-entries t) :active (ebib--get-key-at-point) :keys "\\[universal-argument] \\[ebib-export-entries]"]
