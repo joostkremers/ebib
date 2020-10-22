@@ -1098,17 +1098,20 @@ there for details."
      ["Load Filters From File" ebib-filters-load-from-file ebib--cur-db]
      "--"
      ["View Filters" ebib-filters-view-all-filters ebib--filters-alist])
+
     ("Reading List"
      ["Create Reading List" ebib-create-reading-list (not ebib-reading-list-file)]
      ["Add Current Entry" ebib-add-reading-list-item (and ebib-reading-list-file (ebib--get-key-at-point))]
      ["Mark Current Entry As Done" ebib-mark-reading-list-item-as-done (ebib--reading-list-item-p (ebib--get-key-at-point))]
      ["View Reading List" ebib-view-reading-list ebib-reading-list-file])
+
     ("Keywords"
      ["Add Keywords To Current Entry" ebib-add-keywords-to-entry (ebib--get-key-at-point)]
      ["Add Keyword To Canonical List" ebib-add-canonical-keyword t]
      ["Add All Keywords To Canonical List" ebib-add-all-keywords-to-canonical-list t]
      ["Purge Keywords Field" ebib-purge-keywords-field t]
      ["Save New Keywords" ebib-save-canonical-keywords-list (get 'ebib--keywords-completion-list :modified)])
+
     ("Print Entries"
      ["As Bibliography" ebib-latex-entries (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
      ["As Index Cards" ebib-print-entries ebib--cur-db]
