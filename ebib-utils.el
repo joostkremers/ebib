@@ -768,7 +768,7 @@ customizing the option `ebib--hidden-fields'."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-timestamp-format "%a %b %e %T %Y"
+(defcustom ebib-timestamp-format "%Y-%m-%d %T (%Z)"
   "Format of the time string used in the timestamp.
 This option specifies the format string that is used to create
 the timestamp.  The default value produces a timestamp of the form
