@@ -12,6 +12,8 @@ is.
 ## Version 2.28, October 2020
 
   - Redesign keyword handling.
+  - New timestamp format. This new format is more in line with ISO 8601
+    and is sortable alphanumerically.
 
 ## Version 2.27, October 2020
 
@@ -552,9 +554,9 @@ this option set, a timestamp is included in entries added to the
 database with `a`. Ebib will also add a timestamp to entries imported
 from a buffer or merged from a file, and to entries exported to another
 database or to a file. When importing or exporting entries, existing
-timestamps will be overwritten. The logic behind this is that the
-timestamp records the date and time when the entry was added to the
-database, not when it was first created.
+timestamps are overwritten. The logic behind this is that the timestamp
+records the date and time when the entry was added to the database, not
+when it was first created.
 
 Note that if this option is unset, the timestamp of an entry is retained
 when it’s imported or exported. Therefore, if you record timestamps and
@@ -564,19 +566,18 @@ temporarily unset this option, which can be done in the menu under
 
 Ebib uses the function `format-time-string` to create the timestamp. The
 format string that Ebib uses can be customised. The default string is
-`"%a %b` `%e %T %Y"`, which produces a timestamp of the form `"Mon
-Mar 12 01:03:26 2007"`. This string is not directly suitable for
-sorting, so if you want to be able to sort on timestamps, you’ll need to
-customise the format string. See the documentation for
-`format-time-string` on the options that are available. (Alternatively,
-the default time stamp format can be converted into a sortable time
-format using `date-to-time`, but currently Ebib is not able to do this
-automatically.)
+`"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form
+`"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the
+additional advantage that it can converted to Emacs’ internal time
+representation with the function `date-to-time`. The format can be
+customised; see the documentation for `format-time-string` on the
+options that are available.
 
 Adding timestamps in a format that `date-to-time` can parse makes it
 possible to list the most recent additions to the database. Ebib
 provides a function to do this: `ebib-list-recent`, which asks for a
-number of days and lists the entries that were added since then.
+number of days and lists the entries that were added since then. See
+[Special Filters](#special-filters) for details.
 
 ## Copy, Cut (Kill), Paste (Yank), and Delete
 
