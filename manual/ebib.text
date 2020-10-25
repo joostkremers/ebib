@@ -271,7 +271,7 @@ You can tell Ebib to create timestamps by setting the option "Use Timestamp" (`e
 
 Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under “Options”.
 
-Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
+Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can be converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
 
 Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then. See [Special Filters](#special-filters) for details.
 

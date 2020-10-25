@@ -568,7 +568,7 @@ Ebib uses the function `format-time-string` to create the timestamp. The
 format string that Ebib uses can be customised. The default string is
 `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form
 `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the
-additional advantage that it can converted to Emacs’ internal time
+additional advantage that it can be converted to Emacs’ internal time
 representation with the function `date-to-time`. The format can be
 customised; see the documentation for `format-time-string` on the
 options that are available.
