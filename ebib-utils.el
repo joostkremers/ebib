@@ -771,10 +771,11 @@ customizing the option `ebib--hidden-fields'."
 (defcustom ebib-timestamp-format "%Y-%m-%d %T (%Z)"
   "Format of the time string used in the timestamp.
 This option specifies the format string that is used to create
-the timestamp.  The default value produces a timestamp of the form
-\"Mon Mar 12 01:03:26 2007\".  This option uses the Emacs function
-`format-time-string` to create the timestamp.  See that function's
-documentation for details on customizing the format string."
+the timestamp.  The default value produces a timestamp of the
+form \"2007-03-12 01:03:26 (CET)\".  This option uses the Emacs
+function `format-time-string` to create the timestamp.  See that
+function's documentation for details on customizing the format
+string."
   :group 'ebib
   :type 'string)
 
