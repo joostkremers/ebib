@@ -3973,7 +3973,9 @@ a special manner."
                   ;; a string, without any form of completion.  We use a numeric
                   ;; prefix argument (see below), so we must check whether `pfx'
                   ;; is unequal to 1.
-                  ((/= pfx 1) (ebib--edit-normal-field field init-contents))
+                  ((and (numberp pfx)
+                        (/= pfx 1))
+                   (ebib--edit-normal-field field init-contents))
                   ((and (member-ignore-case field '("author" "editor"))
                         (member-ignore-case "author" ebib-fields-with-completion))
                    (ebib--edit-author/editor-field field))
