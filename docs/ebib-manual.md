@@ -9,6 +9,12 @@ is.
 
 # News
 
+## Version 2.28, October 2020
+
+  - Redesign keyword handling.
+  - New timestamp format. This new format is more in line with ISO 8601
+    and is sortable alphanumerically.
+
 ## Version 2.27, October 2020
 
   - Add customisation options `ebib-multiline-fields` and
@@ -548,9 +554,9 @@ this option set, a timestamp is included in entries added to the
 database with `a`. Ebib will also add a timestamp to entries imported
 from a buffer or merged from a file, and to entries exported to another
 database or to a file. When importing or exporting entries, existing
-timestamps will be overwritten. The logic behind this is that the
-timestamp records the date and time when the entry was added to the
-database, not when it was first created.
+timestamps are overwritten. The logic behind this is that the timestamp
+records the date and time when the entry was added to the database, not
+when it was first created.
 
 Note that if this option is unset, the timestamp of an entry is retained
 when it’s imported or exported. Therefore, if you record timestamps and
@@ -560,19 +566,18 @@ temporarily unset this option, which can be done in the menu under
 
 Ebib uses the function `format-time-string` to create the timestamp. The
 format string that Ebib uses can be customised. The default string is
-`"%a %b` `%e %T %Y"`, which produces a timestamp of the form `"Mon
-Mar 12 01:03:26 2007"`. This string is not directly suitable for
-sorting, so if you want to be able to sort on timestamps, you’ll need to
-customise the format string. See the documentation for
-`format-time-string` on the options that are available. (Alternatively,
-the default time stamp format can be converted into a sortable time
-format using `date-to-time`, but currently Ebib is not able to do this
-automatically.)
+`"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form
+`"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the
+additional advantage that it can be converted to Emacs’ internal time
+representation with the function `date-to-time`. The format can be
+customised; see the documentation for `format-time-string` on the
+options that are available.
 
 Adding timestamps in a format that `date-to-time` can parse makes it
 possible to list the most recent additions to the database. Ebib
 provides a function to do this: `ebib-list-recent`, which asks for a
-number of days and lists the entries that were added since then.
+number of days and lists the entries that were added since then. See
+[Special Filters](#special-filters) for details.
 
 ## Copy, Cut (Kill), Paste (Yank), and Delete
 
@@ -2134,7 +2139,7 @@ pressing `E` in the index buffer.
 # @Preamble Definition
 
 Apart from database entries, BibTeX allows three more types of elements
-to appear in a `.bib` file. These are `@comment`, `@Preamble` and
+to appear in a `.bib` file. These are `@Comment`, `@Preamble` and
 `@String` definitions. Ebib provides facilities to handle these, which
 are discussed here and in the following sections.
 
@@ -2243,116 +2248,81 @@ completion to complete a partial string.
 
 # @Comments
 
-If Ebib finds a `@comment` in a `.bib` file, it will read it and store
-it in the database. When the database is saved, all the `@comment`s will
-be saved with it, at the top of the file (right after the `@Preamble`.)
-There is no way to edit comments, nor can you specify where in the
-`.bib` file a comment is placed, but they won’t be lost.
+If Ebib finds a `@Comment` in a `.bib` file, it will read it and store
+it in the database. When the database is saved, all the `@Comment`s will
+be saved with it, at the top of the file, immediately after the
+`@Preamble` (with the exception of a `@Comment` surrounding a `Local
+Variables:` block, which is saved at the end of the file). There is no
+way to edit comments, nor can you specify where in the `.bib` file a
+comment is placed, but they won’t be lost.
 
 # Managing Keywords
 
-Ebib provides some special functionality for handling keywords. By
-default, there is a `keywords` field in the list of extra fields.
-Editing this field is a bit different from other fields. Instead of just
-entering a string and hitting `RET` to store it and return to the entry
-buffer, you should enter a single keyword and hit enter. The keyword
-will then be added to the keywords already present and you are asked to
-enter the next keyword. If you’ve added all keywords you want, just hit
-`RET` to finish.
+Biblatex supports a `keywords` field, which can contain a
+(comma-separated) list of keywords for an entry. BibTeX does not support
+this field directly, but Ebib includes a `keywords` field in the extra
+fields for BibTeX entries. Ebib offers some special facilities for
+editing this field.
 
-The advantage of doing it this way is that you can reuse keywords: once
-you’ve added a keyword to one entry, Ebib remembers it. The next time
-you want to use the same keyword for a different entry, you just need to
-type the first (few) letters, hit `TAB` and the keyword will be
-completed. That makes it easier to ensure you use the exact same
-keywords in different entries. Note that Ebib’s keyword functionality is
-not used to check the contents of keyword fields. It is simply a way to
-make it easier to stick to specific keywords, which should make it
-easier to categorise and search your entries.
+Ebib keeps a list of keywords used in your database(s) and offers these
+for completion when you edit the `keywords` field. You can enter a
+keyword and accept it with `RET`, after which you will be asked for the
+next keyword. Just hitting `RET` without any input finishes the edit and
+returns focus to the entry buffer. (With `ivy` or `helm` the key binding
+to finish editing the `keywords` field is different; the prompt will
+indicate what key to press). You can, of course, also enter a keyword
+that is not on the completion list. If you do, it will be added to the
+list.
 
-It is still possible to edit the `keywords` field directly. To do so,
-use a prefix argument: `C-u e` (or any other prefix argument) on the
-`keywords` field will allow you to edit the entire contents in the
-normal way. Use this method if you want to remove single keywords.
-(Blanking the entire `keywords` field is quicker with `k` or `d`.)
+If you need to edit a keyword or remove one from the list, you need to
+edit the `keywords` field directly. To do this, use a prefix argument:
+`C-u RET` instead of just `RET` to edit the field. Note, though, that
+this does not update the completion list.
 
-It is also possible to add keywords to an entry from the index buffer,
-using the command `K a` (`ebib-keywords-add`). This works essentially
-the same way as when adding keywords from the entry buffer. There is one
-advantage, however: this command can also operate on marked entries, so
-that you can add keywords to multiple entries in one go.
+The keywords completion list is composed of the keywords in all the
+`.bib` files you have open and is available in every database. If you
+open another `.bib` file, its keywords are added to the completion list.
+(Note that if you close a database, its keywords are not removed from
+the completion list, since Ebib does not keep track of which keywords
+are used in which database.)
 
-Remembering keywords is practical, but it is even more useful if
-remembered keywords can be saved, so that they are available the next
-time you start Ebib. There are two ways of doing this: first, there is
-an option “Keywords List” that you can use to store keywords. Keywords
-stored in this option will be available for `TAB` completion to all
-databases in Ebib. New keywords, however, will not automatically be
-stored. If you find you need a keyword not on the list and want to make
-it permanent, you’ll have to add it to “Keywords List” yourself.
+## Using a Canonical Keywords List
 
-The other way of making keywords permanent is by storing them in a file.
-Ebib offers two ways of doing this (which are mutually exclusive, so you
-have to choose one). You can either configure a single keyword file,
-with keywords that are available to all databases, or you can configure
-per-directory keyword files, with keywords that are available for all
-`.bib` files in the same directory. You can set up keyword files by
-configuring the option “Keywords File”. You can either set it to use a
-single keyword file, in which case you need to specify a file with its
-full path, or you can use per-directory keyword files, in which case you
-must provide a filename without a path. That is, if you use
-per-directory keyword files, the files have the same name in each
-directory. The default name is `ebib-keywords.txt`, but you can change
-that if you like, of course.
+By default, the completion list does not contain keywords that are not
+used in any of your `.bib` files. If you wish to use a set of canonical
+keywords that are always offered for completion, regardless of whether
+they are used in a currently opened `.bib` file or not, you can set the
+option “Keywords” (`ebib-keywords`). This can be a list of keywords or
+the name of a file containing the keywords. If it is a file name, the
+file should be a simple text file with one keyword per line.
 
-Note that after setting or changing this option, you need to restart
-Ebib for the change to take effect. If you do not, Ebib will not be able
-to save your keywords.
+If you set this option, keywords in a database that are not in the
+canonical list are displayed in Ebib’s warning face
+(`ebib-warning-face`). You can add them to the canonical list with the
+key sequence `K s`, which will ask you for the keyword to add, or with
+`K c`, which adds all keywords of the current entry to the canonical
+list. You can also remove all keywords from the `keywords` field that
+are not in the list of canonical keywords with the key sequence `K p`.
 
-Keywords that have not been made permanent are marked as such in the
-entry buffer in `ebib-warning-face`, (usually a red foreground colour,
-but this can be customised). If you run into such keywords and want to
-make them permanent, use the command `K s`. This will take the keywords
-in the `keywords` field of the current entry and store all keywords that
-are not permanent yet.
+Even if you use a list of canonical keywords, you can still enter
+keywords that are not in the list when you edit the `keywords` field. If
+you do so, the new keywords are added to the list automatically. If you
+do not wish this to happen, unset the option “Keywords Add New To
+Canonical”.
 
-Keyword files have a very simple format: they are text files with one
-keyword per line. So you can easily create or edit keyword files by
-hand, or have them created by some other programme. Keep in mind,
-though, that Ebib does not check for changes to keyword files. If you
-have a single keyword file, it is loaded when Ebib starts up;
-per-directory keyword files are loaded when the first `.bib` file in
-that directory is opened. If you open a second `.bib` file from the same
-directory, Ebib won’t reload the keywords file.
+If new keywords were added to the list of canonical keywords, you will
+be asked if you wish to save the list when you quit Ebib. If you always
+want this to happen without asking for confirmation, set the option
+“Keywords Save On Exit” to `always`. Note that you can also save the
+list manually with the key sequence `K S` (capital `K`, capital `S`).
 
-When you close a database, Ebib checks if you have added new keywords to
-it and asks you if you want to save them. You can tell Ebib to save new
-keywords automatically by setting the option “Keywords File Save On
-Exit” to `always`. Note that this doesn’t save the keywords when you
-enter them, only when you close the database or quit Ebib. You can also
-set this option to `never`, which means Ebib will discard new keywords
-when the database is closed. Note that if you want to save the keywords
-file without having to close the database, you can do so through the
-menu.
-
-The option “Keywords Use Only File” controls whether Ebib uses only the
-keyword file, or both the keyword file and the configured keyword list.
-This option is only useful when you have configured a keyword file. In
-that case, setting this option to use both the keyword list and the
-keyword file tells Ebib to offer keywords from both sources when you
-edit the keyword field. Otherwise, only the keyword file is used.
-
-It is also possible to tell Ebib to sort the keywords in the `keywords`
-field in alphabetical order. Set the option “Keywords Field Keep Sorted”
-if you want to do this. Note that setting this option also automatically
-removes duplicates.
-
-Lastly, you can configure the separator used between keywords in the
-keyword field. By default, it is set to `", "`, i.e., comma-space. (The
-separator is a comma because that is what `biblatex` expects in the
-`keywords` field.) If you change it, keep in mind that Ebib does not add
-a space between keywords, so if you want a space, make sure to add it to
-the separator.
+If you haven’t configured a list of canonical keywords, the key sequence
+`K S` creates one from the keywords used in your open `.bib` files. The
+list is then saved to your customisation file (usually
+`~/.emacs.d/init.el`). If you prefer to keep your keywords in a separate
+file, you need to create the file yourself (as mentioned, one keyword
+per line; keywords may of course contain spaces), and configure the
+option “Keywords” (`ebib-keywords`) yourself.
 
 # Sorting the `.bib` File
 

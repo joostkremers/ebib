@@ -768,13 +768,14 @@ customizing the option `ebib--hidden-fields'."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-timestamp-format "%a %b %e %T %Y"
+(defcustom ebib-timestamp-format "%Y-%m-%d %T (%Z)"
   "Format of the time string used in the timestamp.
 This option specifies the format string that is used to create
-the timestamp.  The default value produces a timestamp of the form
-\"Mon Mar 12 01:03:26 2007\".  This option uses the Emacs function
-`format-time-string` to create the timestamp.  See that function's
-documentation for details on customizing the format string."
+the timestamp.  The default value produces a timestamp of the
+form \"2007-03-12 01:03:26 (CET)\".  This option uses the Emacs
+function `format-time-string` to create the timestamp.  See that
+function's documentation for details on customizing the format
+string."
   :group 'ebib
   :type 'string)
 
@@ -1151,7 +1152,7 @@ Currently, the following problems are marked:
 (defvar ebib--databases nil "List of structs containing the databases.")
 (defvar ebib--cur-db nil "The database that is currently active.")
 
-;; Bookkeeping required when editing field values or @STRING definitions.
+;; Bookkeeping required when editing field values or @String definitions.
 
 (defvar ebib--hide-hidden-fields t "If set to T, hidden fields are not shown.")
 
@@ -1313,9 +1314,9 @@ the message and sets the variable `ebib--log-error' to 0; finally,
 to 1. The latter two can be used to signal the user to check the
 log for warnings or errors.
 
-FORMAT-STRING and ARGS function as in `format'.  Note that this
-function adds a newline to the message being logged.  The return
-value is always nil."
+FORMAT-STRING and ARGS function as in `format'.  A time stamp is
+inserted with the log message and a final newline is added as
+well.  The return value is always nil."
   (with-current-ebib-buffer 'log
     (cond
      ((eq type 'warning)
@@ -1325,6 +1326,7 @@ value is always nil."
       (setq ebib--log-error 1))
      ((eq type 'message)
       (apply #'message format-string args)))
+    (insert (format "%s: " (format-time-string "%d %b %Y, %H:%M:%S")))
     (insert (apply #'format (concat (if (eq type 'error)
                                         (propertize format-string 'face 'font-lock-warning-face)
                                       format-string)
@@ -1786,7 +1788,7 @@ formatting the entry."
       (insert "\n}\n\n"))))
 
 (defun ebib--format-comments (db)
-  "Write the @COMMENTS of DB into the current buffer in BibTeX format."
+  "Write the @Comments of DB into the current buffer in BibTeX format."
   (mapc (lambda (c)
           (insert (format "@Comment%s\n\n" c)))
         (ebib-db-get-comments db)))
@@ -1825,34 +1827,6 @@ referred to by ENTRY-KEY."
                       (mapconcat (lambda (e) (format "%s%s: %s\n" ebib-local-variable-indentation (car e) (cadr e))) lvars "")
                       ebib-local-variable-indentation "End:\n"
                       "}\n\n")))))
-
-(defun ebib--export-entries-to-db (entries target-db source-db)
-  "Export ENTRIES from SOURCE-DB to TARGET-DB.
-ENTRIES is a list of entry keys."
-  (if (ebib-db-dependent-p target-db)
-      (error "Cannot export entries to a dependent database ")
-    (let ((target-keys-list (ebib-db-list-keys target-db))
-          (modified nil))
-      (mapc (lambda (key)
-              (if (member key target-keys-list)
-                  (ebib--log 'message "Entry key `%s' already exists in database %s" key (ebib-db-get-filename target-db 'short))
-                (ebib--store-entry key (copy-tree (ebib-db-get-entry key source-db)) target-db t)
-                (setq modified t)))
-            entries)
-      (when modified
-        (ebib--mark-index-dirty target-db)
-        (ebib-db-set-modified t target-db)))))
-
-(defun ebib--export-entries-to-file (entries filename source-db)
-  "Export ENTRIES from SOURCE-DB to FILENAME.
-ENTRIES is a list of entry keys."
-  (with-temp-buffer
-    (insert "\n")
-    (mapc (lambda (key)
-            (ebib--format-entry key source-db nil))
-          entries)
-    (append-to-file (point-min) (point-max) filename)
-    (setq ebib--export-filename filename)))
 
 (defun ebib--find-db-for-key (key db)
   "Return the database containing KEY.
@@ -1908,7 +1882,7 @@ This function basically just calls `ebib-db-set-string' to do the
                       db overwrite))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced)
-  "Return the value of @STRING definition ABBR in database DB.
+  "Return the value of @String definition ABBR in database DB.
 NOERROR functions as in `ebib-db-get-string', which this
 functions calls to get the actual value.  The braces around the
 value are removed if UNBRACED is non-nil."

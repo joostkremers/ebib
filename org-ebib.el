@@ -67,7 +67,7 @@ This can be `key', which creates a link with the key of the
 entry, `key+filename', which adds the file name of the `.bib'
 file containing the key, or `key+filepath', which adds the full
 path to the `.bib' file.  If the file name or path is added, it
-is separated from the key with an ampersand."
+is separated from the key with an @-sign."
   :group 'ebib
   :type '(choice (const :tag "Key only" 'key)
                  (const :tag "Key and file name" 'key+filename)
