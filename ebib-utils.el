@@ -410,7 +410,7 @@ database DB."
                                                          (funcall (alist-get field transformations #'identity nil #'cl-equalp) value)
                                                          post)
                                          "")))))
-      (replace-regexp-in-string "{.*?}" #'create-replacements template nil nil))))
+      (replace-regexp-in-string "{.*?}" #'create-replacements template nil t))))
 
 (defcustom ebib-citation-commands '((latex-mode
                                      (("cite"   "\\cite%<[%A]%>[%A]{%(%K%,)}")
