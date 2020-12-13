@@ -2246,20 +2246,27 @@ candidates from the current database."
     (default
       (error "[Ebib] No database opened"))))
 
-(defun ebib--create-collection-ivy (databases)
-  "Create a collection for use in `ebib-read-entry-ivy'.
-The keys for the collection are taken from the databases listed
-in DATABASES."
+(defun ebib--create-completion-collection (databases &optional prepend-db)
+  "Create a collection for use in `ebib-read-entry-*' functions.
+The keys for the collection are taken from DATABASES.  Return
+value is an alist with the completion strings as keys and a list
+of entry key and database as values.  If PREPEND-DB is non-nil,
+the database name is prepended to the candidate string.  This is
+especially useful if helm or ivy is used as completion system.
+"
   (seq-reduce (lambda (coll db)
                 (let ((file (propertize (ebib-db-get-filename db 'short) 'face 'ebib-display-bibfile-face)))
                   (append (mapcar (lambda (key)
-                                    (propertize (format "%-20s  %s (%s) «%s»"
-                                                        file
-                                                        (ebib--get-field-value-for-display "Author/Editor" key db 'face 'ebib-display-author-face)
-                                                        (ebib--get-field-value-for-display "Year" key db 'face 'ebib-display-year-face)
-                                                        (ebib--get-field-value-for-display "Title" key db))
-                                                'ebib-key key
-                                                'ebib-db db))
+                                    (let ((candidate (format "%s (%s) «%s»"
+                                                             (ebib--get-field-value-for-display "Author/Editor" key db 'face 'ebib-display-author-face)
+                                                             (ebib--get-field-value-for-display "Year" key db 'face 'ebib-display-year-face)
+                                                             (ebib--get-field-value-for-display "Title" key db))))
+                                      (setq candidate
+                                            (cond
+                                             (prepend-db
+                                              (concat (format "%-20s  " file) "  " candidate))
+                                             (t (concat key "  " candidate))))
+                                      (cons candidate (list key db))))
                                   (ebib-db-list-keys db))
                           coll)))
               databases nil))
@@ -2277,35 +2284,18 @@ databases containing them."
   (let ((minibuffer-allow-text-properties t)
         (ivy-sort-max-size (expt 256 6))
         entries)
-    (let ((collection (ebib--create-collection-ivy databases)))
+    (let ((collection (ebib--create-completion-collection databases t)))
       (if (not collection)
           (error "[Ebib] No entries found in database(s)")
         (ivy-read "Select entry: " collection
                   :action (lambda (item)
-                            (let ((key (get-text-property 0 'ebib-key item))
-                                  (db (get-text-property 0 'ebib-db item)))
+                            (let ((key (cadr item))
+                                  (db (caddr item)))
                               (unless (cl-find key entries :key #'car)
                                 (push (cons key db) entries))))
                   :history 'ebib--citation-history
                   :sort t)
         (nreverse entries)))))
-
-(defun ebib--create-collection-helm (databases)
-  "Create a collection for use in `ebib-read-entry-helm'.
-The keys for the collection are taken from the databases listed
-in DATABASES."
-  (seq-reduce (lambda (coll db)
-                (let ((file (propertize (ebib-db-get-filename db 'short) 'face 'ebib-display-bibfile-face)))
-                  (append (mapcar (lambda (key)
-                                    (cons (format "%-20s  %s (%s) «%s»"
-                                                  file
-                                                  (ebib--get-field-value-for-display "Author/Editor" key db 'face 'ebib-display-author-face)
-                                                  (ebib--get-field-value-for-display "Year" key db 'face 'ebib-display-year-face)
-                                                  (ebib--get-field-value-for-display "Title" key db))
-                                          (list key db)))
-                                  (ebib-db-list-keys db))
-                          coll)))
-              databases nil))
 
 (defun ebib-helm-action-function (_)
   "Return a list of cons cells of the selected candidates and the databases that contain them."
@@ -2323,24 +2313,12 @@ It is possible to select multiple entries in the helm buffer.
 Return value is a list of cons cells of the selected keys and the
 databases containing them."
   (let ((sources (helm-build-sync-source "Select entry: "
-                                         :candidates (ebib--create-collection-helm databases)
+                                         :candidates (ebib--create-completion-collection databases t)
                                          :action '(("Select entry" . ebib-helm-action-function)))))
     (helm :sources sources
           :sort t
           :buffer "*helm ebib*"
           :prompt "Select entry: ")))
-
-(defun ebib--create-collection-default-method (databases)
-  "Create a collection for the default completion mechanism.
-The keys for the collection are taken from the databases listed
-in DATABASES.  Unlike with the `ivy' and `helm' counterparts, the
-collection only consists of the entry keys."
-  (seq-reduce (lambda (coll db)
-                (append (mapcar (lambda (key)
-                                  (propertize key 'ebib-db db))
-                                (ebib-db-list-keys db))
-                        coll))
-              databases nil))
 
 (defun ebib-read-entry-single (databases)
   "Read an entry from the user using default completion.
@@ -2350,10 +2328,11 @@ completion.
 For compatibility with the other `ebib-read-entry-*' functions,
 the return value is a list with a single cons cell of the key and
 the database containing the selected entry."
-  (let ((collection (ebib--create-collection-default-method databases)))
+  (let ((collection (ebib--create-completion-collection databases)))
     (if collection
-        (let* ((key (completing-read "Select entry: " collection nil t nil 'ebib--key-history))
-               (db (get-text-property 0 'ebib-db (assoc-string key collection))))
+        (let* ((entry (completing-read "Select entry: " collection nil t nil 'ebib--key-history))
+               (key (cadr (assoc-string entry collection)))
+               (db (caddr (assoc-string entry collection))))
           (list (cons key db)))
       (error "[Ebib] No BibTeX entries found"))))
 
@@ -2364,13 +2343,14 @@ completion.
 
 Return value is a list of cons cells of the selected keys and the
 databases containing them."
-  (let ((collection (ebib--create-collection-default-method databases)))
+  (let ((collection (ebib--create-completion-collection databases)))
     (if collection
         (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
                (crm-separator "[ \t]+" )
                (keys (completing-read-multiple "Keys to insert: " collection nil t nil 'ebib--key-history)))
-          (mapcar (lambda (key)
-                    (cons key (get-text-property 0 'ebib-db (assoc-string key collection))))
+          (mapcar (lambda (entry)
+                    (cons (cadr (assoc-string entry collection))
+                          (caddr (assoc-string entry collection))))
                   keys))
       (error "[Ebib] No BibTeX entries found"))))
 
