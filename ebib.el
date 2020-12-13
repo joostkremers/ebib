@@ -652,6 +652,7 @@ user."
 COMMAND is the command to finish, one of the symbols
 `completing-read' or `read-file-name'."
   (cond
+   ((and (boundp 'selectrum-mode) selectrum-mode) (key-description (where-is-internal 'selectrum-submit-exact-input (list selectrum-minibuffer-map) 'non-ascii)))
    ((and (boundp 'ivy-mode) ivy-mode) (key-description (where-is-internal 'ivy-immediate-done (list ivy-minibuffer-map) 'non-ascii)))
    ((and (boundp 'helm-mode) helm-mode) (let ((map (symbol-value (alist-get command '((completing-read . helm-comp-read-map)
 										      (read-file-name . helm-read-file-map))))))
@@ -2253,7 +2254,12 @@ value is an alist with the completion strings as keys and a list
 of entry key and database as values.  If PREPEND-DB is non-nil,
 the database name is prepended to the candidate string.  This is
 especially useful if helm or ivy is used as completion system.
-"
+
+If PREPEND-DB is nil, the database name is added to the string in
+the text property `selectrum-candidate-display-right-margin'.
+When selectrum is used as the completion system, the database is
+displayed at the right margin.  If selectrum is not used, the key
+is prepended to the completion candidates."
   (seq-reduce (lambda (coll db)
                 (let ((file (propertize (ebib-db-get-filename db 'short) 'face 'ebib-display-bibfile-face)))
                   (append (mapcar (lambda (key)
@@ -2265,6 +2271,8 @@ especially useful if helm or ivy is used as completion system.
                                             (cond
                                              (prepend-db
                                               (concat (format "%-20s  " file) "  " candidate))
+                                             ((and (boundp 'selectrum-mode) selectrum-mode)
+                                              (propertize candidate 'selectrum-candidate-display-right-margin file))
                                              (t (concat key "  " candidate))))
                                       (cons candidate (list key db))))
                                   (ebib-db-list-keys db))

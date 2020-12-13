@@ -340,13 +340,14 @@ are offered for completion are the keys from all open databases. After
 selecting a key, Ebib changes to the corresponding database and shows
 the entry corresponding to the key.
 
-If you use [ivy](https://github.com/abo-abo/swiper) or
+If you use [selectrum](https://github.com/raxod502/selectrum),
+[ivy](https://github.com/abo-abo/swiper) or
 [helm](https://github.com/emacs-helm/helm) for completion, instead of
 completing the entry key, you can type any part of the author/editor
 names, of the title and the year of the entry you want to jump to. You
 can also see the bibliography file to which the entry belongs. This is a
 good way to search for a particular entry if you’re not sure of the
-entry key. (In fact, with `ivy` or `helm`, it becomes generally
+entry key. (In fact, with these completion systems, it is generally
 unnecessary to remember the key of an entry, and you can customise the
 option `ebib-index-columns` in order not to display it in the index
 buffer.)
@@ -792,7 +793,8 @@ command to search for an entry in all open databases. If you want to
 restrict it to just the current database, use a prefix argument: `C-u
 j`.
 
-If you use [ivy](https://github.com/abo-abo/swiper) or
+If you use [selectrum](https://github.com/raxod502/selectrum),
+[ivy](https://github.com/abo-abo/swiper) or
 [helm](https://github.com/emacs-helm/helm), this method is actually very
 convenient, because the completion is more sophisticated: you can search
 not on entry key but on any part of the author/editor name, the title
@@ -1134,7 +1136,8 @@ below.
 When you invoke `ebib-insert-citation`, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
 command to use. You can use `TAB` completion when typing the key. If you
-have [ivy](https://github.com/abo-abo/swiper) or
+have [selectrum](https://github.com/raxod502/selectrum),
+[ivy](https://github.com/abo-abo/swiper) or
 [helm](https://github.com/emacs-helm/helm) installed, however, Ebib uses
 a more sophisticated method: instead of typing just the key, you can
 type (parts of) the author name, publication year and title in order to
@@ -1168,14 +1171,14 @@ one key to a citation, you can mark them in Ebib’s index buffer with `m`
 and then insert them into a text buffer with `i`. If you use ivy or
 helm, the standard method that these packages provide for selecting and
 acting on multiple candidates can be used if you insert a citation from
-within your text buffer with `ebib-insert-citation`. If you use Emacs’
-built-in completion method, you can enable selection of multiple keys by
-setting the option `ebib-citations-insert-multiple`. With this option
-set, you can select multiple keys when calling `ebib-insert-citation` in
-the following way: start typing a key, complete it with `TAB`, type
-`SPC` and start typing the next key, again with the ability to complete
-it with `TAB`. When you have entered all the keys you wish to select,
-press `RET`.
+within your text buffer with `ebib-insert-citation`. If you use
+selectrum or Emacs’ built-in completion method, you can enable selection
+of multiple keys by setting the option `ebib-citations-insert-multiple`.
+With this option set, you can select multiple keys when calling
+`ebib-insert-citation` in the following way: start typing a key,
+complete it with `TAB`, type `SPC` and start typing the next key, again
+with the ability to complete it with `TAB`. When you have entered all
+the keys you wish to select, press `RET`.
 
 This method of multiple selection is somewhat cumbersome and it does not
 use Emacs’ standard completion function `completing-read`, so it is
@@ -2268,11 +2271,11 @@ Ebib keeps a list of keywords used in your database(s) and offers these
 for completion when you edit the `keywords` field. You can enter a
 keyword and accept it with `RET`, after which you will be asked for the
 next keyword. Just hitting `RET` without any input finishes the edit and
-returns focus to the entry buffer. (With `ivy` or `helm` the key binding
-to finish editing the `keywords` field is different; the prompt will
-indicate what key to press). You can, of course, also enter a keyword
-that is not on the completion list. If you do, it will be added to the
-list.
+returns focus to the entry buffer. (With selectrum, ivy or helm the key
+binding to finish editing the `keywords` field is different; the prompt
+will indicate what key to press). You can, of course, also enter a
+keyword that is not on the completion list. If you do, it will be added
+to the list.
 
 If you need to edit a keyword or remove one from the list, you need to
 edit the `keywords` field directly. To do this, use a prefix argument:

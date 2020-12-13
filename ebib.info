@@ -542,13 +542,14 @@ that are offered for completion are the keys from all open databases.
 After selecting a key, Ebib changes to the corresponding database and
 shows the entry corresponding to the key.
 
-If you use ivy (https://github.com/abo-abo/swiper) or helm
+If you use selectrum (https://github.com/raxod502/selectrum), ivy
+(https://github.com/abo-abo/swiper) or helm
 (https://github.com/emacs-helm/helm) for completion, instead of
 completing the entry key, you can type any part of the author/editor
 names, of the title and the year of the entry you want to jump to.  You
 can also see the bibliography file to which the entry belongs.  This is
 a good way to search for a particular entry if you’re not sure of the
-entry key.  (In fact, with ‘ivy’ or ‘helm’, it becomes generally
+entry key.  (In fact, with these completion systems, it is generally
 unnecessary to remember the key of an entry, and you can customise the
 option ‘ebib-index-columns’ in order not to display it in the index
 buffer.)
@@ -1081,7 +1082,8 @@ command to search for an entry in all open databases.  If you want to
 restrict it to just the current database, use a prefix argument: ‘C-u
 j’.
 
-If you use ivy (https://github.com/abo-abo/swiper) or helm
+If you use selectrum (https://github.com/raxod502/selectrum), ivy
+(https://github.com/abo-abo/swiper) or helm
 (https://github.com/emacs-helm/helm), this method is actually very
 convenient, because the completion is more sophisticated: you can search
 not on entry key but on any part of the author/editor name, the title
@@ -1462,7 +1464,8 @@ support for Org mode (http://orgmode.org) as well, as discussed below.
 When you invoke ‘ebib-insert-citation’, Emacs prompts you for a key from
 the database(s) associated with the current buffer and for a citation
 command to use.  You can use ‘TAB’ completion when typing the key.  If
-you have ivy (https://github.com/abo-abo/swiper) or helm
+you have selectrum (https://github.com/raxod502/selectrum), ivy
+(https://github.com/abo-abo/swiper) or helm
 (https://github.com/emacs-helm/helm) installed, however, Ebib uses a
 more sophisticated method: instead of typing just the key, you can type
 (parts of) the author name, publication year and title in order to find
@@ -1509,13 +1512,13 @@ with ‘m’ and then insert them into a text buffer with ‘i’.  If you use
 ivy or helm, the standard method that these packages provide for
 selecting and acting on multiple candidates can be used if you insert a
 citation from within your text buffer with ‘ebib-insert-citation’.  If
-you use Emacs’ built-in completion method, you can enable selection of
-multiple keys by setting the option ‘ebib-citations-insert-multiple’.
-With this option set, you can select multiple keys when calling
-‘ebib-insert-citation’ in the following way: start typing a key,
-complete it with ‘TAB’, type ‘SPC’ and start typing the next key, again
-with the ability to complete it with ‘TAB’.  When you have entered all
-the keys you wish to select, press ‘RET’.
+you use selectrum or Emacs’ built-in completion method, you can enable
+selection of multiple keys by setting the option
+‘ebib-citations-insert-multiple’.  With this option set, you can select
+multiple keys when calling ‘ebib-insert-citation’ in the following way:
+start typing a key, complete it with ‘TAB’, type ‘SPC’ and start typing
+the next key, again with the ability to complete it with ‘TAB’.  When
+you have entered all the keys you wish to select, press ‘RET’.
 
 This method of multiple selection is somewhat cumbersome and it does not
 use Emacs’ standard completion function ‘completing-read’, so it is
@@ -2698,11 +2701,11 @@ Ebib keeps a list of keywords used in your database(s) and offers these
 for completion when you edit the ‘keywords’ field.  You can enter a
 keyword and accept it with ‘RET’, after which you will be asked for the
 next keyword.  Just hitting ‘RET’ without any input finishes the edit
-and returns focus to the entry buffer.  (With ‘ivy’ or ‘helm’ the key
-binding to finish editing the ‘keywords’ field is different; the prompt
-will indicate what key to press).  You can, of course, also enter a
-keyword that is not on the completion list.  If you do, it will be added
-to the list.
+and returns focus to the entry buffer.  (With selectrum, ivy or helm the
+key binding to finish editing the ‘keywords’ field is different; the
+prompt will indicate what key to press).  You can, of course, also enter
+a keyword that is not on the completion list.  If you do, it will be
+added to the list.
 
 If you need to edit a keyword or remove one from the list, you need to
 edit the ‘keywords’ field directly.  To do this, use a prefix argument:
@@ -3150,122 +3153,122 @@ Node: Preloading bib Files17266
 Ref: #preloading-.bib-files17454
 Node: Navigating a bib File18210
 Ref: #navigating-a-.bib-file18405
-Node: Starting a New bib File22912
-Ref: #starting-a-new-.bib-file23082
-Node: Editing the Database23374
-Ref: #editing-the-database23529
-Node: Adding and Deleting Entries23906
-Ref: #adding-and-deleting-entries24082
-Node: Editing Field Values26293
-Ref: #editing-field-values26488
-Node: Editing Multiline Values29649
-Ref: #editing-multiline-values29841
-Node: Undefined Fields32038
-Ref: #undefined-fields32207
-Node: Hidden Fields33096
-Ref: #hidden-fields33245
-Node: Timestamps34315
-Ref: #timestamps34477
-Node: Copy Cut Kill Paste Yank and Delete36450
-Ref: #copy-cut-kill-paste-yank-and-delete36654
-Node: Saving a Database37600
-Ref: #saving-a-database37752
-Node: Biblatex vs BibTeX39400
-Ref: #biblatex-vs.-bibtex39560
-Node: Setting the BibTeX Dialect40357
-Ref: #setting-the-bibtex-dialect40530
-Node: Alias Types and Fields42573
-Ref: #alias-types-and-fields42738
-Node: The Entries List44783
-Ref: #the-entries-list44921
-Node: Searching48662
-Ref: #searching48806
-Node: Simple Searches49309
-Ref: #simple-searches49425
-Node: Filters52630
-Ref: #filters52730
-Node: Simple Selection53805
-Ref: #simple-selection53934
-Node: Complex Filters55643
-Ref: #complex-filters55805
-Node: Storing and Saving Filters59880
-Ref: #storing-and-saving-filters60063
-Node: Special Filters62918
-Ref: #special-filters63099
-Node: An Example Listing Recent Additions64467
-Ref: #an-example-listing-recent-additions64696
-Node: Properties of Filtered Databases67066
-Ref: #properties-of-filtered-databases67263
-Node: Inserting Citations into a Text Buffer68918
-Ref: #inserting-citations-into-a-text-buffer69157
-Node: Citations with multiple keys71655
-Ref: #citations-with-multiple-keys71844
-Node: Key Bindings73027
-Ref: #key-bindings73219
-Node: Defining Citation Commands73977
-Ref: #defining-citation-commands74210
-Node: Associating a Database with a Text Buffer80106
-Ref: #associating-a-database-with-a-text-buffer80391
-Node: Links and Citations in Org buffers81770
-Ref: #links-and-citations-in-org-buffers82006
-Node: Copying Entries to the Kill Ring and System Clipboard83437
-Ref: #copying-entries-to-the-kill-ring-and-system-clipboard83727
-Node: Main and Dependent Databases86274
-Ref: #main-and-dependent-databases86493
-Node: Cross-referencing89478
-Ref: #cross-referencing89637
-Node: Marking Entries93164
-Ref: #marking-entries93312
-Node: Printing the Database94189
-Ref: #printing-the-database94367
-Node: Calling a Browser for URLs and DOIs97836
-Ref: #calling-a-browser-for-urls-and-dois98054
-Node: Viewing and Importing Files100362
-Ref: #viewing-and-importing-files100554
-Node: Editing the file field105764
-Ref: #editing-the-file-field105913
-Node: Notes files107284
-Ref: #notes-files107432
-Node: Separate notes files108201
-Ref: #separate-notes-files108350
-Node: One single notes file109941
-Ref: #one-single-notes-file110134
-Node: Customising the notes file format112051
-Ref: #customising-the-notes-file-format112264
-Node: Displaying notes115859
-Ref: #displaying-notes116008
-Node: Managing a reading list117345
-Ref: #managing-a-reading-list117507
-Node: Window Management120522
-Ref: #window-management120681
-Node: Creating Entry Stubs123840
-Ref: #creating-entry-stubs124002
-Node: @Preamble Definition125000
-Ref: #preamble-definition125164
-Node: @String Definitions127136
-Ref: #string-definitions127287
-Node: @Comments130780
-Ref: #comments130908
-Node: Managing Keywords131401
-Ref: #managing-keywords131546
-Node: Using a Canonical Keywords List133154
-Ref: #using-a-canonical-keywords-list133312
-Node: Sorting the bib File135470
-Ref: #sorting-the-.bib-file135643
-Node: Merging and Importing138762
-Ref: #merging-and-importing138927
-Node: Exporting Entries140697
-Ref: #exporting-entries140859
-Node: Multiple Identical Fields142375
-Ref: #multiple-identical-fields142554
-Node: Multiline Edit Buffers144482
-Ref: #multiline-edit-buffers144654
-Node: The Options Menu148531
-Ref: #the-options-menu148679
-Node: Customisation149297
-Ref: #customisation149408
-Node: Modifying Key Bindings150016
-Ref: #modifying-key-bindings150143
+Node: Starting a New bib File22959
+Ref: #starting-a-new-.bib-file23129
+Node: Editing the Database23421
+Ref: #editing-the-database23576
+Node: Adding and Deleting Entries23953
+Ref: #adding-and-deleting-entries24129
+Node: Editing Field Values26340
+Ref: #editing-field-values26535
+Node: Editing Multiline Values29696
+Ref: #editing-multiline-values29888
+Node: Undefined Fields32085
+Ref: #undefined-fields32254
+Node: Hidden Fields33143
+Ref: #hidden-fields33292
+Node: Timestamps34362
+Ref: #timestamps34524
+Node: Copy Cut Kill Paste Yank and Delete36497
+Ref: #copy-cut-kill-paste-yank-and-delete36701
+Node: Saving a Database37647
+Ref: #saving-a-database37799
+Node: Biblatex vs BibTeX39447
+Ref: #biblatex-vs.-bibtex39607
+Node: Setting the BibTeX Dialect40404
+Ref: #setting-the-bibtex-dialect40577
+Node: Alias Types and Fields42620
+Ref: #alias-types-and-fields42785
+Node: The Entries List44830
+Ref: #the-entries-list44968
+Node: Searching48709
+Ref: #searching48853
+Node: Simple Searches49356
+Ref: #simple-searches49472
+Node: Filters52728
+Ref: #filters52828
+Node: Simple Selection53903
+Ref: #simple-selection54032
+Node: Complex Filters55741
+Ref: #complex-filters55903
+Node: Storing and Saving Filters59978
+Ref: #storing-and-saving-filters60161
+Node: Special Filters63016
+Ref: #special-filters63197
+Node: An Example Listing Recent Additions64565
+Ref: #an-example-listing-recent-additions64794
+Node: Properties of Filtered Databases67164
+Ref: #properties-of-filtered-databases67361
+Node: Inserting Citations into a Text Buffer69016
+Ref: #inserting-citations-into-a-text-buffer69255
+Node: Citations with multiple keys71804
+Ref: #citations-with-multiple-keys71993
+Node: Key Bindings73190
+Ref: #key-bindings73382
+Node: Defining Citation Commands74140
+Ref: #defining-citation-commands74373
+Node: Associating a Database with a Text Buffer80269
+Ref: #associating-a-database-with-a-text-buffer80554
+Node: Links and Citations in Org buffers81933
+Ref: #links-and-citations-in-org-buffers82169
+Node: Copying Entries to the Kill Ring and System Clipboard83600
+Ref: #copying-entries-to-the-kill-ring-and-system-clipboard83890
+Node: Main and Dependent Databases86437
+Ref: #main-and-dependent-databases86656
+Node: Cross-referencing89641
+Ref: #cross-referencing89800
+Node: Marking Entries93327
+Ref: #marking-entries93475
+Node: Printing the Database94352
+Ref: #printing-the-database94530
+Node: Calling a Browser for URLs and DOIs97999
+Ref: #calling-a-browser-for-urls-and-dois98217
+Node: Viewing and Importing Files100525
+Ref: #viewing-and-importing-files100717
+Node: Editing the file field105927
+Ref: #editing-the-file-field106076
+Node: Notes files107447
+Ref: #notes-files107595
+Node: Separate notes files108364
+Ref: #separate-notes-files108513
+Node: One single notes file110104
+Ref: #one-single-notes-file110297
+Node: Customising the notes file format112214
+Ref: #customising-the-notes-file-format112427
+Node: Displaying notes116022
+Ref: #displaying-notes116171
+Node: Managing a reading list117508
+Ref: #managing-a-reading-list117670
+Node: Window Management120685
+Ref: #window-management120844
+Node: Creating Entry Stubs124003
+Ref: #creating-entry-stubs124165
+Node: @Preamble Definition125163
+Ref: #preamble-definition125327
+Node: @String Definitions127299
+Ref: #string-definitions127450
+Node: @Comments130943
+Ref: #comments131071
+Node: Managing Keywords131564
+Ref: #managing-keywords131709
+Node: Using a Canonical Keywords List133316
+Ref: #using-a-canonical-keywords-list133474
+Node: Sorting the bib File135632
+Ref: #sorting-the-.bib-file135805
+Node: Merging and Importing138924
+Ref: #merging-and-importing139089
+Node: Exporting Entries140859
+Ref: #exporting-entries141021
+Node: Multiple Identical Fields142537
+Ref: #multiple-identical-fields142716
+Node: Multiline Edit Buffers144644
+Ref: #multiline-edit-buffers144816
+Node: The Options Menu148693
+Ref: #the-options-menu148841
+Node: Customisation149459
+Ref: #customisation149570
+Node: Modifying Key Bindings150178
+Ref: #modifying-key-bindings150305
 
 End Tag Table
 
