@@ -9,6 +9,10 @@ is.
 
 # News
 
+## Version 2.29, December 2020
+
+  - Add support for [selectrum](https://github.com/raxod502/selectrum).
+
 ## Version 2.28, October 2020
 
   - Redesign keyword handling.
