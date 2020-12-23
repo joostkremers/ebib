@@ -2214,9 +2214,9 @@ buffer and switch to it."
   "Jump to an entry.
 Select an entry from any open database using completion and jump
 to it.  By default, completion is performed using only the entry
-keys, but if either `ivy', `helm' or `ido' is available,
-completion is more sophisticated, allowing to select an entry
-using the author, year and title.
+keys, but if either `selectrum', `ivy', `helm' or `ido' is
+available, completion is more sophisticated, allowing to select
+an entry using the author, year and title.
 
 If prefix argument ARG is non-nil, only offer selection
 candidates from the current database."
@@ -3046,7 +3046,7 @@ If `ebib-citation-insert-multiple' is non-nil, it calls
 `ebib-read-entry-multiple', which uses `completing-read-multiple'.
 If `ido' is active, it calls `ebib-read-entry-ido'. Otherwise, it
 calls `ebib-read-entry-single', which uses standard Emacs
-completion."
+completion, or `selectrum', if available."
   (interactive)
   (unless ebib--initialized
     (ebib-init))
