@@ -2214,9 +2214,9 @@ buffer and switch to it."
   "Jump to an entry.
 Select an entry from any open database using completion and jump
 to it.  By default, completion is performed using only the entry
-keys, but if either `ivy' or `helm' is available, completion is
-more sophisticated, allowing to select an entry using the author,
-year and title.
+keys, but if either `ivy', `helm' or `ido' is available,
+completion is more sophisticated, allowing to select an entry
+using the author, year and title.
 
 If prefix argument ARG is non-nil, only offer selection
 candidates from the current database."
@@ -2227,6 +2227,7 @@ candidates from the current database."
             (entries (cond
                       ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy sources))
                       ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm sources))
+                      ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido sources))
                       (t (ebib-read-entry-single sources))))
             ;; The `ebib-read-entry-*' functions return a list of selected
             ;; entries. We can only jump to one of them, obviously. Jumping to
@@ -2327,6 +2328,23 @@ databases containing them."
           :sort t
           :buffer "*helm ebib*"
           :prompt "Select entry: ")))
+
+(defun ebib-read-entry-ido (databases)
+  "Read an entry from the user using ido.
+Offer the entries in DATABASES (a list of database structs) for
+completion.
+
+For compatibility with the other `ebib-read-entry-*' functions,
+the return value is a list with a single cons cell of the key and
+the database containing the selected entry."
+  (let ((collection (ebib--create-completion-collection databases)))
+    (if collection
+        (let* ((candidates (mapcar #'car collection))
+               (entry (ido-completing-read "Select entry: " candidates nil t nil 'ebib--key-history))
+               (key (cadr (assoc-string entry collection)))
+               (db (caddr (assoc-string entry collection))))
+          (list (cons key db)))
+      (error "[Ebib] No BibTeX entries found"))))
 
 (defun ebib-read-entry-single (databases)
   "Read an entry from the user using default completion.
@@ -3026,8 +3044,9 @@ the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
 the `helm' package is loaded, it calls `ebib-read-entry-helm'.
 If `ebib-citation-insert-multiple' is non-nil, it calls
 `ebib-read-entry-multiple', which uses `completing-read-multiple'.
-Otherwise, it calls `ebib-read-entry-single', which uses standard
-Emacs completion."
+If `ido' is active, it calls `ebib-read-entry-ido'. Otherwise, it
+calls `ebib-read-entry-single', which uses standard Emacs
+completion."
   (interactive)
   (unless ebib--initialized
     (ebib-init))
@@ -3045,6 +3064,7 @@ Emacs completion."
                         ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
                         ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
                         (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
+                        ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido databases))
                         (t (ebib-read-entry-single databases))))
               (keys (mapcar #'car entries))
               (db (cdar entries)) ; We only take the database of the first entry.
