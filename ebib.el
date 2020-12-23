@@ -3044,7 +3044,7 @@ the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
 the `helm' package is loaded, it calls `ebib-read-entry-helm'.
 If `ebib-citation-insert-multiple' is non-nil, it calls
 `ebib-read-entry-multiple', which uses `completing-read-multiple'.
-If `ido' is active, it calls `ebib-read-entry-ido'. Otherwise, it
+If `ido' is active, it calls `ebib-read-entry-ido'.  Otherwise, it
 calls `ebib-read-entry-single', which uses standard Emacs
 completion, or `selectrum', if available."
   (interactive)
