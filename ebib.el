@@ -3039,14 +3039,9 @@ the entries of its main database are offered as completion
 candidates and the entry that is selected is added to the
 dependent database if not already there.
 
-This is a front-end for other citation insertion functions: if
-the `ivy' package is loaded, it calls `ebib-read-entry-ivy', if
-the `helm' package is loaded, it calls `ebib-read-entry-helm'.
-If `ebib-citation-insert-multiple' is non-nil, it calls
-`ebib-read-entry-multiple', which uses `completing-read-multiple'.
-If `ido' is active, it calls `ebib-read-entry-ido'.  Otherwise, it
-calls `ebib-read-entry-single', which uses standard Emacs
-completion, or `selectrum', if available."
+This function uses a dedicated completion framework (selectrum,
+ivy, helm or ido), if available and active.  It also honors the
+option `ebib-citation-insert-multiple'."
   (interactive)
   (unless ebib--initialized
     (ebib-init))
