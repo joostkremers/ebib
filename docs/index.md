@@ -56,10 +56,11 @@ Bib(La)TeX files easier.
 
 - From within a LaTeX, Org mode or [Pandoc](https://pandoc.org) document, it is
   possible to select a Bib(La)TeX key using standard Emacs completion,
-  [Ivy](https://github.com/abo-abo/swiper), or
-  [Helm](https://github.com/emacs-helm/helm), and insert a citation into the
-  document. This can also be set up for other document formats that support
-  automatic bibliographies.
+  [Selectrum](https://github.com/raxod502/selectrum),
+  [Ivy](https://github.com/abo-abo/swiper),
+  [Helm](https://github.com/emacs-helm/helm), or `ido-mode` and insert a
+  citation into the document. This can also be set up for other document formats
+  that support automatic bibliographies.
 - Inside Ebib, it is possible to push entries to a LaTeX / Org mode / Markdown
   buffer.
 - Quick summary of entries into a `*Help*` buffer.
