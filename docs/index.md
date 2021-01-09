@@ -43,9 +43,8 @@ Bib(La)TeX files easier.
 
 ### Searching
 
-- Quickly jump to any entry in any database using completion (especially useful
-  when using [Selectrum](https://github.com/raxod502/selectrum), [Ivy](https://github.com/abo-abo/swiper),
-  [Helm](https://github.com/emacs-helm/helm)) or built-in `ido-mode`.
+- Quickly jump to any entry in any database using completion, which is especially useful when using [Selectrum](https://github.com/raxod502/selectrum), [Ivy](https://github.com/abo-abo/swiper),
+  [Helm](https://github.com/emacs-helm/helm) or the built-in `ido-mode`.
 - Simple regexp searches can be performed on a database, searching the
   contents of all fields of each entry.
 - Complex search queries with logical `and`, `or` and `not` operators,
