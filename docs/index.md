@@ -38,7 +38,7 @@ Bib(La)TeX files easier.
 ### Databases
 
 - Multiple `.bib` files can be opened at the same time.
-- Easily create a separate `.bib` file for a paper, article or book through a "slave" database.
+- Easily create a separate `.bib` file for a paper, article or book through a "dependent" database which shares its content with a main database but is saved as a separate `.bib` file.
 - Databases can be merged; specific entries or `@preamble` and `@string` definitions can be exported to other databases or to a `.bib`file.
 
 ### Searching
