@@ -43,7 +43,7 @@
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 
-(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-file)
+(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-file "Ebib 2.20")
 
 (defcustom ebib-notes-file nil
   "Name of the notes file.
@@ -53,8 +53,6 @@ one file per note, provided `ebib-notes-directory' is set."
   :group 'ebib-notes
   :type '(choice (const :tag "Use multiple notes files" nil)
                  (file :tag "Notes File")))
-
-(define-obsolete-variable-alias 'ebib-notes-file-symbol 'ebib-notes-symbol)
 
 (defcustom ebib-notes-symbol "N"
   "Symbol used to indicate the presence of a note for the current entry.
