@@ -68,9 +68,13 @@
 (require 'ivy nil 'noerror)
 (require 'helm nil 'noerror)
 
-;;; Silence the byte-compiler
+;;; Silence the byte-compiler.
 (defvar pandoc-mode)
+(defvar selectrum-minibuffer-map)
 (declare-function pandoc--get "ext:pandoc-mode-utils.el" (option &optional buffer))
+(declare-function helm-marked-candidates "ext:helm.el" (&optional with-wildcard all-sources))
+(declare-function helm-build-sync-source "ext:helm-source.el" (name &rest args))
+(declare-function helm "ext:helm.el" (&rest plist))
 
 ;;; Helper functions
 
