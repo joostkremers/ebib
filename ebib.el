@@ -311,19 +311,20 @@ The return value is a list of strings, each a separate line,
 which can be passed to `ebib--display-multiline-field'."
   (with-temp-buffer
     (cond
-     (ebib-notes-file
-      (let (beg end)
-        (with-current-buffer (ebib--notes-buffer)
-          (run-hooks 'ebib-notes-search-note-before-hook)
-          (let ((location (ebib--notes-locate-note key)))
-            (when location
-              (save-mark-and-excursion
-                (goto-char location)
-                (org-mark-subtree)
-                (setq beg (region-beginning)
-                      end (region-end))))))
-        (insert-buffer-substring (ebib--notes-buffer) beg end)))
-     ((not ebib-notes-file)
+     ((eq ebib-notes-storage 'multiple-note-per-file)
+      (let* ((location (ebib--notes-goto-note key))
+             (buffer (car location))
+             (position (cdr location))
+             beg end)
+        (when location
+          (with-current-buffer buffer
+            (save-mark-and-excursion
+              (goto-char position)
+              (org-mark-subtree)
+              (setq beg (region-beginning)
+                    end (region-end))))
+          (insert-buffer-substring buffer beg end))))
+     ((eq ebib-notes-storage 'one-file-per-note)
       (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
         (when (file-readable-p filename)
           (insert-file-contents filename)))))
@@ -560,8 +561,8 @@ the field contents."
     (if (window-live-p ebib--note-window)
         (let ((buf (window-buffer ebib--note-window)))
           (delete-window ebib--note-window)
-          (unless ebib-notes-file
-            (kill-buffer buf))
+          (if (eq ebib-notes-storage 'one-file-per-note)
+              (kill-buffer buf))
           (setq ebib--needs-update nil))) ; See below.
     (setq ebib--note-window nil))
   (with-current-ebib-buffer 'entry
@@ -582,6 +583,11 @@ the field contents."
                   ;; t, which then causes the command `ebib' to redisplay the
                   ;; buffers. This is a hack, but the simplest way to do it.
                   ebib--needs-update t))))))
+
+(defun ebib--maybe-update-entry-buffer ()
+  "Update the entry buffer if it exists."
+  (if (ebib--buffer 'entry)
+      (ebib--update-entry-buffer)))
 
 (defun ebib--set-modified (mod db &optional main dependents)
   "Set the modified flag MOD on database DB.
@@ -610,7 +616,7 @@ The return value is MOD."
           dependents))
   (when (eq db ebib--cur-db)
     (with-current-ebib-buffer 'index
-                              (force-mode-line-update)))
+      (force-mode-line-update)))
   mod)
 
 (defun ebib--modified-p ()
@@ -1513,7 +1519,7 @@ If `ebib-notes-file' is set, this function runs
        (when buf
          (with-current-buffer (car buf)
            (goto-char (cdr buf))
-           (when ebib-notes-file
+           (when (eq ebib-notes-storage 'multiple-notes-per-file)
              (run-hooks hook)))
          (unless no-select
            (pop-to-buffer (car buf)))
