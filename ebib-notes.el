@@ -75,7 +75,8 @@ Ebib creates notes files based on the entry key using the options
 If this option is nil, the first directory in `ebib-file-search-dirs' is
 used.
 
-Note that this option is ignored if `ebib-notes-file' is set."
+Note that this option is ignored if `ebib-notes-storage' is set
+to `multiple-note-per-file'."
   :group 'ebib-notes
   :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
                  (directory :tag "Specify directory")))
@@ -107,8 +108,8 @@ Note that this file does not need to be listed in
 (defcustom ebib-notes-file-extension "org"
   "Extension used for notes files.
 The extension should be specified without a dot.  Note that this
-option is only used for multiple notes files, i.e., when
-`ebib-notes-file' is unset."
+option is only used if `ebib-notes-storage' is set to
+`one-file-per-note'."
   :group 'ebib-notes
   :type '(string :tag "Extension"))
 
