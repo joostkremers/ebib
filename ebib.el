@@ -688,7 +688,8 @@ loaded, switch to it.  If KEY is given, jump to it."
   ;; Initialize Ebib if required.
   (unless ebib--initialized
     (ebib-init)
-    (setq ebib--needs-update t))
+    (setq ebib--needs-update t)
+    (ebib-check-notes-config))
   ;; Set up the windows.
   (ebib--setup-windows)
   ;; See if we have a file.
@@ -830,6 +831,14 @@ the new buffer."
     (when db
       (ebib-db-set-buffer buffer db))
     buffer))
+
+(defun ebib-check-notes-config ()
+  "Check the user's notes configuration and adjust if necessary.
+If `ebib-notes-file' is set, `ebib-notes-locations' is set to
+`multiple-notes-per-file' and a warning is issued."
+  (when (and (bound-and-true-p ebib-notes-file))
+    (setq ebib-notes-storage 'multiple-notes-per-file)
+    (ebib--log 'warning "Ebib's handling of external notes has changed.  Please visit the manual and update your configuration.")))
 
 (defun ebib-force-quit ()
   "Force quit Ebib by call `ebib-quit'."
