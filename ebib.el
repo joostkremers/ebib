@@ -1504,9 +1504,9 @@ containing the entry.  If NO-SELECT is nil, select the note
 buffer (using `pop-to-buffer'), otherwise just return the buffer.
 NO-SELECT non-nil also inhibits the creation of a new note.
 
-If `ebib-notes-file' is set, this function runs
-`ebib-notes-open-note-after-hook' for an existing note or
-`ebib-notes-new-note-hook' for a new note."
+If `ebib-notes-storage' is set to `multiple-notes-per-file', this
+function runs `ebib-notes-open-note-after-hook' for an existing
+note or `ebib-notes-new-note-hook' for a new note."
   (interactive (list (ebib--get-key-at-point) current-prefix-arg))
   (ebib--execute-when
     (entries
