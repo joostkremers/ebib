@@ -241,18 +241,23 @@ string where point should be located."
 List all the files in `ebib-notes-locations' and all files in the
 directories in `ebib-notes-locations' that have the extension in
 `ebib-notes-file-extension'."
-  (if ebib-notes-locations
-      (cl-flet ((list-files (loc)
-                            (cond
-                             ((file-directory-p loc)
-                              (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
-                             ((string= (downcase (file-name-extension loc)) "org")
-                              (list loc)))))
-        (seq-reduce (lambda (lst loc)
-                      (append (list-files loc) lst))
-                    ebib-notes-locations (if ebib-notes-default-file
-                                             (list ebib-notes-default-file)
-                                           '())))))
+  (cond
+   ;; If `ebib-notes-locations' is nil, we don't need to do all this, but we
+   ;; still need to check `ebib-notes-default-file' (see below).
+   (ebib-notes-locations
+    (cl-flet ((list-files (loc)
+                          (cond
+                           ((file-directory-p loc)
+                            (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
+                           ((string= (downcase (file-name-extension loc)) "org")
+                            (list loc)))))
+      (seq-reduce (lambda (lst loc)
+                    (append (list-files loc) lst))
+                  ebib-notes-locations (if ebib-notes-default-file
+                                           (list ebib-notes-default-file)
+                                         '()))))
+   (ebib-notes-default-file
+    (list ebib-notes-default-file))))
 
 (defun ebib--notes-locate-note (key)
   "Locate the note identified by KEY in the current buffer.
