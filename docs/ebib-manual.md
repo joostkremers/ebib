@@ -9,147 +9,154 @@ is.
 
 # News
 
+## Version 2.30, February 2021
+
+-   Redesign handling of external notes. It is now possible to have
+    multiple files with multiple notes in them. This may mean you need
+    to redo your configuration, see [Upgrading from earlier Ebib
+    versions](#upgrading-from-earlier-ebib-versions) for details.
+
 ## Version 2.29, December 2020
 
-  - Add support for [selectrum](https://github.com/raxod502/selectrum).
+-   Add support for [selectrum](https://github.com/raxod502/selectrum).
 
 ## Version 2.28, October 2020
 
-  - Redesign keyword handling.
-  - New timestamp format. This new format is more in line with ISO 8601
+-   Redesign keyword handling.
+-   New timestamp format. This new format is more in line with ISO 8601
     and is sortable alphanumerically.
 
 ## Version 2.27, October 2020
 
-  - Add customisation options `ebib-multiline-fields` and
+-   Add customisation options `ebib-multiline-fields` and
     `ebib-fields-with-completion`.
-  - Remove customisation option
+-   Remove customisation option
     `ebib-edit-author/editor-without-completion` (use
     `ebib-fields-with-completion` instead).
-  - Remove customisation options `ebib-file-field`, `ebib-url-field` and
+-   Remove customisation options `ebib-file-field`, `ebib-url-field` and
     `ebib-doi-field`. There is no point in customising these fields,
     because `biblatex` expects these fields to contain their intended
     values.
 
 ## Version 2.26, September 2020
 
-  - Copy key, entry, reference or citation to the kill ring (and system
+-   Copy key, entry, reference or citation to the kill ring (and system
     clipboard), for easy pasting to other buffers or applications.
 
 ## Version 2.25, June 2020
 
-  - Allow adding the `.bib` file to Org mode links. The option
+-   Allow adding the `.bib` file to Org mode links. The option
     `org-ebib-link-type` determines which kinds of Org links are created
     when doing `org-add-link` in an Ebib index buffer.
 
 ## Version 2.24, June 2020
 
-  - Rename master/slave databases to main/dependent databases.
+-   Rename master/slave databases to main/dependent databases.
 
 ## Version 2.23, May 2020
 
-  - Allow specifying .bib files with a file-local variable (esp. for
+-   Allow specifying .bib files with a file-local variable (esp. for
     non-LaTeX files).
 
 ## Version 2.22, February 2020
 
-  - Improve prompting when inserting citations.
-  - Allow selecting multiple entries when inserting a citation in a text
+-   Improve prompting when inserting citations.
+-   Allow selecting multiple entries when inserting a citation in a text
     buffer.
-  - Automatically save a dependent database when an entry is added that
+-   Automatically save a dependent database when an entry is added that
     is being inserted into a text buffer.
 
 ## Version 2.21, December 2019
 
-  - New option `ebib-default-dir`: control the directory that Ebib uses
+-   New option `ebib-default-dir`: control the directory that Ebib uses
     as its default directory.
 
 ## Version 2.20, December 2019
 
-  - Display the contents of an external note when the current entry has
+-   Display the contents of an external note when the current entry has
     one. This behaviour can be customized with the option
     `ebib-notes-show-note-method`.
-  - Rename `ebib-notes-use-single-file` to `ebib-notes-file`.
+-   Rename `ebib-notes-use-single-file` to `ebib-notes-file`.
 
 ## Version 2.19, November 2019
 
-  - Add command `ebib-jump-to-entry` (bound to `j` in the index buffer):
+-   Add command `ebib-jump-to-entry` (bound to `j` in the index buffer):
     quickly jump to any entry in any database using completion.
-  - Allow a full URL in the `doi` field: when passing the DOI to a
+-   Allow a full URL in the `doi` field: when passing the DOI to a
     browser, `"https://dx.doi.org/"` is only added if the contents of
     the `doi` field does not start with `"http://"` `"https://"`.
 
 ## Version 2.17, June 2019
 
-  - Create dependent databases, i.e., databases that share their data
+-   Create dependent databases, i.e., databases that share their data
     with a main database but which are saved as separate `.bib` files.
-  - Use completion when editing certain fields, to make it easier to
+-   Use completion when editing certain fields, to make it easier to
     enter e.g., author or editor names consistently.
 
 ## Version 2.16, February 2019
 
-  - Add command `ebib-download-url`: download pdf from a site in the
+-   Add command `ebib-download-url`: download pdf from a site in the
     `url` field.
-  - Add command `ebib-import-file`: import local file into current
+-   Add command `ebib-import-file`: import local file into current
     database.
-  - Update the menus.
-  - Change display of the `file` field in the entry buffer and make file
+-   Update the menus.
+-   Change display of the `file` field in the entry buffer and make file
     names clickable.
-  - Bug fix: Do not look for alias fields in BibTeX databases. (Alias
+-   Bug fix: Do not look for alias fields in BibTeX databases. (Alias
     fields are only defined for `biblatex`).
-  - Bug fix: `ebib-yank-field-contents` can now be repeated.
+-   Bug fix: `ebib-yank-field-contents` can now be repeated.
 
 ## Version 2.15, January 2019
 
-  - Multiline field values can now be displayed in the entry buffer.
-  - Do not warn about aliased entry types when loading `biblatex` files.
-  - The abstract field is now treated as a multiline field by default,
+-   Multiline field values can now be displayed in the entry buffer.
+-   Do not warn about aliased entry types when loading `biblatex` files.
+-   The abstract field is now treated as a multiline field by default,
     similar to the annote/annotation field.
-  - Bug fix: `ebib-show-annotation` (bound to `A`) shows the contents of
+-   Bug fix: `ebib-show-annotation` (bound to `A`) shows the contents of
     the annote field in BibTeX databases, not the annotation field
     (which is `biblatex`-specific).
 
 ## Version 2.14, December 2018
 
-  - Change the user interface of the export functions. Calling one of
+-   Change the user interface of the export functions. Calling one of
     the export functions now exports to another database. The user is
     asked to specify the database, enabling completion on the database
     names. To export to a file, the export functions have to be called
     with a prefix argument.
-  - Bug fix: Handle overwriting the local BibTeX dialect correctly.
-  - Bug fix: Add braces to the crossref field.
+-   Bug fix: Handle overwriting the local BibTeX dialect correctly.
+-   Bug fix: Add braces to the crossref field.
 
 ## Version 2.13, November 2018
 
-  - Use a separate index buffer for each open `.bib` file. Filling the
+-   Use a separate index buffer for each open `.bib` file. Filling the
     index buffer can be slow for large `.bib` files, because of the need
     to calculate the tabulated columns.
 
 ## Version 2.12.3, November 2018
 
-  - Bug fix: when searching the database, only search visible entries.
+-   Bug fix: when searching the database, only search visible entries.
 
 ## Version 2.12.2, November 2018
 
-  - Bug fix: when editing the `crossref` field, offer keys from all
+-   Bug fix: when editing the `crossref` field, offer keys from all
     databases as completion targets, not just the current one.
 
 ## Version 2.12, August 2018
 
-  - Add an option to specify the default sort field and direction. It is
+-   Add an option to specify the default sort field and direction. It is
     no longer necessary to set the desired sort field as the first
     column in the index buffer, but Ebib still defaults to this if the
     default sort field and direction are not set explicitly.
 
 ## Version 2.11.12, July 2018
 
-  - Use `biblatex`’s `Date` field, if present, for displaying the year.
-  - Check for changed files on disk when saving all databases, not just
+-   Use `biblatex`’s `Date` field, if present, for displaying the year.
+-   Check for changed files on disk when saving all databases, not just
     when saving the current database.
-  - Improve handling of multiple databases: `crossref` entries can now
+-   Improve handling of multiple databases: `crossref` entries can now
     occur in other open databases as well, and searches with `/` can be
     continued in other databases.
-  - Autogenerating keys is now on by default.
+-   Autogenerating keys is now on by default.
 
 # Installation
 
@@ -277,9 +284,9 @@ Ebib’s customisation buffer, under the option “Preload Bib Files”
 
 Files listed in `ebib-preload-bib-files` that do not have a full path
 specification are searched for in the directories listed in the option
-“Bib Search Dirs” (`ebib-bib-search-dirs`). By default, this option
-only lists your home directory. Since this is most likely not where you
-keep your `.bib` files, it makes sense to customize this option.
+“Bib Search Dirs” (`ebib-bib-search-dirs`). By default, this option only
+lists your home directory. Since this is most likely not where you keep
+your `.bib` files, it makes sense to customize this option.
 
 ## Navigating a `.bib` File
 
@@ -635,7 +642,7 @@ without asking for confirmation.
 # `Biblatex` vs. BibTeX
 
 BibTeX has long been a core part of the TeX ecosystem, but it has not
-received any substantial update since 1988(\!) and it has next to no
+received any substantial update since 1988(!) and it has next to no
 support for languages other than English. Compared to BibTeX, `biblatex`
 has an expanded set of entry types allowing for more diverse types of
 references, a larger number of fields, and a much more sophisticated
@@ -669,7 +676,7 @@ dialect that Ebib gives to newly created `.bib` files and which it
 assumes for files that are not otherwise specified. If you wish to work
 with a file that is in a different dialect than what you set as the
 default, you can set the dialect for this particular file. To do this,
-load the file and then set the dialect through the menu option «Ebib |
+load the file and then set the dialect through the menu option «Ebib \|
 BibTeX Dialect» or with the command `M-x ebib-set-dialect`. You only
 need to do this once for a file, because the setting is saved in the
 `.bib` file in the local variable block. (If no local variable block
@@ -735,8 +742,8 @@ existing ones.
 
 You can use any `biblatex` (or BibTeX) field to define a column in the
 index buffer. There are a few column label that do not correspond
-directly to a field name, however. For example, the column label `"Entry
-Key"`, which displays the entry key, is not a `biblatex` field.
+directly to a field name, however. For example, the column label
+`"Entry Key"`, which displays the entry key, is not a `biblatex` field.
 Similarly, there is a column label `"Author/Editor"`, which displays the
 contents of the author field if it is not empty, and the contents of the
 editor field otherwise. Furthermore, the column label `"Year"` does not
@@ -794,8 +801,8 @@ If you want to look for a particular entry, the easiest way to do this
 is to use `j`. This command (`ebib-jump-to-entry`) asks for an entry
 key, offering completion while you type. Note that you can use this
 command to search for an entry in all open databases. If you want to
-restrict it to just the current database, use a prefix argument: `C-u
-j`.
+restrict it to just the current database, use a prefix argument:
+`C-u j`.
 
 If you use [selectrum](https://github.com/raxod502/selectrum),
 [ivy](https://github.com/abo-abo/swiper) or
@@ -855,12 +862,12 @@ of *filters*. A filter is basically a search expression that selects
 entries from the current database. When you apply a filter to a
 database, only the entries that match are shown. With filters, you can,
 for example, select all entries from a database that contain the string
-“Jones” in their `author` field. A filter can be as complex as you
-want: you can select all entries that do *not* contain “Jones” in the
-`author` field, or all entries that contain “Jones” in either the
-`author` or the `editor` field, or all entries that contain “Jones” in
-the `author` field, and “symbiotic hibernation” in the `keyword` field,
-etc. Basically, the filter can consist of an arbitary number of search
+“Jones” in their `author` field. A filter can be as complex as you want:
+you can select all entries that do *not* contain “Jones” in the `author`
+field, or all entries that contain “Jones” in either the `author` or the
+`editor` field, or all entries that contain “Jones” in the `author`
+field, and “symbiotic hibernation” in the `keyword` field, etc.
+Basically, the filter can consist of an arbitary number of search
 criteria combined with the logical operators `and`, `or` and `not`.
 
 ### Simple Selection
@@ -1008,8 +1015,8 @@ rename a filter, you can do so with `F R`.
 
 Note that cancelling a filter with `F c` does not delete it from the
 list of stored filters, it will remain available for later application.
-If you want to delete a filter from the list of stored filters, use `F
-d`. You can also delete all stored filters with `F D`. These deletion
+If you want to delete a filter from the list of stored filters, use
+`F d`. You can also delete all stored filters with `F D`. These deletion
 commands do not ask for confirmation, but if you delete any filters by
 accident, you can reload them from `~/.emacs.d/ebib-filters` with `F l`.
 
@@ -1108,18 +1115,18 @@ from view. For that, you need to reapply the filter with `F r`.
 
 It is also possible to mark entries. Marked entries stay marked when you
 cancel the filter, so in order to do something with all the entries
-matching a filter, you can mark them all in the filter view with `C-u
-m`, then cancel the filter and perform an action on them.
+matching a filter, you can mark them all in the filter view with
+`C-u m`, then cancel the filter and perform an action on them.
 
 If a database has an active filter, the save command is disabled,
 because it would not be clear whether you want to save the entire
 database or just the filtered entries. If you want to save only the
 filtered entries to a file, you can use the command `w` (or the menu
-option “Database | Save As”). This also saves the `@String`, `@Preamble`
-and `@comments`, as well as any file-local variables, so you will have a
-self-contained `.bib` file with only the filtered entries. In order to
-save the entire database, you need to cancel the filter. (After saving,
-you can reapply the filter with `F L`, of course.)
+option “Database \| Save As”). This also saves the `@String`,
+`@Preamble` and `@comments`, as well as any file-local variables, so you
+will have a self-contained `.bib` file with only the filtered entries.
+In order to save the entire database, you need to cancel the filter.
+(After saving, you can reapply the filter with `F L`, of course.)
 
 One final note: of all the filter-related commands, `~`, `F c`, `F r`,
 `F s` and `F v` are only available when a filter is active. The other
@@ -1226,19 +1233,22 @@ though). The format string can contain a few directives, which are used
 to add the citation key and any optional arguments. The following
 directives are recognised:
 
-  - `%K`  
-    the entry key to be inserted.
-  - `%A`  
-    an argument, for which the user is prompted.
-  - `%<...%>`  
-    optional material surrounding a `%A` directive.
-  - `%(...%<sep>)`  
-    a so-called *repeater*, which contains material that can be
-    repeated. If present, the repeater must contain the entry key
-    directive `%K`.
-  - `%D`  
-    a description, for which the user is prompted. Mainly for use in Org
-    citations.
+`%K`  
+the entry key to be inserted.
+
+`%A`  
+an argument, for which the user is prompted.
+
+`%<...%>`  
+optional material surrounding a `%A` directive.
+
+`%(...%<sep>)`  
+a so-called *repeater*, which contains material that can be repeated. If
+present, the repeater must contain the entry key directive `%K`.
+
+`%D`  
+a description, for which the user is prompted. Mainly for use in Org
+citations.
 
 In the simplest case, the format string contains just a `%K` directive:
 {% raw %} `\cite{%K}`. {% endraw %} In this case, `%K` is replaced with
@@ -1432,8 +1442,8 @@ Ebib offers several ways to copy an entry to the kill ring (and the
 system clipboard), which you can then insert into another buffer or
 another application. You can copy the entry key (`C k`), the entire
 BibTeX entry (`C e`), a full reference as would appear in a list of
-references (`C r`) or a citation, by default of the Author-Year type (`C
-c`).
+references (`C r`) or a citation, by default of the Author-Year type
+(`C c`).
 
 The functions that copy a reference or citation make use of templates
 that specify how such a reference/citation should be formatted. These
@@ -1670,7 +1680,7 @@ buffer. From there you can run LaTeX and view the result.
 Before doing all this, Ebib asks you which file to write to. Be careful
 with this: since this is supposed to be a temporary file, Ebib simply
 assumes that if you provide a filename of an existing file, it can
-overwrite that file without warning\!
+overwrite that file without warning!
 
 A better way to tell Ebib which file to use is to set the option “Print
 Tempfile” in Ebib’s customisation buffer to some temporary file. When
@@ -1843,90 +1853,127 @@ if you prefer to keep notes outside the `.bib` file, there is an easy
 way to do that as well. When you hit `N` on an entry in the index
 buffer, Ebib creates a note for the entry, which is saved in a separate
 file. If an entry already has a note associated with it, `N` opens it.
-The mode line of the entry buffer indicates whether an entry has a note
-associated with it by displaying the string `[N]` (customisable with
-`ebib-notes-symbol`). By default, each note is saved to its own file,
-but you can also use a single file to store all notes.
+In the entry buffer, the first few lines of the note are shown under
+`external note`. This is not an actual field in the `.bib` file, even
+though it is displayed as such. (You can customise this behaviour.)
 
-## Separate notes files
+Notes are created as Org files. Even though it is possible to change
+this, it requires quite a bit of configuration, so it’s recommended to
+just stick to Org.
 
-If you wish to use separate files for each note, you need to configure
-the directory in which to store them by setting the option
-`ebib-notes-directory`. If this is not set, Ebib uses the first
-directory in `ebib-file-search-dirs`, (which defaults to the user’s home
-directory).
+Note that with Ebib version 2.30, the functionality for notes files has
+changed and it may be necessary to update your configuration. See
+[Upgrading from earlier Ebib
+versions](#upgrading-from-earlier-ebib-versions) below for details.
 
-The name of a notes file is formed by taking the entry’s key and
-appending the extension `.org` to it, which means that a notes file is
-(by default) an Org file. Before creating the file name, Ebib applies
-the function in `ebib-notes-name-transform-function` to it, or, if this
-is not set, the function in `ebib-name-transform-function`. See [Viewing
-Files](#viewing-and-importing-files) for some examples of the changes
-that can be applied. Note that if you do not wish to apply any changes
-but also do not want the function in `ebib-name-transform-function` to
-be applied, you can set `ebib-notes-name-transform-function` to
-`identity`.
+## Configuring files for storing notes
 
-When a new note is created, it is given a title (an Org headline)
-consisting of the author(s), year and title of the entry. Ebib also
-includes a `:PROPERTIES:` block containing a custom ID for the entry,
-which consists of the entry key. This initial contents is based on a
-template, which can be customised.
+By default, Ebib saves each note to a separate file in the first
+directory listed in `ebib-file-search-dirs`. Since this is also the main
+directory for your `.bib` files, it is advisable to use a different
+directory, which you can do by customising the option
+`ebib-notes-directory`.
 
-As mentioned, notes files are Org files by default. This can be changed
-by customising the option `ebib-notes-file-extension`. If you change
-this option, it makes sense to change `ebib-notes-template` as well,
-since the template is an Org template. How to customise the template is
-discussed below.
+Instead of using a separate file for each note, you can also store
+multiple notes in a notes file. To do this, you need to configure the
+option `ebib-notes-storage` and set it to `multiple-notes-per-file`.
+Having done this, you can add the files you wish to use for notes to
+`ebib-notes-locations`. You can also add directories to this list: all
+Org files in those directories are considered notes files. (This does
+not mean that they *must* contain notes. Ebib searches all Org files in
+`ebib-notes-locations` for notes, but it won’t complain if it doesn’t
+find any, or if any of the files contain more than just notes.)
 
-## One single notes file
+The procedure for creating a new note depends on the setting of
+`ebib-notes-storage`. If this option is set to `one-note-per-file` (the
+default), Ebib creates a new note file in `ebib-notes-directory` and
+gives it a name that consists of the entry key plus the extension
+“.org”. Before creating the file name, however, Ebib applies the
+function in `ebib-notes-name-transform-function` to it, or, if this is
+not set, the function in `ebib-name-transform-function`. This means that
+you can configure the name of the new note file to whatever you prefer.
+(See [Viewing Files](#viewing-and-importing-files) for some examples of
+the changes that can be applied. Note that if you do not wish to apply
+any changes but also do not want the function in
+`ebib-name-transform-function` to be applied, you can set
+`ebib-notes-name-transform-function` to `identity`.)
 
-If you wish to store all notes in a single file, you must set the option
-`ebib-notes-file` to the notes file. In this case, the options
-`ebib-notes-directory` and `ebib-notes-extension` are ignored, which
-means that you must specify the full path and the extension of the notes
-file. The option `ebib-notes-name-transform-function` is also ignored.
+If `ebib-notes-storage` is set to `multiple-notes-per-files`, Ebib won’t
+create a new file when you create a new note. Instead, it will ask you
+for the file to save the note to and offer the files in
+`ebib-notes-locations` as candidates. If you don’t want to be asked, you
+can set the option `ebib-notes-default-file`: new notes are then
+automatically stored to that file. You can subsequently use Org to move
+notes around or archive them.
 
-Ebib assumes that the notes file is an Org file and creates notes using
-the template in `ebib-notes-template`, but the Org format is not
-enforced. If you specify a notes file with an extension different from
-`.org`, the corresponding format will be used, which requires
-customising the template. How to do this is discussed below.
+New notes are created based on a template (`ebib-note-nemplate`). By
+default, the note is a top-level item with an Org headline consisting of
+the author(s), year and title of the entry. The entry also has a
+`:PROPERTIES:` block containing a custom ID for the entry, which
+consists of the entry key. If `ebib-notes-storage` is set to
+`multiple-notes-per-fil`, this custom ID is essential, because it is
+what Ebib uses to find the note. (If you use `one-file-per-note`, the
+file name is used to identify an entry, even though the custom ID is
+still included.)
 
-There are three hooks that can be used to change the way the notes file
-is displayed when a note is opened. When an existing note is displayed,
-the hook `ebib-notes-open-note-after-hook` is run. By default, this
-contains two functions: `org-back-to-header`, which puts point at the
-start of the note, and `org-narrow-to-subtree`, which narrows the notes
-buffer to just the note you’re viewing.
+The template can of course be customised. Details are discussed below.
+
+## Hooks
+
+If `ebib-notes-storage` is set to `multiple-notes-per-file`, Ebib uses
+three hooks to control the way a note is displayed. By default, when you
+jump to a note from Ebib, the Org file is narrowed to the subtree
+containing the note and point is positioned at the note’s heading.
+
+When an existing note is displayed, the hook
+`ebib-notes-open-note-after-hook` is run. By default, this contains two
+functions: `org-back-to-header`, which puts point at the start of the
+note, and `org-narrow-to-subtree`, which narrows the notes buffer to
+just the note you’re viewing.
 
 When a new note is created, the hook `ebib-notes-new-note-hook` is run.
-By default, this contains the function `org-narrow-to-subtree`. For a
-new note, the cursor is positioned after the title and the
-`:PROPERTIES:` block, so that you can start typing right away.
+By default, this contains the function `org-narrow-to-subtree`. Point is
+not positioned at the heading, but after the title and the
+`:PROPERTIES:` block, so that you can start typing right away. (The
+position of point can be customised in the template.)
 
-Because both these hooks narrow the notes buffer, there must be a way to
-widen the buffer again when searching for another note. This is the
-purpose of `ebib-notes-search-note-before-hook`. This hook is run every
-time Ebib searches a note (to see if it exists or to open it) and by
-default contains the function `widen`, so that the entire buffer is
-searched.
+Because both these hooks narrow the notes buffer, the buffer must be
+widened again when searching for another note. This is handled by the
+hook `ebib-notes-search-note-before-hook`, which is run every time Ebib
+searches a note and by default contains the function `widen`, so that
+the entire buffer is searched.
 
 All three hooks are customisable. For example, if you prefer not to
 narrow the buffer, simply remove the corresponding functions from the
 hooks.
 
+## Upgrading from earlier Ebib versions
+
+Ebib 2.30 added the option to have more than one file with multiple
+notes. This unfortunately required some changes to the customisation
+options, which means that you may need to revisit your configuration.
+
+If you have been using one file per note, there is nothing you need to
+do. This is now the default method and the user option
+`ebib-notes-directory` has not changed.
+
+If, however, you have been storing your notes in a single file, you will
+need to set the user option `ebib-notes-storage` to
+`multiple-note-per-file`. Furthermore, the option `ebib-notes-file` has
+been deprecated in favour of `ebib-notes-default-file`. Although
+`ebib-notes-file` is still an alias for the new option, it is a good
+idea to update your configuration. You may also want to check out the
+new option `ebib-notes-locations`, which allows you to have more than
+one Org file for your notes.
+
 ## Customising the notes file format
 
-If you do not want to use Org mode to write your notes files, you can do
-so, but several things have to be configured. Firstly, you will need to
-customise the template that is used to create a new note. By default,
-this template creates an Org entry whose header consists of the author
-or editor, the year of publication and the title. The entry has a
-`:PROPERTIES:` block containing a `Custom_id:`.
-
-To see how the template can be customised, it is easiest to look at the
-default template first:
+When creating a new note, the default template creates an Org entry
+whose header consists of the author or editor, the year of publication
+and the title. The entry has a `:PROPERTIES:` block containing a
+`Custom_id:`. This can all be customised (although it is important to
+keep the `Custom_id:` property.) To see how this can be done, it is
+easiest to look at the default template first:
 
     "* %T
     :PROPERTIES:
@@ -1943,24 +1990,19 @@ editor), the year of publication and the title of the bibliography
 entry. The template also contains the string `">|<"`, which indicates
 the position of the cursor when a new note is created.
 
-It is possible to change the template by customising the option
+To change the template, you must customise the option
 `ebib-notes-template`. If you use Org for your notes and keep your notes
 in a single file, the template **must** contain a `:PROPERTIES:` block
 with the `%K` format specifier, because it is required in order to
 identify the note and connect it to its BibTeX entry. Without it, Ebib
-won’t be able to tell whether an entry has a note or not.
+won’t be able to tell whether an entry has a note or not and won’t be
+able to display it.
 
 If you use a separate file for each note, the notes are identified by
 the file name, so there’s no real need for the `:PROPERTIES:` block, but
 it can still be useful if you use other Org-based tools on your note
-files.
-
-If you do not wish to use Org mode for your notes, it is easiest to use
-separate note files, but as long as you have a `%K` directive in your
-template (and an appropriately defined function for it, see
-`ebib-notes-template-specifiers` below), it should still be possible to
-use a single notes file. (Emphasis on *should*, however, because this
-has not been tested.)
+files (or if you ever want to collect your notes into a single file but
+keep them available for Ebib.)
 
 There are a few more specifiers that may be used in the template: `%F`
 creates an Org link to the file in the BibTeX entry’s `file` field, `%D`
@@ -1986,11 +2028,21 @@ value of a specific field in the entry:
 
     (ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
 
-where `<field>` is the field (as a string) whose value is to be
-retrieved.
+where `<field>` is the field as a (case-insensitive) string whose value
+is to be retrieved.
 
 Instead of a function, you may also provide a variable. The variable’s
 value is then used to replace the specifier.
+
+Because the template can be customised and the major mode is determined
+from the file extension, it is in principle possible to use another
+format than Org for notes. In this case, it is easier to use separate
+note files, but as long as you have a `%K` directive in your template
+(and an appropriately defined function for it, see
+`ebib-notes-template-specifiers` below), it should still be possible to
+use a single notes file. (Emphasis on *should*, however, because this
+has not been tested.) You will also need to customise the three hooks
+discussed above in this case.
 
 ## Displaying notes
 
@@ -2001,14 +2053,14 @@ which defaults to 10. If you prefer, you can also have the entire note
 shown, not just the first few lines, by customising the option
 `ebib-notes-show-note-method`. The note is then shown in a separate
 buffer that is displayed when an entry has a note. This setting is only
-really convenient if you use a single notes file, because the buffer is
-not closed after displaying the note. If you use separate files for each
-note, you’ll end up with a lot of open buffers. (Showing only the first
-few lines in the entry buffer does not have this limitation, as it just
-reads the text of the note from the file, it does not visit the file in
-a buffer.)
+really convenient if you use a multiple notes per file, because the
+buffer is not closed after displaying the note. If you use a separate
+file for each note, you’ll end up with a lot of open buffers. (Showing
+only the first few lines in the entry buffer does not have this
+limitation, as it just reads the text of the note from the file, it does
+not visit the file in a buffer.)
 
-Note also displaying the note inline in the entry buffer is only
+Note also that displaying the note inline in the entry buffer is only
 possible with Org files, so your notes must use Org mode for it to work.
 Showing the entire note in a separate buffer can be done with any
 format, but only works if you use Ebib’s default window layout (see the
@@ -2258,10 +2310,10 @@ completion to complete a partial string.
 If Ebib finds a `@Comment` in a `.bib` file, it will read it and store
 it in the database. When the database is saved, all the `@Comment`s will
 be saved with it, at the top of the file, immediately after the
-`@Preamble` (with the exception of a `@Comment` surrounding a `Local
-Variables:` block, which is saved at the end of the file). There is no
-way to edit comments, nor can you specify where in the `.bib` file a
-comment is placed, but they won’t be lost.
+`@Preamble` (with the exception of a `@Comment` surrounding a
+`Local Variables:` block, which is saved at the end of the file). There
+is no way to edit comments, nor can you specify where in the `.bib` file
+a comment is placed, but they won’t be lost.
 
 # Managing Keywords
 
@@ -2407,11 +2459,11 @@ unique key.
 Another way to add entries to a database is to import them from an Emacs
 buffer. If, for example, you find ready-formatted BibTeX entries in a
 text file or on the internet, you can copy & paste them to any Emacs
-buffer (e.g. the `*scratch*` buffer), and then execute the command `M-x
-ebib-import`. Ebib then goes through the buffer and loads all BibTeX
-entries it finds into the current database (i.e. the database that was
-active when you lowered Ebib). If you call `ebib-import` while the
-region is active, Ebib only reads the BibTeX entries in the region.
+buffer (e.g. the `*scratch*` buffer), and then execute the command
+`M-x ebib-import`. Ebib then goes through the buffer and loads all
+BibTeX entries it finds into the current database (i.e. the database
+that was active when you lowered Ebib). If you call `ebib-import` while
+the region is active, Ebib only reads the BibTeX entries in the region.
 
 If a BibTeX entry in the buffer lacks an entry key (which sometimes
 happens with BibTeX entries found on the internet), Ebib will generate a
@@ -2519,7 +2571,7 @@ multiline edit buffer.
 `ebib-quit-multiline-buffer-and-save`, bound to `C-c | q`, leaves the
 multiline edit buffer and stores the text in the database. If you invoke
 this command when you’ve deleted all contents of the buffer (including
-the final newline\!) and you were editing a field value or the
+the final newline!) and you were editing a field value or the
 `@Preamble`, the field value or preamble is deleted. (This is in fact
 the *only* way to delete the `@Preamble` definition. Field values on the
 other hand can also be deleted by hitting `k` or `d` on them in the
@@ -2593,7 +2645,7 @@ five subgroups: `ebib-faces`, `ebib-filters`, `ebib-notes`, and
 where options for Ebib’s window management can be set. All options are
 documented in the customisation buffers. You can go to Ebib’s
 customisation buffer with `M-x customize-group RET ebib RET`, or by
-using the menu «Ebib | Options | Customize Ebib».
+using the menu «Ebib \| Options \| Customize Ebib».
 
 ## Modifying Key Bindings
 

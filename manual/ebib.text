@@ -8,6 +8,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 # News #
 
+## Version 2.30, February 2021##
+
+- Redesign handling of external notes. It is now possible to have multiple files with multiple notes in them. This may mean you need to redo your configuration, see [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) for details.
+
 ## Version 2.29, December 2020 ##
 
 - Add support for [selectrum](https://github.com/raxod502/selectrum).
@@ -794,40 +798,53 @@ The first directory in the option "File Search Dirs" is used as the starting dir
 
 # Notes files #
 
-Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it. The mode line of the entry buffer indicates whether an entry has a note associated with it by displaying the string `[N]` (customisable with `ebib-notes-symbol`). By default, each note is saved to its own file, but you can also use a single file to store all notes. 
+Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it. In the entry buffer, the first few lines of the note are shown under `external note`. This is not an actual field in the `.bib` file, even though it is displayed as such. (You can customise this behaviour.)
+
+Notes are created as Org files. Even though it is possible to change this, it requires quite a bit of configuration, so it's recommended to just stick to Org.
+
+Note that with Ebib version 2.30, the functionality for notes files has changed and it may be necessary to update your configuration. See [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) below for details.
 
 
-## Separate notes files ##
+## Configuring files for storing notes ##
 
-If you wish to use separate files for each note, you need to configure the directory in which to store them by setting the option `ebib-notes-directory`. If this is not set, Ebib uses the first directory in `ebib-file-search-dirs`, (which defaults to the user's home directory).
+By default, Ebib saves each note to a separate file in the first directory listed in `ebib-file-search-dirs`. Since this is also the main directory for your `.bib` files, it is advisable to use a different directory, which you can do by customising the option `ebib-notes-directory`.
 
-The name of a notes file is formed by taking the entry's key and appending the extension `.org` to it, which means that a notes file is (by default) an Org file. Before creating the file name, Ebib applies the function in `ebib-notes-name-transform-function` to it, or, if this is not set, the function in `ebib-name-transform-function`. See [Viewing Files](#viewing-and-importing-files) for some examples of the changes that can be applied. Note that if you do not wish to apply any changes but also do not want the function in `ebib-name-transform-function` to be applied, you can set `ebib-notes-name-transform-function` to `identity`.
+Instead of using a separate file for each note, you can also store multiple notes in a notes file. To do this, you need to configure the option `ebib-notes-storage` and set it to `multiple-notes-per-file`. Having done this, you can add the files you wish to use for notes to `ebib-notes-locations`. You can also add directories to this list: all Org files in those directories are considered notes files. (This does not mean that they *must* contain notes. Ebib searches all Org files in `ebib-notes-locations` for notes, but it won't complain if it doesn't find any, or if any of the files contain more than just notes.)
 
-When a new note is created, it is given a title (an Org headline) consisting of the author(s), year and title of the entry. Ebib also includes a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. This initial contents is based on a template, which can be customised.
+The procedure for creating a new note depends on the setting of `ebib-notes-storage`. If this option is set to `one-note-per-file` (the default), Ebib creates a new note file in `ebib-notes-directory` and gives it a name that consists of the entry key plus the extension ".org". Before creating the file name, however, Ebib applies the function in `ebib-notes-name-transform-function` to it, or, if this is not set, the function in `ebib-name-transform-function`. This means that you can configure the name of the new note file to whatever you prefer. (See [Viewing Files](#viewing-and-importing-files) for some examples of the changes that can be applied. Note that if you do not wish to apply any changes but also do not want the function in `ebib-name-transform-function` to be applied, you can set `ebib-notes-name-transform-function` to `identity`.)
 
-As mentioned, notes files are Org files by default. This can be changed by customising the option `ebib-notes-file-extension`. If you change this option, it makes sense to change `ebib-notes-template` as well, since the template is an Org template. How to customise the template is discussed below.
+If `ebib-notes-storage` is set to `multiple-notes-per-files`, Ebib won't create a new file when you create a new note. Instead, it will ask you for the file to save the note to and offer the files in `ebib-notes-locations` as candidates. If you don't want to be asked, you can set the option `ebib-notes-default-file`: new notes are then automatically stored to that file. You can subsequently use Org to move notes around or archive them.
+
+New notes are created based on a template (`ebib-note-nemplate`). By default, the note is a top-level item with an Org headline consisting of the author(s), year and title of the entry. The entry also has a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. If `ebib-notes-storage` is set to `multiple-notes-per-fil`, this custom ID is essential, because it is what Ebib uses to find the note. (If you use `one-file-per-note`, the file name is used to identify an entry, even though the custom ID is still included.)
+
+The template can of course be customised. Details are discussed below.
 
 
-## One single notes file ##
+## Hooks ##
 
-If you wish to store all notes in a single file, you must set the option `ebib-notes-file` to the notes file. In this case, the options `ebib-notes-directory` and `ebib-notes-extension` are ignored, which means that you must specify the full path and the extension of the notes file. The option `ebib-notes-name-transform-function` is also ignored.
+If `ebib-notes-storage` is set to `multiple-notes-per-file`, Ebib uses three hooks to control the way a note is displayed. By default, when you jump to a note from Ebib, the Org file is narrowed to the subtree containing the note and point is positioned at the note's heading.
 
-Ebib assumes that the notes file is an Org file and creates notes using the template in `ebib-notes-template`, but the Org format is not enforced. If you specify a notes file with an extension different from `.org`, the corresponding format will be used, which requires customising the template. How to do this is discussed below.
+When an existing note is displayed, the hook `ebib-notes-open-note-after-hook` is run. By default, this contains two functions: `org-back-to-header`, which puts point at the start of the note, and `org-narrow-to-subtree`, which narrows the notes buffer to just the note you're viewing.
 
-There are three hooks that can be used to change the way the notes file is displayed when a note is opened. When an existing note is displayed, the hook `ebib-notes-open-note-after-hook` is run. By default, this contains two functions: `org-back-to-header`, which puts point at the start of the note, and `org-narrow-to-subtree`, which narrows the notes buffer to just the note you're viewing.
+When a new note is created, the hook `ebib-notes-new-note-hook` is run. By default, this contains the function `org-narrow-to-subtree`. Point is not positioned at the heading, but after the title and the `:PROPERTIES:` block, so that you can start typing right away. (The position of point can be customised in the template.)
 
-When a new note is created, the hook `ebib-notes-new-note-hook` is run. By default, this contains the function `org-narrow-to-subtree`. For a new note, the cursor is positioned after the title and the `:PROPERTIES:` block, so that you can start typing right away.
-
-Because both these hooks narrow the notes buffer, there must be a way to widen the buffer again when searching for another note. This is the purpose of `ebib-notes-search-note-before-hook`. This hook is run every time Ebib searches a note (to see if it exists or to open it) and by default contains the function `widen`, so that the entire buffer is searched.
+Because both these hooks narrow the notes buffer, the buffer must be widened again when searching for another note. This is handled by the hook `ebib-notes-search-note-before-hook`, which is run every time Ebib searches a note and by default contains the function `widen`, so that the entire buffer is searched.
 
 All three hooks are customisable. For example, if you prefer not to narrow the buffer, simply remove the corresponding functions from the hooks.
 
 
+## Upgrading from earlier Ebib versions ##
+
+Ebib 2.30 added the option to have more than one file with multiple notes. This unfortunately required some changes to the customisation options, which means that you may need to revisit your configuration.
+
+If you have been using one file per note, there is nothing you need to do. This is now the default method and the user option  `ebib-notes-directory` has not changed.
+
+If, however, you have been storing your notes in a single file, you will need to set the user option `ebib-notes-storage` to `multiple-note-per-file`. Furthermore, the option `ebib-notes-file` has been deprecated in favour of `ebib-notes-default-file`. Although `ebib-notes-file` is still an alias for the new option, it is a good idea to update your configuration. You may also want to check out the new option `ebib-notes-locations`, which allows you to have more than one Org file for your notes.
+
+
 ## Customising the notes file format ##
 
-If you do not want to use Org mode to write your notes files, you can do so, but several things have to be configured. Firstly, you will need to customise the template that is used to create a new note. By default, this template creates an Org entry whose header consists of the author or editor, the year of publication and the title. The entry has a `:PROPERTIES:` block containing a `Custom_id:`. 
-
-To see how the template can be customised, it is easiest to look at the default template first:
+When creating a new note, the default template creates an Org entry whose header consists of the author or editor, the year of publication and the title. The entry has a `:PROPERTIES:` block containing a `Custom_id:`. This can all be customised (although it is important to keep the `Custom_id:` property.) To see how this can be done, it is easiest to look at the default template first:
 
 ```
 "* %T
@@ -840,11 +857,9 @@ To see how the template can be customised, it is easiest to look at the default 
 
 This template contains two format specifiers: `%K` and `%T`. `%K` is replaced with the key of the entry prepended with the string `"Custom_id: "` in order to create an Org property. The `%T` specifier is replaced with the title of the note, which consists of the author (or editor), the year of publication and the title of the bibliography entry. The template also contains the string `">|<"`, which indicates the position of the cursor when a new note is created.
 
-It is possible to change the template by customising the option `ebib-notes-template`. If you use Org for your notes and keep your notes in a single file, the template **must** contain a `:PROPERTIES:` block with the `%K` format specifier, because it is required in order to identify the note and connect it to its BibTeX entry. Without it, Ebib won't be able to tell whether an entry has a note or not.
+To change the template, you must customise the option `ebib-notes-template`. If you use Org for your notes and keep your notes in a single file, the template **must** contain a `:PROPERTIES:` block with the `%K` format specifier, because it is required in order to identify the note and connect it to its BibTeX entry. Without it, Ebib won't be able to tell whether an entry has a note or not and won't be able to display it.
 
-If you use a separate file for each note, the notes are identified by the file name, so there's no real need for the `:PROPERTIES:` block, but it can still be useful if you use other Org-based tools on your note files.
-
-If you do not wish to use Org mode for your notes, it is easiest to use separate note files, but as long as you have a `%K` directive in your template (and an appropriately defined function for it, see `ebib-notes-template-specifiers` below), it should still be possible to use a single notes file. (Emphasis on *should*, however, because this has not been tested.)
+If you use a separate file for each note, the notes are identified by the file name, so there's no real need for the `:PROPERTIES:` block, but it can still be useful if you use other Org-based tools on your note files (or if you ever want to collect your notes into a single file but keep them available for Ebib.)
 
 There are a few more specifiers that may be used in the template: `%F` creates an Org link to the file in the BibTeX entry's `file` field, `%D` creates an Org link to the DOI in the entry's `doi` field, and `%U` an Org link to the entry's `url` field. There is also a `%L` specifier, which creates an Org link to the entry's file, its DOI, or its URL, whichever is found first.
 
@@ -856,16 +871,18 @@ When the specifier functions are called, the `key` argument is set to the key of
 (ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
 ```
 
-where `<field>` is the field (as a string) whose value is to be retrieved.
+where `<field>` is the field as a (case-insensitive) string whose value is to be retrieved.
 
 Instead of a function, you may also provide a variable. The variable's value is then used to replace the specifier.
+
+Because the template can be customised and the major mode is determined from the file extension, it is in principle possible to use another format than Org for notes. In this case, it is easier to use separate note files, but as long as you have a `%K` directive in your template (and an appropriately defined function for it, see `ebib-notes-template-specifiers` below), it should still be possible to use a single notes file. (Emphasis on *should*, however, because this has not been tested.) You will also need to customise the three hooks discussed above in this case.
 
 
 ## Displaying notes ##
 
-If an entry has an external note, the first few lines are shown in the entry buffer as a field called `external note`. The number of lines to show can be customised with the option `ebib-notes-display-max-lines`, which defaults to 10. If you prefer, you can also have the entire note shown, not just the first few lines, by customising the option `ebib-notes-show-note-method`. The note is then shown in a separate buffer that is displayed when an entry has a note. This setting is only really convenient if you use a single notes file, because the buffer is not closed after displaying the note. If you use separate files for each note, you'll end up with a lot of open buffers. (Showing only the first few lines in the entry buffer does not have this limitation, as it just reads the text of the note from the file, it does not visit the file in a buffer.)
+If an entry has an external note, the first few lines are shown in the entry buffer as a field called `external note`. The number of lines to show can be customised with the option `ebib-notes-display-max-lines`, which defaults to 10. If you prefer, you can also have the entire note shown, not just the first few lines, by customising the option `ebib-notes-show-note-method`. The note is then shown in a separate buffer that is displayed when an entry has a note. This setting is only really convenient if you use a multiple notes per file, because the buffer is not closed after displaying the note. If you use a separate file for each note, you'll end up with a lot of open buffers. (Showing only the first few lines in the entry buffer does not have this limitation, as it just reads the text of the note from the file, it does not visit the file in a buffer.)
 
-Note also displaying the note inline in the entry buffer is only possible with Org files, so your notes must use Org mode for it to work. Showing the entire note in a separate buffer can be done with any format, but only works if you use Ebib's default window layout (see the section [Window Management](#window-management) for details), because that is the only window layout that ensures that the note can be displayed without getting in the way.
+Note also that displaying the note inline in the entry buffer is only possible with Org files, so your notes must use Org mode for it to work. Showing the entire note in a separate buffer can be done with any format, but only works if you use Ebib's default window layout (see the section [Window Management](#window-management) for details), because that is the only window layout that ensures that the note can be displayed without getting in the way.
 
 
 # Managing a reading list #
