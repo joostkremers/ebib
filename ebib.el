@@ -311,7 +311,7 @@ The return value is a list of strings, each a separate line,
 which can be passed to `ebib--display-multiline-field'."
   (with-temp-buffer
     (cond
-     ((eq ebib-notes-storage 'multiple-note-per-file)
+     ((eq ebib-notes-storage 'multiple-notes-per-file)
       (let* ((location (ebib--notes-goto-note key))
              (buffer (car location))
              (position (cdr location))
