@@ -76,7 +76,7 @@ If this option is nil, the first directory in `ebib-file-search-dirs' is
 used.
 
 Note that this option is ignored if `ebib-notes-storage' is set
-to `multiple-note-per-file'."
+to `multiple-notes-per-file'."
   :group 'ebib-notes
   :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
                  (directory :tag "Specify directory")))
