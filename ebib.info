@@ -2365,8 +2365,8 @@ do.  This is now the default method and the user option
 
 If, however, you have been storing your notes in a single file, you will
 need to set the user option ‘ebib-notes-storage’ to
-‘multiple-note-per-file’.  Furthermore, the option ‘ebib-notes-file’ has
-been deprecated in favour of ‘ebib-notes-default-file’.  Although
+‘multiple-notes-per-file’.  Furthermore, the option ‘ebib-notes-file’
+has been deprecated in favour of ‘ebib-notes-default-file’.  Although
 ‘ebib-notes-file’ is still an alias for the new option, it is a good
 idea to update your configuration.  You may also want to check out the
 new option ‘ebib-notes-locations’, which allows you to have more than
@@ -3307,42 +3307,42 @@ Node: Hooks112712
 Ref: #hooks112875
 Node: Upgrading from earlier Ebib versions114276
 Ref: #upgrading-from-earlier-ebib-versions114499
-Node: Customising the notes file format115408
-Ref: #customising-the-notes-file-format115636
-Node: Displaying notes119473
-Ref: #displaying-notes119622
-Node: Managing a reading list120971
-Ref: #managing-a-reading-list121133
-Node: Window Management124148
-Ref: #window-management124307
-Node: Creating Entry Stubs127466
-Ref: #creating-entry-stubs127628
-Node: @Preamble Definition128626
-Ref: #preamble-definition128790
-Node: @String Definitions130762
-Ref: #string-definitions130913
-Node: @Comments134406
-Ref: #comments134534
-Node: Managing Keywords135027
-Ref: #managing-keywords135172
-Node: Using a Canonical Keywords List136779
-Ref: #using-a-canonical-keywords-list136937
-Node: Sorting the bib File139095
-Ref: #sorting-the-.bib-file139268
-Node: Merging and Importing142387
-Ref: #merging-and-importing142552
-Node: Exporting Entries144322
-Ref: #exporting-entries144484
-Node: Multiple Identical Fields146000
-Ref: #multiple-identical-fields146179
-Node: Multiline Edit Buffers148107
-Ref: #multiline-edit-buffers148279
-Node: The Options Menu152156
-Ref: #the-options-menu152304
-Node: Customisation152922
-Ref: #customisation153033
-Node: Modifying Key Bindings153641
-Ref: #modifying-key-bindings153768
+Node: Customising the notes file format115409
+Ref: #customising-the-notes-file-format115637
+Node: Displaying notes119474
+Ref: #displaying-notes119623
+Node: Managing a reading list120972
+Ref: #managing-a-reading-list121134
+Node: Window Management124149
+Ref: #window-management124308
+Node: Creating Entry Stubs127467
+Ref: #creating-entry-stubs127629
+Node: @Preamble Definition128627
+Ref: #preamble-definition128791
+Node: @String Definitions130763
+Ref: #string-definitions130914
+Node: @Comments134407
+Ref: #comments134535
+Node: Managing Keywords135028
+Ref: #managing-keywords135173
+Node: Using a Canonical Keywords List136780
+Ref: #using-a-canonical-keywords-list136938
+Node: Sorting the bib File139096
+Ref: #sorting-the-.bib-file139269
+Node: Merging and Importing142388
+Ref: #merging-and-importing142553
+Node: Exporting Entries144323
+Ref: #exporting-entries144485
+Node: Multiple Identical Fields146001
+Ref: #multiple-identical-fields146180
+Node: Multiline Edit Buffers148108
+Ref: #multiline-edit-buffers148280
+Node: The Options Menu152157
+Ref: #the-options-menu152305
+Node: Customisation152923
+Ref: #customisation153034
+Node: Modifying Key Bindings153642
+Ref: #modifying-key-bindings153769
 
 End Tag Table
 

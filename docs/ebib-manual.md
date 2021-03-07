@@ -1959,7 +1959,7 @@ do. This is now the default method and the user option
 
 If, however, you have been storing your notes in a single file, you will
 need to set the user option `ebib-notes-storage` to
-`multiple-note-per-file`. Furthermore, the option `ebib-notes-file` has
+`multiple-notes-per-file`. Furthermore, the option `ebib-notes-file` has
 been deprecated in favour of `ebib-notes-default-file`. Although
 `ebib-notes-file` is still an alias for the new option, it is a good
 idea to update your configuration. You may also want to check out the

@@ -839,7 +839,7 @@ Ebib 2.30 added the option to have more than one file with multiple notes. This 
 
 If you have been using one file per note, there is nothing you need to do. This is now the default method and the user option  `ebib-notes-directory` has not changed.
 
-If, however, you have been storing your notes in a single file, you will need to set the user option `ebib-notes-storage` to `multiple-note-per-file`. Furthermore, the option `ebib-notes-file` has been deprecated in favour of `ebib-notes-default-file`. Although `ebib-notes-file` is still an alias for the new option, it is a good idea to update your configuration. You may also want to check out the new option `ebib-notes-locations`, which allows you to have more than one Org file for your notes.
+If, however, you have been storing your notes in a single file, you will need to set the user option `ebib-notes-storage` to `multiple-notes-per-file`. Furthermore, the option `ebib-notes-file` has been deprecated in favour of `ebib-notes-default-file`. Although `ebib-notes-file` is still an alias for the new option, it is a good idea to update your configuration. You may also want to check out the new option `ebib-notes-locations`, which allows you to have more than one Org file for your notes.
 
 
 ## Customising the notes file format ##
