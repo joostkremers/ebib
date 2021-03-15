@@ -345,7 +345,7 @@ the current database, but it does not leave Ebib, and the other
 databases you have open will remain so.
 
 You can quickly jump to any entry in the database with the key `j`. This
-ask you for an entry key (using completion) and then jumps to the
+asks you for an entry key (using completion) and then jumps to the
 corresponding entry. This actually works across databases: the keys that
 are offered for completion are the keys from all open databases. After
 selecting a key, Ebib changes to the corresponding database and shows
@@ -364,7 +364,7 @@ option `ebib-index-columns` in order not to display it in the index
 buffer.)
 
 You can restrict the jump candidates to the current database by using a
-prefix argument, i.e., by tying `C-u j`.
+prefix argument, i.e., by typing `C-u j`.
 
 ## Starting a New `.bib` File
 

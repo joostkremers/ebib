@@ -189,11 +189,11 @@ Ebib is not restricted to opening just one `.bib` file at a time. You can open m
 
 With the `left` and `right` cursor keys, you can move to the previous or next database. These keys wrap, so if you hit the `left` cursor key while the first database is active, you move to the last database. If you are done with a database and want to close it, type `c`. This closes the current database, but it does not leave Ebib, and the other databases you have open will remain so.
 
-You can quickly jump to any entry in the database with the key `j`. This ask you for an entry key (using completion) and then jumps to the corresponding entry. This actually works across databases: the keys that are offered for completion are the keys from all open databases. After selecting a key, Ebib changes to the corresponding database and shows the entry corresponding to the key.
+You can quickly jump to any entry in the database with the key `j`. This asks you for an entry key (using completion) and then jumps to the corresponding entry. This actually works across databases: the keys that are offered for completion are the keys from all open databases. After selecting a key, Ebib changes to the corresponding database and shows the entry corresponding to the key.
 
 If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) for completion, instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. (In fact, with these completion systems, it is generally unnecessary to remember the key of an entry, and you can customise the option `ebib-index-columns` in order not to display it in the index buffer.)
 
-You can restrict the jump candidates to the current database by using a prefix argument, i.e., by tying `C-u j`.
+You can restrict the jump candidates to the current database by using a prefix argument, i.e., by typing `C-u j`.
 
 
 ## Starting a New `.bib` File ##
