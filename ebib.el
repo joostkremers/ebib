@@ -4516,10 +4516,10 @@ the @String definitions to."
 (define-minor-mode ebib-multiline-mode
   "Minor mode for Ebib's multiline edit buffer."
   :init-value nil :lighter " Ebib/M" :global nil
-  :keymap '(("\C-c|q" . ebib-quit-multiline-buffer-and-save)
-            ("\C-c|c" . ebib-cancel-multiline-buffer)
-            ("\C-c|s" . ebib-save-from-multiline-buffer)
-            ("\C-c|h" . ebib-multiline-help)))
+  :keymap '(("\C-c\C-c" . ebib-quit-multiline-buffer-and-save)
+            ("\C-c\C-k" . ebib-cancel-multiline-buffer)
+            ("\C-c\C-s" . ebib-save-from-multiline-buffer)
+            ("\C-c\C-h" . ebib-multiline-help)))
 
 (easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu"
   '("Ebib"

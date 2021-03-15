@@ -487,15 +487,11 @@ when you edit one of these fields, Ebib puts you in a so-called
 *multiline edit buffer*. This is essentially a text mode buffer that
 allows you to enter as much text as you like.
 
-To store the text and leave the multiline edit buffer, type `C-c | q`.
+To store the text and leave the multiline edit buffer, type `C-c C-c`.
 If you want to leave the multiline edit buffer without saving the text
-you have just typed, type `C-c | c`. This command cancels the edit and
+you have just typed, type `C-c C-k`. This command cancels the edit and
 leaves the multiline edit buffer. The text that is stored in the field
-you were editing is not altered. (These keys are admittedly rather
-awkward, but because of Emacs’ key binding conventions, it’s not
-possible to set up something better by default. You can, of course,
-change them yourself. See [Modifying Key
-Bindings](#modifying-key-bindings) for details.)
+you were editing is not altered.
 
 Multiline values are not restricted to the `annotation` and `abstract`
 fields. Any field (except the `type` and `crossref` fields) can in fact
@@ -2219,8 +2215,8 @@ you can write this in your `.bib` file:
 Creating or editing a `@Preamble` definition in Ebib is done by hitting
 (uppercase) `P` in the index buffer. Ebib uses the multiline edit buffer
 for editing the text of the `@Preamble` definition, which means that
-`C-c | q` stores the `@Preamble` text and returns focus to the index
-buffer, while `C-c | c` returns focus to the index buffer while
+`C-c C-c` stores the `@Preamble` text and returns focus to the index
+buffer, while `C-c C-k` returns focus to the index buffer while
 abandoning any changes you may have made. (For details on using
 multiline edit buffers, see [Multiline Edit
 Buffers](#multiline-edit-buffers).)
@@ -2568,7 +2564,7 @@ multiline edit buffer, which are bound to key sequences in the minor
 mode `ebib-multiline-edit-mode`, which is activated automatically in the
 multiline edit buffer.
 
-`ebib-quit-multiline-buffer-and-save`, bound to `C-c | q`, leaves the
+`ebib-quit-multiline-buffer-and-save`, bound to `C-c C-c`, leaves the
 multiline edit buffer and stores the text in the database. If you invoke
 this command when you’ve deleted all contents of the buffer (including
 the final newline!) and you were editing a field value or the
@@ -2577,13 +2573,13 @@ the *only* way to delete the `@Preamble` definition. Field values on the
 other hand can also be deleted by hitting `k` or `d` on them in the
 entry buffer.)
 
-`ebib-cancel-multiline-buffer`, bound to `C-c | c`, also leaves the
+`ebib-cancel-multiline-buffer`, bound to `C-c C-k`, also leaves the
 multiline edit buffer, but it does so without storing the text. The
 original value of the field, string or preamble will be retained. If the
 text was modified, Ebib will ask for a confirmation before leaving the
 buffer.
 
-`ebib-save-from-multiline-buffer`, bound to `C-c | s`, can be used in
+`ebib-save-from-multiline-buffer`, bound to `C-c C-s`, can be used in
 the multiline edit buffer to save the database. This command first
 stores the text in the database and then saves it. Because Ebib does not
 do an autosave of the current database, it is advisable to save the
@@ -2600,27 +2596,31 @@ buffer open while doing other work. It is even possible to have several
 multiline edit buffers open at the same time. Ebib makes sure that when
 you finish one, its contents is stored in the correct place.
 
-Admittedly, the key combinations of the multiline edit buffer are
-somewhat awkward. The reason for this is that these commands are part of
-a minor mode, which restricts the available keys to combinations of
-`C-c` plus a non-alphanumeric character. However, it is possible to
-change the key commands, if you wish. For example, you could put
-something like the following in your `~/.emacs`:
+The key combinations of the multiline edit buffer strictly speaking
+violate Emacs’ suggested key binding conventions. They are defined in
+the keymap of a minor mode (`ebib-multiline-mode`, to be specific), but
+a minor mode keymap should only use key bindings of `C-c` plus a
+non-alphanumeric character. The bindings do follow practical
+conventions, however: they are used for similar functions in e.g., Org’s
+capture mechanism, in `message-mode`, in VC, magit, etc. For this
+reason, Ebib uses them as well.
+
+If you find that these key bindings conflict with key bindings in the
+major mode you use in the multiline edit buffer, you can change them, of
+course. To do this, put something like the following in your init file:
 
 ``` commonlisp
 (with-eval-after-load 'ebib
   (define-key ebib-multiline-mode-map
-    "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
+    "\C-c | c" 'ebib-quit-multiline-buffer-and-save)
   (define-key ebib-multiline-mode-map
-    "\C-c\C-q" 'ebib-cancel-multiline-buffer)
+    "\C-c | k" 'ebib-cancel-multiline-buffer)
   (define-key ebib-multiline-mode-map
-    "\C-c\C-s" 'ebib-save-from-multiline-buffer))
+    "\C-c | s" 'ebib-save-from-multiline-buffer))
 ```
 
-This sets up `C-c C-c`, `C-c C-q` and `C-c C-s` for use in the multiline
-edit buffer. Since such key combinations are restricted for use with
-major modes, however, Ebib cannot set these up automatically, but as an
-Emacs user, you are free to do as you like, of course.
+This sets up `C-c | c`, `C-c | k` and `C-c | s` for use in the multiline
+edit buffer. You can obviously use other keys if you prefer.
 
 # The Options Menu
 
@@ -2652,10 +2652,10 @@ using the menu «Ebib \| Options \| Customize Ebib».
 If you would like to change Ebib’s standard key bindings, or if you
 would like to bind a command that is only available through the menu to
 a key, you can do so by adding the relevant key bindings to Emacs init
-file (`~.emacs.d/init.el` by default). The relevant key maps are
-`ebib-index-mode-map`, `ebib-entry-mode-map`, `ebib-strings-mode-map`
-for the index, entry, and strings buffer, and `ebib-multiline-mode-map`,
-which adds keys to finish writing multiline field values.
+file. The relevant key maps are `ebib-index-mode-map`,
+`ebib-entry-mode-map`, `ebib-strings-mode-map` for the index, entry, and
+strings buffer, and `ebib-multiline-mode-map`, which contains the key
+bindings in multiline edit buffers.
 
 In addition, `ebib-search-map` is a transient key map that is activated
 when `ebib-search` is called, and `ebib-filters-map`,
@@ -2663,16 +2663,3 @@ when `ebib-search` is called, and `ebib-filters-map`,
 using `define-prefix-command`) that contain bindings for filters,
 keywords and the reading list, respectively. Finally, there is
 `ebib-log-mode-map` which is active in Ebib’s log buffer.
-
-As an example, the default keybindings in`ebib-multiline-mode-map`,
-which are rather awkward to type, can be redefined as follows:
-
-``` commonlisp
-(with-eval-after-load 'ebib
-  (define-key ebib-multiline-mode-map
-    "\C-c\C-c" 'ebib-quit-multiline-buffer-and-save)
-  (define-key ebib-multiline-mode-map
-    "\C-c\C-q" 'ebib-cancel-multiline-buffer)
-  (define-key ebib-multiline-mode-map
-    "\C-c\C-s" 'ebib-save-from-multiline-buffer))
-```
