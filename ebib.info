@@ -1532,15 +1532,26 @@ citation from within your text buffer with ‘ebib-insert-citation’.  If
 you use selectrum or Emacs’ built-in completion method, you can enable
 selection of multiple keys by setting the option
 ‘ebib-citations-insert-multiple’.  With this option set, you can select
-multiple keys when calling ‘ebib-insert-citation’ in the following way:
-start typing a key, complete it with ‘TAB’, type ‘SPC’ and start typing
-the next key, again with the ability to complete it with ‘TAB’.  When
-you have entered all the keys you wish to select, press ‘RET’.
+multiple keys when calling ‘ebib-insert-citation’ by selecting a
+candidate and then pressing ‘TAB’.  Once you hit ‘TAB’, you need to add
+an ampersand ‘&’ as a separator (possibly surrounded by spaces) and then
+you can select the next candidate.  Finish by typing ‘RET’.
 
-This method of multiple selection is somewhat cumbersome and it does not
-use Emacs’ standard completion function ‘completing-read’, so it is
-likely unfamiliar to most users.  For these reasons, it is not enabled
-by default, but it is there if you want to use it.
+Note that selectrum automatically adds the ampersand for you, so you
+don’t need to type it: after hitting ‘TAB’, you can immediately start
+selecting the next candidate.  If you use default completion, however,
+you need to type it yourself.
+
+Also note that with default completion, ‘TAB’ completes partial input
+strings just as it does in normal completion.  It only selects the
+candidate once you’ve typed enough to narrow down the choices to a
+single candidate.  With selectrum, ‘TAB’ always selects the currently
+highlighted candidate.  This is the default behaviour of ‘TAB’ in both
+completion systems, so should not be confusing.
+
+This method of multiple selection may be somewhat cumbersome and it is
+likely unfamiliar to most users.  For this reason, it is not enabled by
+default, but it is there if you want to use it.
 
 
 File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
@@ -3264,74 +3275,74 @@ Node: Inserting Citations into a Text Buffer69565
 Ref: #inserting-citations-into-a-text-buffer69804
 Node: Citations with multiple keys72353
 Ref: #citations-with-multiple-keys72542
-Node: Key Bindings73739
-Ref: #key-bindings73931
-Node: Defining Citation Commands74689
-Ref: #defining-citation-commands74922
-Node: Associating a Database with a Text Buffer80818
-Ref: #associating-a-database-with-a-text-buffer81103
-Node: Links and Citations in Org buffers82482
-Ref: #links-and-citations-in-org-buffers82718
-Node: Copying Entries to the Kill Ring and System Clipboard84149
-Ref: #copying-entries-to-the-kill-ring-and-system-clipboard84439
-Node: Main and Dependent Databases86986
-Ref: #main-and-dependent-databases87205
-Node: Cross-referencing90190
-Ref: #cross-referencing90349
-Node: Marking Entries93876
-Ref: #marking-entries94024
-Node: Printing the Database94901
-Ref: #printing-the-database95079
-Node: Calling a Browser for URLs and DOIs98548
-Ref: #calling-a-browser-for-urls-and-dois98766
-Node: Viewing and Importing Files101074
-Ref: #viewing-and-importing-files101266
-Node: Editing the file field106476
-Ref: #editing-the-file-field106625
-Node: Notes files107996
-Ref: #notes-files108144
-Node: Configuring files for storing notes109300
-Ref: #configuring-files-for-storing-notes109478
-Node: Hooks112445
-Ref: #hooks112608
-Node: Upgrading from earlier Ebib versions114009
-Ref: #upgrading-from-earlier-ebib-versions114232
-Node: Customising the notes file format115142
-Ref: #customising-the-notes-file-format115370
-Node: Displaying notes119207
-Ref: #displaying-notes119356
-Node: Managing a reading list120705
-Ref: #managing-a-reading-list120867
-Node: Window Management123882
-Ref: #window-management124041
-Node: Creating Entry Stubs127200
-Ref: #creating-entry-stubs127362
-Node: @Preamble Definition128360
-Ref: #preamble-definition128524
-Node: @String Definitions130496
-Ref: #string-definitions130647
-Node: @Comments134140
-Ref: #comments134268
-Node: Managing Keywords134761
-Ref: #managing-keywords134906
-Node: Using a Canonical Keywords List136513
-Ref: #using-a-canonical-keywords-list136671
-Node: Sorting the bib File138829
-Ref: #sorting-the-.bib-file139002
-Node: Merging and Importing142121
-Ref: #merging-and-importing142286
-Node: Exporting Entries144056
-Ref: #exporting-entries144218
-Node: Multiple Identical Fields145734
-Ref: #multiple-identical-fields145913
-Node: Multiline Edit Buffers147841
-Ref: #multiline-edit-buffers148013
-Node: The Options Menu152098
-Ref: #the-options-menu152246
-Node: Customisation152864
-Ref: #customisation152975
-Node: Modifying Key Bindings153583
-Ref: #modifying-key-bindings153710
+Node: Key Bindings74309
+Ref: #key-bindings74501
+Node: Defining Citation Commands75259
+Ref: #defining-citation-commands75492
+Node: Associating a Database with a Text Buffer81388
+Ref: #associating-a-database-with-a-text-buffer81673
+Node: Links and Citations in Org buffers83052
+Ref: #links-and-citations-in-org-buffers83288
+Node: Copying Entries to the Kill Ring and System Clipboard84719
+Ref: #copying-entries-to-the-kill-ring-and-system-clipboard85009
+Node: Main and Dependent Databases87556
+Ref: #main-and-dependent-databases87775
+Node: Cross-referencing90760
+Ref: #cross-referencing90919
+Node: Marking Entries94446
+Ref: #marking-entries94594
+Node: Printing the Database95471
+Ref: #printing-the-database95649
+Node: Calling a Browser for URLs and DOIs99118
+Ref: #calling-a-browser-for-urls-and-dois99336
+Node: Viewing and Importing Files101644
+Ref: #viewing-and-importing-files101836
+Node: Editing the file field107046
+Ref: #editing-the-file-field107195
+Node: Notes files108566
+Ref: #notes-files108714
+Node: Configuring files for storing notes109870
+Ref: #configuring-files-for-storing-notes110048
+Node: Hooks113015
+Ref: #hooks113178
+Node: Upgrading from earlier Ebib versions114579
+Ref: #upgrading-from-earlier-ebib-versions114802
+Node: Customising the notes file format115712
+Ref: #customising-the-notes-file-format115940
+Node: Displaying notes119777
+Ref: #displaying-notes119926
+Node: Managing a reading list121275
+Ref: #managing-a-reading-list121437
+Node: Window Management124452
+Ref: #window-management124611
+Node: Creating Entry Stubs127770
+Ref: #creating-entry-stubs127932
+Node: @Preamble Definition128930
+Ref: #preamble-definition129094
+Node: @String Definitions131066
+Ref: #string-definitions131217
+Node: @Comments134710
+Ref: #comments134838
+Node: Managing Keywords135331
+Ref: #managing-keywords135476
+Node: Using a Canonical Keywords List137083
+Ref: #using-a-canonical-keywords-list137241
+Node: Sorting the bib File139399
+Ref: #sorting-the-.bib-file139572
+Node: Merging and Importing142691
+Ref: #merging-and-importing142856
+Node: Exporting Entries144626
+Ref: #exporting-entries144788
+Node: Multiple Identical Fields146304
+Ref: #multiple-identical-fields146483
+Node: Multiline Edit Buffers148411
+Ref: #multiline-edit-buffers148583
+Node: The Options Menu152668
+Ref: #the-options-menu152816
+Node: Customisation153434
+Ref: #customisation153545
+Node: Modifying Key Bindings154153
+Ref: #modifying-key-bindings154280
 
 End Tag Table
 

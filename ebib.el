@@ -2391,7 +2391,7 @@ databases containing them."
   (let ((collection (ebib--create-completion-collection databases)))
     (if collection
         (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
-               (crm-separator "[ \t]+" )
+               (crm-separator "\\s-*&\\s-*")
                (keys (completing-read-multiple "Keys to insert: " collection nil t nil 'ebib--key-history)))
           (mapcar (lambda (entry)
                     (cons (cadr (assoc-string entry collection))

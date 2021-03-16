@@ -1182,14 +1182,25 @@ within your text buffer with `ebib-insert-citation`. If you use
 selectrum or Emacs’ built-in completion method, you can enable selection
 of multiple keys by setting the option `ebib-citations-insert-multiple`.
 With this option set, you can select multiple keys when calling
-`ebib-insert-citation` in the following way: start typing a key,
-complete it with `TAB`, type `SPC` and start typing the next key, again
-with the ability to complete it with `TAB`. When you have entered all
-the keys you wish to select, press `RET`.
+`ebib-insert-citation` by selecting a candidate and then pressing `TAB`.
+Once you hit `TAB`, you need to add an ampersand `&` as a separator
+(possibly surrounded by spaces) and then you can select the next
+candidate. Finish by typing `RET`.
 
-This method of multiple selection is somewhat cumbersome and it does not
-use Emacs’ standard completion function `completing-read`, so it is
-likely unfamiliar to most users. For these reasons, it is not enabled by
+Note that selectrum automatically adds the ampersand for you, so you
+don’t need to type it: after hitting `TAB`, you can immediately start
+selecting the next candidate. If you use default completion, however,
+you need to type it yourself.
+
+Also note that with default completion, `TAB` completes partial input
+strings just as it does in normal completion. It only selects the
+candidate once you’ve typed enough to narrow down the choices to a
+single candidate. With selectrum, `TAB` always selects the currently
+highlighted candidate. This is the default behaviour of `TAB` in both
+completion systems, so should not be confusing.
+
+This method of multiple selection may be somewhat cumbersome and it is
+likely unfamiliar to most users. For this reason, it is not enabled by
 default, but it is there if you want to use it.
 
 ## Key Bindings
