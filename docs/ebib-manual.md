@@ -9,6 +9,10 @@ is.
 
 # News
 
+## Version 2.31, March 2021
+
+-   Allow the use of `org-capture` to create notes.
+
 ## Version 2.30, February 2021
 
 -   Redesign handling of external notes. It is now possible to have
@@ -1860,13 +1864,19 @@ if you prefer to keep notes outside the `.bib` file, there is an easy
 way to do that as well. When you hit `N` on an entry in the index
 buffer, Ebib creates a note for the entry, which is saved in a separate
 file. If an entry already has a note associated with it, `N` opens it.
-In the entry buffer, the first few lines of the note are shown under
-`external note`. This is not an actual field in the `.bib` file, even
-though it is displayed as such. (You can customise this behaviour.)
+By default, notes are created as Org entries. (Changing that is
+possible, though it’s somewhat involved.)
 
-Notes are created as Org files. Even though it is possible to change
-this, it requires quite a bit of configuration, so it’s recommended to
-just stick to Org.
+In the entry buffer, the first few lines of the note are shown under a
+pseudo-field `external note`. This is not an actual field in the `.bib`
+file, even though it is displayed as such. (You can customise this
+behaviour.)
+
+When you record a new note, Ebib pops up a buffer and adds the note to
+the end of the relevant notes file. If you prefer, you can also use Org
+mode’s capture system to record new notes. This has the advantage that
+you have more control over the location where a note is stored and that
+you can more than one capture template.
 
 Note that with Ebib version 2.30, the functionality for notes files has
 changed and it may be necessary to update your configuration. See
@@ -1986,7 +1996,7 @@ easiest to look at the default template first:
     :PROPERTIES:
     %K
     :END:
-    >|<
+    %%?
     "
 
 This template contains two format specifiers: `%K` and `%T`. `%K` is
@@ -1994,8 +2004,11 @@ replaced with the key of the entry prepended with the string
 `"Custom_id: "` in order to create an Org property. The `%T` specifier
 is replaced with the title of the note, which consists of the author (or
 editor), the year of publication and the title of the bibliography
-entry. The template also contains the string `">|<"`, which indicates
-the position of the cursor when a new note is created.
+entry. The template also contains the string `"%%?"`, which indicates
+the position of the cursor when a new note is created. (For backward
+compatibility reasons, the string `">|<"` can also be used to indicate
+the cursor position, although this does not work if you use
+`org-capture` to record new notes.)
 
 To change the template, you must customise the option
 `ebib-notes-template`. If you use Org for your notes and keep your notes
@@ -2045,11 +2058,11 @@ Because the template can be customised and the major mode is determined
 from the file extension, it is in principle possible to use another
 format than Org for notes. In this case, it is easier to use separate
 note files, but as long as you have a `%K` directive in your template
-(and an appropriately defined function for it, see
-`ebib-notes-template-specifiers` below), it should still be possible to
-use a single notes file. (Emphasis on *should*, however, because this
-has not been tested.) You will also need to customise the three hooks
-discussed above in this case.
+(and an appropriately defined function for it, see the option
+`ebib-notes-template-specifiers`), it should still be possible to use a
+single notes file. (Emphasis on *should*, however, because this has not
+been tested.) You will also need to customise the three hooks discussed
+above in this case.
 
 ## Displaying notes
 
@@ -2074,6 +2087,123 @@ format, but only works if you use Ebib’s default window layout (see the
 section [Window Management](#window-management) for details), because
 that is the only window layout that ensures that the note can be
 displayed without getting in the way.
+
+## Using `org-capture` to record notes
+
+Instead of using Ebib’s own system to record notes, you can also used
+`org-capture` to do so. This has two advantages: first, Org capture
+templates allow you to specify the type of the note and the location
+where the note is to be stored more precisely than what Ebib’s system
+allows. Second, you can define more than one template, so you can
+capture different kinds of notes or record them in different files.
+
+Note that `org-capture` is only used for creating new notes, not for
+displaying existing notes. Therefore, you still need to configure Ebib
+to look for notes in the right locations.
+
+When using `org-capture`, you’ll most likely want to set
+`ebib-notes-storage` to `multiple-notes-per-file`. (Though technically
+it would be possible to have a single file for each note, there is
+little reason to go through the trouble of setting that up.) In
+addition, you’ll need to set `ebib-notes-locations` to the files and/or
+directories you use to store notes. There is no point but also no harm
+in setting `ebib-notes-default-file`; this setting is ignored when you
+create notes through `org-capture` but Ebib still uses it to search for
+existing notes.
+
+In order to use `org-capture` for creating notes, you need to set
+`ebib-notes-use-org-capture` and you need to add an entry to
+`org-capture-templates` that you can use to create a note. This entry
+can have any key, description, type and target you like, but the
+template should be a function.
+
+The following is an example entry for `org-capture-templates`:
+
+    ("e"
+     "BibTeX note"
+     entry
+     (file+headline "~/Work/Bibtex/Bib_Notes.org" "Bibliography Notes")
+     (function ebib-notes-create-org-template))
+
+Because you are free to set the type and target to anything that
+`org-capture` accepts, you have more control over the way a note is
+created and where it is stored.
+
+As mentioned, the only part of this entry that should not be changed is
+the last line. This line specifies that the actual template is created
+by the function`ebib-notes-create-org-template`. This function takes
+`ebib-notes-template` and converts it into a template that `org-capture`
+can use.
+
+The `%`-directives in `ebib-notes-template` are interpreted by Ebib, not
+by the Org capture mechanism. It is therefore still essential that it
+contains a `%K` directive to create an identifier that Ebib can find.
+
+It is possible to add `org-capture` directives to the template, though.
+To do this, put an additional `%` before the directive. For example,
+`org-capture` can add a time stamp with `%t`. In order to add a time
+stamp to a bibliography note, write `%%t`:
+
+    (setq ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%t\n%%?\n")
+
+`ebib-notes-create-org-template` strips off one `%` and passes the
+result on to `org-capture`, which then sees `%t` and replaces it with a
+time stamp. (Note that this is the reason why the cursor position is
+indicated with `%%?`: `ebib-notes-create-org-template` converts it to
+`%?`, which is used by `org-capture` to position the cursor.)
+
+Note that this `org-capture-templates` entry should only be selected
+when creating a note from within Ebib. The function
+`ebib-notes-create-org-template` needs some setup to function properly
+and this can only be done when it is called from Ebib. Therefore, you
+may want to disable the entry altogether when you call `org-capture`
+from somewhere else. You can do this by configuring the option
+`org-capture-template-contexts`:
+
+    (setq org-capture-template-contexts '(("e" ((in-mode ebib-index-mode)))))
+
+The `"e"` is the key that you’ve chosen for your template. This setting
+ensures that the `org-capture` template associated with the key `"e"` is
+only shown when `org-capture` is called from a buffer with major mode
+`ebib-index-mode`, which is Ebib’s index buffer.
+
+You can also bypass the `org-capture` selection buffer altogether. To
+use `org-capture` for creating notes, you must set
+`ebib-notes-use-org-capture`. Setting it to `t` causes the selection
+buffer to be popped up. However, you can also set it to the key of the
+template that you use for Ebib notes (`"e"` in the current example):
+
+    (setq ebib-notes-use-org-capture "e")
+
+This will cause `org-capture` to bypass the selection buffer and
+immediately put you in the edit buffer with the relevant template.
+
+Alternatively, it is also possible to set up more than one `org-capture`
+entry for Ebib notes. This can be useful if you want to use different
+locations for storing notes or store different types of notes. If you do
+so, you still need to use the same function
+`ebib-notes-create-org-template` to create the actual template, however.
+`org-capture` itself does not know about Ebib’s databases and cannot
+access them. This is what `ebib-notes-create-org-template` is for.
+
+If you wish to associate each `org-capture` entry with a different
+template, you can do so by setting `ebib-notes-template` to a list. Each
+element of the list should itself be a list of two items, the key of the
+relevant template in `org-capture-templates` and the template to use.
+
+Note that Ebib only finds one note per entry, so if you create several
+notes for an entry, Ebib can only display and open the first one it
+finds. More than one note for an entry can still be useful, though, for
+example as a reading list or to export entries to some Org-based format.
+(You can customise `ebib-notes-template-specifiers` and add new
+`%`-forms, as discussed above.)
+
+Note that Ebib also provides an Ebib-friendly command to call
+`org-capture` directly. This command, `ebib-org-capture` (not bound to
+any key by default), takes the same arguments as `org-capture` and can
+be used in the same way. It makes sure that
+`ebib-notes-create-org-template` can find the current entry and then
+calls `org-capture`.
 
 # Managing a reading list
 

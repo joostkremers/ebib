@@ -8,6 +8,10 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 # News #
 
+## Version 2.31, March 2021 ##
+
+- Allow the use of `org-capture` to create notes.
+
 ## Version 2.30, February 2021##
 
 - Redesign handling of external notes. It is now possible to have multiple files with multiple notes in them. This may mean you need to redo your configuration, see [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) for details.
@@ -60,7 +64,7 @@ It should be noted that Ebib is *not* a minor or major mode for editing `.bib` f
 
 ## Version 2.19, November 2019 ##
 
-- Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion. 
+- Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion.
 - Allow a full URL in the `doi` field: when passing the DOI to a browser, `"https://dx.doi.org/"` is only added if the contents of the `doi` field does not start with `"http://"` `"https://"`.
 
 ## Version 2.17, June 2019 ##
@@ -244,7 +248,7 @@ If you want to edit a field value directly, without completion, you can use a pr
 
 There are two other fields that Ebib handles in a special way when you edit their value. These are the `annotation` field (or `annote` in BibTeX), and the `abstract` field. Most field values normally consist of a single line of text. However, because the `annotation` and `abstract` fields are meant for creating annotated bibliographies, it would not be very useful if you could only write one line of text in them. Therefore, when you edit one of these fields, Ebib puts you in a so-called *multiline edit buffer*. This is essentially a text mode buffer that allows you to enter as much text as you like.
 
-To store the text and leave the multiline edit buffer, type `C-c C-c`. If you want to leave the multiline edit buffer without saving the text you have just typed, type `C-c C-k`. This command cancels the edit and leaves the multiline edit buffer. The text that is stored in the field you were editing is not altered. 
+To store the text and leave the multiline edit buffer, type `C-c C-c`. If you want to leave the multiline edit buffer without saving the text you have just typed, type `C-c C-k`. This command cancels the edit and leaves the multiline edit buffer. The text that is stored in the field you were editing is not altered.
 
 Multiline values are not restricted to the `annotation` and `abstract` fields. Any field (except the `type` and `crossref` fields) can in fact hold a multiline value. To give a field a multiline value, use `m` instead of `e`.
 
@@ -341,7 +345,7 @@ The final predefined column label is `"Note"`. This does not, however, display t
 
 You can define new column labels and redefine the existing ones by customising the option `ebib-field-transformation-functions`. Note that `"Title"`, `"Doi"`, `"Url"`, and `"Note"` are actually defined through this option. `"Entry Key"`, `"Author/Editor"`, and `"Year"` are not (they are hard-coded), but they can be overridden by adding an entry for them in `ebib-field-transformation-functions`.
 
-The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort`. 
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press `=`. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort`.
 
 
 # Searching #
@@ -683,7 +687,7 @@ If none of the fields in a directive has any contents, the directive is discarde
 
     "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
 
-If the `Doi` and `Url` fields are both empty, the directive is simply ignored. 
+If the `Doi` and `Url` fields are both empty, the directive is simply ignored.
 
 A directive may contain punctuation before or after the field name (or sequence of field names), which is dropped if the field is empty. The `{Doi|Url.}` directive in the previous example contains a full stop, which is only included in the reference if the `Doi` or `Url` field is present.
 
@@ -698,7 +702,7 @@ Furthermore, if you have a text buffer that's associated with a dependent databa
 
 You can create a dependent database with the key sequence `M c` in the database that you want to be its main database. Ebib asks you for a file name and then creates a new empty database.
 
-Adding new entries to a dependent database can be done as described, by inserting citations in a text buffer. It's also possible to add entries in the usual way, i.e., by pressing `a` in Ebib's index buffer. If you do this in a dependent database, instead of creating a new entry, you are prompted for an entry from the main database to add to the dependent one. 
+Adding new entries to a dependent database can be done as described, by inserting citations in a text buffer. It's also possible to add entries in the usual way, i.e., by pressing `a` in Ebib's index buffer. If you do this in a dependent database, instead of creating a new entry, you are prompted for an entry from the main database to add to the dependent one.
 
 It's also possible to add entries to a dependent database from its main database with the command `M a`. This command also works on marked entries, making it possible to add multiple entries to a dependent database in one go.
 
@@ -802,9 +806,11 @@ The first directory in the option "File Search Dirs" is used as the starting dir
 
 # Notes files #
 
-Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it. In the entry buffer, the first few lines of the note are shown under `external note`. This is not an actual field in the `.bib` file, even though it is displayed as such. (You can customise this behaviour.)
+Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit `N` on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, `N` opens it.  By default, notes are created as Org entries. (Changing that is possible, though it's somewhat involved.)
 
-Notes are created as Org files. Even though it is possible to change this, it requires quite a bit of configuration, so it's recommended to just stick to Org.
+In the entry buffer, the first few lines of the note are shown under a pseudo-field `external note`. This is not an actual field in the `.bib` file, even though it is displayed as such. (You can customise this behaviour.)
+
+When you record a new note, Ebib pops up a buffer and adds the note to the end of the relevant notes file. If you prefer, you can also use Org mode's capture system to record new notes. This has the advantage that you have more control over the location where a note is stored and that you can more than one capture template.
 
 Note that with Ebib version 2.30, the functionality for notes files has changed and it may be necessary to update your configuration. See [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) below for details.
 
@@ -855,11 +861,11 @@ When creating a new note, the default template creates an Org entry whose header
 :PROPERTIES:
 %K
 :END:
->|<
+%%?
 "
 ```
 
-This template contains two format specifiers: `%K` and `%T`. `%K` is replaced with the key of the entry prepended with the string `"Custom_id: "` in order to create an Org property. The `%T` specifier is replaced with the title of the note, which consists of the author (or editor), the year of publication and the title of the bibliography entry. The template also contains the string `">|<"`, which indicates the position of the cursor when a new note is created.
+This template contains two format specifiers: `%K` and `%T`. `%K` is replaced with the key of the entry prepended with the string `"Custom_id: "` in order to create an Org property. The `%T` specifier is replaced with the title of the note, which consists of the author (or editor), the year of publication and the title of the bibliography entry. The template also contains the string `"%%?"`, which indicates the position of the cursor when a new note is created. (For backward compatibility reasons, the string `">|<"` can also be used to indicate the cursor position, although this does not work if you use `org-capture` to record new notes.)
 
 To change the template, you must customise the option `ebib-notes-template`. If you use Org for your notes and keep your notes in a single file, the template **must** contain a `:PROPERTIES:` block with the `%K` format specifier, because it is required in order to identify the note and connect it to its BibTeX entry. Without it, Ebib won't be able to tell whether an entry has a note or not and won't be able to display it.
 
@@ -879,7 +885,7 @@ where `<field>` is the field as a (case-insensitive) string whose value is to be
 
 Instead of a function, you may also provide a variable. The variable's value is then used to replace the specifier.
 
-Because the template can be customised and the major mode is determined from the file extension, it is in principle possible to use another format than Org for notes. In this case, it is easier to use separate note files, but as long as you have a `%K` directive in your template (and an appropriately defined function for it, see `ebib-notes-template-specifiers` below), it should still be possible to use a single notes file. (Emphasis on *should*, however, because this has not been tested.) You will also need to customise the three hooks discussed above in this case.
+Because the template can be customised and the major mode is determined from the file extension, it is in principle possible to use another format than Org for notes. In this case, it is easier to use separate note files, but as long as you have a `%K` directive in your template (and an appropriately defined function for it, see the option `ebib-notes-template-specifiers`), it should still be possible to use a single notes file. (Emphasis on *should*, however, because this has not been tested.) You will also need to customise the three hooks discussed above in this case.
 
 
 ## Displaying notes ##
@@ -887,6 +893,60 @@ Because the template can be customised and the major mode is determined from the
 If an entry has an external note, the first few lines are shown in the entry buffer as a field called `external note`. The number of lines to show can be customised with the option `ebib-notes-display-max-lines`, which defaults to 10. If you prefer, you can also have the entire note shown, not just the first few lines, by customising the option `ebib-notes-show-note-method`. The note is then shown in a separate buffer that is displayed when an entry has a note. This setting is only really convenient if you use a multiple notes per file, because the buffer is not closed after displaying the note. If you use a separate file for each note, you'll end up with a lot of open buffers. (Showing only the first few lines in the entry buffer does not have this limitation, as it just reads the text of the note from the file, it does not visit the file in a buffer.)
 
 Note also that displaying the note inline in the entry buffer is only possible with Org files, so your notes must use Org mode for it to work. Showing the entire note in a separate buffer can be done with any format, but only works if you use Ebib's default window layout (see the section [Window Management](#window-management) for details), because that is the only window layout that ensures that the note can be displayed without getting in the way.
+
+
+## Using `org-capture` to record notes ##
+
+Instead of using Ebib's own system to record notes, you can also used `org-capture` to do so. This has two advantages: first, Org capture templates allow you to specify the type of the note and the location where the note is to be stored more precisely than what Ebib's system allows. Second, you can define more than one template, so you can capture different kinds of notes or record them in different files.
+
+Note that `org-capture` is only used for creating new notes, not for displaying existing notes. Therefore, you still need to configure Ebib to look for notes in the right locations.
+
+When using `org-capture`, you'll most likely want to set `ebib-notes-storage` to `multiple-notes-per-file`. (Though technically it would be possible to have a single file for each note, there is little reason to go through the trouble of setting that up.) In addition, you'll need to set `ebib-notes-locations` to the files and/or directories you use to store notes. There is no point but also no harm in setting `ebib-notes-default-file`; this setting is ignored when you create notes through `org-capture` but Ebib still uses it to search for existing notes.
+
+In order to use `org-capture` for creating notes, you need to set `ebib-notes-use-org-capture` and you need to add an entry to `org-capture-templates` that you can use to create a note. This entry can have any key, description, type and target you like, but the template should be a function.
+
+The following is an example entry for `org-capture-templates`:
+
+```
+("e"
+ "BibTeX note"
+ entry
+ (file+headline "~/Work/Bibtex/Bib_Notes.org" "Bibliography Notes")
+ (function ebib-notes-create-org-template))
+```
+
+Because you are free to set the type and target to anything that `org-capture` accepts, you have more control over the way a note is created and where it is stored.
+
+As mentioned, the only part of this entry that should not be changed is the last line. This line specifies that the actual template is created by the function`ebib-notes-create-org-template`. This function takes `ebib-notes-template` and converts it into a template that `org-capture` can use.
+
+The `%`-directives in `ebib-notes-template` are interpreted by Ebib, not by the Org capture mechanism. It is therefore still essential that it contains a `%K` directive to create an identifier that Ebib can find.
+
+It is possible to add `org-capture` directives to the template, though. To do this, put an additional `%` before the directive. For example, `org-capture` can add a time stamp with `%t`. In order to add a time stamp to a bibliography note, write `%%t`:
+
+    (setq ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%t\n%%?\n")
+
+`ebib-notes-create-org-template` strips off one `%` and passes the result on to `org-capture`, which then sees `%t` and replaces it with a time stamp. (Note that this is the reason why the cursor position is indicated with `%%?`: `ebib-notes-create-org-template` converts it to `%?`, which is used by `org-capture` to position the cursor.)
+
+Note that this `org-capture-templates` entry should only be selected when creating a note from within Ebib. The function `ebib-notes-create-org-template` needs some setup to function properly and this can only be done when it is called from Ebib. Therefore, you may want to disable the entry altogether when you call `org-capture` from somewhere else. You can do this by configuring the option `org-capture-template-contexts`:
+
+    (setq org-capture-template-contexts '(("e" ((in-mode ebib-index-mode)))))
+
+The `"e"` is the key that you've chosen for your template. This setting ensures that the `org-capture` template associated with the key `"e"` is only shown when `org-capture` is called from a buffer with major mode `ebib-index-mode`, which is Ebib's index buffer.
+
+You can also bypass the `org-capture` selection buffer altogether. To use `org-capture` for creating notes, you must set `ebib-notes-use-org-capture`. Setting it to `t` causes the selection buffer to be popped up. However, you can also set it to the key of the template that you use for Ebib notes (`"e"` in the current example):
+
+    (setq ebib-notes-use-org-capture "e")
+
+This will cause `org-capture` to bypass the selection buffer and immediately put you in the edit buffer with the relevant template.
+
+Alternatively, it is also possible to set up more than one `org-capture` entry for Ebib notes. This can be useful if you want to use different locations for storing notes or store different types of notes. If you do so, you still need to use the same function `ebib-notes-create-org-template` to create the actual template, however. `org-capture` itself does not know about Ebib's databases and cannot access them. This is what `ebib-notes-create-org-template` is for.
+
+If you wish to associate each `org-capture` entry with a different template, you can do so by setting `ebib-notes-template` to a list. Each element of the list should itself be a list of two items, the key of the relevant template in `org-capture-templates` and the template to use.
+
+Note that Ebib only finds one note per entry, so if you create several notes for an entry, Ebib can only display and open the first one it finds. More than one note for an entry can still be useful, though, for example as a reading list or to export entries to some Org-based format. (You can customise `ebib-notes-template-specifiers` and add new `%`-forms, as discussed above.)
+
+Note that Ebib also provides an Ebib-friendly command to call `org-capture` directly. This command, `ebib-org-capture` (not bound to any key by default), takes the same arguments as `org-capture` and can be used in the same way. It makes sure that `ebib-notes-create-org-template` can find the current entry and then calls `org-capture`. 
+
 
 
 # Managing a reading list #

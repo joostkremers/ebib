@@ -122,22 +122,31 @@ instead."
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
 
-(defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n>|<\n"
+(defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%?\n"
   "Template for a note entry in the notes file.
 New notes are created on the basis of this template.  The
 template can contain format specifiers consisting of a percent
 sign and a character.  These specifiers are defined by
-`ebib-notes-template-specifiers'.  Note that the `%K' specifier
-must be present in the template and should be replaced by an
-identifier that is unique for the entry.  This identifier is used
-to retrieve the note.  Without it, Ebib is not able to determine
-whether an entry has a note or not.
+`ebib-notes-template-specifiers'.
 
-The template can also contain the string \">|<\" to indicate the
+Note that the `%K' specifier must be present in the template and
+should be replaced by an identifier that is unique for the entry.
+This identifier is used to retrieve the note.  Without it, Ebib
+is not able to determine whether an entry has a note or not.
+
+The template can also contain the string \"%%?\" to indicate the
 position where the cursor is to be placed when creating a new
-note."
+note.
+
+If `org-capture' is used to create notes, the template can also
+contain format specifiers for `org-capture'; these need to be
+preceded by an extra `%', which is stripped before the template
+is passed to the `org-capture' mechanism."
   :group 'ebib-notes
-  :type '(string :tag "Note template"))
+  :type '(choice (string :tag "Note template")
+                 (repeat :tag "List of templates"
+                         (cons (string :tag "Key")
+                               (string :tag "Note template")))))
 
 (defcustom ebib-notes-template-specifiers '((?K . ebib-create-org-identifier)
 					    (?T . ebib-create-org-description)
@@ -161,6 +170,34 @@ used to create an identifier for the note."
   :type '(repeat (cons :tag "Specifier"
                        (character :tag "Character")
                        (symbol :tag "Function or variable"))))
+
+(defcustom ebib-notes-use-org-capture nil
+  "If set, use `org-capture' to create new notes.
+If this option is set to a string, it must correspond to a key in
+`org-capture-templates'.  Creating a new note will then
+automatically use the corresponding template and bypass the
+interactive selection."
+  :group 'ebib-notes
+  :type '(choice (const :tag "Use org-capture" t)
+                 (string :tag "Use org-capture template")
+                 (const :tag "Do not use org-capture" nil)))
+
+(defvar ebib--org-current-key nil
+  "Key of the current entry when `org-capture' is called from Ebib.")
+
+(defun ebib-notes-create-org-template ()
+  "Create an `org-capture' template for a note.
+This function should be used in `org-capture-templates' as the
+`template' element.  It takes `ebib-notes-template' and converts
+it into a suitable template for `org-capture' to use."
+  (let* ((key (org-capture-get :key))
+         (template (cond
+                    ((stringp ebib-notes-template)
+                     ebib-notes-template)
+                    ((listp ebib-notes-template)
+                     (cdr (assoc-string key ebib-notes-template)))
+                    (t "* %T\n:PROPERTIES:\n%K\n:END:\n%%?\n"))))
+    (ebib-format-template template ebib-notes-template-specifiers ebib--org-current-key ebib--cur-db)))
 
 (defcustom ebib-notes-search-note-before-hook '(widen)
   "Hook run before searching for a note.
@@ -230,9 +267,9 @@ to be in Org format."
 Return a cons of the new note as a string and a position in this
 string where point should be located."
   (let* ((note (ebib-format-template ebib-notes-template ebib-notes-template-specifiers key db))
-         (pos (string-match-p ">|<" note)))
+         (pos (string-match-p "\\(>|<\\|%\\?\\)" note)))
     (if pos
-        (setq note (replace-regexp-in-string ">|<" "" note))
+        (setq note (replace-regexp-in-string "\\(>|<\\|%\\?\\)" "" note))
       (setq pos 0))
     (cons note pos)))
 
@@ -326,32 +363,41 @@ If KEY has no note, return nil."
       (when buf (cons buf 1))))))
 
 (defun ebib--notes-create-new-note (key db)
-  "Create a note for KEY in DB and .
-If `ebib-notes-file' is set, add an entry to the bottom of this
-file and leave point there.  Otherwise, create a new note file in
-`ebib-notes-directory'.
+  "Create a note for KEY in DB.
+If `ebib-notes-use-org-capture' is set, call `org-capture' and
+return nil.
 
-Return a cons of the buffer in which the new note is created and
+If `ebib-notes-use-org-capture' is not set, create a new note
+according to the settings of `ebib-notes-storage',
+`ebib-notes-default-file' and/or `ebib-notes-directory' and
+return a cons of the buffer in which the new note is created and
 the position where point should be placed."
-  (let (buf pos)
-    (cond
-     ((eq ebib-notes-storage 'multiple-notes-per-file)
-      (setq buf (ebib--notes-buffer (or ebib-notes-default-file
-                                        (completing-read "Save note to file: " (ebib--notes-list-files) nil t)))
-            pos (1+ (buffer-size buf))))
-     ((eq ebib-notes-storage 'one-file-per-note)
-      (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
-        (if (file-writable-p filename)
-            (setq buf (ebib--notes-open-single-note-file filename)
-                  pos 1)
-          (error "[Ebib] Could not create note file `%s' " filename)))))
-    (let ((note (ebib--notes-fill-template key db)))
-      (with-current-buffer buf
-        (goto-char pos)
-        (insert (car note))
-        (setq pos (+ pos (cdr note)))
-        (push key ebib--notes-list)))
-    (cons buf pos)))
+  (if ebib-notes-use-org-capture
+      (let ((ebib--org-current-key key))
+        (if (stringp ebib-notes-use-org-capture)
+            (org-capture nil ebib-notes-use-org-capture)
+          (org-capture))
+        (push key ebib--notes-list)
+        nil) ; We must return nil, cf. comment in `ebib-popup-note'.
+    (let (buf pos)
+      (cond
+       ((eq ebib-notes-storage 'multiple-notes-per-file)
+        (setq buf (ebib--notes-buffer (or ebib-notes-default-file
+                                          (completing-read "Save note to file: " (ebib--notes-list-files) nil t)))
+              pos (1+ (buffer-size buf))))
+       ((eq ebib-notes-storage 'one-file-per-note)
+        (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
+          (if (file-writable-p filename)
+              (setq buf (ebib--notes-open-single-note-file filename)
+                    pos 1)
+            (error "[Ebib] Could not create note file `%s' " filename)))))
+      (let ((note (ebib--notes-fill-template key db)))
+        (with-current-buffer buf
+          (goto-char pos)
+          (insert (car note))
+          (setq pos (+ pos (cdr note)))
+          (push key ebib--notes-list)))
+      (cons buf pos))))
 
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return a string to indicate if a note exists for KEY.

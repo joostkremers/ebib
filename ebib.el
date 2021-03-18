@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.30
+;; Version: 2.31
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
@@ -71,6 +71,8 @@
 ;;; Silence the byte-compiler.
 (defvar pandoc-mode)
 (defvar selectrum-minibuffer-map)
+(declare-function org-capture "org-capture" (&optional goto keys))
+(declare-function org-capture "org-capture-get" (prop &optional local))
 (declare-function pandoc--get "ext:pandoc-mode-utils.el" (option &optional buffer))
 (declare-function helm-marked-candidates "ext:helm.el" (&optional with-wildcard all-sources))
 (declare-function helm-build-sync-source "ext:helm-source.el" (name &rest args))
@@ -576,7 +578,7 @@ the field contents."
                  (eq ebib-notes-show-note-method 'all)
                  (eq ebib-layout 'full)
                  (ebib--notes-has-note key))
-            (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point) t))
+            (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point)))
                   ;; If Ebib is lowered and then reopened, we need to redisplay
                   ;; the entry buffer, because otherwise the notes buffer isn't
                   ;; redisplayed. So we set the variable `ebib--needs-update' to
@@ -962,7 +964,7 @@ keywords before Emacs is killed."
     (define-key map "m" #'ebib-mark-entry) ; prefix
     (define-key map "M" 'ebib-dependent-map)
     (define-key map "n" #'ebib-next-entry)
-    (define-key map "N" #'ebib-open-note)
+    (define-key map "N" #'ebib-popup-note)
     (define-key map [(control n)] #'ebib-next-entry)
     (define-key map [(meta n)] #'ebib-index-scroll-up)
     (define-key map "o" #'ebib-open-bibtex-file)
@@ -1065,7 +1067,7 @@ there for details."
      ["Edit Key" ebib-edit-keyname (ebib--get-key-at-point)]
      ["Autogenerate Key" ebib-generate-autokey (ebib--get-key-at-point)]
      "--"
-     ["Open Note" ebib-open-note (ebib--get-key-at-point)]
+     ["Open Note" ebib-popup-note (ebib--get-key-at-point)]
      ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
      ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
 
@@ -1506,33 +1508,57 @@ interactively."
             (princ contents)
           (princ "[No annotation]"))))))
 
-(defun ebib-open-note (key &optional no-select)
+(defun ebib-open-note (key)
+  "Open the note for KEY and return its buffer.
+If `ebib-notes-storage' is set to `multiple-notes-per-file', this
+function runs `ebib-notes-open-note-after-hook'."
+  (let ((buf (ebib--notes-goto-note key)))
+    (when buf
+      (with-current-buffer (car buf)
+        (goto-char (cdr buf))
+        (if (eq ebib-notes-storage 'multiple-notes-per-file)
+            (run-hooks 'ebib-notes-open-note-after-hook)))
+      (car buf))))
+
+(defun ebib-popup-note (key)
   "Open the note for KEY or create a new one if none exists.
-KEY defaults to the current entry's key.  Return the buffer
-containing the entry.  If NO-SELECT is nil, select the note
-buffer (using `pop-to-buffer'), otherwise just return the buffer.
-NO-SELECT non-nil also inhibits the creation of a new note.
+KEY defaults to the current entry's key.  Display and select the
+buffer containing the entry using `pop-to-buffer'.
 
 If `ebib-notes-storage' is set to `multiple-notes-per-file', this
 function runs `ebib-notes-open-note-after-hook' for an existing
 note or `ebib-notes-new-note-hook' for a new note."
-  (interactive (list (ebib--get-key-at-point) current-prefix-arg))
+  (interactive (list (ebib--get-key-at-point)))
   (ebib--execute-when
     (entries
      (let ((buf (ebib--notes-goto-note key))
            (hook 'ebib-notes-open-note-after-hook))
-       (when (and (not buf)
-                  (not no-select))
+       (when (not buf) ; We need to create a new note.
          (setq buf (ebib--notes-create-new-note key ebib--cur-db)
                hook 'ebib-notes-new-note-hook))
+       ;; If `ebib-notes-use-org-capture' is non-nil, we don't need to pop up
+       ;; the buffer.  `ebib--notes-create-new-note' returns nil in this case,
+       ;; so we can simply check the value of `buf':
        (when buf
          (with-current-buffer (car buf)
            (goto-char (cdr buf))
            (when (eq ebib-notes-storage 'multiple-notes-per-file)
              (run-hooks hook)))
-         (unless no-select
-           (pop-to-buffer (car buf)))
-         (car buf))))
+         (pop-to-buffer (car buf)))))
+    (default
+      (beep))))
+
+(defun ebib-org-capture (&optional goto keys)
+  "Call `org-capture' from within Ebib.
+GOTO and KEYS are passed on to `org-capture'.  This function sets
+`ebib--org-current-key' to the current key before calling
+`org-capture', so that `ebib-notes-create-org-template' can
+function properly."
+  (interactive "P")
+  (ebib--execute-when
+    (entries
+     (let ((ebib--org-current-key (ebib--get-key-at-point)))
+       (org-capture goto keys)))
     (default
       (beep))))
 
@@ -2786,7 +2812,7 @@ new database."
                      (string-equal word ebib-notes-symbol))))
     (cond
      (link (ebib--call-browser link))
-     (notep (ebib-open-note (ebib--get-key-at-point)))
+     (notep (ebib-popup-note (ebib--get-key-at-point)))
      (t (when (eobp)
           (forward-line -1))
         (ebib-select-and-popup-entry)))))
@@ -4019,7 +4045,7 @@ a special manner."
                   ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
                   ((string= field "external")
-                   (ebib-open-note (ebib--get-key-at-point))
+                   (ebib-popup-note (ebib--get-key-at-point))
                    nil) ; See above.
                   ;; The catch-all edits a field without completion.
                   (t (ebib--edit-normal-field field init-contents)))))

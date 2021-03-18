@@ -62,6 +62,7 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 
 * Menu:
 
+* Version 231 March 2021::
 * Version 230 February 2021::
 * Version 229 December 2020::
 * Version 228 October 2020::
@@ -85,9 +86,17 @@ File: ebib.info,  Node: News,  Next: Installation,  Prev: Top,  Up: Top
 * Version 21112 July 2018::
 
 
-File: ebib.info,  Node: Version 230 February 2021,  Next: Version 229 December 2020,  Up: News
+File: ebib.info,  Node: Version 231 March 2021,  Next: Version 230 February 2021,  Up: News
 
-1.1 Version 2.30, February 2021
+1.1 Version 2.31, March 2021
+============================
+
+   • Allow the use of ‘org-capture’ to create notes.
+
+
+File: ebib.info,  Node: Version 230 February 2021,  Next: Version 229 December 2020,  Prev: Version 231 March 2021,  Up: News
+
+1.2 Version 2.30, February 2021
 ===============================
 
    • Redesign handling of external notes.  It is now possible to have
@@ -98,7 +107,7 @@ File: ebib.info,  Node: Version 230 February 2021,  Next: Version 229 December 2
 
 File: ebib.info,  Node: Version 229 December 2020,  Next: Version 228 October 2020,  Prev: Version 230 February 2021,  Up: News
 
-1.2 Version 2.29, December 2020
+1.3 Version 2.29, December 2020
 ===============================
 
    • Add support for selectrum (https://github.com/raxod502/selectrum).
@@ -106,7 +115,7 @@ File: ebib.info,  Node: Version 229 December 2020,  Next: Version 228 October 20
 
 File: ebib.info,  Node: Version 228 October 2020,  Next: Version 227 October 2020,  Prev: Version 229 December 2020,  Up: News
 
-1.3 Version 2.28, October 2020
+1.4 Version 2.28, October 2020
 ==============================
 
    • Redesign keyword handling.
@@ -116,7 +125,7 @@ File: ebib.info,  Node: Version 228 October 2020,  Next: Version 227 October 202
 
 File: ebib.info,  Node: Version 227 October 2020,  Next: Version 226 September 2020,  Prev: Version 228 October 2020,  Up: News
 
-1.4 Version 2.27, October 2020
+1.5 Version 2.27, October 2020
 ==============================
 
    • Add customisation options ‘ebib-multiline-fields’ and
@@ -132,7 +141,7 @@ File: ebib.info,  Node: Version 227 October 2020,  Next: Version 226 September 2
 
 File: ebib.info,  Node: Version 226 September 2020,  Next: Version 225 June 2020,  Prev: Version 227 October 2020,  Up: News
 
-1.5 Version 2.26, September 2020
+1.6 Version 2.26, September 2020
 ================================
 
    • Copy key, entry, reference or citation to the kill ring (and system
@@ -141,7 +150,7 @@ File: ebib.info,  Node: Version 226 September 2020,  Next: Version 225 June 2020
 
 File: ebib.info,  Node: Version 225 June 2020,  Next: Version 224 June 2020,  Prev: Version 226 September 2020,  Up: News
 
-1.6 Version 2.25, June 2020
+1.7 Version 2.25, June 2020
 ===========================
 
    • Allow adding the ‘.bib’ file to Org mode links.  The option
@@ -151,7 +160,7 @@ File: ebib.info,  Node: Version 225 June 2020,  Next: Version 224 June 2020,  Pr
 
 File: ebib.info,  Node: Version 224 June 2020,  Next: Version 223 May 2020,  Prev: Version 225 June 2020,  Up: News
 
-1.7 Version 2.24, June 2020
+1.8 Version 2.24, June 2020
 ===========================
 
    • Rename master/slave databases to main/dependent databases.
@@ -159,7 +168,7 @@ File: ebib.info,  Node: Version 224 June 2020,  Next: Version 223 May 2020,  Pre
 
 File: ebib.info,  Node: Version 223 May 2020,  Next: Version 222 February 2020,  Prev: Version 224 June 2020,  Up: News
 
-1.8 Version 2.23, May 2020
+1.9 Version 2.23, May 2020
 ==========================
 
    • Allow specifying .bib files with a file-local variable (esp. for
@@ -168,8 +177,8 @@ File: ebib.info,  Node: Version 223 May 2020,  Next: Version 222 February 2020, 
 
 File: ebib.info,  Node: Version 222 February 2020,  Next: Version 221 December 2019,  Prev: Version 223 May 2020,  Up: News
 
-1.9 Version 2.22, February 2020
-===============================
+1.10 Version 2.22, February 2020
+================================
 
    • Improve prompting when inserting citations.
    • Allow selecting multiple entries when inserting a citation in a
@@ -180,7 +189,7 @@ File: ebib.info,  Node: Version 222 February 2020,  Next: Version 221 December 2
 
 File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2019,  Prev: Version 222 February 2020,  Up: News
 
-1.10 Version 2.21, December 2019
+1.11 Version 2.21, December 2019
 ================================
 
    • New option ‘ebib-default-dir’: control the directory that Ebib uses
@@ -189,7 +198,7 @@ File: ebib.info,  Node: Version 221 December 2019,  Next: Version 220 December 2
 
 File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2019,  Prev: Version 221 December 2019,  Up: News
 
-1.11 Version 2.20, December 2019
+1.12 Version 2.20, December 2019
 ================================
 
    • Display the contents of an external note when the current entry has
@@ -200,7 +209,7 @@ File: ebib.info,  Node: Version 220 December 2019,  Next: Version 219 November 2
 
 File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,  Prev: Version 220 December 2019,  Up: News
 
-1.12 Version 2.19, November 2019
+1.13 Version 2.19, November 2019
 ================================
 
    • Add command ‘ebib-jump-to-entry’ (bound to ‘j’ in the index
@@ -213,7 +222,7 @@ File: ebib.info,  Node: Version 219 November 2019,  Next: Version 217 June 2019,
 
 File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,  Prev: Version 219 November 2019,  Up: News
 
-1.13 Version 2.17, June 2019
+1.14 Version 2.17, June 2019
 ============================
 
    • Create dependent databases, i.e., databases that share their data
@@ -224,7 +233,7 @@ File: ebib.info,  Node: Version 217 June 2019,  Next: Version 216 February 2019,
 
 File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 2019,  Prev: Version 217 June 2019,  Up: News
 
-1.14 Version 2.16, February 2019
+1.15 Version 2.16, February 2019
 ================================
 
    • Add command ‘ebib-download-url’: download pdf from a site in the
@@ -241,7 +250,7 @@ File: ebib.info,  Node: Version 216 February 2019,  Next: Version 215 January 20
 
 File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 2018,  Prev: Version 216 February 2019,  Up: News
 
-1.15 Version 2.15, January 2019
+1.16 Version 2.15, January 2019
 ===============================
 
    • Multiline field values can now be displayed in the entry buffer.
@@ -256,7 +265,7 @@ File: ebib.info,  Node: Version 215 January 2019,  Next: Version 214 December 20
 
 File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2018,  Prev: Version 215 January 2019,  Up: News
 
-1.16 Version 2.14, December 2018
+1.17 Version 2.14, December 2018
 ================================
 
    • Change the user interface of the export functions.  Calling one of
@@ -270,7 +279,7 @@ File: ebib.info,  Node: Version 214 December 2018,  Next: Version 213 November 2
 
 File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 2018,  Prev: Version 214 December 2018,  Up: News
 
-1.17 Version 2.13, November 2018
+1.18 Version 2.13, November 2018
 ================================
 
    • Use a separate index buffer for each open ‘.bib’ file.  Filling the
@@ -280,7 +289,7 @@ File: ebib.info,  Node: Version 213 November 2018,  Next: Version 2123 November 
 
 File: ebib.info,  Node: Version 2123 November 2018,  Next: Version 2122 November 2018,  Prev: Version 213 November 2018,  Up: News
 
-1.18 Version 2.12.3, November 2018
+1.19 Version 2.12.3, November 2018
 ==================================
 
    • Bug fix: when searching the database, only search visible entries.
@@ -288,7 +297,7 @@ File: ebib.info,  Node: Version 2123 November 2018,  Next: Version 2122 November
 
 File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 2018,  Prev: Version 2123 November 2018,  Up: News
 
-1.19 Version 2.12.2, November 2018
+1.20 Version 2.12.2, November 2018
 ==================================
 
    • Bug fix: when editing the ‘crossref’ field, offer keys from all
@@ -297,7 +306,7 @@ File: ebib.info,  Node: Version 2122 November 2018,  Next: Version 212 August 20
 
 File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,  Prev: Version 2122 November 2018,  Up: News
 
-1.20 Version 2.12, August 2018
+1.21 Version 2.12, August 2018
 ==============================
 
    • Add an option to specify the default sort field and direction.  It
@@ -308,7 +317,7 @@ File: ebib.info,  Node: Version 212 August 2018,  Next: Version 21112 July 2018,
 
 File: ebib.info,  Node: Version 21112 July 2018,  Prev: Version 212 August 2018,  Up: News
 
-1.21 Version 2.11.12, July 2018
+1.22 Version 2.11.12, July 2018
 ===============================
 
    • Use ‘biblatex’’s ‘Date’ field, if present, for displaying the year.
@@ -2246,13 +2255,19 @@ if you prefer to keep notes outside the ‘.bib’ file, there is an easy
 way to do that as well.  When you hit ‘N’ on an entry in the index
 buffer, Ebib creates a note for the entry, which is saved in a separate
 file.  If an entry already has a note associated with it, ‘N’ opens it.
-In the entry buffer, the first few lines of the note are shown under
-‘external note’.  This is not an actual field in the ‘.bib’ file, even
-though it is displayed as such.  (You can customise this behaviour.)
+By default, notes are created as Org entries.  (Changing that is
+possible, though it’s somewhat involved.)
 
-Notes are created as Org files.  Even though it is possible to change
-this, it requires quite a bit of configuration, so it’s recommended to
-just stick to Org.
+In the entry buffer, the first few lines of the note are shown under a
+pseudo-field ‘external note’.  This is not an actual field in the ‘.bib’
+file, even though it is displayed as such.  (You can customise this
+behaviour.)
+
+When you record a new note, Ebib pops up a buffer and adds the note to
+the end of the relevant notes file.  If you prefer, you can also use Org
+mode’s capture system to record new notes.  This has the advantage that
+you have more control over the location where a note is stored and that
+you can more than one capture template.
 
 Note that with Ebib version 2.30, the functionality for notes files has
 changed and it may be necessary to update your configuration.  See *note
@@ -2266,6 +2281,7 @@ Upgrading from earlier Ebib versions:
 * Upgrading from earlier Ebib versions::
 * Customising the notes file format::
 * Displaying notes::
+* Using org-capture to record notes::
 
 
 File: ebib.info,  Node: Configuring files for storing notes,  Next: Hooks,  Up: Notes files
@@ -2396,7 +2412,7 @@ easiest to look at the default template first:
 :PROPERTIES:
 %K
 :END:
->|<
+%%?
 "
 
 This template contains two format specifiers: ‘%K’ and ‘%T’.  ‘%K’ is
@@ -2404,8 +2420,11 @@ replaced with the key of the entry prepended with the string
 ‘"Custom_id: "’ in order to create an Org property.  The ‘%T’ specifier
 is replaced with the title of the note, which consists of the author (or
 editor), the year of publication and the title of the bibliography
-entry.  The template also contains the string ‘">|<"’, which indicates
-the position of the cursor when a new note is created.
+entry.  The template also contains the string ‘"%%?"’, which indicates
+the position of the cursor when a new note is created.  (For backward
+compatibility reasons, the string ‘">|<"’ can also be used to indicate
+the cursor position, although this does not work if you use
+‘org-capture’ to record new notes.)
 
 To change the template, you must customise the option
 ‘ebib-notes-template’.  If you use Org for your notes and keep your
@@ -2455,14 +2474,14 @@ Because the template can be customised and the major mode is determined
 from the file extension, it is in principle possible to use another
 format than Org for notes.  In this case, it is easier to use separate
 note files, but as long as you have a ‘%K’ directive in your template
-(and an appropriately defined function for it, see
-‘ebib-notes-template-specifiers’ below), it should still be possible to
-use a single notes file.  (Emphasis on _should_, however, because this
-has not been tested.)  You will also need to customise the three hooks
-discussed above in this case.
+(and an appropriately defined function for it, see the option
+‘ebib-notes-template-specifiers’), it should still be possible to use a
+single notes file.  (Emphasis on _should_, however, because this has not
+been tested.)  You will also need to customise the three hooks discussed
+above in this case.
 
 
-File: ebib.info,  Node: Displaying notes,  Prev: Customising the notes file format,  Up: Notes files
+File: ebib.info,  Node: Displaying notes,  Next: Using org-capture to record notes,  Prev: Customising the notes file format,  Up: Notes files
 
 17.5 Displaying notes
 =====================
@@ -2488,6 +2507,128 @@ format, but only works if you use Ebib’s default window layout (see the
 section *note Window Management: #window-management. for details),
 because that is the only window layout that ensures that the note can be
 displayed without getting in the way.
+
+
+File: ebib.info,  Node: Using org-capture to record notes,  Prev: Displaying notes,  Up: Notes files
+
+17.6 Using ‘org-capture’ to record notes
+========================================
+
+Instead of using Ebib’s own system to record notes, you can also used
+‘org-capture’ to do so.  This has two advantages: first, Org capture
+templates allow you to specify the type of the note and the location
+where the note is to be stored more precisely than what Ebib’s system
+allows.  Second, you can define more than one template, so you can
+capture different kinds of notes or record them in different files.
+
+Note that ‘org-capture’ is only used for creating new notes, not for
+displaying existing notes.  Therefore, you still need to configure Ebib
+to look for notes in the right locations.
+
+When using ‘org-capture’, you’ll most likely want to set
+‘ebib-notes-storage’ to ‘multiple-notes-per-file’.  (Though technically
+it would be possible to have a single file for each note, there is
+little reason to go through the trouble of setting that up.)  In
+addition, you’ll need to set ‘ebib-notes-locations’ to the files and/or
+directories you use to store notes.  There is no point but also no harm
+in setting ‘ebib-notes-default-file’; this setting is ignored when you
+create notes through ‘org-capture’ but Ebib still uses it to search for
+existing notes.
+
+In order to use ‘org-capture’ for creating notes, you need to set
+‘ebib-notes-use-org-capture’ and you need to add an entry to
+‘org-capture-templates’ that you can use to create a note.  This entry
+can have any key, description, type and target you like, but the
+template should be a function.
+
+The following is an example entry for ‘org-capture-templates’:
+
+("e"
+ "BibTeX note"
+ entry
+ (file+headline "~/Work/Bibtex/Bib_Notes.org" "Bibliography Notes")
+ (function ebib-notes-create-org-template))
+
+Because you are free to set the type and target to anything that
+‘org-capture’ accepts, you have more control over the way a note is
+created and where it is stored.
+
+As mentioned, the only part of this entry that should not be changed is
+the last line.  This line specifies that the actual template is created
+by the function‘ebib-notes-create-org-template’.  This function takes
+‘ebib-notes-template’ and converts it into a template that ‘org-capture’
+can use.
+
+The ‘%’-directives in ‘ebib-notes-template’ are interpreted by Ebib, not
+by the Org capture mechanism.  It is therefore still essential that it
+contains a ‘%K’ directive to create an identifier that Ebib can find.
+
+It is possible to add ‘org-capture’ directives to the template, though.
+To do this, put an additional ‘%’ before the directive.  For example,
+‘org-capture’ can add a time stamp with ‘%t’.  In order to add a time
+stamp to a bibliography note, write ‘%%t’:
+
+(setq ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%t\n%%?\n")
+
+‘ebib-notes-create-org-template’ strips off one ‘%’ and passes the
+result on to ‘org-capture’, which then sees ‘%t’ and replaces it with a
+time stamp.  (Note that this is the reason why the cursor position is
+indicated with ‘%%?’: ‘ebib-notes-create-org-template’ converts it to
+‘%?’, which is used by ‘org-capture’ to position the cursor.)
+
+Note that this ‘org-capture-templates’ entry should only be selected
+when creating a note from within Ebib.  The function
+‘ebib-notes-create-org-template’ needs some setup to function properly
+and this can only be done when it is called from Ebib.  Therefore, you
+may want to disable the entry altogether when you call ‘org-capture’
+from somewhere else.  You can do this by configuring the option
+‘org-capture-template-contexts’:
+
+(setq org-capture-template-contexts '(("e" ((in-mode ebib-index-mode)))))
+
+The ‘"e"’ is the key that you’ve chosen for your template.  This setting
+ensures that the ‘org-capture’ template associated with the key ‘"e"’ is
+only shown when ‘org-capture’ is called from a buffer with major mode
+‘ebib-index-mode’, which is Ebib’s index buffer.
+
+You can also bypass the ‘org-capture’ selection buffer altogether.  To
+use ‘org-capture’ for creating notes, you must set
+‘ebib-notes-use-org-capture’.  Setting it to ‘t’ causes the selection
+buffer to be popped up.  However, you can also set it to the key of the
+template that you use for Ebib notes (‘"e"’ in the current example):
+
+(setq ebib-notes-use-org-capture "e")
+
+This will cause ‘org-capture’ to bypass the selection buffer and
+immediately put you in the edit buffer with the relevant template.
+
+Alternatively, it is also possible to set up more than one ‘org-capture’
+entry for Ebib notes.  This can be useful if you want to use different
+locations for storing notes or store different types of notes.  If you
+do so, you still need to use the same function
+‘ebib-notes-create-org-template’ to create the actual template, however.
+‘org-capture’ itself does not know about Ebib’s databases and cannot
+access them.  This is what ‘ebib-notes-create-org-template’ is for.
+
+If you wish to associate each ‘org-capture’ entry with a different
+template, you can do so by setting ‘ebib-notes-template’ to a list.
+Each element of the list should itself be a list of two items, the key
+of the relevant template in ‘org-capture-templates’ and the template to
+use.
+
+Note that Ebib only finds one note per entry, so if you create several
+notes for an entry, Ebib can only display and open the first one it
+finds.  More than one note for an entry can still be useful, though, for
+example as a reading list or to export entries to some Org-based format.
+(You can customise ‘ebib-notes-template-specifiers’ and add new
+‘%’-forms, as discussed above.)
+
+Note that Ebib also provides an Ebib-friendly command to call
+‘org-capture’ directly.  This command, ‘ebib-org-capture’ (not bound to
+any key by default), takes the same arguments as ‘org-capture’ and can
+be used in the same way.  It makes sure that
+‘ebib-notes-create-org-template’ can find the current entry and then
+calls ‘org-capture’.
 
 
 File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev: Notes files,  Up: Top
@@ -3165,184 +3306,188 @@ Tag Table:
 Node: Top186
 Node: News1456
 Ref: #news1546
-Node: Version 230 February 20212165
-Ref: #version-2.30-february-20212328
-Node: Version 229 December 20202612
-Ref: #version-2.29-december-20202808
-Node: Version 228 October 20202883
-Ref: #version-2.28-october-20203076
-Node: Version 227 October 20203226
-Ref: #version-2.27-october-20203420
-Node: Version 226 September 20203916
-Ref: #version-2.26-september-20204111
-Node: Version 225 June 20204255
-Ref: #version-2.25-june-20204437
-Node: Version 224 June 20204647
-Ref: #version-2.24-june-20204823
-Node: Version 223 May 20204890
-Ref: #version-2.23-may-20205068
-Node: Version 222 February 20205164
-Ref: #version-2.22-february-20205356
-Node: Version 221 December 20195615
-Ref: #version-2.21-december-20195814
-Node: Version 220 December 20195925
-Ref: #version-2.20-december-20196124
-Node: Version 219 November 20196373
-Ref: #version-2.19-november-20196568
-Node: Version 217 June 20196951
-Ref: #version-2.17-june-20197138
-Node: Version 216 February 20197414
-Ref: #version-2.16-february-20197608
-Node: Version 215 January 20198115
-Ref: #version-2.15-january-20198311
-Node: Version 214 December 20188781
-Ref: #version-2.14-december-20188979
-Node: Version 213 November 20189421
-Ref: #version-2.13-november-20189621
-Node: Version 2123 November 20189820
-Ref: #version-2.12.3-november-201810025
-Node: Version 2122 November 201810100
-Ref: #version-2.12.2-november-201810303
-Node: Version 212 August 201810443
-Ref: #version-2.12-august-201810635
-Node: Version 21112 July 201810915
-Ref: #version-2.11.12-july-201811074
-Node: Installation11513
-Ref: #installation11631
-Node: Package manager11725
-Ref: #package-manager11854
-Node: Debian and Ubuntu12206
-Ref: #debian-and-ubuntu12367
-Node: Manual installation12501
-Ref: #manual-installation12664
-Node: Starting Ebib12945
-Ref: #starting-ebib13070
-Node: Getting Started13955
-Ref: #getting-started14095
-Node: Opening a bib File16085
-Ref: #opening-a-.bib-file16239
-Node: Preloading bib Files18082
-Ref: #preloading-.bib-files18270
-Node: Navigating a bib File19026
-Ref: #navigating-a-.bib-file19221
-Node: Starting a New bib File23777
-Ref: #starting-a-new-.bib-file23947
-Node: Editing the Database24239
-Ref: #editing-the-database24394
-Node: Adding and Deleting Entries24771
-Ref: #adding-and-deleting-entries24947
-Node: Editing Field Values27158
-Ref: #editing-field-values27353
-Node: Editing Multiline Values30514
-Ref: #editing-multiline-values30706
-Node: Undefined Fields32634
-Ref: #undefined-fields32803
-Node: Hidden Fields33692
-Ref: #hidden-fields33841
-Node: Timestamps34911
-Ref: #timestamps35073
-Node: Copy Cut Kill Paste Yank and Delete37046
-Ref: #copy-cut-kill-paste-yank-and-delete37250
-Node: Saving a Database38196
-Ref: #saving-a-database38348
-Node: Biblatex vs BibTeX39996
-Ref: #biblatex-vs.-bibtex40156
-Node: Setting the BibTeX Dialect40953
-Ref: #setting-the-bibtex-dialect41126
-Node: Alias Types and Fields43169
-Ref: #alias-types-and-fields43334
-Node: The Entries List45379
-Ref: #the-entries-list45517
-Node: Searching49258
-Ref: #searching49402
-Node: Simple Searches49905
-Ref: #simple-searches50021
-Node: Filters53277
-Ref: #filters53377
-Node: Simple Selection54452
-Ref: #simple-selection54581
-Node: Complex Filters56290
-Ref: #complex-filters56452
-Node: Storing and Saving Filters60527
-Ref: #storing-and-saving-filters60710
-Node: Special Filters63565
-Ref: #special-filters63746
-Node: An Example Listing Recent Additions65114
-Ref: #an-example-listing-recent-additions65343
-Node: Properties of Filtered Databases67713
-Ref: #properties-of-filtered-databases67910
-Node: Inserting Citations into a Text Buffer69565
-Ref: #inserting-citations-into-a-text-buffer69804
-Node: Citations with multiple keys72353
-Ref: #citations-with-multiple-keys72542
-Node: Key Bindings74309
-Ref: #key-bindings74501
-Node: Defining Citation Commands75259
-Ref: #defining-citation-commands75492
-Node: Associating a Database with a Text Buffer81388
-Ref: #associating-a-database-with-a-text-buffer81673
-Node: Links and Citations in Org buffers83052
-Ref: #links-and-citations-in-org-buffers83288
-Node: Copying Entries to the Kill Ring and System Clipboard84719
-Ref: #copying-entries-to-the-kill-ring-and-system-clipboard85009
-Node: Main and Dependent Databases87556
-Ref: #main-and-dependent-databases87775
-Node: Cross-referencing90760
-Ref: #cross-referencing90919
-Node: Marking Entries94446
-Ref: #marking-entries94594
-Node: Printing the Database95471
-Ref: #printing-the-database95649
-Node: Calling a Browser for URLs and DOIs99118
-Ref: #calling-a-browser-for-urls-and-dois99336
-Node: Viewing and Importing Files101644
-Ref: #viewing-and-importing-files101836
-Node: Editing the file field107046
-Ref: #editing-the-file-field107195
-Node: Notes files108566
-Ref: #notes-files108714
-Node: Configuring files for storing notes109870
-Ref: #configuring-files-for-storing-notes110048
-Node: Hooks113015
-Ref: #hooks113178
-Node: Upgrading from earlier Ebib versions114579
-Ref: #upgrading-from-earlier-ebib-versions114802
-Node: Customising the notes file format115712
-Ref: #customising-the-notes-file-format115940
-Node: Displaying notes119777
-Ref: #displaying-notes119926
-Node: Managing a reading list121275
-Ref: #managing-a-reading-list121437
-Node: Window Management124452
-Ref: #window-management124611
-Node: Creating Entry Stubs127770
-Ref: #creating-entry-stubs127932
-Node: @Preamble Definition128930
-Ref: #preamble-definition129094
-Node: @String Definitions131066
-Ref: #string-definitions131217
-Node: @Comments134710
-Ref: #comments134838
-Node: Managing Keywords135331
-Ref: #managing-keywords135476
-Node: Using a Canonical Keywords List137083
-Ref: #using-a-canonical-keywords-list137241
-Node: Sorting the bib File139399
-Ref: #sorting-the-.bib-file139572
-Node: Merging and Importing142691
-Ref: #merging-and-importing142856
-Node: Exporting Entries144626
-Ref: #exporting-entries144788
-Node: Multiple Identical Fields146304
-Ref: #multiple-identical-fields146483
-Node: Multiline Edit Buffers148411
-Ref: #multiline-edit-buffers148583
-Node: The Options Menu152668
-Ref: #the-options-menu152816
-Node: Customisation153434
-Ref: #customisation153545
-Node: Modifying Key Bindings154153
-Ref: #modifying-key-bindings154280
+Node: Version 231 March 20212192
+Ref: #version-2.31-march-20212346
+Node: Version 230 February 20212406
+Ref: #version-2.30-february-20212600
+Node: Version 229 December 20202884
+Ref: #version-2.29-december-20203080
+Node: Version 228 October 20203155
+Ref: #version-2.28-october-20203348
+Node: Version 227 October 20203498
+Ref: #version-2.27-october-20203692
+Node: Version 226 September 20204188
+Ref: #version-2.26-september-20204383
+Node: Version 225 June 20204527
+Ref: #version-2.25-june-20204709
+Node: Version 224 June 20204919
+Ref: #version-2.24-june-20205095
+Node: Version 223 May 20205162
+Ref: #version-2.23-may-20205340
+Node: Version 222 February 20205436
+Ref: #version-2.22-february-20205630
+Node: Version 221 December 20195889
+Ref: #version-2.21-december-20196088
+Node: Version 220 December 20196199
+Ref: #version-2.20-december-20196398
+Node: Version 219 November 20196647
+Ref: #version-2.19-november-20196842
+Node: Version 217 June 20197225
+Ref: #version-2.17-june-20197412
+Node: Version 216 February 20197688
+Ref: #version-2.16-february-20197882
+Node: Version 215 January 20198389
+Ref: #version-2.15-january-20198585
+Node: Version 214 December 20189055
+Ref: #version-2.14-december-20189253
+Node: Version 213 November 20189695
+Ref: #version-2.13-november-20189895
+Node: Version 2123 November 201810094
+Ref: #version-2.12.3-november-201810299
+Node: Version 2122 November 201810374
+Ref: #version-2.12.2-november-201810577
+Node: Version 212 August 201810717
+Ref: #version-2.12-august-201810909
+Node: Version 21112 July 201811189
+Ref: #version-2.11.12-july-201811348
+Node: Installation11787
+Ref: #installation11905
+Node: Package manager11999
+Ref: #package-manager12128
+Node: Debian and Ubuntu12480
+Ref: #debian-and-ubuntu12641
+Node: Manual installation12775
+Ref: #manual-installation12938
+Node: Starting Ebib13219
+Ref: #starting-ebib13344
+Node: Getting Started14229
+Ref: #getting-started14369
+Node: Opening a bib File16359
+Ref: #opening-a-.bib-file16513
+Node: Preloading bib Files18356
+Ref: #preloading-.bib-files18544
+Node: Navigating a bib File19300
+Ref: #navigating-a-.bib-file19495
+Node: Starting a New bib File24051
+Ref: #starting-a-new-.bib-file24221
+Node: Editing the Database24513
+Ref: #editing-the-database24668
+Node: Adding and Deleting Entries25045
+Ref: #adding-and-deleting-entries25221
+Node: Editing Field Values27432
+Ref: #editing-field-values27627
+Node: Editing Multiline Values30788
+Ref: #editing-multiline-values30980
+Node: Undefined Fields32908
+Ref: #undefined-fields33077
+Node: Hidden Fields33966
+Ref: #hidden-fields34115
+Node: Timestamps35185
+Ref: #timestamps35347
+Node: Copy Cut Kill Paste Yank and Delete37320
+Ref: #copy-cut-kill-paste-yank-and-delete37524
+Node: Saving a Database38470
+Ref: #saving-a-database38622
+Node: Biblatex vs BibTeX40270
+Ref: #biblatex-vs.-bibtex40430
+Node: Setting the BibTeX Dialect41227
+Ref: #setting-the-bibtex-dialect41400
+Node: Alias Types and Fields43443
+Ref: #alias-types-and-fields43608
+Node: The Entries List45653
+Ref: #the-entries-list45791
+Node: Searching49532
+Ref: #searching49676
+Node: Simple Searches50179
+Ref: #simple-searches50295
+Node: Filters53551
+Ref: #filters53651
+Node: Simple Selection54726
+Ref: #simple-selection54855
+Node: Complex Filters56564
+Ref: #complex-filters56726
+Node: Storing and Saving Filters60801
+Ref: #storing-and-saving-filters60984
+Node: Special Filters63839
+Ref: #special-filters64020
+Node: An Example Listing Recent Additions65388
+Ref: #an-example-listing-recent-additions65617
+Node: Properties of Filtered Databases67987
+Ref: #properties-of-filtered-databases68184
+Node: Inserting Citations into a Text Buffer69839
+Ref: #inserting-citations-into-a-text-buffer70078
+Node: Citations with multiple keys72627
+Ref: #citations-with-multiple-keys72816
+Node: Key Bindings74583
+Ref: #key-bindings74775
+Node: Defining Citation Commands75533
+Ref: #defining-citation-commands75766
+Node: Associating a Database with a Text Buffer81662
+Ref: #associating-a-database-with-a-text-buffer81947
+Node: Links and Citations in Org buffers83326
+Ref: #links-and-citations-in-org-buffers83562
+Node: Copying Entries to the Kill Ring and System Clipboard84993
+Ref: #copying-entries-to-the-kill-ring-and-system-clipboard85283
+Node: Main and Dependent Databases87830
+Ref: #main-and-dependent-databases88049
+Node: Cross-referencing91034
+Ref: #cross-referencing91193
+Node: Marking Entries94720
+Ref: #marking-entries94868
+Node: Printing the Database95745
+Ref: #printing-the-database95923
+Node: Calling a Browser for URLs and DOIs99392
+Ref: #calling-a-browser-for-urls-and-dois99610
+Node: Viewing and Importing Files101918
+Ref: #viewing-and-importing-files102110
+Node: Editing the file field107320
+Ref: #editing-the-file-field107469
+Node: Notes files108840
+Ref: #notes-files108988
+Node: Configuring files for storing notes110475
+Ref: #configuring-files-for-storing-notes110653
+Node: Hooks113620
+Ref: #hooks113783
+Node: Upgrading from earlier Ebib versions115184
+Ref: #upgrading-from-earlier-ebib-versions115407
+Node: Customising the notes file format116317
+Ref: #customising-the-notes-file-format116545
+Node: Displaying notes120577
+Ref: #displaying-notes120768
+Node: Using org-capture to record notes122117
+Ref: #using-org-capture-to-record-notes122308
+Node: Managing a reading list128334
+Ref: #managing-a-reading-list128496
+Node: Window Management131511
+Ref: #window-management131670
+Node: Creating Entry Stubs134829
+Ref: #creating-entry-stubs134991
+Node: @Preamble Definition135989
+Ref: #preamble-definition136153
+Node: @String Definitions138125
+Ref: #string-definitions138276
+Node: @Comments141769
+Ref: #comments141897
+Node: Managing Keywords142390
+Ref: #managing-keywords142535
+Node: Using a Canonical Keywords List144142
+Ref: #using-a-canonical-keywords-list144300
+Node: Sorting the bib File146458
+Ref: #sorting-the-.bib-file146631
+Node: Merging and Importing149750
+Ref: #merging-and-importing149915
+Node: Exporting Entries151685
+Ref: #exporting-entries151847
+Node: Multiple Identical Fields153363
+Ref: #multiple-identical-fields153542
+Node: Multiline Edit Buffers155470
+Ref: #multiline-edit-buffers155642
+Node: The Options Menu159727
+Ref: #the-options-menu159875
+Node: Customisation160493
+Ref: #customisation160604
+Node: Modifying Key Bindings161212
+Ref: #modifying-key-bindings161339
 
 End Tag Table
 
