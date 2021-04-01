@@ -2514,7 +2514,7 @@ File: ebib.info,  Node: Using org-capture to record notes,  Prev: Displaying not
 17.6 Using ‘org-capture’ to record notes
 ========================================
 
-Instead of using Ebib’s own system to record notes, you can also used
+Instead of using Ebib’s own system to record notes, you can also use
 ‘org-capture’ to do so.  This has two advantages: first, Org capture
 templates allow you to specify the type of the note and the location
 where the note is to be stored more precisely than what Ebib’s system
@@ -2578,11 +2578,11 @@ indicated with ‘%%?’: ‘ebib-notes-create-org-template’ converts it to
 
 Note that this ‘org-capture-templates’ entry should only be selected
 when creating a note from within Ebib.  The function
-‘ebib-notes-create-org-template’ needs some setup to function properly
-and this can only be done when it is called from Ebib.  Therefore, you
-may want to disable the entry altogether when you call ‘org-capture’
-from somewhere else.  You can do this by configuring the option
-‘org-capture-template-contexts’:
+‘ebib-notes-create-org-template’ needs some information about the
+current entry to function properly and this can only be provided when it
+is called from Ebib.  Therefore, you may want to disable the entry
+altogether when you call ‘org-capture’ from somewhere else.  You can do
+this by configuring the option ‘org-capture-template-contexts’:
 
 (setq org-capture-template-contexts '(("e" ((in-mode ebib-index-mode)))))
 
@@ -2591,11 +2591,10 @@ ensures that the ‘org-capture’ template associated with the key ‘"e"’ is
 only shown when ‘org-capture’ is called from a buffer with major mode
 ‘ebib-index-mode’, which is Ebib’s index buffer.
 
-You can also bypass the ‘org-capture’ selection buffer altogether.  To
-use ‘org-capture’ for creating notes, you must set
-‘ebib-notes-use-org-capture’.  Setting it to ‘t’ causes the selection
-buffer to be popped up.  However, you can also set it to the key of the
-template that you use for Ebib notes (‘"e"’ in the current example):
+You can also bypass the ‘org-capture’ selection buffer altogether and
+open an ‘org-capture’ buffer immediately with the appropriate template.
+To do this, set ‘ebib-notes-use-org-capture’ to the key of the template
+that you use for Ebib notes (‘"e"’ in the current example):
 
 (setq ebib-notes-use-org-capture "e")
 
@@ -2616,8 +2615,8 @@ Each element of the list should itself be a list of two items, the key
 of the relevant template in ‘org-capture-templates’ and the template to
 use.
 
-Note that Ebib only finds one note per entry, so if you create several
-notes for an entry, Ebib can only display and open the first one it
+Note that Ebib only searches for a single note for each entry, so if you
+create more than one, Ebib only displays and opens the first one it
 finds.  More than one note for an entry can still be useful, though, for
 example as a reading list or to export entries to some Org-based format.
 (You can customise ‘ebib-notes-template-specifiers’ and add new
@@ -3456,38 +3455,38 @@ Node: Displaying notes120577
 Ref: #displaying-notes120768
 Node: Using org-capture to record notes122117
 Ref: #using-org-capture-to-record-notes122308
-Node: Managing a reading list128334
-Ref: #managing-a-reading-list128496
-Node: Window Management131511
-Ref: #window-management131670
-Node: Creating Entry Stubs134829
-Ref: #creating-entry-stubs134991
-Node: @Preamble Definition135989
-Ref: #preamble-definition136153
-Node: @String Definitions138125
-Ref: #string-definitions138276
-Node: @Comments141769
-Ref: #comments141897
-Node: Managing Keywords142390
-Ref: #managing-keywords142535
-Node: Using a Canonical Keywords List144142
-Ref: #using-a-canonical-keywords-list144300
-Node: Sorting the bib File146458
-Ref: #sorting-the-.bib-file146631
-Node: Merging and Importing149750
-Ref: #merging-and-importing149915
-Node: Exporting Entries151685
-Ref: #exporting-entries151847
-Node: Multiple Identical Fields153363
-Ref: #multiple-identical-fields153542
-Node: Multiline Edit Buffers155470
-Ref: #multiline-edit-buffers155642
-Node: The Options Menu159727
-Ref: #the-options-menu159875
-Node: Customisation160493
-Ref: #customisation160604
-Node: Modifying Key Bindings161212
-Ref: #modifying-key-bindings161339
+Node: Managing a reading list128306
+Ref: #managing-a-reading-list128468
+Node: Window Management131483
+Ref: #window-management131642
+Node: Creating Entry Stubs134801
+Ref: #creating-entry-stubs134963
+Node: @Preamble Definition135961
+Ref: #preamble-definition136125
+Node: @String Definitions138097
+Ref: #string-definitions138248
+Node: @Comments141741
+Ref: #comments141869
+Node: Managing Keywords142362
+Ref: #managing-keywords142507
+Node: Using a Canonical Keywords List144114
+Ref: #using-a-canonical-keywords-list144272
+Node: Sorting the bib File146430
+Ref: #sorting-the-.bib-file146603
+Node: Merging and Importing149722
+Ref: #merging-and-importing149887
+Node: Exporting Entries151657
+Ref: #exporting-entries151819
+Node: Multiple Identical Fields153335
+Ref: #multiple-identical-fields153514
+Node: Multiline Edit Buffers155442
+Ref: #multiline-edit-buffers155614
+Node: The Options Menu159699
+Ref: #the-options-menu159847
+Node: Customisation160465
+Ref: #customisation160576
+Node: Modifying Key Bindings161184
+Ref: #modifying-key-bindings161311
 
 End Tag Table
 

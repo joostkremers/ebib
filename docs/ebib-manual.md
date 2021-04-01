@@ -2090,7 +2090,7 @@ displayed without getting in the way.
 
 ## Using `org-capture` to record notes
 
-Instead of using Ebib’s own system to record notes, you can also used
+Instead of using Ebib’s own system to record notes, you can also use
 `org-capture` to do so. This has two advantages: first, Org capture
 templates allow you to specify the type of the note and the location
 where the note is to be stored more precisely than what Ebib’s system
@@ -2154,11 +2154,11 @@ indicated with `%%?`: `ebib-notes-create-org-template` converts it to
 
 Note that this `org-capture-templates` entry should only be selected
 when creating a note from within Ebib. The function
-`ebib-notes-create-org-template` needs some setup to function properly
-and this can only be done when it is called from Ebib. Therefore, you
-may want to disable the entry altogether when you call `org-capture`
-from somewhere else. You can do this by configuring the option
-`org-capture-template-contexts`:
+`ebib-notes-create-org-template` needs some information about the
+current entry to function properly and this can only be provided when it
+is called from Ebib. Therefore, you may want to disable the entry
+altogether when you call `org-capture` from somewhere else. You can do
+this by configuring the option `org-capture-template-contexts`:
 
     (setq org-capture-template-contexts '(("e" ((in-mode ebib-index-mode)))))
 
@@ -2167,11 +2167,10 @@ ensures that the `org-capture` template associated with the key `"e"` is
 only shown when `org-capture` is called from a buffer with major mode
 `ebib-index-mode`, which is Ebib’s index buffer.
 
-You can also bypass the `org-capture` selection buffer altogether. To
-use `org-capture` for creating notes, you must set
-`ebib-notes-use-org-capture`. Setting it to `t` causes the selection
-buffer to be popped up. However, you can also set it to the key of the
-template that you use for Ebib notes (`"e"` in the current example):
+You can also bypass the `org-capture` selection buffer altogether and
+open an `org-capture` buffer immediately with the appropriate template.
+To do this, set `ebib-notes-use-org-capture` to the key of the template
+that you use for Ebib notes (`"e"` in the current example):
 
     (setq ebib-notes-use-org-capture "e")
 
@@ -2191,8 +2190,8 @@ template, you can do so by setting `ebib-notes-template` to a list. Each
 element of the list should itself be a list of two items, the key of the
 relevant template in `org-capture-templates` and the template to use.
 
-Note that Ebib only finds one note per entry, so if you create several
-notes for an entry, Ebib can only display and open the first one it
+Note that Ebib only searches for a single note for each entry, so if you
+create more than one, Ebib only displays and opens the first one it
 finds. More than one note for an entry can still be useful, though, for
 example as a reading list or to export entries to some Org-based format.
 (You can customise `ebib-notes-template-specifiers` and add new
