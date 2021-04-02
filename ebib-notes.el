@@ -37,7 +37,6 @@
 ;;; Code:
 
 (require 'ebib-utils)
-(require 'ebib-db)
 
 (require 'org-element nil t) ; Load org-element.el if available.
 
