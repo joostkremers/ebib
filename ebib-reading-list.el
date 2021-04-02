@@ -142,7 +142,7 @@ still pending, nil if it is done."
   :type 'function)
 
 (defun ebib-reading-list-item-org-active-p ()
-  "Return t if point is in a reading list item that is done."
+  "Return t if point is in a reading list item that is still active."
   (string= (org-get-todo-state) ebib-reading-list-todo-marker))
 
 (defcustom ebib-reading-list-new-item-hook nil
