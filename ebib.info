@@ -2637,10 +2637,10 @@ File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev
 
 Ebib offers the ability to manage a reading list as an Org file.  In
 order to make use of this functionality, you must set the option
-‘ebib-reading-list’ to a file in which the reading list is stored.  Once
-you’ve specified a file, you can add the current entry to the reading
-list with ‘R a’.  The mode line of the entry buffer will show ‘[R]’ to
-indicate that the current entry is on the reading list.
+‘ebib-reading-list-file’ to a file in which the reading list is stored.
+Once you’ve specified a file, you can add the current entry to the
+reading list with ‘R a’.  The mode line of the entry buffer will show
+‘[R]’ to indicate that the current entry is on the reading list.
 
 A reading list is simply an Org file with one entry (i.e., heading) per
 item.  Each entry is marked with ‘TODO’, so that the items can be
@@ -3457,36 +3457,36 @@ Node: Using org-capture to record notes122117
 Ref: #using-org-capture-to-record-notes122308
 Node: Managing a reading list128306
 Ref: #managing-a-reading-list128468
-Node: Window Management131483
-Ref: #window-management131642
-Node: Creating Entry Stubs134801
-Ref: #creating-entry-stubs134963
-Node: @Preamble Definition135961
-Ref: #preamble-definition136125
-Node: @String Definitions138097
-Ref: #string-definitions138248
-Node: @Comments141741
-Ref: #comments141869
-Node: Managing Keywords142362
-Ref: #managing-keywords142507
-Node: Using a Canonical Keywords List144114
-Ref: #using-a-canonical-keywords-list144272
-Node: Sorting the bib File146430
-Ref: #sorting-the-.bib-file146603
-Node: Merging and Importing149722
-Ref: #merging-and-importing149887
-Node: Exporting Entries151657
-Ref: #exporting-entries151819
-Node: Multiple Identical Fields153335
-Ref: #multiple-identical-fields153514
-Node: Multiline Edit Buffers155442
-Ref: #multiline-edit-buffers155614
-Node: The Options Menu159699
-Ref: #the-options-menu159847
-Node: Customisation160465
-Ref: #customisation160576
-Node: Modifying Key Bindings161184
-Ref: #modifying-key-bindings161311
+Node: Window Management131487
+Ref: #window-management131646
+Node: Creating Entry Stubs134805
+Ref: #creating-entry-stubs134967
+Node: @Preamble Definition135965
+Ref: #preamble-definition136129
+Node: @String Definitions138101
+Ref: #string-definitions138252
+Node: @Comments141745
+Ref: #comments141873
+Node: Managing Keywords142366
+Ref: #managing-keywords142511
+Node: Using a Canonical Keywords List144118
+Ref: #using-a-canonical-keywords-list144276
+Node: Sorting the bib File146434
+Ref: #sorting-the-.bib-file146607
+Node: Merging and Importing149726
+Ref: #merging-and-importing149891
+Node: Exporting Entries151661
+Ref: #exporting-entries151823
+Node: Multiple Identical Fields153339
+Ref: #multiple-identical-fields153518
+Node: Multiline Edit Buffers155446
+Ref: #multiline-edit-buffers155618
+Node: The Options Menu159703
+Ref: #the-options-menu159851
+Node: Customisation160469
+Ref: #customisation160580
+Node: Modifying Key Bindings161188
+Ref: #modifying-key-bindings161315
 
 End Tag Table
 

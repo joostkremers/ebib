@@ -2208,10 +2208,10 @@ calls `org-capture`.
 
 Ebib offers the ability to manage a reading list as an Org file. In
 order to make use of this functionality, you must set the option
-`ebib-reading-list` to a file in which the reading list is stored. Once
-you’ve specified a file, you can add the current entry to the reading
-list with `R a`. The mode line of the entry buffer will show `[R]` to
-indicate that the current entry is on the reading list.
+`ebib-reading-list-file` to a file in which the reading list is stored.
+Once you’ve specified a file, you can add the current entry to the
+reading list with `R a`. The mode line of the entry buffer will show
+`[R]` to indicate that the current entry is on the reading list.
 
 A reading list is simply an Org file with one entry (i.e., heading) per
 item. Each entry is marked with `TODO`, so that the items can be

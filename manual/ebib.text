@@ -950,7 +950,7 @@ Note that Ebib also provides an Ebib-friendly command to call `org-capture` dire
 
 # Managing a reading list #
 
-Ebib offers the ability to manage a reading list as an Org file. In order to make use of this functionality, you must set the option `ebib-reading-list` to a file in which the reading list is stored. Once you've specified a file, you can add the current entry to the reading list with `R a`. The mode line of the entry buffer will show `[R]` to indicate that the current entry is on the reading list.
+Ebib offers the ability to manage a reading list as an Org file. In order to make use of this functionality, you must set the option `ebib-reading-list-file` to a file in which the reading list is stored. Once you've specified a file, you can add the current entry to the reading list with `R a`. The mode line of the entry buffer will show `[R]` to indicate that the current entry is on the reading list.
 
 A reading list is simply an Org file with one entry (i.e., heading) per item. Each entry is marked with `TODO`, so that the items can be included in the Org agenda. If you prefer to use another todo state, you can customise the option `ebib-reading-list-todo-marker`. You can mark an entry as done from within Ebib with the key `R d`. This will change the todo state of the item to `DONE` (customisable through the option `ebib-reading-list-done-marker`). With `R v` you can view the reading list.
 
