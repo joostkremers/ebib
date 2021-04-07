@@ -741,7 +741,7 @@ the column can be sorted. You can add or remove fields, or reorder the
 existing ones.
 
 You can use any `biblatex` (or BibTeX) field to define a column in the
-index buffer. There are a few column label that do not correspond
+index buffer. There are a few column labels that do not correspond
 directly to a field name, however. For example, the column label
 `"Entry Key"`, which displays the entry key, is not a `biblatex` field.
 Similarly, there is a column label `"Author/Editor"`, which displays the
