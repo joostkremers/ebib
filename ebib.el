@@ -4822,11 +4822,12 @@ If prefix ARG is non-nil, do not delete the original file."
 
 ;;; Functions for non-Ebib buffers
 
-(defun ebib-import ()
+(defun ebib-import (&optional db)
   "Search for BibTeX entries in the current buffer.
-The entries are added to the current database (i.e., the database
-that was active when Ebib was lowered.  Works on the whole buffer,
-or on the region if it is active."
+The entries are added to DB, which defaults to the current
+database (i.e., the database that was active when Ebib was
+lowered.  Works on the whole buffer, or on the region if it is
+active."
   (interactive)
   (ebib--execute-when
     ((and real-db entries)
@@ -4835,12 +4836,13 @@ or on the region if it is active."
          (if (use-region-p)
              (narrow-to-region (region-beginning)
                                (region-end)))
-         (let ((buffer (current-buffer)))
+         (let ((db (or db ebib--cur-db))
+               (buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--bib-find-bibtex-entries ebib--cur-db t)))
-               (ebib--mark-index-dirty ebib--cur-db)
-               (ebib-db-set-modified t ebib--cur-db)
+             (let ((result (ebib--bib-find-bibtex-entries db t)))
+               (ebib--mark-index-dirty db)
+               (ebib-db-set-modified t db)
                (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
                                 (car result)
                                 (cadr result)
