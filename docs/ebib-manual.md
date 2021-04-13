@@ -2596,10 +2596,11 @@ Another way to add entries to a database is to import them from an Emacs
 buffer. If, for example, you find ready-formatted BibTeX entries in a
 text file or on the internet, you can copy & paste them to any Emacs
 buffer (e.g. the `*scratch*` buffer), and then execute the command
-`M-x ebib-import`. Ebib then goes through the buffer and loads all
-BibTeX entries it finds into the current database (i.e. the database
-that was active when you lowered Ebib). If you call `ebib-import` while
-the region is active, Ebib only reads the BibTeX entries in the region.
+`M-x ebib-import-entries`. Ebib then goes through the buffer and loads
+all BibTeX entries it finds into the current database (i.e. the database
+that was active when you lowered Ebib). If you call
+`ebib-import-entries` while the region is active, Ebib only reads the
+BibTeX entries in the region.
 
 If a BibTeX entry in the buffer lacks an entry key (which sometimes
 happens with BibTeX entries found on the internet), Ebib will generate a

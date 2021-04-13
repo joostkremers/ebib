@@ -3065,10 +3065,11 @@ Another way to add entries to a database is to import them from an Emacs
 buffer.  If, for example, you find ready-formatted BibTeX entries in a
 text file or on the internet, you can copy & paste them to any Emacs
 buffer (e.g. the ‘*scratch*’ buffer), and then execute the command ‘M-x
-ebib-import’.  Ebib then goes through the buffer and loads all BibTeX
-entries it finds into the current database (i.e. the database that was
-active when you lowered Ebib).  If you call ‘ebib-import’ while the
-region is active, Ebib only reads the BibTeX entries in the region.
+ebib-import-entries’.  Ebib then goes through the buffer and loads all
+BibTeX entries it finds into the current database (i.e. the database
+that was active when you lowered Ebib).  If you call
+‘ebib-import-entries’ while the region is active, Ebib only reads the
+BibTeX entries in the region.
 
 If a BibTeX entry in the buffer lacks an entry key (which sometimes
 happens with BibTeX entries found on the internet), Ebib will generate a
@@ -3475,18 +3476,18 @@ Node: Sorting the bib File146435
 Ref: #sorting-the-.bib-file146608
 Node: Merging and Importing149727
 Ref: #merging-and-importing149892
-Node: Exporting Entries151662
-Ref: #exporting-entries151824
-Node: Multiple Identical Fields153340
-Ref: #multiple-identical-fields153519
-Node: Multiline Edit Buffers155447
-Ref: #multiline-edit-buffers155619
-Node: The Options Menu159704
-Ref: #the-options-menu159852
-Node: Customisation160470
-Ref: #customisation160581
-Node: Modifying Key Bindings161189
-Ref: #modifying-key-bindings161316
+Node: Exporting Entries151678
+Ref: #exporting-entries151840
+Node: Multiple Identical Fields153356
+Ref: #multiple-identical-fields153535
+Node: Multiline Edit Buffers155463
+Ref: #multiline-edit-buffers155635
+Node: The Options Menu159720
+Ref: #the-options-menu159868
+Node: Customisation160486
+Ref: #customisation160597
+Node: Modifying Key Bindings161205
+Ref: #modifying-key-bindings161332
 
 End Tag Table
 

@@ -4822,7 +4822,7 @@ If prefix ARG is non-nil, do not delete the original file."
 
 ;;; Functions for non-Ebib buffers
 
-(defun ebib-import (&optional db)
+(defun ebib-import-entries (&optional db)
   "Search for BibTeX entries in the current buffer.
 The entries are added to DB, which defaults to the current
 database (i.e., the database that was active when Ebib was
@@ -4848,6 +4848,8 @@ active."
                                 (cadr result)
                                 (if (nth 2 result) "a" "no")))))))))
     (default (error "[Ebib] No database loaded"))))
+
+(define-obsolete-function-alias 'ebib-import 'ebib-import-entries "Ebib 2.32")
 
 (defun ebib--get-db-from-filename (search-filename)
   "Return the database struct associated with SEARCH-FILENAME."
