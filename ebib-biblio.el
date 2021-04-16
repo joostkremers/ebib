@@ -42,6 +42,7 @@
 
 (defvar ebib--databases)
 (defvar ebib--cur-db)
+(defvar ebib-index-mode-map)
 (declare-function ebib-read-database "ext:ebib.el" (prompt &optional databases))
 (declare-function ebib-import-entries "ext:ebib.el" (&optional db))
 
@@ -55,6 +56,8 @@ The entry is stored in the current database."
                                  (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
                                                      (current-buffer))
                                  (ebib-import-entries ebib--cur-db)))))
+
+(define-key ebib-index-mode-map "B" #'ebib-biblio-import-doi)
 
 (defun ebib-biblio-selection-import-callback (bibtex _entry)
   "Add a BibTeX entry to the current Ebib database.
