@@ -1055,6 +1055,7 @@ there for details."
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
      ["Kill" ebib-kill-entry (ebib--get-key-at-point)]
      ["Yank From Kill Ring" ebib-yank-entry ebib--cur-db]
+     ["Fetch By DOI" ebib-biblio-import-doi :visible (fboundp 'ebib-biblio-import-doi)]
      ["Delete" ebib-delete-entry (and ebib--cur-db
                                       (ebib--get-key-at-point)
                                       (not (ebib-db-get-filter ebib--cur-db)))]
