@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.31
+;; Version: 2.32
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
@@ -1055,6 +1055,7 @@ there for details."
      ["Edit" ebib-edit-entry (ebib--get-key-at-point)]
      ["Kill" ebib-kill-entry (ebib--get-key-at-point)]
      ["Yank From Kill Ring" ebib-yank-entry ebib--cur-db]
+     ["Fetch By DOI" ebib-biblio-import-doi :visible (fboundp 'ebib-biblio-import-doi)]
      ["Delete" ebib-delete-entry (and ebib--cur-db
                                       (ebib--get-key-at-point)
                                       (not (ebib-db-get-filter ebib--cur-db)))]
@@ -4822,11 +4823,12 @@ If prefix ARG is non-nil, do not delete the original file."
 
 ;;; Functions for non-Ebib buffers
 
-(defun ebib-import ()
+(defun ebib-import-entries (&optional db)
   "Search for BibTeX entries in the current buffer.
-The entries are added to the current database (i.e., the database
-that was active when Ebib was lowered.  Works on the whole buffer,
-or on the region if it is active."
+The entries are added to DB, which defaults to the current
+database (i.e., the database that was active when Ebib was
+lowered.  Works on the whole buffer, or on the region if it is
+active."
   (interactive)
   (ebib--execute-when
     ((and real-db entries)
@@ -4835,17 +4837,23 @@ or on the region if it is active."
          (if (use-region-p)
              (narrow-to-region (region-beginning)
                                (region-end)))
-         (let ((buffer (current-buffer)))
+         (let ((db (or db ebib--cur-db))
+               (buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--bib-find-bibtex-entries ebib--cur-db t)))
-               (ebib--mark-index-dirty ebib--cur-db)
-               (ebib-db-set-modified t ebib--cur-db)
-               (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
+             (let ((result (ebib--bib-find-bibtex-entries db t)))
+               (ebib-db-set-modified t db)
+               (if-let ((index (ebib-db-get-buffer db))
+                        (window (get-buffer-window index t)))
+                   (ebib--update-index-buffer)
+                 (ebib--mark-index-dirty db))
+               (message (format "Imported %d entries, %d @Strings and %s @Preamble."
                                 (car result)
                                 (cadr result)
                                 (if (nth 2 result) "a" "no")))))))))
     (default (error "[Ebib] No database loaded"))))
+
+(define-obsolete-function-alias 'ebib-import 'ebib-import-entries "Ebib 2.32")
 
 (defun ebib--get-db-from-filename (search-filename)
   "Return the database struct associated with SEARCH-FILENAME."

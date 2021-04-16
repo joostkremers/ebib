@@ -9,6 +9,11 @@ is.
 
 # News
 
+## Version 2.32, April 2021
+
+-   Add support for
+    [`biblio.el`](https://github.com/cpitclaudel/biblio.el).
+
 ## Version 2.31, March 2021
 
 -   Allow the use of `org-capture` to create notes.
@@ -1746,6 +1751,32 @@ Ebib uses the Emacs function `browse-url` to call the default browser on
 the system. If you prefer to use another browser, however, you can
 specify this with the option “Browser Command”.
 
+# Integration with the Biblio package
+
+[Biblio](https://github.com/cpitclaudel/biblio.el) is a package with
+which you can browse a number of online bibliographic databases and
+import BibTeX entries based on their DOI. If you use Biblio, you can add
+support for it to Ebib by loading the package `ebib-biblio` in your init
+file and adding an entry to `biblio-selection-mode-map`:
+
+    (require 'ebib-biblio)
+    (define-key biblio-selection-mode-map (kbd "e") #'ebib-biblio-selection-import)
+
+Or with `use-package`:
+
+    (use-package ebib-biblio
+      :after (ebib biblio)
+      :bind (:map biblio-selection-mode-map
+                  ("e" . ebib-biblio-selection-import)))
+
+If you now call `biblio-lookup`, you can use the key `e` (or any other
+key you choose, of course) in Biblio’s selection buffer to import the
+selected entry into the current Ebib database.
+
+Additionally, loading `ebib-biblio` adds the key `B` to the Ebib index.
+This key asks you for a DOI and then tries to import the entry that the
+DOI points to into the current database.
+
 # Viewing and Importing Files
 
 If you have electronic versions of the papers in your database stored on
@@ -2596,10 +2627,11 @@ Another way to add entries to a database is to import them from an Emacs
 buffer. If, for example, you find ready-formatted BibTeX entries in a
 text file or on the internet, you can copy & paste them to any Emacs
 buffer (e.g. the `*scratch*` buffer), and then execute the command
-`M-x ebib-import`. Ebib then goes through the buffer and loads all
-BibTeX entries it finds into the current database (i.e. the database
-that was active when you lowered Ebib). If you call `ebib-import` while
-the region is active, Ebib only reads the BibTeX entries in the region.
+`M-x ebib-import-entries`. Ebib then goes through the buffer and loads
+all BibTeX entries it finds into the current database (i.e. the database
+that was active when you lowered Ebib). If you call
+`ebib-import-entries` while the region is active, Ebib only reads the
+BibTeX entries in the region.
 
 If a BibTeX entry in the buffer lacks an entry key (which sometimes
 happens with BibTeX entries found on the internet), Ebib will generate a
