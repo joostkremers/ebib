@@ -4841,9 +4841,12 @@ active."
            (with-temp-buffer
              (insert-buffer-substring buffer)
              (let ((result (ebib--bib-find-bibtex-entries db t)))
-               (ebib--mark-index-dirty db)
                (ebib-db-set-modified t db)
-               (message (format "%d entries, %d @Strings and %s @Preamble found in buffer."
+               (if-let ((index (ebib-db-get-buffer db))
+                        (window (get-buffer-window index t)))
+                   (ebib--update-index-buffer)
+                 (ebib--mark-index-dirty db))
+               (message (format "Imported %d entries, %d @Strings and %s @Preamble."
                                 (car result)
                                 (cadr result)
                                 (if (nth 2 result) "a" "no")))))))))
