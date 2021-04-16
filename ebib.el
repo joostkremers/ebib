@@ -502,9 +502,9 @@ contents is recreated unconditionally."
 If `ebib--cur-db' is nil, the buffer is just erased and its name
 set to \"Ebib (no file)\".  If NO-REFRESH is non-nil, display the
 index buffer associated with `ebib--cur-db' but do not refresh
-its contents.  If NO-REFRESH in non-nil but `ebib--cur-db' does
-not have an associated index buffer, create an index buffer and
-fill it."
+its contents, unless the buffer-local value of
+`ebib--dirty-index-buffer' is non-nil.  If `ebib--cur-db' does
+not have an associated index buffer, create one and fill it."
   (let ((window (get-buffer-window (ebib--buffer 'index)))
         (index-buffer (when ebib--cur-db
                         (ebib-db-get-buffer ebib--cur-db))))
