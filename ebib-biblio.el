@@ -35,6 +35,13 @@
 ;; functions that integrate [biblio.el] with Ebib.
 ;;
 ;; [biblio]: https://github.com/cpitclaudel/biblio.el
+;;
+;; To use this code, `require' it in your init file.  This adds the key "B" to
+;; the index mode map, which fetches a BibTeX entry by DOI
+;; (`ebib-biblio-import-doi').  You should also add a key to
+;; `biblio-selection-mode-map' and bind it to `ebib-biblio-selection-import':
+;;
+;; (define-key biblio-selection-mode-map (kbd "e") #'ebib-biblio-selection-import)
 
 ;;; Code:
 
