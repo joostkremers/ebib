@@ -2161,6 +2161,18 @@ Additionally, loading ‘ebib-biblio’ adds the key ‘B’ to the Ebib index.
 This key asks you for a DOI and then tries to import the entry that the
 DOI points to into the current database.
 
+When fetching entries via Biblio, Ebib checks for duplicates based on
+the key of the new entry.  This will only work reliably if both Ebib and
+Biblio are configured to automatically generate BibTeX keys.  Ebib does
+this by default (see the option ‘ebib-autogenerate-keys’), Biblio does
+not.  You need to set the option ‘biblio-bibtex-use-autokey’ in order to
+make sure that it does.
+
+Ebib and Biblio both use the functionality of ‘bibtex.el’ to generate
+keys.  Refer to the documentation string of the function
+‘bibtex-generate-autokey’ to find out how to customise this
+functionality.
+
 
 File: ebib.info,  Node: Viewing and Importing Files,  Next: Notes files,  Prev: Integration with the Biblio package,  Up: Top
 
@@ -3483,56 +3495,56 @@ Node: Calling a Browser for URLs and DOIs99733
 Ref: #calling-a-browser-for-urls-and-dois99959
 Node: Integration with the Biblio package102267
 Ref: #integration-with-the-biblio-package102499
-Node: Viewing and Importing Files103514
-Ref: #viewing-and-importing-files103706
-Node: Editing the file field108916
-Ref: #editing-the-file-field109065
-Node: Notes files110436
-Ref: #notes-files110584
-Node: Configuring files for storing notes112071
-Ref: #configuring-files-for-storing-notes112249
-Node: Hooks115216
-Ref: #hooks115379
-Node: Upgrading from earlier Ebib versions116780
-Ref: #upgrading-from-earlier-ebib-versions117003
-Node: Customising the notes file format117913
-Ref: #customising-the-notes-file-format118141
-Node: Displaying notes122173
-Ref: #displaying-notes122364
-Node: Using org-capture to record notes123713
-Ref: #using-org-capture-to-record-notes123904
-Node: Managing a reading list129902
-Ref: #managing-a-reading-list130064
-Node: Window Management133083
-Ref: #window-management133242
-Node: Creating Entry Stubs136401
-Ref: #creating-entry-stubs136563
-Node: @Preamble Definition137561
-Ref: #preamble-definition137725
-Node: @String Definitions139697
-Ref: #string-definitions139848
-Node: @Comments143341
-Ref: #comments143469
-Node: Managing Keywords143962
-Ref: #managing-keywords144107
-Node: Using a Canonical Keywords List145714
-Ref: #using-a-canonical-keywords-list145872
-Node: Sorting the bib File148030
-Ref: #sorting-the-.bib-file148203
-Node: Merging and Importing151322
-Ref: #merging-and-importing151487
-Node: Exporting Entries153273
-Ref: #exporting-entries153435
-Node: Multiple Identical Fields154951
-Ref: #multiple-identical-fields155130
-Node: Multiline Edit Buffers157058
-Ref: #multiline-edit-buffers157230
-Node: The Options Menu161315
-Ref: #the-options-menu161463
-Node: Customisation162081
-Ref: #customisation162192
-Node: Modifying Key Bindings162800
-Ref: #modifying-key-bindings162927
+Node: Viewing and Importing Files104117
+Ref: #viewing-and-importing-files104309
+Node: Editing the file field109519
+Ref: #editing-the-file-field109668
+Node: Notes files111039
+Ref: #notes-files111187
+Node: Configuring files for storing notes112674
+Ref: #configuring-files-for-storing-notes112852
+Node: Hooks115819
+Ref: #hooks115982
+Node: Upgrading from earlier Ebib versions117383
+Ref: #upgrading-from-earlier-ebib-versions117606
+Node: Customising the notes file format118516
+Ref: #customising-the-notes-file-format118744
+Node: Displaying notes122776
+Ref: #displaying-notes122967
+Node: Using org-capture to record notes124316
+Ref: #using-org-capture-to-record-notes124507
+Node: Managing a reading list130505
+Ref: #managing-a-reading-list130667
+Node: Window Management133686
+Ref: #window-management133845
+Node: Creating Entry Stubs137004
+Ref: #creating-entry-stubs137166
+Node: @Preamble Definition138164
+Ref: #preamble-definition138328
+Node: @String Definitions140300
+Ref: #string-definitions140451
+Node: @Comments143944
+Ref: #comments144072
+Node: Managing Keywords144565
+Ref: #managing-keywords144710
+Node: Using a Canonical Keywords List146317
+Ref: #using-a-canonical-keywords-list146475
+Node: Sorting the bib File148633
+Ref: #sorting-the-.bib-file148806
+Node: Merging and Importing151925
+Ref: #merging-and-importing152090
+Node: Exporting Entries153876
+Ref: #exporting-entries154038
+Node: Multiple Identical Fields155554
+Ref: #multiple-identical-fields155733
+Node: Multiline Edit Buffers157661
+Ref: #multiline-edit-buffers157833
+Node: The Options Menu161918
+Ref: #the-options-menu162066
+Node: Customisation162684
+Ref: #customisation162795
+Node: Modifying Key Bindings163403
+Ref: #modifying-key-bindings163530
 
 End Tag Table
 

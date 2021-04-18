@@ -803,6 +803,10 @@ If you now call `biblio-lookup`, you can use the key `e` (or any other key you c
 
 Additionally, loading `ebib-biblio` adds the key `B` to the Ebib index. This key asks you for a DOI and then tries to import the entry that the DOI points to into the current database.
 
+When fetching entries via Biblio, Ebib checks for duplicates based on the key of the new entry. This will only work reliably if both Ebib and Biblio are configured to automatically generate BibTeX keys. Ebib does this by default (see the option `ebib-autogenerate-keys`), Biblio does not. You need to set the option `biblio-bibtex-use-autokey` in order to make sure that it does.
+
+Ebib and Biblio both use the functionality of `bibtex.el` to generate keys. Refer to the documentation string of the function `bibtex-generate-autokey` to find out how to customise this functionality.
+
 
 # Viewing and Importing Files #
 
