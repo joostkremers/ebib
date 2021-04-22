@@ -1,4 +1,7 @@
-Ebib is a program for managing BibTeX and BibLaTeX databases that runs
+% Ebib
+% Joost Kremers
+
+Ebib is a program for managing BibTeX and `biblatex` databases that runs
 inside Emacs. Ebib provides functions with which you can select a key
 from the database and have it inserted directly into your LaTeX text.
 Similar functionality is available for Markdown and Orgmode.
@@ -18,20 +21,20 @@ Bib(La)TeX files easier.
 - Copy/cut/paste mechanism for quickly copying field values. (This fully
   integrates with Emacs’ kill ring.)
 - Automatic loading of `.bib` files upon start-up.
-- Extensive [user manual](ebib-manual.md).
+- Extensive [user manual](ebib-manual.html).
 
-### BibTeX / BibLaTeX
+### BibTeX / `biblatex`
 
-- Support for both BibTeX and BibLaTeX files.
+- Support for both BibTeX and `biblatex` files.
 - Creating and editing `@string` and `@preamble` definitions is supported
   (`@comment`s are kept, but are not editable).
-- BibTeX / BibLaTeX entry and field types can be customised, allowing adaptation
+- BibTeX / `biblatex` entry and field types can be customised, allowing adaptation
   for non-standard and personal bibliography styles.
 - Automatic creation of entry keys (using the functionality of Emacs’
   `bibtex-mode`).
 - Field values containing newlines are supported, allowing the creation of
   annotated bibliographies.
-- Crossreferencing is supported, both BibTeX and BibLaTeX mechanisms.
+- Crossreferencing is supported, both BibTeX and `biblatex` mechanisms.
 - The database can be saved with the entries in the `.bib` file sorted on
   user-specified fields (useful in ConTeXt).
 
@@ -84,7 +87,7 @@ Bib(La)TeX files easier.
 - A time stamp can be added to each new entry, allowing you to keep track of new
   additions in the database.
 - (Parts of) databases can be printed, either as a list of references typeset by
-  BibTeX / BibLaTeX, or directly as database entries.
+  BibTeX / `biblatex`, or directly as database entries.
 - No lock-in. Use any other tool Emacs provides on your `.bib` files and simply reload the file in Ebib afterwards.
 
 ## Screenshots
@@ -97,24 +100,24 @@ displayed in a lighter gray colour come from the cross-referenced entry. (The
 colours Ebib uses are inherited from the current colour theme, but they can be
 customised independently.)
 
-![Main View](images/Main-view.png)
+[![Main View](images/Main-view.png)](images/Main-view.png){target="_blank"}
 
 In the second image, which uses an alternative partial-frame layout, the string
 `"Geraci"` is highlighted as the result of a text search. It also shows a buffer
 with a note for the highlighted entry.
 
-![Search View](images/Search-view.png)
+[![Search View](images/Search-view.png)](images/Search-view.png){target="_blank"}
 
 The third screenshot shows the strings buffer in the lower window, where you can
 edit the `@String` definitions in the database.
 
-![Strings Buffer](images/Strings-buffer.png)
+[![Strings Buffer](images/Strings-buffer.png)](images/Strings-buffer.png){target="_blank"}
 
 
 ## Manual
 
 The complete user manual for Ebib is available in html format
-[here](ebib-manual.md). If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.
+[here](ebib-manual.html). If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.
 
 
 ## Installation

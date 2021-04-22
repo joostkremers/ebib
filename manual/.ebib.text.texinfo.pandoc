@@ -1,9 +1,9 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for ebib.text
-;; saved on 2019.07.14 09:24
+;; saved on 2021.04.22 23:19
 
-((lua-filter "raw.lua")
+((lua-filter)
  (html-q-tags)
  (no-tex-ligatures)
  (old-dashes)

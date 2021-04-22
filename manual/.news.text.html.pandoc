@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
-;; pandoc-mode local settings file for ebib.text
-;; saved on 2021.04.20 17:37
+;; pandoc-mode local settings file for news.text
+;; saved on 2021.04.22 00:05
 
 ((html-q-tags)
  (no-tex-ligatures)
@@ -10,7 +10,7 @@
  (ascii)
  (biblatex)
  (natbib)
- (table-of-contents . t)
+ (table-of-contents)
  (no-highlight)
  (no-wrap)
  (section-divs)
@@ -129,7 +129,7 @@
   ("tex_math_double_backslash")
   ("tex_math_single_backslash")
   ("yaml_metadata_block"))
- (output . "ebib-manual.html")
+ (output . "NEWS.html")
  (data-dir)
  (output-dir . "~/src/Elisp/ebib/docs/")
  (template)
