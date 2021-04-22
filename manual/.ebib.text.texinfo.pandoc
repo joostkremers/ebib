@@ -142,7 +142,7 @@
  (epub-cover-image)
  (csl)
  (citation-abbreviations)
- (include-in-header . "~/src/ebib/manual/before-body.texi")
+ (include-in-header . "~/src/Elisp/ebib/manual/before-body.texi")
  (include-before-body)
  (include-after-body)
  (epub-embed-font)
