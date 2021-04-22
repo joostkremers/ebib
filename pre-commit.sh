@@ -68,7 +68,7 @@ function run_makeinfo
 }
 
 
-function create_htl
+function create_html
 {
     local source="$1"
     echo "$SCRIPT: running pandoc to create HTML"
