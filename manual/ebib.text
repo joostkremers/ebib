@@ -20,7 +20,7 @@ Users of Debian 9 or later and Ubuntu 16.10 or later can also use their distro's
 
 It's also possible to install Ebib manually. If you prefer this method, then you probably know what you're doing, so detailed instructions are omitted here. Just be sure to also install the [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib depends on.
 
-## News ##
+## News ## {.unlisted .unnumbered}
 
 New features and changes to existing features are announced in the [NEWS](NEWS.html) file.
 
