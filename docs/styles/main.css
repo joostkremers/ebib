@@ -1,4 +1,5 @@
 /* Color palette: https://colorhunt.co/palette/212648 */
+
 /* #f4f4f2 */
 /* #e8e8e8 */
 /* #bbbfca */
@@ -13,7 +14,6 @@ body {
   color: #495464;
   background-color: white;
   line-height: 140%;
-  /* font-size: 120%; */
   width: 40%;
   margin: 40px auto;
   padding: 0 40px;
@@ -54,8 +54,11 @@ h1.title {
 }
 
 h2 {
-  padding-top: 10px;
-  font-size: 1.3em;
+  font-family: 'Merriweather Sans', sans-serif;
+  position: relative;
+  left: -30%;
+  top: 50px;
+  font-size: 2em;
 }
 
 p.author {
@@ -83,20 +86,6 @@ article {
   margin-right: 10%;
   max-width: 80em;
   text-align: justify;
-}
-
-table {
-  width: 100%;
-}
-
-th {
-  font-size: 90%;
-}
-
-th,
-td {
-  padding: 5px;
-  border-bottom: 1px solid #ddd;
 }
 
 code {
@@ -128,7 +117,6 @@ ul {
   padding-right: 1%;
   font-size: 90%;
   text-align: left;
-  /* box-shadow: 1px 1px 4px 4px #333; */
 }
 
 #TOC a {
