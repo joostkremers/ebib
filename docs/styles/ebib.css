@@ -13,7 +13,7 @@ body {
   color: #495464;
   background-color: white;
   line-height: 140%;
-  font-size: 120%;
+  /* font-size: 120%; */
   width: 40%;
   margin: 40px auto;
   padding: 0 40px;
@@ -86,7 +86,7 @@ article {
 }
 
 code {
-  font-size: 130%;
+  font-size: 110%;
 }
 
 ul {
