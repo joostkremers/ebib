@@ -148,6 +148,24 @@ When a field has a multiline value, at most ten lines are shown in the entry buf
 For more details on working with multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers).
 
 
+## Copy, Cut (Kill), Paste (Yank), and Delete ##
+
+A few more commands are available when you're in the entry buffer editing field values. The commands [`c`]{.key}, [`k`]{.key} and [`y`]{.key} implement copy, kill and yank: [`c`]{.key} copies the contents of the current field to the kill ring, [`k`]{.key} kills the contents of the current field to the kill ring, and [`y`]{.key} yanks (pastes) the most recently killed text in the kill ring. You can type [`y`]{.key} repeatedly to get the same effect you get in Emacs when you type [`M-y`]{.key} after an initial [`C-y`]{.key}.
+
+Lastly, there is the command [`d`]{.key}, which deletes the contents of the current field without storing the text in the kill ring. (It asks for confirmation, though, just to make sure.)
+
+Note that [`y`]{.key} only works when the current field does not have a value yet. This is to prevent you from accidentally overwriting a field value. If you do want to yank text into a field that already has a value, simply hit [`d`]{.key} first to delete the text.
+
+
+## Saving a Database ##
+
+When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing [`s`]{.key}. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to [`C-x C-s`]{.key} in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option `ebib-create-backups`.)
+
+If you want to force-save a database that has not been modified, you can use a prefix argument: [`C-u s`]{.key}. In either case, however, Ebib checks whether the underlying file was modified and warns you if it was. (Ebib does this by storing the `.bib` file’s modification time when reading the file and comparing this time with the modification time when requested to save the file.) If you also want to forego this check, use a double prefix argument: [`C-u C-u s`]{.key}. This saves the file unconditionally.
+
+If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. The command for this is [`w`]{.key}. This command can also be prefixed with [`C-u`]{.key} (or in fact any other prefix argument) in order to overwrite any existing file without asking for confirmation.
+
+
 ## Undefined Fields ##
 
 `Biblatex` and BibTeX ignore fields that they do not know about, which is a property that can be exploited to add any kind of  information to an entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.
@@ -177,24 +195,6 @@ Note that if this option is unset, the timestamp of an entry is retained when it
 Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can be converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
 
 Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then. See [Special Filters](#special-filters) for details.
-
-
-## Copy, Cut (Kill), Paste (Yank), and Delete ##
-
-A few more commands are available when you're in the entry buffer editing field values. The commands [`c`]{.key}, [`k`]{.key} and [`y`]{.key} implement copy, kill and yank: [`c`]{.key} copies the contents of the current field to the kill ring, [`k`]{.key} kills the contents of the current field to the kill ring, and [`y`]{.key} yanks (pastes) the most recently killed text in the kill ring. You can type [`y`]{.key} repeatedly to get the same effect you get in Emacs when you type [`M-y`]{.key} after an initial [`C-y`]{.key}.
-
-Lastly, there is the command [`d`]{.key}, which deletes the contents of the current field without storing the text in the kill ring. (It asks for confirmation, though, just to make sure.)
-
-Note that [`y`]{.key} only works when the current field does not have a value yet. This is to prevent you from accidentally overwriting a field value. If you do want to yank text into a field that already has a value, simply hit [`d`]{.key} first to delete the text.
-
-
-# Saving a Database #
-
-When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing [`s`]{.key}. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to [`C-x C-s`]{.key} in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option `ebib-create-backups`.)
-
-If you want to force-save a database that has not been modified, you can use a prefix argument: [`C-u s`]{.key}. In either case, however, Ebib checks whether the underlying file was modified and warns you if it was. (Ebib does this by storing the `.bib` file’s modification time when reading the file and comparing this time with the modification time when requested to save the file.) If you also want to forego this check, use a double prefix argument: [`C-u C-u s`]{.key}. This saves the file unconditionally.
-
-If you have multiple databases open, have made changes in more than one of them, and want to save all of them without going through each yourself, you can save all databases at once through the menu. You can also save the database to another name, similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. The command for this is [`w`]{.key}. This command can also be prefixed with [`C-u`]{.key} (or in fact any other prefix argument) in order to overwrite any existing file without asking for confirmation.
 
 
 # Biblatex vs. BibTeX #
