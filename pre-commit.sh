@@ -24,7 +24,7 @@ TEXINFO="manual/ebib.texi"                    # texinfo output
 INFO="ebib.info"                              # GNU info output
 HTML_HEADERS="manual/google-fonts.html"       # HTML header includes
 HTML="docs/ebib-manual.html"                  # HTML output
-CSS="docs/styles/ebib.css"                    # CSS file
+CSS="styles/ebib.css"                         # CSS file
 SCRIPT=$(basename "$0")
 
 E_SUCCESS=0
