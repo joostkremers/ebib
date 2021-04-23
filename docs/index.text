@@ -1,16 +1,9 @@
 % Ebib
 % Joost Kremers
 
-Ebib is a program for managing BibTeX and `biblatex` databases that runs
-inside Emacs. Ebib provides functions with which you can select a key
-from the database and have it inserted directly into your LaTeX text.
-Similar functionality is available for Markdown and Orgmode.
-
-Ebib provides the standard capabilities that one would expect from a
-BibTeX database manager: `.bib` files can be opened, modified (adding,
-deleting, modifying entries), searched, and saved. Apart from the
-basics, Ebib has quite a few extra features that make managing your
-Bib(La)TeX files easier.
+Ebib is a program for managing BibTeX and `biblatex` databases that runs inside
+Emacs. It allows you to manage bibliography files without having to edit the raw
+`.bib` files.
 
 
 ## Features
@@ -41,8 +34,11 @@ Bib(La)TeX files easier.
 ### Databases
 
 - Multiple `.bib` files can be opened at the same time.
-- Easily create a separate `.bib` file for a paper, article or book through a "dependent" database which shares its content with a main database but is saved as a separate `.bib` file.
-- Databases can be merged; specific entries or `@preamble` and `@string` definitions can be exported to other databases or to a `.bib`file.
+- Easily create a separate `.bib` file for a paper, article or book through a
+  "dependent" database which shares its content with a main database but is
+  saved as a separate `.bib` file.
+- Databases can be merged; specific entries or `@preamble` and `@string`
+  definitions can be exported to other databases or to a `.bib`file.
 
 ### Searching
 
@@ -88,36 +84,34 @@ Bib(La)TeX files easier.
   additions in the database.
 - (Parts of) databases can be printed, either as a list of references typeset by
   BibTeX / `biblatex`, or directly as database entries.
-- No lock-in. Use any other tool Emacs provides on your `.bib` files and simply reload the file in Ebib afterwards.
+- No lock-in. Use any other tool Emacs provides on your `.bib` files and simply
+  reload the file in Ebib afterwards.
 
 ## Screenshots
 
-Visually, Ebib is not very spectacular, but to get an impression of what it
-looks like, you can look at the following three screenshots. The first shows
-Ebib’s standard lay-out, with the list of entry keys in the top window and the
-fields of the currently highlighted entry in the bottom window. The field values
-displayed in a lighter gray colour come from the cross-referenced entry. (The
-colours Ebib uses are inherited from the current colour theme, but they can be
-customised independently.)
+Visually, Ebib is not very spectacular, but the following three screenshots give
+an impression. The first shows Ebib’s standard layout. The field values
+displayed in a lighter gray colour come from the cross-referenced entry.
 
-[![Main View](images/Main-view.png)](images/Main-view.png){target="_blank"}
+[![Main View](images/Main-view.png)](images/Main-view.png)
 
 In the second image, which uses an alternative partial-frame layout, the string
 `"Geraci"` is highlighted as the result of a text search. It also shows a buffer
 with a note for the highlighted entry.
 
-[![Search View](images/Search-view.png)](images/Search-view.png){target="_blank"}
+[![Search View](images/Search-view.png)](images/Search-view.png)
 
 The third screenshot shows the strings buffer in the lower window, where you can
 edit the `@String` definitions in the database.
 
-[![Strings Buffer](images/Strings-buffer.png)](images/Strings-buffer.png){target="_blank"}
+[![Strings Buffer](images/Strings-buffer.png)](images/Strings-buffer.png)
 
 
 ## Manual
 
 The complete user manual for Ebib is available in html format
-[here](ebib-manual.html). If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.
+[here](ebib-manual.html). If Ebib is installed from Melpa, the manual is also
+available inside Emacs in Info format.
 
 
 ## Installation
@@ -125,12 +119,16 @@ The complete user manual for Ebib is available in html format
 The easiest way to install Ebib is to use [Melpa](http://melpa.org/).
 
 If you want to download the source, you can clone the [git
-repository](https://github.com/joostkremers/ebib.git) for Ebib, or get a
-tar ball from the [Github releases
-page](https://github.com/joostkremers/ebib/releases). Note that Ebib depends on [parsebib](https://github.com/joostkremers/parsebib), which therefore also needs to be installed.
+repository](https://github.com/joostkremers/ebib.git) for Ebib, or get a tar
+ball from the [Github releases
+page](https://github.com/joostkremers/ebib/releases). Note that Ebib depends on
+[parsebib](https://github.com/joostkremers/parsebib), which therefore also needs
+to be installed.
 
 
 ## Support
 
-If you want to ask a question or report an issue, you can send me an [email](mailto:ebib@joostkremers.fastmail.fm), or, if you happen to have a Github account, open an issue on the [Github
-issue tracker](https://github.com/joostkremers/ebib/issues?state=open).
+If you want to ask a question or report an issue, you can send me an
+[email](mailto:ebib@joostkremers.fastmail.fm), or, if you happen to have a
+Github account, open an issue on the [Github issue
+tracker](https://github.com/joostkremers/ebib/issues?state=open).

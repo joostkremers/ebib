@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for index.text
-;; saved on 2021.04.22 01:59
+;; saved on 2021.04.23 23:23
 
 ((latexmathml)
  (mathml)
@@ -35,7 +35,7 @@
  (email-obfuscation)
  (id-prefix)
  (title-prefix)
- (css "styles/ebib.css")
+ (css "styles/main.css")
  (reference-links)
  (atx-headers)
  (number-sections)

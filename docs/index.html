@@ -15,7 +15,7 @@
     ul.task-list{list-style: none;}
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="styles/ebib.css" />
+  <link rel="stylesheet" href="styles/main.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -25,8 +25,7 @@
 <h1 class="title">Ebib</h1>
 <p class="author">Joost Kremers</p>
 </header>
-<p>Ebib is a program for managing BibTeX and <code>biblatex</code> databases that runs inside Emacs. Ebib provides functions with which you can select a key from the database and have it inserted directly into your LaTeX text. Similar functionality is available for Markdown and Orgmode.</p>
-<p>Ebib provides the standard capabilities that one would expect from a BibTeX database manager: <code>.bib</code> files can be opened, modified (adding, deleting, modifying entries), searched, and saved. Apart from the basics, Ebib has quite a few extra features that make managing your Bib(La)TeX files easier.</p>
+<p>Ebib is a program for managing BibTeX and <code>biblatex</code> databases that runs inside Emacs. It allows you to manage bibliography files without having to edit the raw <code>.bib</code> files.</p>
 <h2 id="features">Features</h2>
 <h3 id="general">General</h3>
 <ul>
@@ -77,12 +76,12 @@
 <li>No lock-in. Use any other tool Emacs provides on your <code>.bib</code> files and simply reload the file in Ebib afterwards.</li>
 </ul>
 <h2 id="screenshots">Screenshots</h2>
-<p>Visually, Ebib is not very spectacular, but to get an impression of what it looks like, you can look at the following three screenshots. The first shows Ebib’s standard lay-out, with the list of entry keys in the top window and the fields of the currently highlighted entry in the bottom window. The field values displayed in a lighter gray colour come from the cross-referenced entry. (The colours Ebib uses are inherited from the current colour theme, but they can be customised independently.)</p>
-<p><a href="images/Main-view.png" target="_blank"><img src="images/Main-view.png" alt="Main View" /></a></p>
+<p>Visually, Ebib is not very spectacular, but the following three screenshots give an impression. The first shows Ebib’s standard layout. The field values displayed in a lighter gray colour come from the cross-referenced entry.</p>
+<p><a href="images/Main-view.png"><img src="images/Main-view.png" alt="Main View" /></a></p>
 <p>In the second image, which uses an alternative partial-frame layout, the string <code>"Geraci"</code> is highlighted as the result of a text search. It also shows a buffer with a note for the highlighted entry.</p>
-<p><a href="images/Search-view.png" target="_blank"><img src="images/Search-view.png" alt="Search View" /></a></p>
+<p><a href="images/Search-view.png"><img src="images/Search-view.png" alt="Search View" /></a></p>
 <p>The third screenshot shows the strings buffer in the lower window, where you can edit the <code>@String</code> definitions in the database.</p>
-<p><a href="images/Strings-buffer.png" target="_blank"><img src="images/Strings-buffer.png" alt="Strings Buffer" /></a></p>
+<p><a href="images/Strings-buffer.png"><img src="images/Strings-buffer.png" alt="Strings Buffer" /></a></p>
 <h2 id="manual">Manual</h2>
 <p>The complete user manual for Ebib is available in html format <a href="ebib-manual.html">here</a>. If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.</p>
 <h2 id="installation">Installation</h2>
