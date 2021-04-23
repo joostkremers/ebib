@@ -85,6 +85,20 @@ article {
   text-align: justify;
 }
 
+table {
+  width: 100%;
+}
+
+th {
+  font-size: 90%;
+}
+
+th,
+td {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
 code {
   font-size: 110%;
 }
