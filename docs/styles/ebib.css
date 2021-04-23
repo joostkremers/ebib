@@ -148,3 +148,25 @@ pre {
   border-radius: 5px;
   margin: 0 1px;                /* To add preceding or following punctuation slightly. */
 }
+
+@media screen and (max-width: 1400px) {
+  body {
+    width: 90%;
+  }
+
+  #TOC {
+    position: static;
+    width: unset;
+    column-count: 2;
+  }
+
+  #TOC ul li li {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  #TOC {
+    column-count: 1;
+  }
+}
