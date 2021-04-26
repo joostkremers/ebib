@@ -25,21 +25,18 @@ is.
 * Installation::
 * Getting Started::
 * Editing the Database::
+* Main and Dependent Databases::
 * Searching::
 * Filters::
 * Inserting Citations into a Text Buffer::
 * Importing BibTeX entries::
-* Copying Entries to the Kill Ring::
-* Main and Dependent Databases::
-* Printing the Database::
-* Calling a Browser for URLs and DOIs::
-* Viewing and Importing Files::
+* Linking to external resources::
 * Notes files::
 * Managing a reading list::
-* Window Management::
 * Managing Keywords::
-* Exporting Entries::
-* Multiline Edit Buffers::
+* Window Management::
+* Copying Entries to the Kill Ring::
+* Printing the Database::
 * Customisation::
 
 
@@ -276,20 +273,13 @@ Key                Action
 ‘g’ ‘Home’         move to the first entry
 ‘G’ ‘End’          move to the last entry
 
-To move around in the index buffer, you can use the ‘up’ and ‘down’
-cursor keys, ‘p’ and ‘n’ and also the versions with the control key
-‘C-p’ and ‘C-n’.  Furthermore, ‘Space’ and ‘PgDn’ move a screenful of
-entries down, while ‘b’ and ‘PgUp’ move in the other direction.  Lastly,
-‘g’ and ‘Home’ move to the first entry, while ‘G’ and ‘End’ move to the
-last one.
-
-If you have more than one database opened, you can use the keys ‘1’
-through ‘9’ to jump between databases.  The number of each database is
-shown in the mode line of the index buffer before the database name.
-(Note that the numbering is dynamic: if you have three databases opened
-and then close the second, database 3 becomes database 2.)  You can also
-use the ‘left’ and ‘right’ cursor keys to move to the previous or next
-database (these keys wrap).
+If you have more than one database opened, you can use the keys ‘1’–‘9’
+to jump between databases.  The number of each database is shown in the
+mode line of the index buffer before the database name.  (Note that the
+numbering is dynamic: if you have three databases opened and then close
+the second, database 3 becomes database 2.)  You can also use the ‘left’
+and ‘right’ cursor keys to move to the previous or next database (these
+keys wrap).
 
 If you are done with a database, type ‘c’ to close it.  This unleads the
 current database (you are asked for confirmation if you have unsaved
@@ -500,7 +490,7 @@ you can easily copy the value of the ‘journal’ field to the
 ‘biblatex’’s conventions.
 
 
-File: ebib.info,  Node: Editing the Database,  Next: Searching,  Prev: Getting Started,  Up: Top
+File: ebib.info,  Node: Editing the Database,  Next: Main and Dependent Databases,  Prev: Getting Started,  Up: Top
 
 3 Editing the Database
 **********************
@@ -516,16 +506,17 @@ important editing facilities.
 * Editing Field Values::
 * Editing Multiline Values::
 * Copy Cut Kill Paste Yank and Delete::
-* Saving a Database::
-* Cross-referencing::
-* Sorting the bib File::
 * Undefined Fields::
 * Hidden Fields::
 * Timestamps::
+* Saving a Database::
+* Cross-referencing::
+* Sorting the bib File::
 * @Preamble Definition::
 * @String Definitions::
 * @Comments::
 * Creating Entry Stubs::
+* Multiline Edit Buffers::
 
 
 File: ebib.info,  Node: Adding and Deleting Entries,  Next: Marking Entries,  Up: Editing the Database
@@ -584,9 +575,9 @@ entries if there are any.  Of the commands discussed so far, these are
 (Note that Ebib creates a single citation command with commas separating
 the entry keys.)
 
-With a prefix argument, i.e, with ‘C-u m’, you can unmark all entries
-or, if there are no marked entries, mark all entries in the current
-database.
+With a prefix argument, i.e, with ‘C-u’ followed by ‘m’, you can unmark
+all entries or, if there are no marked entries, mark all entries in the
+current database.
 
 
 File: ebib.info,  Node: Editing Field Values,  Next: Editing Multiline Values,  Prev: Marking Entries,  Up: Editing the Database
@@ -685,7 +676,7 @@ can in fact hold a multiline value.  To give a field a multiline value,
 use ‘m’ instead of ‘e’.
 
 
-File: ebib.info,  Node: Copy Cut Kill Paste Yank and Delete,  Next: Saving a Database,  Prev: Editing Multiline Values,  Up: Editing the Database
+File: ebib.info,  Node: Copy Cut Kill Paste Yank and Delete,  Next: Undefined Fields,  Prev: Editing Multiline Values,  Up: Editing the Database
 
 3.5 Copy, Cut (Kill), Paste (Yank), and Delete
 ==============================================
@@ -708,9 +699,97 @@ value.  If you do want to yank text into a field that already has a
 value, simply hit ‘d’ first to delete the text.
 
 
-File: ebib.info,  Node: Saving a Database,  Next: Cross-referencing,  Prev: Copy Cut Kill Paste Yank and Delete,  Up: Editing the Database
+File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Copy Cut Kill Paste Yank and Delete,  Up: Editing the Database
 
-3.6 Saving a Database
+3.6 Undefined Fields
+====================
+
+‘Biblatex’ and BibTeX ignore fields that they do not know about, which
+is a property that can be exploited to add any kind of information to an
+entry.  Ebib accommodates this by allowing fields with any name, not
+just the ones that are predefined.  Such undefined fields are displayed
+last in the entry buffer, following the extra fields.
+
+It is even possible to add such fields to an entry by pressing ‘a’ in
+the entry buffer.  This asks for a field name and then a value.  If you
+make heavy use of this option, though, it may be better to define the
+relevant fields through the user option ‘ebib-extra-fields’.
+
+Note that if you delete the contents of an undefined field, the field
+itself is also deleted.  (In fact, the field remains in the database
+until you close the database, but it will not be saved, so the next time
+you load the ‘.bib’ file, the field is gone.)
+
+
+File: ebib.info,  Node: Hidden Fields,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
+
+3.7 Hidden Fields
+=================
+
+‘Biblatex’ defines a large number of fields, many of which are optional
+for most entry types.  Displaying all these fields in the entry buffer
+would not be very practical, because you are most likely interested in
+only a few of them.  For this reason, Ebib defines a (fairly large)
+number of fields as ‘hidden’, meaning that they are not shown in the
+entry buffer.  You can make these fields visible with the key ‘H’ in the
+index buffer.  Which fields are treated as hidden is controlled by the
+option “Hidden Fields” (‘ebib-hidden-fields’), which can be customised.
+
+Most of the fields defined as hidden are ‘biblatex’-specific, because
+BibTeX recognises a much smaller number of fields and there isn’t much
+of a need to hide the lesser used ones.  However, the functionality is
+available: if you wish to use it, just add the relevant fields to the
+option ‘ebib-hidden-fields’.
+
+Note that a hidden field that has a value is always shown in the index
+buffer.  Hidden fields are only hidden in entries that don’t define a
+value for them.
+
+
+File: ebib.info,  Node: Timestamps,  Next: Saving a Database,  Prev: Hidden Fields,  Up: Editing the Database
+
+3.8 Timestamps
+==============
+
+Ebib provides the possibility to add a timestamp to every new entry,
+recording the time it was added to the database.  The timestamp is
+recorded in the (extra) field ‘timestamp’, which is hidden by default.
+
+You can tell Ebib to create timestamps by setting the option “Use
+Timestamp” (‘ebib-use-timestamp’) in Ebib’s customisation buffer.  With
+this option set, a timestamp is included in entries added to the
+database with ‘a’.  Ebib will also add a timestamp to entries imported
+from a buffer or merged from a file, and to entries exported to another
+database or to a file.  When importing or exporting entries, existing
+timestamps are overwritten.  The logic behind this is that the timestamp
+records the date and time when the entry was added to the database, not
+when it was first created.
+
+Note that if this option is unset, the timestamp of an entry is retained
+when it’s imported or exported.  Therefore, if you record timestamps and
+want to im-/export entries without changing their timestamps,
+temporarily unset this option, which can be done in the menu under
+“Options”.
+
+Ebib uses the function ‘format-time-string’ to create the timestamp.
+The format string that Ebib uses can be customised.  The default string
+is ‘"%Y-%m-%d %T (%Z)"’, which produces a timestamp of the form
+‘"2007-03-12 01:03:26 (CET)"’.  This string is sortable and has the
+additional advantage that it can be converted to Emacs’ internal time
+representation with the function ‘date-to-time’.  The format can be
+customised; see the documentation for ‘format-time-string’ on the
+options that are available.
+
+Adding timestamps in a format that ‘date-to-time’ can parse makes it
+possible to list the most recent additions to the database.  Ebib
+provides a function to do this: ‘ebib-list-recent’, which asks for a
+number of days and lists the entries that were added since then.  See
+*note Special Filters: #special-filters. for details.
+
+
+File: ebib.info,  Node: Saving a Database,  Next: Cross-referencing,  Prev: Timestamps,  Up: Editing the Database
+
+3.9 Saving a Database
 =====================
 
 When you have undertaken any kind of editing action on a database, it is
@@ -734,11 +813,46 @@ with the database.  This command can also be prefixed with ‘C-u’ (or in
 fact any other prefix argument) in order to overwrite any existing file
 without asking for confirmation.
 
+* Menu:
+
+* Exporting Entries::
+
+
+File: ebib.info,  Node: Exporting Entries,  Up: Saving a Database
+
+3.9.1 Exporting Entries
+-----------------------
+
+Sometimes it can be useful to copy entries from one database to another,
+or to create a new ‘.bib’ file with several entries from an existing
+database.  For this purpose, Ebib provides exporting facilities.  To
+export an entry to another database, use the command ‘x’.  This command
+operates on a single entry or on all marked entries.  Ebib will ask you
+for the database to export the entry or entries to.  ‘TAB’ completion is
+available, based on the file names of the databases.
+
+You can also export entries to a file.  To do this, call the command ‘x’
+with a prefix argument: ‘C-u x’.  You will be prompted for the file name
+to export the entries to.  If the file already exists, Ebib appends the
+entries to it.  Note that in this case, there is no check to see if the
+exported entries already exist in the target file, so it’s possible to
+end up with duplicate entries in this way.
+
+Apart from entries, it is also possible to export the ‘@Preamble’ and
+‘@String’ definitions.  The ‘@Preamble’ definition is exported with the
+command ‘X’ in the index buffer.  ‘@String’ definitions can be exported
+in the strings buffer: ‘x’ in this buffer exports the current string,
+while ‘X’ exports all ‘@String’ definitions in one go.  All these
+commands function in the same way: when used without a prefix argument,
+they ask for an open database to export the entry to.  With a prefix
+argument, they ask for a filename, and then append the relevant data to
+that file.
+
 
 File: ebib.info,  Node: Cross-referencing,  Next: Sorting the bib File,  Prev: Saving a Database,  Up: Editing the Database
 
-3.7 Cross-referencing
-=====================
+3.10 Cross-referencing
+======================
 
 ‘Biblatex’ has a sophisticated cross-referencing facility that Ebib
 supports.  Suppose you have an entry ‘Jones1998’, which appeared in a
@@ -799,10 +913,10 @@ with a ‘crossref’ field first in the ‘.bib’ file.  Without this,
 cross-referencing will not work reliably.
 
 
-File: ebib.info,  Node: Sorting the bib File,  Next: Undefined Fields,  Prev: Cross-referencing,  Up: Editing the Database
+File: ebib.info,  Node: Sorting the bib File,  Next: @Preamble Definition,  Prev: Cross-referencing,  Up: Editing the Database
 
-3.8 Sorting the ‘.bib’ File
-===========================
+3.11 Sorting the ‘.bib’ File
+============================
 
 By default, the entries in the database are saved to the ‘.bib’ file in
 alphabetical order according to entry key.  If you only deal with the
@@ -860,95 +974,7 @@ cross-referenced entries are saved first.  Since “Save Xrefs First” is
 set by default, you need to unset if you set “Sort Order”.
 
 
-File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Sorting the bib File,  Up: Editing the Database
-
-3.9 Undefined Fields
-====================
-
-‘Biblatex’ and BibTeX ignore fields that they do not know about, which
-is a property that can be exploited to add any kind of information to an
-entry.  Ebib accommodates this by allowing fields with any name, not
-just the ones that are predefined.  Such undefined fields are displayed
-last in the entry buffer, following the extra fields.
-
-It is even possible to add such fields to an entry by pressing ‘a’ in
-the entry buffer.  This asks for a field name and then a value.  If you
-make heavy use of this option, though, it may be better to define the
-relevant fields through the user option ‘ebib-extra-fields’.
-
-Note that if you delete the contents of an undefined field, the field
-itself is also deleted.  (In fact, the field remains in the database
-until you close the database, but it will not be saved, so the next time
-you load the ‘.bib’ file, the field is gone.)
-
-
-File: ebib.info,  Node: Hidden Fields,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
-
-3.10 Hidden Fields
-==================
-
-‘Biblatex’ defines a large number of fields, many of which are optional
-for most entry types.  Displaying all these fields in the entry buffer
-would not be very practical, because you are most likely interested in
-only a few of them.  For this reason, Ebib defines a (fairly large)
-number of fields as ‘hidden’, meaning that they are not shown in the
-entry buffer.  You can make these fields visible with the key ‘H’ in the
-index buffer.  Which fields are treated as hidden is controlled by the
-option “Hidden Fields” (‘ebib-hidden-fields’), which can be customised.
-
-Most of the fields defined as hidden are ‘biblatex’-specific, because
-BibTeX recognises a much smaller number of fields and there isn’t much
-of a need to hide the lesser used ones.  However, the functionality is
-available: if you wish to use it, just add the relevant fields to the
-option ‘ebib-hidden-fields’.
-
-Note that a hidden field that has a value is always shown in the index
-buffer.  Hidden fields are only hidden in entries that don’t define a
-value for them.
-
-
-File: ebib.info,  Node: Timestamps,  Next: @Preamble Definition,  Prev: Hidden Fields,  Up: Editing the Database
-
-3.11 Timestamps
-===============
-
-Ebib provides the possibility to add a timestamp to every new entry,
-recording the time it was added to the database.  The timestamp is
-recorded in the (extra) field ‘timestamp’, which is hidden by default.
-
-You can tell Ebib to create timestamps by setting the option “Use
-Timestamp” (‘ebib-use-timestamp’) in Ebib’s customisation buffer.  With
-this option set, a timestamp is included in entries added to the
-database with ‘a’.  Ebib will also add a timestamp to entries imported
-from a buffer or merged from a file, and to entries exported to another
-database or to a file.  When importing or exporting entries, existing
-timestamps are overwritten.  The logic behind this is that the timestamp
-records the date and time when the entry was added to the database, not
-when it was first created.
-
-Note that if this option is unset, the timestamp of an entry is retained
-when it’s imported or exported.  Therefore, if you record timestamps and
-want to im-/export entries without changing their timestamps,
-temporarily unset this option, which can be done in the menu under
-“Options”.
-
-Ebib uses the function ‘format-time-string’ to create the timestamp.
-The format string that Ebib uses can be customised.  The default string
-is ‘"%Y-%m-%d %T (%Z)"’, which produces a timestamp of the form
-‘"2007-03-12 01:03:26 (CET)"’.  This string is sortable and has the
-additional advantage that it can be converted to Emacs’ internal time
-representation with the function ‘date-to-time’.  The format can be
-customised; see the documentation for ‘format-time-string’ on the
-options that are available.
-
-Adding timestamps in a format that ‘date-to-time’ can parse makes it
-possible to list the most recent additions to the database.  Ebib
-provides a function to do this: ‘ebib-list-recent’, which asks for a
-number of days and lists the entries that were added since then.  See
-*note Special Filters: #special-filters. for details.
-
-
-File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Timestamps,  Up: Editing the Database
+File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Sorting the bib File,  Up: Editing the Database
 
 3.12 @Preamble Definition
 =========================
@@ -1080,7 +1106,7 @@ way to edit comments, nor can you specify where in the ‘.bib’ file a
 comment is placed, but they won’t be lost.
 
 
-File: ebib.info,  Node: Creating Entry Stubs,  Prev: @Comments,  Up: Editing the Database
+File: ebib.info,  Node: Creating Entry Stubs,  Next: Multiline Edit Buffers,  Prev: @Comments,  Up: Editing the Database
 
 3.15 Creating Entry Stubs
 =========================
@@ -1103,9 +1129,161 @@ for details.  If you prefer to edit the keys by hand, you can do so by
 pressing ‘E’ in the index buffer.
 
 
-File: ebib.info,  Node: Searching,  Next: Filters,  Prev: Editing the Database,  Up: Top
+File: ebib.info,  Node: Multiline Edit Buffers,  Prev: Creating Entry Stubs,  Up: Editing the Database
 
-4 Searching
+3.16 Multiline Edit Buffers
+===========================
+
+As mentioned several times before, field values that contain newlines
+(so-called _multiline fields_) and the ‘@Preamble’ are edited in a
+so-called _multiline edit buffer_.  This section discusses the details
+of this buffer.
+
+Ebib enters a multiline edit buffer in one of three cases: when you edit
+the ‘@Preamble’ definition, when you hit ‘m’ in the entry buffer to edit
+the current field as multiline, or when you hit ‘e’ on the
+‘annote’/‘annotation’ or ‘abstract’ fields, or on a field whose value
+already is multiline.
+
+The major mode that is used in multiline edit buffers is
+user-configurable.  The default value is ‘text-mode’, but if you prefer
+to use some other mode, you can specify this through the customisation
+option ‘ebib-multiline-major-mode’.
+
+Three commands are relevant for interacting with Ebib when you’re in the
+multiline edit buffer, which are bound to key sequences in the minor
+mode ‘ebib-multiline-edit-mode’, which is activated automatically in the
+multiline edit buffer.
+
+‘ebib-quit-multiline-buffer-and-save’, bound to ‘C-c C-c’, leaves the
+multiline edit buffer and stores the text in the database.  If you
+invoke this command when you’ve deleted all contents of the buffer
+(including the final newline!)  and you were editing a field value or
+the ‘@Preamble’, the field value or preamble is deleted.  (This is in
+fact the _only_ way to delete the ‘@Preamble’ definition.  Field values
+on the other hand can also be deleted by hitting ‘k’ or ‘d’ on them in
+the entry buffer.)
+
+‘ebib-cancel-multiline-buffer’, bound to ‘C-c C-k’, also leaves the
+multiline edit buffer, but it does so without storing the text.  The
+original value of the field, string or preamble will be retained.  If
+the text was modified, Ebib will ask for a confirmation before leaving
+the buffer.
+
+‘ebib-save-from-multiline-buffer’, bound to ‘C-c C-s’, can be used in
+the multiline edit buffer to save the database.  This command first
+stores the text in the database and then saves it.  Because Ebib does
+not do an autosave of the current database, it is advisable to save the
+database manually every now and then to prevent data loss in case of
+crashes.  It would be annoying to have to leave the multiline edit
+buffer every time you want to do this, so this command has been provided
+to allow you to do this from within the buffer.
+
+Note that you do not need to finish a multiline edit before you can
+return to the database and possibly edit other fields and even entries.
+Ebib keeps track of which field in which entry of which database a
+multiline edit buffer belongs to, so you can keep a multiline edit
+buffer open while doing other work.  It is even possible to have several
+multiline edit buffers open at the same time.  Ebib makes sure that when
+you finish one, its contents is stored in the correct place.
+
+The key combinations of the multiline edit buffer strictly speaking
+violate Emacs’ suggested key binding conventions.  They are defined in
+the keymap of a minor mode (‘ebib-multiline-mode’, to be specific), but
+a minor mode keymap should only use key bindings of ‘C-c’ plus a
+non-alphanumeric character.  The bindings do follow practical
+conventions, however: they are used for similar functions in e.g., Org’s
+capture mechanism, in ‘message-mode’, in VC, magit, etc.  For this
+reason, Ebib uses them as well.
+
+If you find that these key bindings conflict with key bindings in the
+major mode you use in the multiline edit buffer, you can change them, of
+course.  To do this, put something like the following in your init file:
+
+(with-eval-after-load 'ebib
+  (define-key ebib-multiline-mode-map
+    "\C-c c" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | c" 'ebib-quit-multiline-buffer-and-save)
+
+  (define-key ebib-multiline-mode-map
+    "\C-c s" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | s" 'ebib-save-from-multiline-buffer))
+
+  (define-key ebib-multiline-mode-map
+    "\C-c k" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | k" 'ebib-cancel-multiline-buffer)
+
+This removes the key bindings for ‘C-c c’, ‘C-c s’ and ‘C-c k’ and sets
+up ‘C-c | c’, ‘C-c | s’ and ‘C-c | k’ for use in the multiline edit
+buffer.  You can obviously use other keys if you prefer.
+
+
+File: ebib.info,  Node: Main and Dependent Databases,  Next: Searching,  Prev: Editing the Database,  Up: Top
+
+4 Main and Dependent Databases
+******************************
+
+If you want to create a ‘.bib’ file from a larger database that only
+contains the references of a particular paper, you can use a dependent
+database.  A dependent database, as the name suggests, depends on
+another, real database that is called its main database.  The dependent
+database can only contain entries that also exist in its main database
+and all the data of the entries is shared by both databases.  If you
+edit an entry in the dependent database, the edit shows up in the main
+one as well, and vice versa.
+
+Furthermore, if you have a text buffer that’s associated with a
+dependent database, inserting an entry with ‘M-x ebib-insert-citation’
+offers all entries of the main database for completion, not just the
+ones that are already in the dependent database.  If you select an entry
+that is not in the dependent database yet, it is added to it.  This way,
+creating a separate database for a paper is easy: just create a
+dependent database and associate it with the relevant text buffer.  Then
+insert citation commands as usual.
+
+You can create a dependent database with the key sequence ‘M c’ in the
+database that you want to be its main database.  Ebib asks you for a
+file name and then creates a new empty database.
+
+Adding new entries to a dependent database can be done as described, by
+inserting citations in a text buffer.  It’s also possible to add entries
+in the usual way, i.e., by pressing ‘a’ in Ebib’s index buffer.  If you
+do this in a dependent database, instead of creating a new entry, you
+are prompted for an entry from the main database to add to the dependent
+one.
+
+It’s also possible to add entries to a dependent database from its main
+database with the command ‘M a’.  This command also works on marked
+entries, making it possible to add multiple entries to a dependent
+database in one go.
+
+Deleting an entry in a dependent database only removes it from the
+dependent database, not from the main database.  If you delete an entry
+from the main database that is also present in a dependent database, it
+is removed from both, given that a dependent database can only have
+entries that also exist in the main database.
+
+A database can serve as the main database for more than one dependent
+databases, but the reverse is not possible: each dependent database can
+only have one main database.
+
+If you save a dependent database, it is saved as a normal, standalone
+‘.bib’ file that can be used with ‘biblatex’ or BibTeX. When you reopen
+the file in Ebib, a special comment at the top of the file makes sure
+that Ebib recognises it as a dependent database and loads the main
+database as well, if necessary.  Note that when Ebib opens a dependent
+database, it only reads the entry keys from the ‘.bib’ file.  The data
+of each entry is taken from the main database.  This means that if you
+edit a dependent database’s ‘.bib’ file outside of Ebib, the changes you
+make are ignored when you open the file in Ebib.
+
+
+File: ebib.info,  Node: Searching,  Next: Filters,  Prev: Main and Dependent Databases,  Up: Top
+
+5 Searching
 ***********
 
 Ebib provides several ways of searching through your database(s).  This
@@ -1174,7 +1352,7 @@ database but not in one of the visible entries, Ebib will respond with a
 
 File: ebib.info,  Node: Filters,  Next: Inserting Citations into a Text Buffer,  Prev: Searching,  Up: Top
 
-5 Filters
+6 Filters
 *********
 
 Ebib also has a much more sophisticated search mechanism that makes use
@@ -1202,7 +1380,7 @@ criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
 
 File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
 
-5.1 Simple Selection
+6.1 Simple Selection
 ====================
 
 Creating a filter is simple: press ‘&’, and Ebib will ask you for a
@@ -1237,7 +1415,7 @@ enter any search term, of course.
 
 File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Prev: Simple Selection,  Up: Filters
 
-5.2 Complex Filters
+6.2 Complex Filters
 ===================
 
 Once you have filtered your database, you can refine or extend it.  For
@@ -1259,9 +1437,10 @@ Therefore, ‘or’ is the required operator in this case.  If you would use
 ‘and’, you would only get those entries that contain ‘"Jones"’ in both
 the ‘author’ _and_ ‘editor’ fields (i.e., most likely none at all).
 
-To perform a logical ‘or’ operation, press the key ‘|’.  As before, you
-will be asked which field you want to filter on, and which regexp you
-want to filter with.  Ebib will then update the index buffer.
+To perform a logical ‘or’ operation, press the key ‘|’ (the pipe bar).
+As before, you will be asked which field you want to filter on, and
+which regexp you want to filter with.  Ebib will then update the index
+buffer.
 
 It is also possible to perform a logical ‘and’ on the filter.  Use this
 if you want to select those entries that contain ‘"Jones"’ in the
@@ -1309,7 +1488,7 @@ Modifying Key Bindings: #modifying-key-bindings. for details.)
 
 File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
 
-5.3 Storing and Saving Filters
+6.3 Storing and Saving Filters
 ==============================
 
 When you cancel a filter, it is automatically stored so that it can be
@@ -1365,7 +1544,7 @@ accident, you can reload them from ‘~/.emacs.d/ebib-filters’ with ‘F l’.
 
 File: ebib.info,  Node: Special Filters,  Next: An Example Listing Recent Additions,  Prev: Storing and Saving Filters,  Up: Filters
 
-5.4 Special Filters
+6.4 Special Filters
 ===================
 
 Filters are essentially Lisp expressions that consist of the functions
@@ -1399,7 +1578,7 @@ example:
 
 File: ebib.info,  Node: An Example Listing Recent Additions,  Next: Properties of Filtered Databases,  Prev: Special Filters,  Up: Filters
 
-5.5 An Example: Listing Recent Additions
+6.5 An Example: Listing Recent Additions
 ========================================
 
 One special filter is included with Ebib.  It filters recent additions
@@ -1454,7 +1633,7 @@ argument and returns ‘t’ if the latter precedes the former.
 
 File: ebib.info,  Node: Properties of Filtered Databases,  Prev: An Example Listing Recent Additions,  Up: Filters
 
-5.6 Properties of Filtered Databases
+6.6 Properties of Filtered Databases
 ====================================
 
 When a filter is active, there are a few things that are not possible or
@@ -1488,7 +1667,7 @@ active.
 
 File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Importing BibTeX entries,  Prev: Filters,  Up: Top
 
-6 Inserting Citations into a Text Buffer
+7 Inserting Citations into a Text Buffer
 ****************************************
 
 * Menu:
@@ -1503,7 +1682,7 @@ File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Importing
 
 File: ebib.info,  Node: Single Citations,  Next: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
 
-6.1 Single Citations
+7.1 Single Citations
 ====================
 
 When you’re in a text buffer and you have Ebib open in the background
@@ -1548,7 +1727,7 @@ citation at the current cursor position in the buffer you’ve supplied.
 
 File: ebib.info,  Node: Citations with multiple keys,  Next: Key Bindings,  Prev: Single Citations,  Up: Inserting Citations into a Text Buffer
 
-6.2 Citations with multiple keys
+7.2 Citations with multiple keys
 ================================
 
 Most citation commands in LaTeX can take multiple keys.  To add more
@@ -1584,7 +1763,7 @@ default, but it is there if you want to use it.
 
 File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
 
-6.3 Key Bindings
+7.3 Key Bindings
 ================
 
 Of course, the easiest way to use the commands discussed here is to bind
@@ -1606,7 +1785,7 @@ will do the right thing.
 
 File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a Text Buffer,  Prev: Key Bindings,  Up: Inserting Citations into a Text Buffer
 
-6.4 Defining Citation Commands
+7.4 Defining Citation Commands
 ==============================
 
 Citation commands are defined for specific major modes.  Ebib defines
@@ -1754,7 +1933,7 @@ buffer.
 
 File: ebib.info,  Node: Associating a Database with a Text Buffer,  Next: Links and Citations in Org buffers,  Prev: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
 
-6.5 Associating a Database with a Text Buffer
+7.5 Associating a Database with a Text Buffer
 =============================================
 
 The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
@@ -1786,7 +1965,7 @@ customisable option.
 
 File: ebib.info,  Node: Links and Citations in Org buffers,  Prev: Associating a Database with a Text Buffer,  Up: Inserting Citations into a Text Buffer
 
-6.6 Links and Citations in Org buffers
+7.6 Links and Citations in Org buffers
 ======================================
 
 Currently, Org mode does not have real support for citations (though
@@ -1816,9 +1995,9 @@ the name or full path of the file.  Which type of link is produced is
 controlled by the user option ‘org-ebib-link-type’.
 
 
-File: ebib.info,  Node: Importing BibTeX entries,  Next: Copying Entries to the Kill Ring,  Prev: Inserting Citations into a Text Buffer,  Up: Top
+File: ebib.info,  Node: Importing BibTeX entries,  Next: Linking to external resources,  Prev: Inserting Citations into a Text Buffer,  Up: Top
 
-7 Importing BibTeX entries
+8 Importing BibTeX entries
 **************************
 
 Manually entering new BibTeX entries can be tedious and error-prone.  If
@@ -1835,7 +2014,7 @@ ways to get entries into Ebib.
 
 File: ebib.info,  Node: Merging bib files,  Next: Importing entries from a buffer,  Up: Importing BibTeX entries
 
-7.1 Merging ‘.bib’ files
+8.1 Merging ‘.bib’ files
 ========================
 
 In the index buffer, the Ebib menu has an option to merge a second
@@ -1851,7 +2030,7 @@ unique key.
 
 File: ebib.info,  Node: Importing entries from a buffer,  Next: Integration with the Biblio package,  Prev: Merging bib files,  Up: Importing BibTeX entries
 
-7.2 Importing entries from a buffer
+8.2 Importing entries from a buffer
 ===================================
 
 Another way to add entries to a database is to import them from an Emacs
@@ -1874,7 +2053,7 @@ if you edit the entry.  See the option “Autogenerate Keys”
 
 File: ebib.info,  Node: Integration with the Biblio package,  Next: Multiple Identical Fields,  Prev: Importing entries from a buffer,  Up: Importing BibTeX entries
 
-7.3 Integration with the Biblio package
+8.3 Integration with the Biblio package
 =======================================
 
 Biblio (https://github.com/cpitclaudel/biblio.el) is a package with
@@ -1915,7 +2094,7 @@ functionality.
 
 File: ebib.info,  Node: Multiple Identical Fields,  Prev: Integration with the Biblio package,  Up: Importing BibTeX entries
 
-7.4 Multiple Identical Fields
+8.4 Multiple Identical Fields
 =============================
 
 Under normal circumstances, a BibTeX entry only contains one occurrence
@@ -1963,247 +2142,24 @@ Fields” set, you will get the following:
 }
 
 
-File: ebib.info,  Node: Copying Entries to the Kill Ring,  Next: Main and Dependent Databases,  Prev: Importing BibTeX entries,  Up: Top
+File: ebib.info,  Node: Linking to external resources,  Next: Notes files,  Prev: Importing BibTeX entries,  Up: Top
 
-8 Copying Entries to the Kill Ring
-**********************************
+9 Linking to external resources
+*******************************
 
-Ebib offers several ways to copy an entry to the kill ring (and the
-system clipboard), which you can then insert into another buffer or
-another application.  You can copy the entry key (‘C k’; note that this
-is capital ‘C’ followed by ‘k’, _not_ ‘C-k’!)  the entire BibTeX entry
-(‘C e’), a full reference as would appear in a list of references (‘C
-r’) or a citation, by default of the Author-Year type (‘C c’).
+BibTeX entries can contain links to external files, URLs and DOIs.  Ebib
+offers several facilities to work with these.
 
-The functions that copy a reference or citation make use of templates
-that specify how such a reference/citation should be formatted.  These
-templates can be customised: the relevant options are
-‘ebib-reference-templates’ and ‘ebib-citation-template’.  (The latter
-should not be confused with ‘ebib-citation-commands’, which defines
-templates for inserting citation commands into a LaTeX / Markdown / etc.
-buffer.)
+* Menu:
 
-These templates are strings that contain directives for inserting
-specific fields from the entry being copied.  As an example, a simple
-template for an author-year citation would be the following:
-
-"{Author} ({Year})"
-
-The directives are marked by braces {} around a field name.  In the
-resulting citation, they are replaced by the contents of the fields.
-(The field names are case-insensitive, they could also be written as
-‘"{author} ({year})."’)
-
-Alternative fields can be separated by a pipe bar ‘|’:
-
-"{Author|Editor} ({Date|Year})"
-
-This template uses the ‘Author’ field unless it’s empty, in which case
-the ‘Editor’ field is used.  Similarly for the year: first the contents
-of the ‘Date’ field is checked.  The ‘Year’ field is used if the ‘Date’
-field is empty.
-
-If none of the fields in a directive has any contents, the directive is
-discarded completely.  Most reference templates for example include a
-directive for the ‘Doi’ or ‘Url’ field:
-
-"{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
-
-If the ‘Doi’ and ‘Url’ fields are both empty, the directive is simply
-ignored.
-
-A directive may contain punctuation before or after the field name (or
-sequence of field names), which is dropped if the field is empty.  The
-‘{Doi|Url.}’ directive in the previous example contains a full stop,
-which is only included in the reference if the ‘Doi’ or ‘Url’ field is
-present.
-
-The contents of the fields is used literally, with two exceptions: the
-‘Date’ field may contain a full date+time specification or even a date
-range, but only the year (or the year of the first date in a date range)
-is used.  Similarly, the ‘Title’ field is stripped of LaTeX markup.
+* Viewing and Importing Files::
+* Calling a Browser for URLs and DOIs::
 
 
-File: ebib.info,  Node: Main and Dependent Databases,  Next: Printing the Database,  Prev: Copying Entries to the Kill Ring,  Up: Top
+File: ebib.info,  Node: Viewing and Importing Files,  Next: Calling a Browser for URLs and DOIs,  Up: Linking to external resources
 
-9 Main and Dependent Databases
-******************************
-
-If you want to create a ‘.bib’ file from a larger database that only
-contains the references of a particular paper, you can use a dependent
-database.  A dependent database, as the name suggests, depends on
-another, real database that is called its main database.  The dependent
-database can only contain entries that also exist in its main database
-and all the data of the entries is shared by both databases.  If you
-edit an entry in the dependent database, the edit shows up in the main
-one as well, and vice versa.
-
-Furthermore, if you have a text buffer that’s associated with a
-dependent database, inserting an entry with ‘M-x ebib-insert-citation’
-offers all entries of the main database for completion, not just the
-ones that are already in the dependent database.  If you select an entry
-that is not in the dependent database yet, it is added to it.  This way,
-creating a separate database for a paper is easy: just create a
-dependent database and associate it with the relevant text buffer.  Then
-insert citation commands as usual.
-
-You can create a dependent database with the key sequence ‘M c’ in the
-database that you want to be its main database.  Ebib asks you for a
-file name and then creates a new empty database.
-
-Adding new entries to a dependent database can be done as described, by
-inserting citations in a text buffer.  It’s also possible to add entries
-in the usual way, i.e., by pressing ‘a’ in Ebib’s index buffer.  If you
-do this in a dependent database, instead of creating a new entry, you
-are prompted for an entry from the main database to add to the dependent
-one.
-
-It’s also possible to add entries to a dependent database from its main
-database with the command ‘M a’.  This command also works on marked
-entries, making it possible to add multiple entries to a dependent
-database in one go.
-
-Deleting an entry in a dependent database only removes it from the
-dependent database, not from the main database.  If you delete an entry
-from the main database that is also present in a dependent database, it
-is removed from both, given that a dependent database can only have
-entries that also exist in the main database.
-
-A database can serve as the main database for more than one dependent
-databases, but the reverse is not possible: each dependent database can
-only have one main database.
-
-If you save a dependent database, it is saved as a normal, standalone
-‘.bib’ file that can be used with ‘biblatex’ or BibTeX. When you reopen
-the file in Ebib, a special comment at the top of the file makes sure
-that Ebib recognises it as a dependent database and loads the main
-database as well, if necessary.  Note that when Ebib opens a dependent
-database, it only reads the entry keys from the ‘.bib’ file.  The data
-of each entry is taken from the main database.  This means that if you
-edit a dependent database’s ‘.bib’ file outside of Ebib, the changes you
-make are ignored when you open the file in Ebib.
-
-
-File: ebib.info,  Node: Printing the Database,  Next: Calling a Browser for URLs and DOIs,  Prev: Main and Dependent Databases,  Up: Top
-
-10 Printing the Database
-************************
-
-Sometimes it may be useful to have a ‘.pdf’ file or print-out of your
-database.  Although Ebib does not actually do the printing itself, it
-can create a LaTeX file for you that you can compile and print.  In
-fact, there are two ways of doing this.
-
-The print options are available in the Ebib menu when the index buffer
-is active.  You can print the entries as index cards or as a
-bibliography.
-
-If you print your entries as a bibliography, Ebib creates a simple LaTeX
-document that essentially contains a ‘\nocite{*}’ command followed by a
-‘\printbibliography’ command, adding a ‘\addbibresource’ command
-referring to the current database.  You can then run the usual sequence
-of LaTeX, Biber, LaTeX, LaTeX on this file, creating a document
-containing a list of all the references in your database.  (Obviously,
-BibTeX is also supported.)
-
-If you choose to print as index cards, Ebib also creates a LaTeX file.
-However, instead of simply providing a ‘\nocite{*}’ command, this file
-contains a ‘tabular’ environment for each entry in the database listing
-all the fields of that entry and their values.
-
-The entries are separated by a ‘\bigskip’, but if you set the option
-‘Print Newpage’ in the customisation buffer (or in the Print menu), the
-entries are separated by a ‘\newpage’, so that every entry is on a
-separate page.  The latter option is useful when printing actual index
-cards (though you’d probably have to change the page size with the
-‘geometry’ package as well).
-
-By default, the index cards only show single-line field values.  That
-is, multiline values are normally excluded.  If you want to include
-multiline values in the print-out, you have to set the option ‘Print
-Multiline’ in the Options menu or in Ebib’s customisation buffer.  With
-this option set, Ebib includes all multiline values in the LaTeX file
-that it creates.  Note however that Ebib does not change anything about
-the formatting of the text in a multiline value.  So if you plan to make
-(heavy) use of this option, make sure that the way you type your text
-conforms to LaTeX’s conventions (e.g. empty lines to mark paragraphs,
-etc.)  and doesn’t contain any characters such as ‘&’ that are illegal
-in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
-
-As mentioned, when you “print” the database, Ebib really just creates a
-LaTeX file.  More precisely, it creates a temporary buffer and writes
-the LaTeX code into it, and then saves the contents of that buffer to a
-file.  After it has done that, Ebib lowers itself and instruct Emacs to
-open the file in a buffer, which will then be properly set up as a LaTeX
-buffer.  From there you can run LaTeX and view the result.
-
-Before doing all this, Ebib asks you which file to write to.  Be careful
-with this: since this is supposed to be a temporary file, Ebib simply
-assumes that if you provide a filename of an existing file, it can
-overwrite that file without warning!
-
-A better way to tell Ebib which file to use is to set the option “Print
-Tempfile” in Ebib’s customisation buffer to some temporary file.  When
-this option is set, Ebib will always use this file to write to, and will
-not ask you for a filename anymore.
-
-Note that both print options operate on all entries of the database or
-on the selected entries.
-
-The option “Print Preamble” and “LaTeX Preamble” allow you to customize
-the preamble of the LaTeX file that is created.
-
-
-File: ebib.info,  Node: Calling a Browser for URLs and DOIs,  Next: Viewing and Importing Files,  Prev: Printing the Database,  Up: Top
-
-11 Calling a Browser for URLs and DOIs
-**************************************
-
-With most scientific literature nowadays being available on-line, it is
-common to store URLs and DOIs in a BibTeX database.  ‘Biblatex’ has
-standardised fields for this information, for BibTeX, Ebib adds these
-fields to each entry.
-
-To open a URL in your default browser, you can type ‘u’ in the index or
-entry buffer.  Ebib takes the URL stored in the ‘url’ field of the
-current entry and passes it to your browser.  If you happen to have more
-than one URL stored in the relevant field, Ebib will ask you which one
-you want to open.  Alternatively, you can use a prefix argument: typing
-‘M-2 u’ sends the second URL to your browser.
-
-It is not even necessary that the relevant field contains _only_ URLs.
-It may contain other text mixed with the URLs: Ebib simply searches the
-URLs in the field and ignores the rest of the text.  Ebib considers
-every string of characters that starts with ‘http://’ or ‘https://’ and
-that does not contain whitespace or any of the characters ‘" ' ; <’ or
-‘>’ as a URL. The semicolon is included here even though it is actually
-a valid character in URLs.  This is done for consistency, because the
-semicolon (actually, semicolon+space) is the standard separator for
-files in the ‘file’ field and in this way, you can use the same
-separator to distinguish multiple URLs in the ‘url’ field.
-
-By default Ebib also regards everything that is enclosed in a LaTeX
-‘\url{...}’ command as a URL. So if you use ‘;’ to separate URLs and
-then happen to run into a URL that contains a semicolon, you can enclose
-it in ‘\url{...}’ and it will be recognised properly.  You can, of
-course, customise the regular expression that controls this behaviour.
-See the option “Url Regexp” for details.
-
-Similarly, with the key ‘I’ in the index buffer you can send a DOI to a
-browser.  The DOI must be stored in the ‘doi’ field.  Unlike URLs, there
-can only be one DOI in this field.  The whole contents of the field is
-assumed to be the DOI and is sent to the browser, prepended with the
-string ‘https://dx.doi.org/’ if necessary.
-
-Ebib uses the Emacs function ‘browse-url’ to call the default browser on
-the system.  If you prefer to use another browser, however, you can
-specify this with the option “Browser Command”.
-
-
-File: ebib.info,  Node: Viewing and Importing Files,  Next: Notes files,  Prev: Calling a Browser for URLs and DOIs,  Up: Top
-
-12 Viewing and Importing Files
-******************************
+9.1 Viewing and Importing Files
+===============================
 
 If you have electronic versions of the papers in your database stored on
 your computer, or any other file associated with your entries (e.g.,
@@ -2298,8 +2254,8 @@ the ‘file’ field if it is not already there.
 
 File: ebib.info,  Node: Editing the file field,  Up: Viewing and Importing Files
 
-12.1 Editing the ‘file’ field
-=============================
+9.1.1 Editing the ‘file’ field
+------------------------------
 
 As mentioned above, editing the ‘file’ field is a bit different from
 editing other fields.  Instead of typing the full contents of the file
@@ -2324,9 +2280,55 @@ this behaviour with the option ‘ebib-truncate-file-names’: if unset,
 file names are always stored as absolute paths.)
 
 
-File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Viewing and Importing Files,  Up: Top
+File: ebib.info,  Node: Calling a Browser for URLs and DOIs,  Prev: Viewing and Importing Files,  Up: Linking to external resources
 
-13 Notes files
+9.2 Calling a Browser for URLs and DOIs
+=======================================
+
+With most scientific literature nowadays being available on-line, it is
+common to store URLs and DOIs in a BibTeX database.  ‘Biblatex’ has
+standardised fields for this information, for BibTeX, Ebib adds these
+fields to each entry.
+
+To open a URL in your default browser, you can type ‘u’ in the index or
+entry buffer.  Ebib takes the URL stored in the ‘url’ field of the
+current entry and passes it to your browser.  If you happen to have more
+than one URL stored in the relevant field, Ebib will ask you which one
+you want to open.  Alternatively, you can use a prefix argument: typing
+‘M-2 u’ sends the second URL to your browser.
+
+It is not even necessary that the relevant field contains _only_ URLs.
+It may contain other text mixed with the URLs: Ebib simply searches the
+URLs in the field and ignores the rest of the text.  Ebib considers
+every string of characters that starts with ‘http://’ or ‘https://’ and
+that does not contain whitespace or any of the characters ‘" ' ; <’ or
+‘>’ as a URL. The semicolon is included here even though it is actually
+a valid character in URLs.  This is done for consistency, because the
+semicolon (actually, semicolon+space) is the standard separator for
+files in the ‘file’ field and in this way, you can use the same
+separator to distinguish multiple URLs in the ‘url’ field.
+
+By default Ebib also regards everything that is enclosed in a LaTeX
+‘\url{...}’ command as a URL. So if you use ‘;’ to separate URLs and
+then happen to run into a URL that contains a semicolon, you can enclose
+it in ‘\url{...}’ and it will be recognised properly.  You can, of
+course, customise the regular expression that controls this behaviour.
+See the option “Url Regexp” for details.
+
+Similarly, with the key ‘I’ in the index buffer you can send a DOI to a
+browser.  The DOI must be stored in the ‘doi’ field.  Unlike URLs, there
+can only be one DOI in this field.  The whole contents of the field is
+assumed to be the DOI and is sent to the browser, prepended with the
+string ‘https://dx.doi.org/’ if necessary.
+
+Ebib uses the Emacs function ‘browse-url’ to call the default browser on
+the system.  If you prefer to use another browser, however, you can
+specify this with the option “Browser Command”.
+
+
+File: ebib.info,  Node: Notes files,  Next: Managing a reading list,  Prev: Linking to external resources,  Up: Top
+
+10 Notes files
 **************
 
 Ebib supports the ‘annotation’ field (or ‘annote’ field in BibTeX), but
@@ -2365,7 +2367,7 @@ Upgrading from earlier Ebib versions:
 
 File: ebib.info,  Node: Configuring files for storing notes,  Next: Hooks,  Up: Notes files
 
-13.1 Configuring files for storing notes
+10.1 Configuring files for storing notes
 ========================================
 
 By default, Ebib saves each note to a separate file in the first
@@ -2421,7 +2423,7 @@ The template can of course be customised.  Details are discussed below.
 
 File: ebib.info,  Node: Hooks,  Next: Upgrading from earlier Ebib versions,  Prev: Configuring files for storing notes,  Up: Notes files
 
-13.2 Hooks
+10.2 Hooks
 ==========
 
 If ‘ebib-notes-storage’ is set to ‘multiple-notes-per-file’, Ebib uses
@@ -2454,7 +2456,7 @@ hooks.
 
 File: ebib.info,  Node: Upgrading from earlier Ebib versions,  Next: Customising the notes file format,  Prev: Hooks,  Up: Notes files
 
-13.3 Upgrading from earlier Ebib versions
+10.3 Upgrading from earlier Ebib versions
 =========================================
 
 Ebib 2.30 added the option to have more than one file with multiple
@@ -2477,7 +2479,7 @@ one Org file for your notes.
 
 File: ebib.info,  Node: Customising the notes file format,  Next: Displaying notes,  Prev: Upgrading from earlier Ebib versions,  Up: Notes files
 
-13.4 Customising the notes file format
+10.4 Customising the notes file format
 ======================================
 
 When creating a new note, the default template creates an Org entry
@@ -2562,7 +2564,7 @@ above in this case.
 
 File: ebib.info,  Node: Displaying notes,  Next: Using org-capture to record notes,  Prev: Customising the notes file format,  Up: Notes files
 
-13.5 Displaying notes
+10.5 Displaying notes
 =====================
 
 If an entry has an external note, the first few lines are shown in the
@@ -2590,7 +2592,7 @@ displayed without getting in the way.
 
 File: ebib.info,  Node: Using org-capture to record notes,  Prev: Displaying notes,  Up: Notes files
 
-13.6 Using ‘org-capture’ to record notes
+10.6 Using ‘org-capture’ to record notes
 ========================================
 
 Instead of using Ebib’s own system to record notes, you can also use
@@ -2711,9 +2713,9 @@ be used in the same way.  It makes sure that
 calls ‘org-capture’.
 
 
-File: ebib.info,  Node: Managing a reading list,  Next: Window Management,  Prev: Notes files,  Up: Top
+File: ebib.info,  Node: Managing a reading list,  Next: Managing Keywords,  Prev: Notes files,  Up: Top
 
-14 Managing a reading list
+11 Managing a reading list
 **************************
 
 Ebib offers the ability to manage a reading list as an Org file.  In
@@ -2767,9 +2769,89 @@ before saving it), the latter immediately after calling the function in
 buffer).  By default, these hooks are empty.
 
 
-File: ebib.info,  Node: Window Management,  Next: Managing Keywords,  Prev: Managing a reading list,  Up: Top
+File: ebib.info,  Node: Managing Keywords,  Next: Window Management,  Prev: Managing a reading list,  Up: Top
 
-15 Window Management
+12 Managing Keywords
+********************
+
+Biblatex supports a ‘keywords’ field, which can contain a
+(comma-separated) list of keywords for an entry.  BibTeX does not
+support this field directly, but Ebib includes a ‘keywords’ field in the
+extra fields for BibTeX entries.  Ebib offers some special facilities
+for editing this field.
+
+Ebib keeps a list of keywords used in your database(s) and offers these
+for completion when you edit the ‘keywords’ field.  You can enter a
+keyword and accept it with ‘RET’, after which you will be asked for the
+next keyword.  Just hitting ‘RET’ without any input finishes the edit
+and returns focus to the entry buffer.  (With selectrum, ivy or helm the
+key binding to finish editing the ‘keywords’ field is different; the
+prompt will indicate what key to press).  You can, of course, also enter
+a keyword that is not on the completion list.  If you do, it will be
+added to the list.
+
+If you need to edit a keyword or remove one from the list, you need to
+edit the ‘keywords’ field directly.  To do this, use a prefix argument:
+‘C-u RET’ instead of just ‘RET’ to edit the field.  Note, though, that
+this does not update the completion list.
+
+The keywords completion list is composed of the keywords in all the
+‘.bib’ files you have open and is available in every database.  If you
+open another ‘.bib’ file, its keywords are added to the completion list.
+(Note that if you close a database, its keywords are not removed from
+the completion list, since Ebib does not keep track of which keywords
+are used in which database.)
+
+* Menu:
+
+* Using a Canonical Keywords List::
+
+
+File: ebib.info,  Node: Using a Canonical Keywords List,  Up: Managing Keywords
+
+12.1 Using a Canonical Keywords List
+====================================
+
+By default, the completion list does not contain keywords that are not
+used in any of your ‘.bib’ files.  If you wish to use a set of canonical
+keywords that are always offered for completion, regardless of whether
+they are used in a currently opened ‘.bib’ file or not, you can set the
+option “Keywords” (‘ebib-keywords’).  This can be a list of keywords or
+the name of a file containing the keywords.  If it is a file name, the
+file should be a simple text file with one keyword per line.
+
+If you set this option, keywords in a database that are not in the
+canonical list are displayed in Ebib’s warning face
+(‘ebib-warning-face’).  You can add them to the canonical list with the
+key sequence ‘K s’, which will ask you for the keyword to add, or with
+‘K c’, which adds all keywords of the current entry to the canonical
+list.  You can also remove all keywords from the ‘keywords’ field that
+are not in the list of canonical keywords with the key sequence ‘K p’.
+
+Even if you use a list of canonical keywords, you can still enter
+keywords that are not in the list when you edit the ‘keywords’ field.
+If you do so, the new keywords are added to the list automatically.  If
+you do not wish this to happen, unset the option “Keywords Add New To
+Canonical”.
+
+If new keywords were added to the list of canonical keywords, you will
+be asked if you wish to save the list when you quit Ebib.  If you always
+want this to happen without asking for confirmation, set the option
+“Keywords Save On Exit” to ‘always’.  Note that you can also save the
+list manually with the key sequence ‘K S’ (capital ‘K’, capital ‘S’).
+
+If you haven’t configured a list of canonical keywords, the key sequence
+‘K S’ creates one from the keywords used in your open ‘.bib’ files.  The
+list is then saved to your customisation file (usually
+‘~/.emacs.d/init.el’).  If you prefer to keep your keywords in a
+separate file, you need to create the file yourself (as mentioned, one
+keyword per line; keywords may of course contain spaces), and configure
+the option “Keywords” (‘ebib-keywords’) yourself.
+
+
+File: ebib.info,  Node: Window Management,  Next: Copying Entries to the Kill Ring,  Prev: Managing Keywords,  Up: Top
+
+13 Window Management
 ********************
 
 By default, Ebib takes over the entire Emacs frame it is started in,
@@ -2827,203 +2909,140 @@ height or its width, depending on whether the index window is displayed
 at the top or on the left of the frame.)
 
 
-File: ebib.info,  Node: Managing Keywords,  Next: Exporting Entries,  Prev: Window Management,  Up: Top
+File: ebib.info,  Node: Copying Entries to the Kill Ring,  Next: Printing the Database,  Prev: Window Management,  Up: Top
 
-16 Managing Keywords
-********************
+14 Copying Entries to the Kill Ring
+***********************************
 
-Biblatex supports a ‘keywords’ field, which can contain a
-(comma-separated) list of keywords for an entry.  BibTeX does not
-support this field directly, but Ebib includes a ‘keywords’ field in the
-extra fields for BibTeX entries.  Ebib offers some special facilities
-for editing this field.
+Ebib offers several ways to copy an entry to the kill ring (and the
+system clipboard), which you can then insert into another buffer or
+another application.  You can copy the entry key (‘C k’; note that this
+is capital ‘C’ followed by ‘k’, _not_ ‘C-k’!)  the entire BibTeX entry
+(‘C e’), a full reference as would appear in a list of references (‘C
+r’) or a citation, by default of the Author-Year type (‘C c’).
 
-Ebib keeps a list of keywords used in your database(s) and offers these
-for completion when you edit the ‘keywords’ field.  You can enter a
-keyword and accept it with ‘RET’, after which you will be asked for the
-next keyword.  Just hitting ‘RET’ without any input finishes the edit
-and returns focus to the entry buffer.  (With selectrum, ivy or helm the
-key binding to finish editing the ‘keywords’ field is different; the
-prompt will indicate what key to press).  You can, of course, also enter
-a keyword that is not on the completion list.  If you do, it will be
-added to the list.
+The functions that copy a reference or citation make use of templates
+that specify how such a reference/citation should be formatted.  These
+templates can be customised: the relevant options are
+‘ebib-reference-templates’ and ‘ebib-citation-template’.  (The latter
+should not be confused with ‘ebib-citation-commands’, which defines
+templates for inserting citation commands into a LaTeX / Markdown / etc.
+buffer.)
 
-If you need to edit a keyword or remove one from the list, you need to
-edit the ‘keywords’ field directly.  To do this, use a prefix argument:
-‘C-u RET’ instead of just ‘RET’ to edit the field.  Note, though, that
-this does not update the completion list.
+These templates are strings that contain directives for inserting
+specific fields from the entry being copied.  As an example, a simple
+template for an author-year citation would be the following:
 
-The keywords completion list is composed of the keywords in all the
-‘.bib’ files you have open and is available in every database.  If you
-open another ‘.bib’ file, its keywords are added to the completion list.
-(Note that if you close a database, its keywords are not removed from
-the completion list, since Ebib does not keep track of which keywords
-are used in which database.)
+"{Author} ({Year})"
 
-* Menu:
+The directives are marked by braces {} around a field name.  In the
+resulting citation, they are replaced by the contents of the fields.
+(The field names are case-insensitive, they could also be written as
+‘"{author} ({year})."’)
 
-* Using a Canonical Keywords List::
+Alternative fields can be separated by a pipe bar ‘|’:
 
-
-File: ebib.info,  Node: Using a Canonical Keywords List,  Up: Managing Keywords
+"{Author|Editor} ({Date|Year})"
 
-16.1 Using a Canonical Keywords List
-====================================
+This template uses the ‘Author’ field unless it’s empty, in which case
+the ‘Editor’ field is used.  Similarly for the year: first the contents
+of the ‘Date’ field is checked.  The ‘Year’ field is used if the ‘Date’
+field is empty.
 
-By default, the completion list does not contain keywords that are not
-used in any of your ‘.bib’ files.  If you wish to use a set of canonical
-keywords that are always offered for completion, regardless of whether
-they are used in a currently opened ‘.bib’ file or not, you can set the
-option “Keywords” (‘ebib-keywords’).  This can be a list of keywords or
-the name of a file containing the keywords.  If it is a file name, the
-file should be a simple text file with one keyword per line.
+If none of the fields in a directive has any contents, the directive is
+discarded completely.  Most reference templates for example include a
+directive for the ‘Doi’ or ‘Url’ field:
 
-If you set this option, keywords in a database that are not in the
-canonical list are displayed in Ebib’s warning face
-(‘ebib-warning-face’).  You can add them to the canonical list with the
-key sequence ‘K s’, which will ask you for the keyword to add, or with
-‘K c’, which adds all keywords of the current entry to the canonical
-list.  You can also remove all keywords from the ‘keywords’ field that
-are not in the list of canonical keywords with the key sequence ‘K p’.
+"{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
 
-Even if you use a list of canonical keywords, you can still enter
-keywords that are not in the list when you edit the ‘keywords’ field.
-If you do so, the new keywords are added to the list automatically.  If
-you do not wish this to happen, unset the option “Keywords Add New To
-Canonical”.
+If the ‘Doi’ and ‘Url’ fields are both empty, the directive is simply
+ignored.
 
-If new keywords were added to the list of canonical keywords, you will
-be asked if you wish to save the list when you quit Ebib.  If you always
-want this to happen without asking for confirmation, set the option
-“Keywords Save On Exit” to ‘always’.  Note that you can also save the
-list manually with the key sequence ‘K S’ (capital ‘K’, capital ‘S’).
+A directive may contain punctuation before or after the field name (or
+sequence of field names), which is dropped if the field is empty.  The
+‘{Doi|Url.}’ directive in the previous example contains a full stop,
+which is only included in the reference if the ‘Doi’ or ‘Url’ field is
+present.
 
-If you haven’t configured a list of canonical keywords, the key sequence
-‘K S’ creates one from the keywords used in your open ‘.bib’ files.  The
-list is then saved to your customisation file (usually
-‘~/.emacs.d/init.el’).  If you prefer to keep your keywords in a
-separate file, you need to create the file yourself (as mentioned, one
-keyword per line; keywords may of course contain spaces), and configure
-the option “Keywords” (‘ebib-keywords’) yourself.
+The contents of the fields is used literally, with two exceptions: the
+‘Date’ field may contain a full date+time specification or even a date
+range, but only the year (or the year of the first date in a date range)
+is used.  Similarly, the ‘Title’ field is stripped of LaTeX markup.
 
 
-File: ebib.info,  Node: Exporting Entries,  Next: Multiline Edit Buffers,  Prev: Managing Keywords,  Up: Top
+File: ebib.info,  Node: Printing the Database,  Next: Customisation,  Prev: Copying Entries to the Kill Ring,  Up: Top
 
-17 Exporting Entries
-********************
+15 Printing the Database
+************************
 
-Sometimes it can be useful to copy entries from one database to another,
-or to create a new ‘.bib’ file with several entries from an existing
-database.  For this purpose, Ebib provides exporting facilities.  To
-export an entry to another database, use the command ‘x’.  This command
-operates on a single entry or on all marked entries.  Ebib will ask you
-for the database to export the entry or entries to.  ‘TAB’ completion is
-available, based on the file names of the databases.
+Sometimes it may be useful to have a ‘.pdf’ file or print-out of your
+database.  Although Ebib does not actually do the printing itself, it
+can create a LaTeX file for you that you can compile and print.  In
+fact, there are two ways of doing this.
 
-You can also export entries to a file.  To do this, call the command ‘x’
-with a prefix argument: ‘C-u x’.  You will be prompted for the file name
-to export the entries to.  If the file already exists, Ebib appends the
-entries to it.  Note that in this case, there is no check to see if the
-exported entries already exist in the target file, so it’s possible to
-end up with duplicate entries in this way.
+The print options are available in the Ebib menu when the index buffer
+is active.  You can print the entries as index cards or as a
+bibliography.
 
-Apart from entries, it is also possible to export the ‘@Preamble’ and
-‘@String’ definitions.  The ‘@Preamble’ definition is exported with the
-command ‘X’ in the index buffer.  ‘@String’ definitions can be exported
-in the strings buffer: ‘x’ in this buffer exports the current string,
-while ‘X’ exports all ‘@String’ definitions in one go.  All these
-commands function in the same way: when used without a prefix argument,
-they ask for an open database to export the entry to.  With a prefix
-argument, they ask for a filename, and then append the relevant data to
-that file.
+If you print your entries as a bibliography, Ebib creates a simple LaTeX
+document that essentially contains a ‘\nocite{*}’ command followed by a
+‘\printbibliography’ command, adding a ‘\addbibresource’ command
+referring to the current database.  You can then run the usual sequence
+of LaTeX, Biber, LaTeX, LaTeX on this file, creating a document
+containing a list of all the references in your database.  (Obviously,
+BibTeX is also supported.)
 
-
-File: ebib.info,  Node: Multiline Edit Buffers,  Next: Customisation,  Prev: Exporting Entries,  Up: Top
+If you choose to print as index cards, Ebib also creates a LaTeX file.
+However, instead of simply providing a ‘\nocite{*}’ command, this file
+contains a ‘tabular’ environment for each entry in the database listing
+all the fields of that entry and their values.
 
-18 Multiline Edit Buffers
-*************************
+The entries are separated by a ‘\bigskip’, but if you set the option
+‘Print Newpage’ in the customisation buffer (or in the Print menu), the
+entries are separated by a ‘\newpage’, so that every entry is on a
+separate page.  The latter option is useful when printing actual index
+cards (though you’d probably have to change the page size with the
+‘geometry’ package as well).
 
-As mentioned several times before, field values that contain newlines
-(so-called _multiline fields_) and the ‘@Preamble’ are edited in a
-so-called _multiline edit buffer_.  This section discusses the details
-of this buffer.
+By default, the index cards only show single-line field values.  That
+is, multiline values are normally excluded.  If you want to include
+multiline values in the print-out, you have to set the option ‘Print
+Multiline’ in the Options menu or in Ebib’s customisation buffer.  With
+this option set, Ebib includes all multiline values in the LaTeX file
+that it creates.  Note however that Ebib does not change anything about
+the formatting of the text in a multiline value.  So if you plan to make
+(heavy) use of this option, make sure that the way you type your text
+conforms to LaTeX’s conventions (e.g. empty lines to mark paragraphs,
+etc.)  and doesn’t contain any characters such as ‘&’ that are illegal
+in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
 
-Ebib enters a multiline edit buffer in one of three cases: when you edit
-the ‘@Preamble’ definition, when you hit ‘m’ in the entry buffer to edit
-the current field as multiline, or when you hit ‘e’ on the
-‘annote’/‘annotation’ or ‘abstract’ fields, or on a field whose value
-already is multiline.
+As mentioned, when you “print” the database, Ebib really just creates a
+LaTeX file.  More precisely, it creates a temporary buffer and writes
+the LaTeX code into it, and then saves the contents of that buffer to a
+file.  After it has done that, Ebib lowers itself and instruct Emacs to
+open the file in a buffer, which will then be properly set up as a LaTeX
+buffer.  From there you can run LaTeX and view the result.
 
-The major mode that is used in multiline edit buffers is
-user-configurable.  The default value is ‘text-mode’, but if you prefer
-to use some other mode, you can specify this through the customisation
-option ‘ebib-multiline-major-mode’.
+Before doing all this, Ebib asks you which file to write to.  Be careful
+with this: since this is supposed to be a temporary file, Ebib simply
+assumes that if you provide a filename of an existing file, it can
+overwrite that file without warning!
 
-Three commands are relevant for interacting with Ebib when you’re in the
-multiline edit buffer, which are bound to key sequences in the minor
-mode ‘ebib-multiline-edit-mode’, which is activated automatically in the
-multiline edit buffer.
+A better way to tell Ebib which file to use is to set the option “Print
+Tempfile” in Ebib’s customisation buffer to some temporary file.  When
+this option is set, Ebib will always use this file to write to, and will
+not ask you for a filename anymore.
 
-‘ebib-quit-multiline-buffer-and-save’, bound to ‘C-c C-c’, leaves the
-multiline edit buffer and stores the text in the database.  If you
-invoke this command when you’ve deleted all contents of the buffer
-(including the final newline!)  and you were editing a field value or
-the ‘@Preamble’, the field value or preamble is deleted.  (This is in
-fact the _only_ way to delete the ‘@Preamble’ definition.  Field values
-on the other hand can also be deleted by hitting ‘k’ or ‘d’ on them in
-the entry buffer.)
+Note that both print options operate on all entries of the database or
+on the selected entries.
 
-‘ebib-cancel-multiline-buffer’, bound to ‘C-c C-k’, also leaves the
-multiline edit buffer, but it does so without storing the text.  The
-original value of the field, string or preamble will be retained.  If
-the text was modified, Ebib will ask for a confirmation before leaving
-the buffer.
-
-‘ebib-save-from-multiline-buffer’, bound to ‘C-c C-s’, can be used in
-the multiline edit buffer to save the database.  This command first
-stores the text in the database and then saves it.  Because Ebib does
-not do an autosave of the current database, it is advisable to save the
-database manually every now and then to prevent data loss in case of
-crashes.  It would be annoying to have to leave the multiline edit
-buffer every time you want to do this, so this command has been provided
-to allow you to do this from within the buffer.
-
-Note that you do not need to finish a multiline edit before you can
-return to the database and possibly edit other fields and even entries.
-Ebib keeps track of which field in which entry of which database a
-multiline edit buffer belongs to, so you can keep a multiline edit
-buffer open while doing other work.  It is even possible to have several
-multiline edit buffers open at the same time.  Ebib makes sure that when
-you finish one, its contents is stored in the correct place.
-
-The key combinations of the multiline edit buffer strictly speaking
-violate Emacs’ suggested key binding conventions.  They are defined in
-the keymap of a minor mode (‘ebib-multiline-mode’, to be specific), but
-a minor mode keymap should only use key bindings of ‘C-c’ plus a
-non-alphanumeric character.  The bindings do follow practical
-conventions, however: they are used for similar functions in e.g., Org’s
-capture mechanism, in ‘message-mode’, in VC, magit, etc.  For this
-reason, Ebib uses them as well.
-
-If you find that these key bindings conflict with key bindings in the
-major mode you use in the multiline edit buffer, you can change them, of
-course.  To do this, put something like the following in your init file:
-
-(with-eval-after-load 'ebib
-  (define-key ebib-multiline-mode-map
-    "\C-c | c" 'ebib-quit-multiline-buffer-and-save)
-  (define-key ebib-multiline-mode-map
-    "\C-c | k" 'ebib-cancel-multiline-buffer)
-  (define-key ebib-multiline-mode-map
-    "\C-c | s" 'ebib-save-from-multiline-buffer))
-
-This sets up ‘C-c | c’, ‘C-c | k’ and ‘C-c | s’ for use in the multiline
-edit buffer.  You can obviously use other keys if you prefer.
+The option “Print Preamble” and “LaTeX Preamble” allow you to customize
+the preamble of the LaTeX file that is created.
 
 
-File: ebib.info,  Node: Customisation,  Prev: Multiline Edit Buffers,  Up: Top
+File: ebib.info,  Node: Customisation,  Prev: Printing the Database,  Up: Top
 
-19 Customisation
+16 Customisation
 ****************
 
 Ebib can be customised through Emacs’ standard customisation interface.
@@ -3054,7 +3073,7 @@ customisation buffer do not change.
 
 File: ebib.info,  Node: Modifying Key Bindings,  Up: Customisation
 
-19.1 Modifying Key Bindings
+16.1 Modifying Key Bindings
 ===========================
 
 If you would like to change Ebib’s standard key bindings, or if you
@@ -3076,150 +3095,152 @@ keywords and the reading list, respectively.  Finally, there is
 
 Tag Table:
 Node: Top186
-Node: Installation1177
-Ref: #installation1294
-Node: Package manager1375
-Ref: #package-manager1506
-Node: Manual installation1682
-Ref: #manual-installation1834
-Node: News2115
-Ref: #news2235
-Node: Starting Ebib2346
-Ref: #starting-ebib2456
-Node: Getting Started3057
-Ref: #getting-started3197
-Node: Opening a bib File4863
-Ref: #opening-a-.bib-file5017
-Node: Preloading bib Files6837
-Ref: #preloading-.bib-files7027
-Node: Starting a New bib File7477
-Ref: #starting-a-new-.bib-file7672
-Node: The Database View7914
-Ref: #the-database-view8090
-Node: Navigating the Database10131
-Ref: #navigating-the-database10335
-Node: Displaying and Sorting the Entries List13138
-Ref: #displaying-and-sorting-the-entries-list13375
-Node: Biblatex vs BibTeX17117
-Ref: #biblatex-vs.-bibtex17282
-Node: Setting the BibTeX Dialect18116
-Ref: #setting-the-bibtex-dialect18293
-Node: Alias Types and Fields20336
-Ref: #alias-types-and-fields20505
-Node: Editing the Database22578
-Ref: #editing-the-database22725
-Node: Adding and Deleting Entries23257
-Ref: #adding-and-deleting-entries23428
-Node: Marking Entries25206
-Ref: #marking-entries25382
-Node: Editing Field Values26259
-Ref: #editing-field-values26442
-Node: Editing Multiline Values29384
-Ref: #editing-multiline-values29595
-Node: Copy Cut Kill Paste Yank and Delete31499
-Ref: #copy-cut-kill-paste-yank-and-delete31743
-Node: Saving a Database32716
-Ref: #saving-a-database32903
-Node: Cross-referencing34132
-Ref: #cross-referencing34304
-Node: Sorting the bib File37831
-Ref: #sorting-the-.bib-file38018
-Node: Undefined Fields41137
-Ref: #undefined-fields41302
-Node: Hidden Fields42191
-Ref: #hidden-fields42342
-Node: Timestamps43412
-Ref: #timestamps43561
-Node: @Preamble Definition45534
-Ref: #preamble-definition45709
-Node: @String Definitions47681
-Ref: #string-definitions47853
-Node: @Comments51346
-Ref: #comments51498
-Node: Creating Entry Stubs51991
-Ref: #creating-entry-stubs52137
-Node: Searching53135
-Ref: #searching53252
-Node: Filters56784
-Ref: #filters56915
-Node: Simple Selection57990
-Ref: #simple-selection58115
-Node: Complex Filters59824
-Ref: #complex-filters59982
-Node: Storing and Saving Filters64057
-Ref: #storing-and-saving-filters64236
-Node: Special Filters67091
-Ref: #special-filters67268
-Node: An Example Listing Recent Additions68651
-Ref: #an-example-listing-recent-additions68876
-Node: Properties of Filtered Databases71246
-Ref: #properties-of-filtered-databases71439
-Node: Inserting Citations into a Text Buffer73094
-Ref: #inserting-citations-into-a-text-buffer73302
-Node: Single Citations73499
-Ref: #single-citations73668
-Node: Citations with multiple keys76041
-Ref: #citations-with-multiple-keys76255
-Node: Key Bindings78022
-Ref: #key-bindings78214
-Node: Defining Citation Commands78972
-Ref: #defining-citation-commands79205
-Node: Associating a Database with a Text Buffer85101
-Ref: #associating-a-database-with-a-text-buffer85386
-Node: Links and Citations in Org buffers86765
-Ref: #links-and-citations-in-org-buffers87001
-Node: Importing BibTeX entries88434
-Ref: #importing-bibtex-entries88639
-Node: Merging bib files88953
-Ref: #merging-.bib-files89124
-Node: Importing entries from a buffer89715
-Ref: #importing-entries-from-a-buffer89948
-Node: Integration with the Biblio package90981
-Ref: #integration-with-the-biblio-package91230
-Node: Multiple Identical Fields92824
-Ref: #multiple-identical-fields93013
-Node: Copying Entries to the Kill Ring94941
-Ref: #copying-entries-to-the-kill-ring95152
-Node: Main and Dependent Databases97768
-Ref: #main-and-dependent-databases97968
-Node: Printing the Database100953
-Ref: #printing-the-database101144
-Node: Calling a Browser for URLs and DOIs104613
-Ref: #calling-a-browser-for-urls-and-dois104831
-Node: Viewing and Importing Files107139
-Ref: #viewing-and-importing-files107331
-Node: Editing the file field112541
-Ref: #editing-the-file-field112690
-Node: Notes files114061
-Ref: #notes-files114209
-Node: Configuring files for storing notes115696
-Ref: #configuring-files-for-storing-notes115874
-Node: Hooks118841
-Ref: #hooks119004
-Node: Upgrading from earlier Ebib versions120405
-Ref: #upgrading-from-earlier-ebib-versions120628
-Node: Customising the notes file format121538
-Ref: #customising-the-notes-file-format121766
-Node: Displaying notes125790
-Ref: #displaying-notes125981
-Node: Using org-capture to record notes127330
-Ref: #using-org-capture-to-record-notes127521
-Node: Managing a reading list133531
-Ref: #managing-a-reading-list133693
-Node: Window Management136712
-Ref: #window-management136868
-Node: Managing Keywords140027
-Ref: #managing-keywords140177
-Node: Using a Canonical Keywords List141784
-Ref: #using-a-canonical-keywords-list141942
-Node: Exporting Entries144100
-Ref: #exporting-entries144255
-Node: Multiline Edit Buffers145771
-Ref: #multiline-edit-buffers145932
-Node: Customisation150017
-Ref: #customisation150134
-Node: Modifying Key Bindings151360
-Ref: #modifying-key-bindings151487
+Node: Installation1090
+Ref: #installation1207
+Node: Package manager1288
+Ref: #package-manager1419
+Node: Manual installation1595
+Ref: #manual-installation1747
+Node: News2028
+Ref: #news2148
+Node: Starting Ebib2259
+Ref: #starting-ebib2369
+Node: Getting Started2970
+Ref: #getting-started3110
+Node: Opening a bib File4776
+Ref: #opening-a-.bib-file4930
+Node: Preloading bib Files6750
+Ref: #preloading-.bib-files6940
+Node: Starting a New bib File7390
+Ref: #starting-a-new-.bib-file7585
+Node: The Database View7827
+Ref: #the-database-view8003
+Node: Navigating the Database10044
+Ref: #navigating-the-database10248
+Node: Displaying and Sorting the Entries List12628
+Ref: #displaying-and-sorting-the-entries-list12865
+Node: Biblatex vs BibTeX16607
+Ref: #biblatex-vs.-bibtex16772
+Node: Setting the BibTeX Dialect17606
+Ref: #setting-the-bibtex-dialect17783
+Node: Alias Types and Fields19826
+Ref: #alias-types-and-fields19995
+Node: Editing the Database22068
+Ref: #editing-the-database22234
+Node: Adding and Deleting Entries22793
+Ref: #adding-and-deleting-entries22964
+Node: Marking Entries24742
+Ref: #marking-entries24918
+Node: Editing Field Values25813
+Ref: #editing-field-values25996
+Node: Editing Multiline Values28938
+Ref: #editing-multiline-values29149
+Node: Copy Cut Kill Paste Yank and Delete31053
+Ref: #copy-cut-kill-paste-yank-and-delete31296
+Node: Undefined Fields32269
+Ref: #undefined-fields32449
+Node: Hidden Fields33338
+Ref: #hidden-fields33487
+Node: Timestamps34557
+Ref: #timestamps34701
+Node: Saving a Database36674
+Ref: #saving-a-database36836
+Node: Exporting Entries38097
+Ref: #exporting-entries38215
+Node: Cross-referencing39731
+Ref: #cross-referencing39905
+Node: Sorting the bib File43432
+Ref: #sorting-the-.bib-file43625
+Node: @Preamble Definition46744
+Ref: #preamble-definition46929
+Node: @String Definitions48901
+Ref: #string-definitions49073
+Node: @Comments52566
+Ref: #comments52718
+Node: Creating Entry Stubs53211
+Ref: #creating-entry-stubs53388
+Node: Multiline Edit Buffers54386
+Ref: #multiline-edit-buffers54549
+Node: Main and Dependent Databases58878
+Ref: #main-and-dependent-databases59054
+Node: Searching62039
+Ref: #searching62164
+Node: Filters65696
+Ref: #filters65827
+Node: Simple Selection66902
+Ref: #simple-selection67027
+Node: Complex Filters68736
+Ref: #complex-filters68894
+Node: Storing and Saving Filters72983
+Ref: #storing-and-saving-filters73162
+Node: Special Filters76017
+Ref: #special-filters76194
+Node: An Example Listing Recent Additions77577
+Ref: #an-example-listing-recent-additions77802
+Node: Properties of Filtered Databases80172
+Ref: #properties-of-filtered-databases80365
+Node: Inserting Citations into a Text Buffer82020
+Ref: #inserting-citations-into-a-text-buffer82228
+Node: Single Citations82425
+Ref: #single-citations82594
+Node: Citations with multiple keys84967
+Ref: #citations-with-multiple-keys85181
+Node: Key Bindings86948
+Ref: #key-bindings87140
+Node: Defining Citation Commands87898
+Ref: #defining-citation-commands88131
+Node: Associating a Database with a Text Buffer94027
+Ref: #associating-a-database-with-a-text-buffer94312
+Node: Links and Citations in Org buffers95691
+Ref: #links-and-citations-in-org-buffers95927
+Node: Importing BibTeX entries97360
+Ref: #importing-bibtex-entries97562
+Node: Merging bib files97876
+Ref: #merging-.bib-files98047
+Node: Importing entries from a buffer98638
+Ref: #importing-entries-from-a-buffer98871
+Node: Integration with the Biblio package99904
+Ref: #integration-with-the-biblio-package100153
+Node: Multiple Identical Fields101747
+Ref: #multiple-identical-fields101936
+Node: Linking to external resources103864
+Ref: #linking-to-external-resources104049
+Node: Viewing and Importing Files104251
+Ref: #viewing-and-importing-files104451
+Node: Editing the file field109661
+Ref: #editing-the-file-field109812
+Node: Calling a Browser for URLs and DOIs111183
+Ref: #calling-a-browser-for-urls-and-dois111399
+Node: Notes files113707
+Ref: #notes-files113857
+Node: Configuring files for storing notes115344
+Ref: #configuring-files-for-storing-notes115522
+Node: Hooks118489
+Ref: #hooks118652
+Node: Upgrading from earlier Ebib versions120053
+Ref: #upgrading-from-earlier-ebib-versions120276
+Node: Customising the notes file format121186
+Ref: #customising-the-notes-file-format121414
+Node: Displaying notes125438
+Ref: #displaying-notes125629
+Node: Using org-capture to record notes126978
+Ref: #using-org-capture-to-record-notes127169
+Node: Managing a reading list133179
+Ref: #managing-a-reading-list133341
+Node: Managing Keywords136360
+Ref: #managing-keywords136516
+Node: Using a Canonical Keywords List138123
+Ref: #using-a-canonical-keywords-list138281
+Node: Window Management140439
+Ref: #window-management140604
+Node: Copying Entries to the Kill Ring143763
+Ref: #copying-entries-to-the-kill-ring143962
+Node: Printing the Database146578
+Ref: #printing-the-database146751
+Node: Customisation150220
+Ref: #customisation150336
+Node: Modifying Key Bindings151562
+Ref: #modifying-key-bindings151689
 
 End Tag Table
 

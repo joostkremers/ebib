@@ -101,9 +101,7 @@ The basic motion keys are the following:
 | [`g`]{.key} [`Home`]{.key}                 | move to the first entry |
 | [`G`]{.key} [`End`]{.key}                  | move to the last entry  |
 
-To move around in the index buffer, you can use the [`up`]{.key} and [`down`]{.key} cursor keys, [`p`]{.key} and [`n`]{.key} and also the versions with the control key [`C-p`]{.key} and [`C-n`]{.key}. Furthermore, [`Space`]{.key} and [`PgDn`]{.key} move a screenful of entries down, while [`b`]{.key} and [`PgUp`]{.key} move in the other direction. Lastly, [`g`]{.key} and [`Home`]{.key} move to the first entry, while [`G`]{.key} and [`End`]{.key} move to the last one.
-
-If you have more than one database opened, you can use the keys [`1`]{.key} through [`9`]{.key} to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the [`left`]{.key} and [`right`]{.key} cursor keys to move to the previous or next database (these keys wrap).
+If you have more than one database opened, you can use the keys [`1`]{.key}–[`9`]{.key} to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the [`left`]{.key} and [`right`]{.key} cursor keys to move to the previous or next database (these keys wrap).
 
 If you are done with a database, type [`c`]{.key} to close it. This unleads the current database (you are asked for confirmation if you have unsaved changes), but it does not leave Ebib, and the other databases you have open will remain so.
 
@@ -203,7 +201,7 @@ Commands in the index buffer generally operate on one single entry. For some com
 
 Commands for which it makes sense automatically operate on all marked entries if there are any. Of the commands discussed so far, these are [`d`]{.key} to delete entries and [`i`]{.key} to insert entries to a LaTeX buffer. (Note that Ebib creates a single citation command with commas separating the entry keys.)
 
-With a prefix argument, i.e, with [`C-u m`]{.key}, you can unmark all entries or, if there are no marked entries, mark all entries in the current database.
+With a prefix argument, i.e, with [`C-u`]{.key} followed by [`m`]{.key}, you can unmark all entries or, if there are no marked entries, mark all entries in the current database.
 
 
 ## Editing Field Values ##
@@ -245,6 +243,37 @@ The contents of a field can also be deleted with the command [`d`]{.key}. This c
 Note that [`y`]{.key} only works when the current field does not have a value yet. This is to prevent you from accidentally overwriting a field value. If you do want to yank text into a field that already has a value, simply hit [`d`]{.key} first to delete the text.
 
 
+## Undefined Fields ##
+
+`Biblatex` and BibTeX ignore fields that they do not know about, which is a property that can be exploited to add any kind of  information to an entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.
+
+It is even possible to add such fields to an entry by pressing [`a`]{.key} in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, though, it may be better to define the relevant fields through the user option `ebib-extra-fields`.
+
+Note that if you delete the contents of an undefined field, the field itself is also deleted. (In fact, the field remains in the database until you close the database, but it will not be saved, so the next time you load the `.bib` file, the field is gone.)
+
+
+## Hidden Fields ##
+
+`Biblatex` defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key [`H`]{.key} in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields" (`ebib-hidden-fields`), which can be customised.
+
+Most of the fields defined as hidden are `biblatex`-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option `ebib-hidden-fields`.
+
+Note that a hidden field that has a value is always shown in the index buffer. Hidden fields are only hidden in entries that don't define a value for them.
+
+
+## Timestamps ##
+
+Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
+
+You can tell Ebib to create timestamps by setting the option "Use Timestamp" (`ebib-use-timestamp`) in Ebib's customisation buffer. With this option set, a timestamp is included in entries added to the database with [`a`]{.key}. Ebib will also add a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps are overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
+
+Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under “Options”.
+
+Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can be converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
+
+Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then. See [Special Filters](#special-filters) for details.
+
+
 ## Saving a Database ##
 
 When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing [`s`]{.key}. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to [`C-x C-s`]{.key} in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option `ebib-create-backups`.)
@@ -252,6 +281,15 @@ When you have undertaken any kind of editing action on a database, it is marked 
 If you want to force-save a database that has not been modified, you can use a prefix argument: [`C-u s`]{.key}. Ebib still checks whether the underlying file was modified, though. If you also want to forego this check, use a double prefix argument: [`C-u C-u s`]{.key}. This saves the file unconditionally.
 
 You can also save a database to another name with [`w`]{.key}. This command is similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. This command can also be prefixed with [`C-u`]{.key} (or in fact any other prefix argument) in order to overwrite any existing file without asking for confirmation.
+
+
+### Exporting Entries ### {.unlisted .unnumbered }
+
+Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to another database, use the command [`x`]{.key}. This command operates on a single entry or on all marked entries. Ebib will ask you for the database to export the entry or entries to. [`TAB`]{.KEY} completion is available, based on the file names of the databases.
+
+You can also export entries to a file. To do this, call the command [`x`]{.key} with a prefix argument: [`C-u x`]{.key}. You will be prompted for the file name to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so it's possible to end up with duplicate entries in this way.
+
+Apart from entries, it is also possible to export the `@Preamble` and `@String` definitions. The `@Preamble` definition is exported with the command [`X`]{.key} in the index buffer. `@String` definitions can be exported in the strings buffer: [`x`]{.key} in this buffer exports the current string, while [`X`]{.key} exports all `@String` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
 
 
 ## Cross-referencing ##
@@ -286,37 +324,6 @@ By default, the option `Sort Order` has no value, which means that the entries i
 Entries that cannot be sorted on some sort level, because the sort fields are empty, are sorted on entry key. (Keep in mind that if the first sort level yields *no value* for a specific entry, Ebib does *not* use the second sort level to sort that entry. It uses the entry key. The second sort level is only used if the first yields *identical* values for two or more entries.)
 
 Note that if you wish to make use of this option, you need to unset the option "Save Xrefs First" ([Cross-referencing](#cross-referencing)). It is pointless to set a sort order if cross-referenced entries are saved first. Since "Save Xrefs First" is set by default, you need to unset if you set "Sort Order".
-
-
-## Undefined Fields ##
-
-`Biblatex` and BibTeX ignore fields that they do not know about, which is a property that can be exploited to add any kind of  information to an entry. Ebib accommodates this by allowing fields with any name, not just the ones that are predefined. Such undefined fields are displayed last in the entry buffer, following the extra fields.
-
-It is even possible to add such fields to an entry by pressing [`a`]{.key} in the entry buffer. This asks for a field name and then a value. If you make heavy use of this option, though, it may be better to define the relevant fields through the user option `ebib-extra-fields`.
-
-Note that if you delete the contents of an undefined field, the field itself is also deleted. (In fact, the field remains in the database until you close the database, but it will not be saved, so the next time you load the `.bib` file, the field is gone.)
-
-
-## Hidden Fields ##
-
-`Biblatex` defines a large number of fields, many of which are optional for most entry types. Displaying all these fields in the entry buffer would not be very practical, because you are most likely interested in only a few of them. For this reason, Ebib defines a (fairly large) number of fields as 'hidden', meaning that they are not shown in the entry buffer. You can make these fields visible with the key [`H`]{.key} in the index buffer. Which fields are treated as hidden is controlled by the option "Hidden Fields" (`ebib-hidden-fields`), which can be customised.
-
-Most of the fields defined as hidden are `biblatex`-specific, because BibTeX recognises a much smaller number of fields and there isn't much of a need to hide the lesser used ones. However, the functionality is available: if you wish to use it, just add the relevant fields to the option `ebib-hidden-fields`.
-
-Note that a hidden field that has a value is always shown in the index buffer. Hidden fields are only hidden in entries that don't define a value for them.
-
-
-## Timestamps ##
-
-Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
-
-You can tell Ebib to create timestamps by setting the option "Use Timestamp" (`ebib-use-timestamp`) in Ebib's customisation buffer. With this option set, a timestamp is included in entries added to the database with [`a`]{.key}. Ebib will also add a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps are overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
-
-Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under “Options”.
-
-Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can be converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
-
-Adding timestamps in a format that `date-to-time` can parse makes it possible to list the most recent additions to the database. Ebib provides a function to do this: `ebib-list-recent`, which asks for a number of days and lists the entries that were added since then. See [Special Filters](#special-filters) for details.
 
 
 ## @Preamble Definition ##
@@ -385,6 +392,68 @@ If you have a directory full of (pdf) files of articles that you want to add to 
 Note that the entry keys for the stubs are temporary keys. They will be replaced by more permanent keys automatically when you edit the entries. This behaviour is controlled by the function `bibtex-generate-autokey`, which has a number of customisation options. Check out its doc string for details. If you prefer to edit the keys by hand, you can do so by pressing [`E`]{.key} in the index buffer.
 
 
+## Multiline Edit Buffers ##
+
+As mentioned several times before, field values that contain newlines (so-called *multiline fields*) and the `@Preamble` are edited in a so-called *multiline edit buffer*. This section discusses the details of this buffer.
+
+Ebib enters a multiline edit buffer in one of three cases: when you edit the `@Preamble` definition, when you hit [`m`]{.key} in the entry buffer to edit the current field as multiline, or when you hit [`e`]{.key} on the `annote`/`annotation` or `abstract`  fields, or on a field whose value already is multiline.
+
+The major mode that is used in multiline edit buffers is user-configurable. The default value is `text-mode`, but if you prefer to use some other mode, you can specify this through the customisation option `ebib-multiline-major-mode`.
+
+Three commands are relevant for interacting with Ebib when you're in the multiline edit buffer, which are bound to key sequences in the minor mode `ebib-multiline-edit-mode`, which is activated automatically in the multiline edit buffer.
+
+`ebib-quit-multiline-buffer-and-save`, bound to [`C-c C-c`]{.key}, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you've deleted all contents of the buffer (including the final newline!) and you were editing a field value or the `@Preamble`, the field value or preamble is deleted. (This is in fact the *only* way to delete the `@Preamble` definition. Field values on the other hand can also be deleted by hitting [`k`]{.key} or [`d`]{.key} on them in the entry buffer.)
+
+`ebib-cancel-multiline-buffer`, bound to [`C-c C-k`]{.key}, also leaves the multiline edit buffer, but it does so without storing the text. The original value of the field, string or preamble will be retained. If the text was modified, Ebib will ask for a confirmation before leaving the buffer.
+
+`ebib-save-from-multiline-buffer`, bound to [`C-c C-s`]{.key}, can be used in the multiline edit buffer to save the database. This command first stores the text in the database and then saves it. Because Ebib does not do an autosave of the current database, it is advisable to save the database manually every now and then to prevent data loss in case of crashes. It would be annoying to have to leave the multiline edit buffer every time you want to do this, so this command has been provided to allow you to do this from within the buffer.
+
+Note that you do not need to finish a multiline edit before you can return to the database and possibly edit other fields and even entries. Ebib keeps track of which field in which entry of which database a multiline edit buffer belongs to, so you can keep a multiline edit buffer open while doing other work. It is even possible to have several multiline edit buffers open at the same time. Ebib makes sure that when you finish one, its contents is stored in the correct place.
+
+The key combinations of the multiline edit buffer strictly speaking violate Emacs' suggested key binding conventions. They are defined in the keymap of a minor mode (`ebib-multiline-mode`, to be specific), but a minor mode keymap  should only use key bindings of [`C-c`]{.key} plus a non-alphanumeric character. The bindings do follow practical conventions, however: they are used for similar functions in e.g., Org's capture mechanism, in `message-mode`, in VC, magit, etc. For this reason, Ebib uses them as well.
+
+If you find that these key bindings conflict with key bindings in the major mode you use in the multiline edit buffer, you can change them, of course. To do this, put something like the following in your init file:
+
+```lisp
+(with-eval-after-load 'ebib
+  (define-key ebib-multiline-mode-map
+    "\C-c c" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | c" 'ebib-quit-multiline-buffer-and-save)
+
+  (define-key ebib-multiline-mode-map
+    "\C-c s" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | s" 'ebib-save-from-multiline-buffer))
+
+  (define-key ebib-multiline-mode-map
+    "\C-c k" nil)
+  (define-key ebib-multiline-mode-map
+    "\C-c | k" 'ebib-cancel-multiline-buffer)
+```
+
+This removes the key bindings for [`C-c c`]{.key}, [`C-c s`]{.key} and [`C-c k`]{.key} and sets up [`C-c | c`]{.key}, [`C-c | s`]{.key} and [`C-c | k`]{.key} for use in the multiline edit buffer. You can obviously use other keys if you prefer.
+
+
+# Main and Dependent Databases #
+
+If you want to create a `.bib` file from a larger database that only contains the references of a particular paper, you can use a dependent database. A dependent database, as the name suggests, depends on another, real database that is called its main database. The dependent database can only contain entries that also exist in its main database and all the data of the entries is shared by both databases. If you edit an entry in the dependent database, the edit shows up in the main one as well, and vice versa.
+
+Furthermore, if you have a text buffer that's associated with a dependent database, inserting an entry with [`M-x ebib-insert-citation`]{.key} offers all entries of the main database for completion, not just the ones that are already in the dependent database. If you select an entry that is not in the dependent database yet, it is added to it. This way, creating a separate database for a paper is easy: just create a dependent database and associate it with the relevant text buffer. Then insert citation commands as usual.
+
+You can create a dependent database with the key sequence [`M c`]{.key} in the database that you want to be its main database. Ebib asks you for a file name and then creates a new empty database.
+
+Adding new entries to a dependent database can be done as described, by inserting citations in a text buffer. It's also possible to add entries in the usual way, i.e., by pressing [`a`]{.key} in Ebib's index buffer. If you do this in a dependent database, instead of creating a new entry, you are prompted for an entry from the main database to add to the dependent one.
+
+It's also possible to add entries to a dependent database from its main database with the command [`M a`]{.key}. This command also works on marked entries, making it possible to add multiple entries to a dependent database in one go.
+
+Deleting an entry in a dependent database only removes it from the dependent database, not from the main database. If you delete an entry from the main database that is also present in a dependent database, it is removed from both, given that a dependent database can only have entries that also exist in the main database.
+
+A database can serve as the main database for more than one dependent databases, but the reverse is not possible: each dependent database can only have one main database.
+
+If you save a dependent database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a dependent database and loads the main database as well, if necessary. Note that when Ebib opens a dependent database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the main database. This means that if you edit a dependent database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
+
+
 # Searching #
 
 Ebib provides several ways of searching through your database(s). This section describes two simple search strategies: jumping to an entry and searching for a string or regular expression. The next section discusses a more powerful search mechanism in the form of filters.
@@ -428,7 +497,7 @@ Once you have filtered your database, you can refine or extend it. For example, 
 
 A short sidenote: the first impulse in a case like this might be to use `and` instead of `or`: after all, you want to select all entries that contain `"Jones"` in the `author` field *and* all entries that contain `"Jones"` in the `editor` field. However, the filter that you build up is used to test each entry *individually* whether it meets the selection criterion. An entry meets the criterion if it contains `"Jones"` in the `author` field *or* if it contains `"Jones"` in the `editor` field. Therefore, `or` is the required operator in this case. If you would use `and`, you would only get those entries that contain `"Jones"` in both the `author` *and* `editor` fields (i.e., most likely none at all).
 
-To perform a logical `or` operation, press the key [`|`]{.key}. As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the index buffer.
+To perform a logical `or` operation, press the key [`|`]{.key} (the pipe bar). As before, you will be asked which field you want to filter on, and which regexp you want to filter with. Ebib will then update the index buffer.
 
 It is also possible to perform a logical `and` on the filter. Use this if you want to select those entries that contain `"Jones"` in the `author` field and e.g. `"symbiotic hibernation"` in the `keyword` field. A logical `and` operation is done with the key [`&`]{.key}. (Note: this is the same key that is used to create the filter. In fact, you can create a filter with [`|`]{.key} as well: when used in an unfiltered database, [`&`]{.key} and [`|`]{.key} are equivalent. They are only different when a filter is already active.)
 
@@ -760,95 +829,12 @@ If you load this entry into Ebib with the option "Allow Identical Fields" set, y
     }
 
 
-# Copying Entries to the Kill Ring #
+#  Linking to external resources #
 
-Ebib offers several ways to copy an entry to the kill ring (and the system clipboard), which you can then insert into another buffer or another application. You can copy the entry key ([`C k`]{.key}; note that this is capital [`C`]{.key} followed by [`k`]{.key}, *not* [`C-k`]{.key}!) the entire BibTeX entry ([`C e`]{.key}), a full reference as would appear in a list of references ([`C r`]{.key}) or a citation, by default of the Author-Year type ([`C c`]{.key}).
-
-The functions that copy a reference or citation make use of templates that specify how such a reference/citation should be formatted. These templates can be customised: the relevant options are `ebib-reference-templates` and `ebib-citation-template`. (The latter should not be confused with `ebib-citation-commands`, which defines templates for inserting citation commands into a LaTeX / Markdown / etc. buffer.)
-
-These templates are strings that contain directives for inserting specific fields from the entry being copied. As an example, a simple template for an author-year citation would be the following:
-
-    "{Author} ({Year})"
-
-The directives are marked by braces {} around a field name. In the resulting citation, they are replaced by the contents of the fields. (The field names are case-insensitive, they could also be written as `"{author} ({year})."`)
-
-Alternative fields can be separated by a pipe bar `|`:
-
-    "{Author|Editor} ({Date|Year})"
-
-This template uses the `Author` field unless it's empty, in which case the `Editor` field is used. Similarly for the year: first the contents of the `Date` field is checked. The `Year` field is used if the `Date` field is empty.
-
-If none of the fields in a directive has any contents, the directive is discarded completely. Most reference templates for example include a directive for the `Doi` or `Url` field:
-
-    "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
-
-If the `Doi` and `Url` fields are both empty, the directive is simply ignored.
-
-A directive may contain punctuation before or after the field name (or sequence of field names), which is dropped if the field is empty. The `{Doi|Url.}` directive in the previous example contains a full stop, which is only included in the reference if the `Doi` or `Url` field is present.
-
-The contents of the fields is used literally, with two exceptions: the `Date` field may contain a full date+time specification or even a date range, but only the year (or the year of the first date in a date range) is used. Similarly, the `Title` field is stripped of LaTeX markup.
+BibTeX entries can contain links to external files, URLs and DOIs. Ebib offers several facilities to work with these. 
 
 
-# Main and Dependent Databases #
-
-If you want to create a `.bib` file from a larger database that only contains the references of a particular paper, you can use a dependent database. A dependent database, as the name suggests, depends on another, real database that is called its main database. The dependent database can only contain entries that also exist in its main database and all the data of the entries is shared by both databases. If you edit an entry in the dependent database, the edit shows up in the main one as well, and vice versa.
-
-Furthermore, if you have a text buffer that's associated with a dependent database, inserting an entry with [`M-x ebib-insert-citation`]{.key} offers all entries of the main database for completion, not just the ones that are already in the dependent database. If you select an entry that is not in the dependent database yet, it is added to it. This way, creating a separate database for a paper is easy: just create a dependent database and associate it with the relevant text buffer. Then insert citation commands as usual.
-
-You can create a dependent database with the key sequence [`M c`]{.key} in the database that you want to be its main database. Ebib asks you for a file name and then creates a new empty database.
-
-Adding new entries to a dependent database can be done as described, by inserting citations in a text buffer. It's also possible to add entries in the usual way, i.e., by pressing [`a`]{.key} in Ebib's index buffer. If you do this in a dependent database, instead of creating a new entry, you are prompted for an entry from the main database to add to the dependent one.
-
-It's also possible to add entries to a dependent database from its main database with the command [`M a`]{.key}. This command also works on marked entries, making it possible to add multiple entries to a dependent database in one go.
-
-Deleting an entry in a dependent database only removes it from the dependent database, not from the main database. If you delete an entry from the main database that is also present in a dependent database, it is removed from both, given that a dependent database can only have entries that also exist in the main database.
-
-A database can serve as the main database for more than one dependent databases, but the reverse is not possible: each dependent database can only have one main database.
-
-If you save a dependent database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a dependent database and loads the main database as well, if necessary. Note that when Ebib opens a dependent database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the main database. This means that if you edit a dependent database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
-
-
-# Printing the Database #
-
-Sometimes it may be useful to have a `.pdf` file or print-out of your database. Although Ebib does not actually do the printing itself, it can create a LaTeX file for you that you can compile and print. In fact, there are two ways of doing this.
-
-The print options are available in the Ebib menu when the index buffer is active. You can print the entries as index cards or as a bibliography.
-
-If you print your entries as a bibliography, Ebib creates a simple LaTeX document that essentially contains a `\nocite{*}` command followed by a `\printbibliography` command, adding a `\addbibresource` command referring to the current database. You can then run the usual sequence of LaTeX, Biber, LaTeX, LaTeX on this file, creating a document containing a list of all the references in your database. (Obviously, BibTeX is also supported.)
-
-If you choose to print as index cards, Ebib also creates a LaTeX file. However, instead of simply providing a `\nocite{*}` command, this file contains a `tabular` environment for each entry in the database listing all the fields of that entry and their values.
-
-The entries are separated by a `\bigskip`, but if you set the option `Print Newpage` in the customisation buffer (or in the Print menu), the entries are separated by a `\newpage`, so that every entry is on a separate page. The latter option is useful when printing actual index cards (though you'd probably have to change the page size with the `geometry` package as well).
-
-By default, the index cards only show single-line field values. That is, multiline values are normally excluded. If you want to include multiline values in the print-out, you have to set the option `Print Multiline` in the Options menu or in Ebib's customisation buffer. With this option set, Ebib includes all multiline values in the LaTeX file that it creates. Note however that Ebib does not change anything about the formatting of the text in a multiline value. So if you plan to make (heavy) use of this option, make sure that the way you type your text conforms to LaTeX's conventions (e.g. empty lines to mark paragraphs, etc.) and doesn't contain any characters such as [`&`]{.key} that are illegal in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
-
-As mentioned, when you "print" the database, Ebib really just creates a LaTeX file. More precisely, it creates a temporary buffer and writes the LaTeX code into it, and then saves the contents of that buffer to a file. After it has done that, Ebib lowers itself and instruct Emacs to open the file in a buffer, which will then be properly set up as a LaTeX buffer. From there you can run LaTeX and view the result.
-
-Before doing all this, Ebib asks you which file to write to. Be careful with this: since this is supposed to be a temporary file, Ebib simply assumes that if you provide a filename of an existing file, it can overwrite that file without warning!
-
-A better way to tell Ebib which file to use is to set the option "Print Tempfile" in Ebib's customisation buffer to some temporary file. When this option is set, Ebib will always use this file to write to, and will not ask you for a filename anymore.
-
-Note that both print options operate on all entries of the database or on the selected entries.
-
-The option "Print Preamble" and "LaTeX Preamble" allow you to customize the preamble of the LaTeX file that is created.
-
-
-# Calling a Browser for URLs and DOIs #
-
-With most scientific literature nowadays being available on-line, it is common to store URLs and DOIs in a BibTeX database. `Biblatex` has standardised fields for this information, for BibTeX, Ebib adds these fields to each entry.
-
-To open a URL in your default browser, you can type [`u`]{.key} in the index or entry buffer. Ebib takes the URL stored in the `url` field of the current entry and passes it to your browser. If you happen to have more than one URL stored in the relevant field, Ebib will ask you which one you want to open. Alternatively, you can use a prefix argument: typing [`M-2 u`]{.key} sends the second URL to your browser.
-
-It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' ; <` or `>` as a URL. The semicolon is included here even though it is actually a valid character in URLs. This is done for consistency, because the semicolon (actually, semicolon+space) is the standard separator for files in the `file` field and in this way, you can use the same separator to distinguish multiple URLs in the `url` field.
-
-By default Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. You can, of course, customise the regular expression that controls this behaviour. See the option "Url Regexp" for details.
-
-Similarly, with the key [`I`]{.key} in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser, prepended with the string `https://dx.doi.org/` if necessary.
-
-Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option "Browser Command".
-
-
-# Viewing and Importing Files #
+## Viewing and Importing Files ##
 
 If you have electronic versions of the papers in your database stored on your computer, or any other file associated with your entries (e.g., notes, if you store those in separate files) you can use Ebib to call external viewers for these files or have them opened in Emacs. The interface for this is similar to that for calling a browser: if you press [`f`]{.key} in the index buffer, Ebib searches the `file` field for a filename and when it finds one, calls an appropriate viewer. In the entry buffer, you can use [`f`]{.key} on any field and it will check that particular field for a file name. It is also possible to have more than one filename in a field. In that case, Ebib asks you which one you want to open.
 
@@ -868,11 +854,27 @@ The function `ebib-import-file` can be used to import a file into the database t
 
 Both `ebib-download-url` and `ebib-import-file` add the imported file to the `file` field if it is not already there.
 
-## Editing the `file` field ## {.unlisted .unnumbered}
+
+### Editing the `file` field ### {.unlisted .unnumbered}
 
 As mentioned above, editing the `file` field is a bit different from editing other fields. Instead of typing the full contents of the file field, you are asked to specify a single file name. When you hit [`RET`]{.KEY}, Ebib adds the filename to the `file` field, appending it to any existing contents (adding a separator if necessary), and then asks you for the next file. If you don't want to add another, just hit [`RET`]{.KEY}. The default separator is `"; "` (semicolon-space), but this can be customised (see the option "Filename Separator" for details). The advantage of this method is that you can use [`TAB`]{.KEY} completion to complete file names.
 
 The first directory in the option "File Search Dirs" is used as the starting directory for filename completion when editing the `file` field. Note that when completing file names, Ebib does not take the directories in "File Search Dirs" into account: completion is done using the standard Emacs file name completion mechanism. However, when you enter a file name, Ebib checks if it is in a (subdirectory of) one of the directories in "File Search Dirs", and if so, cuts off the relevant part of the file name to turn it into a relative path. (You can disable this behaviour with the option `ebib-truncate-file-names`: if unset, file names are always stored as absolute paths.)
+
+
+## Calling a Browser for URLs and DOIs ##
+
+With most scientific literature nowadays being available on-line, it is common to store URLs and DOIs in a BibTeX database. `Biblatex` has standardised fields for this information, for BibTeX, Ebib adds these fields to each entry.
+
+To open a URL in your default browser, you can type [`u`]{.key} in the index or entry buffer. Ebib takes the URL stored in the `url` field of the current entry and passes it to your browser. If you happen to have more than one URL stored in the relevant field, Ebib will ask you which one you want to open. Alternatively, you can use a prefix argument: typing [`M-2 u`]{.key} sends the second URL to your browser.
+
+It is not even necessary that the relevant field contains *only* URLs. It may contain other text mixed with the URLs: Ebib simply searches the URLs in the field and ignores the rest of the text. Ebib considers every string of characters that starts with `http://` or `https://` and that does not contain whitespace or any of the characters `" ' ; <` or `>` as a URL. The semicolon is included here even though it is actually a valid character in URLs. This is done for consistency, because the semicolon (actually, semicolon+space) is the standard separator for files in the `file` field and in this way, you can use the same separator to distinguish multiple URLs in the `url` field.
+
+By default Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. You can, of course, customise the regular expression that controls this behaviour. See the option "Url Regexp" for details.
+
+Similarly, with the key [`I`]{.key} in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser, prepended with the string `https://dx.doi.org/` if necessary.
+
+Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option "Browser Command".
 
 
 # Notes files #
@@ -1007,7 +1009,7 @@ Note that this `org-capture-templates` entry should only be selected when creati
 (setq org-capture-template-contexts
       '(("e" ((in-mode ebib-index-mode)))))
 ```
-
+|
 The `"e"` is the key that you've chosen for your template. This setting ensures that the `org-capture` template associated with the key `"e"` is only shown when `org-capture` is called from a buffer with major mode `ebib-index-mode`, which is Ebib's index buffer.
 
 You can also bypass the `org-capture` selection buffer altogether and open an `org-capture` buffer immediately with the appropriate template. To do this, set `ebib-notes-use-org-capture` to the key of the template that you use for Ebib notes (`"e"` in the current example):
@@ -1042,23 +1044,6 @@ The option `ebib-reading-list-item-active-function` holds a function that should
 Lastly, there are two hooks, `ebib-reading-list-new-item-hook` and `ebib-reading-list-remove-item-hook`. The former is run immediately after a new reading list item is inserted in the reading list file (but before saving it), the latter immediately after calling the function in `ebib-reading-list-remove-item-function` (also before saving the buffer). By default, these hooks are empty.
 
 
-# Window Management #
-
-By default, Ebib takes over the entire Emacs frame it is started in, displaying the index window at the top and the entry window below it. There are a few options to change this behaviour, however. They are all part of the customisation group `ebib-windows`, and allow you to specify two alternative ways to deal with Ebib windows. The main layout option is simply called "Layout" and has four options: use the full frame (the default), use the current window, use the right part of the frame, or display only the index window.
-
-If you set the layout to use only the right part of the frame, the Ebib buffers are displayed on the right of the frame, with the (usually larger) left part of the frame displaying some other buffer, normally the buffer from which you called Ebib. The width of the Ebib windows can be set with the option "Width", which defaults to 80, and which can be specified as an absolute value (the number of columns), but also as a value relative to the current window. In that case, you must specify a value between 0 and 1. Note that when this option is used, the key [`z`]{.key} does not hide the Ebib buffers, it simply switches to a non-Ebib window in the same frame. You can use (uppercase) [`Z`]{.key} to hide the Ebib buffers. Furthermore, with this option, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it.
-
-The fourth option that Ebib provides is to only show the index buffer on start-up. In this case, Ebib does not display the entry buffer when it is started. Instead, only the index buffer is displayed, which can be navigated in the usual manner. The entry buffer is only displayed when you add or edit an entry. When you've finished editing and move back to the index buffer, the entry buffer is hidden again.
-
-The entry buffer is also displayed if you press [`RET`]{.KEY}. When you do this, the index buffer remains selected, so you can use this to display the fields of an entry without moving focus to the entry window. If you navigate the index buffer, the entry buffer remains visible, updating its contents as you move around.
-
-In this case, too, the key [`z`]{.key} does not hide the index window. Rather, it just selects another, non-Ebib window. In order to hide the index window, you can use (uppercase) [`Z`]{.key}.
-
-If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option "Popup Entry Window". Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
-
-Further relevant options are "Window Vertical Split", which displays the index buffer to the left of the frame rather than at the top, and "Index Window Size", which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
-
-
 # Managing Keywords #
 
 Biblatex supports a `keywords` field, which can contain a (comma-separated) list of keywords for an entry. BibTeX does not support this field directly, but Ebib includes a `keywords` field in the extra fields for BibTeX entries. Ebib offers some special facilities for editing this field.
@@ -1083,50 +1068,75 @@ If new keywords were added to the list of canonical keywords, you will be asked 
 If you haven't configured a list of canonical keywords, the key sequence [`K S`]{.key} creates one from the keywords used in your open `.bib` files. The list is then saved to your customisation file (usually `~/.emacs.d/init.el`). If you prefer to keep your keywords in a separate file, you need to create the file yourself (as mentioned, one keyword per line; keywords may of course contain spaces), and configure the option "Keywords" (`ebib-keywords`) yourself.
 
 
-# Exporting Entries #
+# Window Management #
 
-Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to another database, use the command [`x`]{.key}. This command operates on a single entry or on all marked entries. Ebib will ask you for the database to export the entry or entries to. [`TAB`]{.KEY} completion is available, based on the file names of the databases.
+By default, Ebib takes over the entire Emacs frame it is started in, displaying the index window at the top and the entry window below it. There are a few options to change this behaviour, however. They are all part of the customisation group `ebib-windows`, and allow you to specify two alternative ways to deal with Ebib windows. The main layout option is simply called "Layout" and has four options: use the full frame (the default), use the current window, use the right part of the frame, or display only the index window.
 
-You can also export entries to a file. To do this, call the command [`x`]{.key} with a prefix argument: [`C-u x`]{.key}. You will be prompted for the file name to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so it's possible to end up with duplicate entries in this way.
+If you set the layout to use only the right part of the frame, the Ebib buffers are displayed on the right of the frame, with the (usually larger) left part of the frame displaying some other buffer, normally the buffer from which you called Ebib. The width of the Ebib windows can be set with the option "Width", which defaults to 80, and which can be specified as an absolute value (the number of columns), but also as a value relative to the current window. In that case, you must specify a value between 0 and 1. Note that when this option is used, the key [`z`]{.key} does not hide the Ebib buffers, it simply switches to a non-Ebib window in the same frame. You can use (uppercase) [`Z`]{.key} to hide the Ebib buffers. Furthermore, with this option, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it.
 
-Apart from entries, it is also possible to export the `@Preamble` and `@String` definitions. The `@Preamble` definition is exported with the command [`X`]{.key} in the index buffer. `@String` definitions can be exported in the strings buffer: [`x`]{.key} in this buffer exports the current string, while [`X`]{.key} exports all `@String` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
+The fourth option that Ebib provides is to only show the index buffer on start-up. In this case, Ebib does not display the entry buffer when it is started. Instead, only the index buffer is displayed, which can be navigated in the usual manner. The entry buffer is only displayed when you add or edit an entry. When you've finished editing and move back to the index buffer, the entry buffer is hidden again.
 
+The entry buffer is also displayed if you press [`RET`]{.KEY}. When you do this, the index buffer remains selected, so you can use this to display the fields of an entry without moving focus to the entry window. If you navigate the index buffer, the entry buffer remains visible, updating its contents as you move around.
 
-# Multiline Edit Buffers #
+In this case, too, the key [`z`]{.key} does not hide the index window. Rather, it just selects another, non-Ebib window. In order to hide the index window, you can use (uppercase) [`Z`]{.key}.
 
-As mentioned several times before, field values that contain newlines (so-called *multiline fields*) and the `@Preamble` are edited in a so-called *multiline edit buffer*. This section discusses the details of this buffer.
+If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option "Popup Entry Window". Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
 
-Ebib enters a multiline edit buffer in one of three cases: when you edit the `@Preamble` definition, when you hit [`m`]{.key} in the entry buffer to edit the current field as multiline, or when you hit [`e`]{.key} on the `annote`/`annotation` or `abstract`  fields, or on a field whose value already is multiline.
-
-The major mode that is used in multiline edit buffers is user-configurable. The default value is `text-mode`, but if you prefer to use some other mode, you can specify this through the customisation option `ebib-multiline-major-mode`.
-
-Three commands are relevant for interacting with Ebib when you're in the multiline edit buffer, which are bound to key sequences in the minor mode `ebib-multiline-edit-mode`, which is activated automatically in the multiline edit buffer.
-
-`ebib-quit-multiline-buffer-and-save`, bound to [`C-c C-c`]{.key}, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you've deleted all contents of the buffer (including the final newline!) and you were editing a field value or the `@Preamble`, the field value or preamble is deleted. (This is in fact the *only* way to delete the `@Preamble` definition. Field values on the other hand can also be deleted by hitting [`k`]{.key} or [`d`]{.key} on them in the entry buffer.)
-
-`ebib-cancel-multiline-buffer`, bound to [`C-c C-k`]{.key}, also leaves the multiline edit buffer, but it does so without storing the text. The original value of the field, string or preamble will be retained. If the text was modified, Ebib will ask for a confirmation before leaving the buffer.
-
-`ebib-save-from-multiline-buffer`, bound to [`C-c C-s`]{.key}, can be used in the multiline edit buffer to save the database. This command first stores the text in the database and then saves it. Because Ebib does not do an autosave of the current database, it is advisable to save the database manually every now and then to prevent data loss in case of crashes. It would be annoying to have to leave the multiline edit buffer every time you want to do this, so this command has been provided to allow you to do this from within the buffer.
-
-Note that you do not need to finish a multiline edit before you can return to the database and possibly edit other fields and even entries. Ebib keeps track of which field in which entry of which database a multiline edit buffer belongs to, so you can keep a multiline edit buffer open while doing other work. It is even possible to have several multiline edit buffers open at the same time. Ebib makes sure that when you finish one, its contents is stored in the correct place.
-
-The key combinations of the multiline edit buffer strictly speaking violate Emacs' suggested key binding conventions. They are defined in the keymap of a minor mode (`ebib-multiline-mode`, to be specific), but a minor mode keymap  should only use key bindings of [`C-c`]{.key} plus a non-alphanumeric character. The bindings do follow practical conventions, however: they are used for similar functions in e.g., Org's capture mechanism, in `message-mode`, in VC, magit, etc. For this reason, Ebib uses them as well.
-
-If you find that these key bindings conflict with key bindings in the major mode you use in the multiline edit buffer, you can change them, of course. To do this, put something like the following in your init file:
-
-```Commonlisp
-(with-eval-after-load 'ebib
-  (define-key ebib-multiline-mode-map
-    "\C-c | c" 'ebib-quit-multiline-buffer-and-save)
-  (define-key ebib-multiline-mode-map
-    "\C-c | k" 'ebib-cancel-multiline-buffer)
-  (define-key ebib-multiline-mode-map
-    "\C-c | s" 'ebib-save-from-multiline-buffer))
-```
-
-This sets up [`C-c | c`]{.key}, [`C-c | k`]{.key} and [`C-c | s`]{.key} for use in the multiline edit buffer. You can obviously use other keys if you prefer.
+Further relevant options are "Window Vertical Split", which displays the index buffer to the left of the frame rather than at the top, and "Index Window Size", which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
 
 
+# Copying Entries to the Kill Ring #
+
+Ebib offers several ways to copy an entry to the kill ring (and the system clipboard), which you can then insert into another buffer or another application. You can copy the entry key ([`C k`]{.key}; note that this is capital [`C`]{.key} followed by [`k`]{.key}, *not* [`C-k`]{.key}!) the entire BibTeX entry ([`C e`]{.key}), a full reference as would appear in a list of references ([`C r`]{.key}) or a citation, by default of the Author-Year type ([`C c`]{.key}).
+
+The functions that copy a reference or citation make use of templates that specify how such a reference/citation should be formatted. These templates can be customised: the relevant options are `ebib-reference-templates` and `ebib-citation-template`. (The latter should not be confused with `ebib-citation-commands`, which defines templates for inserting citation commands into a LaTeX / Markdown / etc. buffer.)
+
+These templates are strings that contain directives for inserting specific fields from the entry being copied. As an example, a simple template for an author-year citation would be the following:
+
+    "{Author} ({Year})"
+
+The directives are marked by braces {} around a field name. In the resulting citation, they are replaced by the contents of the fields. (The field names are case-insensitive, they could also be written as `"{author} ({year})."`)
+
+Alternative fields can be separated by a pipe bar `|`:
+
+    "{Author|Editor} ({Date|Year})"
+
+This template uses the `Author` field unless it's empty, in which case the `Editor` field is used. Similarly for the year: first the contents of the `Date` field is checked. The `Year` field is used if the `Date` field is empty.
+
+If none of the fields in a directive has any contents, the directive is discarded completely. Most reference templates for example include a directive for the `Doi` or `Url` field:
+
+    "{Author|Editor} ({Date|Year}). {\"Title\"}. {Publisher}. {Doi|Url.}"
+
+If the `Doi` and `Url` fields are both empty, the directive is simply ignored.
+
+A directive may contain punctuation before or after the field name (or sequence of field names), which is dropped if the field is empty. The `{Doi|Url.}` directive in the previous example contains a full stop, which is only included in the reference if the `Doi` or `Url` field is present.
+
+The contents of the fields is used literally, with two exceptions: the `Date` field may contain a full date+time specification or even a date range, but only the year (or the year of the first date in a date range) is used. Similarly, the `Title` field is stripped of LaTeX markup.
+
+
+# Printing the Database #
+
+Sometimes it may be useful to have a `.pdf` file or print-out of your database. Although Ebib does not actually do the printing itself, it can create a LaTeX file for you that you can compile and print. In fact, there are two ways of doing this.
+
+The print options are available in the Ebib menu when the index buffer is active. You can print the entries as index cards or as a bibliography.
+
+If you print your entries as a bibliography, Ebib creates a simple LaTeX document that essentially contains a `\nocite{*}` command followed by a `\printbibliography` command, adding a `\addbibresource` command referring to the current database. You can then run the usual sequence of LaTeX, Biber, LaTeX, LaTeX on this file, creating a document containing a list of all the references in your database. (Obviously, BibTeX is also supported.)
+
+If you choose to print as index cards, Ebib also creates a LaTeX file. However, instead of simply providing a `\nocite{*}` command, this file contains a `tabular` environment for each entry in the database listing all the fields of that entry and their values.
+
+The entries are separated by a `\bigskip`, but if you set the option `Print Newpage` in the customisation buffer (or in the Print menu), the entries are separated by a `\newpage`, so that every entry is on a separate page. The latter option is useful when printing actual index cards (though you'd probably have to change the page size with the `geometry` package as well).
+
+By default, the index cards only show single-line field values. That is, multiline values are normally excluded. If you want to include multiline values in the print-out, you have to set the option `Print Multiline` in the Options menu or in Ebib's customisation buffer. With this option set, Ebib includes all multiline values in the LaTeX file that it creates. Note however that Ebib does not change anything about the formatting of the text in a multiline value. So if you plan to make (heavy) use of this option, make sure that the way you type your text conforms to LaTeX's conventions (e.g. empty lines to mark paragraphs, etc.) and doesn't contain any characters such as [`&`]{.key} that are illegal in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
+
+As mentioned, when you "print" the database, Ebib really just creates a LaTeX file. More precisely, it creates a temporary buffer and writes the LaTeX code into it, and then saves the contents of that buffer to a file. After it has done that, Ebib lowers itself and instruct Emacs to open the file in a buffer, which will then be properly set up as a LaTeX buffer. From there you can run LaTeX and view the result.
+
+Before doing all this, Ebib asks you which file to write to. Be careful with this: since this is supposed to be a temporary file, Ebib simply assumes that if you provide a filename of an existing file, it can overwrite that file without warning!
+
+A better way to tell Ebib which file to use is to set the option "Print Tempfile" in Ebib's customisation buffer to some temporary file. When this option is set, Ebib will always use this file to write to, and will not ask you for a filename anymore.
+
+Note that both print options operate on all entries of the database or on the selected entries.
+
+The option "Print Preamble" and "LaTeX Preamble" allow you to customize the preamble of the LaTeX file that is created.
 
 
 # Customisation #
