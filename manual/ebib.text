@@ -84,6 +84,17 @@ Below the extra fields is one more set of fields. These are fields that exist in
 
 ## Navigating the Database  ##
 
+The basic motion keys are the following:
+
+| Key                                        | Action                  |
+|--------------------------------------------+-------------------------|
+| [`up`]{.key} [`p`]{.key} [`C-p`]{.key}     | move one entry up       |
+| [`down`]{.key} [`n`]{.key} [`C-n`]{.key}   | move one entry down     |
+| [`Space`]{.key} [`PgDn`]{.key}             | move one page up        |
+| [`b`]{.key} [`PgUp`]{.key}                 | move one page down      |
+| [`g`]{.key} [`Home`]{.key}                 | move to the first entry |
+| [`G`]{.key} [`End`]{.key}                  | move to the last entry  |
+
 To move around in the index buffer, you can use the [`up`]{.key} and [`down`]{.key} cursor keys, [`p`]{.key} and [`n`]{.key} and also the versions with the control key [`C-p`]{.key} and [`C-n`]{.key}. Furthermore, [`Space`]{.key} and [`PgDn`]{.key} move a screenful of entries down, while [`b`]{.key} and [`PgUp`]{.key} move in the other direction. Lastly, [`g`]{.key} and [`Home`]{.key} move to the first entry, while [`G`]{.key} and [`End`]{.key} move to the last one.
 
 If you have more than one database opened, you can use the keys [`1`]{.key} through [`9`]{.key} to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the [`left`]{.key} and [`right`]{.key} cursor keys to move to the previous or next database (these keys wrap).
@@ -218,20 +229,20 @@ The mode line of the index buffer shows the dialect that Ebib assumes for the cu
 
 The set of entry types defined by `biblatex` differs from the set used by BibTeX. Mostly, `biblatex` adds new entry types, but there are a few BibTeX entry types that have been dropped. For legacy reasons, `biblatex` still recognises these entry types, but it treats them as aliases for some of its own types:
 
-| Entry type       | Alias for                                   |
-|------------------|---------------------------------------------|
-| `@conference`    | `@inproceedings`                            |
-| `@electronic`    | `@online`                                   |
-| `@mastersthesis` | `@thesis` with `type` as 'Master's thesis'  |
-| `@phdthesis`     | `@thesis` with `type` as 'PhD thesis'       |
-| `@techreport`    | `@report` with `type` as 'technical report' |
-| `@www`           | `@online`                                   |
+| BibTeX Entry type | Biblatex entry type                         |
+|-------------------|---------------------------------------------|
+| `@Conference`     | `@InProceedings`                            |
+| `@Electronic`     | `@Online`                                   |
+| `@MastersThesis`  | `@Thesis` with `type` as 'Master's thesis'  |
+| `@PhDThesis`      | `@Thesis` with `type` as 'PhD thesis'       |
+| `@TechReport`     | `@Report` with `type` as 'technical report' |
+| `@www`            | `@Online`                                   |
  
-If an entry has such an alias as entry type, Ebib displays the entry type that `biblatex` treats it as in the entry buffer. For example, the entry type alias `phdthesis` is shown as  `phdthesis [==> Thesis]`.
+If an entry has such an alias as entry type, Ebib displays the entry type that `biblatex` treats it as in the entry buffer. For example, the entry type alias `PhDThesis` is shown as  `PhDThesis [==> Thesis]`.
 
 Similarly, a number of fields are deprecated but still accepted as aliases:
 
-| Field           | Alias for      |
+| BibTeX Field    | Biblatex Field |
 |-----------------|----------------|
 | `address`       | `location`     |
 | `annote`        | `annotation`   |

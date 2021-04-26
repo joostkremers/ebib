@@ -198,6 +198,41 @@
 <p>The fields <code>url</code> and <code>doi</code> are defined only for BibTeX because <code>biblatex</code> defines them as optional fields for most entry types. If these fields are not sufficient for your use, you can customise the option “Extra Fields”.</p>
 <p>Below the extra fields is one more set of fields. These are fields that exist in the entry but are not defined as part of the entry type nor as extra fields. See the section <a href="#undefined-fields">Undefined Fields</a> for some more information.</p>
 <h2 id="navigating-the-database">Navigating the Database</h2>
+<p>The basic motion keys are the following:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="key"><code>up</code></span> <span class="key"><code>p</code></span> <span class="key"><code>C-p</code></span></td>
+<td>move one entry up</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>down</code></span> <span class="key"><code>n</code></span> <span class="key"><code>C-n</code></span></td>
+<td>move one entry down</td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>Space</code></span> <span class="key"><code>PgDn</code></span></td>
+<td>move one page up</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>b</code></span> <span class="key"><code>PgUp</code></span></td>
+<td>move one page down</td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>g</code></span> <span class="key"><code>Home</code></span></td>
+<td>move to the first entry</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>G</code></span> <span class="key"><code>End</code></span></td>
+<td>move to the last entry</td>
+</tr>
+</tbody>
+</table>
 <p>To move around in the index buffer, you can use the <span class="key"><code>up</code></span> and <span class="key"><code>down</code></span> cursor keys, <span class="key"><code>p</code></span> and <span class="key"><code>n</code></span> and also the versions with the control key <span class="key"><code>C-p</code></span> and <span class="key"><code>C-n</code></span>. Furthermore, <span class="key"><code>Space</code></span> and <span class="key"><code>PgDn</code></span> move a screenful of entries down, while <span class="key"><code>b</code></span> and <span class="key"><code>PgUp</code></span> move in the other direction. Lastly, <span class="key"><code>g</code></span> and <span class="key"><code>Home</code></span> move to the first entry, while <span class="key"><code>G</code></span> and <span class="key"><code>End</code></span> move to the last one.</p>
 <p>If you have more than one database opened, you can use the keys <span class="key"><code>1</code></span> through <span class="key"><code>9</code></span> to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the <span class="key"><code>left</code></span> and <span class="key"><code>right</code></span> cursor keys to move to the previous or next database (these keys wrap).</p>
 <p>If you are done with a database, type <span class="key"><code>c</code></span> to close it. This unleads the current database (you are asked for confirmation if you have unsaved changes), but it does not leave Ebib, and the other databases you have open will remain so.</p>
@@ -262,44 +297,44 @@
 <table>
 <thead>
 <tr class="header">
-<th>Entry type</th>
-<th>Alias for</th>
+<th>BibTeX Entry type</th>
+<th>Biblatex entry type</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>@conference</code></td>
-<td><code>@inproceedings</code></td>
+<td><code>@Conference</code></td>
+<td><code>@InProceedings</code></td>
 </tr>
 <tr class="even">
-<td><code>@electronic</code></td>
-<td><code>@online</code></td>
+<td><code>@Electronic</code></td>
+<td><code>@Online</code></td>
 </tr>
 <tr class="odd">
-<td><code>@mastersthesis</code></td>
-<td><code>@thesis</code> with <code>type</code> as ‘Master’s thesis’</td>
+<td><code>@MastersThesis</code></td>
+<td><code>@Thesis</code> with <code>type</code> as ‘Master’s thesis’</td>
 </tr>
 <tr class="even">
-<td><code>@phdthesis</code></td>
-<td><code>@thesis</code> with <code>type</code> as ‘PhD thesis’</td>
+<td><code>@PhDThesis</code></td>
+<td><code>@Thesis</code> with <code>type</code> as ‘PhD thesis’</td>
 </tr>
 <tr class="odd">
-<td><code>@techreport</code></td>
-<td><code>@report</code> with <code>type</code> as ‘technical report’</td>
+<td><code>@TechReport</code></td>
+<td><code>@Report</code> with <code>type</code> as ‘technical report’</td>
 </tr>
 <tr class="even">
 <td><code>@www</code></td>
-<td><code>@online</code></td>
+<td><code>@Online</code></td>
 </tr>
 </tbody>
 </table>
-<p>If an entry has such an alias as entry type, Ebib displays the entry type that <code>biblatex</code> treats it as in the entry buffer. For example, the entry type alias <code>phdthesis</code> is shown as <code>phdthesis [==&gt; Thesis]</code>.</p>
+<p>If an entry has such an alias as entry type, Ebib displays the entry type that <code>biblatex</code> treats it as in the entry buffer. For example, the entry type alias <code>PhDThesis</code> is shown as <code>PhDThesis [==&gt; Thesis]</code>.</p>
 <p>Similarly, a number of fields are deprecated but still accepted as aliases:</p>
 <table>
 <thead>
 <tr class="header">
-<th>Field</th>
-<th>Alias for</th>
+<th>BibTeX Field</th>
+<th>Biblatex Field</th>
 </tr>
 </thead>
 <tbody>
