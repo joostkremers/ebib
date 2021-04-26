@@ -39,8 +39,6 @@ A BibTeX database is somewhat of a free-form database. A BibTeX entry consists o
 
 When Ebib is started (with [`M-x ebib`]{.key}), the current windows in Emacs are hidden and the Emacs frame is divided into two windows. The top one contains a buffer that is called the *index buffer*, while the lower window shows the *entry buffer*. When a database is loaded, the index buffer holds a list of all the keys in the database plus some additional information for each entry: the author or editor, its year of publication, and the title.
 
-This manual first describes Ebib's basic functionality to get you started. At times, reference will be made to later sections, where more specific functions are described.
-
 Ebib has a menu through which all of its functionality can be accessed. Most functions are also bound to keys, but especially some of the lesser used ones can (by default) only be accessed through the menu.
 
 To quit Ebib and unload all `.bib` files, type [`q`]{.key}. Alternatively, type [`z`]{.key} to put Ebib in the background but keep it active. This way, the `.bib` files that you have opened remain loaded, and you can return to them by typing [`M-x ebib`]{.key} again.
@@ -48,16 +46,16 @@ To quit Ebib and unload all `.bib` files, type [`q`]{.key}. Alternatively, type 
 
 ## Opening a `.bib` File ##
 
-To open a `.bib` file, type [`o`]{.key}. Ebib reads the file that you specify and reports how many entries it found, how many `@String` definitions it found, and whether a `@Preamble` was found. If Ebib encounters entry types in the `.bib` file that it doesn't know, a warning will be logged to a special buffer `*Ebib-log*`. If Ebib finds something that it cannot parse, it will log an error. Ebib attempts to be as liberal as possible, so everything that looks like a BibTeX entry will be read, but if you open a `.bib` file that wasn't written by Ebib, it's always a good idea to check the log buffer to see if everything is in order.
+To open a `.bib` file, type [`o`]{.key}. Ebib reads the file that you specify and reports how many entries it found, how many `@String` definitions it found, and whether a `@Preamble` was found. If Ebib encounters entry types in the `.bib` file that it does not know, a warning will be logged to a special buffer `*Ebib-log*`. If Ebib finds something that it cannot parse, it will log an error. Ebib attempts to be as liberal as possible, so everything that looks like a BibTeX entry will be read, but if you open a `.bib` file that wasn't written by Ebib, it is always a good idea to check the log buffer to see if everything is in order.
 
 In order to parse `.bib` files, Ebib uses the entry type definitions of `bibtex.el`, which is fairly complete, but if you use non-standard entry types, you may need to customise `bibtex-biblatex-entry-alist` or `bibtex-bibtex-entry-alist`, depending on which of the two you use. If Ebib finds entry types in a `.bib` file that are not defined, those entries will still be loaded, but their entry type is displayed using Emacs' `error` face. The most likely case in which this may happen is when you load a BibTeX file without letting Ebib know the file is `biblatex`-specific. By default, Ebib assumes that a `.bib` file it loads is a BibTeX file. If you intend to use `biblatex` files, make sure to read the section [`Biblatex` vs. Bibtex](#biblatex-vs.-bibtex).
 
-When you open a `.bib` file, the directory in which you started Ebib is the start directory for file name completion. If you always want Ebib to assume a specific default directory, regardless of the directory in which Ebib is actually started, you can customize the option "Default Directory" (`ebib-default-directory`).
+When you open a `.bib` file, the directory in which you started Ebib is the start directory for file name completion. If you always want Ebib to assume a specific default directory, regardless of the directory in which Ebib is actually started, you can customise the option `ebib-default-directory`.
 
 
 ## Preloading `.bib` Files ##
 
-Chances are that you will be doing most of your work with one or a few `.bib` files. In order to open these files automatically when Ebib is started, set the option "Preload Bib Files" (`ebib-preload-bib-files`). You may specify the files to preload with their full path or with a relative path. In the latter case, the files are searched for in the directories listed in the option "Bib Search Dirs" (`ebib-bib-search-dirs`).
+Chances are that you will be doing most of your work with one or a few `.bib` files. In order to open these files automatically when Ebib is started, set the option "Preload Bib Files" (`ebib-preload-bib-files`). You may specify the files to preload with their full path or with a relative path. In the latter case, the files are searched for in the directories listed in the option `ebib-bib-search-dirs`.
 
 
 ## Starting a New `.bib` File ##
@@ -65,14 +63,18 @@ Chances are that you will be doing most of your work with one or a few `.bib` fi
 To start a new `.bib` file from scratch, you first need to give the database a name. So, to start a new database, type [`o`]{.key} first, and give the new file a name. Once you have done this, you can start adding entries to the database.
 
 
+## Closing a database ##
+
+If you are done with a database, type [`c`]{.key} to close it. This unloads the current database (you are asked for confirmation if you have unsaved changes), but it does not leave Ebib, and the other databases you have open will remain so.
+
+
 ## The Database View ##
 
 Once you've opened a `.bib` file, all the entries in the file are shown in alphabetical order (sorted by entry key, though this is customisable) in the index buffer in the top Ebib window. The fields of the first entry and their values are shown in the entry buffer in the bottom Ebib window. The first field is the type field (i.e. `Book`, `Article`, etc.)
 
-Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that `biblatex` / BibTeX requires to be filled. The second group are the optional fields, which do not have to be filled but which are normally added to the bibliography if they do have a value. These two groups are specific to the entry type and are defined in Emacs and can be customised in the customisation group `bibtex`.
+Below the type field, Ebib displays (up to) four sets of fields. The first set are the so-called required fields, the fields that `biblatex` / BibTeX requires to be filled. The second group are the optional fields, which do not have to be filled but which are normally added to the bibliography if they do have a value. These two groups are specific to the entry type; they are defined in Emacs and can be customised in the customisation group `bibtex`.
 
-The third group comprises the so-called extra fields. These fields are usually ignored by `biblatex` / BibTeX (note that they normally ignore *all* fields they do not know about), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are not specific to the entry type. They are defined globally, with the user option 
-"Extra Fields" (`ebib-extra-fields`). By default, the following extra fields are defined:
+The third group comprises the so-called extra fields. These fields are usually ignored by `biblatex` / BibTeX (note that `biblatex` and BibTeX  normally ignore *all* fields they do not know about), although there are bibliography styles that treat some of these fields as optional rather than as extra. Extra fields are not specific to the entry type. They are defined globally. By default, Ebib defines following extra fields:
 
 - `abstract`
 - `annote` (`annotation` in `biblatex`)
@@ -83,14 +85,14 @@ The third group comprises the so-called extra fields. These fields are usually i
 - `timestamp`
 - `url` (BibTeX only)
 
-The fields `url` and `doi` are defined only for BibTeX because `biblatex` defines them as optional fields for most entry types. If these fields are not sufficient for your use, you can customise the option "Extra Fields".
+The fields `url` and `doi` are defined only for BibTeX because `biblatex` defines them as optional fields for most entry types. If these fields are not sufficient for your use, you can customise the option `ebib-extra-fields`.
 
 Below the extra fields is one more set of fields. These are fields that exist in the entry but are not defined as part of the entry type nor as extra fields. See the section [Undefined Fields](#undefined-fields) for some more information.
 
 
 ## Navigating the Database  ##
 
-The basic motion keys are the following:
+The basic motion keys in the index buffer are the following:
 
 | Key                                        | Action                  |
 |--------------------------------------------+-------------------------|
@@ -103,11 +105,11 @@ The basic motion keys are the following:
 
 If you have more than one database opened, you can use the keys [`1`]{.key}–[`9`]{.key} to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the [`left`]{.key} and [`right`]{.key} cursor keys to move to the previous or next database (these keys wrap).
 
-If you are done with a database, type [`c`]{.key} to close it. This unleads the current database (you are asked for confirmation if you have unsaved changes), but it does not leave Ebib, and the other databases you have open will remain so.
-
 You can quickly jump to any entry in a database with the key [`j`]{.key}. This asks you for an entry key (using completion) and then jumps to the corresponding entry. This actually works across databases: the keys that are offered for completion are the keys from all open databases. After selecting a key, Ebib changes to the corresponding database and shows the entry corresponding to the key. Note, though, that you can restrict the jump candidates to the current database by using a prefix argument, i.e., by typing [`C-u j`]{.key}.
 
-If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) or the built-in package ido, using [`j`]{.key} becomes even more convenient: instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. (In fact, with these completion systems, it is generally unnecessary to remember the key of an entry, and you can customise the option `ebib-index-columns` in order not to display it in the index buffer.)
+If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) or the built-in package ido, using [`j`]{.key} becomes even more convenient: instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. 
+
+In fact, with these completion systems, it is generally unnecessary to remember the key of an entry, and you can customise the option `ebib-index-columns` in order not to display it in the index buffer, as discussed in the next section.
 
 
 ## Displaying and Sorting the Entries List ##
@@ -116,7 +118,7 @@ By default, the index buffer displays the list of entries in the database in a t
 
 The fields that are displayed in the index buffer can be customised with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
 
-You can use any `biblatex` (or BibTeX) field to define a column in the index buffer. There are a few column labels that do not correspond directly to a field name, however. For example, the column label `"Entry Key"`, which displays the entry key, is not a `biblatex` field. Similarly, there is a column label `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise. Furthermore, the column label `"Year"` does not simply display the contents of the year field. Rather, it first checks the contents of the date field, which is `biblatex`'s replacement of the year  field, and extracts the first year in it. Only if the date field is empty does it display the year field.
+You can use any `biblatex` or BibTeX field to define a column in the index buffer. There are a few column labels that do not correspond directly to a field name, however. For example, the column label `"Entry Key"`, which displays the entry key, is not a field. Similarly, there is a column label `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise. Furthermore, the column label `"Year"` does not simply display the contents of the year field. Rather, it first checks the contents of the date field, which is `biblatex`'s replacement of the year field, and extracts the first year in it. Only if the date field is empty does it display the year field.
 
 Three other column labels have special behaviour: `"Title"`, `"Doi"`, and `"Url"`. These do display information from the fields they correspond with, but in a special way: `"Title"` tries to make the title look nice by removing braces and LaTeX commands (including their optional arguments) and by displaying the arguments of `\emph`, `\textit`, `\textbf` and `\textsc` in italic, bold or caps. `"Doi"` and `"Url"` don't display the contents of these fields, but instead yield a clickable string `"www"`. Clicking on `"www"` takes you to the relevant web page.
 
@@ -131,16 +133,16 @@ The first column defined in `ebib-index-colums` is the column on which the entri
 
 BibTeX has long been a core part of the TeX ecosystem, but it has not received any substantial update since 1988(!) and it has next to no support for languages other than English. Compared to BibTeX, `biblatex` has an expanded set of entry types, allowing for more diverse types of references, a larger number of fields, and a much more sophisticated system of field value inheritances. Most importantly, however, `biblatex` (and its back-end `Biber`) has proper Unicode support.
 
-For these reasons, the use of `biblatex` is highly recommended for anyone using LaTeX. Still, for historical reasons, BibTeX is still the default dialect, so if you intend to use `biblatex` files, you need to tell Ebib that your files are `biblatex` files.
+For these reasons, the use of `biblatex` is highly recommended for anyone using LaTeX. For historical reasons, however, BibTeX is still the default dialect, so if you intend to use `biblatex` files, you need to tell Ebib that your files are `biblatex` files.
 
 
 ### Setting the BibTeX Dialect ### {.unlisted .unnumbered}
 
-`Biblatex` files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a `biblatex` file is determined by the user option “Bibtex Dialect” (`ebib-bibtex-dialect`). Possible values for this option are `BibTeX` and `biblatex`, the default being `BibTeX`. (These values are taken from the variable `bibtex-dialect-list`.)
+`Biblatex` files use the same `.bib` suffix that BibTeX files use. Whether Ebib interprets a file as a BibTeX or a `biblatex` file is determined by the user option `ebib-bibtex-dialect`. Possible values for this option are `BibTeX` and `biblatex`, the default being `BibTeX`. (These values are taken from the variable `bibtex-dialect-list`.)
 
-The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of “Illegal entry type” errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs’ `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
+The dialect specified determines which entry types Ebib recognises and which fields it expects. Reading a file with the wrong dialect setting will most likely result in a series of "Illegal entry type" errors. Note, however, that these entries will still be loaded and displayed, but they will be highlighted with Emacs' `error` face. Fields that are not defined for the current dialect are displayed as undefined fields (i.e., below all other fields in the entry buffer).
 
-The option `bibtex-dialect` sets the default dialect, which is the dialect that Ebib gives to newly created `.bib` files and which it assumes for files that are not otherwise specified. If you wish to work with a file that is in a different dialect than what you set as the default, you can set the dialect for this particular file. To do this, load the file and then set the dialect through the menu option «Ebib | BibTeX Dialect» or with the command [`M-x ebib-set-dialect`]{.key}. You only need to do this once for a file, because the setting is saved in the `.bib` file in the local variable block. (If no local variable block exists, one is created.) The setting is actually saved as a file-local value for the variable `bibtex-dialect`, which means that if you should open the file directly in `bibtex-mode`, Emacs will apply the dialect setting as well.
+The option `ebib-bibtex-dialect` sets the default dialect, which is the dialect that Ebib gives to newly created `.bib` files and which it assumes for files that are not otherwise specified. If you wish to work with a file that is in a different dialect than what you set as the default, you can set the dialect for this particular file. To do this, load the file and then set the dialect through the menu option «Ebib | BibTeX Dialect» or with the command [`M-x ebib-set-dialect`]{.key}. You only need to do this once for a file, because the setting is saved in the `.bib` file in the local variable block. (If no local variable block exists, one is created.) The setting is actually saved as a file-local value for the variable `bibtex-dialect`, which means that if you should open the file directly in `bibtex-mode`, Emacs will apply the dialect setting as well.
 
 The mode line of the index buffer shows the dialect that Ebib assumes for the current database. Note that this does not necessarily mean that the dialect is set in the `.bib` file: if the file does not have a dialect setting, the mode line shows the default setting.
 
@@ -176,19 +178,18 @@ Similarly, a number of fields are deprecated but still accepted as aliases:
 These aliases are also indicated in the entry buffer: for example, if an entry has a `journal` field, its value is shown as the value of the `journaltitle` field; a tag `[<== journal]` is placed after the field value, indicating that the value is actually contained in the journal field. The `journal` field itself is shown as an undefined field, i.e., after all other fields. Displaying the value twice this way means that you can easily copy the value of the `journal` field to the `journaltitle` field, if you wish to bring your entries into line with `biblatex`'s conventions.
 
 
-
-
 # Editing the Database #
 
-Obviously, Ebib not only allows you to see the BibTeX entries in the database, you can also edit it. This section describes the most important editing facilities.
+Obviously, Ebib not only allows you to see the BibTeX entries in your `.bib` files, you can also edit them. This section describes the most important editing facilities.
+
 
 ## Adding and Deleting Entries ##
 
-To add an entry to a database, type [`a`]{.key}. This creates a new entry with a temporary key and puts you in the entry buffer, where you can edit the fields of the entry. When you finish editing the entry fields, the temporary key is replaced with an automatically created key based on the entry's content. (Ebib uses the function `bibtex-generate-autokey` for this; see that function's documentation string for customisation options.) If you prefer to specify a key yourself, you can unset the option `ebib-autogenerate-keys`. With this option unset, Ebib asks you for a key when you create a new entry. 
+To add an entry to a database, type [`a`]{.key}. This creates a new entry with a temporary key and puts you in the entry buffer, where you can edit the fields of the entry. When you finish editing the entry fields, the temporary key is replaced with an automatically created key based on the entry's content. (Ebib uses the function `bibtex-generate-autokey` for this; see that function's documentation string for customisation options.) If you prefer to specify a key yourself, you can unset the option `ebib-autogenerate-keys`.
 
 Deleting an entry can be done in two ways. The key [`d`]{.key} deletes an entry from the database. This command asks for confirmation, because once an entry has been deleted in this way, it cannot be retrieved again. Alternatively, you can use [`k`]{.key}, which kills the current entry, i.e., the entry is deleted from the database and added to the kill ring.
 
-The key [`y`]{.key} lets you yank an entry from the kill ring into the current database. In order for this to work, the item at the top of the kill ring must be a string that constitutes a properly formatted BibTeX entry. If this is not the case, Ebib gives you a warning and rotate the kill ring, so that you can press [`y`]{.key} again to (try and) add the next element in the kill ring to the database.
+The key [`y`]{.key} lets you yank an entry from the kill ring into the current database. In order for this to work, the item at the top of the kill ring must be a string that constitutes a properly formatted BibTeX entry. If this is not the case, Ebib gives you a warning and rotates the kill ring, so that you can press [`y`]{.key} again to (try and) add the next element in the kill ring to the database.
 
 Killing an entry from a database obviously yields a properly formatted BibTeX entry (so you can easily move entries from one database to another by killing and then yanking them), but killing a BibTeX entry from another buffer or copying one from an outside source (e.g., a website) is also possible.
 
@@ -197,28 +198,37 @@ Note that yanking also works with `@Preamble`, `@String` and `@Comment` definiti
 
 ## Marking Entries ##
 
-Commands in the index buffer generally operate on one single entry. For some commands, however, it may sometimes be useful to perform them on more than one entry. This can be achieved by selecting entries. You can select the entries you want to perform a command on with the key [`m`]{.key}. This selects (or unselects) the current entry. Selected entries are highlighted (using the face `ebib-selected-face`).
-
-Commands for which it makes sense automatically operate on all marked entries if there are any. Of the commands discussed so far, these are [`d`]{.key} to delete entries and [`i`]{.key} to insert entries to a LaTeX buffer. (Note that Ebib creates a single citation command with commas separating the entry keys.)
+Commands in the index buffer generally operate on one single entry. Some commands can be performed on multiple entries simultaneously. To do this, first mark the relevant entries with the key [`m`]{.key} and then perform the command. Commands for which it makes sense automatically operate on all marked entries if there are any.
 
 With a prefix argument, i.e, with [`C-u`]{.key} followed by [`m`]{.key}, you can unmark all entries or, if there are no marked entries, mark all entries in the current database.
 
 
 ## Editing Field Values ##
 
-Editing the field values for an entry is done in the lower of the two Ebib buffers, the so-called entry buffer. You can move focus to the entry buffer and start editing field values by typing the command [`e`]{.key} in the index buffer.
+Editing the field values for an entry is done in the lower of the two Ebib buffers, the entry buffer. You can move focus to the entry buffer by typing the command [`e`]{.key} in the index buffer.
 
-You can move between fields with the same keys that you use to move between entries in the index buffer: the cursor keys [`up`]{.key} and [`down`]{.key}, [`p`]{.key} and [`n`]{.key} or [`C-p`]{.key} and [`C-n`]{.key}. [`Space`]{.key} and [`PgDn`]{.key} move to the next set of fields, while [`PgUp`]{.key} and [`b`]{.key} move to the previous set of fields. [`g`]{.key} and [`G`]{.key}, and [`Home`]{.key} and [`End`]{.key} also work as expected. To finish editing fields and move focus back to the index window, use [`q`]{.key}.
+You can move between fields with the same keys that you use to move between entries in the index buffer: 
+
+| Key                                      | Action                  |
+|------------------------------------------+-------------------------|
+| [`up`]{.key} [`p`]{.key} [`C-p`]{.key}   | move one field up       |
+| [`down`]{.key} [`n`]{.key} [`C-n`]{.key} | move one field down     |
+| [`Space`]{.key} [`PgDn`]{.key}           | move to previous set    |
+| [`b`]{.key} [`PgUp`]{.key}               | move to next set        |
+| [`g`]{.key} [`Home`]{.key}               | move to the first field |
+| [`G`]{.key} [`End`]{.key}                | move to the last field  |
+
+To finish editing fields and move focus back to the index window, use [`q`]{.key}.
 
 Editing a field value can be done with [`e`]{.key} or [`RET`]{.KEY}. For most fields, Ebib simply asks you for a string value in the minibuffer. There is no need to put braces `{}` around field values, Ebib adds them when it saves the `.bib` file.
 
-Fields for which it makes sense offer completion when you edit them. For example, when you edit the `type` field, completion is offered on all predefined entry types . Similarly, if you edit the `crossref` field, Ebib offers completion on the keys in the databases currently open. The `keywords` field offers completion on all configured keywords (see the section [Managing Keywords](#managing-keywords)) and the `file` field offers file name completion (see [Viewing Files](#viewing-and-importing-files)).
+Fields for which it makes sense offer completion when you edit them. For example, when you edit the `type` field, completion is offered on all predefined entry types. Similarly, if you edit the `crossref` field, Ebib offers completion on the keys in the databases currently open. The `keywords` field offers completion on all configured keywords (see the section [Managing Keywords](#managing-keywords)) and the `file` field offers file name completion (see [Viewing and Importing Files](#viewing-and-importing-files)).
 
 For other fields that offer completion, the completion candidates are the values of these fields in other entries in the databases that you've opened. Offering these as completion candidates makes it easier to ensure that you enter these values consistently. This of course mainly makes sense for fields that have values that will occur more than once. By default, apart from the fields already mentioned, completion is offered for the `author`, `editor`, `journal`, `journaltitle`, `organization` and `publisher` fields.
 
 In the `author` and `editor` fields, completion takes into account that these fields may contain more than one name. Each name is a separate completion candidate: when editing these fields, you can type the individual names, Ebib adds the `"and"` that separates them.
 
-If you want to edit a field value directly, without completion, you can use a prefix argument: [`C-u e`]{.key} lets you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other other fields, you can customise the user option `ebib-fields-with-completion`. Note that if this option contains the `author` field (which it does by default), completion is also enabled for the `editor` field. Similarly, if it contains the `crossref` field, completion is also enabled for the `xref` and `related` fields.
+If you want to edit a field value directly, without completion, you can use a prefix argument: [`C-u e`]{.key} lets you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other fields, you can customise the user option `ebib-fields-with-completion`. Note that if this option contains the `author` field (which it does by default), completion is also enabled for the `editor` field. Similarly, if it contains the `crossref` field, completion is also enabled for the `xref` and `related` fields.
 
 
 ## Editing Multiline Values ##
@@ -229,7 +239,7 @@ To store the text and leave the multiline edit buffer, type [`C-c C-c`]{.key}. I
 
 For more details on working with multiline edit buffers, see [Multiline Edit Buffers](#multiline-edit-buffers).
 
-When a field has a multiline value, at most ten lines are shown in the entry buffer. If the text is longer, an ellipsis indicator `[...]` is added after the last line that is displayed. If you want to see the whole contents of a multiline field, you can use [`v`]{.key}: this will display the contents of the current field in a `*Help*` buffer (which can be dismissed again with [`q`]{.key}). It's possible to customise the way a multiline value is displayed in the entry buffer. See the options `ebib-multiline-display-function` and `ebib-multiline-display-max-lines` for details.
+When a field has a multiline value, at most ten lines are shown in the entry buffer. If the text is longer, an ellipsis indicator `[...]` is added after the last line that is displayed. If you want to see the whole contents of a multiline field, you can use [`v`]{.key}: this will display the contents of the current field in a `*Help*` buffer (which can be dismissed again with [`q`]{.key}). It is possible to customise the way a multiline value is displayed in the entry buffer. See the options `ebib-multiline-display-function` and `ebib-multiline-display-max-lines` for details.
 
 Note that multiline values are not restricted to the `annotation` and `abstract` fields. Any field except the `type` and `crossref` fields can in fact hold a multiline value. To give a field a multiline value, use [`m`]{.key} instead of [`e`]{.key}.
 
@@ -265,9 +275,9 @@ Note that a hidden field that has a value is always shown in the index buffer. H
 
 Ebib provides the possibility to add a timestamp to every new entry, recording the time it was added to the database. The timestamp is recorded in the (extra) field `timestamp`, which is hidden by default.
 
-You can tell Ebib to create timestamps by setting the option "Use Timestamp" (`ebib-use-timestamp`) in Ebib's customisation buffer. With this option set, a timestamp is included in entries added to the database with [`a`]{.key}. Ebib will also add a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps are overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
+You can tell Ebib to create timestamps by setting the option `ebib-use-timestamp`. With this option set, a timestamp is included in entries added to the database with [`a`]{.key}. Ebib also adds a timestamp to entries imported from a buffer or merged from a file, and to entries exported to another database or to a file. When importing or exporting entries, existing timestamps are overwritten. The logic behind this is that the timestamp records the date and time when the entry was added to the database, not when it was first created.
 
-Note that if this option is unset, the timestamp of an entry is retained when it's imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under “Options”.
+Note that if this option is unset, the timestamp of an entry is retained when it is imported or exported. Therefore, if you record timestamps and want to im-/export entries without changing their timestamps, temporarily unset this option, which can be done in the menu under "Options".
 
 Ebib uses the function `format-time-string` to create the timestamp. The format string that Ebib uses can be customised. The default string is `"%Y-%m-%d %T (%Z)"`, which produces a timestamp of the form `"2007-03-12 01:03:26 (CET)"`. This string is sortable and has the additional advantage that it can be converted to Emacs' internal time representation with the function `date-to-time`. The format can be customised; see the documentation for `format-time-string` on the options that are available.
 
@@ -276,35 +286,35 @@ Adding timestamps in a format that `date-to-time` can parse makes it possible to
 
 ## Saving a Database ##
 
-When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing [`s`]{.key}. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to [`C-x C-s`]{.key} in Emacs.) If you're saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option `ebib-create-backups`.)
+When you have undertaken any kind of editing action on a database, it is marked as modified, which is indicated in the mode line for the index buffer. A modified database can be saved by typing [`s`]{.key}. This saves the database to the file it was loaded from without asking for confirmation. (It is similar to [`C-x C-s`]{.key} in Emacs.) If you are saving a file for the first time after loading it, Ebib creates a backup file. (Ebib honours `backup-directory-alist` when saving backups. Note that you can also disable backups altogether with the option `ebib-create-backups`.)
 
 If you want to force-save a database that has not been modified, you can use a prefix argument: [`C-u s`]{.key}. Ebib still checks whether the underlying file was modified, though. If you also want to forego this check, use a double prefix argument: [`C-u C-u s`]{.key}. This saves the file unconditionally.
 
-You can also save a database to another name with [`w`]{.key}. This command is similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. This command can also be prefixed with [`C-u`]{.key} (or in fact any other prefix argument) in order to overwrite any existing file without asking for confirmation.
+You can also save a database to another name with [`w`]{.key}. This command is similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. This command can also be prefixed with [`C-u`]{.key} in order to overwrite any existing file without asking for confirmation.
 
 
 ### Exporting Entries ### {.unlisted .unnumbered }
 
-Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to another database, use the command [`x`]{.key}. This command operates on a single entry or on all marked entries. Ebib will ask you for the database to export the entry or entries to. [`TAB`]{.KEY} completion is available, based on the file names of the databases.
+Sometimes it can be useful to copy entries from one database to another, or to create a new `.bib` file with several entries from an existing database. For this purpose, Ebib provides exporting facilities. To export an entry to another database that you have open in Ebib, use the command [`x`]{.key}. This command operates on a single entry or on all marked entries.
 
-You can also export entries to a file. To do this, call the command [`x`]{.key} with a prefix argument: [`C-u x`]{.key}. You will be prompted for the file name to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so it's possible to end up with duplicate entries in this way.
+You can also export entries to a file. To do this, call the command [`x`]{.key} with a prefix argument: [`C-u x`]{.key} and type the name of the file to export the entries to. If the file already exists, Ebib appends the entries to it. Note that in this case, there is no check to see if the exported entries already exist in the target file, so you may end up with duplicate entries in this way.
 
 Apart from entries, it is also possible to export the `@Preamble` and `@String` definitions. The `@Preamble` definition is exported with the command [`X`]{.key} in the index buffer. `@String` definitions can be exported in the strings buffer: [`x`]{.key} in this buffer exports the current string, while [`X`]{.key} exports all `@String` definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.
 
 
 ## Cross-referencing ##
 
-`Biblatex` has a sophisticated cross-referencing facility that Ebib supports. Suppose you have an entry `Jones1998`, which appeared in a book that is also in your database, say under `Miller1998`. You can tell `biblatex` that `Jones1998` is contained in `Miller1998` by putting `Miller1998` in the `crossref` field. When `biblatex` finds such a cross-reference, all the fields of `Jones1998` that don't have a value inherit their values from `Miller1998`. At the very least, this saves you some typing, but more importantly, if two or more entries cross-reference the same entry, `biblatex` automatically includes the cross-referenced entry in the bibliography (and puts a reduced reference in the cross-referencing entries).
+Both `Biblatex` and BibTeX allow entries to refer to other entries through the `crossref` field. If an entry has a `crossref` field, Ebib displays the field values that nte entry inherits from its parent entry. To indicate that they are just inherited values, they are marked with `ebib-crossref-face`, which by default inherits from `font-lock-comment-face`. These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).
 
-When you fill in the `crossref` field in Ebib, Ebib displays the values of the cross-referenced entry in the entry buffer. To indicate that they are just inherited values, they are marked with `ebib-crossref-face`, which by default inherits from `font-lock-comment-face`. (You can customise it, of course.) These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).
+`Biblatex`'s inheritance rules are fairly sophisticated: they depend on the fields and on the types of the cross-referencing *and* the cross-referenced entry. Ebib fully supports this inheritance schema. Since inheritance rules can be customised in `biblatex`, they are defined in Ebib in the customisable option `ebib-biblatex-inheritances`. This is set up with the default inheritance relations defined by `biblatex`, but can be customised if needed.
 
-`Biblatex`'s inheritance rules depend on the field and on the types of the cross-referencing *and* the cross-referenced entry. Thus it is possible to specify that the `InBook` entry type can inherit a `maintitle` field from the `title` field if the cross-referenced entry is of type `MVBook`, and a `booktitle` field if the cross-referenced entry is of type `Book`. The inheritance scheme for `biblatex` is defined by the option `ebib-biblatex-inheritances`, which is set up with the default inheritance relations defined by `biblatex`, but which can be customised if needed.
+BibTeX's inheritance mechanism is much more simplistic. A field in a child entry that does not have a value simply inherits the value of the same-name field in the parent entry. Customisation is not possible here, neither in BibTeX nor in Ebib.
 
-BibTeX's inheritance mechanism is much more simplistic. A field without a value in a cross-referencing entry simply inherits the value of the same-name field in the  cross-referenced entry. There is no way to specify that the `title` field should inherit from e.g., the `booktitle` field. Therefore, Ebib does not provide a way to customise inheritance in BibTeX files.
+If you are viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type [`C`]{.key}. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key [`C`]{.key}: if you type [`C`]{.key} on an entry that does not have a cross-reference, Ebib starts searching the database for the current entry key the current search string and searches for its first occurrence after the current entry.
 
-If you're viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type [`C`]{.key}. This command reads the value of the `crossref` field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key [`C`]{.key}: if you type [`C`]{.key} on an entry that does not have a cross-reference, Ebib makes the key of the current entry the current search string and searches for its first occurrence after the current entry. Note that after Ebib has jumped to the first cross-referencing entry, you cannot type [`C`]{.key} again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type [`RET`]{.KEY}, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type [`g`]{.key} and then [`/`]{.key}.)
+Note that after Ebib has jumped to the first cross-referencing entry, you cannot type [`C`]{.key} again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type [`RET`]{.KEY}, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type [`g`]{.key} and then [`/`]{.key}.)
 
-Note that if you want to use `biblatex`'s (or BibTeX's) cross-referencing options, the option `ebib-save-xrefs-first` needs to be set (which it is by default). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, cross-referencing will not work reliably.
+Note that if you want to use `biblatex`'s or BibTeX's cross-referencing options, the option `ebib-save-xrefs-first` needs to be set (which it is by default). This tells Ebib to save all entries with a `crossref` field first in the `.bib` file. Without this, cross-referencing will not work reliably.
 
 
 ## Sorting the `.bib` File ##
@@ -1136,7 +1146,7 @@ A better way to tell Ebib which file to use is to set the option "Print Tempfile
 
 Note that both print options operate on all entries of the database or on the selected entries.
 
-The option "Print Preamble" and "LaTeX Preamble" allow you to customize the preamble of the LaTeX file that is created.
+The option "Print Preamble" and "LaTeX Preamble" allow you to customise the preamble of the LaTeX file that is created.
 
 
 # Customisation #
