@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for ebib.text
-;; saved on 2021.04.20 17:37
+;; saved on 2021.04.26 17:21
 
 ((html-q-tags)
  (no-tex-ligatures)
@@ -133,7 +133,7 @@
  (data-dir)
  (output-dir . "~/src/Elisp/ebib/docs/")
  (template)
- (css "styles/ebib.css")
+ (css "styles/manual.css")
  (reference-odt)
  (reference-docx)
  (epub-metadata)
