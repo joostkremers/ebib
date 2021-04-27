@@ -184,6 +184,10 @@ pre {
     font-size: 1.3em;
   }
 
+  h2 {
+    font-size: 1.1em;
+  }
+
   #TOC {
     column-count: 1;
   }
