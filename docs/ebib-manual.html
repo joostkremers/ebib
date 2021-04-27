@@ -78,7 +78,7 @@
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="styles/ebib.css" />
+  <link rel="stylesheet" href="styles/manual.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -428,23 +428,21 @@
 <p>Apart from entries, it is also possible to export the <code>@Preamble</code> and <code>@String</code> definitions. The <code>@Preamble</code> definition is exported with the command <span class="key"><code>X</code></span> in the index buffer. <code>@String</code> definitions can be exported in the strings buffer: <span class="key"><code>x</code></span> in this buffer exports the current string, while <span class="key"><code>X</code></span> exports all <code>@String</code> definitions in one go. All these commands function in the same way: when used without a prefix argument, they ask for an open database to export the entry to. With a prefix argument, they ask for a filename, and then append the relevant data to that file.</p>
 <h2 id="cross-referencing">Cross-referencing</h2>
 <p>Both <code>Biblatex</code> and BibTeX allow entries to refer to other entries through the <code>crossref</code> field. If an entry has a <code>crossref</code> field, Ebib displays the field values that nte entry inherits from its parent entry. To indicate that they are just inherited values, they are marked with <code>ebib-crossref-face</code>, which by default inherits from <code>font-lock-comment-face</code>. These values are merely displayed for convenience: they cannot be edited. (They can be copied, however).</p>
-<p><code>Biblatex</code>’s inheritance rules are fairly sophisticated: they depend on the fields and on the types of the cross-referencing <em>and</em> the cross-referenced entry. Ebib fully supports this inheritance schema. Since inheritance rules can be customised in <code>biblatex</code>, they are defined in Ebib in the customisable option <code>ebib-biblatex-inheritances</code>. This is set up with the default inheritance relations defined by <code>biblatex</code>, but can be customised if needed.</p>
+<p><code>Biblatex</code>’s inheritance rules are fairly sophisticated: they depend on the fields and on the types of the child <em>and</em> parent entry. Ebib fully supports this inheritance schema. Since inheritance rules can be customised in <code>biblatex</code>, they are defined in Ebib in the customisable option <code>ebib-biblatex-inheritances</code>. This is set up with the default inheritance relations defined by <code>biblatex</code>, but can be customised if needed.</p>
 <p>BibTeX’s inheritance mechanism is much more simplistic. A field in a child entry that does not have a value simply inherits the value of the same-name field in the parent entry. Customisation is not possible here, neither in BibTeX nor in Ebib.</p>
-<p>If you are viewing an entry that has a cross-reference and you want to go to the cross-referenced entry you can type <span class="key"><code>C</code></span>. This command reads the value of the <code>crossref</code> field and then displays that entry. If you want to do the reverse, i.e., see if the current entry is cross-referenced by any other entries, you can use the same key <span class="key"><code>C</code></span>: if you type <span class="key"><code>C</code></span> on an entry that does not have a cross-reference, Ebib starts searching the database for the current entry key the current search string and searches for its first occurrence after the current entry.</p>
-<p>Note that after Ebib has jumped to the first cross-referencing entry, you cannot type <span class="key"><code>C</code></span> again to find the next one. (Instead, it would take you back to the cross-referenced entry.) In order to find the next cross-referencing entry, you have to type <span class="KEY"><code>RET</code></span>, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type <span class="key"><code>g</code></span> and then <span class="key"><code>/</code></span>.)</p>
-<p>Note that if you want to use <code>biblatex</code>’s or BibTeX’s cross-referencing options, the option <code>ebib-save-xrefs-first</code> needs to be set (which it is by default). This tells Ebib to save all entries with a <code>crossref</code> field first in the <code>.bib</code> file. Without this, cross-referencing will not work reliably.</p>
+<p>If you are viewing an entry that has a <code>crossref</code> field and you want to go to the parent entry you can type <span class="key"><code>C</code></span>. This command reads the value of the <code>crossref</code> field and then jumps to the entry it contains. If you want to do the reverse, i.e., see if the current entry is the parent of any other entries, you can use the same key <span class="key"><code>C</code></span>: if you type <span class="key"><code>C</code></span> on an entry that does not have a <code>crossref</code> field, Ebib starts searching the database for the current entry key.</p>
+<p>Note that after Ebib has jumped to the first child entry, you cannot type <span class="key"><code>C</code></span> again to find the next one. Since you are now on a child entry, this key would take you back to the parent entry. In order to find the next child entry, you have to type <span class="KEY"><code>RET</code></span>, as with a normal search. (Also, if the cross-referenced entry appears alphabetically before the cross-referencing entry, you need to type <span class="key"><code>g</code></span> and then <span class="key"><code>/</code></span>.)</p>
+<p>Note that if you want to use <code>biblatex</code>’s or BibTeX’s cross-referencing mechanism, the option <code>ebib-save-xrefs-first</code> needs to be set (which it is by default). This tells Ebib to save all entries with a <code>crossref</code> field first in the <code>.bib</code> file. Without this, cross-referencing will not work reliably.</p>
 <h2 id="sorting-the-.bib-file">Sorting the <code>.bib</code> File</h2>
-<p>By default, the entries in the database are saved to the <code>.bib</code> file in alphabetical order according to entry key. If you only deal with the <code>.bib</code> file through Ebib, you may not care in which order the entries are saved. However, it may sometimes be desirable to be able to specify the sort order of entries in more detail. (Apparently, this can be useful with ConTeXt, for example.)</p>
-<p>You can specify a sort order in Ebib’s customisation buffer. To sort the entries, you must set at least one sort level (that is, a field to sort the entries on). You can also specify more than one sort level: if two entries have identical values for the first sort level, they will be sorted on the second sort level. E.g., if the first sort level is <code>author</code> and the second is <code>year</code>, then the entries are sorted by author, and those entries that have identical values for the <code>author</code> field are sorted by year.</p>
-<p>A sort level is not restricted to a single field. You can specify more fields for a single sort level. Within a single sort level, a second sort field is used if the first sort field does not have a value. For example, books that have an editor instead of an author will have an empty <code>author</code> field. If you sort the database on the <code>author</code> field, such entries will all appear at the beginning of the <code>.bib</code> file, which is most likely not what you want.</p>
-<p>To remedy this, you can specify both the <code>author</code> and the <code>editor</code> fields for the first sort level. Ebib will then sort an entry on its <code>author</code> field if it has a value, and will otherwise use the value of the <code>editor</code> field.</p>
+<p>By default, the entries in the database are saved to the <code>.bib</code> file in alphabetical order according to entry key. (Entries with a <code>crossref</code> field are saved first, but also sorted alphabetically) For most purposes, this is sufficient, but in some cases (e.g., in ConTeXt), it is necessary to have more control over the order of entries in the <code>.bib</code> file.</p>
+<p>Ebib allows you to specify the sort order in the <code>.bib</code> file with the user option <code>ebib-sort-order</code>. This is a list of <em>sort levels</em>: entries are first sorted using the first sort level. If two entries cannot be sorted on the first sort level, they are sorted on the second level, etc.</p>
+<p>Each sort level is a list of field names (as case-insensitive strings). Entries are sorted based on the first field in this list that yields a value. So if the first sort level is <code>(author editor)</code>, an entry is sorted on the <code>author</code> field if it has a value and on the <code>editor</code> field otherwise. If neither the author nor the editor field yields a value for a particular entry, that entry is sorted on the BibTeX key.</p>
+<p>If two or more entries yield the same value for the first sort level, meaning that they cannot be sorted on that level, are sorted on the second sort level. If, for example, the second sort level is <code>(year)</code>, entries from the same author are sorted on the year of publication.</p>
 <p>The difference between two sort fields within one sort level and two sort levels is that a second sort <em>field</em> is an alternative for the first field when it has no value, while a second sort <em>level</em> is an additional sort criterion when two or more entries cannot be sorted on the first level, because they have identical values.</p>
-<p>By default, the option <code>Sort Order</code> has no value, which means that the entries in the <code>.bib</code> file are sorted according to entry key. Those that wish to customise the sort order will usually want to set the first sort level to <code>author editor</code>, and the second to <code>year</code>. In that way, the entries in the <code>.bib</code> file are sorted according to author/editor, and entries with the same author/editor are sorted by year.</p>
-<p>Entries that cannot be sorted on some sort level, because the sort fields are empty, are sorted on entry key. (Keep in mind that if the first sort level yields <em>no value</em> for a specific entry, Ebib does <em>not</em> use the second sort level to sort that entry. It uses the entry key. The second sort level is only used if the first yields <em>identical</em> values for two or more entries.)</p>
-<p>Note that if you wish to make use of this option, you need to unset the option “Save Xrefs First” (<a href="#cross-referencing">Cross-referencing</a>). It is pointless to set a sort order if cross-referenced entries are saved first. Since “Save Xrefs First” is set by default, you need to unset if you set “Sort Order”.</p>
+<p>By default, the option <code>ebib-sort-order</code> has no value, which means that the entries in the <code>.bib</code> file are sorted according to entry key. If you wish to make use of this option, you will most likely want to set the first sort level to <code>(author editor)</code> and the second to <code>(year)</code>. Keep in mind that if you do set this option, you need to unset the option <code>ebib-save-xrefs-first</code> (see <a href="#cross-referencing">Cross-referencing</a>). It is pointless to set a sort order if cross-referenced entries are saved first.</p>
 <h2 id="preamble-definition"><span class="citation" data-cites="Preamble">@Preamble</span> Definition</h2>
-<p>Apart from database entries, BibTeX allows three more types of elements to appear in a <code>.bib</code> file. These are <code>@Comment</code>, <code>@Preamble</code> and <code>@String</code> definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.</p>
-<p>Ebib allows you to add one <code>@Preamble</code> definition to the database. In principle, BibTeX allows more than one such definition, but really one suffices, because you can use the concatenation character <code>#</code> to include multiple TeX or LaTeX commands. So, rather than having two <code>@Preamble</code> definitions such as:</p>
+<p>Apart from database entries, BibTeX allows three more types of elements to appear in a <code>.bib</code> file. These are <code>@Preamble</code>, <code>@String</code> and <code>@Comment</code> definitions. Ebib provides facilities to handle these, which are discussed here and in the following sections.</p>
+<p>Ebib allows you to add one <code>@Preamble</code> definition to the database. In principle, BibTeX allows more than one such definition, but one suffices, because you can use the concatenation character <code>#</code> to include multiple TeX or LaTeX commands. So, rather than having two <code>@Preamble</code> definitions such as:</p>
 <pre><code>@Preamble{ &quot;\newcommand{\noopsort}[1]{} &quot; }
 @Preamble{ &quot;\newcommand{\singleletter}[1]{#1} &quot; }</code></pre>
 <p>you can write this in your <code>.bib</code> file:</p>
@@ -457,10 +455,80 @@
 <h2 id="string-definitions"><span class="citation" data-cites="String">@String</span> Definitions</h2>
 <p>If you press (uppercase) <span class="key"><code>S</code></span> in the index buffer, Ebib hides the entry buffer in the lower window and replaces it with the <em>strings buffer</em>. In this buffer, you can add, delete and edit <code>@String</code> definitions.</p>
 <p>Adding a <code>@String</code> definition is done with the command <span class="key"><code>a</code></span>. This will first ask you for an abbreviation and then for the value to be associated with that abbreviation. Once you’ve entered these, Ebib will sort the new abbreviation into the buffer.</p>
-<p>Moving between the <code>@String</code> definitions can be done in the usual way: the cursor keys <span class="key"><code>up</code></span> and <span class="key"><code>down</code></span>, <span class="key"><code>p</code></span> and <span class="key"><code>n</code></span> or <span class="key"><code>C-p</code></span> and <span class="key"><code>C-n</code></span> move up and down. <span class="key"><code>Space</code></span> and <span class="key"><code>PgDn</code></span> move ten strings down, while <span class="key"><code>b</code></span> and <span class="key"><code>PgUp</code></span> move in the other direction. The keys <span class="key"><code>g</code></span>, <span class="key"><code>G</code></span>, <span class="key"><code>Home</code></span> and <span class="key"><code>End</code></span> also function as expected.</p>
-<p>To delete a <code>@String</code> definition, use <span class="key"><code>d</code></span>. To edit the value of a definition, use <span class="key"><code>e</code></span>. There is also a command <span class="key"><code>c</code></span>, which copies the value of the current <code>@String</code> definition to the kill ring. Unlike in the entry buffer, there are no corresponing commands <span class="key"><code>y</code></span> and <span class="key"><code>x</code></span>. (In fact, <span class="key"><code>x</code></span> does exist, but has another function.) Yanking from the kill ring can be done with <span class="key"><code>C-y/M-y</code></span> in the minibuffer when you edit a <code>@String</code>’s value. Cutting a <code>@String</code>’s value is pointless, because a <code>@String</code> definition must have a value.</p>
-<p>Having defined <code>@String</code> definitions, there must of course be a way to use them. Just giving a field a string abbreviation as value will not do, because Ebib puts braces around the value that you enter when it writes the <code>.bib</code> file, so that BibTeX will not recognise the abbreviation, and will not expand it. BibTeX will only recognise an abbreviation if it appears in the <code>.bib</code> file outside of any braces.</p>
-<p>To accomplish this, you must mark a field’s value as special. A special field is a field whose value is not surrounded by braces when the database is saved, so that BibTeX recognises it as an abbreviation. To mark a field special, press <span class="key"><code>r</code></span>. An asterisk will appear before the field, indicating that has no braces. Pressing <span class="key"><code>r</code></span> again will change the field back to normal. If you press <span class="key"><code>r</code></span> on a field that does not have a value yet, Ebib will ask you for one.</p>
+<p>The following keys are available in the strings buffer:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="key"><code>up</code></span> <span class="key"><code>p</code></span> <span class="key"><code>C-p</code></span></td>
+<td>move one string up</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>down</code></span> <span class="key"><code>n</code></span> <span class="key"><code>C-n</code></span></td>
+<td>move one string down</td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>Space</code></span> <span class="key"><code>PgDn</code></span></td>
+<td>move ten strings up</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>b</code></span> <span class="key"><code>PgUp</code></span></td>
+<td>move ten strings down</td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>g</code></span> <span class="key"><code>Home</code></span></td>
+<td>move to the first string</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>G</code></span> <span class="key"><code>End</code></span></td>
+<td>move to the last string</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>e</code></span></td>
+<td>edit a <code>@String</code> value</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>d</code></span></td>
+<td>delete a <code>@String</code> definition</td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>c</code></span></td>
+<td>copy a <code>@String</code> value</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="key"><code>x</code></span></td>
+<td>export a <code>@String</code> definition</td>
+</tr>
+<tr class="even">
+<td><span class="key"><code>X</code></span></td>
+<td>export all <code>@String</code> definitions</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>It is not possible to cut the value of a <code>@String</code> definition, because they must have a value. Yanking has not been implemented in the strings buffer, but you can use <span class="key"><code>C-y</code></span> / <span class="key"><code>M-y</code></span> in the minibuffer when editing a <code>@String</code> value.</p>
+<p>To use a <code>@String</code> abbreviation in a field value, the field’s value must be marked as special. Normally, when Ebib saves the database, it puts braces around field values. If a field has a <code>@string</code> abbreviation in it, it shouldn’t be surrounded with braces, because that would prevent <code>biblatex</code> or BibTeX from expanding the abbreviation.</p>
+<p>A special field is a field whose value is not surrounded by braces when the database is saved, so that it is recognised as a field with an abbreviation. To mark a field special, press <span class="key"><code>r</code></span>. An asterisk will appear before the field, indicating its status. Pressing <span class="key"><code>r</code></span> again will change the field back to normal. If you press <span class="key"><code>r</code></span> on a field that does not have a value yet, Ebib will ask you for one.</p>
 <p>Note that this also makes it possible to enter field values that are composed of concatenations of strings and abbreviations. The BibTeX documentation for example explains that if you have defined:</p>
 <pre><code>@String{WGA = &quot;World Gnus Almanac&quot;}</code></pre>
 <p>you can create a BibTeX field like this:</p>
@@ -468,15 +536,14 @@
 <p>which will produce “1966 World Gnus Almanac”. Or you can do:</p>
 <pre><code>month = &quot;1~&quot; # jan</code></pre>
 <p>which will produce someting like “1 January”, assuming your bibliography style has defined the abbreviation <code>jan</code>. All this is possible with Ebib, simply by entering the exact text including quotes or braces around the strings, and marking the relevant field as special.</p>
-<p>An easy way to enter a <code>@String</code> abbreviation as a field value is to use the key <span class="key"><code>s</code></span> instead of <span class="key"><code>e</code></span>. If you type <span class="key"><code>s</code></span>, Ebib asks you for a <code>@String</code> abbreviation to put in the current field, and automatically marks the field as special. With this command, Ebib only accepts <code>@String</code> definitions that are in the database, so that by using <span class="key"><code>s</code></span> you can make sure you don’t make any typos. Note that you can use <span class="KEY"><code>TAB</code></span> completion to complete a partial string.</p>
+<p>An easy way to enter a <code>@String</code> abbreviation as a field value is to use the key <span class="key"><code>s</code></span> instead of <span class="key"><code>e</code></span>. If you type <span class="key"><code>s</code></span>, Ebib asks you for a <code>@String</code> abbreviation to put in the current field, and automatically marks the field as special.This method uses completion.</p>
 <h2 id="comments"><span class="citation" data-cites="Comments">@Comments</span></h2>
 <p>If Ebib finds a <code>@Comment</code> in a <code>.bib</code> file, it will read it and store it in the database. When the database is saved, all the <code>@Comment</code>s will be saved with it, at the top of the file, immediately after the <code>@Preamble</code> (with the exception of a <code>@Comment</code> surrounding a <code>Local Variables:</code> block, which is saved at the end of the file). There is no way to edit comments, nor can you specify where in the <code>.bib</code> file a comment is placed, but they won’t be lost.</p>
 <h2 id="creating-entry-stubs">Creating Entry Stubs</h2>
-<p>If you have a directory full of (pdf) files of articles that you want to add to your database, Ebib can make the task a little bit easier by creating entry stubs for all the files. You can do this with the command <span class="key"><code>M-x ebib-add-file-entry</code></span>. This command asks you for a file or a directory and creates an entry in the current database for that file or each file in the directory. The entries only contain a file field pointing to the file, all the other information still has to be filled out by hand, but this way you can at least keep track of which files are already in your database.</p>
-<p>Note that the entry keys for the stubs are temporary keys. They will be replaced by more permanent keys automatically when you edit the entries. This behaviour is controlled by the function <code>bibtex-generate-autokey</code>, which has a number of customisation options. Check out its doc string for details. If you prefer to edit the keys by hand, you can do so by pressing <span class="key"><code>E</code></span> in the index buffer.</p>
+<p>If you have a directory full of (pdf) files of articles that you want to add to your database, Ebib can make the task a little bit easier by creating entry stubs for all the files. You can do this with the command <span class="key"><code>M-x ebib-add-file-entry</code></span>. This command asks you for a file or a directory and creates an entry in the current database for that file or each file in the directory. The entries only contain a file field pointing to the file, all the other information still has to be filled out by hand, but this way you can at least keep track of which files are already in your database. The keys of these entries are temporary keys. They will be replaced by more permanent keys automatically when you edit the entries.</p>
 <h2 id="multiline-edit-buffers">Multiline Edit Buffers</h2>
 <p>As mentioned several times before, field values that contain newlines (so-called <em>multiline fields</em>) and the <code>@Preamble</code> are edited in a so-called <em>multiline edit buffer</em>. This section discusses the details of this buffer.</p>
-<p>Ebib enters a multiline edit buffer in one of three cases: when you edit the <code>@Preamble</code> definition, when you hit <span class="key"><code>m</code></span> in the entry buffer to edit the current field as multiline, or when you hit <span class="key"><code>e</code></span> on the <code>annote</code>/<code>annotation</code> or <code>abstract</code> fields, or on a field whose value already is multiline.</p>
+<p>Ebib enters a multiline edit buffer in one of three cases: when you edit the <code>@Preamble</code> definition, when you hit <span class="key"><code>m</code></span> in the entry buffer to edit a field as multiline, or when you hit <span class="key"><code>e</code></span> on the <code>annote</code>/<code>annotation</code> or <code>abstract</code> fields, or on a field whose value already is multiline.</p>
 <p>The major mode that is used in multiline edit buffers is user-configurable. The default value is <code>text-mode</code>, but if you prefer to use some other mode, you can specify this through the customisation option <code>ebib-multiline-major-mode</code>.</p>
 <p>Three commands are relevant for interacting with Ebib when you’re in the multiline edit buffer, which are bound to key sequences in the minor mode <code>ebib-multiline-edit-mode</code>, which is activated automatically in the multiline edit buffer.</p>
 <p><code>ebib-quit-multiline-buffer-and-save</code>, bound to <span class="key"><code>C-c C-c</code></span>, leaves the multiline edit buffer and stores the text in the database. If you invoke this command when you’ve deleted all contents of the buffer (including the final newline!) and you were editing a field value or the <code>@Preamble</code>, the field value or preamble is deleted. (This is in fact the <em>only</em> way to delete the <code>@Preamble</code> definition. Field values on the other hand can also be deleted by hitting <span class="key"><code>k</code></span> or <span class="key"><code>d</code></span> on them in the entry buffer.)</p>

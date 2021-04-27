@@ -861,38 +861,36 @@ To indicate that they are just inherited values, they are marked with
 convenience: they cannot be edited.  (They can be copied, however).
 
 ‘Biblatex’’s inheritance rules are fairly sophisticated: they depend on
-the fields and on the types of the cross-referencing _and_ the
-cross-referenced entry.  Ebib fully supports this inheritance schema.
-Since inheritance rules can be customised in ‘biblatex’, they are
-defined in Ebib in the customisable option ‘ebib-biblatex-inheritances’.
-This is set up with the default inheritance relations defined by
-‘biblatex’, but can be customised if needed.
+the fields and on the types of the child _and_ parent entry.  Ebib fully
+supports this inheritance schema.  Since inheritance rules can be
+customised in ‘biblatex’, they are defined in Ebib in the customisable
+option ‘ebib-biblatex-inheritances’.  This is set up with the default
+inheritance relations defined by ‘biblatex’, but can be customised if
+needed.
 
 BibTeX’s inheritance mechanism is much more simplistic.  A field in a
 child entry that does not have a value simply inherits the value of the
 same-name field in the parent entry.  Customisation is not possible
 here, neither in BibTeX nor in Ebib.
 
-If you are viewing an entry that has a cross-reference and you want to
-go to the cross-referenced entry you can type ‘C’.  This command reads
-the value of the ‘crossref’ field and then displays that entry.  If you
-want to do the reverse, i.e., see if the current entry is
-cross-referenced by any other entries, you can use the same key ‘C’: if
-you type ‘C’ on an entry that does not have a cross-reference, Ebib
-starts searching the database for the current entry key the current
-search string and searches for its first occurrence after the current
-entry.
+If you are viewing an entry that has a ‘crossref’ field and you want to
+go to the parent entry you can type ‘C’.  This command reads the value
+of the ‘crossref’ field and then jumps to the entry it contains.  If you
+want to do the reverse, i.e., see if the current entry is the parent of
+any other entries, you can use the same key ‘C’: if you type ‘C’ on an
+entry that does not have a ‘crossref’ field, Ebib starts searching the
+database for the current entry key.
 
-Note that after Ebib has jumped to the first cross-referencing entry,
-you cannot type ‘C’ again to find the next one.  (Instead, it would take
-you back to the cross-referenced entry.)  In order to find the next
-cross-referencing entry, you have to type ‘RET’, as with a normal
+Note that after Ebib has jumped to the first child entry, you cannot
+type ‘C’ again to find the next one.  Since you are now on a child
+entry, this key would take you back to the parent entry.  In order to
+find the next child entry, you have to type ‘RET’, as with a normal
 search.  (Also, if the cross-referenced entry appears alphabetically
 before the cross-referencing entry, you need to type ‘g’ and then ‘/’.)
 
 Note that if you want to use ‘biblatex’’s or BibTeX’s cross-referencing
-options, the option ‘ebib-save-xrefs-first’ needs to be set (which it is
-by default).  This tells Ebib to save all entries with a ‘crossref’
+mechanism, the option ‘ebib-save-xrefs-first’ needs to be set (which it
+is by default).  This tells Ebib to save all entries with a ‘crossref’
 field first in the ‘.bib’ file.  Without this, cross-referencing will
 not work reliably.
 
@@ -903,33 +901,29 @@ File: ebib.info,  Node: Sorting the bib File,  Next: @Preamble Definition,  Prev
 ============================
 
 By default, the entries in the database are saved to the ‘.bib’ file in
-alphabetical order according to entry key.  If you only deal with the
-‘.bib’ file through Ebib, you may not care in which order the entries
-are saved.  However, it may sometimes be desirable to be able to specify
-the sort order of entries in more detail.  (Apparently, this can be
-useful with ConTeXt, for example.)
+alphabetical order according to entry key.  (Entries with a ‘crossref’
+field are saved first, but also sorted alphabetically) For most
+purposes, this is sufficient, but in some cases (e.g., in ConTeXt), it
+is necessary to have more control over the order of entries in the
+‘.bib’ file.
 
-You can specify a sort order in Ebib’s customisation buffer.  To sort
-the entries, you must set at least one sort level (that is, a field to
-sort the entries on).  You can also specify more than one sort level: if
-two entries have identical values for the first sort level, they will be
-sorted on the second sort level.  E.g., if the first sort level is
-‘author’ and the second is ‘year’, then the entries are sorted by
-author, and those entries that have identical values for the ‘author’
-field are sorted by year.
+Ebib allows you to specify the sort order in the ‘.bib’ file with the
+user option ‘ebib-sort-order’.  This is a list of _sort levels_: entries
+are first sorted using the first sort level.  If two entries cannot be
+sorted on the first sort level, they are sorted on the second level,
+etc.
 
-A sort level is not restricted to a single field.  You can specify more
-fields for a single sort level.  Within a single sort level, a second
-sort field is used if the first sort field does not have a value.  For
-example, books that have an editor instead of an author will have an
-empty ‘author’ field.  If you sort the database on the ‘author’ field,
-such entries will all appear at the beginning of the ‘.bib’ file, which
-is most likely not what you want.
+Each sort level is a list of field names (as case-insensitive strings).
+Entries are sorted based on the first field in this list that yields a
+value.  So if the first sort level is ‘(author editor)’, an entry is
+sorted on the ‘author’ field if it has a value and on the ‘editor’ field
+otherwise.  If neither the author nor the editor field yields a value
+for a particular entry, that entry is sorted on the BibTeX key.
 
-To remedy this, you can specify both the ‘author’ and the ‘editor’
-fields for the first sort level.  Ebib will then sort an entry on its
-‘author’ field if it has a value, and will otherwise use the value of
-the ‘editor’ field.
+If two or more entries yield the same value for the first sort level,
+meaning that they cannot be sorted on that level, are sorted on the
+second sort level.  If, for example, the second sort level is ‘(year)’,
+entries from the same author are sorted on the year of publication.
 
 The difference between two sort fields within one sort level and two
 sort levels is that a second sort _field_ is an alternative for the
@@ -937,25 +931,14 @@ first field when it has no value, while a second sort _level_ is an
 additional sort criterion when two or more entries cannot be sorted on
 the first level, because they have identical values.
 
-By default, the option ‘Sort Order’ has no value, which means that the
-entries in the ‘.bib’ file are sorted according to entry key.  Those
-that wish to customise the sort order will usually want to set the first
-sort level to ‘author editor’, and the second to ‘year’.  In that way,
-the entries in the ‘.bib’ file are sorted according to author/editor,
-and entries with the same author/editor are sorted by year.
-
-Entries that cannot be sorted on some sort level, because the sort
-fields are empty, are sorted on entry key.  (Keep in mind that if the
-first sort level yields _no value_ for a specific entry, Ebib does _not_
-use the second sort level to sort that entry.  It uses the entry key.
-The second sort level is only used if the first yields _identical_
-values for two or more entries.)
-
-Note that if you wish to make use of this option, you need to unset the
-option “Save Xrefs First” (*note Cross-referencing:
+By default, the option ‘ebib-sort-order’ has no value, which means that
+the entries in the ‘.bib’ file are sorted according to entry key.  If
+you wish to make use of this option, you will most likely want to set
+the first sort level to ‘(author editor)’ and the second to ‘(year)’.
+Keep in mind that if you do set this option, you need to unset the
+option ‘ebib-save-xrefs-first’ (see *note Cross-referencing:
 #cross-referencing.).  It is pointless to set a sort order if
-cross-referenced entries are saved first.  Since “Save Xrefs First” is
-set by default, you need to unset if you set “Sort Order”.
+cross-referenced entries are saved first.
 
 
 File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Sorting the bib File,  Up: Editing the Database
@@ -964,12 +947,12 @@ File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev:
 =========================
 
 Apart from database entries, BibTeX allows three more types of elements
-to appear in a ‘.bib’ file.  These are ‘@Comment’, ‘@Preamble’ and
-‘@String’ definitions.  Ebib provides facilities to handle these, which
+to appear in a ‘.bib’ file.  These are ‘@Preamble’, ‘@String’ and
+‘@Comment’ definitions.  Ebib provides facilities to handle these, which
 are discussed here and in the following sections.
 
 Ebib allows you to add one ‘@Preamble’ definition to the database.  In
-principle, BibTeX allows more than one such definition, but really one
+principle, BibTeX allows more than one such definition, but one
 suffices, because you can use the concatenation character ‘#’ to include
 multiple TeX or LaTeX commands.  So, rather than having two ‘@Preamble’
 definitions such as:
@@ -1018,35 +1001,39 @@ first ask you for an abbreviation and then for the value to be
 associated with that abbreviation.  Once you’ve entered these, Ebib will
 sort the new abbreviation into the buffer.
 
-Moving between the ‘@String’ definitions can be done in the usual way:
-the cursor keys ‘up’ and ‘down’, ‘p’ and ‘n’ or ‘C-p’ and ‘C-n’ move up
-and down.  ‘Space’ and ‘PgDn’ move ten strings down, while ‘b’ and
-‘PgUp’ move in the other direction.  The keys ‘g’, ‘G’, ‘Home’ and ‘End’
-also function as expected.
+The following keys are available in the strings buffer:
 
-To delete a ‘@String’ definition, use ‘d’.  To edit the value of a
-definition, use ‘e’.  There is also a command ‘c’, which copies the
-value of the current ‘@String’ definition to the kill ring.  Unlike in
-the entry buffer, there are no corresponing commands ‘y’ and ‘x’.  (In
-fact, ‘x’ does exist, but has another function.)  Yanking from the kill
-ring can be done with ‘C-y/M-y’ in the minibuffer when you edit a
-‘@String’’s value.  Cutting a ‘@String’’s value is pointless, because a
-‘@String’ definition must have a value.
+Key                Action
+------------------------------------------------------
+‘up’ ‘p’ ‘C-p’     move one string up
+‘down’ ‘n’ ‘C-n’   move one string down
+‘Space’ ‘PgDn’     move ten strings up
+‘b’ ‘PgUp’         move ten strings down
+‘g’ ‘Home’         move to the first string
+‘G’ ‘End’          move to the last string
+‘e’                edit a ‘@String’ value
+‘d’                delete a ‘@String’ definition
+‘c’                copy a ‘@String’ value
+‘x’                export a ‘@String’ definition
+‘X’                export all ‘@String’ definitions
 
-Having defined ‘@String’ definitions, there must of course be a way to
-use them.  Just giving a field a string abbreviation as value will not
-do, because Ebib puts braces around the value that you enter when it
-writes the ‘.bib’ file, so that BibTeX will not recognise the
-abbreviation, and will not expand it.  BibTeX will only recognise an
-abbreviation if it appears in the ‘.bib’ file outside of any braces.
+It is not possible to cut the value of a ‘@String’ definition, because
+they must have a value.  Yanking has not been implemented in the strings
+buffer, but you can use ‘C-y’ / ‘M-y’ in the minibuffer when editing a
+‘@String’ value.
 
-To accomplish this, you must mark a field’s value as special.  A special
-field is a field whose value is not surrounded by braces when the
-database is saved, so that BibTeX recognises it as an abbreviation.  To
-mark a field special, press ‘r’.  An asterisk will appear before the
-field, indicating that has no braces.  Pressing ‘r’ again will change
-the field back to normal.  If you press ‘r’ on a field that does not
-have a value yet, Ebib will ask you for one.
+To use a ‘@String’ abbreviation in a field value, the field’s value must
+be marked as special.  Normally, when Ebib saves the database, it puts
+braces around field values.  If a field has a ‘@string’ abbreviation in
+it, it shouldn’t be surrounded with braces, because that would prevent
+‘biblatex’ or BibTeX from expanding the abbreviation.
+
+A special field is a field whose value is not surrounded by braces when
+the database is saved, so that it is recognised as a field with an
+abbreviation.  To mark a field special, press ‘r’.  An asterisk will
+appear before the field, indicating its status.  Pressing ‘r’ again will
+change the field back to normal.  If you press ‘r’ on a field that does
+not have a value yet, Ebib will ask you for one.
 
 Note that this also makes it possible to enter field values that are
 composed of concatenations of strings and abbreviations.  The BibTeX
@@ -1070,10 +1057,7 @@ around the strings, and marking the relevant field as special.
 An easy way to enter a ‘@String’ abbreviation as a field value is to use
 the key ‘s’ instead of ‘e’.  If you type ‘s’, Ebib asks you for a
 ‘@String’ abbreviation to put in the current field, and automatically
-marks the field as special.  With this command, Ebib only accepts
-‘@String’ definitions that are in the database, so that by using ‘s’ you
-can make sure you don’t make any typos.  Note that you can use ‘TAB’
-completion to complete a partial string.
+marks the field as special.This method uses completion.
 
 
 File: ebib.info,  Node: @Comments,  Next: Creating Entry Stubs,  Prev: @String Definitions,  Up: Editing the Database
@@ -1103,14 +1087,9 @@ a directory and creates an entry in the current database for that file
 or each file in the directory.  The entries only contain a file field
 pointing to the file, all the other information still has to be filled
 out by hand, but this way you can at least keep track of which files are
-already in your database.
-
-Note that the entry keys for the stubs are temporary keys.  They will be
-replaced by more permanent keys automatically when you edit the entries.
-This behaviour is controlled by the function ‘bibtex-generate-autokey’,
-which has a number of customisation options.  Check out its doc string
-for details.  If you prefer to edit the keys by hand, you can do so by
-pressing ‘E’ in the index buffer.
+already in your database.  The keys of these entries are temporary keys.
+They will be replaced by more permanent keys automatically when you edit
+the entries.
 
 
 File: ebib.info,  Node: Multiline Edit Buffers,  Prev: Creating Entry Stubs,  Up: Editing the Database
@@ -1125,9 +1104,8 @@ of this buffer.
 
 Ebib enters a multiline edit buffer in one of three cases: when you edit
 the ‘@Preamble’ definition, when you hit ‘m’ in the entry buffer to edit
-the current field as multiline, or when you hit ‘e’ on the
-‘annote’/‘annotation’ or ‘abstract’ fields, or on a field whose value
-already is multiline.
+a field as multiline, or when you hit ‘e’ on the ‘annote’/‘annotation’
+or ‘abstract’ fields, or on a field whose value already is multiline.
 
 The major mode that is used in multiline edit buffers is
 user-configurable.  The default value is ‘text-mode’, but if you prefer
@@ -3135,98 +3113,98 @@ Node: Exporting Entries37522
 Ref: #exporting-entries37640
 Node: Cross-referencing39012
 Ref: #cross-referencing39186
-Node: Sorting the bib File41730
-Ref: #sorting-the-.bib-file41923
-Node: @Preamble Definition45042
-Ref: #preamble-definition45227
-Node: @String Definitions47199
-Ref: #string-definitions47371
-Node: @Comments50864
-Ref: #comments51016
-Node: Creating Entry Stubs51509
-Ref: #creating-entry-stubs51686
-Node: Multiline Edit Buffers52684
-Ref: #multiline-edit-buffers52847
-Node: Main and Dependent Databases57176
-Ref: #main-and-dependent-databases57352
-Node: Searching60337
-Ref: #searching60462
-Node: Filters63994
-Ref: #filters64125
-Node: Simple Selection65200
-Ref: #simple-selection65325
-Node: Complex Filters67034
-Ref: #complex-filters67192
-Node: Storing and Saving Filters71281
-Ref: #storing-and-saving-filters71460
-Node: Special Filters74315
-Ref: #special-filters74492
-Node: An Example Listing Recent Additions75875
-Ref: #an-example-listing-recent-additions76100
-Node: Properties of Filtered Databases78470
-Ref: #properties-of-filtered-databases78663
-Node: Inserting Citations into a Text Buffer80318
-Ref: #inserting-citations-into-a-text-buffer80526
-Node: Single Citations80723
-Ref: #single-citations80892
-Node: Citations with multiple keys83265
-Ref: #citations-with-multiple-keys83479
-Node: Key Bindings85246
-Ref: #key-bindings85438
-Node: Defining Citation Commands86196
-Ref: #defining-citation-commands86429
-Node: Associating a Database with a Text Buffer92325
-Ref: #associating-a-database-with-a-text-buffer92610
-Node: Links and Citations in Org buffers93989
-Ref: #links-and-citations-in-org-buffers94225
-Node: Importing BibTeX entries95658
-Ref: #importing-bibtex-entries95860
-Node: Merging bib files96174
-Ref: #merging-.bib-files96345
-Node: Importing entries from a buffer96936
-Ref: #importing-entries-from-a-buffer97169
-Node: Integration with the Biblio package98202
-Ref: #integration-with-the-biblio-package98451
-Node: Multiple Identical Fields100045
-Ref: #multiple-identical-fields100234
-Node: Linking to external resources102162
-Ref: #linking-to-external-resources102347
-Node: Viewing and Importing Files102549
-Ref: #viewing-and-importing-files102749
-Node: Editing the file field107959
-Ref: #editing-the-file-field108110
-Node: Calling a Browser for URLs and DOIs109481
-Ref: #calling-a-browser-for-urls-and-dois109697
-Node: Notes files112005
-Ref: #notes-files112155
-Node: Configuring files for storing notes113642
-Ref: #configuring-files-for-storing-notes113820
-Node: Hooks116787
-Ref: #hooks116950
-Node: Upgrading from earlier Ebib versions118351
-Ref: #upgrading-from-earlier-ebib-versions118574
-Node: Customising the notes file format119484
-Ref: #customising-the-notes-file-format119712
-Node: Displaying notes123736
-Ref: #displaying-notes123927
-Node: Using org-capture to record notes125276
-Ref: #using-org-capture-to-record-notes125467
-Node: Managing a reading list131477
-Ref: #managing-a-reading-list131639
-Node: Managing Keywords134658
-Ref: #managing-keywords134814
-Node: Using a Canonical Keywords List136421
-Ref: #using-a-canonical-keywords-list136579
-Node: Window Management138737
-Ref: #window-management138902
-Node: Copying Entries to the Kill Ring142061
-Ref: #copying-entries-to-the-kill-ring142260
-Node: Printing the Database144876
-Ref: #printing-the-database145049
-Node: Customisation148518
-Ref: #customisation148634
-Node: Modifying Key Bindings149860
-Ref: #modifying-key-bindings149987
+Node: Sorting the bib File41622
+Ref: #sorting-the-.bib-file41815
+Node: @Preamble Definition44063
+Ref: #preamble-definition44248
+Node: @String Definitions46213
+Ref: #string-definitions46385
+Node: @Comments49553
+Ref: #comments49705
+Node: Creating Entry Stubs50198
+Ref: #creating-entry-stubs50375
+Node: Multiline Edit Buffers51103
+Ref: #multiline-edit-buffers51266
+Node: Main and Dependent Databases55585
+Ref: #main-and-dependent-databases55761
+Node: Searching58746
+Ref: #searching58871
+Node: Filters62403
+Ref: #filters62534
+Node: Simple Selection63609
+Ref: #simple-selection63734
+Node: Complex Filters65443
+Ref: #complex-filters65601
+Node: Storing and Saving Filters69690
+Ref: #storing-and-saving-filters69869
+Node: Special Filters72724
+Ref: #special-filters72901
+Node: An Example Listing Recent Additions74284
+Ref: #an-example-listing-recent-additions74509
+Node: Properties of Filtered Databases76879
+Ref: #properties-of-filtered-databases77072
+Node: Inserting Citations into a Text Buffer78727
+Ref: #inserting-citations-into-a-text-buffer78935
+Node: Single Citations79132
+Ref: #single-citations79301
+Node: Citations with multiple keys81674
+Ref: #citations-with-multiple-keys81888
+Node: Key Bindings83655
+Ref: #key-bindings83847
+Node: Defining Citation Commands84605
+Ref: #defining-citation-commands84838
+Node: Associating a Database with a Text Buffer90734
+Ref: #associating-a-database-with-a-text-buffer91019
+Node: Links and Citations in Org buffers92398
+Ref: #links-and-citations-in-org-buffers92634
+Node: Importing BibTeX entries94067
+Ref: #importing-bibtex-entries94269
+Node: Merging bib files94583
+Ref: #merging-.bib-files94754
+Node: Importing entries from a buffer95345
+Ref: #importing-entries-from-a-buffer95578
+Node: Integration with the Biblio package96611
+Ref: #integration-with-the-biblio-package96860
+Node: Multiple Identical Fields98454
+Ref: #multiple-identical-fields98643
+Node: Linking to external resources100571
+Ref: #linking-to-external-resources100756
+Node: Viewing and Importing Files100958
+Ref: #viewing-and-importing-files101158
+Node: Editing the file field106368
+Ref: #editing-the-file-field106519
+Node: Calling a Browser for URLs and DOIs107890
+Ref: #calling-a-browser-for-urls-and-dois108106
+Node: Notes files110414
+Ref: #notes-files110564
+Node: Configuring files for storing notes112051
+Ref: #configuring-files-for-storing-notes112229
+Node: Hooks115196
+Ref: #hooks115359
+Node: Upgrading from earlier Ebib versions116760
+Ref: #upgrading-from-earlier-ebib-versions116983
+Node: Customising the notes file format117893
+Ref: #customising-the-notes-file-format118121
+Node: Displaying notes122145
+Ref: #displaying-notes122336
+Node: Using org-capture to record notes123685
+Ref: #using-org-capture-to-record-notes123876
+Node: Managing a reading list129886
+Ref: #managing-a-reading-list130048
+Node: Managing Keywords133067
+Ref: #managing-keywords133223
+Node: Using a Canonical Keywords List134830
+Ref: #using-a-canonical-keywords-list134988
+Node: Window Management137146
+Ref: #window-management137311
+Node: Copying Entries to the Kill Ring140470
+Ref: #copying-entries-to-the-kill-ring140669
+Node: Printing the Database143285
+Ref: #printing-the-database143458
+Node: Customisation146927
+Ref: #customisation147043
+Node: Modifying Key Bindings148269
+Ref: #modifying-key-bindings148396
 
 End Tag Table
 
