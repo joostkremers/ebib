@@ -1,10 +1,3 @@
-/* Color palette: https://colorhunt.co/palette/212648 */
-
-/* #f4f4f2 */
-/* #e8e8e8 */
-/* #bbbfca */
-/* #495464 */
-
 body {
   font-family: 'Roboto Slab', serif;
   color: #495464;
@@ -32,7 +25,7 @@ a:hover {
 h1,
 h2,
 h3 {
-  font-family: 'Merriweather Sans', sans-serif;  
+  font-family: 'Merriweather Sans', sans-serif;
 }
 
 h1 {
@@ -116,64 +109,14 @@ li {
   list-style-type: '› ';
 }
 
-.preamble {
-  margin: auto;
-  max-width: 60%;
-  text-align: justify;
-}
-
 #logo {
   border: none;
   width: 150px;
 }
 
-#menu {
-  position: fixed;
-  margin-left: 2%;
-  padding: 2%;
-  height: 600px;
-  width: 130px;
-}
-
-#TOC {
-  position: absolute;
-  left: 1%;
-  width: 20%;
-  padding-right: 1%;
-  font-size: 90%;
-  text-align: left;
-}
-
-#TOC a {
   text-decoration: none;
 }
 
-pre {
-  background: #f4f4f2;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #8ab6d6;
-  padding: 10px;
-}
-
-.bottom-dweller {
-  width: 100%;
-  bottom: 0%;
-  font-size: 70%;
-  text-align: right;
-}
-
-.footnotes {
-  margin: auto;
-  max-width: 50%;
-}
-
-.key {
-  padding: 0 0.5em;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 5px;
-  margin: 0 1px;                /* To add preceding or following punctuation slightly. */
 }
 
 @media screen and (max-width: 1400px) {
@@ -189,24 +132,10 @@ pre {
     top: unset;
     font-size: 2em;
   }
-
-  #TOC {
-    position: static;
-    width: unset;
-    column-count: 2;
-  }
-
-  #TOC ul li li {
-    display: none;
-  }
 }
 
 @media screen and (max-width: 900px) {
   h1 {
     font-size: 1.3em;
-  }
-
-  #TOC {
-    column-count: 1;
   }
 }
