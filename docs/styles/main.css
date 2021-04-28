@@ -114,9 +114,23 @@ li {
   width: 150px;
 }
 
+.button_github {
+  /* border-radius: 10px; */
+  border: solid #495464 1px;
+  color: #495464;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
   text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
+.button_github:hover {
+  border-color: #cf1212;
 }
 
 @media screen and (max-width: 1400px) {
