@@ -52,6 +52,7 @@ h2 {
   left: -40%;
   top: 50px;
   font-size: 2em;
+  z-index: -1;                  /* The h2 box stretches over the text and covers <a> elements */
 }
 
 .author {
