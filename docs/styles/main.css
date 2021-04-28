@@ -29,8 +29,13 @@ a:hover {
   color: #cf1212;
 }
 
+h1,
+h2,
+h3 {
+  font-family: 'Merriweather Sans', sans-serif;  
+}
+
 h1 {
-  font-family: 'Merriweather Sans', sans-serif;
   font-size: xx-large;
   text-align: center;
   margin-top: 80px;
@@ -50,7 +55,6 @@ h1.title {
 }
 
 h2 {
-  font-family: 'Merriweather Sans', sans-serif;
   position: relative;
   left: -40%;
   top: 50px;
@@ -67,11 +71,29 @@ h3.date {
   font-size: smaller;
 }
 
-img {
+.screenshot {
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 5px;
   width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.screenshot-item {
+  margin: 50px auto 100px auto;
+}
+
+.screenshot-left {
+  width: 20%;
+  float: left;
+  margin-right: 20px;
+}
+
+.screenshot-right {
+  width: 20%;
+  float: right;
+  margin-left: 20px;
 }
 
 .screenshot:hover {
@@ -86,6 +108,7 @@ article {
 }
 
 code {
+  white-space: pre-wrap;
   font-size: 110%;
 }
 
