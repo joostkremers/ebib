@@ -155,7 +155,14 @@ li {
   }
 
   .button_github {
+    width: 30em;
     font-size: 50%;
-    padding: 10px;
+    padding: 0;
+    border-left: none;
+    border-right: none;
+    top: 5em;
+    right: auto;
+    left: -50px;
+    transform: rotate(-45deg);
   }
 }
