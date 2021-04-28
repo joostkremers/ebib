@@ -26,9 +26,9 @@ is.
 * Getting Started::
 * Editing the Database::
 * Main and Dependent Databases::
+* Inserting Citations into a Text Buffer::
 * Searching::
 * Filters::
-* Inserting Citations into a Text Buffer::
 * Importing BibTeX entries::
 * Linking to external resources::
 * Notes files::
@@ -58,9 +58,9 @@ File: ebib.info,  Node: Package manager,  Next: Manual installation,  Up: Instal
 1.1 Package manager
 ===================
 
-The easiest way to install Ebib is to get it from Melpa package archive
-(http://melpa.org/).  This also installs the Info file so you can access
-the Ebib manual within Emacs.
+The easiest way to install Ebib is to get it from the Melpa package
+archive (http://melpa.org/).  This also installs the Info file so you
+can access the Ebib manual within Emacs.
 
 
 File: ebib.info,  Node: Manual installation,  Next: News,  Prev: Package manager,  Up: Installation
@@ -1183,44 +1183,39 @@ up ‘C-c | c’, ‘C-c | s’ and ‘C-c | k’ for use in the multiline edit
 buffer.  You can obviously use other keys if you prefer.
 
 
-File: ebib.info,  Node: Main and Dependent Databases,  Next: Searching,  Prev: Editing the Database,  Up: Top
+File: ebib.info,  Node: Main and Dependent Databases,  Next: Inserting Citations into a Text Buffer,  Prev: Editing the Database,  Up: Top
 
 4 Main and Dependent Databases
 ******************************
 
-If you want to create a ‘.bib’ file from a larger database that only
-contains the references of a particular paper, you can use a dependent
-database.  A dependent database, as the name suggests, depends on
-another, real database that is called its main database.  The dependent
-database can only contain entries that also exist in its main database
-and all the data of the entries is shared by both databases.  If you
-edit an entry in the dependent database, the edit shows up in the main
-one as well, and vice versa.
+A common workflow with bibliographic data is to have a single database
+containing all entries one works with and to export a ‘.bib’ file for a
+paper or book with only the relevant entries.  Ebib enables such a
+workflow with so-called dependent databases.  A dependent database, as
+the name suggests, depends on another, normal database that is called
+its main database.  The dependent database contains a subset of the
+entries of its main database and all the data of the entries is shared
+by both databases.  If you edit an entry in the dependent database, the
+edit shows up in the main one as well, and vice versa.
 
-Furthermore, if you have a text buffer that’s associated with a
-dependent database, inserting an entry with ‘M-x ebib-insert-citation’
-offers all entries of the main database for completion, not just the
-ones that are already in the dependent database.  If you select an entry
-that is not in the dependent database yet, it is added to it.  This way,
-creating a separate database for a paper is easy: just create a
-dependent database and associate it with the relevant text buffer.  Then
-insert citation commands as usual.
+To create a dependent database, type ‘M c’ in the database that is going
+to be the main database.  Ebib asks you for a file name and then creates
+a new empty database.  You can associate this database with a text
+buffer in the normal way (see *note Associating a Database with a Text
+Buffer: #associating-a-database-with-a-text-buffer.).  At this point,
+when you insert a citation into the text buffer with ‘M-x
+ebib-insert-citation’, Ebib offers all entries of the main database for
+completion, not just the ones that are already in the dependent
+database.  If you select an entry that is not in the dependent database
+yet, it is added to it.
 
-You can create a dependent database with the key sequence ‘M c’ in the
-database that you want to be its main database.  Ebib asks you for a
-file name and then creates a new empty database.
-
-Adding new entries to a dependent database can be done as described, by
-inserting citations in a text buffer.  It’s also possible to add entries
-in the usual way, i.e., by pressing ‘a’ in Ebib’s index buffer.  If you
-do this in a dependent database, instead of creating a new entry, you
-are prompted for an entry from the main database to add to the dependent
-one.
-
-It’s also possible to add entries to a dependent database from its main
-database with the command ‘M a’.  This command also works on marked
-entries, making it possible to add multiple entries to a dependent
-database in one go.
+It is also possible to add entries in the usual way, i.e., by pressing
+‘a’ in Ebib’s index buffer.  If you do this in a dependent database,
+instead of creating a new entry, you are prompted for an entry from the
+main database to add to the dependent one.  In the main database, you
+can also push entries to a dependent database with the command ‘M a’.
+This command also works on marked entries, making it possible to add
+multiple entries to a dependent database in one go.
 
 Deleting an entry in a dependent database only removes it from the
 dependent database, not from the main database.  If you delete an entry
@@ -1243,393 +1238,9 @@ edit a dependent database’s ‘.bib’ file outside of Ebib, the changes you
 make are ignored when you open the file in Ebib.
 
 
-File: ebib.info,  Node: Searching,  Next: Filters,  Prev: Main and Dependent Databases,  Up: Top
+File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Searching,  Prev: Main and Dependent Databases,  Up: Top
 
-5 Searching
-***********
-
-Ebib provides several ways of searching through your database(s).  This
-section describes two simple search strategies: jumping to an entry and
-searching for a string or regular expression.  The next section
-discusses a more powerful search mechanism in the form of filters.
-
-If you want to look for a particular entry, the easiest way to do this
-is to use ‘j’.  This command (‘ebib-jump-to-entry’) asks for an entry
-key, offering completion while you type.  Note that you can use this
-command to search for an entry in all open databases.  If you want to
-restrict it to just the current database, use a prefix argument: ‘C-u
-j’.
-
-If you use selectrum (https://github.com/raxod502/selectrum), ivy
-(https://github.com/abo-abo/swiper) or helm
-(https://github.com/emacs-helm/helm), this method is actually very
-convenient, because the completion is more sophisticated: you can search
-not on entry key but on any part of the author/editor name, the title
-and the year.
-
-If you want to search the entire contents of your entries, not just the
-author/editor names and the titles, you can use ‘/’.  This command
-(‘ebib-search’) searches for a string (more precisely, a regular
-expression) starting from the current entry (i.e., _not_ from the first
-entry) and will display the entry with the first occurrence of the
-search string that it finds.  All the occurrences of the search string
-in that entry are highlighted.
-
-Ebib searches all the fields of each entry.  It is not possible with ‘/’
-to specify the fields to search.  Note that if the search term is found
-in a field with a multiline value, Ebib will highlight the ellipsis
-symbol ‘[...]’ that is displayed after the last line of the field value.
-When the search term is found, Ebib gives a message saying so, similarly
-if the search term was not found.
-
-A search term may of course appear more than once in the database.  To
-search for the next occurrence, type ‘RET’.  This continues searching
-for the search term in the rest of the database.  Again, the first entry
-found to contain the search string is displayed.  Note that the search
-does not wrap: if the end of the database is reached, Ebib stops
-searching and informs you that no further occurrence of the search
-string was found.  If you want to continue searching from the top, type
-‘g’ and then continue the search with ‘RET’.
-
-Note that once you’ve started a search with ‘/’, Ebib activates a
-transient key map called ‘ebib-search-map’.  It is this map that holds
-the binding for ‘RET’ to continue searching after the current entry and
-of the key ‘g’ to jump to the top of the database.  There are also
-bindings for the left and right cursor keys, which take you to the
-previous and next database, so you can continue searching there.
-
-Exiting a search (i.e., getting rid of the transient key map) is done by
-pressing any key other than ‘RET’, ‘g’ or the left/right cursor keys.
-The search is ended and the command associated with this key is executed
-normally.  If you want to repeat a previous search, you can pass a
-prefix argument to ‘/’.  So typing ‘C-u /’ starts searching for the
-previous search string again.
-
-Note that if you start a search in a filtered database (i.e., a database
-in which not all entries are visible; see the next section), only the
-visible entries are searched.  If the search string is present in the
-database but not in one of the visible entries, Ebib will respond with a
-“search string not found” message.
-
-
-File: ebib.info,  Node: Filters,  Next: Inserting Citations into a Text Buffer,  Prev: Searching,  Up: Top
-
-6 Filters
-*********
-
-Ebib also has a much more sophisticated search mechanism that makes use
-of _filters_.  A filter is basically a search expression that selects
-entries from the current database.  When you apply a filter to a
-database, only the entries that match are shown.  With filters, you can,
-for example, select all entries from a database that contain the string
-“Jones” in their ‘author’ field.  A filter can be as complex as you
-want: you can select all entries that do _not_ contain “Jones” in the
-‘author’ field, or all entries that contain “Jones” in either the
-‘author’ or the ‘editor’ field, or all entries that contain “Jones” in
-the ‘author’ field, and “symbiotic hibernation” in the ‘keyword’ field,
-etc.  Basically, the filter can consist of an arbitary number of search
-criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
-
-* Menu:
-
-* Simple Selection::
-* Complex Filters::
-* Storing and Saving Filters::
-* Special Filters::
-* An Example Listing Recent Additions::
-* Properties of Filtered Databases::
-
-
-File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
-
-6.1 Simple Selection
-====================
-
-Creating a filter is simple: press ‘&’, and Ebib will ask you for a
-field to select on, and for a regular expression to select with.  So if
-you want to select all entries that contain ‘"Jones"’ in the ‘author’
-field, you press ‘&’ and type ‘author’ as the field and ‘Jones’ as the
-regexp to filter on.  Ebib then runs this filter on the database, and
-only shows those entries that match the filter.  To indicate that a
-filter is active, the active filter is displayed in the mode line of
-index buffer.  (The filter can be displayed in Lisp form, if you prefer:
-customise ‘ebib-filters-display-as-lisp’ to do so.)
-
-If you don’t want to filter on one specific field but rather want to
-select all entries that match a certain regexp in any field, you can
-type ‘any’ as the field to filter on.  So specifying ‘any’ as the field
-and ‘Jones’ as the regexp will give you all entries that have a field
-that contains ‘"Jones"’ in them.
-
-Note that you can also select items based on their entry type.  In order
-to do that, you need to specify ‘=type=’ as the field to search, which
-is the field name under which Ebib stores the entry type internally.
-(There is also a “normal” field called ‘type’, hence the equal signs.)
-If you search the ‘=type=’ field, only exact matches are returned, so if
-you search for ‘book’, only the entries that are of type ‘book’ are
-returned, not those of type ‘inbook’.  You can use ‘TAB’ completion in
-this case, by the way.
-
-If you specify the ‘keywords’ field, the keywords associated with your
-database are available for ‘TAB’ completion as well.  Though you can
-enter any search term, of course.
-
-
-File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Prev: Simple Selection,  Up: Filters
-
-6.2 Complex Filters
-===================
-
-Once you have filtered your database, you can refine or extend it.  For
-example, suppose you have a filter selecting all entries with ‘"Jones"’
-in the ‘author’ field and want to add all entries that have ‘"Jones"’ in
-the editor field to your selection.  In this case you need to do a
-logical ‘or’ operation: you want to select an entry if it contains
-‘"Jones"’ in the ‘author’ field (which you already did) _or_ if it
-contains ‘"Jones"’ in the ‘editor’ field.
-
-A short sidenote: the first impulse in a case like this might be to use
-‘and’ instead of ‘or’: after all, you want to select all entries that
-contain ‘"Jones"’ in the ‘author’ field _and_ all entries that contain
-‘"Jones"’ in the ‘editor’ field.  However, the filter that you build up
-is used to test each entry _individually_ whether it meets the selection
-criterion.  An entry meets the criterion if it contains ‘"Jones"’ in the
-‘author’ field _or_ if it contains ‘"Jones"’ in the ‘editor’ field.
-Therefore, ‘or’ is the required operator in this case.  If you would use
-‘and’, you would only get those entries that contain ‘"Jones"’ in both
-the ‘author’ _and_ ‘editor’ fields (i.e., most likely none at all).
-
-To perform a logical ‘or’ operation, press the key ‘|’ (the pipe bar).
-As before, you will be asked which field you want to filter on, and
-which regexp you want to filter with.  Ebib will then update the index
-buffer.
-
-It is also possible to perform a logical ‘and’ on the filter.  Use this
-if you want to select those entries that contain ‘"Jones"’ in the
-‘author’ field and e.g. ‘"symbiotic hibernation"’ in the ‘keyword’
-field.  A logical ‘and’ operation is done with the key ‘&’.  (Note: this
-is the same key that is used to create the filter.  In fact, you can
-create a filter with ‘|’ as well: when used in an unfiltered database,
-‘&’ and ‘|’ are equivalent.  They are only different when a filter is
-already active.)
-
-Both the ‘&’ and ‘|’ commands can be used with the negative prefix
-argument ‘M--’ (or ‘C-u -’, which is identical).  In this case, the
-search criterion is negated.  That is, the negative prefix argument
-performs a logical ‘not’ operation on the search criterion.  For
-example, if you want to select all entries from a database that do _not_
-contain “Jones” in the ‘author’ field, you can do this by typing ‘M-- &’
-and then filling out the relevant field and regexp.
-
-There is another way of performing a logical ‘not’ operation, which is
-only available when a filter is active: by pressing the key ‘~’, you
-invert the current filter.  That is, if you have a filtered database
-with all the entries containing ‘"Jones"’ in the ‘author’ or in the
-‘editor’ field, and you press ‘~’, the selection is inverted, and now
-contains all entries that do _not_ have ‘"Jones"’ in the ‘author’ or
-‘editor’ field.
-
-Although ‘~’ and the negative prefix argument to ‘&’ or ‘|’ both perform
-logical ‘not’ operations, they are _not_ equivalent: ‘~’ negates the
-entire filter built up so far, while the negative prefix argument only
-negates the single selection criterion you enter with it.
-
-When a filter is active, the filter itself is displayed at the top of
-the index buffer.  If the index window is too small to display the
-entire filter (which can easily happen if Ebib is set to split the frame
-vertically rather than horizontally), you can press ‘F v’ (uppercase
-‘F’, small ‘v’), which will display the filter in the minibuffer.
-
-To cancel the filter and return to the normal view of the database,
-press ‘F c’.  For convenience, this action is also available with ‘c’,
-which normally closes a database.  If a filter is active, however, it
-simply cancels the filter.  (If you find this behaviour confusing, you
-can rebind the ‘c’ key to the function ‘ebib-close-database’.  See *note
-Modifying Key Bindings: #modifying-key-bindings. for details.)
-
-
-File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
-
-6.3 Storing and Saving Filters
-==============================
-
-When you cancel a filter, it is automatically stored so that it can be
-reapplied later.  To reapply a filter, type ‘F L’.  This will reapply
-the last used filter regardless of which database you’re in.  That is,
-you can use this to search more than one database without having to type
-the filter over and over.
-
-However, Ebib only stores one filter this way.  If you want to store
-more filters, you have to name them.  You can store the currently active
-filter or the last used filter with ‘F s’.  Ebib will ask you for a name
-for the filter in order to identify it later.  (By default, filter names
-are case-insensitive, but if you prefer to use case-sensitive filter
-names, you can unset the option ‘ebib-filters-ignore-case’.)  When Ebib
-is closed, all stored filters are saved to a file and they’re
-automatically reloaded when you open Ebib again.  Stored filters are not
-associated with a particular database: once a filter is stored, it is
-available to all databases.
-
-You can apply a stored filter with ‘F a’.  This will ask for the name of
-a filter and apply it to the current database.  You can extend the
-filter in the normal way, though the changes will not be stored
-automatically.  To store it, type ‘F s’ again.  You can store the
-extended filter under the old name, in which case Ebib will ask you for
-confirmation, or under a new name, which will store it as a new filter,
-keeping the old one.
-
-The file that Ebib uses to store filters is ‘~/.emacs.d/ebib-filters’,
-although that can of course be customised (‘ebib-filters-default-file’).
-As mentioned, stored filters are saved automatically when Ebib closes,
-but you can also save them manually with ‘F S’.  Note that if there are
-no stored filters when Ebib is closed (or when you press ‘F S’), the
-file is deleted.
-
-You can also save your filters to a different file with ‘F w’.  Such a
-filter file can be reloaded later with ‘F l’.  If you load filters from
-a file while you still have stored filters, you are asked if you want to
-replace them completely or if you want to add the new filters to the
-existing ones.  In the latter case, however, filters whose name conflict
-with existing filters are not loaded.  (Ebib will log a message about
-this when it happens.)
-
-To see what filters are currently stored, use ‘F V’.  If you want to
-rename a filter, you can do so with ‘F R’.
-
-Note that cancelling a filter with ‘F c’ does not delete it from the
-list of stored filters, it will remain available for later application.
-If you want to delete a filter from the list of stored filters, use ‘F
-d’.  You can also delete all stored filters with ‘F D’.  These deletion
-commands do not ask for confirmation, but if you delete any filters by
-accident, you can reload them from ‘~/.emacs.d/ebib-filters’ with ‘F l’.
-
-
-File: ebib.info,  Node: Special Filters,  Next: An Example Listing Recent Additions,  Prev: Storing and Saving Filters,  Up: Filters
-
-6.4 Special Filters
-===================
-
-Filters are essentially Lisp expressions that consist of the functions
-‘and’, ‘or’, and ‘not’, together with a special macro ‘contains’.
-However, filters are not limited to these forms.  They can essentially
-contain any Lisp expression.  It is not possible to create such special
-filters interactively, but it is possible to write such filters and put
-them in a filter file, or to write a function that creates such a
-special filter.
-
-A filter is a Lisp expression that should return either ‘t’ or ‘nil’,
-indicating whether the entry being tested matches the filter or not.
-The contents of the entry is available in a variable ‘ebib-entry’.  This
-variable is given a value by the function that runs the filter, but it
-is not passed as an argument.  Rather, it is a dynamic variable, which
-means that the file that defines the filter function should declare the
-variable with ‘(defvar ebib-entry)’.  When the filter is run, the value
-of ‘ebib-entry’ is an alist of fields and their values.  These include
-the fields ‘=key=’ and ‘=type=’ for the entry key and type.  For
-example:
-
-(("author" . "{Noam Chomsky}")
- ("title" . "{Syntactic Structures}")
- ("publisher" . "{The Hague: Mouton}")
- ("year" . "{1957}")
- ("timestamp" . "{2007-12-30 12:00:00 (CET)}")
- ("file" . "{c/Chomsky1957.pdf}")
- ("=type=" . "book")
- ("=key=" . "Chomsky1957"))
-
-
-File: ebib.info,  Node: An Example Listing Recent Additions,  Next: Properties of Filtered Databases,  Prev: Special Filters,  Up: Filters
-
-6.5 An Example: Listing Recent Additions
-========================================
-
-One special filter is included with Ebib.  It filters recent additions
-to the database.  The command that creates the filter is
-‘ebib-list-recent’:
-
-(defun ebib-list-recent (days)
-  "List entries created in the last DAYS days."
-  (interactive "nNumber of days: ")
-  ;; Save the database's current filter, if there is one.
-  (let ((filter (ebib-db-get-filter ebib--cur-db)))
-    (when filter (setq ebib--filters-last-filter filter)))
-  (let*
-      ;; Calculate the from-date in Emacs' time format.
-      ((date (time-subtract (current-time) (days-to-time days)))
-       ;; Create a Lisp expression that will function as the filter.
-       (filter `(ebib--newer-than (quote ,date))))
-    ;; Install it as the current database's filter.
-    (ebib-db-set-filter filter ebib--cur-db)
-    ;; Update the current entry key.
-    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
-    ;; Update the display, so that only filtered entries are visible.
-    (ebib--update-buffers)))
-
-First, this function saves the current filter if there is one.  It then
-calculates a date in Emacs’ internal time format by subtracting the
-number of days provided by the user from the current date and creates a
-Lisp expression that tests whether an entry’s timestamp is earlier or
-later than this date.  This expression is then installed as the filter
-for the current database.  A call to ‘ebib--update-buffers’ then updates
-the display, taking the filter into account.
-
-The function ‘ebib--newer-than’ is defined as follows:
-
-(defun ebib--newer-than (date)
-  "Function for use in filters.
-Return t if the entry being tested is newer than DATE.  DATE must
-be a list of the format returned by `current-time' and is
-compared to the timestamp of the entry being tested.  If the
-entry has no timestamp, or a timestamp that cannot be converted
-into a date representation, return nil."
-  (let ((timestamp (cdr (assoc-string "timestamp" ebib-entry))))
-    (when (and timestamp
-               (setq timestamp (ignore-errors (date-to-time timestamp))))
-      (time-less-p date timestamp))))
-
-This function obtains the time stamp of the entry being tested from the
-variable ‘ebib-entry’ and then tries to convert it to Emacs’ time
-format.  If successful, it compares this time to the date passed as an
-argument and returns ‘t’ if the latter precedes the former.
-
-
-File: ebib.info,  Node: Properties of Filtered Databases,  Prev: An Example Listing Recent Additions,  Up: Filters
-
-6.6 Properties of Filtered Databases
-====================================
-
-When a filter is active, there are a few things that are not possible or
-function differently.  First, it is not possible to add or delete
-entries, either interactively or by merging or exporting.  Exporting
-from a filtered database or saving a filtered database is also disabled.
-Editing existing entries is possible, however.  Note that if the entry
-doesn’t match the filter anymore after the edit, it doesn’t disappear
-from view.  For that, you need to reapply the filter with ‘F r’.
-
-It is also possible to mark entries.  Marked entries stay marked when
-you cancel the filter, so in order to do something with all the entries
-matching a filter, you can mark them all in the filter view with ‘C-u
-m’, then cancel the filter and perform an action on them.
-
-If a database has an active filter, the save command is disabled,
-because it would not be clear whether you want to save the entire
-database or just the filtered entries.  If you want to save only the
-filtered entries to a file, you can use the command ‘w’ (or the menu
-option “Database | Save As”).  This also saves the ‘@String’,
-‘@Preamble’ and ‘@comments’, as well as any file-local variables, so you
-will have a self-contained ‘.bib’ file with only the filtered entries.
-In order to save the entire database, you need to cancel the filter.
-(After saving, you can reapply the filter with ‘F L’, of course.)
-
-One final note: of all the filter-related commands, ‘~’, ‘F c’, ‘F r’,
-‘F s’ and ‘F v’ are only available when a filter is active.  The other
-commands operate on the stored filters and can be used when no filter is
-active.
-
-
-File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Importing BibTeX entries,  Prev: Filters,  Up: Top
-
-7 Inserting Citations into a Text Buffer
+5 Inserting Citations into a Text Buffer
 ****************************************
 
 * Menu:
@@ -1644,7 +1255,7 @@ File: ebib.info,  Node: Inserting Citations into a Text Buffer,  Next: Importing
 
 File: ebib.info,  Node: Single Citations,  Next: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
 
-7.1 Single Citations
+5.1 Single Citations
 ====================
 
 When you’re in a text buffer and you have Ebib open in the background
@@ -1689,7 +1300,7 @@ citation at the current cursor position in the buffer you’ve supplied.
 
 File: ebib.info,  Node: Citations with multiple keys,  Next: Key Bindings,  Prev: Single Citations,  Up: Inserting Citations into a Text Buffer
 
-7.2 Citations with multiple keys
+5.2 Citations with multiple keys
 ================================
 
 Most citation commands in LaTeX can take multiple keys.  To add more
@@ -1725,7 +1336,7 @@ default, but it is there if you want to use it.
 
 File: ebib.info,  Node: Key Bindings,  Next: Defining Citation Commands,  Prev: Citations with multiple keys,  Up: Inserting Citations into a Text Buffer
 
-7.3 Key Bindings
+5.3 Key Bindings
 ================
 
 Of course, the easiest way to use the commands discussed here is to bind
@@ -1747,7 +1358,7 @@ will do the right thing.
 
 File: ebib.info,  Node: Defining Citation Commands,  Next: Associating a Database with a Text Buffer,  Prev: Key Bindings,  Up: Inserting Citations into a Text Buffer
 
-7.4 Defining Citation Commands
+5.4 Defining Citation Commands
 ==============================
 
 Citation commands are defined for specific major modes.  Ebib defines
@@ -1895,7 +1506,7 @@ buffer.
 
 File: ebib.info,  Node: Associating a Database with a Text Buffer,  Next: Links and Citations in Org buffers,  Prev: Defining Citation Commands,  Up: Inserting Citations into a Text Buffer
 
-7.5 Associating a Database with a Text Buffer
+5.5 Associating a Database with a Text Buffer
 =============================================
 
 The commands ‘ebib-insert-citation’ and ‘ebib-entry-summary’ must
@@ -1927,7 +1538,7 @@ customisable option.
 
 File: ebib.info,  Node: Links and Citations in Org buffers,  Prev: Associating a Database with a Text Buffer,  Up: Inserting Citations into a Text Buffer
 
-7.6 Links and Citations in Org buffers
+5.6 Links and Citations in Org buffers
 ======================================
 
 Currently, Org mode does not have real support for citations (though
@@ -1957,7 +1568,390 @@ the name or full path of the file.  Which type of link is produced is
 controlled by the user option ‘org-ebib-link-type’.
 
 
-File: ebib.info,  Node: Importing BibTeX entries,  Next: Linking to external resources,  Prev: Inserting Citations into a Text Buffer,  Up: Top
+File: ebib.info,  Node: Searching,  Next: Filters,  Prev: Inserting Citations into a Text Buffer,  Up: Top
+
+6 Searching
+***********
+
+Ebib provides several ways of searching through your database(s).  This
+section describes two simple search strategies: jumping to an entry and
+searching for a string or regular expression.  The next section
+discusses a more powerful search mechanism in the form of filters.
+
+If you want to look for a particular entry, the easiest way to do this
+is to use ‘j’.  This command (‘ebib-jump-to-entry’) asks for an entry
+key, offering completion while you type.  Note that you can use this
+command to search for an entry in all open databases.  If you want to
+restrict it to just the current database, use a prefix argument: ‘C-u
+j’.
+
+If you use selectrum (https://github.com/raxod502/selectrum), ivy
+(https://github.com/abo-abo/swiper) or helm
+(https://github.com/emacs-helm/helm), this method is actually very
+convenient, because completion is more sophisticated: you can search not
+on entry key but on any part of the author/editor name, the title and
+the year.
+
+If you want to search the entire contents of your entries, not just the
+author/editor names and the titles, you can use ‘/’.  This command
+(‘ebib-search’) searches for a string (more precisely, a regular
+expression) starting from the current entry (i.e., _not_ from the first
+entry) and will display the entry with the first occurrence of the
+search string that it finds.  All the occurrences of the search string
+in that entry are highlighted.
+
+Ebib searches all the fields of each entry.  It is not possible with ‘/’
+to specify the fields to search.  (You can use filters for that.)  Note
+that if the search term is found in a field with a multiline value, Ebib
+will highlight the ellipsis symbol ‘[...]’ that is displayed after the
+last line of the field value.
+
+A search term may of course appear more than once in the database.  To
+search for the next occurrence, type ‘RET’.  This continues searching
+for the search term in the rest of the database.  Again, the first entry
+found to contain the search string is displayed.  Note that the search
+does not wrap: if the end of the database is reached, Ebib stops
+searching and informs you that no further occurrence of the search
+string was found.  If you want to continue searching from the top, type
+‘g’ and then continue the search with ‘RET’.
+
+Note that once you’ve started a search with ‘/’, Ebib activates a
+transient key map called ‘ebib-search-map’.  It is this map that holds
+the binding for ‘RET’ to continue searching after the current entry and
+of the key ‘g’ to jump to the top of the database.  There are also
+bindings for the left and right cursor keys, which take you to the
+previous and next database, so you can continue searching there.
+
+Exiting a search (i.e., getting rid of the transient key map) is done by
+pressing any key other than ‘RET’, ‘g’ or the left/right cursor keys.
+The search is ended and the command associated with this key is executed
+normally.  If you want to repeat a previous search, you can pass a
+prefix argument to ‘/’.  So typing ‘C-u /’ starts searching for the
+previous search string again.
+
+Note that if you start a search in a filtered database (i.e., a database
+in which not all entries are visible; see the next section), only the
+visible entries are searched.  If the search string is present in the
+database but not in one of the visible entries, Ebib will respond with a
+“search string not found” message.
+
+
+File: ebib.info,  Node: Filters,  Next: Importing BibTeX entries,  Prev: Searching,  Up: Top
+
+7 Filters
+*********
+
+Ebib also has a much more sophisticated search mechanism that makes use
+of _filters_.  A filter is basically a search expression that selects
+entries from the current database.  When you apply a filter to a
+database, only the entries that match are shown.  With filters, you can,
+for example, select all entries from a database that contain the string
+“Jones” in their ‘author’ field.  A filter can be as complex as you
+want: you can select all entries that do _not_ contain “Jones” in the
+‘author’ field, or all entries that contain “Jones” in either the
+‘author’ or the ‘editor’ field, or all entries that contain “Jones” in
+the ‘author’ field, and “symbiotic hibernation” in the ‘keyword’ field,
+etc.  Basically, the filter can consist of an arbitary number of search
+criteria combined with the logical operators ‘and’, ‘or’ and ‘not’.
+
+* Menu:
+
+* Simple Selection::
+* Complex Filters::
+* Storing and Saving Filters::
+* Special Filters::
+* An Example Listing Recent Additions::
+* Properties of Filtered Databases::
+
+
+File: ebib.info,  Node: Simple Selection,  Next: Complex Filters,  Up: Filters
+
+7.1 Simple Selection
+====================
+
+Creating a filter is simple: press ‘&’, and Ebib will ask you for a
+field to select on, and for a regular expression to select with.  So if
+you want to select all entries that contain ‘"Jones"’ in the ‘author’
+field, you press ‘&’ and type ‘author’ as the field and ‘Jones’ as the
+regexp to filter on.  Ebib then runs this filter on the database, and
+only shows those entries that match the filter.  To indicate that a
+filter is active, the active filter is displayed in the mode line of
+index buffer.  (The filter can be displayed in Lisp form, if you prefer:
+customise ‘ebib-filters-display-as-lisp’ to do so.)
+
+If you don’t want to filter on one specific field but rather want to
+select all entries that match a certain regexp in any field, you can
+type ‘any’ as the field to filter on.  So specifying ‘any’ as the field
+and ‘Jones’ as the regexp will give you all entries that have a field
+that contains ‘"Jones"’ in them.
+
+Note that you can also select items based on their entry type.  In order
+to do that, you need to specify ‘=type=’ as the field to search, which
+is the field name under which Ebib stores the entry type internally.
+(There is also a “normal” field called ‘type’, hence the equal signs.)
+If you search the ‘=type=’ field, only exact matches are returned, so if
+you search for ‘book’, only the entries that are of type ‘book’ are
+returned, not those of type ‘inbook’.  You can use ‘TAB’ completion in
+this case, by the way.
+
+If you specify the ‘keywords’ field, the keywords associated with your
+database are available for ‘TAB’ completion as well.  Though you can
+enter any search term, of course.
+
+
+File: ebib.info,  Node: Complex Filters,  Next: Storing and Saving Filters,  Prev: Simple Selection,  Up: Filters
+
+7.2 Complex Filters
+===================
+
+Once you have filtered your database, you can refine or extend it.  For
+example, suppose you have a filter selecting all entries with ‘"Jones"’
+in the ‘author’ field and want to add all entries that have ‘"Jones"’ in
+the editor field to your selection.  In this case you need to do a
+logical ‘or’ operation: you want to select an entry if it contains
+‘"Jones"’ in the ‘author’ field (which you already did) _or_ if it
+contains ‘"Jones"’ in the ‘editor’ field.
+
+A short sidenote: the first impulse in a case like this might be to use
+‘and’ instead of ‘or’: after all, you want to select all entries that
+contain ‘"Jones"’ in the ‘author’ field _and_ all entries that contain
+‘"Jones"’ in the ‘editor’ field.  However, the filter that you build up
+is used to test each entry _individually_ whether it meets the selection
+criterion.  An entry meets the criterion if it contains ‘"Jones"’ in the
+‘author’ field _or_ if it contains ‘"Jones"’ in the ‘editor’ field.
+Therefore, ‘or’ is the required operator in this case.  If you would use
+‘and’, you would only get those entries that contain ‘"Jones"’ in both
+the ‘author’ _and_ ‘editor’ fields (i.e., most likely none at all).
+
+To perform a logical ‘or’ operation, press the key ‘|’ (the pipe bar).
+As before, you will be asked which field you want to filter on, and
+which regexp you want to filter with.  Ebib will then update the index
+buffer.
+
+It is also possible to perform a logical ‘and’ on the filter.  Use this
+if you want to select those entries that contain ‘"Jones"’ in the
+‘author’ field and e.g. ‘"symbiotic hibernation"’ in the ‘keyword’
+field.  A logical ‘and’ operation is done with the key ‘&’.  (Note: this
+is the same key that is used to create the filter.  In fact, you can
+create a filter with ‘|’ as well: when used in an unfiltered database,
+‘&’ and ‘|’ are equivalent.  They are only different when a filter is
+already active.)
+
+Both the ‘&’ and ‘|’ commands can be used with the negative prefix
+argument ‘M--’ (or ‘C-u -’, which is identical).  In this case, the
+search criterion is negated.  That is, the negative prefix argument
+performs a logical ‘not’ operation on the search criterion.  For
+example, if you want to select all entries from a database that do _not_
+contain “Jones” in the ‘author’ field, you can do this by typing ‘M-- &’
+and then filling out the relevant field and regexp.
+
+There is another way of performing a logical ‘not’ operation, which is
+only available when a filter is active: by pressing the key ‘~’, you
+invert the current filter.  That is, if you have a filtered database
+with all the entries containing ‘"Jones"’ in the ‘author’ or in the
+‘editor’ field, and you press ‘~’, the selection is inverted, and now
+contains all entries that do _not_ have ‘"Jones"’ in the ‘author’ or
+‘editor’ field.
+
+Although ‘~’ and the negative prefix argument to ‘&’ or ‘|’ both perform
+logical ‘not’ operations, they are _not_ equivalent: ‘~’ negates the
+entire filter built up so far, while the negative prefix argument only
+negates the single selection criterion you enter with it.
+
+When a filter is active, the filter itself is displayed at the top of
+the index buffer.  If the index window is too small to display the
+entire filter (which can easily happen if Ebib is set to split the frame
+vertically rather than horizontally), you can press ‘F v’ (uppercase
+‘F’, small ‘v’), which will display the filter in the minibuffer.
+
+To cancel the filter and return to the normal view of the database,
+press ‘F c’.  For convenience, this action is also available with ‘c’,
+which normally closes a database.  If a filter is active, however, it
+simply cancels the filter.  (If you find this behaviour confusing, you
+can rebind the ‘c’ key to the function ‘ebib-close-database’.  See *note
+Modifying Key Bindings: #modifying-key-bindings. for details.)
+
+
+File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
+
+7.3 Storing and Saving Filters
+==============================
+
+When you cancel a filter, it is automatically stored so that it can be
+reapplied later.  To reapply a filter, type ‘F L’.  This will reapply
+the last used filter regardless of which database you’re in.  That is,
+you can use this to search more than one database without having to type
+the filter over and over.
+
+However, Ebib only stores one filter this way.  If you want to store
+more filters, you have to name them.  You can store the currently active
+filter or the last used filter with ‘F s’.  Ebib will ask you for a name
+for the filter in order to identify it later.  (By default, filter names
+are case-insensitive, but if you prefer to use case-sensitive filter
+names, you can unset the option ‘ebib-filters-ignore-case’.)  When Ebib
+is closed, all stored filters are saved to a file and they’re
+automatically reloaded when you open Ebib again.  Stored filters are not
+associated with a particular database: once a filter is stored, it is
+available to all databases.
+
+You can apply a stored filter with ‘F a’.  This will ask for the name of
+a filter and apply it to the current database.  You can extend the
+filter in the normal way, though the changes will not be stored
+automatically.  To store it, type ‘F s’ again.  You can store the
+extended filter under the old name, in which case Ebib will ask you for
+confirmation, or under a new name, which will store it as a new filter,
+keeping the old one.
+
+The file that Ebib uses to store filters is ‘~/.emacs.d/ebib-filters’,
+although that can of course be customised (‘ebib-filters-default-file’).
+As mentioned, stored filters are saved automatically when Ebib closes,
+but you can also save them manually with ‘F S’.  Note that if there are
+no stored filters when Ebib is closed (or when you press ‘F S’), the
+file is deleted.
+
+You can also save your filters to a different file with ‘F w’.  Such a
+filter file can be reloaded later with ‘F l’.  If you load filters from
+a file while you still have stored filters, you are asked if you want to
+replace them completely or if you want to add the new filters to the
+existing ones.  In the latter case, however, filters whose name conflict
+with existing filters are not loaded.  (Ebib will log a message about
+this when it happens.)
+
+To see what filters are currently stored, use ‘F V’.  If you want to
+rename a filter, you can do so with ‘F R’.
+
+Note that cancelling a filter with ‘F c’ does not delete it from the
+list of stored filters, it will remain available for later application.
+If you want to delete a filter from the list of stored filters, use ‘F
+d’.  You can also delete all stored filters with ‘F D’.  These deletion
+commands do not ask for confirmation, but if you delete any filters by
+accident, you can reload them from ‘~/.emacs.d/ebib-filters’ with ‘F l’.
+
+
+File: ebib.info,  Node: Special Filters,  Next: An Example Listing Recent Additions,  Prev: Storing and Saving Filters,  Up: Filters
+
+7.4 Special Filters
+===================
+
+Filters are essentially Lisp expressions that consist of the functions
+‘and’, ‘or’, and ‘not’, together with a special macro ‘contains’.
+However, filters are not limited to these forms.  They can essentially
+contain any Lisp expression.  It is not possible to create such special
+filters interactively, but it is possible to write such filters and put
+them in a filter file, or to write a function that creates such a
+special filter.
+
+A filter is a Lisp expression that should return either ‘t’ or ‘nil’,
+indicating whether the entry being tested matches the filter or not.
+The contents of the entry is available in a variable ‘ebib-entry’.  This
+variable is given a value by the function that runs the filter, but it
+is not passed as an argument.  Rather, it is a dynamic variable, which
+means that the file that defines the filter function should declare the
+variable with ‘(defvar ebib-entry)’.  When the filter is run, the value
+of ‘ebib-entry’ is an alist of fields and their values.  These include
+the fields ‘=key=’ and ‘=type=’ for the entry key and type.  For
+example:
+
+(("author" . "{Noam Chomsky}")
+ ("title" . "{Syntactic Structures}")
+ ("publisher" . "{The Hague: Mouton}")
+ ("year" . "{1957}")
+ ("timestamp" . "{2007-12-30 12:00:00 (CET)}")
+ ("file" . "{c/Chomsky1957.pdf}")
+ ("=type=" . "book")
+ ("=key=" . "Chomsky1957"))
+
+
+File: ebib.info,  Node: An Example Listing Recent Additions,  Next: Properties of Filtered Databases,  Prev: Special Filters,  Up: Filters
+
+7.5 An Example: Listing Recent Additions
+========================================
+
+One special filter is included with Ebib.  It filters recent additions
+to the database.  The command that creates the filter is
+‘ebib-list-recent’:
+
+(defun ebib-list-recent (days)
+  "List entries created in the last DAYS days."
+  (interactive "nNumber of days: ")
+  ;; Save the database's current filter, if there is one.
+  (let ((filter (ebib-db-get-filter ebib--cur-db)))
+    (when filter (setq ebib--filters-last-filter filter)))
+  (let*
+      ;; Calculate the from-date in Emacs' time format.
+      ((date (time-subtract (current-time) (days-to-time days)))
+       ;; Create a Lisp expression that will function as the filter.
+       (filter `(ebib--newer-than (quote ,date))))
+    ;; Install it as the current database's filter.
+    (ebib-db-set-filter filter ebib--cur-db)
+    ;; Update the current entry key.
+    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+    ;; Update the display, so that only filtered entries are visible.
+    (ebib--update-buffers)))
+
+First, this function saves the current filter if there is one.  It then
+calculates a date in Emacs’ internal time format by subtracting the
+number of days provided by the user from the current date and creates a
+Lisp expression that tests whether an entry’s timestamp is earlier or
+later than this date.  This expression is then installed as the filter
+for the current database.  A call to ‘ebib--update-buffers’ then updates
+the display, taking the filter into account.
+
+The function ‘ebib--newer-than’ is defined as follows:
+
+(defun ebib--newer-than (date)
+  "Function for use in filters.
+Return t if the entry being tested is newer than DATE.  DATE must
+be a list of the format returned by `current-time' and is
+compared to the timestamp of the entry being tested.  If the
+entry has no timestamp, or a timestamp that cannot be converted
+into a date representation, return nil."
+  (let ((timestamp (cdr (assoc-string "timestamp" ebib-entry))))
+    (when (and timestamp
+               (setq timestamp (ignore-errors (date-to-time timestamp))))
+      (time-less-p date timestamp))))
+
+This function obtains the time stamp of the entry being tested from the
+variable ‘ebib-entry’ and then tries to convert it to Emacs’ time
+format.  If successful, it compares this time to the date passed as an
+argument and returns ‘t’ if the latter precedes the former.
+
+
+File: ebib.info,  Node: Properties of Filtered Databases,  Prev: An Example Listing Recent Additions,  Up: Filters
+
+7.6 Properties of Filtered Databases
+====================================
+
+When a filter is active, there are a few things that are not possible or
+function differently.  First, it is not possible to add or delete
+entries, either interactively or by merging or exporting.  Exporting
+from a filtered database or saving a filtered database is also disabled.
+Editing existing entries is possible, however.  Note that if the entry
+doesn’t match the filter anymore after the edit, it doesn’t disappear
+from view.  For that, you need to reapply the filter with ‘F r’.
+
+It is also possible to mark entries.  Marked entries stay marked when
+you cancel the filter, so in order to do something with all the entries
+matching a filter, you can mark them all in the filter view with ‘C-u
+m’, then cancel the filter and perform an action on them.
+
+If a database has an active filter, the save command is disabled,
+because it would not be clear whether you want to save the entire
+database or just the filtered entries.  If you want to save only the
+filtered entries to a file, you can use the command ‘w’ (or the menu
+option “Database | Save As”).  This also saves the ‘@String’,
+‘@Preamble’ and ‘@comments’, as well as any file-local variables, so you
+will have a self-contained ‘.bib’ file with only the filtered entries.
+In order to save the entire database, you need to cancel the filter.
+(After saving, you can reapply the filter with ‘F L’, of course.)
+
+One final note: of all the filter-related commands, ‘~’, ‘F c’, ‘F r’,
+‘F s’ and ‘F v’ are only available when a filter is active.  The other
+commands operate on the stored filters and can be used when no filter is
+active.
+
+
+File: ebib.info,  Node: Importing BibTeX entries,  Next: Linking to external resources,  Prev: Filters,  Up: Top
 
 8 Importing BibTeX entries
 **************************
@@ -3061,150 +3055,150 @@ Node: Installation1090
 Ref: #installation1207
 Node: Package manager1288
 Ref: #package-manager1419
-Node: Manual installation1595
-Ref: #manual-installation1747
-Node: News2028
-Ref: #news2148
-Node: Starting Ebib2259
-Ref: #starting-ebib2369
-Node: Getting Started2970
-Ref: #getting-started3110
-Node: Opening a bib File4623
-Ref: #opening-a-.bib-file4777
-Node: Preloading bib Files6569
-Ref: #preloading-.bib-files6759
-Node: Starting a New bib File7185
-Ref: #starting-a-new-.bib-file7381
-Node: Closing a database7623
-Ref: #closing-a-database7796
-Node: The Database View8035
-Ref: #the-database-view8206
-Node: Navigating the Database10206
-Ref: #navigating-the-database10410
-Node: Displaying and Sorting the Entries List12603
-Ref: #displaying-and-sorting-the-entries-list12840
-Node: Biblatex vs BibTeX16566
-Ref: #biblatex-vs.-bibtex16731
-Node: Setting the BibTeX Dialect17567
-Ref: #setting-the-bibtex-dialect17744
-Node: Alias Types and Fields19769
-Ref: #alias-types-and-fields19938
-Node: Editing the Database22011
-Ref: #editing-the-database22177
-Node: Adding and Deleting Entries22747
-Ref: #adding-and-deleting-entries22918
-Node: Marking Entries24619
-Ref: #marking-entries24795
-Node: Editing Field Values25295
-Ref: #editing-field-values25478
-Node: Editing Multiline Values28464
-Ref: #editing-multiline-values28675
-Node: Copy Cut Kill Paste Yank and Delete30578
-Ref: #copy-cut-kill-paste-yank-and-delete30821
-Node: Undefined Fields31794
-Ref: #undefined-fields31974
-Node: Hidden Fields32863
-Ref: #hidden-fields33012
-Node: Timestamps34082
-Ref: #timestamps34226
-Node: Saving a Database36139
-Ref: #saving-a-database36301
-Node: Exporting Entries37522
-Ref: #exporting-entries37640
-Node: Cross-referencing39012
-Ref: #cross-referencing39186
-Node: Sorting the bib File41622
-Ref: #sorting-the-.bib-file41815
-Node: @Preamble Definition44063
-Ref: #preamble-definition44248
-Node: @String Definitions46213
-Ref: #string-definitions46385
-Node: @Comments49553
-Ref: #comments49705
-Node: Creating Entry Stubs50198
-Ref: #creating-entry-stubs50375
-Node: Multiline Edit Buffers51103
-Ref: #multiline-edit-buffers51266
-Node: Main and Dependent Databases55585
-Ref: #main-and-dependent-databases55761
-Node: Searching58746
-Ref: #searching58871
-Node: Filters62403
-Ref: #filters62534
-Node: Simple Selection63609
-Ref: #simple-selection63734
-Node: Complex Filters65443
-Ref: #complex-filters65601
-Node: Storing and Saving Filters69690
-Ref: #storing-and-saving-filters69869
-Node: Special Filters72724
-Ref: #special-filters72901
-Node: An Example Listing Recent Additions74284
-Ref: #an-example-listing-recent-additions74509
-Node: Properties of Filtered Databases76879
-Ref: #properties-of-filtered-databases77072
-Node: Inserting Citations into a Text Buffer78727
-Ref: #inserting-citations-into-a-text-buffer78935
-Node: Single Citations79132
-Ref: #single-citations79301
-Node: Citations with multiple keys81674
-Ref: #citations-with-multiple-keys81888
-Node: Key Bindings83655
-Ref: #key-bindings83847
-Node: Defining Citation Commands84605
-Ref: #defining-citation-commands84838
-Node: Associating a Database with a Text Buffer90734
-Ref: #associating-a-database-with-a-text-buffer91019
-Node: Links and Citations in Org buffers92398
-Ref: #links-and-citations-in-org-buffers92634
-Node: Importing BibTeX entries94067
-Ref: #importing-bibtex-entries94269
-Node: Merging bib files94583
-Ref: #merging-.bib-files94754
-Node: Importing entries from a buffer95345
-Ref: #importing-entries-from-a-buffer95578
-Node: Integration with the Biblio package96611
-Ref: #integration-with-the-biblio-package96860
-Node: Multiple Identical Fields98454
-Ref: #multiple-identical-fields98643
-Node: Linking to external resources100571
-Ref: #linking-to-external-resources100756
-Node: Viewing and Importing Files100958
-Ref: #viewing-and-importing-files101158
-Node: Editing the file field106368
-Ref: #editing-the-file-field106519
-Node: Calling a Browser for URLs and DOIs107890
-Ref: #calling-a-browser-for-urls-and-dois108106
-Node: Notes files110414
-Ref: #notes-files110564
-Node: Configuring files for storing notes112051
-Ref: #configuring-files-for-storing-notes112229
-Node: Hooks115196
-Ref: #hooks115359
-Node: Upgrading from earlier Ebib versions116760
-Ref: #upgrading-from-earlier-ebib-versions116983
-Node: Customising the notes file format117893
-Ref: #customising-the-notes-file-format118121
-Node: Displaying notes122145
-Ref: #displaying-notes122336
-Node: Using org-capture to record notes123685
-Ref: #using-org-capture-to-record-notes123876
-Node: Managing a reading list129886
-Ref: #managing-a-reading-list130048
-Node: Managing Keywords133067
-Ref: #managing-keywords133223
-Node: Using a Canonical Keywords List134830
-Ref: #using-a-canonical-keywords-list134988
-Node: Window Management137146
-Ref: #window-management137311
-Node: Copying Entries to the Kill Ring140470
-Ref: #copying-entries-to-the-kill-ring140669
-Node: Printing the Database143285
-Ref: #printing-the-database143458
-Node: Customisation146927
-Ref: #customisation147043
-Node: Modifying Key Bindings148269
-Ref: #modifying-key-bindings148396
+Node: Manual installation1599
+Ref: #manual-installation1751
+Node: News2032
+Ref: #news2152
+Node: Starting Ebib2263
+Ref: #starting-ebib2373
+Node: Getting Started2974
+Ref: #getting-started3114
+Node: Opening a bib File4627
+Ref: #opening-a-.bib-file4781
+Node: Preloading bib Files6573
+Ref: #preloading-.bib-files6763
+Node: Starting a New bib File7189
+Ref: #starting-a-new-.bib-file7385
+Node: Closing a database7627
+Ref: #closing-a-database7800
+Node: The Database View8039
+Ref: #the-database-view8210
+Node: Navigating the Database10210
+Ref: #navigating-the-database10414
+Node: Displaying and Sorting the Entries List12607
+Ref: #displaying-and-sorting-the-entries-list12844
+Node: Biblatex vs BibTeX16570
+Ref: #biblatex-vs.-bibtex16735
+Node: Setting the BibTeX Dialect17571
+Ref: #setting-the-bibtex-dialect17748
+Node: Alias Types and Fields19773
+Ref: #alias-types-and-fields19942
+Node: Editing the Database22015
+Ref: #editing-the-database22181
+Node: Adding and Deleting Entries22751
+Ref: #adding-and-deleting-entries22922
+Node: Marking Entries24623
+Ref: #marking-entries24799
+Node: Editing Field Values25299
+Ref: #editing-field-values25482
+Node: Editing Multiline Values28468
+Ref: #editing-multiline-values28679
+Node: Copy Cut Kill Paste Yank and Delete30582
+Ref: #copy-cut-kill-paste-yank-and-delete30825
+Node: Undefined Fields31798
+Ref: #undefined-fields31978
+Node: Hidden Fields32867
+Ref: #hidden-fields33016
+Node: Timestamps34086
+Ref: #timestamps34230
+Node: Saving a Database36143
+Ref: #saving-a-database36305
+Node: Exporting Entries37526
+Ref: #exporting-entries37644
+Node: Cross-referencing39016
+Ref: #cross-referencing39190
+Node: Sorting the bib File41626
+Ref: #sorting-the-.bib-file41819
+Node: @Preamble Definition44067
+Ref: #preamble-definition44252
+Node: @String Definitions46217
+Ref: #string-definitions46389
+Node: @Comments49557
+Ref: #comments49709
+Node: Creating Entry Stubs50202
+Ref: #creating-entry-stubs50379
+Node: Multiline Edit Buffers51107
+Ref: #multiline-edit-buffers51270
+Node: Main and Dependent Databases55589
+Ref: #main-and-dependent-databases55794
+Node: Inserting Citations into a Text Buffer58684
+Ref: #inserting-citations-into-a-text-buffer58898
+Node: Single Citations59095
+Ref: #single-citations59264
+Node: Citations with multiple keys61637
+Ref: #citations-with-multiple-keys61851
+Node: Key Bindings63618
+Ref: #key-bindings63810
+Node: Defining Citation Commands64568
+Ref: #defining-citation-commands64801
+Node: Associating a Database with a Text Buffer70697
+Ref: #associating-a-database-with-a-text-buffer70982
+Node: Links and Citations in Org buffers72361
+Ref: #links-and-citations-in-org-buffers72597
+Node: Searching74030
+Ref: #searching74165
+Node: Filters77619
+Ref: #filters77736
+Node: Simple Selection78811
+Ref: #simple-selection78936
+Node: Complex Filters80645
+Ref: #complex-filters80803
+Node: Storing and Saving Filters84892
+Ref: #storing-and-saving-filters85071
+Node: Special Filters87926
+Ref: #special-filters88103
+Node: An Example Listing Recent Additions89486
+Ref: #an-example-listing-recent-additions89711
+Node: Properties of Filtered Databases92081
+Ref: #properties-of-filtered-databases92274
+Node: Importing BibTeX entries93929
+Ref: #importing-bibtex-entries94100
+Node: Merging bib files94414
+Ref: #merging-.bib-files94585
+Node: Importing entries from a buffer95176
+Ref: #importing-entries-from-a-buffer95409
+Node: Integration with the Biblio package96442
+Ref: #integration-with-the-biblio-package96691
+Node: Multiple Identical Fields98285
+Ref: #multiple-identical-fields98474
+Node: Linking to external resources100402
+Ref: #linking-to-external-resources100587
+Node: Viewing and Importing Files100789
+Ref: #viewing-and-importing-files100989
+Node: Editing the file field106199
+Ref: #editing-the-file-field106350
+Node: Calling a Browser for URLs and DOIs107721
+Ref: #calling-a-browser-for-urls-and-dois107937
+Node: Notes files110245
+Ref: #notes-files110395
+Node: Configuring files for storing notes111882
+Ref: #configuring-files-for-storing-notes112060
+Node: Hooks115027
+Ref: #hooks115190
+Node: Upgrading from earlier Ebib versions116591
+Ref: #upgrading-from-earlier-ebib-versions116814
+Node: Customising the notes file format117724
+Ref: #customising-the-notes-file-format117952
+Node: Displaying notes121976
+Ref: #displaying-notes122167
+Node: Using org-capture to record notes123516
+Ref: #using-org-capture-to-record-notes123707
+Node: Managing a reading list129717
+Ref: #managing-a-reading-list129879
+Node: Managing Keywords132898
+Ref: #managing-keywords133054
+Node: Using a Canonical Keywords List134661
+Ref: #using-a-canonical-keywords-list134819
+Node: Window Management136977
+Ref: #window-management137142
+Node: Copying Entries to the Kill Ring140301
+Ref: #copying-entries-to-the-kill-ring140500
+Node: Printing the Database143116
+Ref: #printing-the-database143289
+Node: Customisation146758
+Ref: #customisation146874
+Node: Modifying Key Bindings148100
+Ref: #modifying-key-bindings148227
 
 End Tag Table
 
