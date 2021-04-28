@@ -153,4 +153,9 @@ li {
   h1 {
     font-size: 1.3em;
   }
+
+  .button_github {
+    font-size: 50%;
+    padding: 20px;
+  }
 }
