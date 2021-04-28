@@ -1,4 +1,4 @@
-% Ebib
+% ![Ebib](../ebib-icon2.svg){#logo}
 % Joost Kremers
 
 Ebib is a program for managing BibTeX and `biblatex` databases that runs inside
@@ -8,84 +8,12 @@ Emacs. It allows you to manage bibliography files without having to edit the raw
 
 ## Features
 
-### General
-
-- Visual representation distinguishing obligatory, optional and extra fields.
-- Copy/cut/paste mechanism for quickly copying field values. (This fully
-  integrates with Emacs’ kill ring.)
-- Automatic loading of `.bib` files upon start-up.
-- Extensive [user manual](ebib-manual.html).
-
-### BibTeX / `biblatex`
-
 - Support for both BibTeX and `biblatex` files.
-- Creating and editing `@string` and `@preamble` definitions is supported
-  (`@comment`s are kept, but are not editable).
-- BibTeX / `biblatex` entry and field types can be customised, allowing adaptation
-  for non-standard and personal bibliography styles.
-- Automatic creation of entry keys (using the functionality of Emacs’
-  `bibtex-mode`).
-- Field values containing newlines are supported, allowing the creation of
-  annotated bibliographies.
-- Crossreferencing is supported, both BibTeX and `biblatex` mechanisms.
-- The database can be saved with the entries in the `.bib` file sorted on
-  user-specified fields (useful in ConTeXt).
+- Main vs. dependent databases.
+- LaTeX / Org mode / Markdown integration.
+- Org-capture integration for taking notes.
+- [Much more.](ebib-manual.html)
 
-### Databases
-
-- Multiple `.bib` files can be opened at the same time.
-- Easily create a separate `.bib` file for a paper, article or book through a
-  "dependent" database which shares its content with a main database but is
-  saved as a separate `.bib` file.
-- Databases can be merged; specific entries or `@preamble` and `@string`
-  definitions can be exported to other databases or to a `.bib`file.
-
-### Searching
-
-- Quickly jump to any entry in any database using completion, which is
-  especially useful when using
-  [Selectrum](https://github.com/raxod502/selectrum),
-  [Ivy](https://github.com/abo-abo/swiper),
-  [Helm](https://github.com/emacs-helm/helm) or the built-in `ido-mode`.
-- Simple regexp searches can be performed on a database, searching the
-  contents of all fields of each entry.
-- Complex search queries with logical `and`, `or` and `not` operators,
-  built up interactively, can be performed, with the possibility of
-  searching only specific fields. Search queries can be saved for
-  later reuse.
-
-### LaTeX / Org / Markdown integration
-
-- From within a LaTeX, Org mode or [Pandoc](https://pandoc.org) document, it is
-  possible to select a Bib(La)TeX key using standard Emacs completion,
-  [Selectrum](https://github.com/raxod502/selectrum),
-  [Ivy](https://github.com/abo-abo/swiper),
-  [Helm](https://github.com/emacs-helm/helm), or `ido-mode` and insert a
-  citation into the document. This can also be set up for other document formats
-  that support automatic bibliographies.
-- Inside Ebib, it is possible to push entries to a LaTeX / Org mode / Markdown
-  buffer.
-- Quick summary of entries into a `*Help*` buffer.
-- Creating a `.bib` file from a `.bbl` file, allowing you to create a `.bib`
-  file for a LaTeX document containing only the references in the document.
-
-### Miscellaneous
-
-- Entries can be imported from text buffers or from the `*scratch*` buffer
-  (allowing copy & paste of BibTeX entries, e.g. from the Internet).
-- A URL stored in a BibTeX field can be extracted and sent to a browser.
-- Files stored in a BibTeX field can be opened with user-configurable viewers.
-- Support for maintaining an Org-based reading list that can be integrated with
-  the user's Org agenda.
-- Support for keeping annotations in a separate notes file or notes directory.
-- A list of possible keywords can be stored in a file to aid in maintaining
-  uniformity in keywords within and across `.bib` files.
-- A time stamp can be added to each new entry, allowing you to keep track of new
-  additions in the database.
-- (Parts of) databases can be printed, either as a list of references typeset by
-  BibTeX / `biblatex`, or directly as database entries.
-- No lock-in. Use any other tool Emacs provides on your `.bib` files and simply
-  reload the file in Ebib afterwards.
 
 ## Screenshots
 
@@ -93,18 +21,18 @@ Visually, Ebib is not very spectacular, but the following three screenshots give
 an impression. The first shows Ebib’s standard layout. The field values
 displayed in a lighter gray colour come from the cross-referenced entry.
 
-[![Main View](images/Main-view.png)](images/Main-view.png)
+[![Main View](images/Main-view.png){.screenshot}](images/Main-view.png)
 
 In the second image, which uses an alternative partial-frame layout, the string
 `"Geraci"` is highlighted as the result of a text search. It also shows a buffer
 with a note for the highlighted entry.
 
-[![Search View](images/Search-view.png)](images/Search-view.png)
+[![Search View](images/Search-view.png){.screenshot}](images/Search-view.png)
 
 The third screenshot shows the strings buffer in the lower window, where you can
 edit the `@String` definitions in the database.
 
-[![Strings Buffer](images/Strings-buffer.png)](images/Strings-buffer.png)
+[![Strings Buffer](images/Strings-buffer.png){.screenshot}](images/Strings-buffer.png)
 
 
 ## Manual

@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for index.text
-;; saved on 2021.04.23 23:23
+;; saved on 2021.04.28 18:00
 
 ((latexmathml)
  (mathml)
@@ -54,7 +54,7 @@
  (toc-depth)
  (no-highlight)
  (highlight-style)
- (include-in-header)
+ (include-in-header . "index-header.html")
  (include-before-body)
  (include-after-body)
  (verbose)

@@ -5,10 +5,6 @@
 /* #bbbfca */
 /* #495464 */
 
-/* html { */
-/*   background-color: #f4f4f2; */
-/* } */
-
 body {
   font-family: 'Roboto Slab', serif;
   color: #495464;
@@ -56,13 +52,14 @@ h1.title {
 h2 {
   font-family: 'Merriweather Sans', sans-serif;
   position: relative;
-  left: -30%;
+  left: -40%;
   top: 50px;
   font-size: 2em;
 }
 
-p.author {
+.author {
   text-align: center;
+  display: none;
 }
 
 h3.date {
@@ -77,7 +74,7 @@ img {
   width: 100%;
 }
 
-img:hover {
+.screenshot:hover {
   box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
 }
 
@@ -92,14 +89,19 @@ code {
   font-size: 110%;
 }
 
-ul {
-  padding-left: 12%;
+li {
+  list-style-type: '› ';
 }
 
 .preamble {
   margin: auto;
   max-width: 60%;
   text-align: justify;
+}
+
+#logo {
+  border: none;
+  width: 150px;
 }
 
 #menu {
@@ -154,6 +156,15 @@ pre {
 @media screen and (max-width: 1400px) {
   body {
     width: 80%;
+  }
+
+  h2 {
+    font-family: 'Merriweather Sans', sans-serif;
+    position: static;
+    text-align: center;
+    left: unset;
+    top: unset;
+    font-size: 2em;
   }
 
   #TOC {

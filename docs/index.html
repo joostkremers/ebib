@@ -19,69 +19,29 @@
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
+  <link href="favicon.ico" rel="icon" type='image/x-icon'/>
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Ebib</h1>
+<h1 class="title"><img src="../ebib-icon2.svg" id="logo" alt="Ebib" /></h1>
 <p class="author">Joost Kremers</p>
 </header>
 <p>Ebib is a program for managing BibTeX and <code>biblatex</code> databases that runs inside Emacs. It allows you to manage bibliography files without having to edit the raw <code>.bib</code> files.</p>
 <h2 id="features">Features</h2>
-<h3 id="general">General</h3>
-<ul>
-<li>Visual representation distinguishing obligatory, optional and extra fields.</li>
-<li>Copy/cut/paste mechanism for quickly copying field values. (This fully integrates with Emacs’ kill ring.)</li>
-<li>Automatic loading of <code>.bib</code> files upon start-up.</li>
-<li>Extensive <a href="ebib-manual.html">user manual</a>.</li>
-</ul>
-<h3 id="bibtex-biblatex">BibTeX / <code>biblatex</code></h3>
 <ul>
 <li>Support for both BibTeX and <code>biblatex</code> files.</li>
-<li>Creating and editing <code>@string</code> and <code>@preamble</code> definitions is supported (<code>@comment</code>s are kept, but are not editable).</li>
-<li>BibTeX / <code>biblatex</code> entry and field types can be customised, allowing adaptation for non-standard and personal bibliography styles.</li>
-<li>Automatic creation of entry keys (using the functionality of Emacs’ <code>bibtex-mode</code>).</li>
-<li>Field values containing newlines are supported, allowing the creation of annotated bibliographies.</li>
-<li>Crossreferencing is supported, both BibTeX and <code>biblatex</code> mechanisms.</li>
-<li>The database can be saved with the entries in the <code>.bib</code> file sorted on user-specified fields (useful in ConTeXt).</li>
-</ul>
-<h3 id="databases">Databases</h3>
-<ul>
-<li>Multiple <code>.bib</code> files can be opened at the same time.</li>
-<li>Easily create a separate <code>.bib</code> file for a paper, article or book through a “dependent” database which shares its content with a main database but is saved as a separate <code>.bib</code> file.</li>
-<li>Databases can be merged; specific entries or <code>@preamble</code> and <code>@string</code> definitions can be exported to other databases or to a <code>.bib</code>file.</li>
-</ul>
-<h3 id="searching">Searching</h3>
-<ul>
-<li>Quickly jump to any entry in any database using completion, which is especially useful when using <a href="https://github.com/raxod502/selectrum">Selectrum</a>, <a href="https://github.com/abo-abo/swiper">Ivy</a>, <a href="https://github.com/emacs-helm/helm">Helm</a> or the built-in <code>ido-mode</code>.</li>
-<li>Simple regexp searches can be performed on a database, searching the contents of all fields of each entry.</li>
-<li>Complex search queries with logical <code>and</code>, <code>or</code> and <code>not</code> operators, built up interactively, can be performed, with the possibility of searching only specific fields. Search queries can be saved for later reuse.</li>
-</ul>
-<h3 id="latex-org-markdown-integration">LaTeX / Org / Markdown integration</h3>
-<ul>
-<li>From within a LaTeX, Org mode or <a href="https://pandoc.org">Pandoc</a> document, it is possible to select a Bib(La)TeX key using standard Emacs completion, <a href="https://github.com/raxod502/selectrum">Selectrum</a>, <a href="https://github.com/abo-abo/swiper">Ivy</a>, <a href="https://github.com/emacs-helm/helm">Helm</a>, or <code>ido-mode</code> and insert a citation into the document. This can also be set up for other document formats that support automatic bibliographies.</li>
-<li>Inside Ebib, it is possible to push entries to a LaTeX / Org mode / Markdown buffer.</li>
-<li>Quick summary of entries into a <code>*Help*</code> buffer.</li>
-<li>Creating a <code>.bib</code> file from a <code>.bbl</code> file, allowing you to create a <code>.bib</code> file for a LaTeX document containing only the references in the document.</li>
-</ul>
-<h3 id="miscellaneous">Miscellaneous</h3>
-<ul>
-<li>Entries can be imported from text buffers or from the <code>*scratch*</code> buffer (allowing copy &amp; paste of BibTeX entries, e.g. from the Internet).</li>
-<li>A URL stored in a BibTeX field can be extracted and sent to a browser.</li>
-<li>Files stored in a BibTeX field can be opened with user-configurable viewers.</li>
-<li>Support for maintaining an Org-based reading list that can be integrated with the user’s Org agenda.</li>
-<li>Support for keeping annotations in a separate notes file or notes directory.</li>
-<li>A list of possible keywords can be stored in a file to aid in maintaining uniformity in keywords within and across <code>.bib</code> files.</li>
-<li>A time stamp can be added to each new entry, allowing you to keep track of new additions in the database.</li>
-<li>(Parts of) databases can be printed, either as a list of references typeset by BibTeX / <code>biblatex</code>, or directly as database entries.</li>
-<li>No lock-in. Use any other tool Emacs provides on your <code>.bib</code> files and simply reload the file in Ebib afterwards.</li>
+<li>Main vs. dependent databases.</li>
+<li>LaTeX / Org mode / Markdown integration.</li>
+<li>Org-capture integration for taking notes.</li>
+<li><a href="ebib-manual.html">Much more.</a></li>
 </ul>
 <h2 id="screenshots">Screenshots</h2>
 <p>Visually, Ebib is not very spectacular, but the following three screenshots give an impression. The first shows Ebib’s standard layout. The field values displayed in a lighter gray colour come from the cross-referenced entry.</p>
-<p><a href="images/Main-view.png"><img src="images/Main-view.png" alt="Main View" /></a></p>
+<p><a href="images/Main-view.png"><img src="images/Main-view.png" class="screenshot" alt="Main View" /></a></p>
 <p>In the second image, which uses an alternative partial-frame layout, the string <code>"Geraci"</code> is highlighted as the result of a text search. It also shows a buffer with a note for the highlighted entry.</p>
-<p><a href="images/Search-view.png"><img src="images/Search-view.png" alt="Search View" /></a></p>
+<p><a href="images/Search-view.png"><img src="images/Search-view.png" class="screenshot" alt="Search View" /></a></p>
 <p>The third screenshot shows the strings buffer in the lower window, where you can edit the <code>@String</code> definitions in the database.</p>
-<p><a href="images/Strings-buffer.png"><img src="images/Strings-buffer.png" alt="Strings Buffer" /></a></p>
+<p><a href="images/Strings-buffer.png"><img src="images/Strings-buffer.png" class="screenshot" alt="Strings Buffer" /></a></p>
 <h2 id="manual">Manual</h2>
 <p>The complete user manual for Ebib is available in html format <a href="ebib-manual.html">here</a>. If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.</p>
 <h2 id="installation">Installation</h2>
