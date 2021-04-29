@@ -1,13 +1,3 @@
-/* Color palette: https://colorhunt.co/palette/212648 */
-/* #f4f4f2 */
-/* #e8e8e8 */
-/* #bbbfca */
-/* #495464 */
-
-/* html { */
-/*   background-color: #f4f4f2; */
-/* } */
-
 body {
   font-family: 'Roboto Slab', serif;
   color: #495464;
@@ -61,11 +51,6 @@ p.author {
   text-align: center;
 }
 
-h3.date {
-  text-align: center;
-  font-size: smaller;
-}
-
 img {
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -75,13 +60,6 @@ img {
 
 img:hover {
   box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
-}
-
-article {
-  margin-left: 25%;
-  margin-right: 10%;
-  max-width: 80em;
-  text-align: justify;
 }
 
 table {
@@ -113,20 +91,6 @@ li {
   list-style-type: '› ';
 }
 
-.preamble {
-  margin: auto;
-  max-width: 60%;
-  text-align: justify;
-}
-
-#menu {
-  position: fixed;
-  margin-left: 2%;
-  padding: 2%;
-  height: 600px;
-  width: 130px;
-}
-
 #TOC {
   position: absolute;
   left: 1%;
@@ -146,18 +110,6 @@ pre {
   border-width: 1px;
   border-color: #8ab6d6;
   padding: 10px;
-}
-
-.bottom-dweller {
-  width: 100%;
-  bottom: 0%;
-  font-size: 70%;
-  text-align: right;
-}
-
-.footnotes {
-  margin: auto;
-  max-width: 50%;
 }
 
 .key {
