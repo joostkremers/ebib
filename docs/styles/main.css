@@ -107,6 +107,7 @@ code {
 }
 
 li {
+  text-align: left;
   list-style-type: '› ';
 }
 
