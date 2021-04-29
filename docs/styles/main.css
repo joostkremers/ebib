@@ -72,6 +72,7 @@ h3.date {
   width: 100%;
   display: block;
   margin: 0 auto;
+  cursor: pointer;
 }
 
 .screenshot-item {
