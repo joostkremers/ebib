@@ -239,7 +239,7 @@ MULTILINES corresponds to a line in the resulting string, and all
 lines except the first one are prepended with 19 spaces."
   (let ((first-line (car multilines))
         (rest-lines (mapcar (lambda (line)
-                              (concat (make-string 19 ?\s) line))
+                              (concat (make-string 19 ?\s) (string-trim-left line)))
                             (cdr multilines))))
     (concat first-line
             (if rest-lines
