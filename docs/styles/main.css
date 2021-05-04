@@ -1,0 +1,170 @@
+body {
+  font-family: 'Roboto Slab', serif;
+  color: #495464;
+  background-color: white;
+  line-height: 140%;
+  width: 40%;
+  margin: 40px auto;
+  padding: 0 40px;
+  text-align: justify;
+}
+
+header {
+  padding-bottom: 40px;
+}
+
+a {
+  text-decoration: underline dotted;
+  color: #495464;
+}
+
+a:hover {
+  color: #cf1212;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+h1 {
+  font-size: xx-large;
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 50px;
+  line-height: 1.5;
+  border-style: solid;
+  border-color: #325288;
+  border-width: 1px;
+  padding: 5px 0;
+}
+
+h1.title {
+  text-align: center;
+  font-size: 3em;
+  margin: auto;
+  border-style: none;
+}
+
+h2 {
+  position: relative;
+  left: -40%;
+  top: 50px;
+  font-size: 2em;
+  z-index: -1;                  /* The h2 box stretches over the text and covers <a> elements */
+}
+
+.author {
+  text-align: center;
+  display: none;
+}
+
+h3.date {
+  text-align: center;
+  font-size: smaller;
+}
+
+.screenshot {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.screenshot-item {
+  margin: 50px auto 50px auto;
+}
+
+.screenshot-left {
+  width: 20%;
+  float: left;
+  margin-right: 20px;
+}
+
+.screenshot-right {
+  width: 20%;
+  float: right;
+  margin-left: 20px;
+}
+
+.screenshot:hover {
+  box-shadow: 0 0 2px 1px rgba(193, 66, 66, 0.5);
+}
+
+article {
+  margin-left: 25%;
+  margin-right: 10%;
+  max-width: 80em;
+  text-align: justify;
+}
+
+code {
+  white-space: pre-wrap;
+  font-size: 110%;
+}
+
+li {
+  text-align: left;
+  list-style-type: '› ';
+}
+
+#logo {
+  border: none;
+  width: 150px;
+}
+
+.button_github {
+  /* border-radius: 10px; */
+  border: solid #495464 1px;
+  color: #495464;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.button_github:hover {
+  border-color: #cf1212;
+}
+
+@media screen and (max-width: 1400px) {
+  body {
+    width: 80%;
+  }
+
+  h2 {
+    font-family: 'Merriweather Sans', sans-serif;
+    position: static;
+    text-align: center;
+    left: unset;
+    top: unset;
+    font-size: 2em;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  h1 {
+    font-size: 1.3em;
+  }
+
+  .button_github {
+    width: 20em;
+    font-size: 50%;
+    padding: 0;
+    border-left: none;
+    border-right: none;
+    top: 3em;
+    right: auto;
+    left: -40px;
+    transform: rotate(-45deg);
+  }
+}

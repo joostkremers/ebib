@@ -1,6 +1,6 @@
 ;;; org-ebib.el --- Support for links to Ebib entries in Org  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2014-2016 Grégoire Jadi, Joost Kremers
+;; Copyright (c) 2014-2020 Grégoire Jadi, Joost Kremers
 ;; Al rights reserved
 
 ;; Author: Grégoire Jadi <daimrod@gmail.com>
@@ -33,33 +33,97 @@
 
 ;; This is to silence the byte-compiler and flycheck.
 (defvar ebib--cur-db)
+(defvar ebib--databases)
 (defvar ebib-citation-description-function)
-(defvar reftex-cite-punctuation)
+(defvar ebib-citation-insert-multiple)
 (declare-function ebib "ebib" (&optional file key))
 (declare-function ebib--get-key-at-point "ebib" ())
+(declare-function ebib--get-local-bibfiles "ebib" ())
+(declare-function ebib--get-or-open-db "ebib" file)
+(declare-function ebib-read-entry-ivy "ebib" databases)
+(declare-function ebib-read-entry-helm "ebib" databases)
+(declare-function ebib-read-entry-multiple "ebib" databases)
+(declare-function ebib-read-entry-single "ebib" databases)
+(declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
+(declare-function ebib-db-get-filename "ebib-db" (db &optional shortened))
+
 (declare-function org-link-set-parameters "org" (type &rest parameters))
 (declare-function org-element-context "org-element" (&optional element))
 (declare-function org-element-property "org-element" (property element))
-(declare-function ebib-db-get-entry "ebib-db" (key db &optional noerror))
+
+(defvar reftex-cite-punctuation)
 (declare-function reftex-format-citation "reftex-cite" (entry format))
+
+(defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
+  "Citation format used to display citation info in the message area.
+Must NOT contain %l.  See the variable `reftex-cite-format' for
+possible percent escapes."
+  :group 'ebib
+  :type 'string)
+
+(defcustom org-ebib-link-type 'key
+  "Type of link created by `org-ebib-store-link'.
+This can be `key', which creates a link with the key of the
+entry, `key+filename', which adds the file name of the `.bib'
+file containing the key, or `key+filepath', which adds the full
+path to the `.bib' file.  If the file name or path is added, it
+is separated from the key with an @-sign."
+  :group 'ebib
+  :type '(choice (const :tag "Key only" 'key)
+                 (const :tag "Key and file name" 'key+filename)
+                 (const :tag "Key and file path" 'key+filepath)))
 
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
 ;;;###autoload
-(defun org-ebib-open (key)
-  "Open Ebib and jump to KEY."
-  (ebib nil key))
+(defun org-ebib-open (entry)
+  "Open Ebib and jump to ENTRY."
+  (save-match-data
+    (string-match "^\\(.*?\\)\\(?:@\\(.*?\\)\\)?$" entry)
+    (let ((key (match-string 1 entry))
+          (db (match-string 2 entry)))
+      (ebib db key))))
 
 (defun org-ebib-store-link ()
-  "Store a link to an Ebib entry."
+  "Store a link to an Ebib entry.
+This function is called when executing `org-store-link' in Ebib's
+entry buffer."
   (when (memq major-mode '(ebib-index-mode ebib-entry-mode))
     ;; This is an Ebib entry
     (let* ((key (ebib--get-key-at-point))
-           (link (concat "ebib:" key))
+           (link (concat "ebib:" (pcase org-ebib-link-type
+                                        ('key key)
+                                        ('key+filename (format "%s@%s" key (ebib-db-get-filename ebib--cur-db :shortened)))
+                                        ('key+filepath (format "%s@%s" key (ebib-db-get-filename ebib--cur-db))))))
            (description (ignore-errors (funcall ebib-citation-description-function key ebib--cur-db))))
       (org-store-link-props :type "ebib"
                             :link link
                             :description description))))
+
+(defun org-ebib-insert-link ()
+  "Insert a link to an Ebib entry.
+This function can be called in an Org mode buffer to insert a
+link to an Ebib entry."
+  (interactive)
+  (let* ((database-files (ebib--get-local-bibfiles))
+         (databases (or (delq nil (mapcar #'ebib--get-or-open-db database-files))
+                        ebib--databases))
+         (entries (cond
+                   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
+                   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
+                   (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
+                   (t (ebib-read-entry-single databases))))
+         (separator (if (> (length entries) 1)
+                        (read-string "Separator: ")
+                      "")))
+    (mapc (lambda (entry)
+            (let ((link (pcase org-ebib-link-type
+                          ('key (car entry))
+                          ('key+filename (format "%s@%s" (car entry) (ebib-db-get-filename (cdr entry) :shortened)))
+                          ('key+filepath (format "%s@%s" (car entry) (ebib-db-get-filename (cdr entry))))))
+                  (description (ignore-errors (funcall ebib-citation-description-function (car entry) ebib--cur-db))))
+              (insert (format "[[ebib:%s][%s]]%s" link description separator))))
+          entries)))
 
 (with-eval-after-load "reftex-cite"
   (org-link-set-parameters "ebib" :help-echo #'org-ebib-show-citation-info))
@@ -88,13 +152,6 @@ position in the relevant buffer."
                     "," t)
                    "\n"))
        (t "Not a link?")))))
-
-(defcustom org-ebib-help-echo-format "%2a (%y), %t, %b, %j %<"
-  "Citation format used to display citation info in the message area.
-Must NOT contain %l.  See the variable `reftex-cite-format' for
-possible percent escapes."
-  :group 'ebib
-  :type 'string)
 
 (defun org-ebib-make-help-echo-string (key &optional format)
   "Return the citation string of KEY according to FORMAT.

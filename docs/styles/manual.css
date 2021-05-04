@@ -1,0 +1,152 @@
+body {
+  font-family: 'Roboto Slab', serif;
+  color: #495464;
+  background-color: white;
+  line-height: 140%;
+  width: 40%;
+  margin: 40px auto;
+  padding: 0 40px;
+  text-align: justify;
+}
+
+header {
+  padding-bottom: 40px;
+}
+
+a {
+  text-decoration: underline dotted;
+  color: #495464;
+}
+
+a:hover {
+  color: #cf1212;
+}
+
+h1 {
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: xx-large;
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 50px;
+  line-height: 1.5;
+  border-style: solid;
+  border-color: #325288;
+  border-width: 1px;
+  padding: 5px 0;
+}
+
+h1.title {
+  text-align: center;
+  font-size: 3em;
+  margin: auto;
+  border-style: none;
+}
+
+h2 {
+  padding-top: 10px;
+  font-size: 1.3em;
+}
+
+p.author {
+  text-align: center;
+}
+
+img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 100%;
+}
+
+img:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+}
+
+table {
+  width: 100%;
+  padding: 30px 0;
+  text-align: left;
+}
+
+th {
+  font-size: 90%;
+}
+
+th,
+td {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+code {
+  font-size: 110%;
+}
+
+ul {
+  padding-left: 12%;
+}
+
+li {
+  text-align: left;
+  list-style-type: '› ';
+}
+
+#TOC {
+  position: absolute;
+  left: 1%;
+  width: 20%;
+  padding-right: 1%;
+  font-size: 90%;
+  text-align: left;
+}
+
+#TOC a {
+  text-decoration: none;
+}
+
+pre {
+  background: #f4f4f2;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #8ab6d6;
+  padding: 10px;
+}
+
+.key {
+  padding: 0 0.5em;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 2px;
+  margin: 0 2px;                /* To offset preceding or following punctuation slightly. */
+}
+
+@media screen and (max-width: 1400px) {
+  body {
+    width: 80%;
+  }
+
+  #TOC {
+    position: static;
+    width: unset;
+    column-count: 2;
+  }
+
+  #TOC ul li li {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  h1 {
+    font-size: 1.3em;
+  }
+
+  h2 {
+    font-size: 1.1em;
+  }
+
+  #TOC {
+    column-count: 1;
+  }
+}

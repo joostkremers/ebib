@@ -1,0 +1,169 @@
+% Ebib News
+
+## Version 2.32, April 2021 ##
+
+- Add support for [`biblio.el`](https://github.com/cpitclaudel/biblio.el).
+
+## Version 2.31, March 2021 ##
+
+- Allow the use of `org-capture` to create notes.
+
+## Version 2.30, February 2021##
+
+- Redesign handling of external notes. It is now possible to have multiple files with multiple notes in them. This may mean you need to redo your configuration, see [Upgrading from earlier Ebib versions](ebib-manual.html#upgrading-from-earlier-ebib-versions) for details.
+
+## Version 2.29, December 2020 ##
+
+- Add support for [selectrum](https://github.com/raxod502/selectrum).
+
+## Version 2.28, October 2020 ##
+
+- Redesign keyword handling.
+- New timestamp format. This new format is more in line with ISO 8601 and is sortable alphanumerically.
+
+## Version 2.27, October 2020 ##
+
+- Add customisation options `ebib-multiline-fields` and `ebib-fields-with-completion`.
+- Remove customisation option `ebib-edit-author/editor-without-completion` (use `ebib-fields-with-completion` instead).
+- Remove customisation options `ebib-file-field`, `ebib-url-field` and `ebib-doi-field`. There is no point in customising these fields, because `biblatex` expects these fields to contain their intended values.
+
+## Version 2.26, September 2020 ##
+
+- Copy key, entry, reference or citation to the kill ring (and system clipboard), for easy pasting to other buffers or applications.
+
+## Version 2.25, June 2020 ##
+
+- Allow adding the `.bib` file to Org mode links. The option `org-ebib-link-type` determines which kinds of Org links are created when doing `org-add-link` in an Ebib index buffer.
+
+## Version 2.24, June 2020 ##
+
+- Rename master/slave databases to main/dependent databases.
+
+## Version 2.23, May 2020 ##
+
+- Allow specifying .bib files with a file-local variable (esp. for non-LaTeX files).
+
+## Version 2.22, February 2020 ##
+
+- Improve prompting when inserting citations.
+- Allow selecting multiple entries when inserting a citation in a text buffer.
+- Automatically save a dependent database when an entry is added that is being inserted into a text buffer.
+
+## Version 2.21, December 2019 ##
+
+- New option `ebib-default-dir`: control the directory that Ebib uses as its default directory.
+
+## Version 2.20, December 2019 ##
+
+- Display the contents of an external note when the current entry has one. This behaviour can be customized with the option `ebib-notes-show-note-method`.
+- Rename `ebib-notes-use-single-file` to `ebib-notes-file`.
+
+## Version 2.19, November 2019 ##
+
+- Add command `ebib-jump-to-entry` (bound to `j` in the index buffer): quickly jump to any entry in any database using completion.
+- Allow a full URL in the `doi` field: when passing the DOI to a browser, `"https://dx.doi.org/"` is only added if the contents of the `doi` field does not start with `"http://"` `"https://"`.
+
+## Version 2.17, June 2019 ##
+
+- Create dependent databases, i.e., databases that share their data with a main database but which are saved as separate `.bib` files.
+- Use completion when editing certain fields, to make it easier to enter e.g., author or editor names consistently.
+
+## Version 2.16, February 2019 ##
+
+- Add command `ebib-download-url`: download pdf from a site in the `url` field.
+- Add command `ebib-import-file`: import local file into current database.
+- Update the menus.
+- Change display of the `file` field in the entry buffer and make file names clickable.
+- Bug fix: Do not look for alias fields in BibTeX databases. (Alias fields are only defined for `biblatex`).
+- Bug fix: `ebib-yank-field-contents` can now be repeated.
+
+## Version 2.15, January 2019 ##
+
+- Multiline field values can now be displayed in the entry buffer.
+- Do not warn about aliased entry types when loading `biblatex` files.
+- The abstract field is now treated as a multiline field by default, similar to the annote/annotation field.
+- Bug fix: `ebib-show-annotation` (bound to `A`) shows the contents of the annote field in BibTeX databases, not the annotation field (which is `biblatex`-specific).
+
+## Version 2.14, December 2018 ##
+
+- Change the user interface of the export functions. Calling one of the export functions now exports to another database. The user is asked to specify the database, enabling completion on the database names. To export to a file, the export functions have to be called with a prefix argument.
+- Bug fix: Handle overwriting the local BibTeX dialect correctly.
+- Bug fix: Add braces to the crossref field.
+
+## Version 2.13, November 2018 ##
+
+- Use a separate index buffer for each open `.bib` file. Filling the index buffer can be slow for large `.bib` files, because of the need to calculate the tabulated columns.
+
+## Version 2.12.3, November 2018 ##
+
+- Bug fix: when searching the database, only search visible entries.
+
+## Version 2.12.2, November 2018 ##
+
+- Bug fix: when editing the `crossref` field, offer keys from all databases as completion targets, not just the current one.
+
+## Version 2.12, August 2018 ##
+
+- Add an option to specify the default sort field and direction. It is no longer necessary to set the desired sort field as the first column in the index buffer, but Ebib still defaults to this if the default sort field and direction are not set explicitly.
+
+## Version 2.11.12,  July 2018##
+
+- Use `biblatex`'s `Date` field, if present, for displaying the year.
+- Check for changed files on disk when saving all databases, not just when saving the current database.
+- Improve handling of multiple databases: `crossref` entries can now occur in other open databases as well, and searches with `/` can be continued in other databases.
+- Autogenerating keys is now on by default.
+
+## Version 2.11, January 2017 ##
+
+- Update for `parsebib` v. 2.3.
+
+## Version 2.10, January 2017 ##
+
+- Improved index column display.
+
+## Version 2.9, January 2017 ##
+
+- Allow `%s` in the program strings in `ebib-file-associations`, making it possible to pass command line arguments to the program being called.
+
+## 19 December 2016 ##
+
+- Remove support for a separate rc file for Ebib. User configuration should be moved to Emacs' `init.el` file. To keep Ebib customisation in a separate file, simply load it from `init.el`.
+- The macro `ebib-key` has also been removed. Simply use `define-key` or any other key binding mechanism to define keys for Ebib. See the section [Modifying Key Bindings](#modifying-key-bindings) for details.
+
+## 7 December 2016 ##
+
+- Upgrade Emacs dependency to 24.4.
+
+## 5 December 2016 ##
+
+- New library `org-ebib`. This defines a new Org link type `ebib:`, which uses the command `org-ebib-open` to open Ebib. The previous commands to do this, `ebib-show-entry` and `ebib-open-org-link` have been removed. `org-ebib` also allows the creation of Org links to Ebib entries with `org-store-link`.
+- New citation insertion command `ebib-insert-citation`. This replaces `ebib-insert-bibtex-key`, so please update your key bindings. The new command uses `ivy` for completion if this package is available, so that it is possible to select an entry by typing parts of its author and/or title.
+
+
+## 7 November 2016 ##
+
+- New tabulated list interface in index buffer. This interface is not based on Emacs' built-in `tabulated-list-mode`, hence sorting cannot be done by clicking on the column headers. Sorting can be done with `<`, `>` (sort ascending and sort descending, respectively, which ask for the column to sort) and `=`, to reset to default sort (which is on the entry key).
+- The user option `ebib-index-display-fields` is replaced with `ebib-index-columns`, which has a different format: each element in `ebib-index-columns` describes a column in the tabulated view and consists of a list containing the field name, the column's width and a boolean indicating whether sorting on this column is possible.
+
+
+## Version 2.8, 26 October 2016 ##
+
+- Changed key bindings: `j` and `k` no longer move up/down in the index, entry and strings buffers; use `p` and `n` instead. Furthermore, `i` now executes `ebib-push-bibtex-key` (used to be `p`), and `I` (capital i) executes `ebib-browse-doi` (used to be `i`).
+- In the index buffer, `ebib-search-next` (which used to be bound to `n`) is no longer bound. Instead, `ebib-search` (still bound to `/`) activates a transient map which binds the keys `/` and `RET` to `ebib-search-next`. Any other key disables the transient keymap and is executed normally.
+- In the index buffer, `C-u /` repeats the previous search. (This fixes a small bug that has so far gone unnoticed: moving to the top of the databas and calling `ebib-search-next`, as previously suggested in the manual to get around the fact that `ebib-search-next` does not wrap, would not search the first entry.)
+- In the entry buffer, `x` is replaced by `k` (`ebib-kill-field-contents`).
+- New functions: `ebib-kill-entry` and `ebib-yank-entry` for killing and yanking BibTeX entries. `ebib-kill-entry` deletes the current entry from the database and puts it in the kill ring. `ebib-yank-entry` adds an entry from the kill ring to the current database.
+
+
+## Version 2.7, 22 September 2016 ##
+
+- Reading list management: add and remove BibTeX entries to an Org reading list.
+- Remove options `ebib-notes-identifier-function` and  `ebib-notes-title-function`.
+- Add option `ebib-notes-template-specifiers`: allow customisation of the format specs used in `ebib-notes-template`. (This option replaces `ebib-notes-identifier-function` and  `ebib-notes-title-function`).
+
+## Version 2.6.3, 31 August 2016 ##
+
+- Allow storing notes in a single file rather than using one file per note.
+- Correct handling of DOIs.
+- Add option `ebib-truncate-file-names`: if set (the default), file names added to the `file` field are truncated relative to `ebib-file-search-dirs`.
+- Add option `ebib-file-name-mod-function`: modify file paths before storing them in the `file` field.

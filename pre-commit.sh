@@ -18,13 +18,13 @@
 
 # PREAMBLE
 
-SOURCE="manual/ebib.text"               # markdown source
-SOURCE_BBODY="manual/before-body.texi"  # texinfo headers
-TEXINFO="manual/ebib.texi"              # texinfo output
-INFO="ebib.info"                        # GNU info output
-MARKDOWN_GFM="docs/ebib-manual.md"      # Github-flavoured Markdown output
-RAW_FILTER="manual/raw.lua"             # Filter for handling {{raw}} directives
-
+SOURCE="manual/ebib.text"                     # markdown source
+TEXINFO_BBODY="manual/before-body.texi"       # texinfo headers
+TEXINFO="manual/ebib.texi"                    # texinfo output
+INFO="ebib.info"                              # GNU info output
+HTML_HEADERS="manual/header-include.html"     # HTML header includes
+HTML="docs/ebib-manual.html"                  # HTML output
+CSS="styles/manual.css"                       # CSS file
 SCRIPT=$(basename "$0")
 
 E_SUCCESS=0
@@ -48,8 +48,7 @@ function create_texi
     pandoc --read=markdown \
            --write=texinfo \
            --output="$TEXINFO" \
-           --include-before-body="$SOURCE_BBODY" \
-           --lua-filter="$RAW_FILTER" \
+           --include-before-body="$TEXINFO_BBODY" \
            --standalone \
            --table-of-contents \
            "$1" && return 0
@@ -69,16 +68,19 @@ function run_makeinfo
 }
 
 
-function create_gfm
+function create_html
 {
     local source="$1"
-    echo "$SCRIPT: running pandoc to create gfm"
+    echo "$SCRIPT: running pandoc to create HTML"
     pandoc --read=markdown \
-           --write=gfm \
-           --lua-filter="$RAW_FILTER" \
-           --output="$MARKDOWN_GFM" \
+           --write=html \
+           --standalone \
+           --table-of-contents \
+           --css="$CSS" \
+           --include-in-header="$HTML_HEADERS" \
+           --output="$HTML" \
            "$1" && return 0
-    echo "$SCRIPT: pandoc -w gfm failed"
+    echo "$SCRIPT: pandoc -w html failed"
     let "errors++"
     return 1
 }
@@ -99,10 +101,10 @@ confirm_file "$SOURCE"
 confirm_file "$INFO"
 check_exit   "$errors"
 if [ "$(git status --porcelain manual/ebib.text)" == 'M  manual/ebib.text' ] ; then
-    echo "$SCRIPT: regenerating documentation files"
+    echo "$SCRIPT: regenerating manual files"
     git stash -q --keep-index
     create_texi "$SOURCE" && run_makeinfo "$TEXINFO" && git add "$INFO"
-    create_gfm "$SOURCE" && git add "$MARKDOWN_GFM"
+    create_html "$SOURCE" && git add "$HTML"
     git stash pop -q
 fi
 check_exit   "$errors"

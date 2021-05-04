@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Joost Kremers" />
+  <title>Ebib</title>
+
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/modal.css" />
+
+  <link href="favicon.ico" rel="icon" type='image/x-icon'/>
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title"><img src="ebib-logo.png" id="logo" alt="Ebib" /></h1>
+    <p class="author">Joost Kremers</p>
+  </header>
+
+  <a href="https://github.com/joostkremers/ebib" class="button_github">View on Github</a>
+
+  <p>Ebib is a program for managing BibTeX and <code>biblatex</code> databases that runs inside Emacs. It allows you to manage bibliography files without having to edit the raw <code>.bib</code> files.</p>
+
+  <h2 id="features">Features</h2>
+
+  <ul>
+    <li>Support for both BibTeX and <code>biblatex</code> files.</li>
+    <li>Main vs. dependent databases.</li>
+    <li>LaTeX / Org mode / Markdown integration.</li>
+    <li>Org-capture integration for taking notes.</li>
+    <li><a href="ebib-manual.html">Much more</a>.</li>
+  </ul>
+
+  <h2 id="screenshots">Screenshots</h2>
+
+  <p>Visually, Ebib is not very spectacular, but the following screenshots give an impression. Click on the images to enlarge them.</p>
+
+  <div class="screenshot-block">
+    <div class="screenshot-item">
+      <p><img src="images/Main-view.png" class="screenshot screenshot-left" onclick="openModal();currentSlide(1)" alt="Main View" /></p>
+      <h3 id="main-view">Main view</h3>
+      <p>The first screenshot shows Ebib’s standard layout. The field values displayed in a lighter gray colour come from the cross-referenced entry.</p>
+    </div>
+
+    <div class="screenshot-item">
+      <p><img src="images/Search-view.png" class="screenshot screenshot-right" onclick="openModal();currentSlide(2)" alt="Search View" /></p>
+      <h3 id="search-view">Search view</h3>
+      <p>In the second image, which uses an alternative partial-frame layout, the string <code>"Geraci"</code> is highlighted as the result of a text search. It also shows a buffer with a note for the highlighted entry.</p>
+    </div>
+
+    <div class="screenshot-item">
+      <p><img src="images/Strings-buffer.png" class="screenshot screenshot-left" onclick="openModal();currentSlide(3)" alt="Strings Buffer" /></p>
+      <h3 id="strings-buffer">Strings buffer</h3>
+      <p>The third screenshot shows the strings buffer in the lower window, where you can edit the <code>@String</code> definitions in the database.</p>
+    </div>
+  </div>
+
+  <!-- The Modal/Lightbox -->
+  <div id="myModal" class="modal">
+    <span class="close cursor" onclick="closeModal()">&times;</span>
+    <div class="modal-content">
+
+      <div class="mySlides">
+        <div class="numbertext">1 / 3</div>
+        <img src="images/Main-view.png" alt="Main view" title="Main view" style="width:100%">
+      </div>
+
+      <div class="mySlides">
+        <div class="numbertext">2 / 3</div>
+        <img src="images/Search-view.png" alt="Search view" style="width:100%">
+      </div>
+
+      <div class="mySlides">
+        <div class="numbertext">3 / 3</div>
+        <img src="images/Strings-buffer.png" alt="Strings buffer" style="width:100%">
+      </div>
+
+      <!-- Next/previous controls -->
+      <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+      <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+      <!-- Caption text -->
+      <div class="caption-container">
+        <p id="caption"></p>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="manual">Manual</h2>
+  <p>The complete user manual for Ebib is available in html format <a href="ebib-manual.html">here</a>. If Ebib is installed from Melpa, the manual is also available inside Emacs in Info format.</p>
+
+  <h2 id="installation">Installation</h2>
+  <p>The easiest way to install Ebib is to use <a href="http://melpa.org/">Melpa</a>.</p>
+  <p>If you want to download the source, you can clone the <a href="https://github.com/joostkremers/ebib.git">git repository</a> for Ebib, or get a tar ball from the <a href="https://github.com/joostkremers/ebib/releases">Github releases page</a>. Note that Ebib depends on <a href="https://github.com/joostkremers/parsebib">parsebib</a>, which therefore also needs to be installed.</p>
+
+  <h2 id="support">Support</h2>
+  <p>If you want to ask a question or report an issue, you can send me an <a href="mailto:ebib@joostkremers.fastmail.fm">email</a>, or, if you happen to have a Github account, open an issue on the <a href="https://github.com/joostkremers/ebib/issues?state=open">Github issue tracker</a>.</p>
+</body>
+
+<script>
+ function openModal() {
+   document.getElementById("myModal").style.display = "block";
+ }
+
+ function closeModal() {
+   document.getElementById("myModal").style.display = "none";
+ }
+
+ var slideIndex = 1;
+ showSlides(slideIndex);
+
+ function plusSlides(n) {
+   showSlides(slideIndex += n);
+ }
+
+ function currentSlide(n) {
+   showSlides(slideIndex = n);
+ }
+
+ function showSlides(n) {
+   var i;
+   var slides = document.getElementsByClassName("mySlides");
+   var captionText = document.getElementById("caption");
+   if (n > slides.length) {slideIndex = 1}
+   if (n < 1) {slideIndex = slides.length}
+   for (i = 0; i < slides.length; i++) {
+     slides[i].style.display = "none";
+   }
+   slides[slideIndex-1].style.display = "block";
+ }
+</script>
+
+</html>

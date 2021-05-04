@@ -1,6 +1,6 @@
 ;;; ebib-reading-list.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2020 Joost Kremers
+;; Copyright (c) 2003-2021 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -39,6 +39,7 @@
 (require 'ebib-utils)
 
 (declare-function org-get-todo-state "org.el")
+(declare-function org-todo "org.el")
 
 (defgroup ebib-reading-list nil "Settings for the reading list." :group 'ebib)
 
@@ -141,7 +142,7 @@ still pending, nil if it is done."
   :type 'function)
 
 (defun ebib-reading-list-item-org-active-p ()
-  "Return t if point is in a reading list item that is done."
+  "Return t if point is in a reading list item that is still active."
   (string= (org-get-todo-state) ebib-reading-list-todo-marker))
 
 (defcustom ebib-reading-list-new-item-hook nil

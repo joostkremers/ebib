@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for ebib.text
-;; saved on 2016.08.29 13:56
+;; saved on 2021.04.26 17:21
 
 ((html-q-tags)
  (no-tex-ligatures)
@@ -131,9 +131,9 @@
   ("yaml_metadata_block"))
  (output . "ebib-manual.html")
  (data-dir)
- (output-dir . "/home/joost/src/ebib/docs/")
+ (output-dir . "~/src/Elisp/ebib/docs/")
  (template)
- (css "ebib.css")
+ (css "styles/manual.css")
  (reference-odt)
  (reference-docx)
  (epub-metadata)
@@ -141,7 +141,7 @@
  (epub-cover-image)
  (csl)
  (citation-abbreviations)
- (include-in-header)
+ (include-in-header . "header-include.html")
  (include-before-body)
  (include-after-body)
  (epub-embed-font)

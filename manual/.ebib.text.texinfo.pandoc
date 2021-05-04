@@ -1,9 +1,9 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for ebib.text
-;; saved on 2019.07.14 09:24
+;; saved on 2021.04.22 23:19
 
-((lua-filter "raw.lua")
+((lua-filter)
  (html-q-tags)
  (no-tex-ligatures)
  (old-dashes)
@@ -142,7 +142,7 @@
  (epub-cover-image)
  (csl)
  (citation-abbreviations)
- (include-in-header . "~/src/ebib/manual/before-body.texi")
+ (include-in-header . "~/src/Elisp/ebib/manual/before-body.texi")
  (include-before-body)
  (include-after-body)
  (epub-embed-font)

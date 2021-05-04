@@ -1,6 +1,6 @@
 ;;; ebib-filters.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: nil -*-
 
-;; Copyright (c) 2003-2020 Joost Kremers
+;; Copyright (c) 2003-2021 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -84,7 +84,7 @@ a logical `not' is applied to the selection."
                     ((string= field "=type=")
                      (completing-read prompt (ebib--list-entry-types dialect t) nil t nil 'ebib--filters-history))
                     ((cl-equalp field "keywords")
-                     (completing-read prompt (ebib--keywords-for-database ebib--cur-db)  nil nil nil 'ebib--keywords-history))
+                     (completing-read prompt ebib--keywords-completion-list  nil nil nil 'ebib--keywords-history))
                     (t
                      (read-string prompt nil 'ebib--filters-history)))))
       (ebib--execute-when
@@ -290,8 +290,8 @@ there is a name conflict."
                      (forward-char -1)
                      (read (current-buffer)))))
         (if (not (listp flist))
-            (ebib--log 'warning "No filters found in %s\n" file)
-          (ebib--log 'log "%s: Loading filters from file %s.\n" (format-time-string "%d %b %Y, %H:%M:%S") file)
+            (ebib--log 'warning "No filters found in `%s'\n" file)
+          (ebib--log 'log "Loading filters from file `%s'.\n" file)
           (if overwrite
               (setq ebib--filters-alist nil))
           (mapc (lambda (filter)
@@ -332,7 +332,7 @@ unless OVERWRITE is non-nil."
   (if (ebib--filters-exists-p name)
       (if overwrite
           (setcdr (ebib--filters-get-filter name) (list filter))
-        (ebib--log 'message "Filter name conflict: \"%s\".\n" name))
+        (ebib--log 'message "Filter name conflict: `%s'.\n" name))
     (push (list name filter) ebib--filters-alist)))
 
 (defun ebib--filters-get-filter (name &optional noerror)

@@ -1,6 +1,6 @@
 ;;; ebib-db.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2020 Joost Kremers
+;; Copyright (c) 2003-2021 Joost Kremers
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
@@ -41,9 +41,9 @@
 
 ;; Each database is represented by an alist.
 (defvar ebib-db '((entries)                             ; Hashtable containing the BibTeX entries.
-                  (strings)                             ; Alist with the @STRING definitions.
+                  (strings)                             ; Alist with the @String definitions.
                   (preamble)                            ; String with the @Preamble definition.
-                  (comments)                            ; List of @COMMENTS.
+                  (comments)                            ; List of @Comments.
                   (local-vars)                          ; The file's local variable block.
                   (dialect)                             ; The dialect of this database.
                   (buffer)                              ; The index buffer.
@@ -52,7 +52,7 @@
                   (filter)                              ; The active filter.
                   (sortinfo)                            ; Custom sorting.
                   (filename)                            ; Name of the BibTeX file that holds this database.
-                  (master)                              ; The master database, or nil if this database is not a slave.
+                  (main)                                ; The main database, or nil if this database is not a dependent.
                   (keys)                                ; The keys in the database.
                   (modtime)                             ; Modification time of the .bib file.
                   (modified)                            ; Flag indicating whether this database has been modified.
@@ -63,31 +63,31 @@
 
 ;; Accessing the fields of the `ebib-db' alist can be done with `assq' or
 ;; `alist-get', but should in most cases be done with `ebib-db-val' (which is
-;; `setf'-able), because it checks whether the database is a slave database and
-;; accesses the master database for the fields in `ebib-db-bibdata'.
+;; `setf'-able), because it checks whether the database is a dependent database and
+;; accesses the main database for the fields in `ebib-db-bibdata'.
 
 (defun ebib-db-val (field db)
   "Return the value for FIELD in DB.
-If DB is a slave database and FIELD is one of the fields in
-`ebib-db-bibdata', return the value of FIELD in DB's master
+If DB is a dependent database and FIELD is one of the fields in
+`ebib-db-bibdata', return the value of FIELD in DB's main
 database."
   (cdr (assq field (or (and (memq field ebib-db-bibdata)
-                            (cdr (assq 'master db)))
+                            (cdr (assq 'main db)))
                        db))))
 
 (gv-define-setter ebib-db-val (value field db)
   `(setcdr (assq ,field (or (and (memq ,field ebib-db-bibdata)
-                                 (cdr (assq 'master ,db)))
+                                 (cdr (assq 'main ,db)))
                             ,db))
            ,value))
 
-(defun ebib-db-new-database (&optional master)
+(defun ebib-db-new-database (&optional main)
   "Create a new database instance and return it.
-If MASTER is non-nil, it should be a database object, which is
-set as the master of the new database."
+If MAIN is non-nil, it should be a database object, which is set
+as the main database of the new database."
   (let ((db (copy-tree ebib-db)))
-    (if master
-        (setf (ebib-db-val 'master db) master)
+    (if main
+        (setf (ebib-db-val 'main db) main)
       (setf (ebib-db-val 'entries db) (make-hash-table :test 'equal)))
     db))
 
@@ -100,8 +100,8 @@ Note that the data itself is not destroyed, but may eventually be
 GC'ed, with the exception of the buffer pointed to by the buffer
 field.  This should be killed separately."
   ;; We use `alist-get' here instead of `ebib-db-val' because we don't want to
-  ;; be redirected to the master database.
-  (if (not (alist-get 'master db))
+  ;; be redirected to the main database.
+  (if (not (alist-get 'main db))
       (clrhash (alist-get 'entries db)))
   (mapc (lambda (item)
           (setf (alist-get item db) nil))
@@ -109,7 +109,7 @@ field.  This should be killed separately."
 
 (defun ebib-db-count-entries (db)
   "Return the number of entries in DB."
-  (if (ebib-db-val 'master db)
+  (if (ebib-db-val 'main db)
       (length (ebib-db-val 'keys db))
     (hash-table-count (ebib-db-val 'entries db))))
 
@@ -122,7 +122,7 @@ field.  This should be killed separately."
   (setf (ebib-db-val 'dialect db) dialect))
 
 (defun ebib-db-get-comments (db)
-  "Return a list of @COMMENTS for DB."
+  "Return a list of @Comments for DB."
   (ebib-db-val 'comments db))
 
 (defun ebib-db-set-comment (comment db)
@@ -170,7 +170,7 @@ DATA is an alist of (FIELD . VALUE) pairs.
 
 IF-EXISTS defines what to do when the key already exists in DB.
 If it is `overwrite', replace the existing entry.  If it is `uniquify',
-generate a unique key by appending a letter `b', `c', etc. to it.
+generate a unique key by appending a letter `b', `c', etc., to it.
 If it is `noerror', a duplicate key is not stored and the function
 returns nil.  If it is nil (or any other value), a duplicate key
 triggers an error.
@@ -181,8 +181,8 @@ In order to delete an entry, DATA must be nil and IF-EXISTS must be
 If storing/updating/deleting the entry is successful, return its key.
 
 Note that this function should not be used to add an entry to a
-slave database.  The entry will be added to the master database
-instead.  Use `ebib-db-add-entries-to-slave' instead."
+dependent database.  The entry will be added to the main database
+instead.  Use `ebib-db-add-entries-to-dependent' instead."
   (let ((exists (gethash key (ebib-db-val 'entries db))))
     (when exists
       (cond
@@ -202,12 +202,12 @@ instead.  Use `ebib-db-add-entries-to-slave' instead."
 	(remhash key (ebib-db-val 'entries db)))
       key)))
 
-(defun ebib-db-add-entries-to-slave (entries db)
-  "Add ENTRIES to slave database DB.
+(defun ebib-db-add-entries-to-dependent (entries db)
+  "Add ENTRIES to dependent database DB.
 ENTRIES is either an entry key (a string) or a list of entry
 keys.  Entries that are already in DB are not added again.  This
-function does not check if DB is really a slave database, nor
-whether the entries to be added actually exist in DB's master
+function does not check if DB is really a dependent database, nor
+whether the entries to be added actually exist in DB's main
 database."
   (if (stringp entries)
       (unless (member entries (ebib-db-val 'keys db))
@@ -216,13 +216,13 @@ database."
 
 (defun ebib-db-remove-entry (key db)
   "Remove entry KEY from DB.
-Note: do not use this function to remove an entry from a slave
-database, since the entry will be removed from its master
-instead.  Use `ebib-db-remove-entries-from-slave'."
+Note: do not use this function to remove an entry from a
+dependent database, since the entry will be removed from its main
+database instead.  Use `ebib-db-remove-entries-from-dependent'."
   (ebib-db-set-entry key nil db 'overwrite))
 
-(defun ebib-db-remove-entries-from-slave (entries db)
-  "Remove ENTRIES from slave database DB.
+(defun ebib-db-remove-entries-from-dependent (entries db)
+  "Remove ENTRIES from dependent database DB.
 ENTRIES is either an entry key (a string) or a list of entry
 keys.  They are removed from DB unconditionally: no error is
 raised if the entries do not exist in DB."
@@ -257,19 +257,19 @@ is suffixed, then `ab' etc."
 
 (defun ebib-db-has-entries (db)
   "Return non-nil if DB has entries."
-  (if (ebib-db-val 'master db)
+  (if (ebib-db-val 'main db)
       (not (null (ebib-db-val 'keys db)))
     (> (hash-table-count (ebib-db-val 'entries db)) 0)))
 
 (defun ebib-db-list-keys (db)
   "Return a list of keys in DB."
-  (if (ebib-db-val 'master db)
+  (if (ebib-db-val 'main db)
       (copy-sequence (ebib-db-val 'keys db)) ; Use `copy-tree' because `ebib--sort-keys-list' is destructive.
     (hash-table-keys (ebib-db-val 'entries db))))
 
 (defun ebib-db-has-key (key db)
   "Return non-nil if KEY exists in DB."
-  (if (ebib-db-val 'master db)
+  (if (ebib-db-val 'main db)
       (member key (ebib-db-val 'keys db))
     (gethash key (ebib-db-val 'entries db))))
 
@@ -351,14 +351,14 @@ is t, the new string replaces the existing one.  If it is nil,
 the string is not stored and the function returns nil.  If it is
 the symbol `error', an error is raised.
 
-In order to remove a @STRING definition, pass nil as VALUE and
+In order to remove a @String definition, pass nil as VALUE and
 set IF-EXISTS to `overwrite'."
   (let* ((strings-list (ebib-db-val 'strings db))
          (old-string (cdr (assoc abbr strings-list))))
     (if old-string
         (cond
          ((eq overwrite 'error)
-          (error "[Ebib] @STRING abbreviation `%s' exists in database %s"
+          (error "[Ebib] @String abbreviation `%s' exists in database %s"
                  abbr (ebib-db-get-filename db 'short)))
          ((and overwrite value)
           (setcdr (assoc-string abbr strings-list) value)
@@ -376,26 +376,26 @@ set IF-EXISTS to `overwrite'."
     (setf (ebib-db-val 'strings db) strings-list)))
 
 (defun ebib-db-remove-string (abbr db)
-  "Remove @STRING definition ABBR ttfrom DB."
+  "Remove @String definition ABBR ttfrom DB."
   (ebib-db-set-string abbr nil db 'overwrite))
 
 (defun ebib-db-get-string (abbr db &optional noerror)
-  "Return the value of @STRING definition ABBR in database DB.
+  "Return the value of @String definition ABBR in database DB.
 If ABBR does not exist, trigger an error, unless NOERROR is
 non-nil, in which case return nil."
   ;; I assume abbreviations should be case-sensitive, so I use assoc
   ;; instead of assoc-string here.
   (let ((value (cdr (assoc abbr (ebib-db-val 'strings db)))))
     (unless (or value noerror)
-      (error "[Ebib] @STRING abbreviation `%s' does not exist" abbr))
+      (error "[Ebib] @String abbreviation `%s' does not exist" abbr))
     value))
 
 (defun ebib-db-get-all-strings (db)
-  "Return the alist containing all @STRING definitions in DB."
+  "Return the alist containing all @String definitions in DB."
   (ebib-db-val 'strings db))
 
 (defsubst ebib-db-list-strings (db)
-  "Return a list of @STRING abbreviations in DB without expansions."
+  "Return a list of @String abbreviations in DB without expansions."
   (mapcar #'car (ebib-db-val 'strings db)))
 
 (defun ebib-db-set-preamble (preamble db &optional if-exists)
@@ -467,18 +467,18 @@ return the full path.  If DB is nil, return nil."
         (file-name-nondirectory (ebib-db-val 'filename db))
       (ebib-db-val 'filename db))))
 
-(defun ebib-db-get-master (db)
-  "Return the master database of DB.
-If DB is not a slave database, return nil."
-  (ebib-db-val 'master db))
+(defun ebib-db-get-main (db)
+  "Return the main database of DB.
+If DB is not a dependent database, return nil."
+  (ebib-db-val 'main db))
 
-(defun ebib-db-set-master (master db)
-  "Set MASTER as the master database of DB."
-  (setf (ebib-db-val 'master db) master))
+(defun ebib-db-set-main (main db)
+  "Set MAIN as the main database of DB."
+  (setf (ebib-db-val 'main db) main))
 
-(defun ebib-db-slave-p (db)
-  "Return non-nil if DB is a slave database."
-  (ebib-db-val 'master db))
+(defun ebib-db-dependent-p (db)
+  "Return non-nil if DB is a dependent database."
+  (ebib-db-val 'main db))
 
 (defun ebib-db-get-modtime (db)
   "Return the mod time stored for DB."
@@ -497,28 +497,27 @@ If DB is not a slave database, return nil."
 ENTRY is an entry key."
   (member entry (ebib-db-val 'marked-entries db)))
 
-(defun ebib-db-mark-entry (entry db)
-  "Add ENTRY to the list of marked entries in DB.
-ENTRY is an entry key.  ENTRY is added unconditionally, no check
-is performed to see if it is already on the list.
-
-ENTRY can also be a symbol, in which case all entries are
-marked."
+(defun ebib-db-mark-entry (entries db)
+  "Add ENTRIES to the list of marked entries in DB.
+ENTRIES is an entry key or a list of entry keys."
+  ;; We do not check if `entries' is already in the list of marked entries,
+  ;; because when we unmark an entries, we use `remove', which removes all
+  ;; occurrences anyway.
   (cond
-   ((stringp entry)
-    (setf (ebib-db-val 'marked-entries db) (cons entry (ebib-db-val 'marked-entries db))))
-   (t
-    (setf (ebib-db-val 'marked-entries db) (ebib-db-list-keys db)))))
+   ((stringp entries)
+    (push entries (ebib-db-val 'marked-entries db)))
+   ((listp entries)
+    (setf (ebib-db-val 'marked-entries db) (append entries (ebib-db-val 'marked-entries db))))))
 
-(defun ebib-db-unmark-entry (entry db)
-  "Remove ENTRY from the list of marked entries in DB.
-ENTRY is an entry key.  If ENTRY is 'all, all entries are
-unmarked."
+(defun ebib-db-unmark-entry (entries db)
+  "Remove ENTRIES from the list of marked entries in DB.
+ENTRIES is an entry key or a list of entry keys."
+  ;; Use `remove' here to ensure that *all* occurrences of `entries' are removed.
   (cond
-   ((stringp entry)
-    (setf (ebib-db-val 'marked-entries db) (remove entry (ebib-db-val 'marked-entries db))))
-   ('all
-    (setf (ebib-db-val 'marked-entries db) nil))))
+   ((stringp entries)
+    (setf (ebib-db-val 'marked-entries db) (remove entries (ebib-db-val 'marked-entries db))))
+   ((listp entries)
+    (setf (ebib-db-val 'marked-entries db) (seq-difference (ebib-db-val 'marked-entries db) entries)))))
 
 (defun ebib-db-toggle-mark (entry db)
   "Toggle the mark on ENTRY in DB."
