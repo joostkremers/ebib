@@ -74,7 +74,6 @@
 (defvar ivy-minibuffer-map)
 (defvar ivy-sort-max-size)
 (declare-function org-capture "org-capture" (&optional goto keys))
-(declare-function org-capture "org-capture-get" (prop &optional local))
 (declare-function pandoc--get "ext:pandoc-mode-utils.el" (option &optional buffer))
 (declare-function ivy-read "ext:ivy.el" (prompt collection &rest args))
 (declare-function helm-marked-candidates "ext:helm.el" (&optional with-wildcard all-sources))
