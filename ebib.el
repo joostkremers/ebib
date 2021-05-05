@@ -3324,9 +3324,10 @@ the current entry."
   (cl-flet ((add-keywords (entry-key keywords)
                           ;; KEYWORDS is a list of keywords to be added to entry ENTRY-KEY.
                           (let* ((conts (ebib-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
+                                 (keywords-string (mapconcat #'identity keywords ebib-keywords-separator))
                                  (new-conts (if conts
-                                                (concat conts ebib-keywords-separator (mapconcat #'identity keywords ebib-keywords-separator))
-                                              keywords)))
+                                                (concat conts ebib-keywords-separator keywords-string)
+                                              keywords-string)))
                             (ebib-set-field-value "keywords"
                                                   (if ebib-keywords-field-keep-sorted
                                                       (ebib--keywords-sort new-conts)
