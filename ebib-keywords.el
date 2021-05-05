@@ -95,7 +95,7 @@ Also automatically remove duplicates."
 STR should be a string containing keywords separated by
 `ebib-keywords-separator'."
   (split-string str (regexp-quote (string-trim ebib-keywords-separator))
-				t "[[:space:]]*"))
+		t "[[:space:]]*"))
 
 (defun ebib--keywords-sort (keywords)
   "Sort the KEYWORDS string, remove duplicates, and return it as a string.
