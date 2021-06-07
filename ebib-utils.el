@@ -387,6 +387,16 @@ For details of the template format, see the user option
   :group 'ebib
   :type '(string :tag "Template"))
 
+(defcustom ebib-link-file-path-type org-link-file-path-type
+  "How the path name in file links should be stored.
+Valid values are the same as `org-link-file-path-type'."
+  :group 'ebib
+  :type '(choice (const relative)
+                 (const absolute)
+                 (const noabbrev)
+	             (const adaptive))
+  :safe #'symbolp)
+
 (defun ebib--process-reference-template (template key db)
   "Process TEMPLATE for KEY in DB.
 TEMPLATE is a reference template (see the option
@@ -1514,7 +1524,19 @@ one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
   (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
-        (format "[[file:%s]]" (ebib--expand-file-name (ebib--select-file files nil key)))
+        (let* ((absolute-path (ebib--expand-file-name (ebib--select-file files nil key)))
+               (relative-path (file-relative-name absolute-path default-directory))
+               (abbreviate-path (abbreviate-file-name absolute-path))
+               (final-path
+                (case ebib-link-file-path-type
+                  (relative relative-path)
+                  (adaptive (if (string-match
+                                 (concat "^" (regexp-quote default-directory))
+                                 absolute-path)
+                                relative-path
+                              abbreviate-path))
+                  (otherwise absolute-path))))
+          (format "[[file:%s]]" final-path))
       "")))
 
 (defun ebib-create-org-doi-link (key db)
