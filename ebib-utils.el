@@ -394,7 +394,7 @@ Valid values are the same as `org-link-file-path-type'."
   :type '(choice (const relative)
                  (const absolute)
                  (const noabbrev)
-	             (const adaptive))
+	         (const adaptive))
   :safe #'symbolp)
 
 (defun ebib--process-reference-template (template key db)
