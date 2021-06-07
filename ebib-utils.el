@@ -1528,7 +1528,7 @@ the \"file\" field is empty, return the empty string."
                (relative-path (file-relative-name absolute-path default-directory))
                (abbreviate-path (abbreviate-file-name absolute-path))
                (final-path
-                (case ebib-link-file-path-type
+                (cl-case ebib-link-file-path-type
                   (relative relative-path)
                   (adaptive (if (string-match
                                  (concat "^" (regexp-quote default-directory))
