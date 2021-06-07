@@ -387,6 +387,8 @@ For details of the template format, see the user option
   :group 'ebib
   :type '(string :tag "Template"))
 
+(defvar org-link-file-path-type)
+
 (defcustom ebib-link-file-path-type org-link-file-path-type
   "How the path name in file links should be stored.
 Valid values are the same as `org-link-file-path-type'."
