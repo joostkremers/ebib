@@ -389,7 +389,7 @@ For details of the template format, see the user option
 
 (defvar org-link-file-path-type)
 
-(defcustom ebib-link-file-path-type org-link-file-path-type
+(defcustom ebib-link-file-path-type (if (boundp 'org-link-file-path-type) org-link-file-path-type 'adaptive)
   "How the path name in file links should be stored.
 Valid values are the same as `org-link-file-path-type'."
   :group 'ebib
