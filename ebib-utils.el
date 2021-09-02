@@ -2000,7 +2000,7 @@ Return nil if DB is either a filtered or a dependent database."
                 (eq (ebib-db-get-main db) database))
               ebib--databases))
 
-(defun ebib--list-fields (entry-type type dialect)
+(defun ebib--list-fields (entry-type type &optional dialect)
   "List the fields of ENTRY-TYPE.
 TYPE specifies which fields to list.  It is a symbol and can be
 one of the following: `required' means to list only required
