@@ -3601,6 +3601,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "g" 'ebib-goto-first-field)
     (define-key map "G" 'ebib-goto-last-field)
     (define-key map "h" 'ebib-entry-help)
+    (define-key map "j" 'ebib-jump-to-field)
     (define-key map "k" 'ebib-kill-field-contents)
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "m" 'ebib-edit-multiline-field)
@@ -3786,6 +3787,18 @@ was called interactively."
     ;; Then move to the field name.
     (while (ebib--line-at-point)
       (forward-line -1))))
+
+(defun ebib-jump-to-field ()
+  "Read a field from the user and jump to it."
+  (interactive)
+  (when-let ((entry-type (ebib-get-field-value "=type=" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
+             (fields (ebib--list-fields entry-type 'all))
+             (field (completing-read "Jump to field: " fields nil t))
+             (location (save-excursion
+                         (goto-char (point-min))
+                         (re-search-forward (concat "^" field)))))
+    (goto-char location)
+    (beginning-of-line)))
 
 (defun ebib-add-field (field)
   "Add FIELD to the current entry."
