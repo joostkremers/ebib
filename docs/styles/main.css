@@ -143,10 +143,6 @@ li {
   left: 20px;
 }
 
-#buy-me-a-coffee > img {
-  width: 175px;
-}
-
 @media screen and (max-width: 1400px) {
   body {
     width: 80%;
