@@ -7,9 +7,4 @@ can create and manage `.bib`-files, all within Emacs. It supports `@string` and
 `@preamble` definitions, multi-line field values, searching, and integration
 with Emacs' (La)TeX mode.
 
-See the [Ebib manual](http://joostkremers.github.io/ebib/ebib-manual.html)
-for usage and installation instructions.
-
-The latest release version of Ebib, contact information and mailing list
-can be found at <http://joostkremers.github.io/ebib>. Development sources can be
-found at <https://github.com/joostkremers/ebib>.
+Please refer to [Ebib's website](http://joostkremers.github.io/ebib) for installation instructions and user manual.
