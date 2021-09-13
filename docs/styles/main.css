@@ -117,7 +117,7 @@ li {
   width: 150px;
 }
 
-.button_github {
+#button-github {
   /* border-radius: 10px; */
   border: solid #495464 1px;
   color: #495464;
@@ -132,7 +132,7 @@ li {
   left: 20px;
 }
 
-.button_github:hover {
+#button-github:hover {
   border-color: #cf1212;
 }
 
@@ -156,7 +156,7 @@ li {
     font-size: 1.3em;
   }
 
-  .button_github {
+  #button-github {
     width: 20em;
     font-size: 50%;
     padding: 0;

@@ -39,7 +39,7 @@
 }
 
 /* Hide the slides by default */
-.mySlides {
+.slide {
   display: none;
 }
 

@@ -18,7 +18,7 @@
     <p class="author">Joost Kremers</p>
   </header>
 
-  <a href="https://github.com/joostkremers/ebib" class="button_github">View on Github</a>
+  <a href="https://github.com/joostkremers/ebib" id="button-github">View on Github</a>
 
   <p>Ebib is a program for managing BibTeX and <code>biblatex</code> databases that runs inside Emacs. It allows you to manage bibliography files without having to edit the raw <code>.bib</code> files.</p>
 
@@ -57,25 +57,25 @@
   </div>
 
   <!-- The Modal/Lightbox -->
-  <div id="myModal" class="modal">
+  <div id="modal-lightbox" class="modal">
     <span class="close cursor" onclick="closeModal()">&times;</span>
     <div class="modal-content">
 
-      <div class="mySlides">
+      <div class="slide">
         <figure>
           <img src="images/Main-view.png" alt="Main view" style="width:100%">
           <figcaption>The main view</figcaption>
         </figure>
       </div>
 
-      <div class="mySlides">
+      <div class="slide">
         <figure>
           <img src="images/Search-view.png" alt="Search view" style="width:100%">
           <figcaption>The search view</figcaption>
         </figure>
       </div>
 
-      <div class="mySlides">
+      <div class="slide">
         <figure>
           <img src="images/Strings-buffer.png" alt="Strings buffer" style="width:100%">
           <figcaption>The strings buffer</figcaption>
@@ -101,11 +101,11 @@
 
 <script>
  function openModal() {
-   document.getElementById("myModal").style.display = "block";
+   document.getElementById("modal-lightbox").style.display = "block";
  }
 
  function closeModal() {
-   document.getElementById("myModal").style.display = "none";
+   document.getElementById("modal-lightbox").style.display = "none";
  }
 
  var slideIndex = 1;
@@ -121,7 +121,7 @@
 
  function showSlides(n) {
    var i;
-   var slides = document.getElementsByClassName("mySlides");
+   var slides = document.getElementsByClassName("slide");
    if (n > slides.length) {slideIndex = 1}
    if (n < 1) {slideIndex = slides.length}
    for (i = 0; i < slides.length; i++) {
