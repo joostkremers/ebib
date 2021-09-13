@@ -87,6 +87,8 @@
 /* Caption text */
 .caption-container {
   text-align: center;
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: 12px;
   background-color: black;
   padding: 2px 16px;
   color: white;

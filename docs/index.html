@@ -61,17 +61,17 @@
     <span class="close cursor" onclick="closeModal()">&times;</span>
     <div class="modal-content">
 
-      <div class="mySlides">
+      <div class="mySlides" caption="The main view">
         <div class="numbertext">1 / 3</div>
-        <img src="images/Main-view.png" alt="Main view" title="Main view" style="width:100%">
+        <img src="images/Main-view.png" alt="Main view" style="width:100%">
       </div>
 
-      <div class="mySlides">
+      <div class="mySlides" caption="The search view">
         <div class="numbertext">2 / 3</div>
         <img src="images/Search-view.png" alt="Search view" style="width:100%">
       </div>
 
-      <div class="mySlides">
+      <div class="mySlides" caption="The strings buffer">
         <div class="numbertext">3 / 3</div>
         <img src="images/Strings-buffer.png" alt="Strings buffer" style="width:100%">
       </div>
@@ -121,13 +121,14 @@
  function showSlides(n) {
    var i;
    var slides = document.getElementsByClassName("mySlides");
-   var captionText = document.getElementById("caption");
    if (n > slides.length) {slideIndex = 1}
    if (n < 1) {slideIndex = slides.length}
    for (i = 0; i < slides.length; i++) {
      slides[i].style.display = "none";
    }
    slides[slideIndex-1].style.display = "block";
+   console.log(slides)
+   document.getElementById("caption").innerText = slides[slideIndex-1].getAttribute("caption");
  }
 </script>
 
