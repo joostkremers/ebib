@@ -129,6 +129,20 @@
    }
    slides[slideIndex-1].style.display = "block";
  }
+
+ window.addEventListener("keydown", function (event) {
+   // Do nothing if the event was already processed
+   if (event.defaultPrevented) {
+     return;
+   }
+
+   if (event.key === "Escape" || event.key === "Esc") {
+     closeModal();
+   }
+
+   // Cancel the default action to avoid it being handled twice
+   event.preventDefault();
+ }, true);
 </script>
 
 </html>
