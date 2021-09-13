@@ -136,6 +136,17 @@ li {
   border-color: #cf1212;
 }
 
+#buy-me-a-coffee {
+  /* display: inline-block; */
+  position: absolute;
+  top: 80px;
+  left: 20px;
+}
+
+#buy-me-a-coffee > img {
+  width: 175px;
+}
+
 @media screen and (max-width: 1400px) {
   body {
     width: 80%;
@@ -166,5 +177,16 @@ li {
     right: auto;
     left: -40px;
     transform: rotate(-45deg);
+  }
+
+  #buy-me-a-coffee {
+    position: relative;
+  }
+
+  #buy-me-a-coffee > img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 20px;
   }
 }
