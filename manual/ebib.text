@@ -126,7 +126,9 @@ The final predefined column label is `"Note"`. This does not, however, display t
 
 You can define new column labels and redefine the existing ones by customising the option `ebib-field-transformation-functions`. Note that `"Title"`, `"Doi"`, `"Url"`, and `"Note"` are actually defined through this option. `"Entry Key"`, `"Author/Editor"`, and `"Year"` are not (they are hard-coded), but they can be overridden by adding an entry for them in `ebib-field-transformation-functions`.
 
-The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press [`=`]{.key}. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort`.
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press [`=`]{.key}. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort` using the Customize interface or in your init file:
+
+    (setq ebib-index-default-sort '("Year" . descend))  ; alternatively `ascend'
 
 
 ## Biblatex vs. BibTeX ##
