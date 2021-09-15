@@ -100,50 +100,49 @@
 
   <a href="https://www.buymeacoffee.com/joostkremers" id="buy-me-a-coffee"><img alt="Buy Me A Coffee" src="images/bmc-button-small2.png"/></a>
 
+  <script>
+   function openModal() {
+     document.getElementById("modal-lightbox").style.display = "block";
+   }
+
+   function closeModal() {
+     document.getElementById("modal-lightbox").style.display = "none";
+   }
+
+   var slideIndex = 1;
+   showSlides(slideIndex);
+
+   function plusSlides(n) {
+     showSlides(slideIndex += n);
+   }
+
+   function currentSlide(n) {
+     showSlides(slideIndex = n);
+   }
+
+   function showSlides(n) {
+     var i;
+     var slides = document.getElementsByClassName("slide");
+     if (n > slides.length) {slideIndex = 1}
+     if (n < 1) {slideIndex = slides.length}
+     for (i = 0; i < slides.length; i++) {
+       slides[i].style.display = "none";
+     }
+     slides[slideIndex-1].style.display = "block";
+   }
+
+   window.addEventListener("keydown", function (event) {
+     // Do nothing if the event was already processed
+     if (event.defaultPrevented) {
+       return;
+     }
+
+     if (event.key === "Escape" || event.key === "Esc") {
+       closeModal();
+     }
+
+   }, true);
+  </script>
 </body>
-
-<script>
- function openModal() {
-   document.getElementById("modal-lightbox").style.display = "block";
- }
-
- function closeModal() {
-   document.getElementById("modal-lightbox").style.display = "none";
- }
-
- var slideIndex = 1;
- showSlides(slideIndex);
-
- function plusSlides(n) {
-   showSlides(slideIndex += n);
- }
-
- function currentSlide(n) {
-   showSlides(slideIndex = n);
- }
-
- function showSlides(n) {
-   var i;
-   var slides = document.getElementsByClassName("slide");
-   if (n > slides.length) {slideIndex = 1}
-   if (n < 1) {slideIndex = slides.length}
-   for (i = 0; i < slides.length; i++) {
-     slides[i].style.display = "none";
-   }
-   slides[slideIndex-1].style.display = "block";
- }
-
- window.addEventListener("keydown", function (event) {
-   // Do nothing if the event was already processed
-   if (event.defaultPrevented) {
-     return;
-   }
-
-   if (event.key === "Escape" || event.key === "Esc") {
-     closeModal();
-   }
-
- }, true);
-</script>
 
 </html>
