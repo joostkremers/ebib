@@ -3612,7 +3612,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "G" 'ebib-goto-last-field)
     (define-key map "h" 'ebib-entry-help)
     (define-key map "j" 'ebib-jump-to-field)
-    (define-key map "k" 'ebib-kill-field-contents)
+    (define-key map "k" 'ebib-kill-current-field-contents)
     (define-key map "K" 'ebib-keywords-map)
     (define-key map "m" 'ebib-edit-multiline-field)
     (define-key map "n" 'ebib-next-field)
@@ -3654,7 +3654,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     ["Insert @String Abbreviation" ebib-insert-abbreviation]
     ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
-    ["Kill Field Contents" ebib-kill-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Kill Field Contents" ebib-kill-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Copy Field Contents" ebib-copy-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Yank" ebib-yank-field-contents t]
     ["Delete Field Contents" ebib-delete-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
@@ -4151,13 +4151,11 @@ value is copied to the kill ring."
   (interactive)
   (ebib-copy-field-contents (ebib--current-field)))
 
-(defun ebib-kill-field-contents ()
-  "Kill the contents of the current field.
+(defun ebib-kill-field-contents (field)
+    "Kill the contents of the FIELD in the current entry.
 The killed text is put in the kill ring.  If the field contains a
 value from a cross-referenced entry, it is not killed."
-  (interactive)
-  (let ((field (ebib--current-field))
-        (key (ebib--get-key-at-point)))
+  (let ((key (ebib--get-key-at-point)))
     (unless (or (not field)
                 (string= field "=type="))
       (let ((contents (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced 'xref)))
@@ -4168,13 +4166,20 @@ value from a cross-referenced entry, it is not killed."
          ((stringp contents)
           (ebib-db-remove-field-value field key ebib--cur-db)
           (kill-new contents)
-          (ebib--redisplay-current-field)
+          (ebib--redisplay-field field)
           (ebib--redisplay-index-item field)
           (ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
                                                            (ebib-db-has-key key dependent))
                                                          (ebib--list-dependents ebib--cur-db)))
           (message "Field contents killed."))
          (t (error "Cannot kill an empty field")))))))
+
+(defun ebib-kill-current-field-contents ()
+  "Kill the contents of the current field.
+The killed text is put in the kill ring.  If the field contains a
+value from a cross-referenced entry, it is not killed."
+  (interactive)
+    (ebib-kill-field-contents (ebib--current-field)))
 
 (defun ebib-yank-field-contents (arg)
   "Insert the last killed text into the current field.
