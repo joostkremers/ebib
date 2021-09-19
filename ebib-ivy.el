@@ -46,7 +46,8 @@
    ("k" ebib-kill-field-contents "kill field contents")
    ("d" ebib-delete-field-contents "delete field contents")
    ("e" ebib-edit-field "edit field")
-   ("v" ebib-view-field-as-help "view field as help")))
+   ("v" ebib-view-field-as-help "view field as help")
+   ("s" ebib-insert-abbreviation "insert abbreviation")))
 
 (provide 'ebib-ivy)
 
