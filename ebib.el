@@ -3622,7 +3622,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map [(control p)] 'ebib-prev-field)
     (define-key map [(meta p)] 'ebib-goto-next-set)
     (define-key map "q" 'ebib-quit-entry-buffer)
-    (define-key map "r" 'ebib-toggle-raw)
+    (define-key map "r" 'ebib-toggle-raw-current-field)
     (define-key map "s" 'ebib-insert-abbreviation-current-field)
     (define-key map "u" 'ebib-browse-url)
     (define-key map "v" 'ebib-view-current-field-as-help)
@@ -3652,7 +3652,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     ["Edit Field" ebib-edit-current-field t]
     ["Edit Field As Multiline" ebib-edit-multiline-field t]
     ["Insert @String Abbreviation" ebib-insert-abbreviation-current-field]
-    ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Toggle Raw" ebib-toggle-raw-current-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Kill Field Contents" ebib-kill-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Copy Field Contents" ebib-copy-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
@@ -4245,11 +4245,9 @@ The deleted text is not put in the kill ring."
     (interactive)
     (ebib-delete-field-contents (ebib--current-field)))
 
-(defun ebib-toggle-raw ()
-  "Toggle the \"special\" status of the current field contents."
-  (interactive)
-  (let ((key (ebib--get-key-at-point))
-        (field (ebib--current-field)))
+(defun ebib-toggle-raw (field)
+  "Toggle the \"special\" status of FIELD's contents."
+  (let ((key (ebib--get-key-at-point)))
     (unless (member-ignore-case field '("=type=" "crossref" "xref" "related" "keywords"))
       (let ((contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
         (if (ebib--multiline-p contents) ; Multiline fields cannot be raw.
@@ -4259,10 +4257,15 @@ The deleted text is not put in the kill ring."
             (setq contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
           (when contents ; We must check to make sure the user entered some value.
             (ebib-set-field-value field contents key ebib--cur-db 'overwrite (not (ebib-unbraced-p contents)))
-            (ebib--redisplay-current-field)
+            (ebib--redisplay-field field)
             (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                                (ebib-db-has-key key dependent))
                                                              (ebib--list-dependents ebib--cur-db)))))))))
+
+(defun ebib-toggle-raw-current-field ()
+  "Toggle the \"special\" status of the current field contents."
+  (interactive)
+  (ebib-toggle-raw (ebib--current-field)))
 
 (defun ebib-edit-multiline-field (field init-contents)
   "Edit the current field in multiline-mode.
