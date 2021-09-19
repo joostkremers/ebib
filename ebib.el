@@ -3625,7 +3625,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "r" 'ebib-toggle-raw)
     (define-key map "s" 'ebib-insert-abbreviation)
     (define-key map "u" 'ebib-browse-url)
-    (define-key map "v" 'ebib-view-field-as-help)
+    (define-key map "v" 'ebib-view-current-field-as-help)
     (define-key map "y" 'ebib-yank-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
@@ -3663,7 +3663,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     "--"
     ["View File" ebib-view-file-in-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Browse URL" ebib-browse-url (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
-    ["View Multiline Field" ebib-view-field-as-help (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["View Multiline Field" ebib-view-current-field-as-help (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Quit Entry Buffer" ebib-quit-entry-buffer t]
     ["Help On Entry Buffer" ebib-entry-help t]))
@@ -4296,11 +4296,9 @@ FIELD is the field being edited, INIT-CONTENTS is its initial content."
           (ebib--redisplay-current-field)
           (ebib-next-field))))))
 
-(defun ebib-view-field-as-help ()
-  "Show the contents of the current field in a *Help* window."
-  (interactive)
-  (let ((help-window-select t)                          ; Make sure the help window is selected.
-        (field (ebib--current-field)))
+(defun ebib-view-field-as-help (field)
+  "Show the contents of the FIELD in a *Help* window."
+  (let ((help-window-select t))                          ; Make sure the help window is selected.
     (with-help-window (help-buffer)
       (princ (propertize (format "%s" field) 'face '(:weight bold)))
       (princ "\n\n")
@@ -4308,6 +4306,11 @@ FIELD is the field being edited, INIT-CONTENTS is its initial content."
         (if contents
             (princ contents)
           (princ "[Empty field]"))))))
+
+(defun ebib-view-current-field-as-help ()
+  "Show the contents of the current field in a *Help* window."
+  (interactive)
+  (ebib-view-field-as-help (ebib--current-field)))
 
 (defun ebib-entry-help ()
   "Show the info node for Ebib's entry buffer."
