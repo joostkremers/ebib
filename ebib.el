@@ -3810,10 +3810,12 @@ was called interactively."
     (goto-char location)
     (beginning-of-line)))
 
-(defun ebib-add-field (field)
-  "Add FIELD to the current entry."
-  (interactive "sField: ")
-  (let ((key (ebib--get-key-at-point)))
+(defun ebib-add-field (&optional default)
+  "Prompt for a field name and add to current entry.
+If DEFAULT is specified, it is the initial input for the prompt."
+  (interactive)
+  (let ((field (read-string "Field: " default))
+	(key (ebib--get-key-at-point)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (error "[Ebib] Field `%s' already has a value in entry `%s'" field key)
       ;; We store the field with an empty string as value and then let the user
