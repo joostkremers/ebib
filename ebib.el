@@ -3623,7 +3623,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map [(meta p)] 'ebib-goto-next-set)
     (define-key map "q" 'ebib-quit-entry-buffer)
     (define-key map "r" 'ebib-toggle-raw)
-    (define-key map "s" 'ebib-insert-abbreviation)
+    (define-key map "s" 'ebib-insert-abbreviation-current-field)
     (define-key map "u" 'ebib-browse-url)
     (define-key map "v" 'ebib-view-current-field-as-help)
     (define-key map "y" 'ebib-yank-field-contents)
@@ -3651,7 +3651,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   '("Ebib"
     ["Edit Field" ebib-edit-current-field t]
     ["Edit Field As Multiline" ebib-edit-multiline-field t]
-    ["Insert @String Abbreviation" ebib-insert-abbreviation]
+    ["Insert @String Abbreviation" ebib-insert-abbreviation-current-field]
     ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Kill Field Contents" ebib-kill-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
@@ -4277,11 +4277,9 @@ FIELD is the field being edited, INIT-CONTENTS is its initial content."
     (error "[Ebib] Cannot edit a raw field as multiline"))
    (t (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-unbrace init-contents)))))
 
-(defun ebib-insert-abbreviation ()
-  "Insert an abbreviation from the ones defined in the database."
-  (interactive)
-  (let ((key (ebib--get-key-at-point))
-        (field (ebib--current-field)))
+(defun ebib-insert-abbreviation (field)
+  "Insert an abbreviation to FIELD from the ones defined in the database."
+  (let ((key (ebib--get-key-at-point)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (beep)
       (let ((strings (ebib-db-list-strings ebib--cur-db)))
@@ -4293,8 +4291,13 @@ FIELD is the field being edited, INIT-CONTENTS is its initial content."
                 (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                                    (ebib-db-has-key key dependent))
                                                                  (ebib--list-dependents ebib--cur-db))))))
-          (ebib--redisplay-current-field)
+          (ebib--redisplay-field field)
           (ebib-next-field))))))
+
+(defun ebib-insert-abbreviation-current-field ()
+  "Insert an abbreviation from the database to current field."
+  (interactive)
+  (ebib-insert-abbreviation (ebib--current-field)))
 
 (defun ebib-view-field-as-help (field)
   "Show the contents of the FIELD in a *Help* window."
