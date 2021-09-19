@@ -48,7 +48,10 @@
    ("e" ebib-edit-field "edit field")
    ("v" ebib-view-field-as-help "view field as help")
    ("s" ebib-insert-abbreviation "insert abbreviation")
-   ("r" ebib-toggle-raw "toggle raw")))
+   ("r" ebib-toggle-raw "toggle raw")
+   ("a" ebib-add-field "add field")
+   ("u" (lambda (_) (ebib-browse-url)) "browse url")
+   ("I" (lambda (_) (ebib-browse-doi)) "browse doi")))
 
 (provide 'ebib-ivy)
 
