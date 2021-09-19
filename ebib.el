@@ -3605,7 +3605,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "a" 'ebib-add-field)
     (define-key map "b" 'ebib-goto-prev-set)
     (define-key map "c" 'ebib-copy-current-field-contents)
-    (define-key map "d" 'ebib-delete-field-contents)
+    (define-key map "d" 'ebib-delete-current-field-contents)
     (define-key map "e" 'ebib-edit-field)
     (define-key map "f" 'ebib-view-file-in-field)
     (define-key map "g" 'ebib-goto-first-field)
@@ -3657,7 +3657,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     ["Kill Field Contents" ebib-kill-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Copy Field Contents" ebib-copy-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Yank" ebib-yank-field-contents t]
-    ["Delete Field Contents" ebib-delete-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Delete Field Contents" ebib-delete-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Add Field" ebib-add-field t]
     "--"
@@ -4208,22 +4208,26 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
                                                              (ebib-db-has-key key dependent))
                                                            (ebib--list-dependents ebib--cur-db))))))))
 
-(defun ebib-delete-field-contents ()
-  "Delete the contents of the current field.
+(defun ebib-delete-field-contents (field)
+  "Delete the contents of FIELD.
 The deleted text is not put in the kill ring."
-  (interactive)
-  (let ((key (ebib--get-key-at-point))
-        (field (ebib--current-field)))
+  (let ((key (ebib--get-key-at-point)))
     (if (string= field "=type=")
         (beep)
       (when (y-or-n-p "Delete field contents? ")
         (ebib-db-remove-field-value field key ebib--cur-db)
-        (ebib--redisplay-current-field)
+        (ebib--redisplay-field field)
         (ebib--redisplay-index-item field)
         (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                            (ebib-db-has-key key dependent))
                                                          (ebib--list-dependents ebib--cur-db)))
         (message "Field contents deleted.")))))
+
+(defun ebib-delete-current-field-contents ()
+    "Delete the contents of the current field.
+The deleted text is not put in the kill ring."
+    (interactive)
+    (ebib-delete-field-contents (ebib--current-field)))
 
 (defun ebib-toggle-raw ()
   "Toggle the \"special\" status of the current field contents."

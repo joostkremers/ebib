@@ -43,7 +43,8 @@
 (ivy-add-actions
  'ebib-jump-to-field
  '(("c" ebib-copy-field-contents "copy field contents")
-   ("k" ebib-kill-field-contents "kill field contents")))
+   ("k" ebib-kill-field-contents "kill field contents")
+   ("d" ebib-delete-field-contents "delete field contents")))
 
 (provide 'ebib-ivy)
 
