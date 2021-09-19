@@ -2836,7 +2836,7 @@ new database."
           (forward-line -1))
         (ebib-select-and-popup-entry)))))
 
-(defun ebib-browse-url (arg)
+(defun ebib-browse-url (&optional arg)
   "Browse the URL in the \"url\" field.
 If the \"url\" field contains more than one URL, ask the user
 which one to open.  Alternatively, the user can provide a numeric

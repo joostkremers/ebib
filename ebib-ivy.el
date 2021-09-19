@@ -50,8 +50,7 @@
    ("s" ebib-insert-abbreviation "insert abbreviation")
    ("r" ebib-toggle-raw "toggle raw")
    ("a" ebib-add-field "add field")
-   ("u" (lambda (_) (ebib-browse-url)) "browse url")
-   ("I" (lambda (_) (ebib-browse-doi)) "browse doi")))
+   ("u" (lambda (_) (ebib-browse-url)) "browse url")))
 
 (provide 'ebib-ivy)
 
