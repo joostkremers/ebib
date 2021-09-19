@@ -3599,7 +3599,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map " " 'ebib-goto-next-set)
     (define-key map "a" 'ebib-add-field)
     (define-key map "b" 'ebib-goto-prev-set)
-    (define-key map "c" 'ebib-copy-field-contents)
+    (define-key map "c" 'ebib-copy-current-field-contents)
     (define-key map "d" 'ebib-delete-field-contents)
     (define-key map "e" 'ebib-edit-field)
     (define-key map "f" 'ebib-view-file-in-field)
@@ -3649,8 +3649,8 @@ hook `ebib-reading-list-remove-item-hook' is run."
     ["Insert @String Abbreviation" ebib-insert-abbreviation]
     ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
-    ["Copy Field Contents" ebib-copy-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Kill Field Contents" ebib-kill-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
+    ["Copy Field Contents" ebib-copy-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Yank" ebib-yank-field-contents t]
     ["Delete Field Contents" ebib-delete-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
@@ -4127,19 +4127,24 @@ viewed."
         (while (ebib--line-at-point)
           (forward-line direction))))))
 
-(defun ebib-copy-field-contents ()
-  "Copy the contents of the current field to the kill ring.
+(defun ebib-copy-field-contents (field)
+  "Copy the contents of FIELD to the kill ring.
 If the field contains a value from a cross-referenced entry, that
 value is copied to the kill ring."
-  (interactive)
-  (let ((field (ebib--current-field)))
     (unless (or (not field)
                 (string= field "=type="))
       (let ((contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
         (if (stringp contents)
             (progn (kill-new contents)
                    (message "Field contents copied."))
-          (error "Cannot copy an empty field"))))))
+          (error "Cannot copy an empty field")))))
+
+(defun ebib-copy-current-field-contents ()
+  "Copy the contents of the current field to the kill ring.
+If the field contains a value from a cross-referenced entry, that
+value is copied to the kill ring."
+  (interactive)
+  (ebib-copy-field-contents (ebib--current-field)))
 
 (defun ebib-kill-field-contents ()
   "Kill the contents of the current field.

@@ -37,6 +37,13 @@
 
 ;;; Code:
 
+(require 'ivy)
+(require 'ebib)
+
+(ivy-add-actions
+ 'ebib-jump-to-field
+ '(("c" ebib-copy-field-contents "copy field contents")))
+
 (provide 'ebib-ivy)
 
 ;;; ebib-notes.el ends here
