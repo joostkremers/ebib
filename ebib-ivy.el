@@ -44,7 +44,8 @@
  'ebib-jump-to-field
  '(("c" ebib-copy-field-contents "copy field contents")
    ("k" ebib-kill-field-contents "kill field contents")
-   ("d" ebib-delete-field-contents "delete field contents")))
+   ("d" ebib-delete-field-contents "delete field contents")
+   ("e" ebib-edit-field "edit field")))
 
 (provide 'ebib-ivy)
 

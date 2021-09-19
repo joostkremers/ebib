@@ -3600,13 +3600,13 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map [next] 'ebib-goto-next-set)
     (define-key map [home] 'ebib-goto-first-field)
     (define-key map [end] 'ebib-goto-last-field)
-    (define-key map [return] 'ebib-edit-field)
+    (define-key map [return] 'ebib-edit-current-field)
     (define-key map " " 'ebib-goto-next-set)
     (define-key map "a" 'ebib-add-field)
     (define-key map "b" 'ebib-goto-prev-set)
     (define-key map "c" 'ebib-copy-current-field-contents)
     (define-key map "d" 'ebib-delete-current-field-contents)
-    (define-key map "e" 'ebib-edit-field)
+    (define-key map "e" 'ebib-edit-current-field)
     (define-key map "f" 'ebib-view-file-in-field)
     (define-key map "g" 'ebib-goto-first-field)
     (define-key map "G" 'ebib-goto-last-field)
@@ -3649,7 +3649,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
 
 (easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
   '("Ebib"
-    ["Edit Field" ebib-edit-field t]
+    ["Edit Field" ebib-edit-current-field t]
     ["Edit Field As Multiline" ebib-edit-multiline-field t]
     ["Insert @String Abbreviation" ebib-insert-abbreviation]
     ["Toggle Raw" ebib-toggle-raw (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
@@ -3824,7 +3824,7 @@ was called interactively."
       (ebib--update-entry-buffer)
       (re-search-forward (concat "^" field))
       (condition-case err
-          (ebib-edit-field)
+          (ebib-edit-current-field)
         (quit (ebib-set-field-value field nil key ebib--cur-db 'overwrite)  ; If the user quits the edit, we must remove the field again.
               (ebib--update-entry-buffer))
         (error (signal (car err) (cdr err)))))))
@@ -4012,8 +4012,8 @@ string in the minibuffer."
                                                        (ebib-db-has-key key dependent))
                                                      (ebib--list-dependents ebib--cur-db)))))
 
-(defun ebib-edit-field (&optional pfx)
-  "Edit a field of a BibTeX entry.
+(defun ebib-edit-field (field)
+  "Edit FIELD of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' `crossref', `xref' and
 `related' fields offer completion, the `annote', `annotation' and
@@ -4023,12 +4023,11 @@ field adds keywords one by one, also allowing completion, and the
 they are in (a subdirectory of) one of the directories in
 `ebib-file-search-dirs'.
 
-With a prefix argument PFX, edit the current field directly,
-without any special treatment.  Exceptions are the \"type\" field
-and any field with a multiline value, which are always edited in
-a special manner."
-  (interactive "p")
-  (let* ((field (ebib--current-field))
+With a prefix argument, edit the current field directly, without
+any special treatment. Exceptions are the \"type\" field and any
+field with a multiline value, which are always edited in a
+special manner."
+  (let* ((pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror))
          ;; We relegate the actual editing to a number of helper functions.
          ;; These functions should return non-nil if editing was successful.
@@ -4045,11 +4044,9 @@ a special manner."
                    ;; any further action.
                    nil)
                   ;; A prefix argument means the user wants to edit the field as
-                  ;; a string, without any form of completion.  We use a numeric
-                  ;; prefix argument (see below), so we must check whether `pfx'
-                  ;; is unequal to 1.
-                  ((and (numberp pfx)
-                        (/= pfx 1))
+                  ;; a string, without any form of completion.  Evaluate `pfx' as
+		  ;; a cond.
+                  (pfx
                    (ebib--edit-normal-field field init-contents))
                   ((and (member-ignore-case field '("author" "editor"))
                         (member-ignore-case "author" ebib-fields-with-completion))
@@ -4083,7 +4080,26 @@ a special manner."
       ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
       ;; from Lisp code.
       (when pfx (ebib-next-field))
+      (ebib--redisplay-field field)
       (ebib--redisplay-index-item field))))
+
+(defun ebib-edit-current-field ()
+  "Edit current field of a BibTeX entry.
+Most fields are edited directly using the minibuffer, but a few
+are handled specially: the `type' `crossref', `xref' and
+`related' fields offer completion, the `annote', `annotation' and
+`abstract' fields is edited as a multiline field, the `keywords'
+field adds keywords one by one, also allowing completion, and the
+\"file\" field uses filename completion and shortens filenames if
+they are in (a subdirectory of) one of the directories in
+`ebib-file-search-dirs'.
+
+With a prefix argument, edit the current field directly,
+without any special treatment.  Exceptions are the \"type\" field
+and any field with a multiline value, which are always edited in
+a special manner."
+  (interactive)
+  (ebib-edit-field (ebib--current-field)))
 
 (defun ebib--redisplay-index-item (field)
   "Redisplay current index item if FIELD is being displayed."
@@ -4239,7 +4255,7 @@ The deleted text is not put in the kill ring."
         (if (ebib--multiline-p contents) ; Multiline fields cannot be raw.
             (beep)
           (unless contents  ; If there is no value, the user can enter one,
-            (ebib-edit-field)   ; which we must then store unbraced.
+            (ebib-edit-field field)   ; which we must then store unbraced.
             (setq contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
           (when contents ; We must check to make sure the user entered some value.
             (ebib-set-field-value field contents key ebib--cur-db 'overwrite (not (ebib-unbraced-p contents)))
