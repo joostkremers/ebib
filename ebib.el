@@ -4164,8 +4164,8 @@ value from a cross-referenced entry, it is not killed."
 (defun ebib-yank-field-contents (arg)
   "Insert the last killed text into the current field.
 Repeated calls to this function cycle through the kill ring,
-similar to \\[yank] followed by \\[yank-pop]. The prefix argument
-ARG functions as with \\[yank] / \\[yank-pop]."
+similar to \\[yank] followed by \\[yank-pop].  The prefix
+argument ARG functions as with \\[yank] / \\[yank-pop]."
   (interactive "P")
   (let ((key (ebib--get-key-at-point))
         (field (ebib--current-field)))
