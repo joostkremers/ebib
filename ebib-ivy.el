@@ -45,6 +45,7 @@
  '(("c" ebib-copy-field-contents "copy field contents")
    ("k" ebib-kill-field-contents "kill field contents")
    ("d" ebib-delete-field-contents "delete field contents")
+   ("y" ebib-yank-field-contents "yank field contents")
    ("e" ebib-edit-field "edit field")
    ("v" ebib-view-field-as-help "view field as help")
    ("s" ebib-insert-abbreviation "insert abbreviation")
