@@ -3626,7 +3626,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "s" 'ebib-insert-abbreviation-current-field)
     (define-key map "u" 'ebib-browse-url)
     (define-key map "v" 'ebib-view-current-field-as-help)
-    (define-key map "y" 'ebib-yank-field-contents)
+    (define-key map "y" 'ebib-yank-current-field-contents)
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     (define-key map "\C-x\C-s" #'ebib-save-current-database)
@@ -3656,7 +3656,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     "--"
     ["Kill Field Contents" ebib-kill-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     ["Copy Field Contents" ebib-copy-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
-    ["Yank" ebib-yank-field-contents t]
+    ["Yank" ebib-yank-current-field-contents t]
     ["Delete Field Contents" ebib-delete-current-field-contents (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
     ["Add Field" ebib-add-field t]
@@ -4199,32 +4199,35 @@ value from a cross-referenced entry, it is not killed."
   (interactive)
     (ebib-kill-field-contents (ebib--current-field)))
 
-(defun ebib-yank-field-contents (arg)
+(defun ebib-yank-field-contents (field)
   "Insert the last killed text into the current field.
 Repeated calls to this function cycle through the kill ring,
 similar to \\[yank] followed by \\[yank-pop].  The prefix
 argument ARG functions as with \\[yank] / \\[yank-pop]."
-  (interactive "P")
-  (let ((key (ebib--get-key-at-point))
-        (field (ebib--current-field)))
+  (let ((arg current-prefix-arg)
+	(key (ebib--get-key-at-point)))
     (if (or (member-ignore-case field '("=type=" "crossref")) ; We cannot yank into the `=type=' or `crossref' fields.
-            (unless (eq last-command 'ebib-yank-field-contents) ; Nor into a field already filled.
+            (unless (eq last-command 'ebib-yank-current-field-contents) ; Nor into a field already filled.
               (ebib-get-field-value field key ebib--cur-db 'noerror)))
         (progn
           (setq this-command t)
           (beep))
       (let ((new-contents (current-kill (cond
                                          ((listp arg)
-                                          (if (eq last-command 'ebib-yank-field-contents) 1 0))
+                                          (if (eq last-command 'ebib-yank-current-field-contents) 1 0))
                                          ((eq arg '-) -2)
                                          (t (1- arg))))))
         (when new-contents
           (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite)
-          (ebib--redisplay-current-field)
+	  (ebib--redisplay-field field)
           (ebib--redisplay-index-item field)
           (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
                                                              (ebib-db-has-key key dependent))
                                                            (ebib--list-dependents ebib--cur-db))))))))
+
+(defun ebib-yank-current-field-contents ()
+  (interactive)
+  (ebib-yank-field-contents (ebib--current-field)))
 
 (defun ebib-delete-field-contents (field)
   "Delete the contents of FIELD.
