@@ -3806,9 +3806,10 @@ was called interactively."
              (field (completing-read "Jump to field: " fields nil t))
              (location (save-excursion
                          (goto-char (point-min))
-                         (re-search-forward (concat "^" field)))))
-    (goto-char location)
-    (beginning-of-line)))
+                         (re-search-forward (concat "^" field) nil t))))
+    (if location
+	(goto-char location)
+      (beginning-of-line))))
 
 (defun ebib-add-field (&optional default)
   "Prompt for a field name and add to current entry.
