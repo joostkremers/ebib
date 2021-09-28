@@ -3614,7 +3614,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "j" 'ebib-jump-to-field)
     (define-key map "k" 'ebib-kill-current-field-contents)
     (define-key map "K" 'ebib-keywords-map)
-    (define-key map "m" 'ebib-edit-multiline-field)
+    (define-key map "m" 'ebib-edit-current-field-as-multiline)
     (define-key map "n" 'ebib-next-field)
     (define-key map [(control n)] 'ebib-next-field)
     (define-key map [(meta n)] 'ebib-goto-prev-set)
@@ -3650,7 +3650,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
 (easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
   '("Ebib"
     ["Edit Field" ebib-edit-current-field t]
-    ["Edit Field As Multiline" ebib-edit-multiline-field t]
+    ["Edit Field As Multiline" ebib-edit-current-field-as-multiline t]
     ["Insert @String Abbreviation" ebib-insert-abbreviation-current-field]
     ["Toggle Raw" ebib-toggle-raw-current-field (ebib-db-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror)]
     "--"
@@ -4038,9 +4038,9 @@ special manner."
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
                   ((ebib--multiline-p init-contents)
-                   (ebib-edit-multiline-field field init-contents)
+                   (ebib--edit-field-as-multiline field init-contents)
                    ;; A multiline edit differs from the other fields, because
-                   ;; the edit isn't done when `ebib-edit-multiline-field'
+                   ;; the edit isn't done when `ebib--edit-field-as-multiline'
                    ;; returns. This means we cannot move to the next field.  For
                    ;; this reason, we return `nil', so we know below not to take
                    ;; any further action.
@@ -4065,7 +4065,7 @@ special manner."
                   ((member-ignore-case field ebib-fields-with-completion)
                    (ebib--edit-normal-field field init-contents :complete))
                   ((member-ignore-case field ebib-multiline-fields)
-                   (ebib-edit-multiline-field field init-contents)
+                   (ebib--edit-field-as-multiline field init-contents)
                    nil) ; See above.
                   ;; An external note is shown in the field "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
@@ -4272,18 +4272,27 @@ The deleted text is not put in the kill ring."
   (interactive)
   (ebib-toggle-raw (ebib--current-field)))
 
-(defun ebib-edit-multiline-field (field init-contents)
-  "Edit the current field in multiline-mode.
+(defun ebib--edit-field-as-multiline (field init-contents)
+  "Edit a field in multiline-mode.
 FIELD is the field being edited, INIT-CONTENTS is its initial content."
-  (interactive (let* ((field (ebib--current-field))
-                      (value (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
-                 (list field value)))
   (cond
    ((member-ignore-case field '("=type=" "crossref" "xref" "related"))
     (error "[Ebib] Cannot edit `%s' field as multiline" field))
    ((ebib-unbraced-p init-contents)
     (error "[Ebib] Cannot edit a raw field as multiline"))
    (t (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-unbrace init-contents)))))
+
+(defun ebib--edit-multiline-field (field)
+  "Edit FIELD in multiline-mode.
+
+Convenience wrapper over `ebib--edit-field-as-multiline'."
+  (let ((init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+    (ebib--edit-field-as-multiline field init-contents)))
+
+(defun ebib-edit-current-field-as-multiline ()
+  "Edit current field in multiline-mode."
+  (interactive)
+  (ebib--edit-multiline-field (ebib--current-field)))
 
 (defun ebib-insert-abbreviation (field)
   "Insert an abbreviation to FIELD from the ones defined in the database."
