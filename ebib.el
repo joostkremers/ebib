@@ -3233,31 +3233,30 @@ one to use if there are more than one, and then adds the current
 entry or the marked entries to the dependent database."
   (interactive)
   (ebib--execute-when
-   (dependent-db
-    (let* ((collection (seq-difference (ebib-db-list-keys (ebib-db-get-main ebib--cur-db)) (ebib-db-list-keys ebib--cur-db)))
-           (key (completing-read "Key to add to the current dependent database: " collection nil t)))
-      (ebib-db-add-entries-to-dependent key ebib--cur-db)
-      (ebib-db-set-current-entry-key key ebib--cur-db)
-      (ebib--insert-entry-in-index-sorted key t)
-      (ebib--set-modified t ebib--cur-db)
-      (ebib--update-entry-buffer)))
-   (real-db
-    (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
-                             (y-or-n-p "Add marked entries to dependent database? ")
-                             (ebib-db-list-marked-entries ebib--cur-db))
-                        (ebib--get-key-at-point)))
-           (dependent (seq-filter (lambda (db)
-                                    (eq ebib--cur-db (ebib-db-get-main db)))
-                                  ebib--databases))
-           (target (cond
-                    ((null dependent) (error "No dependent databases associated with current database"))
-                    ((= (length dependent) 1) (car dependent))
-                    (t (ebib-read-database (format "Add %s to dependent database: " (if (stringp entries) "entry" "entries")) dependent)))))
-      (when target
-        (ebib-db-add-entries-to-dependent entries target)
-        (ebib-db-set-modified t target)
-        (ebib--mark-index-dirty target)
-        (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
+    (dependent-db
+     (let ((key (caar (ebib-read-entry "Entry to add to the current dependent database: " (list (ebib-db-get-main ebib--cur-db))))))
+       (ebib-db-add-entries-to-dependent key ebib--cur-db)
+       (ebib-db-set-current-entry-key key ebib--cur-db)
+       (ebib--insert-entry-in-index-sorted key t)
+       (ebib--set-modified t ebib--cur-db)
+       (ebib--update-entry-buffer)))
+    (real-db
+     (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
+                              (y-or-n-p "Add marked entries to dependent database? ")
+                              (ebib-db-list-marked-entries ebib--cur-db))
+                         (ebib--get-key-at-point)))
+            (dependent (seq-filter (lambda (db)
+                                     (eq ebib--cur-db (ebib-db-get-main db)))
+                                   ebib--databases))
+            (target (cond
+                     ((null dependent) (error "No dependent databases associated with current database"))
+                     ((= (length dependent) 1) (car dependent))
+                     (t (ebib-read-database (format "Add %s to dependent database: " (if (stringp entries) "entry" "entries")) dependent)))))
+       (when target
+         (ebib-db-add-entries-to-dependent entries target)
+         (ebib-db-set-modified t target)
+         (ebib--mark-index-dirty target)
+         (message "[Ebib] %s added to database `%s'." (if (stringp entries) "entry" "entries") (ebib-db-get-filename target 'short)))))))
 
 (defun ebib-dependent-delete-entry ()
   "Delete the current entry or marked entries from a dependent database."
