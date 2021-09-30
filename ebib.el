@@ -2272,7 +2272,7 @@ candidates from the current database."
   (ebib--execute-when
     (database
      (let* ((sources (if arg (list ebib--cur-db) ebib--databases))
-            (entries (ebib-read-entry sources))
+            (entries (ebib-read-entry "Jump to entry: " sources))
             ;; The `ebib-read-entry-*' functions return a list of selected
             ;; entries. We can only jump to one of them, obviously. Jumping to
             ;; the last one makes the most sense.
@@ -2324,25 +2324,25 @@ is prepended to the completion candidates."
                           coll)))
               databases nil))
 
-(defun ebib-read-entry (databases &optional multiple)
+(defun ebib-read-entry (prompt databases &optional multiple)
   "Read an entry from the user.
-Offer th entries in DATABASES (a list of database structs) for
-completion.  If MULTIPLE is non-nil, multiple keys can be
-selected.
+Offer the entries in DATABASES (a list of database structs) for
+completion.  PROMPT is the prompt string to use.  If MULTIPLE is
+non-nil, multiple keys can be selected.
 
 This function calls one of the `ebib-read-entry-*' functions
 depending on the completion system in use."
   (cond
-   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
-   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
-   ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple databases)))
-   ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido databases))
-   (t (ebib-read-entry-single databases))))
+   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy prompt databases))
+   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm prompt databases))
+   ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple prompt databases)))
+   ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido prompt databases))
+   (t (ebib-read-entry-single prompt databases))))
 
-(defun ebib-read-entry-ivy (databases)
+(defun ebib-read-entry-ivy (prompt databases)
   "Read an entry from the user using ivy.
 Offer the entries in DATABASES (a list of database structs) for
-completion.
+completion.  PROMPT is the prompt to be displayed.
 
 It is possible to select multiple entries either by using
 `ivy-call' or by marking them with `ivy-mark'.
@@ -2355,7 +2355,7 @@ databases containing them."
     (let ((collection (ebib--create-completion-collection databases t)))
       (if (not collection)
           (error "[Ebib] No entries found in database(s)")
-        (ivy-read "Select entry: " collection
+        (ivy-read prompt collection
                   :action (lambda (item)
                             (let ((key (cadr item))
                                   (db (caddr item)))
@@ -2371,16 +2371,16 @@ databases containing them."
             (cons (nth 0 item) (nth 1 item)))
           (helm-marked-candidates)))
 
-(defun ebib-read-entry-helm (databases)
+(defun ebib-read-entry-helm (prompt databases)
   "Read an entry from the user using helm.
 Offer the entries in DATABASES (a list of database structs) for
-completion.
+completion.  PROMPT is the prompt to be displayed.
 
 It is possible to select multiple entries in the helm buffer.
 
 Return value is a list of cons cells of the selected keys and the
 databases containing them."
-  (let ((sources (helm-build-sync-source "Select entry: "
+  (let ((sources (helm-build-sync-source prompt
                                          :candidates (ebib--create-completion-collection databases t)
                                          :action '(("Select entry" . ebib-helm-action-function)))))
     (helm :sources sources
@@ -2388,10 +2388,10 @@ databases containing them."
           :buffer "*helm ebib*"
           :prompt "Select entry: ")))
 
-(defun ebib-read-entry-ido (databases)
+(defun ebib-read-entry-ido (prompt databases)
   "Read an entry from the user using ido.
 Offer the entries in DATABASES (a list of database structs) for
-completion.
+completion.  PROMPT is the prompt to be displayed.
 
 For compatibility with the other `ebib-read-entry-*' functions,
 the return value is a list with a single cons cell of the key and
@@ -2399,32 +2399,32 @@ the database containing the selected entry."
   (let ((collection (ebib--create-completion-collection databases)))
     (if collection
         (let* ((candidates (mapcar #'car collection))
-               (entry (ido-completing-read "Select entry: " candidates nil t nil 'ebib--key-history))
+               (entry (ido-completing-read prompt candidates nil t nil 'ebib--key-history))
                (key (cadr (assoc-string entry collection)))
                (db (caddr (assoc-string entry collection))))
           (list (cons key db)))
       (error "[Ebib] No BibTeX entries found"))))
 
-(defun ebib-read-entry-single (databases)
+(defun ebib-read-entry-single (prompt databases)
   "Read an entry from the user using default completion.
 Offer the entries in DATABASES (a list of database structs) for
-completion.
+completion.  PROMPT is the prompt to be displayed.
 
 For compatibility with the other `ebib-read-entry-*' functions,
 the return value is a list with a single cons cell of the key and
 the database containing the selected entry."
   (let ((collection (ebib--create-completion-collection databases)))
     (if collection
-        (let* ((entry (completing-read "Select entry: " collection nil t nil 'ebib--key-history))
+        (let* ((entry (completing-read prompt collection nil t nil 'ebib--key-history))
                (key (cadr (assoc-string entry collection)))
                (db (caddr (assoc-string entry collection))))
           (list (cons key db)))
       (error "[Ebib] No BibTeX entries found"))))
 
-(defun ebib-read-entry-multiple (databases)
+(defun ebib-read-entry-multiple (prompt databases)
   "Read a list of entries from the user using default completion.
 Offer the entries in DATABASES (a list of database structs) for
-completion.
+completion.  PROMPT is the prompt to be displayed.
 
 Return value is a list of cons cells of the selected keys and the
 databases containing them."
@@ -2432,7 +2432,7 @@ databases containing them."
     (if collection
         (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
                (crm-separator "\\s-*&\\s-*")
-               (keys (completing-read-multiple "Keys to insert: " collection nil t nil 'ebib--key-history)))
+               (keys (completing-read-multiple prompt collection nil t nil 'ebib--key-history)))
           (mapcar (lambda (entry)
                     (cons (cadr (assoc-string entry collection))
                           (caddr (assoc-string entry collection))))
@@ -3114,7 +3114,7 @@ option `ebib-citation-insert-multiple'."
                   (ebib-db-dependent-p (car databases)))
          (setq dependent-db (car databases))
          (setq databases (list (ebib-db-get-main (car databases)))))
-       (let* ((entries (ebib-read-entry databases 'multiple))
+       (let* ((entries (ebib-read-entry "Select entries: " databases 'multiple))
               (keys (mapcar #'car entries))
               (db (cdar entries)) ; We only take the database of the first entry.
               (citation (ebib--create-citation major-mode keys db)))
