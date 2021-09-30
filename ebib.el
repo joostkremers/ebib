@@ -2272,11 +2272,7 @@ candidates from the current database."
   (ebib--execute-when
     (database
      (let* ((sources (if arg (list ebib--cur-db) ebib--databases))
-            (entries (cond
-                      ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy sources))
-                      ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm sources))
-                      ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido sources))
-                      (t (ebib-read-entry-single sources))))
+            (entries (ebib-read-entry sources))
             ;; The `ebib-read-entry-*' functions return a list of selected
             ;; entries. We can only jump to one of them, obviously. Jumping to
             ;; the last one makes the most sense.
@@ -2327,6 +2323,21 @@ is prepended to the completion candidates."
                                   (ebib-db-list-keys db))
                           coll)))
               databases nil))
+
+(defun ebib-read-entry (databases &optional multiple)
+  "Read an entry from the user.
+Offer th entries in DATABASES (a list of database structs) for
+completion.  If MULTIPLE is non-nil, multiple keys can be
+selected.
+
+This function calls one of the `ebib-read-entry-*' functions
+depending on the completion system in use."
+  (cond
+   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
+   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
+   ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple databases)))
+   ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido databases))
+   (t (ebib-read-entry-single databases))))
 
 (defun ebib-read-entry-ivy (databases)
   "Read an entry from the user using ivy.
@@ -3103,12 +3114,7 @@ option `ebib-citation-insert-multiple'."
                   (ebib-db-dependent-p (car databases)))
          (setq dependent-db (car databases))
          (setq databases (list (ebib-db-get-main (car databases)))))
-       (let* ((entries (cond
-                        ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy databases))
-                        ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm databases))
-                        (ebib-citation-insert-multiple (ebib-read-entry-multiple databases))
-                        ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido databases))
-                        (t (ebib-read-entry-single databases))))
+       (let* ((entries (ebib-read-entry databases 'multiple))
               (keys (mapcar #'car entries))
               (db (cdar entries)) ; We only take the database of the first entry.
               (citation (ebib--create-citation major-mode keys db)))
