@@ -2868,7 +2868,7 @@ being sent to the browser."
   (if ebib-browser-command
       (progn
         (message "Executing `%s %s'" ebib-browser-command url)
-        (start-process "Ebib--browser" nil ebib-browser-command url))
+        (call-process ebib-browser-command nil 0 nil url))
     (message "Opening `%s'" url)
     (browse-url url)))
 
@@ -2895,9 +2895,9 @@ file to choose."
               (if (string-match (regexp-quote "%s") viewer)
                   (let* ((viewer-arg-list (split-string-and-unquote (format viewer (shell-quote-argument file-full-path)))))
                     (message "Executing `%s'" (string-join viewer-arg-list " "))
-                    (apply 'start-process (concat "ebib " ext " viewer process") nil viewer-arg-list))
+                    (apply 'call-process (car viewer-arg-list) nil 0 nil (cdr viewer-arg-list)))
                 (message "Executing `%s %s'" viewer file-full-path)
-                (start-process (concat "ebib " ext " viewer process") nil viewer file-full-path))
+                (call-process viewer nil 0 nil file-full-path))
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
             (find-file file-full-path)))
