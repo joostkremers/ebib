@@ -4847,7 +4847,7 @@ lowered.  Works on the whole buffer, or on the region if it is
 active."
   (interactive)
   (ebib--execute-when
-    ((and real-db entries)
+    (real-db
      (save-excursion
        (save-restriction
          (if (use-region-p)
