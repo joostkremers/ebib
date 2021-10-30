@@ -4297,7 +4297,7 @@ over `ebib--edit-field-as-multiline'."
   (ebib--edit-multiline-field (ebib--current-field)))
 
 (defun ebib-insert-abbreviation (field)
-  "Insert an abbreviation to FIELD from the ones defined in the database."
+  "Insert an abbreviation into FIELD from the ones defined in the database."
   (let ((key (ebib--get-key-at-point)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (beep)
