@@ -3812,7 +3812,7 @@ was called interactively."
       (beginning-of-line))))
 
 (defun ebib-add-field (&optional default)
-  "Prompt for a field name and add to current entry.
+  "Prompt for a field name and add it to current entry.
 If DEFAULT is specified, it is the initial input for the prompt."
   (interactive)
   (let ((field (read-string "Field: " default))
