@@ -4286,7 +4286,8 @@ FIELD is the field being edited, INIT-CONTENTS is its initial content."
 (defun ebib--edit-multiline-field (field)
   "Edit FIELD in multiline-mode.
 
-Convenience wrapper over `ebib--edit-field-as-multiline'."
+Note: this function is essentially just a convenience wrapper
+over `ebib--edit-field-as-multiline'."
   (let ((init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
     (ebib--edit-field-as-multiline field init-contents)))
 
