@@ -4020,14 +4020,14 @@ string in the minibuffer."
 Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' `crossref', `xref' and
 `related' fields offer completion, the `annote', `annotation' and
-`abstract' fields is edited as a multiline field, the `keywords'
+`abstract' fields are edited as a multiline field, the `keywords'
 field adds keywords one by one, also allowing completion, and the
 \"file\" field uses filename completion and shortens filenames if
 they are in (a subdirectory of) one of the directories in
 `ebib-file-search-dirs'.
 
 With a prefix argument, edit the current field directly, without
-any special treatment. Exceptions are the \"type\" field and any
+any special treatment.  Exceptions are the \"type\" field and any
 field with a multiline value, which are always edited in a
 special manner."
   (let* ((pfx current-prefix-arg)
@@ -4091,7 +4091,7 @@ special manner."
 Most fields are edited directly using the minibuffer, but a few
 are handled specially: the `type' `crossref', `xref' and
 `related' fields offer completion, the `annote', `annotation' and
-`abstract' fields is edited as a multiline field, the `keywords'
+`abstract' fields are edited as multiline fields, the `keywords'
 field adds keywords one by one, also allowing completion, and the
 \"file\" field uses filename completion and shortens filenames if
 they are in (a subdirectory of) one of the directories in
