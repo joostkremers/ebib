@@ -206,18 +206,18 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
   "Redisplay the contents of FIELD in the current buffer."
   (with-current-ebib-buffer 'entry
     ;; If the `crossref' field has changed, we need to redisplay the entire entry.
-      (if (cl-equalp field "crossref")
-          (progn
-            (ebib--update-entry-buffer)
-            (re-search-forward "^crossref"))
-        (let ((inhibit-read-only t))
-	  (goto-char (point-min))
-	  (re-search-forward (format "^%s" field))
-          (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field-end))
-          (insert (format "%-17s %s"
-                          (propertize field 'face 'ebib-field-face)
-                          (ebib--get-field-highlighted field (ebib--get-key-at-point))))
-          (beginning-of-line)))))
+    (if (cl-equalp field "crossref")
+        (progn
+          (ebib--update-entry-buffer)
+          (re-search-forward "^crossref"))
+      (let ((inhibit-read-only t))
+	(goto-char (point-min))
+	(re-search-forward (format "^%s" field))
+        (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field-end))
+        (insert (format "%-17s %s"
+                        (propertize field 'face 'ebib-field-face)
+                        (ebib--get-field-highlighted field (ebib--get-key-at-point))))
+        (beginning-of-line)))))
 
 (defun ebib--redisplay-current-field ()
   "Redisplay the contents of the current field in the entry buffer."
