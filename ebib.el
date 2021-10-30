@@ -4314,7 +4314,7 @@ over `ebib--edit-field-as-multiline'."
           (ebib-next-field))))))
 
 (defun ebib-insert-abbreviation-current-field ()
-  "Insert an abbreviation from the database to current field."
+  "Insert an abbreviation into current field from the ones defined the database ."
   (interactive)
   (ebib-insert-abbreviation (ebib--current-field)))
 
