@@ -287,11 +287,12 @@ The label \"Entry Key\" displays the entry's BibTeX key, and the
 label \"Author/Editor\" displays the contents of the Author
 field, or, if that is empty, the contents of the Editor field.
 
-If the sorting flag is `t', then comparison for sorting is done
-with `string-collate-lessp'. If it is nil, sorting is impossible.
-Otherwise, the symbol is called as a function with two arguments,
-and should return `t' if the first should be sorted before the
-second.
+If the sorting flag is `t', a sorting function is looked up in
+`ebib-field-sort-functions-alist', defaulting to
+`string-collate-lessp' if none is found. If it is nil, sorting is
+impossible. Otherwise, the symbol is called as a function with
+two arguments, and should return `t' if the first should be
+sorted before the second.
 
 Note that the default sort field is the entry key, even if the
 \"Entry Key\" field is absent from the index buffer.  You can
@@ -313,6 +314,15 @@ not change the default sort."
                        (string :tag "Sort Field")
                        (choice (const :tag "Ascending Sort" ascend)
                                (const :tag "Descending Sort" descend)))))
+
+(defcustom ebib-field-sort-functions-alist '(("Chapter" . ebib-compare-numerical-strings)
+					     ("Sortyear" . ebib-compare-numerical-strings)
+					     ("Volume" . ebib-compare-numerical-strings)
+					     ("Volumes" . ebib-compare-numerical-strings))
+  "Alist of bib(la)tex fields and functions for sorting the index.
+Field names are case-insensitive."
+  :group 'ebib
+  :type '(alist :key-type string :value-type symbol))
 
 (defcustom ebib-index-column-separator "  "
   "Separator between columns in the index buffer."
@@ -2202,6 +2212,11 @@ This function is mainly intended for the DOI and URL fields."
                     'help-echo str)
       (propertize "   " 'face '(:height 0.8)))))
 
+(defun ebib-compare-numerical-strings (a b)
+  "Return t if A represents a number less than B represents.
+A and B are strings (e.g. \"3\" and \"11\")."
+  (< (string-to-number a) (string-to-number b)))
+
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB.
 First, the keys are sorted themselves, then the list is stably
@@ -2229,9 +2244,14 @@ uses BibLaTeX and UTF-8 characters in fields."
                          (cons (ebib--get-field-value-for-display field key db) key))
                        keys))
 	 (custom-sort (caddr (assoc-string field ebib-index-columns t)))
-	 ;; If custom-sort is t, default to string-collate-lessp
+	 ;; If custom-sort is t, lookup the field name in
+	 ;; ebib-field-sort-functions-alist to get the
+	 ;; comparison operator. If none found, default to
+	 ;; string-collate-lessp
 	 (predicate (if (eq custom-sort t)
-			'string-collate-lessp
+			(alist-get field ebib-field-sort-functions-alist
+				   'string-collate-lessp nil
+				   'cl-equalp)
 		      ;; Custom sort is not t, return custom-sort
 		      custom-sort)))
     (setq list (cl-stable-sort list predicate :key #'car))
