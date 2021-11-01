@@ -3240,7 +3240,7 @@ entry or the marked entries to the dependent database."
        (ebib--insert-entry-in-index-sorted key t)
        (ebib--set-modified t ebib--cur-db)
        (ebib--update-entry-buffer)))
-    (real-db
+    ((or real-db filtered-db)
      (let* ((entries (or (and (ebib-db-marked-entries-p ebib--cur-db)
                               (y-or-n-p "Add marked entries to dependent database? ")
                               (ebib-db-list-marked-entries ebib--cur-db))
