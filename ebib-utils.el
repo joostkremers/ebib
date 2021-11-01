@@ -279,13 +279,19 @@ Ebib-specific mode line altogether."
   "Columns to display in the index buffer.
 Each column consists of the BibTeX field to be displayed, which
 is also the column's label, the column's maximum width and a flag
-indicating whether sorting on this column is possible.
+indicating whether and how sorting on this column is possible.
 
 Any BibTeX or biblatex field can be used as a label.  There are
 also two special labels: \"Entry Key\" and \"Author/Editor\".
 The label \"Entry Key\" displays the entry's BibTeX key, and the
 label \"Author/Editor\" displays the contents of the Author
 field, or, if that is empty, the contents of the Editor field.
+
+If the sorting flag is `t', then comparison for sorting is done
+with `string-collate-lessp'. If it is nil, sorting is impossible.
+Otherwise, the symbol is called as a function with two arguments,
+and should return `t' if the first should be sorted before the
+second.
 
 Note that the default sort field is the entry key, even if the
 \"Entry Key\" field is absent from the index buffer.  You can
@@ -294,7 +300,10 @@ not change the default sort."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
-                        (boolean :tag "Sort"))))
+                        (choice :tag "Sort type"
+                                (const :tag "Sort alphanumerically" t)
+                                (function-item :tag "Sort numerically" #'<)
+                                (function :tag "Use a custom sort function" :value string-collate-lessp)))))
 
 (defcustom ebib-index-default-sort nil
   "Default sort field and direction."
@@ -2200,10 +2209,10 @@ sorted on the sort info of DB.  Thus if two entries have the same
 value for the sort field, their keys determine the order in which
 they appear.
 
-Sorting on the sort field is done with `string-collate-lessp', so
-that the order in which the entries appear depends on the user's
-locale.  This is only relevant if one uses BibLaTeX and UTF-8
-characters in fields."
+The comparison function for sorting on the sort field defaults to
+`string-collate-lessp', so that the order in which the entries
+appear depends on the user's locale. This is only relevant if one
+uses BibLaTeX and UTF-8 characters in fields."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
   ;; And then stably sort on the sort field.
@@ -2218,8 +2227,14 @@ characters in fields."
          ;; that way.
          (list (mapcar (lambda (key)
                          (cons (ebib--get-field-value-for-display field key db) key))
-                       keys)))
-    (setq list (cl-stable-sort list #'string-collate-lessp :key #'car))
+                       keys))
+	 (custom-sort (caddr (assoc-string field ebib-index-columns t)))
+	 ;; If custom-sort is t, default to string-collate-lessp
+	 (predicate (if (eq custom-sort t)
+			'string-collate-lessp
+		      ;; Custom sort is not t, return custom-sort
+		      custom-sort)))
+    (setq list (cl-stable-sort list predicate :key #'car))
     (setq keys (mapcar #'cdr list))
     ;; Reverse the list if necessary.
     (if (eq direction 'descend)
