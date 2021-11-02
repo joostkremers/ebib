@@ -1,5 +1,10 @@
 % Ebib News
 
+## Version 2.33, November 2021 ##
+
+- New command: `ebib-jump-to-field`, bound to `j` in the entry buffer.
+- Add ivy actions to `ebib-jump-to-field`, thanks to [Hugo Heagren](https://github.com/Hugo-Heagren).
+
 ## Version 2.32, April 2021 ##
 
 - Add support for [`biblio.el`](https://github.com/cpitclaudel/biblio.el).
