@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp -*-
 
 ;; pandoc-mode local settings file for news.text
-;; saved on 2021.04.22 00:05
+;; saved on 2021.11.02 23:16
 
 ((html-q-tags)
  (no-tex-ligatures)
@@ -133,7 +133,7 @@
  (data-dir)
  (output-dir . "~/src/Elisp/ebib/docs/")
  (template)
- (css "styles/ebib.css")
+ (css "styles/manual.css")
  (reference-odt)
  (reference-docx)
  (epub-metadata)
@@ -141,7 +141,7 @@
  (epub-cover-image)
  (csl)
  (citation-abbreviations)
- (include-in-header . "google-fonts.html")
+ (include-in-header . "header-include.html")
  (include-before-body)
  (include-after-body)
  (epub-embed-font)
