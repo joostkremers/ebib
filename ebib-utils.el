@@ -1733,7 +1733,25 @@ Return t upon success, or nil if the value could not be stored."
         (setq value (ebib-brace value)))
       (ebib-db-set-field-value field value key db 'overwrite))))
 
-(defun ebib-get-field-value (field key db &optional noerror unbraced xref)
+(defcustom ebib-expand-strings t
+  "Whether expand of abbreviated/concatenated fields for display.
+If set to t, string abbreviations and concatenations are always
+expanded. If a list of strings, then fields which match one of
+the members (case-insensitively) will be expanded. If a field
+with an alias is expanded, values in the alias field are expanded
+too. If only the alias name is in the list, only the alias is
+expanded. If set to nil, nothing is ever expanded.
+
+Expanded values are shown in `ebib-abbrev-face'.
+
+When editing a field, the actual (unexpanded) value is always
+shown."
+  :group 'ebib
+  :type '(choice (const :tag "Always expand" t)
+                 (const :tag "Never expand" nil)
+		 (repeat :tag "Expand only listed fields" string)))
+
+(defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
 is non-nil.  In this case, if NOERROR is a string, return NOERROR,
@@ -1744,6 +1762,10 @@ If XREF is non-nil, the field value may be retrieved from a
 cross-referenced entry.  If the result is non-nil, the returned
 text has the text property `ebib--xref', which has as value the
 key of the entry from which the field value was retrieved.
+
+If EXPAND-STRINGS is non-nil and the field is unbraced then
+abbreviation strings and concatenation are expanded. The result
+has the text property `ebib--expanded' with value t.
 
 Similarly, the value can be retrieved from an alias field.  (See
 the variable `ebib--field-aliases').  In this case, the returned
@@ -1772,6 +1794,19 @@ string has the text property `ebib--alias' with value t."
       (setq value (copy-sequence value)) ; Copy the value so we can add text properties.
       (when unbraced
         (setq value (ebib-unbrace value)))
+      (when (and (ebib-unbraced-p value)
+		 expand-strings
+		 (or (eq ebib-expand-strings t)
+		     (assoc-string field ebib-expand-strings 'case-fold)
+		     (assoc-string alias ebib-expand-strings 'case-fold)))
+	(let ((orig-value value))
+	  (setq value (apply 'concat
+			     (message-unquote-tokens
+			      (mapcar
+			       (lambda (str) (or (ebib-get-string str ebib--cur-db 'noerror 'unbraced) str))
+			       (split-string value "#" t "[[:blank:]]+")))))
+	  (unless (string-equal value orig-value)
+	    (add-text-properties 0 (length value) '(ebib--expanded t) value))))
       (when alias
         (add-text-properties 0 (length value) '(ebib--alias t) value))
       (when xref
