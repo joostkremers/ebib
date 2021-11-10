@@ -375,7 +375,7 @@ which can be passed to `ebib--display-multiline-field'."
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
   (or db (setq db ebib--cur-db))
   (let* ((case-fold-search t)
-         (value (ebib-get-field-value field key db 'noerror nil 'xref))
+         (value (ebib-get-field-value field key db 'noerror nil 'xref 'expand-strings))
          (multiline "")
          (raw " ")
          (matched nil)
@@ -388,6 +388,8 @@ which can be passed to `ebib--display-multiline-field'."
     (when value
       (if (get-text-property 0 'ebib--alias value)
           (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib--field-aliases 'case-fold))) 'face 'ebib-alias-face)))
+      (if (get-text-property 0 'ebib--expanded value)
+          (setq value (propertize value 'face 'ebib-abbrev-face 'fontified t)))
       (if (stringp (get-text-property 0 'ebib--xref value))
           (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
       (if (and (member-ignore-case field '("crossref" "xref" "related"))

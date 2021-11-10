@@ -1094,6 +1094,10 @@ file.  If this option is set, the database is automatically saved."
   "Face used to indicate values inherited from crossreferenced entries."
   :group 'ebib-faces)
 
+(defface ebib-abbrev-face '((t  (:inherit font-lock-regexp-grouping-construct)))
+  "Face used to indicate expanded abbreviated/concatenated strings."
+  :group 'ebib-faces)
+
 (defface ebib-marked-face '((t (:inverse-video t)))
   "Face to indicate marked entries."
   :group 'ebib-faces)
