@@ -40,6 +40,7 @@
 (require 'seq)
 (require 'bibtex)
 (require 'format-spec)
+(require 'message) ; for `message-unquote-tokens'.
 (require 'ebib-db)
 
 ;; Make a bunch of variables obsolete.
