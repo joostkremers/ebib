@@ -890,7 +890,7 @@ to handle a URL on the command line."
 
 (make-obsolete-variable 'ebib-file-field "The standard file field can no longer be customized" "Ebib 2.27")
 
-(defcustom ebib-import-directory "~/Downloads"
+(defcustom ebib-import-directory "~/Downloads/"
   "Directory to import files from.
 When using the command `ebib-import-file', this directory is
 offered as the default directory."
