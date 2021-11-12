@@ -4,6 +4,7 @@
 
 - New command: `ebib-jump-to-field`, bound to `j` in the entry buffer.
 - Add ivy actions to `ebib-jump-to-field`, thanks to [Hugo Heagren](https://github.com/Hugo-Heagren).
+- Display expansions of `@String` abbreviations in the entry buffer, thanks to Hugo Heagren.
 
 ## Version 2.32, April 2021 ##
 
