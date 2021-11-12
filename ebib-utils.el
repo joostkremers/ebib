@@ -1807,9 +1807,10 @@ string has the text property `ebib--alias' with value t."
 	(let ((orig-value value))
 	  (setq value (apply 'concat
 			     (message-unquote-tokens
-			      (mapcar
-			       (lambda (str) (or (ebib-get-string str ebib--cur-db 'noerror 'unbraced) str))
-			       (split-string value "#" t "[[:blank:]]+")))))
+			      (mapcar (lambda (str)
+                                        (or (ebib-get-string str ebib--cur-db 'noerror 'unbraced)
+                                            str))
+			              (split-string value "#" t "[[:blank:]]+")))))
 	  (unless (string-equal value orig-value)
 	    (add-text-properties 0 (length value) '(ebib--expanded t) value))))
       (when alias
