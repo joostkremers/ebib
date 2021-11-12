@@ -1754,7 +1754,7 @@ shown."
   :group 'ebib
   :type '(choice (const :tag "Always expand" t)
                  (const :tag "Never expand" nil)
-		 (repeat :tag "Expand only listed fields" string)))
+		 (repeat :tag "Expand only listed fields" (string :tag "Field"))))
 
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
