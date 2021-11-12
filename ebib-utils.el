@@ -1740,11 +1740,11 @@ Return t upon success, or nil if the value could not be stored."
 (defcustom ebib-expand-strings t
   "Whether expand of abbreviated/concatenated fields for display.
 If set to t, string abbreviations and concatenations are always
-expanded. If a list of strings, then fields which match one of
-the members (case-insensitively) will be expanded. If a field
+expanded.  If a list of strings, then fields which match one of
+the members (case-insensitively) will be expanded.  If a field
 with an alias is expanded, values in the alias field are expanded
-too. If only the alias name is in the list, only the alias is
-expanded. If set to nil, nothing is ever expanded.
+too.  If only the alias name is in the list, only the alias is
+expanded.  If set to nil, nothing is ever expanded.
 
 Expanded values are shown in `ebib-abbrev-face'.
 
@@ -1768,7 +1768,7 @@ text has the text property `ebib--xref', which has as value the
 key of the entry from which the field value was retrieved.
 
 If EXPAND-STRINGS is non-nil and the field is unbraced then
-abbreviation strings and concatenation are expanded. The result
+abbreviation strings and concatenation are expanded.  The result
 has the text property `ebib--expanded' with value t.
 
 Similarly, the value can be retrieved from an alias field.  (See
