@@ -3814,11 +3814,19 @@ was called interactively."
       (beginning-of-line))))
 
 (defun ebib-add-field (&optional default)
-  "Prompt for a field name and add it to current entry.
+  "Prompt with completion for a field name and add it to current entry.
+Completion candidates are all fields ebib knows about for the
+current dialect, less all fields in the current entry.
+
 If DEFAULT is specified, it is the initial input for the prompt."
   (interactive)
-  (let ((field (read-string "Field: " default))
-	(key (ebib--get-key-at-point)))
+  (let* ((key (ebib--get-key-at-point))
+	 (db-fields (seq-mapcat (lambda (type) (ebib--list-fields type 'all (ebib--get-dialect ebib--cur-db)))
+					  (ebib--list-entry-types)))
+	 (current-entry-fields (mapcar 'car (ebib-db-get-entry key ebib--cur-db)))
+	 (candidate-fields (delete-dups
+			     (seq-difference db-fields current-entry-fields)))
+	 (field (completing-read "Field: " candidate-fields nil nil default)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (error "[Ebib] Field `%s' already has a value in entry `%s'" field key)
       ;; We store the field with an empty string as value and then let the user
