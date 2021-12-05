@@ -2371,7 +2371,9 @@ databases containing them."
         (nreverse entries)))))
 
 (defun ebib-helm-action-function (_)
-  "Return a list of cons cells of the selected candidates and the databases that contain them."
+  "Return a list of the selected candidates.
+Each element is a cons cell of a candidate and the database that
+contain it."
   (mapcar (lambda (item)
             (cons (nth 0 item) (nth 1 item)))
           (helm-marked-candidates)))
@@ -3398,7 +3400,9 @@ should be added, do so.  KEYWORDS is a list of keywords."
       (mapc #'ebib--keywords-add-to-completion-list keywords)))
 
 (defun ebib-purge-keywords-field ()
-  "Remove keywords in the current entry that are not on the list of canonical keywords."
+  "Remove non-canonical keywords in the current entry.
+Specifically, remove all keywords that are not on the list of
+canonical keywords."
   (interactive)
   (let* ((keywords (ebib--keywords-to-list (ebib-get-field-value "keywords" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
          (canonical (seq-intersection keywords ebib--keywords-completion-list)))
