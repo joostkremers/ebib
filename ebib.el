@@ -1180,8 +1180,6 @@ there for details."
     ["Quit Ebib" ebib-quit t]
     ["Help on Ebib" ebib-info t]))
 
-(easy-menu-add ebib-index-menu ebib-index-mode-map)
-
 (defun ebib-customize ()
   "Switch to Ebib's customisation group."
   (interactive)
@@ -3670,8 +3668,6 @@ hook `ebib-reading-list-remove-item-hook' is run."
     ["Quit Entry Buffer" ebib-quit-entry-buffer t]
     ["Help On Entry Buffer" ebib-entry-help t]))
 
-(easy-menu-add ebib-entry-menu ebib-entry-mode-map)
-
 (defun ebib--format-entry-info-for-modeline ()
   "Format information about the current entry for display in the mode line.
 Return a string that contains the entry key, `ebib-notes-symbol'
@@ -4401,8 +4397,6 @@ over `ebib--edit-field-as-multiline'."
     ["Quit @Strings Buffer" ebib-quit-strings-buffer t]
     ["Help On @Strings Buffer" ebib-strings-help t]))
 
-(easy-menu-add ebib-strings-menu ebib-strings-mode-map)
-
 (defun ebib-quit-strings-buffer ()
   "Quit editing the @String definitions."
   (interactive)
@@ -4635,8 +4629,6 @@ the @String definitions to."
     ["Cancel Edit" ebib-cancel-multiline-buffer t]
     ["Save Text" ebib-save-from-multiline-buffer t]
     ["Help" ebib-multiline-help t]))
-
-(easy-menu-add ebib-multiline-menu ebib-multiline-mode-map)
 
 (defun ebib--multiline-edit (info &optional starttext)
   "Edit a multiline text.
