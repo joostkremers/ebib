@@ -439,7 +439,7 @@ it is highlighted.  DB defaults to the current database."
          (req-fields (ebib--list-fields entry-type 'required dialect))
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
          (extra-fields (ebib--list-fields entry-type 'extra dialect))
-         (undef-fields (seq-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields (ebib-db-get-entry key db) dialect)))))
+         (undef-fields (seq-remove #'ebib--special-field-p (mapcar #'car (ebib--list-undefined-fields entry dialect)))))
     (insert (format "%-18s %s%s"
                     (propertize "type" 'face 'ebib-field-face)
                     (if (assoc-string entry-type (ebib--list-entry-types dialect t) 'case-fold)
