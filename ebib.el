@@ -454,9 +454,9 @@ it is highlighted.  DB defaults to the current database."
             (when fields ; If one of the sets is empty, we don't want an extra empty line.
               (insert "\n")
               (mapc (lambda (field)
-                      (unless (and (not (assoc-string field entry 'case-fold))
-                                   (member-ignore-case field ebib-hidden-fields)
-                                   ebib--hide-hidden-fields)
+                      (unless (and (not (cdr (assoc-string field entry 'case-fold))) ; If a field does not have a value,
+                                   (member-ignore-case field ebib-hidden-fields)     ; and is hidden, don't display it,
+                                   ebib--hide-hidden-fields)                         ; unless the user wants to see all hidden fields.
                         (insert (format "%-17s %s"
                                         (propertize field 'face 'ebib-field-face)
                                         (ebib--get-field-highlighted field key db match-str))
