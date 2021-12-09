@@ -434,7 +434,7 @@ it is highlighted.  DB defaults to the current database."
   (or db
       (setq db ebib--cur-db))
   (let* ((dialect (ebib--get-dialect db))
-         (entry (ebib-db-get-entry key db))
+         (entry (ebib-get-entry key db 'noerror 'xref))
          (entry-type (cdr (assoc "=type=" entry)))
          (req-fields (ebib--list-fields entry-type 'required dialect))
          (opt-fields (ebib--list-fields entry-type 'optional dialect))
