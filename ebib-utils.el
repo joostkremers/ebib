@@ -41,6 +41,7 @@
 (require 'bibtex)
 (require 'format-spec)
 (require 'message) ; for `message-unquote-tokens'.
+(require 'parsebib)
 (require 'ebib-db)
 
 ;; Make a bunch of variables obsolete.
@@ -1755,6 +1756,25 @@ shown."
   :type '(choice (const :tag "Always expand" t)
                  (const :tag "Never expand" nil)
 		 (repeat :tag "Expand only listed fields" (string :tag "Field"))))
+
+(defun ebib-get-entry (key db &optional noerror xref)
+  "Return entry KEY in database DB as an alist.
+The entry is returned as an alist of (FIELD . VALUE) pairs.
+Trigger an error if KEY does not exist, unless NOERROR is t.  If
+XREF is non-nil, add any fields that are inherited from a
+cross-referenced entry to the alist.  Note that inherited fields
+are not marked in any way, so they cannot be distinguished in the
+return value."
+  (if-let ((entry (ebib-db-get-entry key db noerror))
+           (xref)
+           (xref-key (ebib-unbrace (cdr (assoc-string "crossref" entry 'case-fold))))
+           (xref-db (ebib--find-db-for-key xref-key db))
+           (xref-entry (ebib-db-get-entry xref-key xref-db 'noerror))
+           (inheritances (if (eq (ebib--get-dialect db) 'BibTeX)
+                             'BibTeX
+                           ebib-biblatex-inheritances)))
+      (parsebib--get-xref-fields (copy-alist entry) xref-entry inheritances)
+    entry))
 
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
