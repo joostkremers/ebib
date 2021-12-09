@@ -4180,35 +4180,46 @@ value is copied to the kill ring."
   (interactive)
   (ebib-copy-field-contents (ebib--current-field)))
 
-(defun ebib-kill-field-contents (field)
-    "Kill the contents of the FIELD in the current entry.
-The killed text is put in the kill ring.  If the field contains a
-value from a cross-referenced entry, it is not killed."
-  (let ((key (ebib--get-key-at-point)))
-    (unless (or (not field)
-                (string= field "=type="))
-      (let ((contents (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced 'xref)))
-        (cond
-         ((and (stringp contents)
-               (stringp (get-text-property 0 'ebib--xref contents)))
-          (error "Cannot kill a cross-referenced field value"))
-         ((stringp contents)
-          (ebib-db-remove-field-value field key ebib--cur-db)
-          (kill-new contents)
-          (ebib--redisplay-field field)
-          (ebib--redisplay-index-item field)
-          (ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
-                                                           (ebib-db-has-key key dependent))
-                                                         (ebib--list-dependents ebib--cur-db)))
-          (message "Field contents killed."))
-         (t (error "Cannot kill an empty field")))))))
+(defun ebib-delete-field-contents (field &optional kill)
+  "Kill the contents of the FIELD in the current entry.
+If KILL is non-nil, put the deleted text in the kill-ring. If the
+field contains a value from a cross-referenced entry, it is never
+killed."
+  (if (or (not field)
+          (string= field "=type="))
+      (beep)
+    (let* ((key (ebib--get-key-at-point))
+	   (contents (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced 'xref))
+	   (action-string (if kill "kill" "delete")))
+      (cond
+       ((and (stringp contents)
+             (stringp (get-text-property 0 'ebib--xref contents)))
+	(error "[Ebib] Cannot %s a cross-referenced field value" action-string))
+       ((and (stringp contents) (or kill (y-or-n-p "Delete field contents? ")))
+	(ebib-db-remove-field-value field key ebib--cur-db)
+	(when kill (kill-new contents))
+	(ebib--redisplay-field field)
+	(ebib--redisplay-index-item field)
+	(ebib--set-modified t ebib--cur-db (seq-filter (lambda (dependent)
+							 (ebib-db-has-key key dependent))
+                                                       (ebib--list-dependents ebib--cur-db)))
+	(message "Field contents %s" (if kill "killed" "deleted")))
+       (t (error "[Ebib] Cannot %s an empty field" action-string))))))
 
 (defun ebib-kill-current-field-contents ()
   "Kill the contents of the current field.
 The killed text is put in the kill ring.  If the field contains a
 value from a cross-referenced entry, it is not killed."
   (interactive)
-    (ebib-kill-field-contents (ebib--current-field)))
+  (ebib-delete-field-contents (ebib--current-field) 'kill))
+
+(defun ebib-delete-current-field-contents ()
+  "Delete the contents of the current field.
+The deleted text is not put in the kill ring.  If the field
+contains a value from a cross-referenced entry, it is not
+deleted."
+  (interactive)
+  (ebib-delete-field-contents (ebib--current-field) nil))
 
 (defun ebib-yank-field-contents (field)
   "Insert the last killed text into the current field.
@@ -4239,27 +4250,6 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
 (defun ebib-yank-current-field-contents ()
   (interactive)
   (ebib-yank-field-contents (ebib--current-field)))
-
-(defun ebib-delete-field-contents (field)
-  "Delete the contents of FIELD.
-The deleted text is not put in the kill ring."
-  (let ((key (ebib--get-key-at-point)))
-    (if (string= field "=type=")
-        (beep)
-      (when (y-or-n-p "Delete field contents? ")
-        (ebib-db-remove-field-value field key ebib--cur-db)
-        (ebib--redisplay-field field)
-        (ebib--redisplay-index-item field)
-        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                           (ebib-db-has-key key dependent))
-                                                         (ebib--list-dependents ebib--cur-db)))
-        (message "Field contents deleted.")))))
-
-(defun ebib-delete-current-field-contents ()
-    "Delete the contents of the current field.
-The deleted text is not put in the kill ring."
-    (interactive)
-    (ebib-delete-field-contents (ebib--current-field)))
 
 (defun ebib-toggle-raw (field)
   "Toggle the \"special\" status of FIELD's contents."
