@@ -40,6 +40,43 @@
 (require 'ivy)
 (require 'ebib)
 
+(defvar ebib-completion-finish-key)
+
+(setq ebib-completion-finish-key (let ((key (key-description (where-is-internal 'ivy-immediate-done (list ivy-minibuffer-map) 'non-ascii))))
+                                   (list `(completing-read . ,key)
+                                         `(read-file-name . ,key))))
+
+
+(defun ebib-read-entry-ivy (prompt databases _)
+  "Read an entry from the user using ivy.
+Offer the entries in DATABASES (a list of database structs) for
+completion.  PROMPT is the prompt to be displayed.
+
+It is possible to select multiple entries either by using
+`ivy-call' or by marking them with `ivy-mark'.
+
+Return value is a list of cons cells of the selected keys and the
+databases containing them."
+  (let ((minibuffer-allow-text-properties t)
+        (ivy-sort-max-size (expt 256 6))
+        entries)
+    (let ((collection (ebib--create-completion-collection databases t)))
+      (if (not collection)
+          (error "[Ebib] No entries found in database(s)")
+        (ivy-read prompt collection
+                  :action (lambda (item)
+                            (let ((key (cadr item))
+                                  (db (caddr item)))
+                              (unless (cl-find key entries :key #'car)
+                                (push (cons key db) entries))))
+                  :history 'ebib--citation-history
+                  :sort t)
+        (nreverse entries)))))
+
+(defvar ebib-read-entry-function)
+
+(setq ebib-read-entry-function #'ebib-read-entry-ivy)
+
 (ivy-add-actions
  'ebib-jump-to-field
  '(("c" ebib-copy-field-contents "copy field contents")
@@ -57,4 +94,4 @@
 
 (provide 'ebib-ivy)
 
-;;; ebib-notes.el ends here
+;;; ebib-ivy.el ends here

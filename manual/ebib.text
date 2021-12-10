@@ -16,6 +16,21 @@ The easiest way to install Ebib is to get it from the [Melpa package archive](ht
 
 It's also possible to install Ebib manually. If you prefer this method, then you probably know what you're doing, so detailed instructions are omitted here. Just be sure to also install the [parsebib](https://github.com/joostkremers/parsebib) package, which Ebib depends on.
 
+
+## Completion ##
+
+If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper), [helm](https://github.com/emacs-helm/helm) or the built-in package ido for completion, you should load the corresponding Ebib add-on by adding one of the following to your init file:
+
+```
+(require 'ebib-selectrum)
+(require 'ebib-ivy)
+(require 'ebib-helm)
+(require 'ebib-ido)
+```
+
+These add-ons make selecting an entry more convenient: instead of typing the entry key (which you need to remember), you can select an entry by typing any part of the author, title or year of an entry and the list of possible candidates is narrowed as you type.
+
+
 ## News ## {.unlisted .unnumbered}
 
 New features and (possibly breaking) changes to existing features are announced in the [NEWS](NEWS.html) file.
@@ -106,10 +121,6 @@ The basic motion keys in the index buffer are the following:
 If you have more than one database opened, you can use the keys [`1`]{.key}–[`9`]{.key} to jump between databases. The number of each database is shown in the mode line of the index buffer before the database name. (Note that the numbering is dynamic: if you have three databases opened and then close the second, database 3 becomes database 2.) You can also use the [`left`]{.key} and [`right`]{.key} cursor keys to move to the previous or next database (these keys wrap).
 
 You can quickly jump to any entry in a database with the key [`j`]{.key}. This asks you for an entry key (using completion) and then jumps to the corresponding entry. This actually works across databases: the keys that are offered for completion are the keys from all open databases. After selecting a key, Ebib changes to the corresponding database and shows the entry corresponding to the key. Note, though, that you can restrict the jump candidates to the current database by using a prefix argument, i.e., by typing [`C-u j`]{.key}.
-
-If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) or the built-in package ido, using [`j`]{.key} becomes even more convenient: instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. 
-
-In fact, with these completion systems, it is generally unnecessary to remember the key of an entry, and you can customise the option `ebib-index-columns` in order not to display it in the index buffer, as discussed in the next section.
 
 
 ## Displaying and Sorting the Entries List ##
@@ -219,6 +230,8 @@ You can move between fields with the same keys that you use to move between entr
 | [`b`]{.key} [`PgUp`]{.key}               | move to next set        |
 | [`g`]{.key} [`Home`]{.key}               | move to the first field |
 | [`G`]{.key} [`End`]{.key}                | move to the last field  |
+
+You can jump to any field with [`j`]{.key}, which asks for a field to jump to. If you use ivy and have loaded `ebib-ivy.el`, most actions on fields are also available as ivy actions.
 
 To finish editing fields and move focus back to the index window, use [`q`]{.key}.
 
@@ -480,9 +493,9 @@ If you save a dependent database, it is saved as a normal, standalone `.bib` fil
 
 When you're in a text buffer and you have Ebib open in the background (i.e., you lowered Ebib with [`z`]{.key}), you can insert a citation with the command `ebib-insert-citation`. This command asks for a key and inserts a citation with that key in a (user-selectable) form that is appropriate for the current buffer. By default, this is set up for LaTeX and  [Pandoc](http://johnmacfarlane.net/pandoc/) Markdown buffers. There is some support for [Org mode](http://orgmode.org) as well, as discussed below.
 
-When you invoke `ebib-insert-citation`, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use [`TAB`]{.key} completion when typing the key. If you have [selectrum](https://github.com/raxod502/selectrum),  [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) installed, however, Ebib uses a more sophisticated method: instead of typing just the key, you can type (parts of) the author name, publication year and title in order to find the reference you wish to cite.
+When you invoke `ebib-insert-citation`, Emacs prompts you for a key from the database(s) associated with the current buffer and for a citation command to use. You can use [`TAB`]{.key} completion when typing the key.
 
-You can define different citation commands for each type of file that you use. That is, you can have one set of citation commands for LaTeX files, another set for Org files, etc. For LaTeX buffers, the citation commands that have been predefined are those used by `biblatex` (well, the most common ones, anyway). If you use BibTeX, you may need to customise the option `ebib-citation-commands`, as discussed below, [Defining Citation Commands](#defining-citation-commands).
+You can define different citation commands for each type of text file that you use. That is, you can have one set of citation commands for LaTeX files, another set for Org files, etc. For LaTeX buffers, the citation commands that have been predefined are those used by `biblatex` (well, the most common ones, anyway). If you use BibTeX, you may need to customise the option `ebib-citation-commands`, as discussed below, [Defining Citation Commands](#defining-citation-commands).
 
 For Markdown buffers, three commands have been predefined: `text`, which inserts a citation of the form `@Jones1992`,  `paren`, which inserts a citation of the form `[@Jones1992]` and `year`, which inserts `[-@Jones1992]`. Since these are the only types of citations that Pandoc Markdown knows, you shouldn't need to change anything.
 
@@ -491,7 +504,9 @@ Ebib also provides a way to insert citations into a buffer from within Ebib. If 
 
 ## Citations with multiple keys ##
 
-Most citation commands in LaTeX can take multiple keys. To add more than one key to a citation, you can mark them in Ebib's index buffer with [`m`]{.key} and then insert them into a text buffer with [`i`]{.key}. If you use ivy or helm, the standard method that these packages provide for selecting and acting on multiple candidates can be used if you insert a citation from within your text buffer with `ebib-insert-citation`. If you use selectrum or Emacs' built-in completion method, you can enable selection of multiple keys by setting the option `ebib-citations-insert-multiple`. With this option set, you can select multiple keys when calling `ebib-insert-citation` by selecting a candidate and then pressing [`TAB`]{.key}. Once you hit [`TAB`]{.key}, you need to add an ampersand [`&`]{.key} as a separator (possibly surrounded by spaces) and then you can select the next candidate. Finish by typing [`RET`]{.key}.
+Most citation commands in LaTeX can take multiple keys. To add more than one key to a citation, you can mark them in Ebib's index buffer with [`m`]{.key} and then insert them into a text buffer with [`i`]{.key}. If you use ivy or helm and have the corresponding Ebib add-on installed (see the section [Completion](#completion) above), the standard method that these packages provide for selecting and acting on multiple candidates can be used if you insert a citation from within your text buffer with `ebib-insert-citation`.
+
+Similarly, if you use selectrum or Emacs' built-in completion method, you can enable selection of multiple keys by setting the option `ebib-citations-insert-multiple`. With this option set, you can select multiple keys when calling `ebib-insert-citation` by selecting a candidate and then pressing [`TAB`]{.key}. Once you hit [`TAB`]{.key}, you need to add an ampersand [`&`]{.key} as a separator (possibly surrounded by spaces) and then you can select the next candidate. Finish by typing [`RET`]{.key}.
 
 Note that selectrum automatically adds the ampersand for you, so you don't need to type it: after hitting [`TAB`]{.key}, you can immediately start selecting the next candidate. If you use default completion, however, you need to type it yourself.
 
@@ -636,8 +651,6 @@ The `org-ebib` package also allows you to create Org links to Ebib entries with 
 Ebib provides several ways of searching through your database(s). This section describes two simple search strategies: jumping to an entry and searching for a string or regular expression. The next section discusses a more powerful search mechanism in the form of filters.
 
 If you want to look for a particular entry, the easiest way to do this is to use [`j`]{.key}. This command (`ebib-jump-to-entry`) asks for an entry key, offering completion while you type. Note that you can use this command to search for an entry in all open databases. If you want to restrict it to just the current database, use a prefix argument: [`C-u j`]{.key}.
-
-If you use [selectrum](https://github.com/raxod502/selectrum),  [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm), this method is actually very convenient, because completion is more sophisticated: you can search not on entry key but on any part of the author/editor name, the title and the year.
 
 If you want to search the entire contents of your entries, not just the author/editor names and the titles, you can use [`/`]{.key}. This command (`ebib-search`) searches for a string (more precisely, a regular expression) starting from the current entry (i.e., *not* from the first entry) and will display the entry with the first occurrence of the search string that it finds. All the occurrences of the search string in that entry are highlighted.
 

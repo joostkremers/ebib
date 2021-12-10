@@ -64,21 +64,10 @@
 (require 'ebib-notes)
 (require 'ebib-reading-list)
 
-;; Make sure `ivy' & `helm' are loaded during compilation.
-(require 'ivy nil 'noerror)
-(require 'helm nil 'noerror)
-
 ;;; Silence the byte-compiler.
 (defvar pandoc-mode)
-(defvar selectrum-minibuffer-map)
-(defvar ivy-minibuffer-map)
-(defvar ivy-sort-max-size)
 (declare-function org-capture "org-capture" (&optional goto keys))
 (declare-function pandoc--get "ext:pandoc-mode-utils.el" (option &optional buffer))
-(declare-function ivy-read "ext:ivy.el" (prompt collection &rest args))
-(declare-function helm-marked-candidates "ext:helm.el" (&optional with-wildcard all-sources))
-(declare-function helm-build-sync-source "ext:helm-source.el" (name &rest args))
-(declare-function helm "ext:helm.el" (&rest plist))
 
 ;;; Helper functions
 
@@ -668,17 +657,15 @@ user."
                                                               databases)
                                                nil t)))
 
-(defun ebib--completion-finish-key (command)
+(defvar ebib-completion-finish-key `((completing-read . ,(key-description [return]))
+                                     (read-file-name . ,(key-description [return])))
+  "Keys used to finish specific completion actions.")
+
+(defun ebib--get-completion-finish-key (command)
   "Return the key binding that finishes a completion command.
-COMMAND is the command to finish, one of the symbols
-`completing-read' or `read-file-name'."
-  (cond
-   ((and (boundp 'selectrum-mode) selectrum-mode) (key-description (where-is-internal 'selectrum-submit-exact-input (list selectrum-minibuffer-map) 'non-ascii)))
-   ((and (boundp 'ivy-mode) ivy-mode) (key-description (where-is-internal 'ivy-immediate-done (list ivy-minibuffer-map) 'non-ascii)))
-   ((and (boundp 'helm-mode) helm-mode) (let ((map (symbol-value (alist-get command '((completing-read . helm-comp-read-map)
-										      (read-file-name . helm-read-file-map))))))
-					  (key-description (where-is-internal 'helm-cr-empty-string (list map) 'non-ascii))))
-   (t (key-description [return]))))
+COMMAND is the command to finish, currently one the symbols
+`completing-read' or `read-file-name' are supported."
+  (alist-get command ebib-completion-finish-key))
 
 ;;; Main
 
@@ -2329,6 +2316,8 @@ is prepended to the completion candidates."
                           coll)))
               databases nil))
 
+(defvar ebib-read-entry-function #'ebib-read-entry-default)
+
 (defun ebib-read-entry (prompt databases &optional multiple)
   "Read an entry from the user.
 Offer the entries in DATABASES (a list of database structs) for
@@ -2337,113 +2326,33 @@ non-nil, multiple keys can be selected.
 
 This function calls one of the `ebib-read-entry-*' functions
 depending on the completion system in use."
-  (cond
-   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy prompt databases))
-   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm prompt databases))
-   ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple prompt databases)))
-   ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido prompt databases))
-   (t (ebib-read-entry-single prompt databases))))
+  (funcall ebib-read-entry-function prompt databases multiple))
 
-(defun ebib-read-entry-ivy (prompt databases)
-  "Read an entry from the user using ivy.
-Offer the entries in DATABASES (a list of database structs) for
-completion.  PROMPT is the prompt to be displayed.
-
-It is possible to select multiple entries either by using
-`ivy-call' or by marking them with `ivy-mark'.
-
-Return value is a list of cons cells of the selected keys and the
-databases containing them."
-  (let ((minibuffer-allow-text-properties t)
-        (ivy-sort-max-size (expt 256 6))
-        entries)
-    (let ((collection (ebib--create-completion-collection databases t)))
-      (if (not collection)
-          (error "[Ebib] No entries found in database(s)")
-        (ivy-read prompt collection
-                  :action (lambda (item)
-                            (let ((key (cadr item))
-                                  (db (caddr item)))
-                              (unless (cl-find key entries :key #'car)
-                                (push (cons key db) entries))))
-                  :history 'ebib--citation-history
-                  :sort t)
-        (nreverse entries)))))
-
-(defun ebib-helm-action-function (_)
-  "Return a list of the selected candidates.
-Each element is a cons cell of a candidate and the database that
-contain it."
-  (mapcar (lambda (item)
-            (cons (nth 0 item) (nth 1 item)))
-          (helm-marked-candidates)))
-
-(defun ebib-read-entry-helm (prompt databases)
-  "Read an entry from the user using helm.
-Offer the entries in DATABASES (a list of database structs) for
-completion.  PROMPT is the prompt to be displayed.
-
-It is possible to select multiple entries in the helm buffer.
-
-Return value is a list of cons cells of the selected keys and the
-databases containing them."
-  (let ((sources (helm-build-sync-source prompt
-                                         :candidates (ebib--create-completion-collection databases t)
-                                         :action '(("Select entry" . ebib-helm-action-function)))))
-    (helm :sources sources
-          :sort t
-          :buffer "*helm ebib*"
-          :prompt "Select entry: ")))
-
-(defun ebib-read-entry-ido (prompt databases)
-  "Read an entry from the user using ido.
-Offer the entries in DATABASES (a list of database structs) for
-completion.  PROMPT is the prompt to be displayed.
-
-For compatibility with the other `ebib-read-entry-*' functions,
-the return value is a list with a single cons cell of the key and
-the database containing the selected entry."
-  (let ((collection (ebib--create-completion-collection databases)))
-    (if collection
-        (let* ((candidates (mapcar #'car collection))
-               (entry (ido-completing-read prompt candidates nil t nil 'ebib--key-history))
-               (key (cadr (assoc-string entry collection)))
-               (db (caddr (assoc-string entry collection))))
-          (list (cons key db)))
-      (error "[Ebib] No BibTeX entries found"))))
-
-(defun ebib-read-entry-single (prompt databases)
+(defun ebib-read-entry-default (prompt databases multiple)
   "Read an entry from the user using default completion.
 Offer the entries in DATABASES (a list of database structs) for
-completion.  PROMPT is the prompt to be displayed.
+completion.  PROMPT is the prompt to be displayed.  If MULTIPLE
+is non-nil,  use `completing-read-multiple' to read entries if
+`ebib-citation-insert-multiple' is also non-nil.
 
 For compatibility with the other `ebib-read-entry-*' functions,
 the return value is a list with a single cons cell of the key and
 the database containing the selected entry."
   (let ((collection (ebib--create-completion-collection databases)))
     (if collection
-        (let* ((entry (completing-read prompt collection nil t nil 'ebib--key-history))
-               (key (cadr (assoc-string entry collection)))
-               (db (caddr (assoc-string entry collection))))
-          (list (cons key db)))
-      (error "[Ebib] No BibTeX entries found"))))
-
-(defun ebib-read-entry-multiple (prompt databases)
-  "Read a list of entries from the user using default completion.
-Offer the entries in DATABASES (a list of database structs) for
-completion.  PROMPT is the prompt to be displayed.
-
-Return value is a list of cons cells of the selected keys and the
-databases containing them."
-  (let ((collection (ebib--create-completion-collection databases)))
-    (if collection
-        (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
-               (crm-separator "\\s-*&\\s-*")
-               (keys (completing-read-multiple prompt collection nil t nil 'ebib--key-history)))
-          (mapcar (lambda (entry)
-                    (cons (cadr (assoc-string entry collection))
-                          (caddr (assoc-string entry collection))))
-                  keys))
+        (cond
+         ((and multiple ebib-citation-insert-multiple)
+          (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+                 (crm-separator "\\s-*&\\s-*")
+                 (keys (completing-read-multiple prompt collection nil t nil 'ebib--key-history)))
+            (mapcar (lambda (entry)
+                      (cons (cadr (assoc-string entry collection))
+                            (caddr (assoc-string entry collection))))
+                    keys)))
+         (t (let* ((entry (completing-read prompt collection nil t nil 'ebib--key-history))
+                   (key (cadr (assoc-string entry collection)))
+                   (db (caddr (assoc-string entry collection))))
+              (list (cons key db)))))
       (error "[Ebib] No BibTeX entries found"))))
 
 (defun ebib-export-entries (prefix)
@@ -3319,7 +3228,7 @@ entry or the marked entries to the dependent database."
   "Read keywords with completion from COLLECTION.
 Return the keywords entered as a list.  If no keywords are
 entered, the return value is nil."
-  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--completion-finish-key 'completing-read))))
+  (let* ((prompt (format "Add keyword (%s to finish) [%%s]" (ebib--get-completion-finish-key 'completing-read))))
     (cl-loop for keyword = (completing-read (format prompt (mapconcat #'identity keywords " "))
 					    collection nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
@@ -3861,7 +3770,7 @@ If DEFAULT is specified, it is the initial input for the prompt."
   ;; can unbind <SPC>, since keywords may contain spaces.
   (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
         (key (ebib--get-key-at-point))
-	(prompt (format "New keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
+	(prompt (format "New keyword (%s to finish): " (ebib--get-completion-finish-key 'completing-read))))
     (cl-loop for keyword = (completing-read prompt ebib--keywords-completion-list nil nil nil 'ebib--keywords-history)
              until (string= keyword "")
              do (let* ((conts (ebib-get-field-value "keywords" key ebib--cur-db 'noerror 'unbraced))
@@ -3892,7 +3801,7 @@ relative to the directories listed in `ebib-file-search-dirs',
 otherwise they are stored as absolute paths."
   (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs)))
         (key (ebib--get-key-at-point))
-	(prompt (format "Add file (%s to finish): " (ebib--completion-finish-key 'read-file-name))))
+	(prompt (format "Add file (%s to finish): " (ebib--get-completion-finish-key 'read-file-name))))
     (cl-loop for file = (expand-file-name (read-file-name prompt start-dir nil 'confirm-after-completion) start-dir)
              until (or (string= file "")
                        ;; When using Ivy, the return value of
@@ -3963,7 +3872,7 @@ all other authors and editors in all databases."
   ;; can unbind <SPC>, since authors and editors contain spaces.
   (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
         (collection (ebib--create-author/editor-collection))
-        (prompt (format "Add a new %s (%s to finish): " field (ebib--completion-finish-key 'completing-read)))
+        (prompt (format "Add a new %s (%s to finish): " field (ebib--get-completion-finish-key 'completing-read)))
         (key (ebib--get-key-at-point)))
     (cl-loop for author = (completing-read prompt collection)
              until (string= author "")

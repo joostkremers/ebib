@@ -508,10 +508,10 @@ provided, the user is prompted to supply one."
 
 (defcustom ebib-citation-insert-multiple nil
   "Allow insertion of multiple citations.
-If set, use `ebib-read-entry-multiple' in `ebib-insert-citation'.
-This allows inserting multiple keys in one citation command but
-has the disadvantage that it is not possible to provide a default
-description for citations in Org buffers."
+If set, allow inserting multiple keys in a single citation
+command.  Note that setting this option has the disadvantage that
+it is not possible to provide a default description for citations
+in Org buffers."
   :group 'ebib
   :type 'boolean)
 
