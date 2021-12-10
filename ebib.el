@@ -310,6 +310,15 @@ of strings."
 
 (defun ebib--extract-note-text (key)
   "Extract the text of the note for KEY.
+
+Calls `ebib-notes-extract-text-function' on KEY.
+
+The return value is a list of strings, each a separate line,
+which can be passed to `ebib--display-multiline-field'."
+  (funcall ebib-notes-extract-text-function key truncate))
+
+(defun ebib-extract-note-text-default (key)
+  "Extract the text of the note for KEY.
 The note must be an Org entry under its own headline.
 
 The note is truncated at `ebib-notes-display-max-lines' lines.
@@ -337,44 +346,41 @@ which can be passed to `ebib--display-multiline-field'."
       (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
         (when (file-readable-p filename)
           (insert-file-contents filename)))))
-    (split-string (ebib--extract-note-text-1) "\n")))
+    (let ((truncated nil)
+	  string)
+      ;; First reduce the size of the text we need to pass to
+      ;; `org-element-parse-buffer', since this function can be slow if the note
+      ;; is long.
+      (let ((max (progn
+                   (goto-char (point-min))
+                   (point-at-bol (* 2 ebib-notes-display-max-lines)))))
+	(when (< max (point-max))
+          (setq truncated t)
+          (delete-region max (point-max))))
 
-(defun ebib--extract-note-text-1 ()
-  "Helper function for `ebib--extract-note-text'."
-  (let ((truncated nil))
-    ;; First reduce the size of the text we need to pass to
-    ;; `org-element-parse-buffer', since this function can be slow if the note
-    ;; is long.
-    (let ((max (progn
-                 (goto-char (point-min))
-                 (point-at-bol (* 2 ebib-notes-display-max-lines)))))
-      (when (< max (point-max))
-        (setq truncated t)
-        (delete-region max (point-max))))
+      ;; Extract any property drawers.
+      (let ((contents (org-element-parse-buffer)))
+	(org-element-map contents 'property-drawer
+          (lambda (drawer)
+            (org-element-extract-element drawer)))
+	(erase-buffer)
+	(insert (org-element-interpret-data contents)))
 
-    ;; Extract any property drawers.
-    (let ((contents (org-element-parse-buffer)))
-      (org-element-map contents 'property-drawer
-        (lambda (drawer)
-          (org-element-extract-element drawer)))
-      (erase-buffer)
-      (insert (org-element-interpret-data contents)))
-
-    ;; Then take the first `ebib-notes-display-max-lines' lines, omitting the
-    ;; headline.
-    (let* ((beg (progn
-                  (goto-char (point-min))
-                  (forward-line 1) ; Skip the headline.
-                  (point)))
-           (end (progn
-                  (goto-char (point-min))
-                  (forward-line (1+ ebib-notes-display-max-lines))
-                  (point)))
-           (string (buffer-substring-no-properties beg end)))
-      (if (or truncated
-              (< end (point-max)))
-          (setq string (concat string "[...]\n"))
-        string))))
+      ;; Then take the first `ebib-notes-display-max-lines' lines, omitting the
+      ;; headline.
+      (let* ((beg (progn
+                    (goto-char (point-min))
+                    (forward-line 1)	; Skip the headline.
+                    (point)))
+             (end (progn
+                    (goto-char (point-min))
+                    (forward-line (1+ ebib-notes-display-max-lines))
+                    (point))))
+        (setq string (buffer-substring-no-properties beg end))
+	(if (or truncated
+		(< end (point-max)))
+            (setq string (concat string "[...]\n"))))
+      (split-string string "\n"))))
 
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
@@ -468,7 +474,7 @@ it is highlighted.  DB defaults to the current database."
           (list req-fields opt-fields extra-fields undef-fields))
     (when (and (eq ebib-notes-show-note-method 'top-lines)
                (ebib--notes-has-note key))
-      (let ((note (ebib--extract-note-text key)))
+      (let ((note (ebib--extract-note-text key 'truncate)))
         (insert "\n"
                 (format "%-18s %s"
                         (propertize "external note" 'face 'ebib-field-face)
