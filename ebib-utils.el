@@ -200,30 +200,31 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                 "version"
                                 "volumes")
   "List of fields that are not displayed.
-                                The fields in this list are not displayed by default.  Since
-                                biblatex defines a large number of fields, it is not practical to
-                                display them all in the entry buffer.  You can make these fields
-                                temporarily visible with the command `\\<ebib-index-mode-map>\\[ebib-toggle-hidden]'
-                                or through the menu."
+The fields in this list are not displayed by default.  Since
+biblatex defines a large number of fields, it is not practical to
+display them all in the entry buffer.  You can make these fields
+temporarily visible with the command
+`\\<ebib-index-mode-map>\\[ebib-toggle-hidden]' or through the
+menu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
 (defcustom ebib-layout 'full
   "Ebib window layout.
-                                This option defines how Ebib displays the buffers it uses.  Possible values are:
+This option defines how Ebib displays the buffers it uses.  Possible values are:
 
-                                - `full' (default): Use the entire frame.  The existing windows
-                                are hidden and reappear when Ebib is lowered.
+- `full' (default): Use the entire frame.  The existing windows
+are hidden and reappear when Ebib is lowered.
 
-                                - `window': Use the current window.  This window is split up to
-                                display the index and entry buffers.
+- `window': Use the current window.  This window is split up to
+display the index and entry buffers.
 
-                                - `custom': Use part of the current frame.  The width of the Ebib
-                                windows can be set with the option `ebib-width'.
+- `custom': Use part of the current frame.  The width of the Ebib
+windows can be set with the option `ebib-width'.
 
-                                - `index-only': Display only the index window.  The entry buffer
-                                is displayed when the user edits an entry or after pressing
-                                \\<ebib-index-mode-map>\\[ebib-select-and-popup-entry]."
+- `index-only': Display only the index window.  The entry buffer
+is displayed when the user edits an entry or after pressing
+\\<ebib-index-mode-map>\\[ebib-select-and-popup-entry]."
   :group 'ebib-windows
   :type '(choice (const :tag "Use full frame" full)
                  (const :tag "Use current window" window)
@@ -232,45 +233,45 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
 
 (defcustom ebib-width 80
   "Width of the Ebib windows.
-                                The width can be absolute or relative; if it is absolute, it
-                                specifies the number of columns that the Ebib windows occupies.
-                                If it is relative, the with must be a value between 0 and 1
-                                specifying the width relative to the width of the window that is
-                                selected when Ebib is started.
+The width can be absolute or relative; if it is absolute, it
+specifies the number of columns that the Ebib windows occupies.
+If it is relative, the with must be a value between 0 and 1
+specifying the width relative to the width of the window that is
+selected when Ebib is started.
 
-                                This option only takes effect if `ebib-layout' is set to `custom'."
+This option only takes effect if `ebib-layout' is set to `custom'."
   :group 'ebib-windows
   :type '(choice (integer :tag "Absolute width")
                  (float :tag "Relative width" :value 0.3)))
 
 (defcustom ebib-popup-entry-window nil
   "Create a popup window to display the entry window.
-                                If `ebib-layout' is set to `index-only', Ebib will use an
-                                existing window to display the entry buffer when needed.  By
-                                setting this option, however, you can tell Ebib to use the
-                                function `display-buffer-pop-up-window' to show the entry buffer,
-                                which (usually) means that a new window will be created.
+If `ebib-layout' is set to `index-only', Ebib will use an
+existing window to display the entry buffer when needed.  By
+setting this option, however, you can tell Ebib to use the
+function `display-buffer-pop-up-window' to show the entry buffer,
+which (usually) means that a new window will be created.
 
-                                Note that setting this option has no effect unless `ebib-layout'
-                                is set to `index-only'."
+Note that setting this option has no effect unless `ebib-layout'
+is set to `index-only'."
   :group 'ebib-windows
   :type 'boolean)
 
 (defcustom ebib-window-vertical-split nil
   "Display the index buffer at the left of the frame.
-                                Setting this option makes Ebib display the index buffer at the
-                                left side of the frame rather than at the top.  The width of the
-                                window will be `ebib-index-window-size', which you will probably
-                                have to set to a larger value."
+Setting this option makes Ebib display the index buffer at the
+left side of the frame rather than at the top.  The width of the
+window will be `ebib-index-window-size', which you will probably
+have to set to a larger value."
   :group 'ebib-windows
   :type 'boolean)
 
 (defcustom ebib-index-window-size 10
   "The size of the index buffer window.
-                                This is either the height of the window, or, if
-                                `ebib-window-vertical-split' is set, the width of the window.
-                                The rest of the frame is used for the entry buffer, unless
-                                `ebib-layout' is set to `index-only'."
+This is either the height of the window, or, if
+`ebib-window-vertical-split' is set, the width of the window.
+The rest of the frame is used for the entry buffer, unless
+`ebib-layout' is set to `index-only'."
   :group 'ebib-windows
   :type 'integer)
 
@@ -288,18 +289,18 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                              (format "  |%s|" (ebib--filters-pp-filter (ebib-db-get-filter ebib--cur-db)))
                                            "")))
   "The mode line for the index window.
-                                The mode line of the index window shows some Ebib-specific
-                                information.  You can customize this information if you wish, or
-                                disable the Ebib-specific mode line altogether."
+The mode line of the index window shows some Ebib-specific
+information.  You can customize this information if you wish, or
+disable the Ebib-specific mode line altogether."
   :group 'ebib-windows
   :type '(choice (const :tag "Use standard mode line" nil)
                  (sexp :tag "Customize mode line")))
 
 (defcustom ebib-entry-mode-line '((:eval (ebib--format-entry-info-for-modeline)))
   "The mode line for the entry buffer.
-                                The mode line of the entry window shows the entry key.  You can
-                                customize this information if you wish, or disable the
-                                Ebib-specific mode line altogether."
+The mode line of the entry window shows the entry key.  You can
+customize this information if you wish, or disable the
+Ebib-specific mode line altogether."
   :group 'ebib-windows
   :type '(choice (const :tag "Disable mode line" nil)
                  (sexp :tag "Customize mode line")))
@@ -319,20 +320,20 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                 ("Year" 6 t)
                                 ("Title" 50 t))
   "Columns to display in the index buffer.
-                                Each column consists of the BibTeX field to be displayed, which
-                                is also the column's label, the column's maximum width and a flag
-                                indicating whether sorting on this column is possible.
+Each column consists of the BibTeX field to be displayed, which
+is also the column's label, the column's maximum width and a flag
+indicating whether sorting on this column is possible.
 
-                                Any BibTeX or biblatex field can be used as a label.  There are
-                                also two special labels: \"Entry Key\" and \"Author/Editor\".
-                                The label \"Entry Key\" displays the entry's BibTeX key, and the
-                                label \"Author/Editor\" displays the contents of the Author
-                                field, or, if that is empty, the contents of the Editor field.
+Any BibTeX or biblatex field can be used as a label.  There are
+also two special labels: \"Entry Key\" and \"Author/Editor\".
+The label \"Entry Key\" displays the entry's BibTeX key, and the
+label \"Author/Editor\" displays the contents of the Author
+field, or, if that is empty, the contents of the Editor field.
 
-                                Note that the default sort field is the entry key, even if the
-                                \"Entry Key\" field is absent from the index buffer.  You can
-                                remove the \"Entry Key\" field from this option, but that will
-                                not change the default sort."
+Note that the default sort field is the entry key, even if the
+\"Entry Key\" field is absent from the index buffer.  You can
+remove the \"Entry Key\" field from this option, but that will
+not change the default sort."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
@@ -357,37 +358,37 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                                  ("Url" . ebib-display-www-link)
                                                  ("Note" . ebib-notes-display-note-symbol))
   "Functions transforming field contents to appropriate forms.
-                                Each function should accept three arguments, the field to be
-                                displayed, the key of the entry being displayed, and the database
-                                that contains the entry, and should return a string to be
-                                displayed in the ebib index buffer.  In principle, this string
-                                should be the contents of the field transformed in some way, but
-                                it may actually be anything.  In fact, it is not necessary for
-                                the field to be an actual Bib(La)TeX field, as long as the
-                                transformation function returns something that can be displayed."
+Each function should accept three arguments, the field to be
+displayed, the key of the entry being displayed, and the database
+that contains the entry, and should return a string to be
+displayed in the ebib index buffer.  In principle, this string
+should be the contents of the field transformed in some way, but
+it may actually be anything.  In fact, it is not necessary for
+the field to be an actual Bib(La)TeX field, as long as the
+transformation function returns something that can be displayed."
   :group 'ebib
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
-                                When adding new entries to the database, Ebib does not allow
-                                duplicate keys.  By setting this option, you can tell Ebib to
-                                automatically create a unique key by adding `b', `c'... to it.
-                                This applies when Ebib automatically generates keys for new
-                                entries (see `ebib-autogenerate-keys'), when merging `.bib'
-                                files, and when changing a key."
+When adding new entries to the database, Ebib does not allow
+duplicate keys.  By setting this option, you can tell Ebib to
+automatically create a unique key by adding `b', `c'... to it.
+This applies when Ebib automatically generates keys for new
+entries (see `ebib-autogenerate-keys'), when merging `.bib'
+files, and when changing a key."
   :group 'ebib
   :type 'boolean)
 
 (defcustom ebib-autogenerate-keys t
   "Automatically generate keys for new entries.
-                                With this option set, Ebib does not ask for a key when you add a
-                                new entry.  Instead, it gives the entry a temporary key and
-                                assigns a proper key when you finish editing the entry.  This
-                                option uses the function `bibtex-generate-autokey', which has a
-                                number of user-customizable options.  See that function's
-                                documentation for details."
+With this option set, Ebib does not ask for a key when you add a
+new entry.  Instead, it gives the entry a temporary key and
+assigns a proper key when you finish editing the entry.  This
+option uses the function `bibtex-generate-autokey', which has a
+number of user-customizable options.  See that function's
+documentation for details."
   :group 'ebib
   :type 'boolean)
 
@@ -406,25 +407,25 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                       ("Thesis"        . "{Author} ({Date|Year}). {\"Title\".} {Type,} {Institution.} ")
                                       ("Unpublished"   . "{Author} ({Date|Year}). {\"Title\".} {Howpublished.} {Note.}"))
   "Templates for copying references to the kill ring.
-                                Each template is a string containing literal text and directives
-                                in braces {}.  A directive should contain a field name and is
-                                replaced with the contents of that field.  A directive may
-                                contain multiple fields separated by a pipe bar | (meaning
-                                                                                   \"or\"), in which case the contents of the first non-empty field
-                                replaces the directive.  If all fields are empty, the directive
-                                is simply discarded.
+Each template is a string containing literal text and directives
+in braces {}.  A directive should contain a field name and is
+replaced with the contents of that field.  A directive may
+contain multiple fields separated by a pipe bar | (meaning
+\"or\"), in which case the contents of the first non-empty field
+replaces the directive.  If all fields are empty, the directive
+is simply discarded.
 
-                                A directive may additionally contain punctuation before or after
-                                the field name (or multiple field names).  If the directive is
-                                discarded because its field is empty, any punctuation inside the
-                                braces is discarded as well."
+A directive may additionally contain punctuation before or after
+the field name (or multiple field names).  If the directive is
+discarded because its field is empty, any punctuation inside the
+braces is discarded as well."
   :group 'ebib
   :type '(repeat (cons (string :tag "Entry type")
                        (string :tag "Template string"))))
 
 (defcustom ebib-citation-template "{Author|Editor} ({Date|Year})"
   "Template used for copying a citation to the kill ring.
-                                For details of the template format, see the user option
+For details of the template format, see the user option
                                 `ebib-reference-templates'."
   :group 'ebib
   :type '(string :tag "Template"))
@@ -433,7 +434,7 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
 
 (defcustom ebib-link-file-path-type (if (boundp 'org-link-file-path-type) org-link-file-path-type 'adaptive)
   "How the path name in file links should be stored.
-                                Valid values are the same as `org-link-file-path-type'."
+Valid values are the same as `org-link-file-path-type'."
   :group 'ebib
   :type '(choice (const relative)
                  (const absolute)
@@ -443,10 +444,10 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
 
 (defun ebib--process-reference-template (template key db)
   "Process TEMPLATE for KEY in DB.
-                                TEMPLATE is a reference template (see the option
-                                                                      `ebib-reference-templates').  Fields in the template are replaced
-                                with the contents of the corresponding fields in the entry KEY in
-                                database DB."
+TEMPLATE is a reference template (see the option
+`ebib-reference-templates').  Fields in the template are replaced
+with the contents of the corresponding fields in the entry KEY in
+database DB."
   ;; Define some transformations; Perhaps these should be user-customizable.
   (let ((transformations '(("Title" . ebib-clean-TeX-markup)
                            ("Date" . ebib-biblatex-date-to-year))))
