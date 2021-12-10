@@ -123,6 +123,14 @@ instead."
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
 
+(defcustom ebib-notes-extract-text-function 'ebib-extract-note-text-default
+  "Function to extract the text of a note.
+KEY, indicates the entry to which the relevant note belongs The
+function should return a list of strings, each a separate line,
+which can be passed to `ebib--display-multiline-field'."
+  :group 'ebib-notes
+  :type 'function)
+
 (defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%?\n"
   "Template for a note entry in the notes file.
 New notes are created on the basis of this template.  The
