@@ -497,7 +497,7 @@ database DB."
                                     (markdown-mode
                                      (("text" "@%K%< [%A]%>")
                                       ("paren" "[%(%<%A %>@%K%<, %A%>%; )]")
-                                                        ("year" "[-@%K%< %A%>]"))))
+                                      ("year" "[-@%K%< %A%>]"))))
   "A list of format strings used to insert citations into text buffers.
 Each item in this option consists of a major mode and a list of
 identifier + format strings pairs.  The identifiers (which can be
