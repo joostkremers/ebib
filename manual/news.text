@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.35 ##
+
+- Move completion-related code to separate files. If you wish to use selectrum, ivy, helm or ido for completion, load the corresponding `ebib-<completion-system>.el` file in your init file.
+
 ## Version 2.34, December 2021 ##
 
 - Display expansions of `@String` abbreviations in the entry buffer, thanks to Hugo Heagren.
