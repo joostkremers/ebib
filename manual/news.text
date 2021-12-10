@@ -1,10 +1,14 @@
 % Ebib News
 
+## Version 2.34, December 2021 ##
+
+- Display expansions of `@String` abbreviations in the entry buffer, thanks to Hugo Heagren.
+- Display hidden and undefined fields that inherit a value from a cross-referenced entry.
+
 ## Version 2.33, November 2021 ##
 
 - New command: `ebib-jump-to-field`, bound to `j` in the entry buffer.
 - Add ivy actions to `ebib-jump-to-field`, thanks to [Hugo Heagren](https://github.com/Hugo-Heagren).
-- Display expansions of `@String` abbreviations in the entry buffer, thanks to Hugo Heagren.
 
 ## Version 2.32, April 2021 ##
 
