@@ -125,7 +125,9 @@ instead."
 
 (defcustom ebib-notes-extract-text-function 'ebib-extract-note-text-default
   "Function to extract the text of a note.
-KEY, indicates the entry to which the relevant note belongs The
+Should take one arguments: KEY, indicating entry to which the
+relevant note belongs, and TRUNCATE, if non-nil the resulting
+text should be truncated to `ebib-notes-display-max-lines'. The
 function should return a list of strings, each a separate line,
 which can be passed to `ebib--display-multiline-field'."
   :group 'ebib-notes

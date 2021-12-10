@@ -308,7 +308,7 @@ of strings."
                                                              'ebib-url url))
                                                urls))))
 
-(defun ebib--extract-note-text (key)
+(defun ebib--extract-note-text (key &optional truncate)
   "Extract the text of the note for KEY.
 
 Calls `ebib-notes-extract-text-function' on KEY.
@@ -317,13 +317,13 @@ The return value is a list of strings, each a separate line,
 which can be passed to `ebib--display-multiline-field'."
   (funcall ebib-notes-extract-text-function key truncate))
 
-(defun ebib-extract-note-text-default (key)
+(defun ebib-extract-note-text-default (key truncate)
   "Extract the text of the note for KEY.
 The note must be an Org entry under its own headline.
 
-The note is truncated at `ebib-notes-display-max-lines' lines.
-If the original text is longer than that, an ellipsis marker
-\"[...]\" is added.
+If TRUNCATE is non-nil, the note is truncated at
+`ebib-notes-display-max-lines' lines. If the original text is
+longer than that, an ellipsis marker \"[...]\" is added.
 
 The return value is a list of strings, each a separate line,
 which can be passed to `ebib--display-multiline-field'."
@@ -348,15 +348,16 @@ which can be passed to `ebib--display-multiline-field'."
           (insert-file-contents filename)))))
     (let ((truncated nil)
 	  string)
-      ;; First reduce the size of the text we need to pass to
-      ;; `org-element-parse-buffer', since this function can be slow if the note
-      ;; is long.
-      (let ((max (progn
-                   (goto-char (point-min))
-                   (point-at-bol (* 2 ebib-notes-display-max-lines)))))
-	(when (< max (point-max))
-          (setq truncated t)
-          (delete-region max (point-max))))
+      ;; If appropriate, first reduce the size of the text we need to
+      ;; pass to `org-element-parse-buffer', since this function can
+      ;; be slow if the note is long.
+      (when truncate
+	(let ((max (progn
+                     (goto-char (point-min))
+                     (point-at-bol (* 2 ebib-notes-display-max-lines)))))
+	  (when (< max (point-max))
+            (setq truncated t)
+            (delete-region max (point-max)))))
 
       ;; Extract any property drawers.
       (let ((contents (org-element-parse-buffer)))
@@ -365,17 +366,20 @@ which can be passed to `ebib--display-multiline-field'."
             (org-element-extract-element drawer)))
 	(erase-buffer)
 	(insert (org-element-interpret-data contents)))
-
-      ;; Then take the first `ebib-notes-display-max-lines' lines, omitting the
-      ;; headline.
+      ;; Extract relevant lines
       (let* ((beg (progn
                     (goto-char (point-min))
                     (forward-line 1)	; Skip the headline.
                     (point)))
-             (end (progn
-                    (goto-char (point-min))
-                    (forward-line (1+ ebib-notes-display-max-lines))
-                    (point))))
+	     ;; If `truncate', then take the first
+	     ;; `ebib-notes-display-max-lines' lines.
+             (end (if truncate
+		      (progn
+			(goto-char (point-min))
+			(forward-line (1+ ebib-notes-display-max-lines))
+			(point))
+		    ;; Otherwise take all lines
+		    (point-max))))
         (setq string (buffer-substring-no-properties beg end))
 	(if (or truncated
 		(< end (point-max)))
