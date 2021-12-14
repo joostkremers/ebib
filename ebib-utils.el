@@ -2352,8 +2352,8 @@ uses BibLaTeX and UTF-8 characters in fields."
 	 ;; string-collate-lessp
 	 (predicate (if (eq custom-sort t)
 			(alist-get field ebib-field-sort-functions-alist
-				   'string-collate-lessp nil
-				   'cl-equalp)
+				   #'string-collate-lessp nil
+				   #'cl-equalp)
 		      ;; Custom sort is not t, return custom-sort
 		      custom-sort)))
     (setq list (cl-stable-sort list predicate :key #'car))
