@@ -40,7 +40,7 @@
 
 (require 'org-element nil t) ; Load org-element.el if available.
 
-(declare-function org-capture "org-capture-get" (prop &optional local))
+(declare-function org-capture-get "org-capture" (prop &optional local))
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 
