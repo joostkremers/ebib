@@ -330,7 +330,7 @@ The label \"Entry Key\" displays the entry's BibTeX key, and the
 label \"Author/Editor\" displays the contents of the Author
 field, or, if that is empty, the contents of the Editor field.
 
-If the sorting flag is `t', a sorting function is looked up in
+If the sorting flag is t, a sorting function is looked up in
 `ebib-field-sort-functions-alist', defaulting to
 `string-collate-lessp' if none is found. If it is nil, sorting is
 impossible.
