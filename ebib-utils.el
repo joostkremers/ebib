@@ -354,6 +354,11 @@ default sort field is visible in the index buffer."
                        (choice (const :tag "Ascending Sort" ascend)
                                (const :tag "Descending Sort" descend)))))
 
+(defun ebib-compare-numerical-strings (a b)
+  "Return t if A represents a number less than B represents.
+A and B are strings (e.g. \"3\" and \"11\")."
+  (< (string-to-number a) (string-to-number b)))
+
 (defcustom ebib-field-sort-functions-alist '(("Chapter" . ebib-compare-numerical-strings)
 					     ("Sortyear" . ebib-compare-numerical-strings)
 					     ("Volume" . ebib-compare-numerical-strings)
@@ -2309,11 +2314,6 @@ This function is mainly intended for the DOI and URL fields."
                     'mouse-face 'highlight
                     'help-echo str)
       (propertize "   " 'face '(:height 0.8)))))
-
-(defun ebib-compare-numerical-strings (a b)
-  "Return t if A represents a number less than B represents.
-A and B are strings (e.g. \"3\" and \"11\")."
-  (< (string-to-number a) (string-to-number b)))
 
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB.
