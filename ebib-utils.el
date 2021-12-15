@@ -335,10 +335,8 @@ If the sorting flag is `t', a sorting function is looked up in
 `string-collate-lessp' if none is found. If it is nil, sorting is
 impossible.
 
-Note that the default sort field is the entry key, even if the
-\"Entry Key\" field is absent from the index buffer.  You can
-remove the \"Entry Key\" field from this option, but that will
-not change the default sort."
+Note that the default sort field is the first field in this
+option.  See also `ebib-index-default-sort'."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
