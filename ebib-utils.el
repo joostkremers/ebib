@@ -322,7 +322,7 @@ Ebib-specific mode line altogether."
   "Columns to display in the index buffer.
 Each column consists of the BibTeX field to be displayed, which
 is also the column's label, the column's maximum width and a flag
-indicating whether and how sorting on this column is possible.
+indicating whether sorting on this column is possible.
 
 Any BibTeX or biblatex field can be used as a label.  There are
 also two special labels: \"Entry Key\" and \"Author/Editor\".
@@ -333,9 +333,7 @@ field, or, if that is empty, the contents of the Editor field.
 If the sorting flag is `t', a sorting function is looked up in
 `ebib-field-sort-functions-alist', defaulting to
 `string-collate-lessp' if none is found. If it is nil, sorting is
-impossible. Otherwise, the symbol is called as a function with
-two arguments, and should return `t' if the first should be
-sorted before the second.
+impossible.
 
 Note that the default sort field is the entry key, even if the
 \"Entry Key\" field is absent from the index buffer.  You can
@@ -344,10 +342,7 @@ not change the default sort."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
-                        (choice :tag "Sort type"
-                                (const :tag "Sort alphanumerically" t)
-                                (function-item :tag "Sort numerically" #'<)
-                                (function :tag "Use a custom sort function" :value string-collate-lessp)))))
+                        (boolean :tag "Sort"))))
 
 (defcustom ebib-index-default-sort nil
   "Default sort field and direction."
@@ -2326,13 +2321,14 @@ sorted on the sort info of DB.  Thus if two entries have the same
 value for the sort field, their keys determine the order in which
 they appear.
 
-The comparison function for sorting on the sort field defaults to
-`string-collate-lessp', so that the order in which the entries
-appear depends on the user's locale. This is only relevant if one
-uses BibLaTeX and UTF-8 characters in fields."
+Sorting on the sort field is done with the sort function
+specified in `ebib-field-sort-functions-alist', with
+`string-collate-lessp' as a fall-back."
   ;; First sort the keys themselves.
   (setq keys (sort keys #'string<))
-  ;; And then stably sort on the sort field.
+  ;; And then stably sort on the sort field.  Note that we do not check here if
+  ;; the field can be sorted on according to `ebib-index-columns'. This is a
+  ;; generic sort function.
   (let* ((sortinfo (or (ebib-db-get-sortinfo db)
                        ebib-index-default-sort
                        (cons (caar ebib-index-columns) 'ascend)))
@@ -2342,22 +2338,15 @@ uses BibLaTeX and UTF-8 characters in fields."
          ;; `cl-stable-sort' can simply be `car' rather than (a much
          ;; heavier) `ebib-get-field-value'. Sorting is much faster
          ;; that way.
-         (list (mapcar (lambda (key)
-                         (cons (ebib--get-field-value-for-display field key db) key))
-                       keys))
-	 (custom-sort (caddr (assoc-string field ebib-index-columns t)))
-	 ;; If custom-sort is t, lookup the field name in
-	 ;; ebib-field-sort-functions-alist to get the
-	 ;; comparison operator. If none found, default to
-	 ;; string-collate-lessp
-	 (predicate (if (eq custom-sort t)
-			(alist-get field ebib-field-sort-functions-alist
-				   #'string-collate-lessp nil
-				   #'cl-equalp)
-		      ;; Custom sort is not t, return custom-sort
-		      custom-sort)))
-    (setq list (cl-stable-sort list predicate :key #'car))
-    (setq keys (mapcar #'cdr list))
+         (sort-list (mapcar (lambda (key)
+                              (cons (ebib--get-field-value-for-display field key db) key))
+                            keys))
+	 (predicate (alist-get field ebib-field-sort-functions-alist
+			       #'string-collate-lessp
+                               nil
+			       #'cl-equalp)))
+    (setq sort-list (cl-stable-sort sort-list predicate :key #'car))
+    (setq keys (mapcar #'cdr sort-list))
     ;; Reverse the list if necessary.
     (if (eq direction 'descend)
         (setq keys (nreverse keys))))
