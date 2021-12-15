@@ -343,7 +343,10 @@ option.  See also `ebib-index-default-sort'."
                         (boolean :tag "Sort"))))
 
 (defcustom ebib-index-default-sort nil
-  "Default sort field and direction."
+  "Default sort field and direction.
+If set, the index buffer is sorted on the specified field and in
+the specified direction.  Note that it is not necessary that the
+default sort field is visible in the index buffer."
   :group 'ebib
   :type '(choice (const :tag "Use First Index Column" nil)
                  (cons :tag "User-Defined Sort"
