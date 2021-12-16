@@ -364,7 +364,9 @@ A and B are strings (e.g. \"3\" and \"11\")."
 					     ("Volume" . ebib-compare-numerical-strings)
 					     ("Volumes" . ebib-compare-numerical-strings))
   "Alist of bib(la)tex fields and functions for sorting the index.
-Field names are case-insensitive."
+Field names are case-insensitive.  Sort functions should take two
+arguments and should return t if the first is to be sorted before
+the second."
   :group 'ebib
   :type '(alist :key-type string :value-type symbol))
 
