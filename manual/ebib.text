@@ -109,8 +109,6 @@ You can quickly jump to any entry in a database with the key [`j`]{.key}. This a
 
 If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) or the built-in package ido, using [`j`]{.key} becomes even more convenient: instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. 
 
-In fact, with these completion systems, it is generally unnecessary to remember the key of an entry, and you can customise the option `ebib-index-columns` in order not to display it in the index buffer, as discussed in the next section.
-
 
 ## Displaying and Sorting the Entries List ##
 
