@@ -116,7 +116,7 @@ In fact, with these completion systems, it is generally unnecessary to remember 
 
 By default, the index buffer displays the list of entries in the database in a table format using the entry key, and the author, year and title fields of each entry. The entries are sorted in ascending order on the first column, which by default is the entry key.  You can sort the entries on one of the other columns using the keys [`<`]{.key} and [`>`]{.key}. The former performs an ascending sort (smallest to largest, hence the smaller-than sign), the latter a descending sort. They both ask you for the column to sort on. Restoring the default sort can be done with [`=`]{.key}.
 
-The fields that are displayed in the index buffer can be customised with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones.
+The fields that are displayed in the index buffer can be customised with the user option `ebib-index-columns`. Each element in this option describes a column and consists of the field to display (which is also the column label), the width of the column and a flag indicating whether the column can be sorted. You can add or remove fields, or reorder the existing ones. Note that the width of the last column is ignored: the last column always takes up all the space that is left.
 
 You can use any `biblatex` or BibTeX field to define a column in the index buffer. There are a few column labels that do not correspond directly to a field name, however. For example, the column label `"Entry Key"`, which displays the entry key, is not a field. Similarly, there is a column label `"Author/Editor"`, which displays the contents of the author field if it is not empty, and the contents of the editor field otherwise. Furthermore, the column label `"Year"` does not simply display the contents of the year field. Rather, it first checks the contents of the date field, which is `biblatex`'s replacement of the year field, and extracts the first year in it. Only if the date field is empty does it display the year field.
 
@@ -126,9 +126,9 @@ The final predefined column label is `"Note"`. This does not, however, display t
 
 You can define new column labels and redefine the existing ones by customising the option `ebib-field-transformation-functions`. Note that `"Title"`, `"Doi"`, `"Url"`, and `"Note"` are actually defined through this option. `"Entry Key"`, `"Author/Editor"`, and `"Year"` are not (they are hard-coded), but they can be overridden by adding an entry for them in `ebib-field-transformation-functions`.
 
-The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press [`=`]{.key}. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort` using the Customize interface or in your init file:
+The first column defined in `ebib-index-colums` is the column on which the entries are sorted by default, i.e., when the database is first opened and when you press [`=`]{.key}. You can change the default sort field and the default sort direction (which is ascending, i.e., A-Z and 0-9) by customising the option `ebib-index-default-sort`.
 
-    (setq ebib-index-default-sort '("Year" . descend))  ; alternatively `ascend'
+By default, sorting is done on the string representation of the field value, using the function `string-collate-lessp`. For numeric fields, this may not be appropriate, because it means that the value `10` is sorted between `1` and `2`. To specify a custom sort function for particular fields, you can customise the option `ebib-field-sort-functions-alist`. To sort numeric fields, you can use the predefined function `ebib-compare-numerical-strings`, but you can also define a custom sort function yourself.
 
 
 ## Biblatex vs. BibTeX ##
