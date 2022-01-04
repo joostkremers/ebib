@@ -2015,17 +2015,22 @@ inherit a value, this function returns nil."
 ;; `ebib-db.el' cannot depend on `ebib-utils.el' (because `ebib-utils.el' already depends on
 ;; `ebib-db.el').  Similar considerations apply to `ebib-get-string' below.
 
-(defun ebib-set-string (abbr value db &optional overwrite)
+(defun ebib-set-string (abbr value db &optional overwrite nobrace)
   "Set the @string definition ABBR to VALUE in database DB.
 If ABBR does not exist, create it.  OVERWRITE functions as in
 `ebib-db-set-string'.  VALUE is enclosed in braces if it isn't
 already.
 
+If NOBRACE is t, the value is stored without braces.  If it is
+nil, braces are added if not already present.  NOBRACE may also be
+the symbol ‘as-is’, in which case the value is stored as is.
+
 This function basically just calls `ebib-db-set-string' to do the
   real work."
-  (ebib-db-set-string abbr (if (ebib-unbraced-p value)
-                               (ebib-brace value)
-                             value)
+  (ebib-db-set-string abbr (cl-case nobrace
+			     (as-is value)
+			     (t (ebib-unbrace value))
+			     (nil (ebib-brace value)))
                       db overwrite))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced)
