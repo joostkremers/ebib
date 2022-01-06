@@ -1394,7 +1394,7 @@ Return value is the string if one was read, nil otherwise."
            (abbr (car def))
            (string (cdr def)))
       (if def
-          (if (ebib-set-string abbr string db)
+          (if (ebib-set-string abbr string db nil 'as-is)
               string
             (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
                                         (line-number-at-pos) abbr)))
