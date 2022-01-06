@@ -166,11 +166,14 @@ is applied to the item."
 Point is placed at the beginning of the line.  If there is no
 entry with KEY in the buffer, point is not moved."
   (with-current-ebib-buffer 'index
-    (let ((orig-point (point)))
+    (let ((p (point)))
       (goto-char (point-min))
-      (if-let ((match (text-property-search-forward 'ebib-key key #'string=)))
-          (set-window-point (get-buffer-window) (prop-match-beginning match))
-        (goto-char orig-point)))))
+      (while (not (or (string= key (get-text-property (point) 'ebib-key))
+                      (eobp)))
+        (forward-line 1))
+      (if (eobp)
+          (goto-char p)
+        (set-window-point (get-buffer-window) (point))))))
 
 (defun ebib--get-tabulated-data (key)
   "Get data for KEY.
