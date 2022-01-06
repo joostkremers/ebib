@@ -1880,22 +1880,18 @@ string has the text property `ebib--alias' with value t."
       (error "[Ebib] Field `%s' does not exist in entry `%s'" field key))
     (unless (= 0 (length value)) ; (length value) == 0 if value is nil or if value is "".
       (setq value (copy-sequence value)) ; Copy the value so we can add text properties.
-      (when unbraced
-        (setq value (ebib-unbrace value)))
       (when (and (ebib-unbraced-p value)
 		 expand-strings
+		 ;; Fields consisting of only numerical values can be
+		 ;; written without bracing or quotes, and not be
+		 ;; expanded. Only continue if the value is not so.
+		 (not (string-match "\\`[[:digit:]]+\\'" value))
 		 (or (eq ebib-expand-strings t)
 		     (assoc-string field ebib-expand-strings 'case-fold)
 		     (assoc-string alias ebib-expand-strings 'case-fold)))
-	(let ((orig-value value))
-	  (setq value (apply 'concat
-			     (message-unquote-tokens
-			      (mapcar (lambda (str)
-                                        (or (ebib-get-string str ebib--cur-db 'noerror 'unbraced)
-                                            str))
-			              (split-string value "#" t "[[:blank:]]+")))))
-	  (unless (string-equal value orig-value)
-	    (add-text-properties 0 (length value) '(ebib--expanded t) value))))
+	(setq value (ebib--expand-string value ebib--cur-db 'noerror)))
+      (when unbraced
+        (setq value (ebib-unbrace value)))
       (when alias
         (add-text-properties 0 (length value) '(ebib--alias t) value))
       (when xref
