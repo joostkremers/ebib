@@ -392,6 +392,20 @@ transformation function returns something that can be displayed."
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
+(defcustom ebib-TeX-markup-replace-alist '(("``" . "“")
+					   ("`" . "‘")
+					   ("''" . "”")
+					   ("'" . "’"))
+  "Alist of regexps and replacements for printing TeX.
+This is used when printing text with TeX markup in ebib buffers.
+If the car of an element matches, it is replaced by the cdr. Both
+must be strings. Earlier elements are evaluated before later
+ones, so if one regexp is a subpattern of another, the second
+must appear later (e.g. \"''\" is before \"'\"."
+  :group 'ebib
+  :type '(alist (string :tag "Regexp")
+		(string :tag "replacement")))
+
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
 When adding new entries to the database, Ebib does not allow
@@ -2286,8 +2300,13 @@ year can be extracted from DATE, return nil."
             ("textbf" (setq arg (propertize arg 'face '(bold))))
             ("textsc" (setq arg (upcase arg))))
           (setq string (replace-match arg t t string)))))
-    ;; Now replace all remaining braces. This also takes care of nested braces.
-    (replace-regexp-in-string "[{}]" "" string)))
+    ;; Replace as defined in `ebib--TeX-markup-replace-alist', and
+    ;; remove all {braces} (this takes care of nested braces too)
+    (let ((rep-alist (append '(("[{}]" . "")) ebib-TeX-markup-replace-alist)))
+      (replace-regexp-in-string
+       (rx-to-string (append '(or) (a-keys rep-alist)))
+       (lambda (match) (cdr (assoc match rep-alist 'string=)))
+       string))))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
