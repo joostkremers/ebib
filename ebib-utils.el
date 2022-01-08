@@ -2304,7 +2304,7 @@ year can be extracted from DATE, return nil."
     ;; remove all {braces} (this takes care of nested braces too)
     (let ((rep-alist (append '(("[{}]" . "")) ebib-TeX-markup-replace-alist)))
       (replace-regexp-in-string
-       (rx-to-string (append '(or) (a-keys rep-alist)))
+       (rx-to-string (append '(or) (mapcar #'car rep-alist)))
        (lambda (match) (cdr (assoc match rep-alist 'string=)))
        string))))
 
