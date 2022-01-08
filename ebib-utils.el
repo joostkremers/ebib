@@ -2300,7 +2300,7 @@ year can be extracted from DATE, return nil."
             ("textbf" (setq arg (propertize arg 'face '(bold))))
             ("textsc" (setq arg (upcase arg))))
           (setq string (replace-match arg t t string)))))
-    ;; Replace as defined in `ebib--TeX-markup-replace-alist', and
+    ;; Replace as defined in `ebib-TeX-markup-replace-alist', and
     ;; remove all {braces} (this takes care of nested braces too)
     (let ((rep-alist (append '(("{" . "") ("}" . "")) ebib-TeX-markup-replace-alist)))
       (replace-regexp-in-string
