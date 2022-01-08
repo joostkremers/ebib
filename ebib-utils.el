@@ -396,12 +396,13 @@ transformation function returns something that can be displayed."
 					   ("`" . "‘")
 					   ("''" . "”")
 					   ("'" . "’"))
-  "Alist of regexps and replacements for printing TeX.
-This is used when printing text with TeX markup in ebib buffers.
-If the car of an element matches, it is replaced by the cdr. Both
-must be strings. Earlier elements are evaluated before later
-ones, so if one regexp is a subpattern of another, the second
-must appear later (e.g. \"''\" is before \"'\"."
+  "Alist of strings and replacements for TeX markup.
+This is used in `ebib-clean-TeX-markup' to make TeX markup more
+suitable for display.  If the car of an element matches, it is
+replaced by the cdr. Both must be strings. Earlier elements are
+evaluated before later ones, so if one string is a subpattern of
+another, the second must appear later (e.g. \"''\" is before
+\"'\"."
   :group 'ebib
   :type '(alist (string :tag "Regexp")
 		(string :tag "replacement")))
