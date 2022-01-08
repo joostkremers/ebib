@@ -392,7 +392,9 @@ transformation function returns something that can be displayed."
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
-(defcustom ebib-TeX-markup-replace-alist '(("``" . "“")
+(defcustom ebib-TeX-markup-replace-alist '(("{" . "")
+                                           ("}" . "")
+                                           ("``" . "“")
 					   ("`" . "‘")
 					   ("''" . "”")
 					   ("'" . "’"))
@@ -2303,11 +2305,10 @@ year can be extracted from DATE, return nil."
           (setq string (replace-match arg t t string)))))
     ;; Replace as defined in `ebib-TeX-markup-replace-alist', and
     ;; remove all {braces} (this takes care of nested braces too)
-    (let ((rep-alist (append '(("{" . "") ("}" . "")) ebib-TeX-markup-replace-alist)))
-      (replace-regexp-in-string
-       (rx-to-string (append '(or) (mapcar #'car rep-alist)))
-       (lambda (match) (cdr (assoc match rep-alist 'string=)))
-       string))))
+    (replace-regexp-in-string
+     (rx-to-string (append '(or) (mapcar #'car ebib-TeX-markup-replace-alist)))
+     (lambda (match) (cdr (assoc match ebib-TeX-markup-replace-alist 'string=)))
+     string)))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
