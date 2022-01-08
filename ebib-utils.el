@@ -1897,22 +1897,18 @@ string has the text property `ebib--alias' with value t."
       (error "[Ebib] Field `%s' does not exist in entry `%s'" field key))
     (unless (= 0 (length value)) ; (length value) == 0 if value is nil or if value is "".
       (setq value (copy-sequence value)) ; Copy the value so we can add text properties.
-      (when unbraced
-        (setq value (ebib-unbrace value)))
       (when (and (ebib-unbraced-p value)
 		 expand-strings
+		 ;; Fields consisting of only numerical values can be
+		 ;; written without bracing or quotes, and not be
+		 ;; expanded. Only continue if the value is not so.
+		 (not (string-match "\\`[[:digit:]]+\\'" value))
 		 (or (eq ebib-expand-strings t)
 		     (assoc-string field ebib-expand-strings 'case-fold)
 		     (assoc-string alias ebib-expand-strings 'case-fold)))
-	(let ((orig-value value))
-	  (setq value (apply 'concat
-			     (message-unquote-tokens
-			      (mapcar (lambda (str)
-                                        (or (ebib-get-string str ebib--cur-db 'noerror 'unbraced)
-                                            str))
-			              (split-string value "#" t "[[:blank:]]+")))))
-	  (unless (string-equal value orig-value)
-	    (add-text-properties 0 (length value) '(ebib--expanded t) value))))
+	(setq value (ebib--expand-string value ebib--cur-db 'noerror)))
+      (when unbraced
+        (setq value (ebib-unbrace value)))
       (when alias
         (add-text-properties 0 (length value) '(ebib--alias t) value))
       (when xref
@@ -2032,25 +2028,110 @@ inherit a value, this function returns nil."
 ;; `ebib-db.el' cannot depend on `ebib-utils.el' (because `ebib-utils.el' already depends on
 ;; `ebib-db.el').  Similar considerations apply to `ebib-get-string' below.
 
-(defun ebib-set-string (abbr value db &optional overwrite)
+(defun ebib-set-string (abbr value db &optional overwrite nobrace)
   "Set the @string definition ABBR to VALUE in database DB.
 If ABBR does not exist, create it.  OVERWRITE functions as in
 `ebib-db-set-string'.  VALUE is enclosed in braces if it isn't
 already.
 
+If NOBRACE is t, the value is stored without braces.  If it is
+nil, braces are added if not already present.  NOBRACE may also be
+the symbol ‘as-is’, in which case the value is stored as is.
+
 This function basically just calls `ebib-db-set-string' to do the
   real work."
-  (ebib-db-set-string abbr (if (ebib-unbraced-p value)
-                               (ebib-brace value)
-                             value)
+  (ebib-db-set-string abbr (cl-case nobrace
+			     (as-is value)
+			     (t (ebib-unbrace value))
+			     (nil (ebib-brace value)))
                       db overwrite))
 
-(defun ebib-get-string (abbr db &optional noerror unbraced)
+(defun ebib--expand-string (string db &optional noerror)
+  "Recursively expand STRING using abbreviations in DB.
+
+Respects concatenation wit `#', and quoting with {} and \".
+Throws an error if STRING contains unbalanced (and unescaped)
+braces or quote characters. If NOERROR is non-nil, all errors are
+suppressed.
+
+If passed an entirely braced or quoted string (i.e. a string for
+which `ebib-unbraced-p' is nil), returns the string without the
+outermost set of braces/quotes. If any further expansion
+occurs (i.e. an abbrev string is expanded to its definition, or
+any concatenation around `#' characters), then the returned
+string will have the face `ebib-abbrev-face'."
+  (cl-loop with quoted = nil and curr-section = "" and expanded = nil
+	   ;; To be able detect its end, make sure that the string
+	   ;; ends in '#'. Even if it already does, null strings are
+	   ;; removed from the result, so this fact won't change the
+	   ;; output.
+	   for char across (concat string "#")
+	   ;; When we encounter an unquoted concat char...
+	   if (and (not quoted) (eq char ?#))
+	   ;; ...if the current string is non-empty (this deals with
+	   ;; repeated '#' characters)...
+	   unless (string-empty-p (string-trim curr-section))
+	   ;; ...then add it to the list of strings.
+	   collect (let ((curr-string (string-trim (dbus-byte-array-to-string curr-section))))
+		     (if (ebib-unbraced-p curr-string)
+			 ;; Recur if string not quoted
+			 (progn (setq expanded t)
+				(ebib-get-string curr-string db noerror nil t))
+		       (unless (null list) (setq expanded t))
+		       (ebib-unbrace curr-string)))
+	   into list ;; collect unquoted/expanded strings into var `list'
+	   else	     ;; String contains only whitespace, or is empty
+	   do (unless noerror (error "Too many `#' characters"))
+	   end ;; end the 'unless'
+	   and
+	   ;; Either way, then reinitialise the string var as empty.
+	   do (setq curr-section "")
+	   else
+	   ;; Control delimiter/quoting characters
+	   ;; The `quoted' variable is a running list of opening quote
+	   ;; characters. Each new opening character is added to the
+	   ;; end. On encountering a closing character, if the last
+	   ;; item in the list balances it, remove the last item. This
+	   ;; way, `quoted' is nil whenever we are outside all quotes.
+	   do (unless (equal (last (string-to-list curr-section)) '(?\\))
+		(cl-case char
+		  (?\" (if (eq (car (last quoted)) ?\")
+			   (setq quoted (butlast quoted))
+			 (setq quoted (append quoted '(?\")))))
+		  (?} (if (eq (car (last quoted)) ?{)
+			  (setq quoted (butlast quoted))
+			(unless (or noerror
+				    (member ?\" quoted)) ;; account for e.g. " { "
+			  (error "Bad quoting, last char of: `%s%s%c'"
+				 (apply 'concat list)
+				 curr-section
+				 char))))
+		  (?{ (unless (member ?\" quoted) ;; account for e.g. " { "
+			(setq quoted (append quoted '(?{)))))))
+	   and
+	   ;; If not at a '#' or a delimiter char, add current char to
+	   ;; the string
+	   do (setq curr-section (concat curr-section (char-to-string char)))
+	   end
+	   ;; If a proper expansion has been performed, propertize the result accordingly
+	   finally return (if (null quoted)
+			      (let ((expansion (apply 'concat list)))
+				(if expanded
+				    (propertize expansion 'face 'ebib-abbrev-face)
+				  expansion))
+			    (error "Bad quoting, unbalanced `\"' characters"))))
+
+(defun ebib-get-string (abbr db &optional noerror unbraced expand)
   "Return the value of @String definition ABBR in database DB.
 NOERROR functions as in `ebib-db-get-string', which this
 functions calls to get the actual value.  The braces around the
-value are removed if UNBRACED is non-nil."
-  (let ((value (ebib-db-get-string abbr db noerror)))
+value are removed if UNBRACED is non-nil.
+
+If EXPAND is non-nil, unbraced elements of a string's
+definition (i.e. other, already-defined string abbreviations)
+will be expanded recursively."
+  (let* ((def (ebib-db-get-string abbr db noerror))
+	 (value (if expand (ebib--expand-string def db noerror) def)))
     (if unbraced
         (ebib-unbrace value)
       value)))
