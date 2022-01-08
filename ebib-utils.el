@@ -400,14 +400,14 @@ transformation function returns something that can be displayed."
 					   ("'" . "’"))
   "Alist of strings and replacements for TeX markup.
 This is used in `ebib-clean-TeX-markup' to make TeX markup more
-suitable for display.  If the car of an element matches, it is
-replaced by the cdr. Both must be strings. Earlier elements are
+suitable for display.  Each item in the list consists of a string
+and its replacement.  Both must be strings.  Earlier elements are
 evaluated before later ones, so if one string is a subpattern of
 another, the second must appear later (e.g. \"''\" is before
 \"'\"."
   :group 'ebib
-  :type '(alist (string :tag "Regexp")
-		(string :tag "replacement")))
+  :type '(alist (string :tag "String")
+		(string :tag "Replacement")))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
