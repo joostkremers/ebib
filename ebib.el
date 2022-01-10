@@ -4491,11 +4491,7 @@ beginning of the current line."
     (let ((inhibit-read-only t))
       (erase-buffer)
       (cl-dolist (elem (sort (ebib-db-list-strings ebib--cur-db) #'string<))
-        (let ((str (ebib-get-string elem ebib--cur-db 'noerror 'unbraced)))
-          (insert (format "%-18s %s\n" elem
-                          (if (ebib--multiline-p str)
-                              (concat "+" (ebib--first-line str))
-                            (concat " " str)))))))
+        (insert (ebib--generate-string-display elem) "\n")))
     (goto-char (point-min))
     (set-buffer-modified-p nil)))
 
