@@ -4543,6 +4543,20 @@ When the user enters an empty string, the value is not changed."
       (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
       (message "@String definition deleted."))))
 
+(defun ebib-toggle-raw-string ()
+  "Toggle the \"special\" status of the current string's contents."
+  (interactive)
+  (let* ((string (ebib--current-string))
+	 (def (ebib-get-string string ebib--cur-db 'noerror)))
+    (ebib-set-string
+     string			  ;; label
+     def			  ;; content
+     ebib--cur-db		  ;; db
+     'overwrite			  ;; overwrite
+     (not (ebib-unbraced-p def))) ;; whether to include braces
+    (ebib--redisplay-strings-buffer)
+    (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))))
+
 (defun ebib-add-string ()
   "Create a new @String definition."
   (interactive)
