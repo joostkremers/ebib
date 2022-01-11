@@ -250,18 +250,6 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
       (ebib--fill-strings-buffer)
       (re-search-forward (rx line-start (literal string) (syntax -))))))
 
-(defun ebib--redisplay-current-string ()
-  "Redisplay the current string definition in the strings buffer."
-  (with-current-ebib-buffer 'strings
-    (let ((inhibit-read-only t))
-      (let* ((string (ebib--current-string))
-             (val (ebib-get-string string ebib--cur-db nil 'unbraced)))
-        (delete-region (point-at-bol) (point-at-eol))
-        (insert (format "%-18s %s" string
-                        (if (ebib--multiline-p val)
-                            (concat "+" (ebib--first-line val))
-                          (concat " " val))))))))
-
 (defun ebib--convert-multiline-to-string (multilines)
   "Convert MULTILINES to a single multiline string.
 MULTILINES is a list of strings.  The resulting string is
@@ -4518,7 +4506,7 @@ When the user enters an empty string, the value is not changed."
         (progn
 	  (ebib-set-string string new-contents ebib--cur-db 'overwrite
 			   (ebib-unbraced-p init-contents-raw))
-          (ebib--redisplay-current-string)
+          (ebib--redisplay-strings-buffer)
           (ebib-next-string)
           (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))
       (error "[Ebib] @String definition cannot be empty"))))
@@ -4540,6 +4528,7 @@ When the user enters an empty string, the value is not changed."
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
+      (ebib--redisplay-strings-buffer)
       (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
       (message "@String definition deleted."))))
 
@@ -4573,6 +4562,7 @@ When the user enters an empty string, the value is not changed."
               (goto-char (point-min))
               (re-search-forward new-string nil 'noerror)
               (beginning-of-line)
+	      (ebib--redisplay-strings-buffer)
               (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))))))
 
 (defun ebib-export-string (prefix)
