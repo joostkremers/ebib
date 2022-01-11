@@ -4384,6 +4384,7 @@ over `ebib--edit-field-as-multiline'."
     (define-key map [(control p)] 'ebib-prev-string)
     (define-key map [(meta p)] 'ebib-strings-page-up)
     (define-key map "q" 'ebib-quit-strings-buffer)
+    (define-key map "r" 'ebib-toggle-raw-string)
     (define-key map "x" 'ebib-export-string)
     (define-key map "X" 'ebib-export-all-strings)
     (define-key map "\C-xb" 'ebib-quit-strings-buffer)
@@ -4407,6 +4408,7 @@ over `ebib--edit-field-as-multiline'."
   '("Ebib"
     ["Add @String" ebib-add-string t]
     ["Edit @String" ebib-edit-string t]
+    ["Toggle @String raw" ebib-toggle-raw-string t]
     ["Copy @String" ebib-copy-string-contents (ebib--current-string)]
     ["Delete @String" ebib-delete-string (ebib--current-string)]
     "--"
