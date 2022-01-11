@@ -4548,15 +4548,17 @@ When the user enters an empty string, the value is not changed."
     (ebib--redisplay-strings-buffer)
     (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))))
 
-(defun ebib-add-string ()
-  "Create a new @String definition."
-  (interactive)
+(defun ebib-add-string (&optional arg)
+  "Create a new @String definition.
+
+With prefix ARG, the string is created unbraced."
+  (interactive "P")
   (ebib--ifstring (new-abbr (read-string "New @String abbreviation: " nil 'ebib--key-history))
       (if (member new-abbr (ebib-db-list-strings ebib--cur-db))
           (error "[Ebib] %s already exists" new-abbr)
         (ebib--ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
             (progn
-              (ebib-set-string new-abbr new-string ebib--cur-db 'error)
+              (ebib-set-string new-abbr new-string ebib--cur-db 'error arg)
               (let ((inhibit-read-only t))
                 (goto-char (point-min))
                 (insert (ebib--generate-string-display new-abbr) "\n")
