@@ -4509,13 +4509,15 @@ beginning of the current line."
 When the user enters an empty string, the value is not changed."
   (interactive)
   (let* ((string (ebib--current-string))
-         (init-contents (ebib-get-string string ebib--cur-db 'noerror 'unbraced)))
+         (init-contents-raw (ebib-get-string string ebib--cur-db 'noerror))
+	 (init-contents (ebib-unbrace init-contents-raw)))
     (ebib--ifstring (new-contents (read-string (format "%s: " string)
                                                (if init-contents
                                                    (cons init-contents 0)
                                                  nil)))
         (progn
-          (ebib-set-string string new-contents ebib--cur-db 'overwrite)
+	  (ebib-set-string string new-contents ebib--cur-db 'overwrite
+			   (ebib-unbraced-p init-contents-raw))
           (ebib--redisplay-current-string)
           (ebib-next-string)
           (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))
