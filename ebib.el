@@ -241,6 +241,15 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 	    str		 ;; Definition (presented without unbraced)
 	    expansion))) ;; Full expansion when unbraced
 
+(defun ebib--redisplay-strings-buffer ()
+  "Redisplay all strings in strings buffer."
+  (with-current-ebib-buffer 'strings
+    (let ((inhibit-read-only t)
+	  (string (ebib--current-string)))
+      (erase-buffer)
+      (ebib--fill-strings-buffer)
+      (re-search-forward (rx line-start (literal string) (syntax -))))))
+
 (defun ebib--redisplay-current-string ()
   "Redisplay the current string definition in the strings buffer."
   (with-current-ebib-buffer 'strings
