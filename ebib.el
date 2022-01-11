@@ -223,6 +223,24 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
   "Redisplay the contents of the current field in the entry buffer."
   (ebib--redisplay-field (ebib--current-field)))
 
+(defun ebib--generate-string-display (string)
+  "Get a formatted string for displaying abbrev STRING."
+  (let* ((def (ebib-get-string string ebib--cur-db 'noerror nil))
+	 (rawp (ebib-unbraced-p def))
+	 (unbraced-str (ebib-unbrace def))
+	 (multilinep (ebib--multiline-p unbraced-str))
+	 (str (if multilinep
+		  (ebib--first-line unbraced-str)
+		unbraced-str))
+	 (flags (concat (if rawp "*" "")
+			(if multilinep "+" "")))
+	 (expansion (if rawp (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "")))
+    (format "%-18s %2s%-30s %s"
+	    string	 ;; Abbreviation
+	    flags	 ;; Raw/multiline indicators
+	    str		 ;; Definition (presented without unbraced)
+	    expansion))) ;; Full expansion when unbraced
+
 (defun ebib--redisplay-current-string ()
   "Redisplay the current string definition in the strings buffer."
   (with-current-ebib-buffer 'strings
@@ -4529,7 +4547,7 @@ When the user enters an empty string, the value is not changed."
               (ebib-set-string new-abbr new-string ebib--cur-db 'error)
               (let ((inhibit-read-only t))
                 (goto-char (point-min))
-                (insert (format "%-19s %s\n" new-abbr new-string))
+                (insert (ebib--generate-string-display new-abbr) "\n")
                 (sort-lines nil (point-min) (point-max)))
               (goto-char (point-min))
               (re-search-forward new-string nil 'noerror)
