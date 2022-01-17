@@ -1902,7 +1902,7 @@ string has the text property `ebib--alias' with value t."
 		 ;; Fields consisting of only numerical values can be
 		 ;; written without bracing or quotes, and not be
 		 ;; expanded. Only continue if the value is not so.
-		 (not (string-match "\\`[[:digit:]]+\\'" value))
+		 (not (string-match "\\`[[:digit:]:/-]+\\'" value))
 		 (or (eq ebib-expand-strings t)
 		     (assoc-string field ebib-expand-strings 'case-fold)
 		     (assoc-string alias ebib-expand-strings 'case-fold)))
