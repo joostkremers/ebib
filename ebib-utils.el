@@ -2049,17 +2049,18 @@ This function basically just calls `ebib-db-set-string' to do the
 (defun ebib--expand-string (string db &optional noerror)
   "Recursively expand STRING using abbreviations in DB.
 
-Respects concatenation wit `#', and quoting with {} and \".
-Throws an error if STRING contains unbalanced (and unescaped)
-braces or quote characters. If NOERROR is non-nil, all errors are
-suppressed.
+This function respects concatenation with `#', and quoting with
+{} and \".  If STRING contains unbalanced (and unescaped) braces
+or quote characters, an error is thrown, unless NOERROR is
+non-nil, in which case all errors are suppressed.
 
 If passed an entirely braced or quoted string (i.e. a string for
-which `ebib-unbraced-p' is nil), returns the string without the
-outermost set of braces/quotes. If any further expansion
-occurs (i.e. an abbrev string is expanded to its definition, or
-any concatenation around `#' characters), then the returned
-string will have the face `ebib-abbrev-face'."
+which `ebib-unbraced-p' is nil), the return value is the string
+without the outermost set of braces/quotes.
+
+If any expansion occurs (i.e. an abbrev string is expanded to its
+definition, or any concatenation around `#' characters is done),
+the returned string has the face `ebib-abbrev-face'."
   (cl-loop with quoted = nil and curr-section = "" and expanded = nil
 	   ;; To be able detect its end, make sure that the string
 	   ;; ends in '#'. Even if it already does, null strings are
