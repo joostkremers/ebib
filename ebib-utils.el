@@ -2073,7 +2073,7 @@ the returned string has the face `ebib-abbrev-face'."
 	   ;; repeated '#' characters)...
 	   unless (string-empty-p (string-trim curr-section))
 	   ;; ...then add it to the list of strings.
-	   collect (let ((curr-string (string-trim (dbus-byte-array-to-string curr-section))))
+	   collect (let ((curr-string (string-trim curr-section)))
 		     (if (ebib-unbraced-p curr-string)
 			 ;; Recur if string not quoted
 			 (progn (setq expanded t)
