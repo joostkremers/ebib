@@ -123,7 +123,7 @@ instead."
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
 
-(defcustom ebib-notes-extract-text-function 'ebib-extract-note-text-default
+(defcustom ebib-notes-extract-text-function #'ebib-extract-note-text-default
   "Function to extract the text of a note.
 Should take one arguments: KEY, indicating entry to which the
 relevant note belongs, and TRUNCATE, if non-nil the resulting
