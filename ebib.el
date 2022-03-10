@@ -309,12 +309,11 @@ of strings."
                                                urls))))
 
 (defun ebib--extract-note-text (key &optional truncate)
-  "Extract the text of the note for KEY.
+  "Extract the text of the note for entry KEY.
 
-Calls `ebib-notes-extract-text-function' on KEY.
-
-The return value is a list of strings, each a separate line,
-which can be passed to `ebib--display-multiline-field'."
+This function simply calls `ebib-notes-extract-text-function'.
+KEY and TRUNCATE are passed on unchanged.  For their meaning, see
+the doc string of `ebib-extract-note-text-default'."
   (funcall ebib-notes-extract-text-function key truncate))
 
 (defun ebib-extract-note-text-default (key truncate)
@@ -322,7 +321,7 @@ which can be passed to `ebib--display-multiline-field'."
 The note must be an Org entry under its own headline.
 
 If TRUNCATE is non-nil, the note is truncated at
-`ebib-notes-display-max-lines' lines. If the original text is
+`ebib-notes-display-max-lines' lines.  If the original text is
 longer than that, an ellipsis marker \"[...]\" is added.
 
 The return value is a list of strings, each a separate line,
@@ -4191,10 +4190,11 @@ value is copied to the kill ring."
   (ebib-copy-field-contents (ebib--current-field)))
 
 (defun ebib-delete-field-contents (field &optional kill)
-  "Kill the contents of the FIELD in the current entry.
-If KILL is non-nil, put the deleted text in the kill-ring. If the
-field contains a value from a cross-referenced entry, it is never
-killed."
+  "Delete the contents of FIELD in the current entry.
+If KILL is non-nil, put the deleted text in the kill ring.
+
+Note that if FIELD contains a value from a cross-referenced
+entry, it is never killed."
   (if (or (not field)
           (string= field "=type="))
       (beep)
