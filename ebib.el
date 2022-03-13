@@ -223,17 +223,32 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
   "Redisplay the contents of the current field in the entry buffer."
   (ebib--redisplay-field (ebib--current-field)))
 
-(defun ebib--redisplay-current-string ()
-  "Redisplay the current string definition in the strings buffer."
+(defun ebib--generate-string-display (string)
+  "Get a formatted string for displaying abbrev STRING."
+  (let* ((def (ebib-get-string string ebib--cur-db 'noerror nil))
+	 (rawp (ebib-unbraced-p def))
+	 (unbraced-str (ebib-unbrace def))
+	 (multilinep (ebib--multiline-p unbraced-str))
+	 (str (if multilinep
+		  (ebib--first-line unbraced-str)
+		unbraced-str))
+	 (flags (concat (if rawp "*" "")
+			(if multilinep "+" "")))
+	 (expansion (if rawp (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "")))
+    (format "%-18s %2s%-30s %s"
+	    string	 ;; Abbreviation
+	    flags	 ;; Raw/multiline indicators
+	    str		 ;; Definition (presented without unbraced)
+	    expansion))) ;; Full expansion when unbraced
+
+(defun ebib--redisplay-strings-buffer ()
+  "Redisplay all strings in strings buffer."
   (with-current-ebib-buffer 'strings
-    (let ((inhibit-read-only t))
-      (let* ((string (ebib--current-string))
-             (val (ebib-get-string string ebib--cur-db nil 'unbraced)))
-        (delete-region (point-at-bol) (point-at-eol))
-        (insert (format "%-18s %s" string
-                        (if (ebib--multiline-p val)
-                            (concat "+" (ebib--first-line val))
-                          (concat " " val))))))))
+    (let ((inhibit-read-only t)
+	  (string (ebib--current-string)))
+      (erase-buffer)
+      (ebib--fill-strings-buffer)
+      (re-search-forward (rx line-start (literal string) (syntax -))))))
 
 (defun ebib--convert-multiline-to-string (multilines)
   "Convert MULTILINES to a single multiline string.
@@ -4387,6 +4402,7 @@ over `ebib--edit-field-as-multiline'."
     (define-key map [(control p)] 'ebib-prev-string)
     (define-key map [(meta p)] 'ebib-strings-page-up)
     (define-key map "q" 'ebib-quit-strings-buffer)
+    (define-key map "r" 'ebib-toggle-raw-string)
     (define-key map "x" 'ebib-export-string)
     (define-key map "X" 'ebib-export-all-strings)
     (define-key map "\C-xb" 'ebib-quit-strings-buffer)
@@ -4410,6 +4426,7 @@ over `ebib--edit-field-as-multiline'."
   '("Ebib"
     ["Add @String" ebib-add-string t]
     ["Edit @String" ebib-edit-string t]
+    ["Toggle @String raw" ebib-toggle-raw-string t]
     ["Copy @String" ebib-copy-string-contents (ebib--current-string)]
     ["Delete @String" ebib-delete-string (ebib--current-string)]
     "--"
@@ -4491,11 +4508,7 @@ beginning of the current line."
     (let ((inhibit-read-only t))
       (erase-buffer)
       (cl-dolist (elem (sort (ebib-db-list-strings ebib--cur-db) #'string<))
-        (let ((str (ebib-get-string elem ebib--cur-db 'noerror 'unbraced)))
-          (insert (format "%-18s %s\n" elem
-                          (if (ebib--multiline-p str)
-                              (concat "+" (ebib--first-line str))
-                            (concat " " str)))))))
+        (insert (ebib--generate-string-display elem) "\n")))
     (goto-char (point-min))
     (set-buffer-modified-p nil)))
 
@@ -4504,14 +4517,16 @@ beginning of the current line."
 When the user enters an empty string, the value is not changed."
   (interactive)
   (let* ((string (ebib--current-string))
-         (init-contents (ebib-get-string string ebib--cur-db 'noerror 'unbraced)))
+         (init-contents-raw (ebib-get-string string ebib--cur-db 'noerror))
+	 (init-contents (ebib-unbrace init-contents-raw)))
     (ebib--ifstring (new-contents (read-string (format "%s: " string)
                                                (if init-contents
                                                    (cons init-contents 0)
                                                  nil)))
         (progn
-          (ebib-set-string string new-contents ebib--cur-db 'overwrite)
-          (ebib--redisplay-current-string)
+	  (ebib-set-string string new-contents ebib--cur-db 'overwrite
+			   (ebib-unbraced-p init-contents-raw))
+          (ebib--redisplay-strings-buffer)
           (ebib-next-string)
           (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))
       (error "[Ebib] @String definition cannot be empty"))))
@@ -4533,25 +4548,43 @@ When the user enters an empty string, the value is not changed."
         (delete-region (point-at-bol) (1+ (point-at-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
+      (ebib--redisplay-strings-buffer)
       (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))
       (message "@String definition deleted."))))
 
-(defun ebib-add-string ()
-  "Create a new @String definition."
+(defun ebib-toggle-raw-string ()
+  "Toggle the \"special\" status of the current string's contents."
   (interactive)
+  (let* ((string (ebib--current-string))
+	 (def (ebib-get-string string ebib--cur-db 'noerror)))
+    (ebib-set-string
+     string			  ;; label
+     def			  ;; content
+     ebib--cur-db		  ;; db
+     'overwrite			  ;; overwrite
+     (not (ebib-unbraced-p def))) ;; whether to include braces
+    (ebib--redisplay-strings-buffer)
+    (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db))))
+
+(defun ebib-add-string (&optional arg)
+  "Create a new @String definition.
+
+With prefix ARG, the string is created unbraced."
+  (interactive "P")
   (ebib--ifstring (new-abbr (read-string "New @String abbreviation: " nil 'ebib--key-history))
       (if (member new-abbr (ebib-db-list-strings ebib--cur-db))
           (error "[Ebib] %s already exists" new-abbr)
         (ebib--ifstring (new-string (read-string (format "Value for %s: " new-abbr)))
             (progn
-              (ebib-set-string new-abbr new-string ebib--cur-db 'error)
+              (ebib-set-string new-abbr new-string ebib--cur-db 'error arg)
               (let ((inhibit-read-only t))
                 (goto-char (point-min))
-                (insert (format "%-19s %s\n" new-abbr new-string))
+                (insert (ebib--generate-string-display new-abbr) "\n")
                 (sort-lines nil (point-min) (point-max)))
               (goto-char (point-min))
               (re-search-forward new-string nil 'noerror)
               (beginning-of-line)
+	      (ebib--redisplay-strings-buffer)
               (ebib--set-modified t ebib--cur-db t (ebib--list-dependents ebib--cur-db)))))))
 
 (defun ebib-export-string (prefix)

@@ -2042,8 +2042,8 @@ This function basically just calls `ebib-db-set-string' to do the
   real work."
   (ebib-db-set-string abbr (cl-case nobrace
 			     (as-is value)
-			     (t (ebib-unbrace value))
-			     (nil (ebib-brace value)))
+			     ((nil) (ebib-brace value))
+			     (t (ebib-unbrace value)))
                       db overwrite))
 
 (defun ebib--expand-string (string db &optional noerror)
