@@ -2052,7 +2052,8 @@ This function basically just calls `ebib-db-set-string' to do the
 This function respects concatenation with `#', and quoting with
 {} and \".  If STRING contains unbalanced (and unescaped) braces
 or quote characters, an error is thrown, unless NOERROR is
-non-nil, in which case all errors are suppressed.
+non-nil, in which case all errors are suppressed and the return
+value is simply STRING.
 
 If passed an entirely braced or quoted string (i.e. a string for
 which `ebib-unbraced-p' is nil), the return value is the string
@@ -2061,66 +2062,69 @@ without the outermost set of braces/quotes.
 If any expansion occurs (i.e. an abbrev string is expanded to its
 definition, or any concatenation around `#' characters is done),
 the returned string has the face `ebib-abbrev-face'."
-  (cl-loop with quoted = nil and curr-section = "" and expanded = nil
-	   ;; To be able detect its end, make sure that the string
-	   ;; ends in '#'. Even if it already does, null strings are
-	   ;; removed from the result, so this fact won't change the
-	   ;; output.
-	   for char across (concat string "#")
-	   ;; When we encounter an unquoted concat char...
-	   if (and (not quoted) (eq char ?#))
-	   ;; ...if the current string is non-empty (this deals with
-	   ;; repeated '#' characters)...
-	   unless (string-empty-p (string-trim curr-section))
-	   ;; ...then add it to the list of strings.
-	   collect (let ((curr-string (string-trim curr-section)))
-		     (if (ebib-unbraced-p curr-string)
-			 ;; Recur if string not quoted
-			 (progn (setq expanded t)
-				(ebib-get-string curr-string db noerror nil t))
-		       (unless (null list) (setq expanded t))
-		       (ebib-unbrace curr-string)))
-	   into list ;; collect unquoted/expanded strings into var `list'
-	   else	     ;; String contains only whitespace, or is empty
-	   do (unless noerror (error "Too many `#' characters"))
-	   end ;; end the 'unless'
-	   and
-	   ;; Either way, then reinitialise the string var as empty.
-	   do (setq curr-section "")
-	   else
-	   ;; Control delimiter/quoting characters
-	   ;; The `quoted' variable is a running list of opening quote
-	   ;; characters. Each new opening character is added to the
-	   ;; end. On encountering a closing character, if the last
-	   ;; item in the list balances it, remove the last item. This
-	   ;; way, `quoted' is nil whenever we are outside all quotes.
-	   do (unless (equal (last (string-to-list curr-section)) '(?\\))
-		(cl-case char
-		  (?\" (if (eq (car (last quoted)) ?\")
-			   (setq quoted (butlast quoted))
-			 (setq quoted (append quoted '(?\")))))
-		  (?} (if (eq (car (last quoted)) ?{)
-			  (setq quoted (butlast quoted))
-			(unless (or noerror
-				    (member ?\" quoted)) ;; account for e.g. " { "
-			  (error "Bad quoting, last char of: `%s%s%c'"
-				 (apply 'concat list)
-				 curr-section
-				 char))))
-		  (?{ (unless (member ?\" quoted) ;; account for e.g. " { "
-			(setq quoted (append quoted '(?{)))))))
-	   and
-	   ;; If not at a '#' or a delimiter char, add current char to
-	   ;; the string
-	   do (setq curr-section (concat curr-section (char-to-string char)))
-	   end
-	   ;; If a proper expansion has been performed, propertize the result accordingly
-	   finally return (if (null quoted)
-			      (let ((expansion (apply 'concat list)))
-				(if expanded
-				    (propertize expansion 'face 'ebib-abbrev-face)
-				  expansion))
-			    (error "Bad quoting, unbalanced `\"' characters"))))
+  (condition-case err
+      (cl-loop with quoted = nil and curr-section = "" and expanded = nil
+	       ;; To be able detect its end, make sure that the string
+	       ;; ends in '#'. Even if it already does, null strings are
+	       ;; removed from the result, so this fact won't change the
+	       ;; output.
+	       for char across (concat string "#")
+	       ;; When we encounter an unquoted concat char...
+	       if (and (not quoted) (eq char ?#))
+	       ;; ...if the current string is non-empty (this deals with
+	       ;; repeated '#' characters)...
+	       unless (string-empty-p (string-trim curr-section))
+	       ;; ...then add it to the list of strings.
+	       collect (let ((curr-string (string-trim curr-section)))
+		         (if (ebib-unbraced-p curr-string)
+			     ;; Recur if string not quoted
+			     (progn (setq expanded t)
+				    (ebib-get-string curr-string db nil nil t))
+		           (unless (null list) (setq expanded t))
+		           (ebib-unbrace curr-string)))
+	       into list ;; collect unquoted/expanded strings into var `list'
+	       else      ;; String contains only whitespace, or is empty
+	       do (error "Too many `#' characters")
+	       end ;; end the 'unless'
+	       and
+	       ;; Either way, then reinitialise the string var as empty.
+	       do (setq curr-section "")
+	       else
+	       ;; Control delimiter/quoting characters
+	       ;; The `quoted' variable is a running list of opening quote
+	       ;; characters. Each new opening character is added to the
+	       ;; end. On encountering a closing character, if the last
+	       ;; item in the list balances it, remove the last item. This
+	       ;; way, `quoted' is nil whenever we are outside all quotes.
+	       do (unless (equal (last (string-to-list curr-section)) '(?\\))
+		    (cl-case char
+		      (?\" (if (eq (car (last quoted)) ?\")
+			       (setq quoted (butlast quoted))
+			     (setq quoted (append quoted '(?\")))))
+		      (?} (if (eq (car (last quoted)) ?{)
+			      (setq quoted (butlast quoted))
+			    (unless (member ?\" quoted) ;; account for e.g. " { "
+			      (error "Bad quoting, last char of: `%s%s%c'"
+				     (apply 'concat list)
+				     curr-section
+				     char))))
+		      (?{ (unless (member ?\" quoted) ;; account for e.g. " { "
+			    (setq quoted (append quoted '(?{)))))))
+	       and
+	       ;; If not at a '#' or a delimiter char, add current char to
+	       ;; the string
+	       do (setq curr-section (concat curr-section (char-to-string char)))
+	       end
+	       ;; If a proper expansion has been performed, propertize the result accordingly
+	       finally return (if (null quoted)
+			          (let ((expansion (apply 'concat list)))
+				    (if expanded
+				        (propertize expansion 'face 'ebib-abbrev-face)
+				      expansion))
+			        (error "Bad quoting, unbalanced `\"' characters")))
+    (t (if noerror
+           string
+         (signal (car err) (cdr err))))))
 
 (defun ebib-get-string (abbr db &optional noerror unbraced expand)
   "Return the value of @String definition ABBR in database DB.
