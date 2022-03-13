@@ -1820,7 +1820,7 @@ Return t upon success, or nil if the value could not be stored."
       (ebib-db-set-field-value field value key db 'overwrite))))
 
 (defcustom ebib-expand-strings t
-  "Whether expand of abbreviated/concatenated fields for display.
+  "Whether to expand abbreviated/concatenated fields for display.
 If set to t, string abbreviations and concatenations are always
 expanded.  If a list of strings, then fields which match one of
 the members (case-insensitively) will be expanded.  If a field
