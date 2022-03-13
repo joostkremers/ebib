@@ -4445,7 +4445,8 @@ over `ebib--edit-field-as-multiline'."
         (with-ebib-window-nondedicated (selected-window)
           (switch-to-buffer nil t)))
     (with-ebib-window-nondedicated (selected-window)
-      (switch-to-buffer (ebib--buffer 'entry) t)))
+      (switch-to-buffer (ebib--buffer 'entry) t)
+      (ebib--update-entry-buffer)))  ; Make sure changes made by the user show up.
   (unless (ebib--pop-to-buffer (ebib--buffer 'index))
     (call-interactively (global-key-binding "\C-xb"))))  ; If the index buffer isn't visible, call `switch-to-buffer'.
 
