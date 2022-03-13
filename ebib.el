@@ -4228,7 +4228,9 @@ entry, it is never killed."
 	(when kill (kill-new contents))
 	(if external
 	    (if (eq ebib-notes-storage 'one-file-per-note)
-		(delete-file (expand-file-name (ebib--create-notes-file-name key)))
+		(progn
+		  (delete-file (expand-file-name (ebib--create-notes-file-name key)))
+		  (delete key ebib--notes-list))
 	      (error "[Ebib] `ebib-notes-storage' set to `%s', deleting not supported.
 Try opening the note file and deleting it manually." ebib-notes-storage))
 	  (ebib-db-remove-field-value field key ebib--cur-db))
