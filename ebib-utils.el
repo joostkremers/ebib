@@ -2084,7 +2084,7 @@ the returned string has the face `ebib-abbrev-face'."
 		           (ebib-unbrace curr-string)))
 	       into list ;; collect unquoted/expanded strings into var `list'
 	       else      ;; String contains only whitespace, or is empty
-	       do (error "Too many `#' characters")
+	       do (error "[Ebib] Too many `#' characters")
 	       end ;; end the 'unless'
 	       and
 	       ;; Either way, then reinitialise the string var as empty.
@@ -2104,7 +2104,7 @@ the returned string has the face `ebib-abbrev-face'."
 		      (?} (if (eq (car (last quoted)) ?{)
 			      (setq quoted (butlast quoted))
 			    (unless (member ?\" quoted) ;; account for e.g. " { "
-			      (error "Bad quoting, last char of: `%s%s%c'"
+			      (error "[Ebib] Bad quoting, last char of: `%s%s%c'"
 				     (apply 'concat list)
 				     curr-section
 				     char))))
@@ -2121,7 +2121,7 @@ the returned string has the face `ebib-abbrev-face'."
 				    (if expanded
 				        (propertize expansion 'face 'ebib-abbrev-face)
 				      expansion))
-			        (error "Bad quoting, unbalanced `\"' characters")))
+			        (error "[Ebib] Bad quoting, unbalanced `\"' characters")))
     (t (if noerror
            string
          (signal (car err) (cdr err))))))
