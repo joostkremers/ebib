@@ -56,6 +56,7 @@
 (require 'crm)
 (require 'pp)
 (require 'hl-line)
+(require 'mule-util)
 (require 'parsebib)
 (require 'ebib-utils)
 (require 'ebib-db)
@@ -143,14 +144,22 @@ Included in the display are the data in the fields specified in
 is applied to the item."
   (let ((data (ebib--get-tabulated-data key))
         (n 0)
-        (max (1- (length ebib-index-columns))))
+        (max (1- (length ebib-index-columns)))
+        (ellipsis-width (length truncate-string-ellipsis)))
     (with-current-ebib-buffer 'index
       (while (< n max)
-        (let ((width (cadr (nth n ebib-index-columns)))
-              (item (nth n (cadr data))))
+        (let* ((width (cadr (nth n ebib-index-columns)))
+               (item (nth n (cadr data)))
+               ;; Strings that are too long for their column are truncated, but
+               ;; if the column is too narrow, we prefer not to display
+               ;; anything.
+               (display-item (if (and (< width (+ 5 ellipsis-width))
+                                      (< width (length item)))
+                                 ""
+                               (truncate-string-to-width item width nil nil t))))
           (insert (bidi-string-mark-left-to-right
                    (format (concat "%-" (int-to-string width) "s")
-                           (truncate-string-to-width item width nil nil t)))
+                           display-item))
                   ebib-index-column-separator))
         (cl-incf n))
       ;; The last item isn't truncated.
