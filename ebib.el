@@ -899,7 +899,7 @@ ask for confirmation."
   ;; any of them haven't been saved yet.
   (mapc #'kill-buffer ebib--multiline-buffer-list)
   (when (if (ebib--modified-p)
-            (yes-or-no-p "There are modified databases. Quit anyway? ")
+            (yes-or-no-p "There are modified databases.  Quit anyway? ")
           (or force-quit (y-or-n-p "Quit Ebib? ")))
     (if (and ebib-keywords
              (get 'ebib--keywords-completion-list :modified)
@@ -943,7 +943,7 @@ keywords before Emacs is killed."
                 (progn
                   (ebib-save-all-databases)
                   t)
-              (yes-or-no-p "[Ebib] There are modified databases. Kill anyway? ")))
+              (yes-or-no-p "[Ebib] There are modified databases.  Kill anyway? ")))
     (when (and ebib-keywords
                (get 'ebib--keywords-completion-list :modified)
                (y-or-n-p "[Ebib] Save modified keywords list? "))
@@ -955,7 +955,7 @@ keywords before Emacs is killed."
   (if (and (with-no-warnings ; `ebib-multiline-mode' is not defined yet.
              ebib-multiline-mode)
            (buffer-modified-p))
-      (yes-or-no-p (format "[Ebib] Multiline edit buffer `%s' not saved. Quit anyway? " (buffer-name)))
+      (yes-or-no-p (format "[Ebib] Multiline edit buffer `%s' not saved.  Quit anyway? " (buffer-name)))
     t))
 
 ;;; index-mode
@@ -1070,7 +1070,7 @@ there for details."
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
-(easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu"
+(easy-menu-define ebib-index-menu ebib-index-mode-map "Ebib index menu."
   `("Ebib"
     ("Database"
      ["Open..." ebib-open-bibtex-file t]
@@ -1260,7 +1260,7 @@ interactively."
   (ebib--execute-when
     (entries
      (when (or (and (ebib-db-modified-p ebib--cur-db)
-                    (yes-or-no-p "Database modified. Really reload from file? "))
+                    (yes-or-no-p "Database modified.  Really reload from file? "))
                (y-or-n-p "Reload current database from file? "))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
        (ebib--reload-database ebib--cur-db)
@@ -1277,7 +1277,7 @@ interactively."
     (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
     (dolist (db ebib--databases)
       (when (or (not (ebib-db-modified-p db))
-                (yes-or-no-p (format "Database `%s' modified. Really reload from file? " (ebib-db-get-filename db))))
+                (yes-or-no-p (format "Database `%s' modified.  Really reload from file? " (ebib-db-get-filename db))))
         (ebib--reload-database db)
         (ebib--set-modified nil db)))
     (ebib--update-buffers)))
@@ -1755,7 +1755,7 @@ Keys are in the form: <new-entry1>, <new-entry2>, ..."
     (database
      (catch 'return
        (unless (if (ebib-db-modified-p ebib--cur-db)
-                   (yes-or-no-p "Database modified. Close it anyway? ")
+                   (yes-or-no-p "Database modified.  Close it anyway? ")
                  (y-or-n-p "Close database? "))
          (throw 'return nil))
 
@@ -2024,7 +2024,7 @@ The FORCE argument is used as in `ebib-save-current-database'."
                (time-less-p db-modtime file-modtime))
       (unless (or (and (listp force)
                        (eq 16 (car force)))
-                  (yes-or-no-p (format "File `%s' changed on disk. Overwrite? " (ebib-db-get-filename db))))
+                  (yes-or-no-p (format "File `%s' changed on disk.  Overwrite? " (ebib-db-get-filename db))))
         (error "[Ebib] File not saved"))))
 
   ;; Now save the database.
@@ -3684,7 +3684,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
-(easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu"
+(easy-menu-define ebib-entry-menu ebib-entry-mode-map "Ebib entry menu."
   '("Ebib"
     ["Edit Field" ebib-edit-current-field t]
     ["Edit Field As Multiline" ebib-edit-current-field-as-multiline t]
@@ -4241,7 +4241,7 @@ entry, it is never killed."
 		  (delete-file (expand-file-name (ebib--create-notes-file-name key)))
 		  (delete key ebib--notes-list))
 	      (error "[Ebib] `ebib-notes-storage' set to `%s', deleting not supported.
-Try opening the note file and deleting it manually." ebib-notes-storage))
+Try opening the note file and deleting it manually" ebib-notes-storage))
 	  (ebib-db-remove-field-value field key ebib--cur-db))
 	;; Applicable for external or otherwise
 	(ebib--redisplay-field field)
@@ -4268,7 +4268,7 @@ deleted."
   (ebib-delete-field-contents (ebib--current-field) nil))
 
 (defun ebib-yank-field-contents (field)
-  "Insert the last killed text into the current field.
+  "Insert the last killed text into FIELD.
 Repeated calls to this function cycle through the kill ring,
 similar to \\[yank] followed by \\[yank-pop].  The prefix
 argument ARG functions as with \\[yank] / \\[yank-pop]."
@@ -4294,6 +4294,7 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
                                                            (ebib--list-dependents ebib--cur-db))))))))
 
 (defun ebib-yank-current-field-contents ()
+  "Insert the last killed text into the current field."
   (interactive)
   (ebib-yank-field-contents (ebib--current-field)))
 
@@ -4433,7 +4434,7 @@ over `ebib--edit-field-as-multiline'."
   (set (make-local-variable 'hl-line-face) 'ebib-highlight-extend-face)
   (hl-line-mode 1))
 
-(easy-menu-define ebib-strings-menu ebib-strings-mode-map "Ebib strings menu"
+(easy-menu-define ebib-strings-menu ebib-strings-mode-map "Ebib strings menu."
   '("Ebib"
     ["Add @String" ebib-add-string t]
     ["Edit @String" ebib-edit-string t]
@@ -4690,7 +4691,7 @@ the @String definitions to."
             ("\C-c\C-s" . ebib-save-from-multiline-buffer)
             ("\C-c\C-h" . ebib-multiline-help)))
 
-(easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu"
+(easy-menu-define ebib-multiline-menu ebib-multiline-mode-map "Ebib multiline menu."
   '("Ebib"
     ["Store Text and Exit" ebib-quit-multiline-buffer-and-save t]
     ["Cancel Edit" ebib-cancel-multiline-buffer t]
