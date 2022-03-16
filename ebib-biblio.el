@@ -60,9 +60,12 @@ The entry is stored in the current database."
   (biblio-doi-forward-bibtex (biblio-cleanup-doi doi)
                              (lambda (result)
                                (with-temp-buffer
-                                 (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
+				 (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
                                                      (current-buffer))
-                                 (ebib-import-entries ebib--cur-db)))))
+				 (when-let ((entry-keys (ebib-import-entries ebib--cur-db)))
+				   (ebib--goto-entry-in-index (car entry-keys))
+				   (ebib--update-index-buffer)
+				   (ebib--update-entry-buffer))))))
 
 (define-key ebib-index-mode-map "B" #'ebib-biblio-import-doi)
 

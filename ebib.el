@@ -1329,13 +1329,13 @@ dependent database."
     (if (and (not not-as-dependent)
              (ebib--bib-find-main db))
         (let ((result (ebib--bib-find-bibtex-entries db nil)))
-          (ebib--log 'message "Loaded %d entries into dependent database." (car result)))
+          (ebib--log 'message "Loaded %d entries into dependent database." (length (car result))))
       ;; Opening a non-dependent database.
       (unless (ebib-db-get-dialect db)
         (ebib-db-set-dialect (parsebib-find-bibtex-dialect) db))
       (let ((result (ebib--bib-find-bibtex-entries db nil)))
         (ebib--log 'message "%d entries, %d @Strings and %s @Preamble found in file."
-                   (car result)
+                   (length (car result))
                    (cadr result)
                    (if (nth 2 result) "a" "no"))))
     (when ebib--log-error
@@ -1359,16 +1359,16 @@ error and return nil."
 
 (defun ebib--bib-find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.
-The search is started at the beginnig of the buffer.  All entries
-found are stored in DB.  Return value is a three-element list: the
-first element is the number of entries found, the second the
-number of @String definitions, and the third is t or nil,
-indicating whether a @Preamble was found.
+The search is started at the beginnig of the buffer. All entries
+found are stored in DB. Return value is a three-element list: the
+first element is the list of entry keys of entries found, the
+second the number of @String definitions, and the third is t or
+nil, indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry.  Note that a timestamp is only added if `ebib-use-timestamp'
 is set to t."
-  (let ((n-entries 0)
+  (let ((entry-keys '())
         (n-strings 0)
         (preamble nil)
         (entry-list (ebib--list-entry-types (ebib--get-dialect db))))
@@ -1385,11 +1385,11 @@ is set to t."
               ((cl-equalp entry-type "comment")
                (ebib--bib-read-comment db))
               ((stringp entry-type)
-               (when (ebib--bib-read-entry entry-type db timestamp)
-                 (setq n-entries (1+ n-entries))
-                 (unless (assoc-string entry-type entry-list 'case-fold)
+	       (when-let ((entry-key (ebib--bib-read-entry entry-type db timestamp)))
+		 (push entry-key entry-keys)
+		 (unless (assoc-string entry-type entry-list 'case-fold)
                    (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
-    (list n-entries n-strings preamble)))
+    (list entry-keys n-strings preamble)))
 
 (defun ebib--bib-find-next-bibtex-item ()
   "Search for the next BibTeX item in the current buffer.
@@ -4966,7 +4966,7 @@ If prefix ARG is non-nil, do not delete the original file."
 The entries are added to DB, which defaults to the current
 database (i.e., the database that was active when Ebib was
 lowered.  Works on the whole buffer, or on the region if it is
-active."
+active.  Returns the list of added entry keys."
   (interactive)
   (ebib--execute-when
     (real-db
@@ -4986,9 +4986,10 @@ active."
                    (ebib--update-index-buffer)
                  (ebib--mark-index-dirty db))
                (message (format "Imported %d entries, %d @Strings and %s @Preamble."
-                                (car result)
+                                (length (car result))
                                 (cadr result)
-                                (if (nth 2 result) "a" "no")))))))))
+                                (if (nth 2 result) "a" "no")))
+	       (car result)))))))
     (default (error "[Ebib] No database loaded"))))
 
 (define-obsolete-function-alias 'ebib-import 'ebib-import-entries "Ebib 2.32")
