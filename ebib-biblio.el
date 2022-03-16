@@ -52,6 +52,9 @@
 (defvar ebib-index-mode-map)
 (declare-function ebib-read-database "ext:ebib.el" (prompt &optional databases))
 (declare-function ebib-import-entries "ext:ebib.el" (&optional db))
+(declare-function ebib--goto-entry-in-index "ext:ebib.el" (key))
+(declare-function ebib--update-index-buffer "ext:ebib.el" (&optional no-refresh))
+(declare-function ebib--update-entry-buffer "ext:ebib.el" (&optional match-str))
 
 (defun ebib-biblio-import-doi (doi)
   "Fetch a BibTeX entry from a remote server by its DOI using `biblio.el'.
