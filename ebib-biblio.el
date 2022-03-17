@@ -51,7 +51,7 @@
 (defvar ebib--cur-db)
 (defvar ebib-index-mode-map)
 (declare-function ebib-read-database "ext:ebib.el" (prompt &optional databases))
-(declare-function ebib-import-entries "ext:ebib.el" (&optional db))
+(declare-function ebib-import-entries "ext:ebib.el" (&optional db silent))
 (declare-function ebib--goto-entry-in-index "ext:ebib.el" (key))
 (declare-function ebib--update-index-buffer "ext:ebib.el" (&optional no-refresh))
 (declare-function ebib--update-entry-buffer "ext:ebib.el" (&optional match-str))
@@ -65,8 +65,8 @@ The entry is stored in the current database."
                                (with-temp-buffer
 				 (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
                                                      (current-buffer))
-				 (when-let ((entry-keys (ebib-import-entries ebib--cur-db)))
-				   (ebib--goto-entry-in-index (car entry-keys))
+				 (when-let ((entry-keys (ebib-import-entries ebib--cur-db 'silent)))
+                                   (ebib--goto-entry-in-index (car entry-keys))
 				   (ebib--update-index-buffer)
 				   (ebib--update-entry-buffer))))))
 

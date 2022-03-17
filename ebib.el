@@ -1357,18 +1357,23 @@ error and return nil."
                 (ebib-db-set-main main db)
               (ebib--log 'error "Could not find main database `%s'" main-file))))))) ; This returns nil.
 
-(defun ebib--bib-find-bibtex-entries (db timestamp)
+(defun ebib--bib-find-bibtex-entries (db timestamp &optional list-entries)
   "Find the BibTeX entries in the current buffer.
-The search is started at the beginnig of the buffer. All entries
-found are stored in DB. Return value is a three-element list: the
-first element is the list of entry keys of entries found, the
-second the number of @String definitions, and the third is t or
-nil, indicating whether a @Preamble was found.
+The search is started at the beginnig of the buffer.  All entries
+found are stored in DB.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry.  Note that a timestamp is only added if `ebib-use-timestamp'
-is set to t."
-  (let ((entry-keys '())
+is set to t.
+
+The return value depends on LIST-ENTRIES: if nil, the return
+value is a three-element list: the first element is the number of
+entries found, the second the number of @String definitions, and
+the third is t or nil, indicating whether a @Preamble was found.
+If LIST-ENTRIES is non-nil, the return value is a list of entry
+keys."
+  (let ((entries ())
+        (n-entries 0)
         (n-strings 0)
         (preamble nil)
         (entry-list (ebib--list-entry-types (ebib--get-dialect db))))
@@ -1385,11 +1390,15 @@ is set to t."
               ((cl-equalp entry-type "comment")
                (ebib--bib-read-comment db))
               ((stringp entry-type)
-	       (when-let ((entry-key (ebib--bib-read-entry entry-type db timestamp)))
-		 (push entry-key entry-keys)
-		 (unless (assoc-string entry-type entry-list 'case-fold)
+               (when-let ((entry-key (ebib--bib-read-entry entry-type db timestamp)))
+                 (if list-entries
+                     (push entry-key entries)
+                   (setq n-entries (1+ n-entries)))
+                 (unless (assoc-string entry-type entry-list 'case-fold)
                    (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
-    (list entry-keys n-strings preamble)))
+    (if list-entries
+        (nreverse entries)
+      (list n-entries n-strings preamble))))
 
 (defun ebib--bib-find-next-bibtex-item ()
   "Search for the next BibTeX item in the current buffer.
@@ -4961,12 +4970,13 @@ If prefix ARG is non-nil, do not delete the original file."
 
 ;;; Functions for non-Ebib buffers
 
-(defun ebib-import-entries (&optional db)
+(defun ebib-import-entries (&optional db silent)
   "Search for BibTeX entries in the current buffer.
 The entries are added to DB, which defaults to the current
 database (i.e., the database that was active when Ebib was
 lowered.  Works on the whole buffer, or on the region if it is
-active.  Returns the list of added entry keys."
+active.  If SILENT is non-nil, do not display a short summary of
+imported items but return a list of imported entry keys instead."
   (interactive)
   (ebib--execute-when
     (real-db
@@ -4979,17 +4989,18 @@ active.  Returns the list of added entry keys."
                (buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--bib-find-bibtex-entries db t)))
+             (let ((result (ebib--bib-find-bibtex-entries db t silent)))
                (ebib-db-set-modified t db)
                (if-let ((index (ebib-db-get-buffer db))
                         (window (get-buffer-window index t)))
                    (ebib--update-index-buffer)
                  (ebib--mark-index-dirty db))
-               (message (format "Imported %d entries, %d @Strings and %s @Preamble."
-                                (length (car result))
-                                (cadr result)
-                                (if (nth 2 result) "a" "no")))
-	       (car result)))))))
+               (if silent
+                   result
+                 (message (format "Imported %d entries, %d @Strings and %s @Preamble."
+                                  (car result)
+                                  (cadr result)
+                                  (if (nth 2 result) "a" "no"))))))))))
     (default (error "[Ebib] No database loaded"))))
 
 (define-obsolete-function-alias 'ebib-import 'ebib-import-entries "Ebib 2.32")
