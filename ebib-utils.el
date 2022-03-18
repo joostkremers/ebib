@@ -392,17 +392,107 @@ transformation function returns something that can be displayed."
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
-(defcustom ebib-TeX-markup-replace-alist '(("``" . "“")
-					   ("`" . "‘")
-					   ("''" . "”")
-					   ("'" . "’")
+(defun ebib--build-TeX-accent-command-regexp (command accent)
+  "Return cons of regexp matching TeX COMMAND and ACCENTed argument.
+
+The car is a regexp matching the whole of TeX command COMMAND,
+capturing exactly one argument in curly brackets. The cdr is a
+replacement string, the concatenation of \"\\1\" and ACCENT.
+
+Principally intended for generating lists of matches and replacements
+in `ebib-TeX-markup-replace-alist'.
+
+Specifically, the car regexp matches a string composed of a
+backslash, followed by COMMAND, followed by a single letter (i.e.
+matching [[:alpha:]]). The regexp matches if the letter is in
+curly brackets (`\\COMMAND{a}'), followed by a pair of curly
+brackets (`\\COMMANDa{}') or neither (`\\COMMANDa'). In all
+variants, the letter is captured with group number 1.
+
+COMMAND and ACCENT must both be strings. ACCENT is often just a
+unicode combining character."
+  (cons
+   (rx-to-string
+    `(: "\\" ,command
+	(or (: (* blank) "{" (group-n 1 letter) "}")
+	    (: (,(if (string-match "[a-zA-Z]" command) '+ '*) blank)
+	       (group-n 1 letter))))
+    t)
+   (rx-to-string `(: (backref 1) ,accent) t)))
+
+(defun ebib--build-TeX-command-regexp (command letter)
+  "Return cons of regexp matching TeX COMMAND and LETTER it prints.
+
+The car is a regexp matching the whole of TeX command COMMAND.
+The cdr is LETTER.
+
+Principally intended for generating lists of matches and replacements
+in `ebib-TeX-markup-replace-alist'.
+
+Specifically, the car regexp matches a string composed of a
+backslash, followed by COMMAND followed by a pair of curly
+brackets (`\\COMMANDa{}'), a word ending (e.g. anything command
+beginning with a backslash) or a space. Such a trailing space
+will be included in the overall match.
+
+COMMAND and LETTER must both be strings."
+  (cons
+   (rx-to-string
+    `(: "\\" ,(if (listp command) `(or ,@command) command)
+	;; If a command is terminated by a space, LaTeX includes that
+	;; space in the command itself, so it is not printed (like the
+	;; behaviour for a following {}) Accordingly, if there is one,
+	;; include that space in the replaced string by matching on it
+	;; first.
+	(or (+ blank) word-end "{}"))
+    t)
+   letter))
+
+(defcustom ebib-TeX-markup-replace-alist `(;; Commands Defined to Work in Both Math and Text Mode
+					   ;; (Dashes are separate because they are not \escaped,
+					   ;; unlike everything else.)
+					   ("---\\|\\\\textemdash\\(?: +\\|{}\\|\\>\\)" . "—")
+					   ("--\\|\\\\textendash\\(?: +\\|{}\\|\\>\\)"  . "–")
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
+					      '((("ddag" "textdaggerdbl") "‡") (("dag" "textdagger") "†")
+						("textpertenthousand" "‱") ("textperthousand" "‰")
+						("textquestiondown" "¿") ("P" "¶") (("$" "textdollar") "$")
+						("S" "§") (("ldots" "dots" "textellipsis") "…")))
+
+					   ;; Text-mode Accents
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-accent-command-regexp)
+					      '(("\"" "̈") ("|" "̓") ("f" "̑") ("’" "́") ("~" "̃") ("G" "̏")
+						("u" "̆") ("\." "̇") ("b" "̱") ("h" "̉") ("U" "̎") ("=" "̄")
+						("c" "̡") ("H" "̋") ("^" "̂") ("C" "̏") ("v" "̌") ("‘" "̀")
+						("d" "̣") ("r" "̊")))
+
+					   ;; LaTeX2 Escapable "Special" Characters
+					   ("\\\\%" . "%") ("\\\\&" . "&") ("\\\\#" . "#")
+
+					   ;; Quotes
+					   ("``" . "“") ("`" . "‘") ("''" . "”") ("'" . "’")
+
+					   ;; Formatting Commands
 					   ("\\\\textit{\\(.*?\\)}" . ebib--convert-tex-italics)
 					   ("\\\\emph{\\(.*?\\)}" . ebib--convert-tex-italics)
 					   ("\\\\textbf{\\(.*?\\)}" . ebib--convert-tex-bold)
 					   ("\\\\textsc{\\(.*?\\)}" . ebib--convert-tex-small-caps)
+
+					   ;; Non-ASCII Letters (Excluding Accented Letters)
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
+					      '(("AA" "Å") ("AE" "Æ") ("DH" "Ð") ("DJ" "Ð") ("L" "Ł")
+						("ss" "ß") ("NG" "Ŋ") ("OE" "Œ") ("OF" "Ø") ("TH" "Þ")
+						("aa" "å") ("ae" "æ") ("dh" "ð") ("dj" "đ") ("th" "þ")
+						("ij" "ij") ("l" "ł") ("ng" "ŋ") ("oe" "œ") ("of" "ø")))
+
+					   ;; Other commands
 					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
-					   ("{" . "")
-                                           ("}" . ""))
+
+					   ;; Remove all remaining {braces}
+					   ("{" . "") ("}" . ""))
   "Alist of strings and replacements for TeX markup.
 This is used in `ebib-clean-TeX-markup' to make TeX markup more
 suitable for display.  Each item in the list consists of a regexp
