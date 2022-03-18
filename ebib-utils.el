@@ -2401,11 +2401,12 @@ Any substring matching the car of a cell in
 correspnoding cdr (if the cdr is a string), or with the result of
 calling the cdr on the match (if it is a function). This is done
 with `replace-regexp-in-string', which see for details."
-  (save-match-data
-    (cl-loop for (pattern . replacement) in ebib-TeX-markup-replace-alist
-	     do (setq string (replace-regexp-in-string
-			      pattern replacement string))
-	     finally return string)))
+  (let ((case-fold-search nil))
+    (save-match-data
+      (cl-loop for (pattern . replacement) in ebib-TeX-markup-replace-alist
+	       do (setq string (replace-regexp-in-string
+				pattern replacement string))
+	       finally return string))))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
