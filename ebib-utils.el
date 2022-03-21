@@ -392,22 +392,39 @@ transformation function returns something that can be displayed."
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
-(defcustom ebib-TeX-markup-replace-alist '(("{" . "")
-                                           ("}" . "")
-                                           ("``" . "“")
+(defcustom ebib-TeX-markup-replace-alist '(("``" . "“")
 					   ("`" . "‘")
 					   ("''" . "”")
-					   ("'" . "’"))
+					   ("'" . "’")
+					   ("\\\\textit{\\(.*?\\)}"
+					    . (lambda (str)
+						(propertize
+						 (match-string 1 str) 'face 'italic)))
+					   ("\\\\emph{\\(.*?\\)}"
+					    . (lambda (str)
+						(propertize
+						 (match-string 1 str) 'face 'italic)))
+					   ("\\\\textbf{\\(.*?\\)}"
+					    . (lambda (str)
+						(propertize
+						 (match-string 1 str) 'face 'bold)))
+					   ("\\\\textsc{\\(.*?\\)}"
+					    . (lambda (str) (upcase (match-string 1 str))))
+					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
+					   ("{" . "")
+                                           ("}" . ""))
   "Alist of strings and replacements for TeX markup.
 This is used in `ebib-clean-TeX-markup' to make TeX markup more
-suitable for display.  Each item in the list consists of a string
-and its replacement.  Both must be strings.  Earlier elements are
-evaluated before later ones, so if one string is a subpattern of
-another, the second must appear later (e.g. \"''\" is before
-\"'\"."
+suitable for display.  Each item in the list consists of a regexp
+and its replacement.  The replacement can be a string (which will
+simply replace the match) or a function (the match will be
+replaced by the result of calling the function on the match
+string).  Earlier elements are evaluated before later ones, so if
+one string is a subpattern of another, the second must appear
+later (e.g. \"''\" is before \"'\")."
   :group 'ebib
-  :type '(alist (string :tag "String")
-		(string :tag "Replacement")))
+  :type '(alist (regexp :tag "Pattern")
+		((choice string function) :tag "Replacement")))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
@@ -2376,25 +2393,17 @@ year can be extracted from DATE, return nil."
   (ebib-clean-TeX-markup (ebib-get-field-value field key db "" 'unbraced 'xref)))
 
 (defun ebib-clean-TeX-markup (string)
-  "Return STRING without TeX markup."
+  "Return STRING without TeX markup.
+Any substring matching the car of a cell in
+`ebib-TeX-markup-replace-alist' is replaced with the
+correspnoding cdr (if the cdr is a string), or with the result of
+calling the cdr on the match (if it is a function). This is done
+with `replace-regexp-in-string', which see for details."
   (save-match-data
-    (let ((case-fold-search t))
-      ;; First replace TeX commands with their arguments and do some
-      ;; transformations, i.e., \textsc{cls} ==> CLS.  Note that optional
-      ;; arguments are also removed.
-      (while (string-match "\\\\\\([a-zA-Z*]*\\)\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" string)
-        (let ((arg (copy-sequence (match-string 2 string))))
-          (pcase (match-string 1 string)
-            ((or "emph" "textit") (setq arg (propertize arg 'face '(italic))))
-            ("textbf" (setq arg (propertize arg 'face '(bold))))
-            ("textsc" (setq arg (upcase arg))))
-          (setq string (replace-match arg t t string)))))
-    ;; Replace as defined in `ebib-TeX-markup-replace-alist', and
-    ;; remove all {braces} (this takes care of nested braces too)
-    (replace-regexp-in-string
-     (rx-to-string (append '(or) (mapcar #'car ebib-TeX-markup-replace-alist)))
-     (lambda (match) (cdr (assoc match ebib-TeX-markup-replace-alist 'string=)))
-     string)))
+    (cl-loop for (pattern . replacement) in ebib-TeX-markup-replace-alist
+	     do (setq string (replace-regexp-in-string
+			      pattern replacement string))
+	     finally return string)))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
