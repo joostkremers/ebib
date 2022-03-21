@@ -396,20 +396,10 @@ transformation function returns something that can be displayed."
 					   ("`" . "‘")
 					   ("''" . "”")
 					   ("'" . "’")
-					   ("\\\\textit{\\(.*?\\)}"
-					    . (lambda (str)
-						(propertize
-						 (match-string 1 str) 'face 'italic)))
-					   ("\\\\emph{\\(.*?\\)}"
-					    . (lambda (str)
-						(propertize
-						 (match-string 1 str) 'face 'italic)))
-					   ("\\\\textbf{\\(.*?\\)}"
-					    . (lambda (str)
-						(propertize
-						 (match-string 1 str) 'face 'bold)))
-					   ("\\\\textsc{\\(.*?\\)}"
-					    . (lambda (str) (upcase (match-string 1 str))))
+					   ("\\\\textit{\\(.*?\\)}" . ebib--convert-tex-italics)
+					   ("\\\\emph{\\(.*?\\)}" . ebib--convert-tex-italics)
+					   ("\\\\textbf{\\(.*?\\)}" . ebib--convert-tex-bold)
+					   ("\\\\textsc{\\(.*?\\)}" . ebib--convert-tex-small-caps)
 					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
 					   ("{" . "")
                                            ("}" . ""))
@@ -2391,6 +2381,18 @@ year can be extracted from DATE, return nil."
 (defun ebib-clean-TeX-markup-from-entry (field key db)
   "Return the contents of FIELD from KEY in DB without TeX markup."
   (ebib-clean-TeX-markup (ebib-get-field-value field key db "" 'unbraced 'xref)))
+
+(defun ebib--convert-tex-italics (str)
+  "Return first sub-expression match in STR, in italics"
+  (propertize (match-string 1 str) 'face 'italic))
+
+(defun ebib--convert-tex-bold (str)
+  "Return first sub-expression match in STR, in bold"
+  (propertize (match-string 1 str) 'face 'bold))
+
+(defun ebib--convert-tex-small-caps (str)
+  "Return first sub-expression match in STR, capitalised"
+  (upcase (match-string 1 str)))
 
 (defun ebib-clean-TeX-markup (string)
   "Return STRING without TeX markup.
