@@ -59,9 +59,9 @@
 
 ;; User customisation.
 
-(defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
+(defgroup ebib nil "Ebib: a BibTeX database manager." :group 'tex)
 
-(defgroup ebib-windows nil "Ebib window management" :group 'ebib)
+(defgroup ebib-windows nil "Ebib window management." :group 'ebib)
 
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
@@ -396,7 +396,7 @@ transformation function returns something that can be displayed."
   "Return cons of regexp matching TeX COMMAND and ACCENTed argument.
 
 The car is a regexp matching the whole of TeX command COMMAND,
-capturing exactly one argument in curly brackets. The cdr is a
+capturing exactly one argument in curly brackets.  The cdr is a
 replacement string, the concatenation of \"\\1\" and ACCENT.
 
 Principally intended for generating lists of matches and replacements
@@ -432,7 +432,7 @@ in `ebib-TeX-markup-replace-alist'.
 Specifically, the car regexp matches a string composed of a
 backslash, followed by COMMAND followed by a pair of curly
 brackets (`\\COMMANDa{}'), a word ending (e.g. anything command
-beginning with a backslash) or a space. Such a trailing space
+beginning with a backslash) or a space.  Such a trailing space
 will be included in the overall match.
 
 COMMAND and LETTER must both be strings."
@@ -1254,7 +1254,7 @@ file.  If this option is set, the database is automatically saved."
   :type '(choice (const :tag "Save dependent database after citation" t)
                  (const :tag "Only save dependent databases manually" nil)))
 
-(defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
+(defgroup ebib-faces nil "Faces for Ebib." :group 'ebib)
 
 (defface ebib-highlight-extend-face `((t (:inherit highlight
                                                    ,@(and (>= emacs-major-version 27) '(:extend t)))))
@@ -2473,15 +2473,15 @@ year can be extracted from DATE, return nil."
   (ebib-clean-TeX-markup (ebib-get-field-value field key db "" 'unbraced 'xref)))
 
 (defun ebib--convert-tex-italics (str)
-  "Return first sub-expression match in STR, in italics"
+  "Return first sub-expression match in STR, in italics."
   (propertize (match-string 1 str) 'face 'italic))
 
 (defun ebib--convert-tex-bold (str)
-  "Return first sub-expression match in STR, in bold"
+  "Return first sub-expression match in STR, in bold."
   (propertize (match-string 1 str) 'face 'bold))
 
 (defun ebib--convert-tex-small-caps (str)
-  "Return first sub-expression match in STR, capitalised"
+  "Return first sub-expression match in STR, capitalised."
   (upcase (match-string 1 str)))
 
 (defun ebib-clean-TeX-markup (string)
@@ -2489,7 +2489,7 @@ year can be extracted from DATE, return nil."
 Any substring matching the car of a cell in
 `ebib-TeX-markup-replace-alist' is replaced with the
 correspnoding cdr (if the cdr is a string), or with the result of
-calling the cdr on the match (if it is a function). This is done
+calling the cdr on the match (if it is a function).  This is done
 with `replace-regexp-in-string', which see for details."
   (let ((case-fold-search nil))
     (save-match-data
