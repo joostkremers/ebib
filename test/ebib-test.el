@@ -208,19 +208,19 @@
 (ert-deftest ebib-clean-TeX-markup-textit ()
   (should (equal-including-properties
            (ebib-clean-TeX-markup "The verb \\textit{krijgen}")
-           #("The Verb krijgen" 9 16
+           #("The verb krijgen" 9 16
              (face italic)))))
 
 (ert-deftest ebib-clean-TeX-markup-emph ()
   (should (equal-including-properties
            (ebib-clean-TeX-markup "The verb \\emph{krijgen}")
-           #("The Verb krijgen" 9 16
+           #("The verb krijgen" 9 16
              (face italic)))))
 
 (ert-deftest ebib-clean-TeX-markup-textbf ()
   (should (equal-including-properties
            (ebib-clean-TeX-markup "The verb \\textbf{krijgen}")
-           #("The Verb krijgen" 9 16
+           #("The verb krijgen" 9 16
              (face bold)))))
 
 (ert-deftest ebib-clean-TeX-markup-textsc ()
