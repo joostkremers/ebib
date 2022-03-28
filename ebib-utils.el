@@ -2179,7 +2179,7 @@ already.
 
 If NOBRACE is t, the value is stored without braces.  If it is
 nil, braces are added if not already present.  NOBRACE may also be
-the symbol ‘as-is’, in which case the value is stored as is.
+the symbol `as-is', in which case the value is stored as is.
 
 This function basically just calls `ebib-db-set-string' to do the
   real work."
