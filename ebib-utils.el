@@ -451,14 +451,19 @@ COMMAND and LETTER must both be strings."
 (defcustom ebib-TeX-markup-replace-alist `(;; Commands Defined to Work in Both Math and Text Mode
 					   ;; (Dashes are separate because they are not \escaped,
 					   ;; unlike everything else.)
-					   ("---\\|\\\\textemdash\\(?: +\\|{}\\|\\>\\)" . "—")
-					   ("--\\|\\\\textendash\\(?: +\\|{}\\|\\>\\)"  . "–")
+					   ("---\\|\\\\textemdash\\(?: +\\|{}\\|\\>\\)" . "\N{EM DASH}")
+					   ("--\\|\\\\textendash\\(?: +\\|{}\\|\\>\\)"  . "\N{EN DASH}")
 					   ,@(mapcar
 					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
-					      '((("ddag" "textdaggerdbl") "‡") (("dag" "textdagger") "†")
-						("textpertenthousand" "‱") ("textperthousand" "‰")
-						("textquestiondown" "¿") ("P" "¶") (("$" "textdollar") "$")
-						("S" "§") (("ldots" "dots" "textellipsis") "…")))
+					      '((("ddag" "textdaggerdbl")        "\N{DOUBLE DAGGER}")
+                                                (("dag" "textdagger")            "\N{DAGGER}")
+						("textpertenthousand"            "\N{PER TEN THOUSAND SIGN}")
+                                                ("textperthousand"               "\N{PER MILLE SIGN}")
+						("textquestiondown"              "\N{INVERTED QUESTION MARK}")
+                                                ("P"                             "\N{PILCROW SIGN}")
+                                                (("$" "textdollar")              "$")
+						("S"                             "\N{SECTION SIGN}")
+                                                (("ldots" "dots" "textellipsis") "\N{HORIZONTAL ELLIPSIS}")))
 
 					   ;; Text-mode Accents
 					   ,@(mapcar
@@ -489,22 +494,45 @@ COMMAND and LETTER must both be strings."
 					   ("\\\\%" . "%") ("\\\\&" . "&") ("\\\\#" . "#")
 
 					   ;; Quotes
-					   ("``" . "“") ("`" . "‘") ("''" . "”") ("'" . "’")
+					   ("``" . "\N{LEFT DOUBLE QUOTATION MARK}")
+                                           ("`" . "\N{LEFT SINGLE QUOTATION MARK}")
+                                           ("''" . "\N{RIGHT DOUBLE QUOTATION MARK}")
+                                           ("'" . "\N{RIGHT SINGLE QUOTATION MARK}")
 
 					   ;; Formatting Commands
 					   ("\\\\textit{\\(.*?\\)}" . ebib--convert-tex-italics)
-					   ("\\\\emph{\\(.*?\\)}" . ebib--convert-tex-italics)
+					   ("\\\\emph{\\(.*?\\)}"   . ebib--convert-tex-italics)
 					   ("\\\\textbf{\\(.*?\\)}" . ebib--convert-tex-bold)
 					   ("\\\\textsc{\\(.*?\\)}" . ebib--convert-tex-small-caps)
 
 					   ;; Non-ASCII Letters (Excluding Accented Letters)
 					   ,@(mapcar
 					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
-					      '(("AA" "Å") ("AE" "Æ") ("DH" "Ð") ("DJ" "Ð") ("L" "Ł")
-						("ss" "ß") ("NG" "Ŋ") ("OE" "Œ") ("OF" "Ø") ("TH" "Þ")
-						("aa" "å") ("ae" "æ") ("dh" "ð") ("dj" "đ") ("th" "þ")
-						("ij" "ij") ("l" "ł") ("ng" "ŋ") ("oe" "œ") ("o" "ø")
-                                                ("i" "ı") ("j" "ȷ")))
+					      '(("AA" "\N{LATIN CAPITAL LETTER A WITH RING ABOVE}")
+                                                ("AE" "\N{LATIN CAPITAL LETTER AE}")
+                                                ("DH" "\N{LATIN CAPITAL LETTER ETH}")
+                                                ("DJ" "\N{LATIN CAPITAL LETTER ETH}")
+                                                ("L"  "\N{LATIN CAPITAL LETTER L WITH STROKE}")
+						("SS" "\N{LATIN CAPITAL LETTER SHARP S}")
+                                                ("NG" "\N{LATIN CAPITAL LETTER ENG}")
+                                                ("OE" "\N{LATIN CAPITAL LIGATURE OE}")
+                                                ("O"  "\N{LATIN CAPITAL LETTER O WITH STROKE}")
+                                                ("TH" "\N{LATIN CAPITAL LETTER THORN}")
+
+                                                ("aa" "\N{LATIN SMALL LETTER A WITH RING ABOVE}")
+                                                ("ae" "\N{LATIN SMALL LETTER AE}")
+                                                ("dh" "\N{LATIN SMALL LETTER ETH}")
+                                                ("dj" "\N{LATIN SMALL LETTER ETH}")
+                                                ("l"  "\N{LATIN SMALL LETTER L WITH STROKE}")
+						("ss" "\N{LATIN SMALL LETTER SHARP S}")
+                                                ("ng" "\N{LATIN SMALL LETTER ENG}")
+                                                ("oe" "\N{LATIN SMALL LIGATURE OE}")
+                                                ("o"  "\N{LATIN SMALL LETTER O WITH STROKE}")
+                                                ("th" "\N{LATIN SMALL LETTER THORN}")
+
+						("ij" "ij")
+                                                ("i"  "\N{LATIN SMALL LETTER DOTLESS I}")
+                                                ("j"  "\N{LATIN SMALL LETTER DOTLESS J}")))
 
 					   ;; Other commands
 					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
