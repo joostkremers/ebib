@@ -537,6 +537,9 @@ COMMAND and LETTER must both be strings."
 					   ;; Other commands
 					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
 
+					   ;; Collapse whitespace
+					   ("[[:blank:]]+" . " ")
+
 					   ;; Remove all remaining {braces}
 					   ("{" . "") ("}" . ""))
   "Alist of strings and replacements for TeX markup.
