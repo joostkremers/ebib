@@ -425,22 +425,20 @@ all variants, the letter is captured with group number 1."
     t)
    (rx-to-string `(: (backref 1) ,accent) t)))
 
-(defun ebib--build-TeX-command-regexp (command letter)
-  "Return cons of regexp matching TeX COMMAND and LETTER it prints.
+(defun ebib--build-TeX-command-regexp (command replacement)
+  "Build a regexp-replacement pair for a LaTeX command.
 
-The car is a regexp matching the whole of TeX command COMMAND.
-The cdr is LETTER.
+COMMAND is the name of a TeX or LaTeX command (without
+backslash).  Both COMMAND and REPLACEMENT must be strings.
 
-Principally intended for generating lists of matches and replacements
-in `ebib-TeX-markup-replace-alist'.
+The return value is a cons cell: its car is a regexp matching
+COMMAND, its cdr is REPLACEMENT.  This cons cell can be included
+in `ebib-TeX-markup-replace-alist' directly.
 
-Specifically, the car regexp matches a string composed of a
-backslash, followed by COMMAND followed by a pair of curly
-brackets (`\\COMMANDa{}'), a word ending (e.g. anything command
-beginning with a backslash) or a space.  Such a trailing space
-will be included in the overall match.
-
-COMMAND and LETTER must both be strings."
+Specifically, the regexp matches a string composed of a backslash
+followed by COMMAND and terminated by a pair of curly
+braces (`\\COMMAND{}'), a word ending or a space.  Such a
+trailing space will be included in the overall match."
   (cons
    (rx-to-string
     `(: "\\" ,(if (listp command) `(or ,@command) command)
@@ -451,7 +449,7 @@ COMMAND and LETTER must both be strings."
 	;; first.
 	(or (+ blank) word-end "{}"))
     t)
-   letter))
+   replacement))
 
 (defcustom ebib-TeX-markup-replace-alist `(;; Commands Defined to Work in Both Math and Text Mode
 					   ;; (Dashes are separate because they are not \escaped,
