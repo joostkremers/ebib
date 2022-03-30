@@ -207,26 +207,26 @@
 
 (ert-deftest ebib-clean-TeX-markup-textit ()
   (should (equal-including-properties
-           (ebib-clean-TeX-markup "The verb \\textit{krijgen}")
-           #("The verb krijgen" 9 16
+           (ebib-clean-TeX-markup "The verb \\textit{krijgen} as an undative verb.")
+           #("The verb krijgen as an undative verb." 9 16
              (face italic)))))
 
 (ert-deftest ebib-clean-TeX-markup-emph ()
   (should (equal-including-properties
-           (ebib-clean-TeX-markup "The verb \\emph{krijgen}")
-           #("The verb krijgen" 9 16
+           (ebib-clean-TeX-markup "The verb \\emph{krijgen} as an undative verb.")
+           #("The verb krijgen as an undative verb." 9 16
              (face italic)))))
 
 (ert-deftest ebib-clean-TeX-markup-textbf ()
   (should (equal-including-properties
-           (ebib-clean-TeX-markup "The verb \\textbf{krijgen}")
-           #("The verb krijgen" 9 16
+           (ebib-clean-TeX-markup "The verb \\textbf{krijgen} as an undative verb.")
+           #("The verb krijgen as an undative verb." 9 16
              (face bold)))))
 
 (ert-deftest ebib-clean-TeX-markup-textsc ()
   (should (equal
-           (ebib-clean-TeX-markup "The verb \\textsc{krijgen}")
-           "The verb KRIJGEN")))
+           (ebib-clean-TeX-markup "The verb \\textsc{krijgen} as an undative verb.")
+           "The verb KRIJGEN as an undative verb.")))
 
 (ert-deftest ebib-clean-TeX-markup-nonascii-letters-with-braces ()
   ;; The braces should be removed and the space after it retained.
