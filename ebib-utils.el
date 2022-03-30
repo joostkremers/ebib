@@ -537,8 +537,11 @@ trailing space will be included in the overall match."
                                                 ("i"  "\N{LATIN SMALL LETTER DOTLESS I}")
                                                 ("j"  "\N{LATIN SMALL LETTER DOTLESS J}")))
 
-					   ;; Other commands
-					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.*?\\)}" . "\\1")
+					   ;; Commands with obligatory non-empty argument
+					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.+?\\)}" . "\\1")
+
+                                           ;; Commands without arguments, optionally terminated by empty braces
+                                           ("\\(\\\\[a-zA-Z*]+\\)\\(?:\\[.*\\]\\)?\\(?:{}\\)?" . "\\1")
 
 					   ;; Collapse whitespace
 					   ("[[:blank:]]+" . " ")
