@@ -498,9 +498,9 @@ trailing space will be included in the overall match."
 
 					   ;; Quotes
 					   ("``" . "\N{LEFT DOUBLE QUOTATION MARK}")
-                                           ("`" . "\N{LEFT SINGLE QUOTATION MARK}")
+                                           ("`"  . "\N{LEFT SINGLE QUOTATION MARK}")
                                            ("''" . "\N{RIGHT DOUBLE QUOTATION MARK}")
-                                           ("'" . "\N{RIGHT SINGLE QUOTATION MARK}")
+                                           ("'"  . "\N{RIGHT SINGLE QUOTATION MARK}")
 
 					   ;; Formatting Commands
 					   ("\\\\textit{\\(.*?\\)}" . ebib--convert-tex-italics)
