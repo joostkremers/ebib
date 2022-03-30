@@ -299,7 +299,7 @@
   (should (equal (ebib-clean-TeX-markup "\\foo[]{bar} and") "bar and"))
   (should (equal (ebib-clean-TeX-markup "\\foo[bar]{baz} and") "baz and"))
   (should (equal (ebib-clean-TeX-markup "\\foo[bar][baz]{boo} and") "boo and"))
-  (should (equal (ebib-clean-TeX-markup "\\foo[bar][baz]{} and") "foo and")))
+  (should (equal (ebib-clean-TeX-markup "\\foo[bar][baz]{} and") "\\foo and")))
 
 (ert-deftest ebib-clean-TeX-markup-braces ()
   ;; Braces not part of a command should be removed.
