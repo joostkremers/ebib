@@ -393,24 +393,29 @@ transformation function returns something that can be displayed."
                        (function :tag "Transform function"))))
 
 (defun ebib--build-TeX-accent-command-regexp (command accent)
-  "Return cons of regexp matching TeX COMMAND and ACCENTed argument.
+  "Build a regexp-replacement pair for LaTeX diacritics.
 
-The car is a regexp matching the whole of TeX command COMMAND,
-capturing exactly one argument in curly brackets.  The cdr is a
-replacement string, the concatenation of \"\\1\" and ACCENT.
+COMMAND is the name of a TeX or LaTeX command (without
+backslash), ACCENT is the character (usually a Unicode combining
+character) that COMMAND generates.  Both COMMAND and ACCENT must
+be strings.
 
-Principally intended for generating lists of matches and replacements
-in `ebib-TeX-markup-replace-alist'.
+The return value is a cons cell that can be included in
+`ebib-TeX-markup-replace-alist' directly.
+
+The car of this cons cell is a regexp matching the TeX or LaTeX
+COMMAND, capturing exactly one obligatory argument.  The
+cdr is a replacement string, the concatenation of \"\\1\" and
+ACCENT.
 
 Specifically, the car regexp matches a string composed of a
-backslash, followed by COMMAND, followed by a single letter (i.e.
-matching [[:alpha:]]). The regexp matches if the letter is in
-curly brackets (`\\COMMAND{a}'), followed by a pair of curly
-brackets (`\\COMMANDa{}') or neither (`\\COMMANDa'). In all
-variants, the letter is captured with group number 1.
-
-COMMAND and ACCENT must both be strings. ACCENT is often just a
-unicode combining character."
+backslash, followed by COMMAND and a single letter (i.e.
+matching [[:alpha:]]).  The regexp matches if the letter is in
+curly braces (\"\\d{a}\") or if it is separated from COMMAND by
+white space (\"\\d a\".  If COMMAND is a non-letter character,
+the regexp also matches if the letter follows COMMAND
+immediately, without white space or curly braces (\"\\'a\").  In
+all variants, the letter is captured with group number 1."
   (cons
    (rx-to-string
     `(: "\\" ,command
