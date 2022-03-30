@@ -199,7 +199,7 @@
 
 (ert-deftest ebib-clean-TeX-markup-escapable-characters ()
   (should (equal (ebib-clean-TeX-markup "percent: \\%  ampersand: \\&  hash: \\#")
-                 "percent: %  ampersand: &  hash: #")))
+                 "percent: % ampersand: & hash: #")))
 
 (ert-deftest ebib-clean-TeX-markup-quotes ()
   (should (equal (ebib-clean-TeX-markup "``double'' quotes") "\N{LEFT DOUBLE QUOTATION MARK}double\N{RIGHT DOUBLE QUOTATION MARK} quotes"))
