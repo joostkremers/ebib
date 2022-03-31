@@ -59,9 +59,9 @@
 
 ;; User customisation.
 
-(defgroup ebib nil "Ebib: a BibTeX database manager" :group 'tex)
+(defgroup ebib nil "Ebib: a BibTeX database manager." :group 'tex)
 
-(defgroup ebib-windows nil "Ebib window management" :group 'ebib)
+(defgroup ebib-windows nil "Ebib window management." :group 'ebib)
 
 (defcustom ebib-default-entry-type "Article"
   "The default entry type.
@@ -392,22 +392,174 @@ transformation function returns something that can be displayed."
   :type '(repeat (cons (string :tag "Field")
                        (function :tag "Transform function"))))
 
-(defcustom ebib-TeX-markup-replace-alist '(("{" . "")
-                                           ("}" . "")
-                                           ("``" . "“")
-					   ("`" . "‘")
-					   ("''" . "”")
-					   ("'" . "’"))
+(defun ebib--build-TeX-accent-command-regexp (command accent)
+  "Build a regexp-replacement pair for LaTeX diacritics.
+
+COMMAND is the name of a TeX or LaTeX command (without
+backslash), ACCENT is the character (usually a Unicode combining
+character) that COMMAND generates.  Both COMMAND and ACCENT must
+be strings.
+
+The return value is a cons cell that can be included in
+`ebib-TeX-markup-replace-alist' directly.
+
+The car of this cons cell is a regexp matching the TeX or LaTeX
+COMMAND, capturing exactly one obligatory argument.  The
+cdr is a replacement string, the concatenation of \"\\1\" and
+ACCENT.
+
+Specifically, the car regexp matches a string composed of a
+backslash, followed by COMMAND and a single letter (i.e.
+matching [[:alpha:]]).  The regexp matches if the letter is in
+curly braces (\"\\d{a}\") or if it is separated from COMMAND by
+white space (\"\\d a\".  If COMMAND is a non-letter character,
+the regexp also matches if the letter follows COMMAND
+immediately, without white space or curly braces (\"\\'a\").  In
+all variants, the letter is captured with group number 1."
+  (cons
+   (rx-to-string
+    `(: "\\" ,command
+	(or (: (* blank) "{" (group-n 1 letter) "}")
+	    (: (,(if (string-match "[a-zA-Z]" command) '+ '*) blank)
+	       (group-n 1 letter))))
+    t)
+   (rx-to-string `(: (backref 1) ,accent) t)))
+
+(defun ebib--build-TeX-command-regexp (command replacement)
+  "Build a regexp-replacement pair for a LaTeX command.
+
+COMMAND is the name of a TeX or LaTeX command (without
+backslash).  Both COMMAND and REPLACEMENT must be strings.
+
+The return value is a cons cell: its car is a regexp matching
+COMMAND, its cdr is REPLACEMENT.  This cons cell can be included
+in `ebib-TeX-markup-replace-alist' directly.
+
+Specifically, the regexp matches a string composed of a backslash
+followed by COMMAND and terminated by a pair of curly
+braces (`\\COMMAND{}'), a word ending or a space.  Such a
+trailing space will be included in the overall match."
+  (cons
+   (rx-to-string
+    `(: "\\" ,(if (listp command) `(or ,@command) command)
+	;; If a command is terminated by a space, LaTeX includes that
+	;; space in the command itself, so it is not printed (like the
+	;; behaviour for a following {}) Accordingly, if there is one,
+	;; include that space in the replaced string by matching on it
+	;; first.
+	(or (+ blank) word-end "{}"))
+    t)
+   replacement))
+
+(defcustom ebib-TeX-markup-replace-alist `(;; Commands Defined to Work in Both Math and Text Mode
+					   ;; (Dashes are separate because they are not \escaped,
+					   ;; unlike everything else.)
+					   ("---\\|\\\\textemdash\\(?: +\\|{}\\|\\>\\)" . "\N{EM DASH}")
+					   ("--\\|\\\\textendash\\(?: +\\|{}\\|\\>\\)"  . "\N{EN DASH}")
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
+					      '((("ddag" "textdaggerdbl")        "\N{DOUBLE DAGGER}")
+                                                (("dag" "textdagger")            "\N{DAGGER}")
+						("textpertenthousand"            "\N{PER TEN THOUSAND SIGN}")
+                                                ("textperthousand"               "\N{PER MILLE SIGN}")
+						("textquestiondown"              "\N{INVERTED QUESTION MARK}")
+                                                ("P"                             "\N{PILCROW SIGN}")
+                                                (("$" "textdollar")              "$")
+						("S"                             "\N{SECTION SIGN}")
+                                                (("ldots" "dots" "textellipsis") "\N{HORIZONTAL ELLIPSIS}")))
+
+					   ;; Text-mode Accents
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-accent-command-regexp)
+					      '(("\"" "\N{COMBINING DIAERESIS}")
+                                                ("'"  "\N{COMBINING ACUTE ACCENT}")
+                                                ("."  "\N{COMBINING DOT ABOVE}")
+                                                ("="  "\N{COMBINING MACRON}")
+						("^"  "\N{COMBINING CIRCUMFLEX ACCENT}")
+                                                ("`"  "\N{COMBINING GRAVE ACCENT}")
+						("b"  "\N{COMBINING MACRON BELOW}")
+                                                ("c"  "\N{COMBINING CEDILLA}")
+                                                ("d"  "\N{COMBINING DOT BELOW}")
+                                                ("H"  "\N{COMBINING DOUBLE ACUTE ACCENT}")
+                                                ("k"  "\N{COMBINING OGONEK}")
+                                                ("U"  "\N{COMBINING DOUBLE VERTICAL LINE ABOVE}")
+						("u"  "\N{COMBINING BREVE}")
+                                                ("v"  "\N{COMBINING CARON}")
+                                                ("~"  "\N{COMBINING TILDE}")
+                                                ("|"  "\N{COMBINING COMMA ABOVE}")
+                                                ("f"  "\N{COMBINING INVERTED BREVE}")
+                                                ("G"  "\N{COMBINING DOUBLE GRAVE ACCENT}")
+                                                ("h"  "\N{COMBINING HOOK ABOVE}")
+                                                ("C"  "\N{COMBINING DOUBLE GRAVE ACCENT}")
+                                                ("r"  "\N{COMBINING RING ABOVE}")))
+
+					   ;; LaTeX2 Escapable "Special" Characters
+					   ("\\\\%" . "%") ("\\\\&" . "&") ("\\\\#" . "#")
+
+					   ;; Quotes
+					   ("``" . "\N{LEFT DOUBLE QUOTATION MARK}")
+                                           ("`"  . "\N{LEFT SINGLE QUOTATION MARK}")
+                                           ("''" . "\N{RIGHT DOUBLE QUOTATION MARK}")
+                                           ("'"  . "\N{RIGHT SINGLE QUOTATION MARK}")
+
+					   ;; Formatting Commands
+					   ("\\\\textit{\\(.*?\\)}" . ebib--convert-tex-italics)
+					   ("\\\\emph{\\(.*?\\)}"   . ebib--convert-tex-italics)
+					   ("\\\\textbf{\\(.*?\\)}" . ebib--convert-tex-bold)
+					   ("\\\\textsc{\\(.*?\\)}" . ebib--convert-tex-small-caps)
+
+					   ;; Non-ASCII Letters (Excluding Accented Letters)
+					   ,@(mapcar
+					      (apply-partially 'apply 'ebib--build-TeX-command-regexp)
+					      '(("AA" "\N{LATIN CAPITAL LETTER A WITH RING ABOVE}")
+                                                ("AE" "\N{LATIN CAPITAL LETTER AE}")
+                                                ("DH" "\N{LATIN CAPITAL LETTER ETH}")
+                                                ("DJ" "\N{LATIN CAPITAL LETTER ETH}")
+                                                ("L"  "\N{LATIN CAPITAL LETTER L WITH STROKE}")
+						("SS" "\N{LATIN CAPITAL LETTER SHARP S}")
+                                                ("NG" "\N{LATIN CAPITAL LETTER ENG}")
+                                                ("OE" "\N{LATIN CAPITAL LIGATURE OE}")
+                                                ("O"  "\N{LATIN CAPITAL LETTER O WITH STROKE}")
+                                                ("TH" "\N{LATIN CAPITAL LETTER THORN}")
+
+                                                ("aa" "\N{LATIN SMALL LETTER A WITH RING ABOVE}")
+                                                ("ae" "\N{LATIN SMALL LETTER AE}")
+                                                ("dh" "\N{LATIN SMALL LETTER ETH}")
+                                                ("dj" "\N{LATIN SMALL LETTER ETH}")
+                                                ("l"  "\N{LATIN SMALL LETTER L WITH STROKE}")
+						("ss" "\N{LATIN SMALL LETTER SHARP S}")
+                                                ("ng" "\N{LATIN SMALL LETTER ENG}")
+                                                ("oe" "\N{LATIN SMALL LIGATURE OE}")
+                                                ("o"  "\N{LATIN SMALL LETTER O WITH STROKE}")
+                                                ("th" "\N{LATIN SMALL LETTER THORN}")
+
+						("ij" "ij")
+                                                ("i"  "\N{LATIN SMALL LETTER DOTLESS I}")
+                                                ("j"  "\N{LATIN SMALL LETTER DOTLESS J}")))
+
+					   ;; Commands with obligatory non-empty argument
+					   ("\\\\[a-zA-Z*]+\\(?:\\[.*\\]\\)?{\\(.+?\\)}" . "\\1")
+
+                                           ;; Commands without arguments, optionally terminated by empty braces
+                                           ("\\(\\\\[a-zA-Z*]+\\)\\(?:\\[.*\\]\\)?\\(?:{}\\)?" . "\\1")
+
+					   ;; Collapse whitespace
+					   ("[[:blank:]]+" . " ")
+
+					   ;; Remove all remaining {braces}
+					   ("{" . "") ("}" . ""))
   "Alist of strings and replacements for TeX markup.
 This is used in `ebib-clean-TeX-markup' to make TeX markup more
-suitable for display.  Each item in the list consists of a string
-and its replacement.  Both must be strings.  Earlier elements are
-evaluated before later ones, so if one string is a subpattern of
-another, the second must appear later (e.g. \"''\" is before
-\"'\"."
+suitable for display.  Each item in the list consists of a regexp
+and its replacement.  The replacement can be a string (which will
+simply replace the match) or a function (the match will be
+replaced by the result of calling the function on the match
+string).  Earlier elements are evaluated before later ones, so if
+one string is a subpattern of another, the second must appear
+later (e.g. \"''\" is before \"'\")."
   :group 'ebib
-  :type '(alist (string :tag "String")
-		(string :tag "Replacement")))
+  :type '(alist (regexp :tag "Pattern")
+		((choice string function) :tag "Replacement")))
 
 (defcustom ebib-uniquify-keys nil
   "Create unique keys.
@@ -1157,7 +1309,7 @@ file.  If this option is set, the database is automatically saved."
   :type '(choice (const :tag "Save dependent database after citation" t)
                  (const :tag "Only save dependent databases manually" nil)))
 
-(defgroup ebib-faces nil "Faces for Ebib" :group 'ebib)
+(defgroup ebib-faces nil "Faces for Ebib." :group 'ebib)
 
 (defface ebib-highlight-extend-face `((t (:inherit highlight
                                                    ,@(and (>= emacs-major-version 27) '(:extend t)))))
@@ -2036,7 +2188,7 @@ already.
 
 If NOBRACE is t, the value is stored without braces.  If it is
 nil, braces are added if not already present.  NOBRACE may also be
-the symbol ‘as-is’, in which case the value is stored as is.
+the symbol `as-is', in which case the value is stored as is.
 
 This function basically just calls `ebib-db-set-string' to do the
   real work."
@@ -2375,26 +2527,31 @@ year can be extracted from DATE, return nil."
   "Return the contents of FIELD from KEY in DB without TeX markup."
   (ebib-clean-TeX-markup (ebib-get-field-value field key db "" 'unbraced 'xref)))
 
+(defun ebib--convert-tex-italics (str)
+  "Return first sub-expression match in STR, in italics."
+  (propertize (match-string 1 str) 'face 'italic))
+
+(defun ebib--convert-tex-bold (str)
+  "Return first sub-expression match in STR, in bold."
+  (propertize (match-string 1 str) 'face 'bold))
+
+(defun ebib--convert-tex-small-caps (str)
+  "Return first sub-expression match in STR, capitalised."
+  (upcase (match-string 1 str)))
+
 (defun ebib-clean-TeX-markup (string)
-  "Return STRING without TeX markup."
-  (save-match-data
-    (let ((case-fold-search t))
-      ;; First replace TeX commands with their arguments and do some
-      ;; transformations, i.e., \textsc{cls} ==> CLS.  Note that optional
-      ;; arguments are also removed.
-      (while (string-match "\\\\\\([a-zA-Z*]*\\)\\(?:\\[.*?\\]\\)*{\\(.*?\\)}" string)
-        (let ((arg (copy-sequence (match-string 2 string))))
-          (pcase (match-string 1 string)
-            ((or "emph" "textit") (setq arg (propertize arg 'face '(italic))))
-            ("textbf" (setq arg (propertize arg 'face '(bold))))
-            ("textsc" (setq arg (upcase arg))))
-          (setq string (replace-match arg t t string)))))
-    ;; Replace as defined in `ebib-TeX-markup-replace-alist', and
-    ;; remove all {braces} (this takes care of nested braces too)
-    (replace-regexp-in-string
-     (rx-to-string (append '(or) (mapcar #'car ebib-TeX-markup-replace-alist)))
-     (lambda (match) (cdr (assoc match ebib-TeX-markup-replace-alist 'string=)))
-     string)))
+  "Return STRING without TeX markup.
+Any substring matching the car of a cell in
+`ebib-TeX-markup-replace-alist' is replaced with the
+correspnoding cdr (if the cdr is a string), or with the result of
+calling the cdr on the match (if it is a function).  This is done
+with `replace-regexp-in-string', which see for details."
+  (let ((case-fold-search nil))
+    (save-match-data
+      (cl-loop for (pattern . replacement) in ebib-TeX-markup-replace-alist
+	       do (setq string (replace-regexp-in-string
+				pattern replacement string))
+	       finally return string))))
 
 (defun ebib-abbreviate-journal-title (field key db)
   "Abbreviate the content of FIELD from KEY in database DB.
