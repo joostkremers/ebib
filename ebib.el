@@ -257,7 +257,8 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 	  (string (ebib--current-string)))
       (erase-buffer)
       (ebib--fill-strings-buffer)
-      (re-search-forward (rx line-start (literal string) (syntax -))))))
+      (re-search-forward
+       (rx-to-string `(: line-start ,string (syntax -)) t)))))
 
 (defun ebib--convert-multiline-to-string (multilines)
   "Convert MULTILINES to a single multiline string.
