@@ -243,8 +243,8 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 		unbraced-str))
 	 (flags (concat (if rawp "*" "")
 			(if multilinep "+" "")))
-	 (expansion (if rawp (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "")))
-    (format "%-18s %2s%-30s %s"
+	 (expansion (if rawp (concat "[" (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "]") "")))
+    (format "%-18s %2s%s  %s"
 	    string	 ;; Abbreviation
 	    flags	 ;; Raw/multiline indicators
 	    str		 ;; Definition (presented without unbraced)
