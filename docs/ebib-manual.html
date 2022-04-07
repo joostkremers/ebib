@@ -312,7 +312,7 @@ which this may happen is when you load a BibTeX file without letting
 Ebib know the file is <code>biblatex</code>-specific. By default, Ebib
 assumes that a <code>.bib</code> file it loads is a BibTeX file. If you
 intend to use <code>biblatex</code> files, make sure to read the section
-<a href="#biblatex-vs.-bibtex"><code>Biblatex</code> vs. Bibtex</a>.</p>
+<a href="#biblatex-vs-bibtex"><code>Biblatex</code> vs. Bibtex</a>.</p>
 <p>When you open a <code>.bib</code> file, the directory in which you
 started Ebib is the start directory for file name completion. If you
 always want Ebib to assume a specific default directory, regardless of
@@ -493,20 +493,22 @@ special way: <code>"Title"</code> tries to make the title look nice by
 removing braces and LaTeX commands (including their optional arguments)
 and by displaying the arguments of <code>\emph</code>,
 <code>\textit</code>, <code>\textbf</code> and <code>\textsc</code> in
-italic, bold or caps. <code>"Doi"</code> and <code>"Url"</code> don’t
-display the contents of these fields, but instead yield a clickable
-string <code>"www"</code>. Clicking on <code>"www"</code> takes you to
-the relevant web page.</p>
+italic, bold or caps. (You can customise what exactly is replaced and
+stripped; see the user option <code>ebib-TeX-markup-replace-alist</code>
+for details.) <code>"Doi"</code> and <code>"Url"</code> don’t display
+the contents of these fields, but instead yield a clickable string
+<code>"www"</code>; clicking on <code>"www"</code> takes you to the
+relevant web page.</p>
 <p>The final predefined column label is <code>"Note"</code>. This does
-not, however, display the contents of the note field. Rather, it checks
-whether the entry in question has an external annotation (see <a
-href="#notes-files">Notes Files</a>). For those entries that have an
-annotation, the <code>"Note"</code> column will display a (clickable)
-<code>"N"</code>. Keep in mind, though, that if you keep your notes in a
-single file, adding this column to the index display can slow down the
-creation of the index buffer (and thus Ebib’s start-up). If you wish to
-use this column, it is probably best to keep notes in separate
-files.</p>
+not, as might be expected, display the contents of the note field.
+Rather, it checks whether the entry in question has an external
+annotation (see <a href="#notes-files">Notes Files</a>). For those
+entries that have an annotation, the <code>"Note"</code> column displays
+a (clickable) <code>"N"</code>. (Keep in mind, though, that if you keep
+your notes in a single file, adding this column to the index display can
+slow down the creation of the index buffer (and thus Ebib’s start-up).
+If you wish to use this column, it is probably best to keep notes in
+separate files.)</p>
 <p>You can define new column labels and redefine the existing ones by
 customising the option <code>ebib-field-transformation-functions</code>.
 Note that <code>"Title"</code>, <code>"Doi"</code>, <code>"Url"</code>,
@@ -2908,7 +2910,9 @@ full stop, which is only included in the reference if the
 the <code>Date</code> field may contain a full date+time specification
 or even a date range, but only the year (or the year of the first date
 in a date range) is used. Similarly, the <code>Title</code> field is
-stripped of LaTeX markup.</p>
+stripped of LaTeX markup. (See the user option
+<code>ebib-TeX-markup-replace-alist</code> if you want to customise what
+exactly is stripped.)</p>
 <h1 id="printing-the-database">Printing the Database</h1>
 <p>Sometimes it may be useful to have a <code>.pdf</code> file or
 print-out of your database. Although Ebib does not actually do the
