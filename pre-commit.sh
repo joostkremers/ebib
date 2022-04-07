@@ -45,7 +45,7 @@ function create_texi
 {
     local source="$1"
     echo "$SCRIPT: running pandoc to create texinfo"
-    pandoc --read=markdown \
+    pandoc --read=markdown+gfm_auto_identifiers \
            --write=texinfo \
            --output="$TEXINFO" \
            --include-before-body="$TEXINFO_BBODY" \
