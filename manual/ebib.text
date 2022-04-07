@@ -230,6 +230,32 @@ In the `author` and `editor` fields, completion takes into account that these fi
 
 If you want to edit a field value directly, without completion, you can use a prefix argument: [`C-u e`]{.key} lets you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other fields, you can customise the user option `ebib-fields-with-completion`. Note that if this option contains the `author` field (which it does by default), completion is also enabled for the `editor` field. Similarly, if it contains the `crossref` field, completion is also enabled for the `xref` and `related` fields.
 
+## `@String` abbreviations in field values ##
+
+BibTeX and `biblatex` provide so-called `@String` abbreviations, short abbreviations for strings of text that occur often in your database, e.g., publisher names, names of journals, etc.
+
+You can define such abbreviations in Ebib in the *strings buffer* (see [`@String` Definitions](#string-definitions) for details). To use a `@String` abbreviation in a field value, the field's value must be marked as *special*. Normally, when Ebib saves the database, it puts braces around field values. If a field has a `@string` abbreviation in it, it shouldn't be surrounded with braces, because that would prevent `biblatex` or BibTeX from expanding the abbreviation.
+
+A special field is a field whose value is not surrounded by braces when the database is saved, so that it is recognised as a field with an abbreviation. To mark a field special, press [`r`]{.key}. An asterisk will appear before the field, indicating its status. Pressing [`r`]{.key} again will change the field back to normal. If you press [`r`]{.key} on a field that does not have a value yet, Ebib will ask you for one.
+
+By default, Ebib shows the *expanded* value of a field that is marked special. So for example, if you have a `@String` abbreviation `cup` for `"Cambridge University Press"`, putting `cup` in the `publisher` field and marking it special will show the expanded value `Cambridge University Press` in the entry buffer. The field is still marked with an asterisk and the expanded value is displayed in a different colour to indicate that it is an expansion. You can turn this behaviour off by unsetting the user option `ebib-expand-strings`.
+
+Note that a field value can actually be composed of a concatenation of "normal" text and abbreviations. The BibTeX documentation for example explains that if you have defined:
+
+    @String{WGA = "World Gnus Almanac"}
+
+you can create a BibTeX field like this:
+
+    title = 1966 # WGA
+
+which will produce "1966 World Gnus Almanac". Or you can do:
+
+    month = "1~" # jan
+
+which will produce someting like "1 January" (assuming your bibliography style has defined the abbreviation `jan`). All this is possible with Ebib, simply by entering the exact text including quotes or braces around the strings, and marking the relevant field as special.
+
+An easy way to enter a `@String` abbreviation as a field value is to use the key [`s`]{.key} instead of [`e`]{.key}. If you type [`s`]{.key}, Ebib asks you for a `@String` abbreviation to put in the current field, and automatically marks the field as special. This method uses completion.
+
 
 ## Editing Multiline Values ##
 
@@ -379,29 +405,10 @@ The following keys are available in the strings buffer:
 |                                          |                                  |
 | [`x`]{.key}                              | export a `@String` definition    |
 | [`X`]{.key}                              | export all `@String` definitions |
-|                                          |                                  |
 
 It is not possible to cut the value of a `@String` definition, because they must have a value. Yanking has not been implemented in the strings buffer, but you can use [`C-y`]{.key} / [`M-y`]{.key} in the minibuffer when editing a `@String` value.
 
-To use a `@String` abbreviation in a field value, the field's value must be marked as special. Normally, when Ebib saves the database, it puts braces around field values. If a field has a `@string` abbreviation in it, it shouldn't be surrounded with braces, because that would prevent `biblatex` or BibTeX from expanding the abbreviation.
-
-A special field is a field whose value is not surrounded by braces when the database is saved, so that it is recognised as a field with an abbreviation. To mark a field special, press [`r`]{.key}. An asterisk will appear before the field, indicating its status. Pressing [`r`]{.key} again will change the field back to normal. If you press [`r`]{.key} on a field that does not have a value yet, Ebib will ask you for one.
-
-Note that this also makes it possible to enter field values that are composed of concatenations of strings and abbreviations. The BibTeX documentation for example explains that if you have defined:
-
-    @String{WGA = "World Gnus Almanac"}
-
-you can create a BibTeX field like this:
-
-    title = 1966 # WGA
-
-which will produce "1966 World Gnus Almanac". Or you can do:
-
-    month = "1~" # jan
-
-which will produce someting like "1 January", assuming your bibliography style has defined the abbreviation `jan`. All this is possible with Ebib, simply by entering the exact text including quotes or braces around the strings, and marking the relevant field as special.
-
-An easy way to enter a `@String` abbreviation as a field value is to use the key [`s`]{.key} instead of [`e`]{.key}. If you type [`s`]{.key}, Ebib asks you for a `@String` abbreviation to put in the current field, and automatically marks the field as special.This method uses completion.
+`@String` definitions, like field values, can contain other abbreviations. That is, you can define an abbreviation `up` with the value `{University Press}`, and then define another abbreviation `cup` with the value `{Cambridge } # up`. This will expand to `"Cambridge University Press"`. When Ebib detects such a 'nested' `@String` definition, it will display the full expansion in the strings buffer next to the value. Note that for this to work, such values need to be marked *special*, just like field values that contain `@String` definitions.
 
 
 ## @Comments ##
