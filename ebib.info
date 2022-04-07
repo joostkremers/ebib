@@ -511,6 +511,7 @@ important editing facilities.
 * Adding and Deleting Entries::
 * Marking Entries::
 * Editing Field Values::
+* @String abbreviations in field values::
 * Editing Multiline Values::
 * Copy Cut Kill Paste Yank and Delete::
 * Undefined Fields::
@@ -579,7 +580,7 @@ all entries or, if there are no marked entries, mark all entries in the
 current database.
 
 
-File: ebib.info,  Node: Editing Field Values,  Next: Editing Multiline Values,  Prev: Marking Entries,  Up: Editing the Database
+File: ebib.info,  Node: Editing Field Values,  Next: @String abbreviations in field values,  Prev: Marking Entries,  Up: Editing the Database
 
 3.3 Editing Field Values
 ========================
@@ -642,9 +643,67 @@ also enabled for the ‘editor’ field.  Similarly, if it contains the
 ‘related’ fields.
 
 
-File: ebib.info,  Node: Editing Multiline Values,  Next: Copy Cut Kill Paste Yank and Delete,  Prev: Editing Field Values,  Up: Editing the Database
+File: ebib.info,  Node: @String abbreviations in field values,  Next: Editing Multiline Values,  Prev: Editing Field Values,  Up: Editing the Database
 
-3.4 Editing Multiline Values
+3.4 ‘@String’ abbreviations in field values
+===========================================
+
+BibTeX and ‘biblatex’ provide so-called ‘@String’ abbreviations, short
+abbreviations for strings of text that occur often in your database,
+e.g., publisher names, names of journals, etc.
+
+You can define such abbreviations in Ebib in the _strings buffer_ (see
+*note ‘@String’ Definitions: #string-definitions. for details).  To use
+a ‘@String’ abbreviation in a field value, the field’s value must be
+marked as _special_.  Normally, when Ebib saves the database, it puts
+braces around field values.  If a field has a ‘@string’ abbreviation in
+it, it shouldn’t be surrounded with braces, because that would prevent
+‘biblatex’ or BibTeX from expanding the abbreviation.
+
+A special field is a field whose value is not surrounded by braces when
+the database is saved, so that it is recognised as a field with an
+abbreviation.  To mark a field special, press ‘r’.  An asterisk will
+appear before the field, indicating its status.  Pressing ‘r’ again will
+change the field back to normal.  If you press ‘r’ on a field that does
+not have a value yet, Ebib will ask you for one.
+
+By default, Ebib shows the _expanded_ value of a field that is marked
+special.  So for example, if you have a ‘@String’ abbreviation ‘cup’ for
+‘"Cambridge University Press"’, putting ‘cup’ in the ‘publisher’ field
+and marking it special will show the expanded value ‘Cambridge
+University Press’ in the entry buffer.  The field is still marked with
+an asterisk and the expanded value is displayed in a different colour to
+indicate that it is an expansion.  You can turn this behaviour off by
+unsetting the user option ‘ebib-expand-strings’.
+
+Note that a field value can actually be composed of a concatenation of
+“normal” text and abbreviations.  The BibTeX documentation for example
+explains that if you have defined:
+
+@String{WGA = "World Gnus Almanac"}
+
+you can create a BibTeX field like this:
+
+title = 1966 # WGA
+
+which will produce “1966 World Gnus Almanac”.  Or you can do:
+
+month = "1~" # jan
+
+which will produce someting like “1 January” (assuming your bibliography
+style has defined the abbreviation ‘jan’).  All this is possible with
+Ebib, simply by entering the exact text including quotes or braces
+around the strings, and marking the relevant field as special.
+
+An easy way to enter a ‘@String’ abbreviation as a field value is to use
+the key ‘s’ instead of ‘e’.  If you type ‘s’, Ebib asks you for a
+‘@String’ abbreviation to put in the current field, and automatically
+marks the field as special.  This method uses completion.
+
+
+File: ebib.info,  Node: Editing Multiline Values,  Next: Copy Cut Kill Paste Yank and Delete,  Prev: @String abbreviations in field values,  Up: Editing the Database
+
+3.5 Editing Multiline Values
 ============================
 
 There are two other fields that Ebib handles in a special way when you
@@ -684,7 +743,7 @@ use ‘m’ instead of ‘e’.
 
 File: ebib.info,  Node: Copy Cut Kill Paste Yank and Delete,  Next: Undefined Fields,  Prev: Editing Multiline Values,  Up: Editing the Database
 
-3.5 Copy, Cut (Kill), Paste (Yank), and Delete
+3.6 Copy, Cut (Kill), Paste (Yank), and Delete
 ==============================================
 
 A few more commands are available when you’re in the entry buffer
@@ -707,7 +766,7 @@ value, simply hit ‘d’ first to delete the text.
 
 File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Copy Cut Kill Paste Yank and Delete,  Up: Editing the Database
 
-3.6 Undefined Fields
+3.7 Undefined Fields
 ====================
 
 ‘Biblatex’ and BibTeX ignore fields that they do not know about, which
@@ -729,7 +788,7 @@ you load the ‘.bib’ file, the field is gone.)
 
 File: ebib.info,  Node: Hidden Fields,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
 
-3.7 Hidden Fields
+3.8 Hidden Fields
 =================
 
 ‘Biblatex’ defines a large number of fields, many of which are optional
@@ -754,7 +813,7 @@ value for them.
 
 File: ebib.info,  Node: Timestamps,  Next: Saving a Database,  Prev: Hidden Fields,  Up: Editing the Database
 
-3.8 Timestamps
+3.9 Timestamps
 ==============
 
 Ebib provides the possibility to add a timestamp to every new entry,
@@ -794,8 +853,8 @@ number of days and lists the entries that were added since then.  See
 
 File: ebib.info,  Node: Saving a Database,  Next: Cross-referencing,  Prev: Timestamps,  Up: Editing the Database
 
-3.9 Saving a Database
-=====================
+3.10 Saving a Database
+======================
 
 When you have undertaken any kind of editing action on a database, it is
 marked as modified, which is indicated in the mode line for the index
@@ -824,8 +883,8 @@ order to overwrite any existing file without asking for confirmation.
 
 File: ebib.info,  Node: Exporting Entries,  Up: Saving a Database
 
-3.9.1 Exporting Entries
------------------------
+3.10.1 Exporting Entries
+------------------------
 
 Sometimes it can be useful to copy entries from one database to another,
 or to create a new ‘.bib’ file with several entries from an existing
@@ -854,7 +913,7 @@ that file.
 
 File: ebib.info,  Node: Cross-referencing,  Next: Sorting the bib File,  Prev: Saving a Database,  Up: Editing the Database
 
-3.10 Cross-referencing
+3.11 Cross-referencing
 ======================
 
 Both ‘Biblatex’ and BibTeX allow entries to refer to other entries
@@ -902,7 +961,7 @@ not work reliably.
 
 File: ebib.info,  Node: Sorting the bib File,  Next: @Preamble Definition,  Prev: Cross-referencing,  Up: Editing the Database
 
-3.11 Sorting the ‘.bib’ File
+3.12 Sorting the ‘.bib’ File
 ============================
 
 By default, the entries in the database are saved to the ‘.bib’ file in
@@ -948,7 +1007,7 @@ cross-referenced entries are saved first.
 
 File: ebib.info,  Node: @Preamble Definition,  Next: @String Definitions,  Prev: Sorting the bib File,  Up: Editing the Database
 
-3.12 @Preamble Definition
+3.13 @Preamble Definition
 =========================
 
 Apart from database entries, BibTeX allows three more types of elements
@@ -994,7 +1053,7 @@ manner just described and saves them in one ‘@Preamble’ definition.
 
 File: ebib.info,  Node: @String Definitions,  Next: @Comments,  Prev: @Preamble Definition,  Up: Editing the Database
 
-3.13 @String Definitions
+3.14 @String Definitions
 ========================
 
 If you press (uppercase) ‘S’ in the index buffer, Ebib hides the entry
@@ -1028,47 +1087,20 @@ they must have a value.  Yanking has not been implemented in the strings
 buffer, but you can use ‘C-y’ / ‘M-y’ in the minibuffer when editing a
 ‘@String’ value.
 
-To use a ‘@String’ abbreviation in a field value, the field’s value must
-be marked as special.  Normally, when Ebib saves the database, it puts
-braces around field values.  If a field has a ‘@string’ abbreviation in
-it, it shouldn’t be surrounded with braces, because that would prevent
-‘biblatex’ or BibTeX from expanding the abbreviation.
-
-A special field is a field whose value is not surrounded by braces when
-the database is saved, so that it is recognised as a field with an
-abbreviation.  To mark a field special, press ‘r’.  An asterisk will
-appear before the field, indicating its status.  Pressing ‘r’ again will
-change the field back to normal.  If you press ‘r’ on a field that does
-not have a value yet, Ebib will ask you for one.
-
-Note that this also makes it possible to enter field values that are
-composed of concatenations of strings and abbreviations.  The BibTeX
-documentation for example explains that if you have defined:
-
-@String{WGA = "World Gnus Almanac"}
-
-you can create a BibTeX field like this:
-
-title = 1966 # WGA
-
-which will produce “1966 World Gnus Almanac”.  Or you can do:
-
-month = "1~" # jan
-
-which will produce someting like “1 January”, assuming your bibliography
-style has defined the abbreviation ‘jan’.  All this is possible with
-Ebib, simply by entering the exact text including quotes or braces
-around the strings, and marking the relevant field as special.
-
-An easy way to enter a ‘@String’ abbreviation as a field value is to use
-the key ‘s’ instead of ‘e’.  If you type ‘s’, Ebib asks you for a
-‘@String’ abbreviation to put in the current field, and automatically
-marks the field as special.This method uses completion.
+‘@String’ definitions, like field values, can contain other
+abbreviations.  That is, you can define an abbreviation ‘up’ with the
+value ‘{University Press}’, and then define another abbreviation ‘cup’
+with the value ‘{Cambridge } # up’.  This will expand to ‘"Cambridge
+University Press"’.  When Ebib detects such a ‘nested’ ‘@String’
+definition, it will display the full expansion in the strings buffer
+next to the value.  Note that for this to work, such values need to be
+marked _special_, just like field values that contain ‘@String’
+definitions.
 
 
 File: ebib.info,  Node: @Comments,  Next: Creating Entry Stubs,  Prev: @String Definitions,  Up: Editing the Database
 
-3.14 @Comments
+3.15 @Comments
 ==============
 
 If Ebib finds a ‘@Comment’ in a ‘.bib’ file, it will read it and store
@@ -1082,7 +1114,7 @@ comment is placed, but they won’t be lost.
 
 File: ebib.info,  Node: Creating Entry Stubs,  Next: Multiline Edit Buffers,  Prev: @Comments,  Up: Editing the Database
 
-3.15 Creating Entry Stubs
+3.16 Creating Entry Stubs
 =========================
 
 If you have a directory full of (pdf) files of articles that you want to
@@ -1100,7 +1132,7 @@ the entries.
 
 File: ebib.info,  Node: Multiline Edit Buffers,  Prev: Creating Entry Stubs,  Up: Editing the Database
 
-3.16 Multiline Edit Buffers
+3.17 Multiline Edit Buffers
 ===========================
 
 As mentioned several times before, field values that contain newlines
@@ -3091,120 +3123,122 @@ Node: Alias Types and Fields20180
 Ref: #alias-types-and-fields20349
 Node: Editing the Database22422
 Ref: #editing-the-database22588
-Node: Adding and Deleting Entries23158
-Ref: #adding-and-deleting-entries23329
-Node: Marking Entries25030
-Ref: #marking-entries25206
-Node: Editing Field Values25706
-Ref: #editing-field-values25889
-Node: Editing Multiline Values28875
-Ref: #editing-multiline-values29086
-Node: Copy Cut Kill Paste Yank and Delete30989
-Ref: #copy-cut-kill-paste-yank-and-delete31232
-Node: Undefined Fields32205
-Ref: #undefined-fields32385
-Node: Hidden Fields33274
-Ref: #hidden-fields33423
-Node: Timestamps34493
-Ref: #timestamps34637
-Node: Saving a Database36550
-Ref: #saving-a-database36712
-Node: Exporting Entries37933
-Ref: #exporting-entries38051
-Node: Cross-referencing39423
-Ref: #cross-referencing39597
-Node: Sorting the bib File42033
-Ref: #sorting-the-.bib-file42226
-Node: @Preamble Definition44474
-Ref: #preamble-definition44659
-Node: @String Definitions46624
-Ref: #string-definitions46796
-Node: @Comments50289
-Ref: #comments50441
-Node: Creating Entry Stubs50934
-Ref: #creating-entry-stubs51111
-Node: Multiline Edit Buffers51839
-Ref: #multiline-edit-buffers52002
-Node: Main and Dependent Databases56321
-Ref: #main-and-dependent-databases56526
-Node: Inserting Citations into a Text Buffer59416
-Ref: #inserting-citations-into-a-text-buffer59630
-Node: Single Citations59827
-Ref: #single-citations59996
-Node: Citations with multiple keys62369
-Ref: #citations-with-multiple-keys62583
-Node: Key Bindings64350
-Ref: #key-bindings64542
-Node: Defining Citation Commands65300
-Ref: #defining-citation-commands65533
-Node: Associating a Database with a Text Buffer71429
-Ref: #associating-a-database-with-a-text-buffer71714
-Node: Links and Citations in Org buffers73093
-Ref: #links-and-citations-in-org-buffers73329
-Node: Searching74762
-Ref: #searching74897
-Node: Filters78351
-Ref: #filters78468
-Node: Simple Selection79543
-Ref: #simple-selection79668
-Node: Complex Filters81377
-Ref: #complex-filters81535
-Node: Storing and Saving Filters85624
-Ref: #storing-and-saving-filters85803
-Node: Special Filters88658
-Ref: #special-filters88835
-Node: An Example Listing Recent Additions90218
-Ref: #an-example-listing-recent-additions90443
-Node: Properties of Filtered Databases92813
-Ref: #properties-of-filtered-databases93006
-Node: Importing BibTeX entries94661
-Ref: #importing-bibtex-entries94832
-Node: Merging bib files95146
-Ref: #merging-.bib-files95317
-Node: Importing entries from a buffer95908
-Ref: #importing-entries-from-a-buffer96141
-Node: Integration with the Biblio package97174
-Ref: #integration-with-the-biblio-package97423
-Node: Multiple Identical Fields99017
-Ref: #multiple-identical-fields99206
-Node: Linking to external resources101134
-Ref: #linking-to-external-resources101319
-Node: Viewing and Importing Files101521
-Ref: #viewing-and-importing-files101721
-Node: Editing the file field106931
-Ref: #editing-the-file-field107082
-Node: Calling a Browser for URLs and DOIs108453
-Ref: #calling-a-browser-for-urls-and-dois108669
-Node: Notes files110977
-Ref: #notes-files111127
-Node: Configuring files for storing notes112614
-Ref: #configuring-files-for-storing-notes112792
-Node: Hooks115759
-Ref: #hooks115922
-Node: Upgrading from earlier Ebib versions117323
-Ref: #upgrading-from-earlier-ebib-versions117546
-Node: Customising the notes file format118456
-Ref: #customising-the-notes-file-format118684
-Node: Displaying notes122708
-Ref: #displaying-notes122899
-Node: Using org-capture to record notes124248
-Ref: #using-org-capture-to-record-notes124439
-Node: Managing a reading list130449
-Ref: #managing-a-reading-list130611
-Node: Managing Keywords133630
-Ref: #managing-keywords133786
-Node: Using a Canonical Keywords List135393
-Ref: #using-a-canonical-keywords-list135551
-Node: Window Management137709
-Ref: #window-management137874
-Node: Copying Entries to the Kill Ring141033
-Ref: #copying-entries-to-the-kill-ring141232
-Node: Printing the Database143848
-Ref: #printing-the-database144021
-Node: Customisation147490
-Ref: #customisation147606
-Node: Modifying Key Bindings148832
-Ref: #modifying-key-bindings148959
+Node: Adding and Deleting Entries23200
+Ref: #adding-and-deleting-entries23371
+Node: Marking Entries25072
+Ref: #marking-entries25248
+Node: Editing Field Values25748
+Ref: #editing-field-values25944
+Node: @String abbreviations in field values28930
+Ref: #string-abbreviations-in-field-values29177
+Node: Editing Multiline Values31795
+Ref: #editing-multiline-values32023
+Node: Copy Cut Kill Paste Yank and Delete33926
+Ref: #copy-cut-kill-paste-yank-and-delete34169
+Node: Undefined Fields35142
+Ref: #undefined-fields35322
+Node: Hidden Fields36211
+Ref: #hidden-fields36360
+Node: Timestamps37430
+Ref: #timestamps37574
+Node: Saving a Database39487
+Ref: #saving-a-database39651
+Node: Exporting Entries40872
+Ref: #exporting-entries40992
+Node: Cross-referencing42364
+Ref: #cross-referencing42538
+Node: Sorting the bib File44974
+Ref: #sorting-the-.bib-file45167
+Node: @Preamble Definition47415
+Ref: #preamble-definition47600
+Node: @String Definitions49565
+Ref: #string-definitions49737
+Node: @Comments52093
+Ref: #comments52245
+Node: Creating Entry Stubs52738
+Ref: #creating-entry-stubs52915
+Node: Multiline Edit Buffers53643
+Ref: #multiline-edit-buffers53806
+Node: Main and Dependent Databases58125
+Ref: #main-and-dependent-databases58330
+Node: Inserting Citations into a Text Buffer61220
+Ref: #inserting-citations-into-a-text-buffer61434
+Node: Single Citations61631
+Ref: #single-citations61800
+Node: Citations with multiple keys64173
+Ref: #citations-with-multiple-keys64387
+Node: Key Bindings66154
+Ref: #key-bindings66346
+Node: Defining Citation Commands67104
+Ref: #defining-citation-commands67337
+Node: Associating a Database with a Text Buffer73233
+Ref: #associating-a-database-with-a-text-buffer73518
+Node: Links and Citations in Org buffers74897
+Ref: #links-and-citations-in-org-buffers75133
+Node: Searching76566
+Ref: #searching76701
+Node: Filters80155
+Ref: #filters80272
+Node: Simple Selection81347
+Ref: #simple-selection81472
+Node: Complex Filters83181
+Ref: #complex-filters83339
+Node: Storing and Saving Filters87428
+Ref: #storing-and-saving-filters87607
+Node: Special Filters90462
+Ref: #special-filters90639
+Node: An Example Listing Recent Additions92022
+Ref: #an-example-listing-recent-additions92247
+Node: Properties of Filtered Databases94617
+Ref: #properties-of-filtered-databases94810
+Node: Importing BibTeX entries96465
+Ref: #importing-bibtex-entries96636
+Node: Merging bib files96950
+Ref: #merging-.bib-files97121
+Node: Importing entries from a buffer97712
+Ref: #importing-entries-from-a-buffer97945
+Node: Integration with the Biblio package98978
+Ref: #integration-with-the-biblio-package99227
+Node: Multiple Identical Fields100821
+Ref: #multiple-identical-fields101010
+Node: Linking to external resources102938
+Ref: #linking-to-external-resources103123
+Node: Viewing and Importing Files103325
+Ref: #viewing-and-importing-files103525
+Node: Editing the file field108735
+Ref: #editing-the-file-field108886
+Node: Calling a Browser for URLs and DOIs110257
+Ref: #calling-a-browser-for-urls-and-dois110473
+Node: Notes files112781
+Ref: #notes-files112931
+Node: Configuring files for storing notes114418
+Ref: #configuring-files-for-storing-notes114596
+Node: Hooks117563
+Ref: #hooks117726
+Node: Upgrading from earlier Ebib versions119127
+Ref: #upgrading-from-earlier-ebib-versions119350
+Node: Customising the notes file format120260
+Ref: #customising-the-notes-file-format120488
+Node: Displaying notes124512
+Ref: #displaying-notes124703
+Node: Using org-capture to record notes126052
+Ref: #using-org-capture-to-record-notes126243
+Node: Managing a reading list132253
+Ref: #managing-a-reading-list132415
+Node: Managing Keywords135434
+Ref: #managing-keywords135590
+Node: Using a Canonical Keywords List137197
+Ref: #using-a-canonical-keywords-list137355
+Node: Window Management139513
+Ref: #window-management139678
+Node: Copying Entries to the Kill Ring142837
+Ref: #copying-entries-to-the-kill-ring143036
+Node: Printing the Database145652
+Ref: #printing-the-database145825
+Node: Customisation149294
+Ref: #customisation149410
+Node: Modifying Key Bindings150636
+Ref: #modifying-key-bindings150763
 
 End Tag Table
 
