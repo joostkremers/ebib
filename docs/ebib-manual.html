@@ -130,6 +130,9 @@ Entries</a></li>
 Entries</a></li>
 <li><a href="#editing-field-values"
 id="toc-editing-field-values">Editing Field Values</a></li>
+<li><a href="#string-abbreviations-in-field-values"
+id="toc-string-abbreviations-in-field-values"><code>@String</code>
+abbreviations in field values</a></li>
 <li><a href="#editing-multiline-values"
 id="toc-editing-multiline-values">Editing Multiline Values</a></li>
 <li><a href="#copy-cut-kill-paste-yank-and-delete"
@@ -817,6 +820,58 @@ contains the <code>author</code> field (which it does by default),
 completion is also enabled for the <code>editor</code> field. Similarly,
 if it contains the <code>crossref</code> field, completion is also
 enabled for the <code>xref</code> and <code>related</code> fields.</p>
+<h2 id="string-abbreviations-in-field-values"><code>@String</code>
+abbreviations in field values</h2>
+<p>BibTeX and <code>biblatex</code> provide so-called
+<code>@String</code> abbreviations, short abbreviations for strings of
+text that occur often in your database, e.g., publisher names, names of
+journals, etc.</p>
+<p>You can define such abbreviations in Ebib in the <em>strings
+buffer</em> (see <a href="#string-definitions"><code>@String</code>
+Definitions</a> for details). To use a <code>@String</code> abbreviation
+in a field value, the field’s value must be marked as <em>special</em>.
+Normally, when Ebib saves the database, it puts braces around field
+values. If a field has a <code>@string</code> abbreviation in it, it
+shouldn’t be surrounded with braces, because that would prevent
+<code>biblatex</code> or BibTeX from expanding the abbreviation.</p>
+<p>A special field is a field whose value is not surrounded by braces
+when the database is saved, so that it is recognised as a field with an
+abbreviation. To mark a field special, press <span
+class="key"><code>r</code></span>. An asterisk will appear before the
+field, indicating its status. Pressing <span
+class="key"><code>r</code></span> again will change the field back to
+normal. If you press <span class="key"><code>r</code></span> on a field
+that does not have a value yet, Ebib will ask you for one.</p>
+<p>By default, Ebib shows the <em>expanded</em> value of a field that is
+marked special. So for example, if you have a <code>@String</code>
+abbreviation <code>cup</code> for
+<code>"Cambridge University Press"</code>, putting <code>cup</code> in
+the <code>publisher</code> field and marking it special will show the
+expanded value <code>Cambridge University Press</code> in the entry
+buffer. The field is still marked with an asterisk and the expanded
+value is displayed in a different colour to indicate that it is an
+expansion. You can turn this behaviour off by unsetting the user option
+<code>ebib-expand-strings</code>.</p>
+<p>Note that a field value can actually be composed of a concatenation
+of “normal” text and abbreviations. The BibTeX documentation for example
+explains that if you have defined:</p>
+<pre><code>@String{WGA = &quot;World Gnus Almanac&quot;}</code></pre>
+<p>you can create a BibTeX field like this:</p>
+<pre><code>title = 1966 # WGA</code></pre>
+<p>which will produce “1966 World Gnus Almanac”. Or you can do:</p>
+<pre><code>month = &quot;1~&quot; # jan</code></pre>
+<p>which will produce someting like “1 January” (assuming your
+bibliography style has defined the abbreviation <code>jan</code>). All
+this is possible with Ebib, simply by entering the exact text including
+quotes or braces around the strings, and marking the relevant field as
+special.</p>
+<p>An easy way to enter a <code>@String</code> abbreviation as a field
+value is to use the key <span class="key"><code>s</code></span> instead
+of <span class="key"><code>e</code></span>. If you type <span
+class="key"><code>s</code></span>, Ebib asks you for a
+<code>@String</code> abbreviation to put in the current field, and
+automatically marks the field as special. This method uses
+completion.</p>
 <h2 id="editing-multiline-values">Editing Multiline Values</h2>
 <p>There are two other fields that Ebib handles in a special way when
 you edit their value. These are the <code>annotation</code> field (or
@@ -1206,10 +1261,6 @@ class="key"><code>End</code></span></td>
 <td><span class="key"><code>X</code></span></td>
 <td>export all <code>@String</code> definitions</td>
 </tr>
-<tr class="odd">
-<td></td>
-<td></td>
-</tr>
 </tbody>
 </table>
 <p>It is not possible to cut the value of a <code>@String</code>
@@ -1218,40 +1269,16 @@ implemented in the strings buffer, but you can use <span
 class="key"><code>C-y</code></span> / <span
 class="key"><code>M-y</code></span> in the minibuffer when editing a
 <code>@String</code> value.</p>
-<p>To use a <code>@String</code> abbreviation in a field value, the
-field’s value must be marked as special. Normally, when Ebib saves the
-database, it puts braces around field values. If a field has a
-<code>@string</code> abbreviation in it, it shouldn’t be surrounded with
-braces, because that would prevent <code>biblatex</code> or BibTeX from
-expanding the abbreviation.</p>
-<p>A special field is a field whose value is not surrounded by braces
-when the database is saved, so that it is recognised as a field with an
-abbreviation. To mark a field special, press <span
-class="key"><code>r</code></span>. An asterisk will appear before the
-field, indicating its status. Pressing <span
-class="key"><code>r</code></span> again will change the field back to
-normal. If you press <span class="key"><code>r</code></span> on a field
-that does not have a value yet, Ebib will ask you for one.</p>
-<p>Note that this also makes it possible to enter field values that are
-composed of concatenations of strings and abbreviations. The BibTeX
-documentation for example explains that if you have defined:</p>
-<pre><code>@String{WGA = &quot;World Gnus Almanac&quot;}</code></pre>
-<p>you can create a BibTeX field like this:</p>
-<pre><code>title = 1966 # WGA</code></pre>
-<p>which will produce “1966 World Gnus Almanac”. Or you can do:</p>
-<pre><code>month = &quot;1~&quot; # jan</code></pre>
-<p>which will produce someting like “1 January”, assuming your
-bibliography style has defined the abbreviation <code>jan</code>. All
-this is possible with Ebib, simply by entering the exact text including
-quotes or braces around the strings, and marking the relevant field as
-special.</p>
-<p>An easy way to enter a <code>@String</code> abbreviation as a field
-value is to use the key <span class="key"><code>s</code></span> instead
-of <span class="key"><code>e</code></span>. If you type <span
-class="key"><code>s</code></span>, Ebib asks you for a
-<code>@String</code> abbreviation to put in the current field, and
-automatically marks the field as special.This method uses
-completion.</p>
+<p><code>@String</code> definitions, like field values, can contain
+other abbreviations. That is, you can define an abbreviation
+<code>up</code> with the value <code>{University Press}</code>, and then
+define another abbreviation <code>cup</code> with the value
+<code>{Cambridge } # up</code>. This will expand to
+<code>"Cambridge University Press"</code>. When Ebib detects such a
+‘nested’ <code>@String</code> definition, it will display the full
+expansion in the strings buffer next to the value. Note that for this to
+work, such values need to be marked <em>special</em>, just like field
+values that contain <code>@String</code> definitions.</p>
 <h2 id="comments"><span class="citation"
 data-cites="Comments">@Comments</span></h2>
 <p>If Ebib finds a <code>@Comment</code> in a <code>.bib</code> file, it
