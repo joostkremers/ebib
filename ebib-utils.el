@@ -1114,17 +1114,30 @@ Ebib (not Emacs)."
                  (const :tag "Show the cursor" nil)))
 
 (make-obsolete-variable 'ebib-edit-author/editor-without-completion 'ebib-fields-with-completion "Ebib 2.27")
+(make-obsolete-variable 'ebib-fields-with-completion 'ebib-field-edit-functions "Ebib 2.34")
 
-(defcustom ebib-fields-with-completion '("author" "crossref" "file" "keywords" "journal" "journaltitle" "organization" "publisher")
-  "Fields that are edited using completion.
-When editing a field in this list, Ebib offers a sensible set of
-possible completion candidates (see the manual for details).
+(defcustom ebib-field-edit-functions '((("author" "editor")	      . ebib--edit-list-field)
+				       (("crossref" "xref" "related") . ebib--edit-key-field)
+				       (("file")		      . ebib--edit-file-field)
+				       (("keywords")		      . ebib--edit-separated-values-field)
+				       (("journal" "journaltitle")    . ebib--edit-literal-field)
+				       (("organization")	      . ebib--edit-list-field)
+				       (("publisher")		      . ebib--edit-list-field))
+  "Alist of completion functions for fields.
+The car of each element is a list of fields, which must all have
+the same BibLaTeX type. When any of the fields is edited, the
+completion function in the cdr of the element is called with
+three arguments: the field to be edited, the complete list of
+fields in the car and the original contents of the field as a
+string as a string if non-empty, or nil otherwise.
 
-Note that the \"author\" field also implies the \"editor\" field
-and that \"crossref\" also implies the \"xref\" and \"related\"
-fields."
+Functions should prompt for a value, using the name of the edited
+field in the prompt string, and completing on values of the
+fields in the list where appropriate. They should return a
+string, suitable as a field value."
   :group 'ebib
-  :type '(repeat (string :tag "Field")))
+  :type '(repeat (cons (repeat (string) :tag "Fields")
+		       (function :tag "Completion function"))))
 
 (defcustom ebib-multiline-fields '("annote" "annotation" "abstract")
   "Fields that are edited as multiline fields by default."
