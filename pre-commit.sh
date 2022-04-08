@@ -30,6 +30,8 @@ SCRIPT=$(basename "$0")
 E_SUCCESS=0
 E_FAILURE=1
 
+unset GIT_LITERAL_PATHSPECS # See Magit FAQ A.2.10 and https://github.com/magit/magit/discussions/4654
+
 # FUNCTIONS
 
 function confirm_file
