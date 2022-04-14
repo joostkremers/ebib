@@ -4102,23 +4102,9 @@ special manner."
 		  ;; a cond.
                   (pfx
                    (ebib--edit-normal-field field init-contents))
-                  ((and (member-ignore-case field '("author" "editor"))
-                        (member-ignore-case "author" ebib-fields-with-completion))
-                   (ebib--edit-author/editor-field field))
-                  ((and (member-ignore-case field '("crossref" "xref" "related"))
-                        (member-ignore-case "crossref" ebib-fields-with-completion))
-                   (ebib--edit-crossref field))
-                  ((and (cl-equalp field "keywords")
-                        (member-ignore-case "keywords" ebib-fields-with-completion))
-                   (ebib--edit-keywords-field))
-                  ((and (cl-equalp field "file")
-                        (member-ignore-case "file" ebib-fields-with-completion))
-                   (ebib--edit-file-field))
-                  ((member-ignore-case field ebib-fields-with-completion)
-                   (ebib--edit-normal-field field init-contents :complete))
-                  ((member-ignore-case field ebib-multiline-fields)
-                   (ebib--edit-field-as-multiline field init-contents)
-                   nil) ; See above.
+		  ((when-let ((data (assoc field ebib-field-edit-functions
+					   (lambda (a b) (member-ignore-case b a)))))
+		     (funcall (cdr data) field (car data) init-contents)))
                   ;; An external note is shown in the field "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
