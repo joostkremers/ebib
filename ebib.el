@@ -4086,8 +4086,9 @@ With a prefix argument, edit the current field directly, without
 any special treatment.  Exceptions are the \"type\" field and any
 field with a multiline value, which are always edited in a
 special manner."
-  (let* ((pfx current-prefix-arg)
-         (init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror))
+  (let* ((key (ebib--get-key-at-point))
+	 (pfx current-prefix-arg)
+         (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
          ;; We relegate the actual editing to a number of helper functions.
          ;; These functions should return non-nil if editing was successful.
          ;; They should also ensure that the field being edited is redisplayed
@@ -4124,6 +4125,7 @@ special manner."
       ;; A numeric prefix argument is always non-nil when a command is called
       ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
       ;; from Lisp code.
+      (ebib-set-field-value field result key ebib--cur-db)
       (when pfx (ebib-next-field))
       (ebib--redisplay-field field)
       (ebib--redisplay-index-item field))))
