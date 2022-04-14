@@ -4043,6 +4043,11 @@ all other authors and editors in all databases."
                                                                                    (not (ebib-db-dependent-p db)))
                                                                                  ebib--databases)))))))
 
+(defun ebib--create-collection-from-fields (fields)
+  "Create a collection from contents of a list of FIELDS."
+  (seq-uniq (apply 'append (mapcar #'ebib--create-collection-from-field
+				   fields))))
+
 (defun ebib--edit-normal-field (field init-contents &optional complete)
   "Edit a field as a string.
 FIELD is the field being edited, INIT-CONTENTS is its initial
