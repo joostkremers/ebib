@@ -4110,7 +4110,7 @@ special manner."
                    (ebib--edit-normal-field field init-contents))
 		  ((when-let ((data (assoc field ebib-field-edit-functions
 					   (lambda (a b) (member-ignore-case b a)))))
-		     (funcall (cdr data) field (car data) init-contents)))
+		     (funcall (cdr data) field (car data) (ebib-unbrace init-contents))))
                   ;; An external note is shown in the field "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
                   ;; it just returns "external".
@@ -4125,7 +4125,7 @@ special manner."
       ;; A numeric prefix argument is always non-nil when a command is called
       ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
       ;; from Lisp code.
-      (ebib-set-field-value field result key ebib--cur-db)
+      (ebib-set-field-value field result key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
       (when pfx (ebib-next-field))
       (ebib--redisplay-field field)
       (ebib--redisplay-index-item field))))

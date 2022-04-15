@@ -1131,6 +1131,11 @@ three arguments: the field to be edited, the complete list of
 fields in the car and the original contents of the field as a
 string as a string if non-empty, or nil otherwise.
 
+If the original contents of the field being edited were braced,
+`ebib-edit-field' will preserve this bracing, but will pass an
+unbraced string to the relevant function. As such, the functions
+should not handle bracing.
+
 Functions should prompt for a value, using the name of the edited
 field in the prompt string, and completing on values of the
 fields in the list where appropriate. They should return a
