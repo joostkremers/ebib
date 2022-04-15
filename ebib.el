@@ -4134,6 +4134,28 @@ special manner."
                                         (ebib-db-has-key key dependent))
                                       (ebib--list-dependents ebib--cur-db))))))
 
+(defun ebib--edit-literal-field (field-name fields init-contents &optional &rest extra-tables)
+  "Edit a 'literal' type field.
+FIELD-NAME is the name of the field being edited. FIELDS is a
+list of fields from which to pull completion candidates.
+INIT-CONTENTS is the original value of the field. See also
+`ebib-field-edit-functions'.
+
+EXTRA-TABLES are extra completion tables to be included in the
+candidate list, alongside the candidates generated from FIELDS.
+This argument is useful for fields which have a canonical
+list of candidates, like \"pubstate\".
+
+See also `ebib-field-edit-functions'."
+  (completing-read
+   (format "%s: " field-name)
+   (apply #'completion-table-merge
+	  `(,(ebib--create-collection-from-fields fields)
+	    ,@extra-tables))
+   (lambda (str) (not (string-empty-p str))) ;; predicate
+   nil					;; require-match
+   init-contents))                      ;; initial-input
+
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
