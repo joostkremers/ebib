@@ -4128,7 +4128,11 @@ special manner."
       (ebib-set-field-value field result key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
       (when pfx (ebib-next-field))
       (ebib--redisplay-field field)
-      (ebib--redisplay-index-item field))))
+      (ebib--redisplay-index-item field)
+      (ebib--set-modified t ebib--cur-db t
+			  (seq-filter (lambda (dependent)
+                                        (ebib-db-has-key key dependent))
+                                      (ebib--list-dependents ebib--cur-db))))))
 
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
