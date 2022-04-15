@@ -4162,6 +4162,51 @@ See also `ebib-field-edit-functions'."
    nil					;; require-match
    init-contents))                      ;; initial-input
 
+(defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
+  "Edit a 'name list' or 'literal list' type field.
+
+FIELD-NAME is the name of the field being edited. FIELDS is a
+list of fields from which to pull completion candidates.
+INIT-CONTENTS is the original value of the field. In name- and
+literal-list fields, this is an \"and\"-delimited list of values,
+as a single string.
+
+EXTRA-TABLES are extra completion tables to be included in the
+candidate list, alongside the candidates generated from FIELDS.
+This argument is useful for list fields which have a canonical
+list of candidates, like \"language\".
+
+See also `ebib-field-edit-functions'."
+  (let* ((crm-char ";")
+	 (crm-separator (format "[[:space:]]+*%s[[:space:]]+*" crm-char))
+	 (and-regexp "[[:space:]]+and[[:space:]]+")
+	 (collection
+	  ;; Account for fields containing more than one entry, e.g.
+	  ;; author = {Bar, Foo and Qux, Baz}
+	  (delete-dups
+	   (apply
+	    #'append
+	    (mapcar (lambda (str) (split-string str and-regexp t "[[:space:]]"))
+		    (ebib--create-collection-from-fields fields)))))
+	 (table (apply #'completion-table-merge `(,collection ,@extra-tables)))
+	 (result (completing-read-multiple
+		  (format "%s: " field-name)           ;; prompt
+		  table                                ;; collection
+		  (lambda (str) (not (string-empty-p str))) ;; predicate
+		  nil                                  ;; require-match
+		  ;; Replace all instances of " and " (Bib(La)TeX's
+		  ;; list separator) in initial contents with " ; "
+		  ;; (our list separator). Then append a crm-separator
+		  ;; to the result, so that `completing-read-multiple'
+		  ;; treats it as a list of selected candidates
+		  (when init-contents
+		    (concat
+		     (replace-regexp-in-string
+		      and-regexp (format " %s " crm-char)
+		      init-contents)
+		     crm-char)))))
+    (string-join result " and ")))
+
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
