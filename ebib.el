@@ -4162,6 +4162,14 @@ See also `ebib-field-edit-functions'."
    nil					;; require-match
    init-contents))                      ;; initial-input
 
+(defun ebib--edit-editor-type-field (field-name fields init-contents)
+  "Edit \"editor-type\" field.
+Arguments are as in `ebib--edit-literal-field'."
+  (ebib--edit-literal-field
+   field-name fields init-contents
+   '("editor" "compiler" "founder" "continuator"
+     "redactor" "reviser" "collaborator" "organizer")))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
