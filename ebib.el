@@ -4188,6 +4188,14 @@ Arguments are as in `ebib--edit-literal-field'."
   (ebib--edit-literal-field
    field-name fields init-contents ebib--biblatex-language-keys))
 
+(defun ebib--edit-pagination-field (field-name fields init-contents)
+  "Edit \"pagination\" field.
+
+Arguments are as in `ebib--edit-literal-field'."
+  (ebib--edit-literal-field
+   field-name fields init-contents
+   '("page" "column" "line" "verse" "section" "paragraph")))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
