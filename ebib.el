@@ -4196,6 +4196,15 @@ Arguments are as in `ebib--edit-literal-field'."
    field-name fields init-contents
    '("page" "column" "line" "verse" "section" "paragraph")))
 
+(defun ebib--edit-pubstate-field (field-name fields init-contents)
+  "Edit \"pubstate\" field.
+
+Arguments are as in `ebib--edit-literal-field'."
+  (ebib--edit-literal-field
+   field-name fields init-contents
+   '("inpreparation" "submitted"
+     "forthcoming" "inpress" "prepublished")))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
