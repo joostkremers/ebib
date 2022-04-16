@@ -1125,13 +1125,28 @@ Ebib (not Emacs)."
 (make-obsolete-variable 'ebib-edit-author/editor-without-completion 'ebib-fields-with-completion "Ebib 2.27")
 (make-obsolete-variable 'ebib-fields-with-completion 'ebib-field-edit-functions "Ebib 2.34")
 
-(defcustom ebib-field-edit-functions '((("author" "editor")	      . ebib--edit-list-field)
-				       (("crossref" "xref" "related") . ebib--edit-key-field)
+(defcustom ebib-field-edit-functions '((("abstract" "addendum" "note") . ebib--edit-literal-field-multiline)
+				       (("afterword" "annotator" "author" "bookauthor"
+					 "commentator" "editor" "editora" "editorb"
+					 "editorc" "foreword" "holder" "introduction"
+					 "sortname" "translator")
+					. ebib--edit-list-field)
+				       (("bookpagination" "pagination") . ebib--edit-pagination-field)
+				       (("crossref" "xref")           . ebib--edit-ref-field)
+				       (("editortype" "editoratype" "editorbtype" "editorctype")
+					. ebib--edit-editor-type-field)
 				       (("file")		      . ebib--edit-file-field)
-				       (("keywords")		      . ebib--edit-separated-values-field)
+				       (("institution")               . ebib--edit-list-field)
 				       (("journal" "journaltitle")    . ebib--edit-literal-field)
+				       (("keywords")		      . ebib--edit-separated-values-field)
+				       (("langid")                    . ebib--edit-lang-id-field)
+				       (("language" "origlanguage")   . ebib--edit-language-field)
+				       (("location" "origlocation")   . ebib--edit-literal-field)
 				       (("organization")	      . ebib--edit-list-field)
-				       (("publisher")		      . ebib--edit-list-field))
+				       (("publisher" "origpublisher") . ebib--edit-list-field)
+				       (("pubstate")                  . ebib--edit-pubstate-field)
+				       (("related" "xdata")           . ebib--edit-ref-list-field)
+				       (("venue")                     . ebib--edit-literal-field))
   "Alist of completion functions for fields.
 The car of each element is a list of fields, which must all have
 the same BibLaTeX type. When any of the fields is edited, the
