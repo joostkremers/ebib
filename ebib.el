@@ -4233,6 +4233,14 @@ See also `ebib-field-edit-functions'."
 		     crm-char)))))
     (string-join result " and ")))
 
+(defun ebib--edit-language-field (field-name fields init-contents)
+  "Edit \"language\" field.
+
+Arguments are as in `ebib--edit-list-field'."
+  (ebib--edit-list-field
+   field-name fields init-contents
+   ebib--biblatex-language-keys))
+
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
