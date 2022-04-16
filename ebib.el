@@ -4170,6 +4170,17 @@ Arguments are as in `ebib--edit-literal-field'."
    '("editor" "compiler" "founder" "continuator"
      "redactor" "reviser" "collaborator" "organizer")))
 
+(defconst ebib--biblatex-language-keys
+  '("bulgarian" "catalan" "croatian" "czech" "danish" "dutch"
+    "american" "USenglish" "english" "british" "UKenglish"
+    "canadian" "australian" "newzealand" "estonian" "finnish"
+    "french" "german" "austrian" "swissgerman" "ngerman"
+    "naustrian" "nswissgerman" "greek" "magyar" "hungarian"
+    "icelandic" "italian" "latvian" "norsk" "nynorsk" "polish"
+    "brazil" "portuguese" "portuges" "russian" "slovak"
+    "slovene" "slovenian" "spanish" "swedish" "ukrainian")
+  "List of language IDs used in BibLaTeX.")
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
