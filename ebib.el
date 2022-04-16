@@ -4175,6 +4175,13 @@ Arguments are as in `ebib--edit-literal-field'."
     "slovene" "slovenian" "spanish" "swedish" "ukrainian")
   "List of language IDs used in BibLaTeX.")
 
+(defun ebib--edit-lang-id-field (field-name fields init-contents)
+  "Edit \"lang-id\" field.
+
+Arguments are as in `ebib--edit-literal-field'."
+  (ebib--edit-literal-field
+   field-name fields init-contents ebib--biblatex-language-keys))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
