@@ -6,10 +6,10 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.34
+;; Version: 2.35
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
-;; Package-Requires: ((parsebib "2.3") (emacs "25.1"))
+;; Package-Requires: ((parsebib "2.3") (emacs "26.1"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions

@@ -1,7 +1,7 @@
 % Ebib Manual
 % Joost Kremers
 
-Ebib is a program with which you can manage `biblatex` and BibTeX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 25.1 or higher.
+Ebib is a program with which you can manage `biblatex` and BibTeX database files without having to edit the raw `.bib` files. It runs in GNU/Emacs, version 26.1 or higher.
 
 It should be noted that Ebib is *not* a minor or major mode for editing `.bib` files. It is a program in itself, which just happens to make use of Emacs as a working environment, in the same way that for example Gnus is.
 

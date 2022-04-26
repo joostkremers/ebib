@@ -1,5 +1,12 @@
 % Ebib News
 
+## Version 2.35, April 2022 ##
+
+- Add support for "recursive" `@String` definitions (i.e., `@String` definitions in which the expansion itself contains an `@String` abbreviation).
+- Show expansion of recursive `@String` definitions in the Strings buffer.
+- Better handling of narrow columns in the index buffer.
+- Improved support for cleaning up TeX code when displaying titles in the index buffer.
+
 ## Version 2.34, December 2021 ##
 
 - Display expansions of `@String` abbreviations in the entry buffer, thanks to Hugo Heagren.
