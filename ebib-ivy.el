@@ -1,6 +1,6 @@
 ;;; ebib-ivy.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2021 Hugo Heagren
+;; Copyright (c) 2022 Hugo Heagren
 ;; All rights reserved.
 
 ;; Author: Hugo Heagren <hugo@heagren.com>
