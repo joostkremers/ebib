@@ -45,13 +45,20 @@
 
 ;;; Code:
 
-(require 'biblio)
+(require 'biblio nil 'noerror)
 
 (defvar ebib--databases)
 (defvar ebib--cur-db)
 (defvar ebib-index-mode-map)
 (declare-function ebib-read-database "ext:ebib.el" (prompt &optional databases))
 (declare-function ebib-import-entries "ext:ebib.el" (&optional db))
+
+(declare-function biblio-doi-forward-bibtex "ext:biblio-doi.el" (doi forward-to))
+(declare-function biblio-cleanup-doi "ext:biblio-core.el" (doi))
+(declare-function biblio-doi--insert "ext:biblio-doi.el" (bibtex buffer))
+(declare-function biblio-format-bibtex "ext:biblio-core.el" (bibtex &optional autokey))
+(defvar biblio-bibtex-use-autokey)
+(declare-function biblio--selection-forward-bibtex "ext:biblio-core.el" (forward-to &optional quit))
 
 (defun ebib-biblio-import-doi (doi)
   "Fetch a BibTeX entry from a remote server by its DOI using `biblio.el'.

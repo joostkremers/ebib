@@ -37,8 +37,10 @@
 
 ;;; Code:
 
-(require 'ivy)
+(require 'ivy nil 'noerror)
 (require 'ebib)
+
+(declare-function ivy-add-actions "ext:ivy.el" (cmd actions))
 
 (ivy-add-actions
  'ebib-jump-to-field
