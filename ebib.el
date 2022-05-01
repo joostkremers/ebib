@@ -4048,34 +4048,28 @@ all other authors and editors in all databases."
   (seq-uniq (apply 'append (mapcar #'ebib--create-collection-from-field
 				   fields))))
 
-(defun ebib--edit-normal-field (field init-contents &optional complete)
+(defun ebib--edit-field-literally (field init-contents &optional complete)
   "Edit a field as a string.
 FIELD is the field being edited, INIT-CONTENTS is its initial
 contents.  If COMPLETE is non-nil, offer completion, the list of
 completion candidates being composed of the contents of FIELD in
 all entries of the database.  If COMPLETE is nil, just ask for a
-string in the minibuffer."
+string in the minibuffer.  Return the resulting string."
   (let* ((unbraced? nil)
          (key (ebib--get-key-at-point)))
     (when init-contents
       (setq unbraced? (ebib-unbraced-p init-contents))
       (setq init-contents (ebib-unbrace init-contents)))
-    (ebib--ifstring (new-contents (if complete
-                                      (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
-                                        (completing-read (format "%s: " field)
-                                                         (ebib--create-collection-from-field field)
-                                                         nil nil
-                                                         (if init-contents
-                                                             (cons init-contents 0))))
-                                    (read-string (format "%s: " field)
-                                                 (if init-contents
-                                                     (cons init-contents 0)))))
-        (ebib-set-field-value field new-contents key ebib--cur-db 'overwrite unbraced?)
-      (ebib-db-remove-field-value field key ebib--cur-db))
-    (ebib--redisplay-current-field)
-    (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                       (ebib-db-has-key key dependent))
-                                                     (ebib--list-dependents ebib--cur-db)))))
+    (if complete
+        (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
+          (completing-read (format "%s: " field)
+                           (ebib--create-collection-from-field field)
+                           nil nil
+                           (if init-contents
+                               (cons init-contents 0))))
+      (read-string (format "%s: " field)
+                   (if init-contents
+                       (cons init-contents 0))))))
 
 (defun ebib-edit-field (field)
   "Edit FIELD of a BibTeX entry.
@@ -4113,7 +4107,7 @@ special manner."
                   ;; a string, without any form of completion.  Evaluate `pfx' as
 		  ;; a cond.
                   (pfx
-                   (ebib--edit-normal-field field init-contents))
+                   (ebib--edit-field-literally field init-contents))
 		  ((when-let ((data (assoc field ebib-field-edit-functions
 					   (lambda (a b) (member-ignore-case b a)))))
 		     (funcall (cdr data) field (car data) (ebib-unbrace init-contents))))
@@ -4124,14 +4118,16 @@ special manner."
                    (ebib-popup-note (ebib--get-key-at-point))
                    nil) ; See above.
                   ;; The catch-all edits a field without completion.
-                  (t (ebib--edit-normal-field field init-contents)))))
+                  (t (ebib--edit-field-literally field init-contents)))))
     ;; When the edit returns, see if we need to move to the next field and
     ;; check whether we need to update the index display.
     (when result
+      (ebib--ifstring (val result)
+	  (ebib-set-field-value field val key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
+	(ebib-db-remove-field-value field key ebib--cur-db))
       ;; A numeric prefix argument is always non-nil when a command is called
       ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
       ;; from Lisp code.
-      (ebib-set-field-value field result key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
       (when pfx (ebib-next-field))
       (ebib--redisplay-field field)
       (ebib--redisplay-index-item field)
