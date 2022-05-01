@@ -4201,6 +4201,23 @@ Arguments are as in `ebib--edit-literal-field'."
    '("inpreparation" "submitted"
      "forthcoming" "inpress" "prepublished")))
 
+(defun ebib--read-ref-as-entry (prompt databases &optional multiple)
+  "Read entry keys from user.
+
+Arguments are as in `ebib-read-entry', except that
+`ebib-citation-insert-multiple' is ignored when reading multiple
+candidates.
+
+If MULTIPLE is nil, the key is returned as a string, If non-nil,
+all selected keys are returned as a list of strings."
+  (let* ((ebib-citation-insert-multiple t)
+	(entry (ebib-read-entry
+		(format "%s: " prompt) databases
+		multiple)))
+    (if multiple
+	(mapcar #'car entry)
+      (caar entry))))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
