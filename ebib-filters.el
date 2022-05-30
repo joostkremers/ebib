@@ -44,7 +44,7 @@
 (require 'ebib-keywords)
 (require 'ebib-db)
 
-(defgroup ebib-filters nil "Filter settings for Ebib" :group 'ebib)
+(defgroup ebib-filters nil "Filter settings for Ebib." :group 'ebib)
 
 (defcustom ebib-filters-display-as-lisp nil
   "If set, display filters as Lisp expressions."
