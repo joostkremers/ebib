@@ -3538,6 +3538,12 @@ the filter."
     (default
       (beep))))
 
+(defun ebib-filters-toggle-crossref ()
+  "Toggle inclusion of cross-referenced entries."
+  (interactive)
+  (setq ebib-filters-include-crossref (not ebib-filters-include-crossref))
+  (ebib--update-buffers))
+
 (defun ebib-filters-apply-filter ()
   "Select a filter and apply it to the current database."
   (interactive)

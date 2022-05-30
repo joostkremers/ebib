@@ -56,6 +56,16 @@
   :group 'ebib-filters
   :type 'boolean)
 
+(defcustom ebib-filters-include-crossref nil
+  "If set, include field values from cross-referenced entries.
+By default, if an entry inherits field values from a
+cross-referenced entry, those field values are not checked
+against the filter.  If this option is set, those field values
+are checked, so that entries for which the filter matches on a
+cross-referenced field are included in the results as well."
+  :group 'ebib-filters
+  :type 'boolean)
+
 (defcustom ebib-filters-default-file "~/.emacs.d/ebib-filters"
   "File for saving filters."
   :group 'ebib-filters
@@ -119,7 +129,8 @@ a logical `not' is applied to the selection."
   (define-key ebib-filters-map "S" 'ebib-filters-save-filters)
   (define-key ebib-filters-map "v" 'ebib-filters-view-filter)
   (define-key ebib-filters-map "V" 'ebib-filters-view-all-filters)
-  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file))
+  (define-key ebib-filters-map "w" 'ebib-filters-write-to-file)
+  (define-key ebib-filters-map "x" 'ebib-filters-toggle-crossref))
 
 (defun ebib-filters-view-filter ()
   "Display the currently active filter in the minibuffer."
@@ -241,7 +252,9 @@ See `ebib--filters-run-filter'.")
      `(cl-macrolet ((contains (field regexp)
                               `(ebib--search-in-entry ,regexp ebib-entry ,(unless (cl-equalp field "any") field))))
         (seq-filter (lambda (key)
-                      (let ((ebib-entry (ebib-db-get-entry key db 'noerror)))
+                      (let ((ebib-entry (if ebib-filters-include-crossref
+                                            (ebib-get-entry key db 'noerror 'xref)
+                                          (ebib-db-get-entry key db 'noerror))))
                         (when ,filter
                           key)))
                     (ebib-db-list-keys db))))))
