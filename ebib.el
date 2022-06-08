@@ -3931,37 +3931,39 @@ If DEFAULT is specified, it is the initial input for the prompt."
                                                                    (ebib--list-dependents ebib--cur-db))))
              finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
 
-(defun ebib--edit-file-field ()
+(defun ebib--edit-file-field (_ _ init-contents)
   "Edit the \"file\" field'.
-Filenames are added to the standard file field separated by
-`ebib-filename-separator'.  The first directory in
-`ebib-file-search-dirs' is used as the start directory.  If
-`ebib-truncate-file-names' is t, file names are truncated
-relative to the directories listed in `ebib-file-search-dirs',
-otherwise they are stored as absolute paths."
-  (let ((start-dir (file-name-as-directory (car ebib-file-search-dirs)))
-        (key (ebib--get-key-at-point))
-	(prompt (format "Add file (%s to finish): " (ebib--completion-finish-key 'read-file-name))))
-    (cl-loop for file = (expand-file-name (read-file-name prompt start-dir nil 'confirm-after-completion) start-dir)
-             until (or (string= file "")
-                       ;; When using Ivy, the return value of
-                       ;; `ivy-immediate-done' is the `start-dir' rather than
-                       ;; the empty string, so we check for that.  To be on the
-                       ;; safe side, expand the returned path and make sure
-                       ;; directories do not end in trailing slash.
-                       (string= (directory-file-name file)
-                                (directory-file-name (expand-file-name start-dir))))
-             do (let* ((file-name (ebib--transform-file-name-for-storing file))
-                       (conts (ebib-get-field-value "file" key ebib--cur-db 'noerror 'unbraced))
-                       (new-conts (if conts
-                                      (concat conts ebib-filename-separator file-name)
-                                    file-name)))
-                  (ebib-set-field-value "file" new-conts key ebib--cur-db 'overwrite)
-                  (ebib--redisplay-current-field)
-                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                                     (ebib-db-has-key key dependent))
-                                                                   (ebib--list-dependents ebib--cur-db))))
-             finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
+Completing-read-multiple over filenames. Filenames are added to
+the standard file field separated by `ebib-filename-separator'.
+The first directory in `ebib-file-search-dirs' is used as the
+start directory. If `ebib-truncate-file-names' is t, file names
+are truncated relative to the directories listed in
+`ebib-file-search-dirs', otherwise they are stored as absolute
+paths.
+
+Ignored first two arguments for compatibility with the format of
+`ebib-field-edit-functions'. Init-contents is used as the initial
+input to `completing-read-multiple'. Consequently, entries are
+separated in the completion by `ebib-filename-separator'."
+  (let* ((key (ebib--get-key-at-point))
+	 (crm-separator ebib-filename-separator)
+	 (default-directory (file-name-as-directory (car ebib-file-search-dirs)))
+	 (list (completing-read-multiple
+		(format "File(s) for %s: " key)
+		#'completion-file-name-table
+		nil 'require-match
+		(when init-contents
+		  (concat init-contents ebib-filename-separator))))
+	 (string (string-join (mapcar #'ebib--transform-file-name-for-storing list)
+			      ebib-filename-separator))
+	 ;; `ebib-filename-separator', but without trailing whitespace
+	 (to-trim (string-trim ebib-filename-separator nil "[[:space:]]+")))
+    ;; Return the string, but with `to-trim', and any trailing
+    ;; whitespace, removed. Removing whitespace above and declaring it
+    ;; here ensures that it is matched with "*". This accounts for
+    ;; cases where `ebib-filename-separator' is set to "; ", but there
+    ;; is a trailing ";" on the final value, without whitespace
+    (string-trim string nil (concat to-trim "[[:space:]]*"))))
 
 (defun ebib--transform-file-name-for-storing (file)
   "Return a name for FILE that can be stored in the file field.
