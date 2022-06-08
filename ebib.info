@@ -1810,6 +1810,15 @@ simply cancels the filter.  (If you find this behaviour confusing, you
 can rebind the ‘c’ key to the function ‘ebib-close-database’.  See *note
 Modifying Key Bindings: #modifying-key-bindings. for details.)
 
+By default, a filter does not check the values of fields in
+cross-referenced entries.  The rationale for this is that if a filter
+applies to, e.g., an entry of type ‘Collection’, any ‘InCollection’
+entries contained in it will match the filter, which is not always
+desirable.  If you do wish to include cross-referenced entries, however,
+you can press ‘F x’, which toggles the inclusion of cross-referenced
+entries.  If you wish to include cross-referenced entries by default,
+customise the user option ‘ebib-filters-include-crossref’.
+
 
 File: ebib.info,  Node: Storing and Saving Filters,  Next: Special Filters,  Prev: Complex Filters,  Up: Filters
 
@@ -3186,62 +3195,62 @@ Node: Simple Selection81485
 Ref: #simple-selection81610
 Node: Complex Filters83319
 Ref: #complex-filters83477
-Node: Storing and Saving Filters87566
-Ref: #storing-and-saving-filters87745
-Node: Special Filters90600
-Ref: #special-filters90777
-Node: An Example Listing Recent Additions92160
-Ref: #an-example-listing-recent-additions92385
-Node: Properties of Filtered Databases94755
-Ref: #properties-of-filtered-databases94948
-Node: Importing BibTeX entries96603
-Ref: #importing-bibtex-entries96774
-Node: Merging bib files97088
-Ref: #merging-bib-files97259
-Node: Importing entries from a buffer97850
-Ref: #importing-entries-from-a-buffer98083
-Node: Integration with the Biblio package99116
-Ref: #integration-with-the-biblio-package99365
-Node: Multiple Identical Fields100959
-Ref: #multiple-identical-fields101148
-Node: Linking to external resources103076
-Ref: #linking-to-external-resources103261
-Node: Viewing and Importing Files103463
-Ref: #viewing-and-importing-files103663
-Node: Editing the file field108873
-Ref: #editing-the-file-field109024
-Node: Calling a Browser for URLs and DOIs110395
-Ref: #calling-a-browser-for-urls-and-dois110611
-Node: Notes files112919
-Ref: #notes-files113069
-Node: Configuring files for storing notes114556
-Ref: #configuring-files-for-storing-notes114734
-Node: Hooks117701
-Ref: #hooks117864
-Node: Upgrading from earlier Ebib versions119265
-Ref: #upgrading-from-earlier-ebib-versions119488
-Node: Customising the notes file format120398
-Ref: #customising-the-notes-file-format120626
-Node: Displaying notes124650
-Ref: #displaying-notes124841
-Node: Using org-capture to record notes126190
-Ref: #using-org-capture-to-record-notes126381
-Node: Managing a reading list132391
-Ref: #managing-a-reading-list132553
-Node: Managing Keywords135572
-Ref: #managing-keywords135728
-Node: Using a Canonical Keywords List137335
-Ref: #using-a-canonical-keywords-list137493
-Node: Window Management139651
-Ref: #window-management139816
-Node: Copying Entries to the Kill Ring142975
-Ref: #copying-entries-to-the-kill-ring143174
-Node: Printing the Database145899
-Ref: #printing-the-database146072
-Node: Customisation149541
-Ref: #customisation149657
-Node: Modifying Key Bindings150883
-Ref: #modifying-key-bindings151010
+Node: Storing and Saving Filters88119
+Ref: #storing-and-saving-filters88298
+Node: Special Filters91153
+Ref: #special-filters91330
+Node: An Example Listing Recent Additions92713
+Ref: #an-example-listing-recent-additions92938
+Node: Properties of Filtered Databases95308
+Ref: #properties-of-filtered-databases95501
+Node: Importing BibTeX entries97156
+Ref: #importing-bibtex-entries97327
+Node: Merging bib files97641
+Ref: #merging-bib-files97812
+Node: Importing entries from a buffer98403
+Ref: #importing-entries-from-a-buffer98636
+Node: Integration with the Biblio package99669
+Ref: #integration-with-the-biblio-package99918
+Node: Multiple Identical Fields101512
+Ref: #multiple-identical-fields101701
+Node: Linking to external resources103629
+Ref: #linking-to-external-resources103814
+Node: Viewing and Importing Files104016
+Ref: #viewing-and-importing-files104216
+Node: Editing the file field109426
+Ref: #editing-the-file-field109577
+Node: Calling a Browser for URLs and DOIs110948
+Ref: #calling-a-browser-for-urls-and-dois111164
+Node: Notes files113472
+Ref: #notes-files113622
+Node: Configuring files for storing notes115109
+Ref: #configuring-files-for-storing-notes115287
+Node: Hooks118254
+Ref: #hooks118417
+Node: Upgrading from earlier Ebib versions119818
+Ref: #upgrading-from-earlier-ebib-versions120041
+Node: Customising the notes file format120951
+Ref: #customising-the-notes-file-format121179
+Node: Displaying notes125203
+Ref: #displaying-notes125394
+Node: Using org-capture to record notes126743
+Ref: #using-org-capture-to-record-notes126934
+Node: Managing a reading list132944
+Ref: #managing-a-reading-list133106
+Node: Managing Keywords136125
+Ref: #managing-keywords136281
+Node: Using a Canonical Keywords List137888
+Ref: #using-a-canonical-keywords-list138046
+Node: Window Management140204
+Ref: #window-management140369
+Node: Copying Entries to the Kill Ring143528
+Ref: #copying-entries-to-the-kill-ring143727
+Node: Printing the Database146452
+Ref: #printing-the-database146625
+Node: Customisation150094
+Ref: #customisation150210
+Node: Modifying Key Bindings151436
+Ref: #modifying-key-bindings151563
 
 End Tag Table
 

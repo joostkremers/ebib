@@ -693,6 +693,8 @@ When a filter is active, the filter itself is displayed at the top of the index 
 
 To cancel the filter and return to the normal view of the database, press [`F c`]{.key}. For convenience, this action is also available with [`c`]{.key}, which normally closes a database. If a filter is active, however, it simply cancels the filter. (If you find this behaviour confusing, you can rebind the [`c`]{.key} key to the function `ebib-close-database`. See [Modifying Key Bindings](#modifying-key-bindings) for details.)
 
+By default, a filter does not check the values of fields in cross-referenced entries. The rationale for this is that if a filter applies to, e.g., an entry of type `Collection`, any `InCollection` entries contained in it will match the filter, which is not always desirable. If you do wish to include cross-referenced entries, however, you can press [`F x`]{.key}, which toggles the inclusion of cross-referenced entries. If you wish to include cross-referenced entries by default, customise the user option `ebib-filters-include-crossref`.
+
 
 ## Storing and Saving Filters ## {.unlisted .unnumbered}
 

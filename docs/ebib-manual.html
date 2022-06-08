@@ -1915,6 +1915,16 @@ can rebind the <span class="key"><code>c</code></span> key to the
 function <code>ebib-close-database</code>. See <a
 href="#modifying-key-bindings">Modifying Key Bindings</a> for
 details.)</p>
+<p>By default, a filter does not check the values of fields in
+cross-referenced entries. The rationale for this is that if a filter
+applies to, e.g., an entry of type <code>Collection</code>, any
+<code>InCollection</code> entries contained in it will match the filter,
+which is not always desirable. If you do wish to include
+cross-referenced entries, however, you can press <span
+class="key"><code>F x</code></span>, which toggles the inclusion of
+cross-referenced entries. If you wish to include cross-referenced
+entries by default, customise the user option
+<code>ebib-filters-include-crossref</code>.</p>
 <h2 class="unlisted unnumbered" id="storing-and-saving-filters">Storing
 and Saving Filters</h2>
 <p>When you cancel a filter, it is automatically stored so that it can
