@@ -223,9 +223,10 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 	(goto-char (point-min))
 	(re-search-forward (format "^%s" field))
         (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field-end))
-        (insert (format "%-17s %s"
-                        (propertize field 'face 'ebib-field-face)
-                        (ebib--get-field-highlighted field (ebib--get-key-at-point))))
+	(save-excursion
+          (insert (format "%-17s %s"
+                          (propertize field 'face 'ebib-field-face)
+                          (ebib--get-field-highlighted field (ebib--get-key-at-point)))))
         (beginning-of-line)))))
 
 (defun ebib--redisplay-current-field ()
