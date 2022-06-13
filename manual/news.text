@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.36, June 2022 ##
+
+- Support for including field values from cross-referenced entries when applying filters. Entries to which a filter applies only by virtue of field values inherited from another entry can now be included in the filter results.
+
 ## Version 2.35, April 2022 ##
 
 - Add support for "recursive" `@String` definitions (i.e., `@String` definitions in which the expansion itself contains an `@String` abbreviation).
