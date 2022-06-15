@@ -4124,9 +4124,10 @@ special manner."
     ;; When the edit returns, see if we need to move to the next field and
     ;; check whether we need to update the index display.
     (when result
-      (ebib--ifstring (val result)
-	  (ebib-set-field-value field val key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
-	(ebib-db-remove-field-value field key ebib--cur-db))
+      (when (stringp result)
+	(ebib--ifstring (val result)
+	    (ebib-set-field-value field val key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
+	  (ebib-db-remove-field-value field key ebib--cur-db)))
       ;; A numeric prefix argument is always non-nil when a command is called
       ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
       ;; from Lisp code.
