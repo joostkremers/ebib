@@ -4273,6 +4273,34 @@ Arguments are as in `ebib--edit-list-field'."
    field-name fields init-contents
    ebib--biblatex-language-keys))
 
+(defun ebib--edit-separated-values-field (field-name fields init-contents)
+  "Edit a 'separated values' type field.
+FIELD-NAME is the name of the field being edited. FIELDS is a
+list of fields from which to pull completion candidates.
+INIT-CONTENTS is the original value of the field, assumed to be a
+list separated by commas with optional whitespace on either side.
+
+See also `ebib-field-edit-functions'."
+  ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
+  ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
+  (let* ((crm-separator "[[:space:]]*,[[:space:]]*")
+	 (collection
+	  ;; Account for fields containing more than one entry, e.g.
+	  ;; keywords = {Bar, Foo, Qux}
+	  (delete-dups
+	   (apply
+	    #'append
+	    (mapcar (lambda (str)
+		      (split-string str crm-separator t "[[:space:]]"))
+		    (ebib--create-collection-from-fields fields)))))
+	 (result (completing-read-multiple
+		  (format "%s: " field-name) collection nil nil
+		  ;; Append a crm-separator to the result, so that
+		  ;; `completing-read-multiple' treats it as a list of
+		  ;; selected candidates
+		  (when init-contents (concat init-contents ", ")))))
+    (string-join result ", ")))
+
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
