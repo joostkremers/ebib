@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.37, June 2022 ##
+
+- Move `ebib-TeX-markup-replace-alist` and related functions to `parsebib.el`. This makes customising the specific behaviour a bit more difficult, because the new variable `parsebib-TeX-markup-replace-alist` is not a user option, but moving this functionality to `parsebib` makes it available to other packages using that library. If you haven't customised `ebib-TeX-markup-replace-alist`, you shouldn't notice any difference.
+
 ## Version 2.36, June 2022 ##
 
 - Support for including field values from cross-referenced entries when applying filters. Entries to which a filter applies only by virtue of field values inherited from another entry can now be included in the filter results.

@@ -29,6 +29,17 @@
 <header id="title-block-header">
 <h1 class="title">Ebib News</h1>
 </header>
+<h2 id="version-2.37-june-2022">Version 2.37, June 2022</h2>
+<ul>
+<li>Move <code>ebib-TeX-markup-replace-alist</code> and related
+functions to <code>parsebib.el</code>. This makes customising the
+specific behaviour a bit more difficult, because the new variable
+<code>parsebib-TeX-markup-replace-alist</code> is not a user option, but
+moving this functionality to <code>parsebib</code> makes it available to
+other packages using that library. If you haven’t customised
+<code>ebib-TeX-markup-replace-alist</code>, you shouldn’t notice any
+difference.</li>
+</ul>
 <h2 id="version-2.36-june-2022">Version 2.36, June 2022</h2>
 <ul>
 <li>Support for including field values from cross-referenced entries
