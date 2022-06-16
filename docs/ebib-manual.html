@@ -490,15 +490,17 @@ display the year field.</p>
 <code>"Title"</code>, <code>"Doi"</code>, and <code>"Url"</code>. These
 do display information from the fields they correspond with, but in a
 special way: <code>"Title"</code> tries to make the title look nice by
-removing braces and LaTeX commands (including their optional arguments)
-and by displaying the arguments of <code>\emph</code>,
+removing braces and LaTeX commands (leaving only their obligatory
+arguments) and by displaying the arguments of <code>\emph</code>,
 <code>\textit</code>, <code>\textbf</code> and <code>\textsc</code> in
-italic, bold or caps. (You can customise what exactly is replaced and
-stripped; see the user option <code>ebib-TeX-markup-replace-alist</code>
-for details.) <code>"Doi"</code> and <code>"Url"</code> don’t display
-the contents of these fields, but instead yield a clickable string
-<code>"www"</code>; clicking on <code>"www"</code> takes you to the
-relevant web page.</p>
+italic, bold or caps. Accented characters that are created using LaTeX
+commands such as <code>\"{a}</code> are displayed as the actual accented
+characters and a number of LaTeX commands for special characters are
+replaced with the corresponding Unicode character.</p>
+<p>The column labels<code>"Doi"</code> and <code>"Url"</code> don’t
+display the contents of these fields, but instead yield a clickable
+string <code>"www"</code>; clicking on <code>"www"</code> takes you to
+the relevant web page.</p>
 <p>The final predefined column label is <code>"Note"</code>. This does
 not, as might be expected, display the contents of the note field.
 Rather, it checks whether the entry in question has an external
@@ -516,7 +518,9 @@ and <code>"Note"</code> are actually defined through this option.
 <code>"Entry Key"</code>, <code>"Author/Editor"</code>, and
 <code>"Year"</code> are not (they are hard-coded), but they can be
 overridden by adding an entry for them in
-<code>ebib-field-transformation-functions</code>.</p>
+<code>ebib-field-transformation-functions</code>. For example, if you do
+not wish for TeX markup to be hidden in titles, remove the
+<code>"Title"</code> entry in this option.</p>
 <p>The first column defined in <code>ebib-index-colums</code> is the
 column on which the entries are sorted by default, i.e., when the
 database is first opened and when you press <span
