@@ -966,20 +966,27 @@ offered as the default directory."
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
   "List of file associations.
-Lists file extensions together with external programs to handle
-files with those extensions.  If the program string contains a
-literal `%s', it is replaced with the name of the file being
-opened, allowing the use of command line options.  Otherwise, the
-string is treated as an executable, searched for in the variable
-`exec-path'.
+Lists of (EXT . HANDLER), where EXT is a file extension like
+\"pdf\" or \"ps\", and HANDLER is a method to handle files with
+those extensions.
 
-When you open a file for which no external program is defined,
-the file is opened in Emacs."
+HANDLER could be a program string.  If the program string
+contains a literal `%s', it is replaced with the name of the file
+being opened, allowing the use of command line options.
+Otherwise, the string is treated as an executable, searched for
+in the variable `exec-path'.
+
+HANDLER could also be a Emacs Lisp function, with its only
+argument being the file to handle.
+
+When you open a file for which no HANDLER is defined, the file is
+opened in Emacs."
   :group 'ebib
   :type '(repeat (cons :tag "File association"
                        (string :tag "Extension")
                        (choice (const :tag "Open in Emacs" nil)
-                               (string :tag "Run external command")))))
+                               (string :tag "Run external command")
+			       (function :tag "Run Emacs Lisp function")))))
 
 (defcustom ebib-filename-separator "; "
   "Separator for filenames in the \"file\" field'.

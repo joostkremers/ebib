@@ -2932,17 +2932,28 @@ file to choose."
   "Open FILE with an external viewer."
   (let ((file-full-path (ebib--expand-file-name file)))
     (if (file-exists-p file-full-path)
-        (let ((ext (file-name-extension file-full-path)))
-          (ebib--ifstring (viewer (cdr (assoc ext ebib-file-associations)))
-              (if (string-match (regexp-quote "%s") viewer)
-                  (let* ((viewer-arg-list (split-string-and-unquote (format viewer (shell-quote-argument file-full-path)))))
-                    (message "Executing `%s'" (string-join viewer-arg-list " "))
-                    (apply 'call-process (car viewer-arg-list) nil 0 nil (cdr viewer-arg-list)))
-                (message "Executing `%s %s'" viewer file-full-path)
-                (call-process viewer nil 0 nil file-full-path))
+        (let* ((ext (file-name-extension file-full-path))
+               (viewer (cdr (assoc ext ebib-file-associations))))
+	  (cond
+	   (;; Case 1: VIEWER is a program string.
+	    (stringp viewer)
+            (if (string-match (regexp-quote "%s") viewer)
+                (let* ((viewer-arg-list (split-string-and-unquote (format viewer (shell-quote-argument file-full-path)))))
+                  (message "Executing `%s'" (string-join viewer-arg-list " "))
+                  (apply 'call-process (car viewer-arg-list) nil 0 nil (cdr viewer-arg-list)))
+              (message "Executing `%s %s'" viewer file-full-path)
+              (call-process viewer nil 0 nil file-full-path)))
+	   (;; Case 2: VIEWER is a Emacs Lisp function.
+	    (functionp viewer)
+	    (funcall viewer file-full-path))
+	   (;; Case 3: VIEWER is nil.
+	    (equal viewer nil)
             (message "Opening `%s'" file-full-path)
             (ebib-lower)
-            (find-file file-full-path)))
+            (find-file file-full-path))
+	   (;; Default Case: invalid viewer defined.
+	    t
+	    (error "[Ebib] Invalid viewer for extension `%s'" ext))))
       (error "[Ebib] File not found: `%s'" (funcall ebib-file-name-mod-function file nil)))))
 
 (defun ebib-set-dialect (dialect)
