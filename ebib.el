@@ -4230,6 +4230,20 @@ The other two argument places are for compatibility with
 `ebib-field-edit-functions', and are ignore."
   (ebib--read-ref-as-entry (format "%s: " field-name) `(,ebib--cur-db)))
 
+(defun ebib--edit-ref-list-field (field-name _ _)
+  "Read multiple entry keys, returning a comma-separated list.
+
+FIELD-NAME is the name of the field being edited. Key is read
+with `ebib--read-ref-as-entry'.
+
+The other two argument places are for compatibility with
+`ebib-field-edit-functions', and are ignore."
+  (let ((list (ebib--read-ref-as-entry
+	       field-name `(,ebib--cur-db) 'multiple)))
+    ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
+    ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
+    (string-join list ", ")))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
