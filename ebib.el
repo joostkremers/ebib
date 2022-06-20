@@ -4221,6 +4221,15 @@ all selected keys are returned as a list of strings."
 	(mapcar #'car entry)
       (caar entry))))
 
+(defun ebib--edit-ref-field (field-name _ _)
+  "Edit an 'entry key' type field.
+FIELD-NAME is the name of the field being edited. Key is read
+with `ebib--read-ref-as-entry'.
+
+The other two argument places are for compatibility with
+`ebib-field-edit-functions', and are ignore."
+  (ebib--read-ref-as-entry (format "%s: " field-name) `(,ebib--cur-db)))
+
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
