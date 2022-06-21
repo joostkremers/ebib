@@ -2236,29 +2236,28 @@ directories listed in the option “File Search Dirs”. As an extra
 service, Ebib also searches for the base filename, i.e.,
 <code>Abney1987</code> in this particular case.</p>
 <p>Ebib can call different external programs depending on the file
-extension of the relevant file. The option “File Associations” allows
-you to specify which programs to call for which types of files. By
-default, <code>.pdf</code> and <code>.ps</code> files are handled, by
-<code>xpdf</code> and <code>gv</code>, respectively. You can specify
-further file types by their extensions (do not include the dot). The
-program is searched for in <code>PATH</code>, but you can of course
-specify the full path to the program. You can also specify further
-command line arguments, but if you do this, you should include the
-directive <code>%s</code> in the string, which will be replaced with the
-full path to the file you are opening. (There is no need to put
-<code>%s</code> in double quotes in order to handle possible spaces in
-the file name, Ebib takes care of this.)</p>
-<p>There is also the option to open files in Emacs. Use this if you want
-to read pdf files in Emacs, for example, with <code>doc-view-mode</code>
-or <a
-href="https://github.com/politza/pdf-tools"><code>pdf-tools</code></a>.
-In the customisation buffer, you can choose the option “Open in Emacs”,
-in your init file (the variable is called
-<code>ebib-file-associations</code>), you can simply leave the file
-association empty, or remove the relevant entry entirely. If Ebib
-doesn’t find a program to use for a specific file type, it opens the
-relevant file in Emacs.</p>
-<p>If the <code>file</code> field is empty, pressing <span
+extension of the relevant file. The option
+<code>ebib-file-associations</code> allows you to specify which programs
+to call for which types of files. By default, <code>.pdf</code> and
+<code>.ps</code> files are handled, by <code>xpdf</code> and
+<code>gv</code>, respectively. You can specify further file types by
+their extensions (do not include the dot). The program is searched for
+in <code>exec-path</code>, but you can of course specify the full path
+to the program.</p>
+<p>If you need to pass further command-line options to the executable,
+you can do so, but you will need to include a directive <code>%s</code>
+in the string, which will be replaced with the full path to the file you
+are opening. If you have special requirements that cannot be handled in
+this way, you can also specify an Elisp function to handle the file.
+This function should take one argument, the path of the file being
+opened.</p>
+<p>If you do not specify any program for a particular extension (or if
+you remove the extension from <code>ebib-file-associatons</code>
+altogether), Ebib opens the file in Emacs itself, using
+<code>find-file</code>. Use this if you want to read pdf files in Emacs,
+for example, with <code>doc-view-mode</code> or <a
+href="https://github.com/politza/pdf-tools"><code>pdf-tools</code></a>.</p>
+<p>If the <code>file</code> field of an entry is empty, pressing <span
 class="key"><code>f</code></span> causes Ebib to search for a pdf file
 with a name based on the entry key. By default, Ebib just appends
 <code>.pdf</code> to the entry key and tries to find a file by the name

@@ -2194,38 +2194,37 @@ the option “File Search Dirs”.  As an extra service, Ebib also searches
 for the base filename, i.e., ‘Abney1987’ in this particular case.
 
 Ebib can call different external programs depending on the file
-extension of the relevant file.  The option “File Associations” allows
-you to specify which programs to call for which types of files.  By
-default, ‘.pdf’ and ‘.ps’ files are handled, by ‘xpdf’ and ‘gv’,
+extension of the relevant file.  The option ‘ebib-file-associations’
+allows you to specify which programs to call for which types of files.
+By default, ‘.pdf’ and ‘.ps’ files are handled, by ‘xpdf’ and ‘gv’,
 respectively.  You can specify further file types by their extensions
-(do not include the dot).  The program is searched for in ‘PATH’, but
-you can of course specify the full path to the program.  You can also
-specify further command line arguments, but if you do this, you should
-include the directive ‘%s’ in the string, which will be replaced with
-the full path to the file you are opening.  (There is no need to put
-‘%s’ in double quotes in order to handle possible spaces in the file
-name, Ebib takes care of this.)
+(do not include the dot).  The program is searched for in ‘exec-path’,
+but you can of course specify the full path to the program.
 
-There is also the option to open files in Emacs.  Use this if you want
+If you need to pass further command-line options to the executable, you
+can do so, but you will need to include a directive ‘%s’ in the string,
+which will be replaced with the full path to the file you are opening.
+If you have special requirements that cannot be handled in this way, you
+can also specify an Elisp function to handle the file.  This function
+should take one argument, the path of the file being opened.
+
+If you do not specify any program for a particular extension (or if you
+remove the extension from ‘ebib-file-associatons’ altogether), Ebib
+opens the file in Emacs itself, using ‘find-file’.  Use this if you want
 to read pdf files in Emacs, for example, with ‘doc-view-mode’ or
-‘pdf-tools’ (https://github.com/politza/pdf-tools).  In the
-customisation buffer, you can choose the option “Open in Emacs”, in your
-init file (the variable is called ‘ebib-file-associations’), you can
-simply leave the file association empty, or remove the relevant entry
-entirely.  If Ebib doesn’t find a program to use for a specific file
-type, it opens the relevant file in Emacs.
+‘pdf-tools’ (https://github.com/politza/pdf-tools).
 
-If the ‘file’ field is empty, pressing ‘f’ causes Ebib to search for a
-pdf file with a name based on the entry key.  By default, Ebib just
-appends ‘.pdf’ to the entry key and tries to find a file by the name
-thus created.  If you want, you can modify the file name that Ebib
-searches for by setting the option ‘ebib-name-transform-function’ to a
-function that performs the transformation.  This function takes the key
-of the current entry as its argument (as a string), and should return
-the file name to use (without ‘.pdf’, which is added automatically).
-Note that you can use the function ‘ebib-get-field-value’ to access the
-values of the entry’s fields (you need to pass ‘ebib--cur-db’ for the
-‘db’ argument).
+If the ‘file’ field of an entry is empty, pressing ‘f’ causes Ebib to
+search for a pdf file with a name based on the entry key.  By default,
+Ebib just appends ‘.pdf’ to the entry key and tries to find a file by
+the name thus created.  If you want, you can modify the file name that
+Ebib searches for by setting the option ‘ebib-name-transform-function’
+to a function that performs the transformation.  This function takes the
+key of the current entry as its argument (as a string), and should
+return the file name to use (without ‘.pdf’, which is added
+automatically).  Note that you can use the function
+‘ebib-get-field-value’ to access the values of the entry’s fields (you
+need to pass ‘ebib--cur-db’ for the ‘db’ argument).
 
 There are two functions that can help you to attach files to your
 database: ‘ebib-download-url’ and ‘ebib-import-file’.  By default, these
@@ -3223,40 +3222,40 @@ Node: Linking to external resources103877
 Ref: #linking-to-external-resources104062
 Node: Viewing and Importing Files104264
 Ref: #viewing-and-importing-files104464
-Node: Editing the file field109674
-Ref: #editing-the-file-field109825
-Node: Calling a Browser for URLs and DOIs111196
-Ref: #calling-a-browser-for-urls-and-dois111412
-Node: Notes files113720
-Ref: #notes-files113870
-Node: Configuring files for storing notes115357
-Ref: #configuring-files-for-storing-notes115535
-Node: Hooks118502
-Ref: #hooks118665
-Node: Upgrading from earlier Ebib versions120066
-Ref: #upgrading-from-earlier-ebib-versions120289
-Node: Customising the notes file format121199
-Ref: #customising-the-notes-file-format121427
-Node: Displaying notes125451
-Ref: #displaying-notes125642
-Node: Using org-capture to record notes126991
-Ref: #using-org-capture-to-record-notes127182
-Node: Managing a reading list133192
-Ref: #managing-a-reading-list133354
-Node: Managing Keywords136373
-Ref: #managing-keywords136529
-Node: Using a Canonical Keywords List138136
-Ref: #using-a-canonical-keywords-list138294
-Node: Window Management140452
-Ref: #window-management140617
-Node: Copying Entries to the Kill Ring143776
-Ref: #copying-entries-to-the-kill-ring143975
-Node: Printing the Database146700
-Ref: #printing-the-database146873
-Node: Customisation150342
-Ref: #customisation150458
-Node: Modifying Key Bindings151684
-Ref: #modifying-key-bindings151811
+Node: Editing the file field109595
+Ref: #editing-the-file-field109746
+Node: Calling a Browser for URLs and DOIs111117
+Ref: #calling-a-browser-for-urls-and-dois111333
+Node: Notes files113641
+Ref: #notes-files113791
+Node: Configuring files for storing notes115278
+Ref: #configuring-files-for-storing-notes115456
+Node: Hooks118423
+Ref: #hooks118586
+Node: Upgrading from earlier Ebib versions119987
+Ref: #upgrading-from-earlier-ebib-versions120210
+Node: Customising the notes file format121120
+Ref: #customising-the-notes-file-format121348
+Node: Displaying notes125372
+Ref: #displaying-notes125563
+Node: Using org-capture to record notes126912
+Ref: #using-org-capture-to-record-notes127103
+Node: Managing a reading list133113
+Ref: #managing-a-reading-list133275
+Node: Managing Keywords136294
+Ref: #managing-keywords136450
+Node: Using a Canonical Keywords List138057
+Ref: #using-a-canonical-keywords-list138215
+Node: Window Management140373
+Ref: #window-management140538
+Node: Copying Entries to the Kill Ring143697
+Ref: #copying-entries-to-the-kill-ring143896
+Node: Printing the Database146621
+Ref: #printing-the-database146794
+Node: Customisation150263
+Ref: #customisation150379
+Node: Modifying Key Bindings151605
+Ref: #modifying-key-bindings151732
 
 End Tag Table
 
