@@ -967,20 +967,22 @@ offered as the default directory."
                                     ("ps" . "gv"))
   "List of file associations.
 Lists of (EXT . HANDLER), where EXT is a file extension like
-\"pdf\" or \"ps\", and HANDLER is a method to handle files with
-those extensions.
+\"pdf\" or \"ps\" (without dot), and HANDLER is a method to
+handle files with those extensions.
 
-HANDLER could be a program string.  If the program string
-contains a literal `%s', it is replaced with the name of the file
-being opened, allowing the use of command line options.
-Otherwise, the string is treated as an executable, searched for
-in the variable `exec-path'.
+HANDLER can be a string, in which case it should be the name of
+an executable, which is searched for in the variable `exec-path'.
+The string can also contain command-line options to be passed to
+the executable.  In this case, the string should also contain
+\"%s\", which will be replaced with the path to the file being
+opened.
 
-HANDLER could also be a Emacs Lisp function, with its only
-argument being the file to handle.
+HANDLER can also be a Emacs Lisp function, which should take one
+argument, the path to the file being opened.
 
-When you open a file for which no HANDLER is defined, the file is
-opened in Emacs."
+When you open a file for which no HANDLER is defined, or for
+which HANDLER is empty, the file is opened in Emacs using the
+function `find-file'."
   :group 'ebib
   :type '(repeat (cons :tag "File association"
                        (string :tag "Extension")
