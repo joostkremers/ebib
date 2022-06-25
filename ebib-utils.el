@@ -1137,7 +1137,7 @@ Ebib (not Emacs)."
 				       (("organization")	      . ebib--edit-list-field)
 				       (("publisher" "origpublisher") . ebib--edit-list-field)
 				       (("pubstate")                  . ebib--edit-pubstate-field)
-				       (("related" "xdata")           . ebib--edit-ref-list-field)
+				       (("related" "xdata" "entryset") . ebib--edit-ref-list-field)
 				       (("venue")                     . ebib--edit-literal-field))
   "Alist of completion functions for fields.
 The car of each element is a list of fields, which must all have
