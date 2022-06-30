@@ -4319,6 +4319,13 @@ See also `ebib-field-edit-functions'."
 		  (when init-contents (concat init-contents ", ")))))
     (string-join result ", ")))
 
+(defun ebib--edit-TeX-code-field (field-name _fields _init-contents)
+  "Edit FIELD-NAME in a multline `tex-mode' buffer.
+_FIELDS and _INIT-CONTENTS are ignored, because
+`ebib--edit-field-as-multiline' ignores them."
+  (let ((ebib-multiline-major-mode 'tex-mode))
+    (ebib--edit-field-as-multiline field-name)))
+
 (defun ebib-edit-current-field ()
   "Edit current field of a BibTeX entry.
 Most fields are edited directly using the minibuffer, but a few
