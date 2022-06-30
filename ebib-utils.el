@@ -1117,7 +1117,7 @@ Ebib (not Emacs)."
 (make-obsolete-variable 'ebib-fields-with-completion 'ebib-field-edit-functions "Ebib 2.34")
 
 (defcustom ebib-field-edit-functions '((("abstract" "addendum" "note" "annotation")
-					. ebib--edit-literal-field-multiline)
+					. ebib--edit-field-as-multiline)
 				       (("afterword" "annotator" "author" "bookauthor"
 					 "commentator" "editor" "editora" "editorb"
 					 "editorc" "foreword" "holder" "introduction"

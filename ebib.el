@@ -4092,7 +4092,7 @@ special manner."
          (result (cond
                   ((string= field "=type=") (ebib--edit-entry-type))
                   ((ebib--multiline-p init-contents)
-                   (ebib--edit-field-as-multiline field init-contents)
+                   (ebib--edit-field-as-multiline field)
                    ;; A multiline edit differs from the other fields, because
                    ;; the edit isn't done when `ebib--edit-field-as-multiline'
                    ;; returns. This means we cannot move to the next field.  For
@@ -4510,28 +4510,27 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
   (interactive)
   (ebib-toggle-raw (ebib--current-field)))
 
-(defun ebib--edit-field-as-multiline (field init-contents)
+(defun ebib--edit-field-as-multiline (field &optional _fields _init-contents)
   "Edit a field in multiline-mode.
-FIELD is the field being edited, INIT-CONTENTS is its initial content."
-  (cond
-   ((member-ignore-case field '("=type=" "crossref" "xref" "related"))
-    (error "[Ebib] Cannot edit `%s' field as multiline" field))
-   ((ebib-unbraced-p init-contents)
-    (error "[Ebib] Cannot edit a raw field as multiline"))
-   (t (ebib--multiline-edit (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field) (ebib-unbrace init-contents)))))
+FIELD is the field being edited.
 
-(defun ebib--edit-multiline-field (field)
-  "Edit FIELD in multiline-mode.
-
-Note: this function is essentially just a convenience wrapper
-over `ebib--edit-field-as-multiline'."
-  (let ((init-contents (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
-    (ebib--edit-field-as-multiline field init-contents)))
+_FIELDS and _INIT-CONTENTS are ignored. They are included as
+arguments for compatibility with `ebib-field-edit-functions'."
+  (let ((init-contents
+	 (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
+    (cond
+     ((member-ignore-case field '("=type=" "crossref" "xref" "related"))
+      (error "[Ebib] Cannot edit `%s' field as multiline" field))
+     ((ebib-unbraced-p init-contents)
+      (error "[Ebib] Cannot edit a raw field as multiline"))
+     (t (ebib--multiline-edit
+	 (list 'field (ebib-db-get-filename ebib--cur-db) (ebib--get-key-at-point) field)
+	 (ebib-unbrace init-contents))))))
 
 (defun ebib-edit-current-field-as-multiline ()
   "Edit current field in multiline-mode."
   (interactive)
-  (ebib--edit-multiline-field (ebib--current-field)))
+  (ebib--edit-field-as-multiline (ebib--current-field)))
 
 (defun ebib-insert-abbreviation (field)
   "Insert an abbreviation into FIELD from the ones defined in the database."

@@ -49,7 +49,7 @@
    ("d" ebib-delete-field-contents "delete field contents")
    ("y" ebib-yank-field-contents "yank field contents")
    ("e" ebib-edit-field "edit field")
-   ("m" ebib--edit-multiline-field "edit multiline field")
+   ("m" ebib--edit-field-as-multiline "edit multiline field")
    ("v" ebib-view-field-as-help "view field as help")
    ("s" ebib-insert-abbreviation "insert abbreviation")
    ("r" ebib-toggle-raw "toggle raw")
