@@ -1127,6 +1127,7 @@ Ebib (not Emacs)."
 				       (("crossref" "xref")           . ebib--edit-ref-field)
 				       (("editortype" "editoratype" "editorbtype" "editorctype")
 					. ebib--edit-editor-type-field)
+				       (("execute")                   . ebib--edit-TeX-code-field)
 				       (("file")		      . ebib--edit-file-field)
 				       (("institution")               . ebib--edit-list-field)
 				       (("journal" "journaltitle")    . ebib--edit-literal-field)
