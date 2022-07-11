@@ -473,7 +473,7 @@ TEMPLATE is a reference template (see the option
 with the contents of the corresponding fields in the entry KEY in
 database DB."
   ;; Define some transformations; Perhaps these should be user-customizable.
-  (let ((transformations '(("Title" . ebib-clean-TeX-markup)
+  (let ((transformations '(("Title" . parsebib-clean-TeX-markup)
                            ("Date" . ebib-biblatex-date-to-year))))
     (cl-flet ((create-replacements (match)
                                    (save-match-data
