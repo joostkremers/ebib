@@ -466,7 +466,9 @@ which can be passed to `ebib--display-multiline-field'."
       (if (cl-equalp field "url")
           (setq value (ebib--display-url-field value)))
       (if (cl-equalp field "doi")
-          (setq value (ebib--display-doi-field value))))
+          (setq value (ebib--display-doi-field value)))
+      (if (cl-equalp field "crossref")
+          (setq value (ebib--display-crossref-field value))))
     (concat raw value alias multiline)))
 
 (defun ebib--display-fields (key &optional db match-str)
