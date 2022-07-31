@@ -325,10 +325,16 @@ of strings."
 (defun ebib--display-doi-field (doi-field)
   "Return a string for DOI-FIELD to display in the entry buffer."
   (propertize doi-field
-              'face '(:inherit ebib-link-face)
-              'mouse-face '(highlight (:inherit ebib-link-face))
-              'help-echo "mouse-1: follow this doi"
-              'ebib-url (concat "https://dx.doi.org/" doi-field)))
+	      'face 'button
+	      'font-lock-face 'button
+	      'mouse-face 'highlight
+	      'help-echo "mouse-1: follow this doi"
+	      'button t
+	      'follow-link t
+	      'category t
+	      'button-data (concat "https://dx.doi.org/" doi-field)
+	      'keymap button-map
+	      'action 'ebib--call-browser))
 
 (defun ebib--display-url-field (url-field)
   "Return a string for URL-FIELD to display in the entry buffer."
