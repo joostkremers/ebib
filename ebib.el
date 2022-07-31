@@ -334,6 +334,14 @@ of strings."
                                                              'ebib-url url))
                                                urls))))
 
+(defun ebib--display-crossref-field (crossref)
+  "Return a string for CROSSREF to display in the entry buffer."
+  (propertize crossref
+              'face '(:inherit ebib-link-face)
+              'mouse-face '(highlight (:inherit ebib-link-face))
+              'help-echo "mouse-1: follow crossref"
+              'ebib-crossref t))
+
 (defun ebib--extract-note-text (key &optional truncate)
   "Extract the text of the note for entry KEY.
 
