@@ -58,6 +58,7 @@
 (require 'hl-line)
 (require 'mule-util)
 (require 'parsebib)
+(require 'button)
 (require 'ebib-utils)
 (require 'ebib-db)
 (require 'ebib-filters)
@@ -309,11 +310,17 @@ of strings."
   "Return a string for FILE-FIELD to display in the entry buffer."
   (let ((files (ebib--split-files file-field)))
     (ebib--convert-multiline-to-string (mapcar (lambda (file)
-                                                 (propertize file
-                                                             'face '(:inherit ebib-link-face)
-                                                             'mouse-face '(highlight (:inherit ebib-link-face))
-                                                             'help-echo "mouse-1: open this file"
-                                                             'ebib-file file))
+						 (propertize file
+							     'face 'button
+							     'font-lock-face 'button
+							     'mouse-face 'highlight
+							     'help-echo "mouse-1: open this file"
+							     'button t
+							     'follow-link t
+							     'category t
+							     'button-data file
+							     'keymap button-map
+							     'action 'ebib--call-file-viewer))
                                                files))))
 
 (defun ebib--display-doi-field (doi-field)
