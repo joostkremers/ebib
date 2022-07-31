@@ -354,6 +354,20 @@ of strings."
 			   'action 'ebib--call-browser))
              urls))))
 
+(defun ebib--display-crossref-field (crossref)
+  "Return a string for CROSSREF to display in the entry buffer."
+  (propertize crossref
+	      'face 'button
+	      'font-lock-face 'button
+	      'mouse-face 'highlight
+	      'help-echo "mouse-1: follow crossref"
+	      'button t
+	      'follow-link t
+	      'category t
+	      'button-data nil
+	      'keymap button-map
+	      'action (lambda (_) (ebib-follow-crossref))))
+
 (defun ebib--extract-note-text (key &optional truncate)
   "Extract the text of the note for entry KEY.
 
