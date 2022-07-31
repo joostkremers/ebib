@@ -2875,10 +2875,14 @@ new database."
                     (get-text-property 0 'help-echo word)))
          (notep (and word
                      (get-text-property 0 'mouse-face word)
-                     (string-equal word ebib-notes-symbol))))
+                     (string-equal word ebib-notes-symbol)))
+	 (crossref (and word
+                       (get-text-property 0 'mouse-face word)
+                       (get-text-property 0 'ebib-crossref word))))
     (cond
      (link (ebib--call-browser link))
      (notep (ebib-popup-note (ebib--get-key-at-point)))
+     (crossref (ebib-follow-crossref))
      (t (when (eobp)
           (forward-line -1))
         (ebib-select-and-popup-entry)))))
