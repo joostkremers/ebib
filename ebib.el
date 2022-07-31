@@ -340,13 +340,20 @@ of strings."
 (defun ebib--display-url-field (url-field)
   "Return a string for URL-FIELD to display in the entry buffer."
   (let ((urls (ebib--split-urls url-field)))
-    (ebib--convert-multiline-to-string (mapcar (lambda (url)
-                                                 (propertize url
-                                                             'face '(:inherit ebib-link-face)
-                                                             'mouse-face '(highlight (:inherit ebib-link-face))
-                                                             'help-echo "mouse-1: follow this url"
-                                                             'ebib-url url))
-                                               urls))))
+    (ebib--convert-multiline-to-string
+     (mapcar (lambda (url)
+	       (propertize url
+			   'face 'button
+			   'font-lock-face 'button
+			   'mouse-face 'highlight
+			   'help-echo "mouse-1: follow this url"
+			   'button t
+			   'follow-link t
+			   'category t
+			   'button-data url
+			   'keymap button-map
+			   'action 'ebib--call-browser))
+             urls))))
 
 (defun ebib--extract-note-text (key &optional truncate)
   "Extract the text of the note for entry KEY.
