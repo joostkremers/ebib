@@ -1067,7 +1067,6 @@ keywords before Emacs is killed."
     (define-key map "y" #'ebib-yank-entry)
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
-    (define-key map [mouse-1] #'ebib-index-open-at-point)
     map)
   "Keymap for the ebib index buffer.")
 
@@ -2891,23 +2890,6 @@ new database."
        (when arg
          (ebib-db-set-current-entry-key nil ebib--cur-db))
        (ebib--update-buffers 'no-refresh)))))
-
-(defun ebib-index-open-at-point ()
-  "Open link, note or files at point."
-  (interactive)
-  (let* ((word (thing-at-point 'word))
-         (link (and word
-                    (get-text-property 0 'mouse-face word)
-                    (get-text-property 0 'help-echo word)))
-         (notep (and word
-                     (get-text-property 0 'mouse-face word)
-                     (string-equal word ebib-notes-symbol))))
-    (cond
-     (link (ebib--call-browser link))
-     (notep (ebib-popup-note (ebib--get-key-at-point)))
-     (t (when (eobp)
-          (forward-line -1))
-        (ebib-select-and-popup-entry)))))
 
 (defun ebib-browse-url (&optional arg)
   "Browse the URL in the \"url\" field.
