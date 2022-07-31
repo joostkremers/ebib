@@ -3681,7 +3681,6 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "\C-xb" 'ebib-quit-entry-buffer)
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     (define-key map "\C-x\C-s" #'ebib-save-current-database)
-    (define-key map [mouse-1] #'ebib-entry-open-at-point)
     map)
   "Keymap for the Ebib entry buffer.")
 
@@ -4313,30 +4312,6 @@ viewed."
   (let ((file (ebib-get-field-value (ebib--current-field) (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
         (num (if (numberp arg) arg nil)))
     (ebib--call-file-viewer (ebib--select-file file num (ebib--get-key-at-point)))))
-
-(defun ebib-entry-open-at-point ()
-  "Open file at point."
-  (interactive)
-  (unwind-protect
-      (let* ((word (thing-at-point 'word))
-             (file (and word
-                        (get-text-property 0 'mouse-face word)
-                        (get-text-property 0 'ebib-file word)))
-             (url (and word
-                       (get-text-property 0 'mouse-face word)
-                       (get-text-property 0 'ebib-url word))))
-        (cond
-         (file (ebib--call-file-viewer file))
-         (url (ebib--call-browser url))))
-    ;; Properly position the cursor.
-    (beginning-of-line)
-    (let ((direction (alist-get (ebib--line-at-point)
-                                '((last-line . -1) ; Move up.
-                                  (multi-line . -1)
-                                  (empty-line . 1))))) ; Move down.
-      (when direction
-        (while (ebib--line-at-point)
-          (forward-line direction))))))
 
 (defun ebib-copy-field-contents (field)
   "Copy the contents of FIELD to the kill ring.
