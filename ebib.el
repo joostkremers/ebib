@@ -4204,10 +4204,14 @@ viewed."
                         (get-text-property 0 'ebib-file word)))
              (url (and word
                        (get-text-property 0 'mouse-face word)
-                       (get-text-property 0 'ebib-url word))))
+                       (get-text-property 0 'ebib-url word)))
+	     (crossref (and word
+                       (get-text-property 0 'mouse-face word)
+                       (get-text-property 0 'ebib-crossref word))))
         (cond
          (file (ebib--call-file-viewer file))
-         (url (ebib--call-browser url))))
+         (url (ebib--call-browser url))
+	 (crossref (ebib-follow-crossref))))
     ;; Properly position the cursor.
     (beginning-of-line)
     (let ((direction (alist-get (ebib--line-at-point)
