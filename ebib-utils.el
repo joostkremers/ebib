@@ -122,6 +122,7 @@ when it is first saved.  Note that Ebib uses
                  (const :tag "Do not create backups" nil)))
 
 (defcustom ebib-extra-fields '((biblatex "crossref"
+					 "xdata"
                                          "annotation"
                                          "abstract"
                                          "keywords"
