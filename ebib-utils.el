@@ -704,6 +704,7 @@ assumed to use this dialect.  Possible values are those listed in
                                         ("all"                           "all"
 					 (("ids"                         . none)
 					  ("crossref"                    . none)
+					  ("xdata"                       . none)
 					  ("xref"                        . none)
 					  ("entryset"                    . none)
 					  ("entrysubtype"                . none)
