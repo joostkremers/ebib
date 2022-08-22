@@ -4961,7 +4961,7 @@ If prefix ARG is non-nil, do not delete the original file."
           (?r (setq new-name (read-string (format "Change `%s' to: " new-name) new-name))
               (setq dest-path (concat (file-name-as-directory (car ebib-file-search-dirs)) new-name)))
           (?o (setq overwrite t)))))
-    (copy-file file-path dest-path)
+    (copy-file file-path dest-path t)
     (unless arg
       (delete-file file-path t))
     (let ((files (ebib-get-field-value "file" key ebib--cur-db 'noerror 'unbraced)))
