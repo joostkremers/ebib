@@ -323,6 +323,28 @@ of strings."
 							     'action 'ebib--call-file-viewer))
                                                files))))
 
+(defun ebib--display-xdata-field (xdata-field)
+  "Return a string for XDATA-FIELD to display in the entry buffer.
+Separate values by commas and put each on a separate line. For
+each value, test if there is an entry with that key, and that it
+is actually an `@XData' entry. If either test fails, propertize
+the value with `ebib-warning-face' and an information help-echo
+message."
+  (let ((keys (split-string xdata-field ",[[:space:]]*")))
+    (ebib--convert-multiline-to-string
+     (mapcar
+      (lambda (key)
+	(if-let ((type (ebib-db-get-field-value "=type=" key ebib--cur-db 'noerror)))
+	    (if (cl-equalp "xdata" type)
+		key
+	      (propertize key
+			  'face 'ebib-warning-face
+			  'help-echo (format "%s is not an @XData entry." key)))
+	  (propertize key
+		      'face 'ebib-warning-face
+		      'help-echo (format "No entry with key `%s'" key))))
+      keys))))
+
 (defun ebib--display-doi-field (doi-field)
   "Return a string for DOI-FIELD to display in the entry buffer."
   (propertize doi-field
