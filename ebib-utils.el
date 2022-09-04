@@ -1919,17 +1919,34 @@ the variable `ebib--field-aliases').  In this case, the returned
 string has the text property `ebib--alias' with value t."
   (let* ((value (ebib-db-get-field-value field key db 'noerror))
          (type (ebib-db-get-field-value "=type=" key db 'noerror))
-         (xref-key)
+	 (xref-inherit-from-key)
+         (xref-key-alist)
          (alias))
     (when (and (not value) xref)      ; Check if there's a cross-reference.
-      (setq xref-key (ebib-unbrace (ebib-db-get-field-value "crossref" key db 'noerror)))
-      (when xref-key
-        (let ((xref-db (ebib--find-db-for-key xref-key db)))
-          (when xref-db
-            (let* ((source-type (ebib-db-get-field-value "=type=" xref-key xref-db 'noerror))
-                   (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db))))
-              (when xref-field
-                (setq value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror))))))))
+      (let* ((xdata-field-value (ebib-get-field-value "xdata" key db 'noerror 'unbraced))
+	     (xdata-key-list (when xdata-field-value (split-string xdata-field-value ",[[:space:]]*")))
+	     (crossref-key (ebib-get-field-value "crossref" key db 'noerror 'unbraced)))
+	;; Alist of name of refering field, and bibkey to which it refers. Order
+	;; matters here -- earlier xdata keys take precedence, then later ones, then
+	;; the crossref key (this follows the BibLaTeX implementation).
+	(setq xref-key-alist `(,@(mapcar (lambda (key) `("xdata" . ,key)) xdata-key-list)
+			       ("crossref" . ,crossref-key))))
+      (when xref-key-alist
+	;; Try inheriting from each key in `xref-key-alist' in turn,
+	;; until `value' is non-nil
+	(cl-loop for (xref-type . xref-key) in xref-key-alist until value
+		 do
+		 (when-let ((xref-db (ebib--find-db-for-key xref-key db))
+			    (source-type (ebib-db-get-field-value "=type=" xref-key xref-db 'noerror))
+			    (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db)))
+			    ;; When the cross-reference is from an xdata field, check if entry
+			    ;; referred to is an @Xdata entry. Otherwise anything is fine.
+			    (_ (if (cl-equalp xref-type "xdata")
+				   (cl-equalp source-type "xdata")
+				 t))
+			    (xref-value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror)))
+		   (setq value xref-value)
+		   (setq xref-inherit-from-key xref-key)))))
     (when (and (not value)
                (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
       (setq alias (cdr (assoc-string field ebib--field-aliases 'case-fold)))
@@ -1954,7 +1971,8 @@ string has the text property `ebib--alias' with value t."
       (when alias
         (add-text-properties 0 (length value) '(ebib--alias t) value))
       (when xref
-        (add-text-properties 0 (length value) `(ebib--xref ,xref-key) value)))
+        (add-text-properties 0 (length value) `(ebib--xref ,xref-inherit-from-key) value)
+	(add-text-properties 0 (length value) `(help-echo ,(format "Inherited from entry `%s'" xref-inherit-from-key)) value)))
     (when (and (not value)
                (stringp noerror))
       (setq value noerror))
