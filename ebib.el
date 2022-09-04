@@ -511,6 +511,8 @@ which can be passed to `ebib--display-multiline-field'."
         (cl-multiple-value-setq (value multiline) (ebib--display-multiline-field value matched)))
       (if (cl-equalp field "file")
           (setq value (ebib--display-file-field value)))
+      (if (cl-equalp field "xdata")
+          (setq value (ebib--display-xdata-field value)))
       (if (cl-equalp field "url")
           (setq value (ebib--display-url-field value)))
       (if (cl-equalp field "doi")
