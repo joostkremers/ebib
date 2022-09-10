@@ -1898,6 +1898,34 @@ return value."
 	       finally return entry)
     entry))
 
+(defun ebib--propertize-xdata-warnings (parts xkey xfield &optional xindex help-echo)
+  "Return a granular xdata ref string with warning properties.
+PARTS is a list containing any the symbols `key' `field' and
+'index', in any order. XKEY is the key of the XData entry being
+referred to. XFIELD is the field referred to in that entry,
+.XINDEX is the index of the item in the value of the field, if
+provided. See the BibLaTeX manual, Sec. 3.13.6 for more details.
+
+Returns a string \"xdata-XKEY-XFIELD[-XINDEX]\". XINDEX and the
+preceding dash are only included if XINDEX is non-nil. Each of the
+items in PARTS is highlighted in `ebib-warning-face'. Dashes between
+two adjacent highlighted parts are also highlighted. All highlighted
+parts also have their `help-echo' text property set to HELP-ECHO.
+
+Intended as a convenience function for use in
+`ebib--replace-granular-xdata-references'."
+  (concat
+   "xdata="
+   (apply 'propertize `(,xkey ,@(when (member 'key parts) `(face ebib-warning-face help-echo ,help-echo))))
+   (apply 'propertize `("-" ,@(when (and (member 'key parts) (member 'field parts))
+				`(face ebib-warning-face help-echo ,help-echo))))
+   (apply 'propertize `(,xfield ,@(when (member 'field parts) `(face ebib-warning-face help-echo ,help-echo))))
+   (when xindex
+     (concat
+      (apply 'propertize `("-" ,@(when (and (member 'field parts) (member 'index parts))
+				   `(face ebib-warning-face help-echo ,help-echo))))
+      (apply 'propertize `(,xindex ,@(when (member 'index parts) `(face ebib-warning-face help-echo ,help-echo))))))))
+
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
