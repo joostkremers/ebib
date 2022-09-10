@@ -2070,6 +2070,8 @@ string has the text property `ebib--alias' with value t."
 		     (assoc-string field ebib-expand-strings 'case-fold)
 		     (assoc-string alias ebib-expand-strings 'case-fold)))
 	(setq value (ebib--expand-string value ebib--cur-db 'noerror)))
+      (when (and value xref)
+	(setq value (ebib--replace-granular-xdata-references value db)))
       (when unbraced
         (setq value (ebib-unbrace value)))
       (when alias
