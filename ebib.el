@@ -4057,21 +4057,17 @@ contents.  If COMPLETE is non-nil, offer completion, the list of
 completion candidates being composed of the contents of FIELD in
 all entries of the database.  If COMPLETE is nil, just ask for a
 string in the minibuffer.  Return the resulting string."
-  (let* ((unbraced? nil)
-         (key (ebib--get-key-at-point)))
-    (when init-contents
-      (setq unbraced? (ebib-unbraced-p init-contents))
-      (setq init-contents (ebib-unbrace init-contents)))
-    (if complete
-        (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
-          (completing-read (format "%s: " field)
-                           (ebib--create-collection-from-field field)
-                           nil nil
-                           (if init-contents
-                               (cons init-contents 0))))
-      (read-string (format "%s: " field)
-                   (if init-contents
-                       (cons init-contents 0))))))
+  (setq init-contents (ebib-unbrace init-contents))
+  (if complete
+      (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map)))
+        (completing-read (format "%s: " field)
+                         (ebib--create-collection-from-field field)
+                         nil nil
+                         (if init-contents
+                             (cons init-contents 0))))
+    (read-string (format "%s: " field)
+                 (if init-contents
+                     (cons init-contents 0)))))
 
 (defun ebib-edit-field (field)
   "Edit FIELD of a BibTeX entry.
