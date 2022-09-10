@@ -486,8 +486,18 @@ which can be passed to `ebib--display-multiline-field'."
           (setq alias (propertize (format "  [<== %s]" (cdr (assoc-string field ebib--field-aliases 'case-fold))) 'face 'ebib-alias-face)))
       (if (get-text-property 0 'ebib--expanded value)
           (setq value (propertize value 'face 'ebib-abbrev-face 'fontified t)))
-      (if (stringp (get-text-property 0 'ebib--xref value))
-          (setq value (propertize value 'face 'ebib-crossref-face 'fontified t)))
+      ;; Propertize any stretch of the value which has an `ebib--xref'
+      ;; property with `ebib-crossref-face'
+      (let* ((xref-lst (seq-filter (lambda (plist) (eq (caaddr plist) 'ebib--xref)) (object-intervals value)))
+	     (int-lst (mapcar #'butlast xref-lst)))
+	(mapcar
+	 (lambda (ints)
+	   (add-text-properties
+	    (car ints) (cadr ints)
+	    `(face ebib-crossref-face
+              help-echo ,(format "Inherited from entry `%s'" (get-text-property (car ints) 'ebib--xref value)))
+	   value))
+	 int-lst))
       (if (and (member-ignore-case field '("crossref" "xref" "related"))
                (not (ebib--find-db-for-key (ebib-unbrace value) ebib--cur-db)))
           (setq value (propertize value 'face 'ebib-warning-face)))
