@@ -3,7 +3,7 @@
 ## Version 2.39, September 2022 ##
 
 - New user option `ebib-field-edit-functions` allows one to customise the way fields are edited.
-- Use standard Emacs completion functions in field editing functions. This especially changes the way multiple completion is handled in fields such as `author`, `editor`, `file`, etc. See the manual for a way to recreate the old behaviour.
+- Use standard Emacs completion functions in field editing functions. This especially changes the way multiple completion is handled in fields such as `author`, `editor`, `file`, etc.
 
 ## Version 2.38, June 2022 ##
 
