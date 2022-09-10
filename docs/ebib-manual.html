@@ -9,10 +9,15 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -51,7 +56,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -64,7 +69,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -814,18 +819,22 @@ offered for the <code>author</code>, <code>editor</code>,
 <p>In the <code>author</code> and <code>editor</code> fields, completion
 takes into account that these fields may contain more than one name.
 Each name is a separate completion candidate: when editing these fields,
-you can type the individual names, Ebib adds the <code>"and"</code> that
-separates them.</p>
+you can type the individual names, Ebib adds the <code>"and"</code> or
+the semicolon that separates them.</p>
 <p>If you want to edit a field value directly, without completion, you
 can use a prefix argument: <span class="key"><code>C-u e</code></span>
 lets you edit a field as a plain string. If you wish to disable
 completion permanently for particular fields, or if you want to enable
 completion for other fields, you can customise the user option
-<code>ebib-fields-with-completion</code>. Note that if this option
-contains the <code>author</code> field (which it does by default),
-completion is also enabled for the <code>editor</code> field. Similarly,
-if it contains the <code>crossref</code> field, completion is also
-enabled for the <code>xref</code> and <code>related</code> fields.</p>
+<code>ebib-edit-fields-functions</code>.</p>
+<p>With fields that can contain lists of values, such as the
+<code>author</code> and <code>editor</code> fields, but also the
+<code>file</code> field, Ebib offers multiple completion: you can select
+one candidate with <code>TAB</code> and then go on to select the next
+one. When you’ve selected all candidates you want, hit <code>RET</code>.
+Ebib uses Emacs’ standard <code>completing-read-multiple</code> function
+for this, but note that <code>crm-separator</code> is set to something
+appropriate for the field being edited.</p>
 <h2 id="string-abbreviations-in-field-values"><code>@String</code>
 abbreviations in field values</h2>
 <p>BibTeX and <code>biblatex</code> provide so-called

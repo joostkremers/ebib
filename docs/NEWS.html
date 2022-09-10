@@ -8,10 +8,15 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="styles/manual.css" />
@@ -29,6 +34,19 @@
 <header id="title-block-header">
 <h1 class="title">Ebib News</h1>
 </header>
+<h2 id="version-2.39-september-2022">Version 2.39, September 2022</h2>
+<ul>
+<li>New user option <code>ebib-field-edit-functions</code> allows one to
+customise the way fields are edited.</li>
+<li>Use standard Emacs completion functions in field editing functions.
+This especially changes the way multiple completion is handled in fields
+such as <code>author</code>, <code>editor</code>, <code>file</code>,
+etc. See the manual for a way to recreate the old behaviour.</li>
+</ul>
+<h2 id="version-2.38-june-2022">Version 2.38, June 2022</h2>
+<ul>
+<li>Allow Elisp functions as handlers of external files.</li>
+</ul>
 <h2 id="version-2.37-june-2022">Version 2.37, June 2022</h2>
 <ul>
 <li>Move <code>ebib-TeX-markup-replace-alist</code> and related

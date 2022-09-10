@@ -228,9 +228,12 @@ Fields for which it makes sense offer completion when you edit them. For example
 
 For other fields that offer completion, the completion candidates are the values of these fields in other entries in the databases that you've opened. Offering these as completion candidates makes it easier to ensure that you enter these values consistently. This of course mainly makes sense for fields that have values that will occur more than once. By default, apart from the fields already mentioned, completion is offered for the `author`, `editor`, `journal`, `journaltitle`, `organization` and `publisher` fields.
 
-In the `author` and `editor` fields, completion takes into account that these fields may contain more than one name. Each name is a separate completion candidate: when editing these fields, you can type the individual names, Ebib adds the `"and"` that separates them.
+In the `author` and `editor` fields, completion takes into account that these fields may contain more than one name. Each name is a separate completion candidate: when editing these fields, you can type the individual names, Ebib adds the `"and"` or the semicolon that separates them.
 
-If you want to edit a field value directly, without completion, you can use a prefix argument: [`C-u e`]{.key} lets you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other fields, you can customise the user option `ebib-fields-with-completion`. Note that if this option contains the `author` field (which it does by default), completion is also enabled for the `editor` field. Similarly, if it contains the `crossref` field, completion is also enabled for the `xref` and `related` fields.
+If you want to edit a field value directly, without completion, you can use a prefix argument: [`C-u e`]{.key} lets you edit a field as a plain string. If you wish to disable completion permanently for particular fields, or if you want to enable completion for other fields, you can customise the user option `ebib-edit-fields-functions`.
+
+With fields that can contain lists of values, such as the `author` and `editor` fields, but also the `file` field, Ebib offers multiple completion: you can select one candidate with `TAB` and then go on to select the next one. When you've selected all candidates you want, hit `RET`. Ebib uses Emacs' standard `completing-read-multiple` function for this, but note that `crm-separator` is set to something appropriate for the field being edited.
+
 
 ## `@String` abbreviations in field values ##
 
