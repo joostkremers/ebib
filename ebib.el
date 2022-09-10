@@ -3948,7 +3948,7 @@ are truncated relative to the directories listed in
 paths.
 
 Ignored first two arguments for compatibility with the format of
-`ebib-field-edit-functions'. Init-contents is used as the initial
+`ebib-field-edit-functions'. INIT-CONTENTS is used as the initial
 input to `completing-read-multiple'. Consequently, entries are
 separated in the completion by `ebib-filename-separator'."
   (let* ((key (ebib--get-key-at-point))
@@ -4141,9 +4141,9 @@ special manner."
 
 (defun ebib--edit-literal-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'literal' type field.
-FIELD-NAME is the name of the field being edited. FIELDS is a
+FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
-INIT-CONTENTS is the original value of the field. See also
+INIT-CONTENTS is the original value of the field.  See also
 `ebib-field-edit-functions'.
 
 EXTRA-TABLES are extra completion tables to be included in the
@@ -4163,7 +4163,8 @@ See also `ebib-field-edit-functions'."
 
 (defun ebib--edit-editor-type-field (field-name fields init-contents)
   "Edit \"editor-type\" field.
-Arguments are as in `ebib--edit-literal-field'."
+Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
+`ebib--edit-literal-field'."
   (ebib--edit-literal-field
    field-name fields init-contents
    '("editor" "compiler" "founder" "continuator"
@@ -4183,14 +4184,16 @@ Arguments are as in `ebib--edit-literal-field'."
 (defun ebib--edit-lang-id-field (field-name fields init-contents)
   "Edit \"lang-id\" field.
 
-Arguments are as in `ebib--edit-literal-field'."
+Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
+`ebib--edit-literal-field'."
   (ebib--edit-literal-field
    field-name fields init-contents ebib--biblatex-language-keys))
 
 (defun ebib--edit-pagination-field (field-name fields init-contents)
   "Edit \"pagination\" field.
 
-Arguments are as in `ebib--edit-literal-field'."
+Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
+`ebib--edit-literal-field'."
   (ebib--edit-literal-field
    field-name fields init-contents
    '("page" "column" "line" "verse" "section" "paragraph")))
@@ -4198,7 +4201,8 @@ Arguments are as in `ebib--edit-literal-field'."
 (defun ebib--edit-pubstate-field (field-name fields init-contents)
   "Edit \"pubstate\" field.
 
-Arguments are as in `ebib--edit-literal-field'."
+Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
+`ebib--edit-literal-field'."
   (ebib--edit-literal-field
    field-name fields init-contents
    '("inpreparation" "submitted"
@@ -4207,9 +4211,9 @@ Arguments are as in `ebib--edit-literal-field'."
 (defun ebib--read-ref-as-entry (prompt databases &optional multiple)
   "Read entry keys from user.
 
-Arguments are as in `ebib-read-entry', except that
-`ebib-citation-insert-multiple' is ignored when reading multiple
-candidates.
+Arguments PROMPT and DATABASES are as in `ebib-read-entry',
+except that `ebib-citation-insert-multiple' is ignored when
+reading multiple candidates.
 
 If MULTIPLE is nil, the key is returned as a string, If non-nil,
 all selected keys are returned as a list of strings."
@@ -4223,7 +4227,7 @@ all selected keys are returned as a list of strings."
 
 (defun ebib--edit-ref-field (field-name _ _)
   "Edit an 'entry key' type field.
-FIELD-NAME is the name of the field being edited. Key is read
+FIELD-NAME is the name of the field being edited.  Key is read
 with `ebib--read-ref-as-entry'.
 
 The other two argument places are for compatibility with
@@ -4233,7 +4237,7 @@ The other two argument places are for compatibility with
 (defun ebib--edit-ref-list-field (field-name _ _)
   "Read multiple entry keys, returning a comma-separated list.
 
-FIELD-NAME is the name of the field being edited. Key is read
+FIELD-NAME is the name of the field being edited.  Key is read
 with `ebib--read-ref-as-entry'.
 
 The other two argument places are for compatibility with
@@ -4247,9 +4251,9 @@ The other two argument places are for compatibility with
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
 
-FIELD-NAME is the name of the field being edited. FIELDS is a
+FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
-INIT-CONTENTS is the original value of the field. In name- and
+INIT-CONTENTS is the original value of the field.  In name- and
 literal-list fields, this is an \"and\"-delimited list of values,
 as a single string.
 
@@ -4292,14 +4296,15 @@ See also `ebib-field-edit-functions'."
 (defun ebib--edit-language-field (field-name fields init-contents)
   "Edit \"language\" field.
 
-Arguments are as in `ebib--edit-list-field'."
+Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
+`ebib--edit-list-field'."
   (ebib--edit-list-field
    field-name fields init-contents
    ebib--biblatex-language-keys))
 
 (defun ebib--edit-separated-values-field (field-name fields init-contents)
   "Edit a 'separated values' type field.
-FIELD-NAME is the name of the field being edited. FIELDS is a
+FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field, assumed to be a
 list separated by commas with optional whitespace on either side.
@@ -4527,7 +4532,7 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
   "Edit a field in multiline-mode.
 FIELD is the field being edited.
 
-_FIELDS and _INIT-CONTENTS are ignored. They are included as
+_FIELDS and _INIT-CONTENTS are ignored.  They are included as
 arguments for compatibility with `ebib-field-edit-functions'."
   (let ((init-contents
 	 (ebib-get-field-value field (ebib--get-key-at-point) ebib--cur-db 'noerror)))
