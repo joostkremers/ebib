@@ -1926,6 +1926,82 @@ Intended as a convenience function for use in
 				   `(face ebib-warning-face help-echo ,help-echo))))
       (apply 'propertize `(,xindex ,@(when (member 'index parts) `(face ebib-warning-face help-echo ,help-echo))))))))
 
+(defun ebib--replace-granular-xdata-references (string db)
+  "Replace xdata references within STRING with their values.
+Replace all strings of the form \"xdata=-KEY-FIELD[-INDEX]\" with
+the value of FIELD in entry with key KEY. If INDEX is present,
+parse the value as a list (splitting on \"and\" and removing
+surrounding whitespace) and return the element at INDEX,
+beginning at 1.
+
+See BibLaTeX manual, Sec. 3.13.6 for more details.
+
+DB is the database to use when finding the database for each
+KEY (see `ebib--find-db-for-key').
+
+If successful, replaced text has the text property `ebib--xref', with
+the key of the entry inherited from as its value.
+
+If unsuccessful, text is propertized appropriately:
+- if the entry at KEY does not exist, or is not an xdata entry,
+  highlight key with `ebib-warning-face' and set the help-echo
+  property to an explanatory message.
+- if INDEX is present, but the field is not indexable (i.e. is known
+  to be of a type which is not a list), highlight FIELD-INDEX and set
+  help-echo saying that FIELD is not indexable
+- If INDEX is present but there are not enough items, highlight just
+  INDEX, and set appropriate help-echo message."
+  (let ((xdata-regexp (rx "xdata="
+			  (group (one-or-more (in alnum  ?_ ?: ?\; ?! ??))) ;; Key of @XData entry
+			  "-"
+			  (group (one-or-more (in alpha))) ;; Field in @XData entry
+			  (optional "-" (group (one-or-more (in digit)))))) ;; Optional index into field value
+	(get-xdata-function
+	 (lambda (match-text)
+	   (let ((xdata-key (match-string 1 match-text))
+		 (xdata-field (match-string 2 match-text))
+		 (xdata-index (match-string 3 match-text)))
+	     ;; Does the entry exist?
+	     (if (not (ebib-db-get-entry xdata-key db t))
+		 (ebib--propertize-xdata-warnings '(key) xdata-key xdata-field nil (format "No entry with key `%s'" xdata-key))
+	       (let* ((xdata-db (ebib--find-db-for-key xdata-key db))
+		      (xdata-value (ebib-unbrace (ebib-get-field-value
+						  xdata-field xdata-key xdata-db 'noerror 'xref 'expand-strings))))
+		 (cond ;; Is it an xdata entry?
+		  ((not (cl-equalp "xdata" (ebib-db-get-field-value "=type=" xdata-key xdata-db 'noerror)))
+		   (ebib--propertize-xdata-warnings '(key) xdata-key xdata-field (or xdata-index) (format "`%s' is not an @XData entry" xdata-key)))
+		  ;; Is there a value?
+		  ;; TODO check that this is the right format
+		  ((not xdata-value)
+		   (ebib--propertize-xdata-warnings
+		    '(key field) xdata-key xdata-field (or xdata-index)
+		    (format "No value for `%s' in entry `%s'" xdata-field xdata-key)))
+		  ;; Is there an index?
+		  (xdata-index
+		   ;; Is the field indexable?
+		   (if (or (member
+			    xdata-field
+			    '("address" "afterword" "annotator" "author"
+			      "bookauthor" "commentator" "editor"
+			      "editora" "editorb" "editorc" "foreword"
+			      "holder" "institution" "introduction"
+			      "language" "location" "organization"
+			      "origlanguage" "origlocation" "origpublisher"
+			      "pageref" "publisher" "school" "shortauthor"
+			      "shorteditor" "sortname" "translator"))
+			   ;; ...or is it field which only the user uses (valid because
+			   ;; BibLaTeX ignores fields it doesn't know about)...
+			   (not (member xdata-field (mapcar #'car bibtex-biblatex-field-alist))))
+		       (if-let (val (nth (- (string-to-number xdata-index) 1)
+					 (save-match-data
+					   (split-string xdata-value "and" t "[[:space:]]*"))))
+			   (propertize val 'ebib--xref xdata-key)
+			 (ebib--propertize-xdata-warnings '(index) xdata-key xdata-field xdata-index "Not enough items in field"))
+		     (ebib--propertize-xdata-warnings '(field index) xdata-key xdata-field xdata-index (format "`%s' is not an indexable field" xdata-field))))
+		  ;; Everything is good, no index, just return the value
+		  (t (propertize xdata-value 'ebib--xref xdata-key)))))))))
+    (replace-regexp-in-string xdata-regexp get-xdata-function string)))
+
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
