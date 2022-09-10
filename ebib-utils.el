@@ -2238,7 +2238,8 @@ will be expanded recursively."
 
 (defun ebib-unbraced-p (string)
   "Non-nil if STRING is not enclosed in braces or quotes."
-  (cl-flet ((remove-from-string (string remove)
+  (save-match-data
+   (cl-flet ((remove-from-string (string remove)
                                 (apply #'concat (split-string string remove))))
     (when (stringp string)
       (cond
@@ -2258,7 +2259,7 @@ will be expanded recursively."
         (> (length (remove-from-string (remove-from-string string "[\\][\"]")
                                        "\"[^\"]*?\""))
            0))
-       (t t)))))
+       (t t))))))
 
 (defun ebib-unbrace (string)
   "Convert STRING to its unbraced counterpart.
