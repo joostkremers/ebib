@@ -2023,7 +2023,6 @@ the variable `ebib--field-aliases').  In this case, the returned
 string has the text property `ebib--alias' with value t."
   (let* ((value (ebib-db-get-field-value field key db 'noerror))
          (type (ebib-db-get-field-value "=type=" key db 'noerror))
-	 (xref-inherit-from-key)
          (xref-key-alist)
          (alias))
     (when (and (not value) xref)      ; Check if there's a cross-reference.
@@ -2049,8 +2048,7 @@ string has the text property `ebib--alias' with value t."
 				   (cl-equalp source-type "xdata")
 				 t))
 			    (xref-value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror)))
-		   (setq value xref-value)
-		   (setq xref-inherit-from-key xref-key)))))
+		   (setq value (propertize xref-value 'ebib--xref xref-key))))))
     (when (and (not value)
                (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
       (setq alias (cdr (assoc-string field ebib--field-aliases 'case-fold)))
@@ -2075,10 +2073,7 @@ string has the text property `ebib--alias' with value t."
       (when unbraced
         (setq value (ebib-unbrace value)))
       (when alias
-        (add-text-properties 0 (length value) '(ebib--alias t) value))
-      (when xref
-        (add-text-properties 0 (length value) `(ebib--xref ,xref-inherit-from-key) value)
-	(add-text-properties 0 (length value) `(help-echo ,(format "Inherited from entry `%s'" xref-inherit-from-key)) value)))
+        (add-text-properties 0 (length value) '(ebib--alias t) value)))
     (when (and (not value)
                (stringp noerror))
       (setq value noerror))
