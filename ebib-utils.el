@@ -2047,7 +2047,7 @@ string has the text property `ebib--alias' with value t."
 			    (_ (if (cl-equalp xref-type "xdata")
 				   (cl-equalp source-type "xdata")
 				 t))
-			    (xref-value (ebib-db-get-field-value xref-field xref-key xref-db 'noerror)))
+			    (xref-value (ebib-get-field-value xref-field xref-key xref-db 'noerror nil 'xref)))
 		   (setq value (propertize xref-value 'ebib--xref xref-key))))))
     (when (and (not value)
                (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
