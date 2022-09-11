@@ -2002,6 +2002,31 @@ If unsuccessful, text is propertized appropriately:
 		  (t (propertize xdata-value 'ebib--xref xdata-key)))))))))
     (replace-regexp-in-string xdata-regexp get-xdata-function string)))
 
+(defun ebib--get-xref-alist (key db)
+  "Return alist of crossreferencing keys in entry KEY, in DB.
+Only keys entered as values in the crossref, xdata and xref
+fields are considered (keys used in 'granular' xdata entries like
+\"xdata=fookey-foofield\" are not considered).
+
+The car of each element is the string name of the field
+referencing the key (\"xdata\" or \"crossref\"). The cdr is the
+key itself.
+
+Keys in the xdata field are listed first, in the same order as in
+the entry. The crossref key is listed last. This reflects the
+precedence given to these keys by BibLaTeX's inheritance system."
+  (let* ((xdata-field-value (ebib-get-field-value "xdata" key db 'noerror 'unbraced))
+	 (xdata-key-list (when xdata-field-value
+			   (save-match-data (split-string xdata-field-value ",[[:space:]]*"))))
+	 (crossref-key (ebib-get-field-value "crossref" key db 'noerror 'unbraced))
+	 (xref-key (ebib-get-field-value "xref" key db 'noerror 'unbraced)))
+    ;; Alist of name of refering field, and bibkey to which it refers. Order
+    ;; matters here -- earlier xdata keys take precedence, then later ones, then
+    ;; the crossref key (this follows the BibLaTeX implementation).
+    `(,@(mapcar (lambda (key) `("xdata" . ,key)) xdata-key-list)
+      ,@(when crossref-key `(("crossref" . ,crossref-key)))
+      ,@(when xref-key `(("xref" . ,xref-key))))))
+
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
