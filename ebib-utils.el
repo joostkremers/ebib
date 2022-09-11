@@ -2051,14 +2051,11 @@ string has the text property `ebib--alias' with value t."
          (xref-key-alist)
          (alias))
     (when (and (not value) xref)      ; Check if there's a cross-reference.
-      (let* ((xdata-field-value (ebib-get-field-value "xdata" key db 'noerror 'unbraced))
-	     (xdata-key-list (when xdata-field-value (split-string xdata-field-value ",[[:space:]]*")))
-	     (crossref-key (ebib-get-field-value "crossref" key db 'noerror 'unbraced)))
-	;; Alist of name of refering field, and bibkey to which it refers. Order
-	;; matters here -- earlier xdata keys take precedence, then later ones, then
-	;; the crossref key (this follows the BibLaTeX implementation).
-	(setq xref-key-alist `(,@(mapcar (lambda (key) `("xdata" . ,key)) xdata-key-list)
-			       ("crossref" . ,crossref-key))))
+      (setq xref-key-alist (cl-remove-if
+			    ;; Don't consider entries in the `xref'
+			    ;; field -- they don't inherit data.
+			    (lambda (x) (cl-equalp (car x) "xref"))
+			    (ebib--get-xref-alist key db)))
       (when xref-key-alist
 	;; Try inheriting from each key in `xref-key-alist' in turn,
 	;; until `value' is non-nil
