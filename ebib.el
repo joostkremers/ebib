@@ -4233,7 +4233,14 @@ with `ebib--read-ref-as-entry'.
 The other two argument places are for compatibility with
 `ebib-field-edit-functions', and are ignored."
   (let ((list (ebib--read-ref-as-entry
-	       field-name `(,ebib--cur-db) 'multiple)))
+	       field-name `(,ebib--cur-db) 'multiple
+	       ;; If editing an xdata field, limit to only @XData
+	       ;; entries, by using a filtered db
+	       (when (cl-equalp field-name "xdata")
+		 (lambda (key _ db)
+		   (cl-equalp
+		    (ebib-db-get-field-value "=type=" key db)
+		    "xdata"))))))
     ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
     ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
     (string-join list ", ")))
