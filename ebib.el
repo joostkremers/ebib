@@ -2717,7 +2717,16 @@ result."
     result))
 
 
-(defun ebib-follow-crossref ()
+(defcustom ebib-follow-current-field-crossref t
+  "Consider only current crossref fields when following crossrefs.
+If non-nil, `ebib-follow-crossref' will only consider keys
+present in the value of the current field, when called with point
+on a field which crossrefs other entries (`crossref', `xdata' or
+`xref')."
+  :group 'ebib
+  :type 'boolean)
+
+(defun ebib-follow-crossref (&optional arg)
   "Jump to an entry crossreffed from the current entry.
 Crossreffed entries are those whose key appears in the
 `crossref', `xdata' or `xref' fields of the current entry.
