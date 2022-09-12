@@ -2400,20 +2400,38 @@ is prepended to the completion candidates."
                           coll)))
               databases nil))
 
-(defun ebib-read-entry (prompt databases &optional multiple)
+(defun ebib-read-entry (prompt databases &optional multiple filter)
   "Read an entry from the user.
 Offer the entries in DATABASES (a list of database structs) for
 completion.  PROMPT is the prompt string to use.  If MULTIPLE is
 non-nil, multiple keys can be selected.
 
 This function calls one of the `ebib-read-entry-*' functions
-depending on the completion system in use."
-  (cond
-   ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy prompt databases))
-   ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm prompt databases))
-   ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple prompt databases)))
-   ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido prompt databases))
-   (t (ebib-read-entry-single prompt databases))))
+depending on the completion system in use.
+
+If non-nil FILTER is a function applied to the entries of all
+databases. It is called for each entry with three arguments: the
+key, the entry itself (as an alist) and the databse. It should
+return non-nil for all entries which should be included in the
+prompt."
+  (let ((dbs
+	 (if filter
+	     (mapcar
+	      (lambda (db)
+		(let ((filtered-entries (make-hash-table)))
+		  (maphash (lambda (k v)
+			     (when (funcall filter k v db)
+			       (puthash k v filtered-entries)))
+			   (ebib-db-val 'entries db))
+		  `((entries . ,filtered-entries) ,@(cdr db))))
+	      databases)
+	   databases)))
+    (cond
+     ((and (boundp 'ivy-mode) ivy-mode) (ebib-read-entry-ivy prompt dbs))
+     ((and (boundp 'helm-mode) helm-mode) (ebib-read-entry-helm prompt dbs))
+     ((and multiple ebib-citation-insert-multiple (ebib-read-entry-multiple prompt dbs)))
+     ((and (boundp 'ido-mode) ido-mode) (ebib-read-entry-ido prompt dbs))
+     (t (ebib-read-entry-single prompt dbs)))))
 
 (defun ebib-read-entry-ivy (prompt databases)
   "Read an entry from the user using ivy.
