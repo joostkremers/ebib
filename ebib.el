@@ -4200,7 +4200,7 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
    '("inpreparation" "submitted"
      "forthcoming" "inpress" "prepublished")))
 
-(defun ebib--read-ref-as-entry (prompt databases &optional multiple)
+(defun ebib--read-ref-as-entry (prompt databases &optional multiple filter)
   "Read entry keys from user.
 Arguments PROMPT and DATABASES are as in `ebib-read-entry',
 except that `ebib-citation-insert-multiple' is ignored when
@@ -4211,7 +4211,7 @@ all selected keys are returned as a list of strings."
   (let* ((ebib-citation-insert-multiple t)
 	 (entry (ebib-read-entry
 		 (format "%s: " prompt) databases
-		 multiple)))
+		 multiple filter)))
     (if multiple
 	(mapcar #'car entry)
       (caar entry))))
