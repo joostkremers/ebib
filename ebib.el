@@ -2683,32 +2683,44 @@ result."
 
 
 (defun ebib-follow-crossref ()
-  "Follow the crossref field and jump to that entry.
-If the current entry's crossref field is empty, search for the
-first entry with the current entry's key in its crossref field."
+  "Jump to an entry crossreffed from the current entry.
+Crossreffed entries are those whose key appears in the
+`crossref', `xdata' or `xref' fields of the current entry.
+
+If there is only one such entry, switch to it. If there is more
+than one, allow the user to choose one from a list. If there are
+none, search for the first entry with the current entry's key in
+one of its crossreffing fields."
   (interactive)
   (ebib--execute-when
     (entries
-     (let ((xref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
-       (if xref
-           ;; If the entry has a crossref, see if we can find the relevant entry.
-           (let ((database (seq-find (lambda (db)
-                                       (ebib-db-get-entry xref db 'noerror))
-                                     ebib--databases)))
-             (unless database
-               (error "[Ebib] Entry `%s' not found in any open database" xref))
-             ;; If the entry exists, switch to the relevant database and try to
-             ;; show the entry.
-             (ebib-switch-to-database database)
-             (if (not (ebib--key-in-index-p xref))
-                 (error "[Ebib] Crossreference `%s' not visible due to active filter" xref)
-               (ebib--goto-entry-in-index xref)
-               (ebib--update-entry-buffer)))
-         ;; If the entry has no crossref, we assume the user wants to search for
-         ;; entries cross-referencing the current one.
-         (setq ebib--search-string (ebib--get-key-at-point))
-         (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
-         (ebib-search-next))))
+     (if-let ((xref-list (ebib--get-xref-alist (ebib--get-key-at-point) ebib--cur-db))
+	      ;; If there is only one crossref key, jump to it
+	      (xref (if (cdr xref-list)
+			;; Otherwise read a key from the user
+			(ebib--read-ref-as-entry
+			 "Crossref key" `(,ebib--cur-db) nil
+			 ;; Filter presented keys for just those crossreffed in current entry
+			 (lambda (key ent db) (member key (mapcar #'cdr xref-list))))
+		      (cdar xref-list))))
+	 ;; If the entry has a crossref, see if we can find the relevant entry.
+         (let ((database (seq-find (lambda (db)
+				     (ebib-db-get-entry xref db 'noerror))
+                                   ebib--databases)))
+           (unless database
+	     (error "[Ebib] Entry `%s' not found in any open database" xref))
+           ;; If the entry exists, switch to the relevant database and try to
+           ;; show the entry.
+           (ebib-switch-to-database database)
+           (if (not (ebib--key-in-index-p xref))
+               (error "[Ebib] Crossreference `%s' not visible due to active filter" xref)
+	     (ebib--goto-entry-in-index xref)
+	     (ebib--update-entry-buffer)))
+       ;; If the entry has no crossref, we assume the user wants to search for
+       ;; entries cross-referencing the current one.
+       (setq ebib--search-string (ebib--get-key-at-point))
+       (set-transient-map ebib-search-map t (lambda () (message "Search ended.  Use `C-u /' to resume.")))
+       (ebib-search-next)))
     (default (beep))))
 
 (defun ebib-search-goto-first-entry ()
