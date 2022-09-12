@@ -2731,14 +2731,25 @@ on a field which crossrefs other entries (`crossref', `xdata' or
 Crossreffed entries are those whose key appears in the
 `crossref', `xdata' or `xref' fields of the current entry.
 
+If the entry buffer is current, and the current field is one of
+`crosref', `xdata' or `xref', and has a value, then only consider
+keys in that value. ARG forces considering all crossref keys.
+
 If there is only one such entry, switch to it. If there is more
 than one, allow the user to choose one from a list. If there are
 none, search for the first entry with the current entry's key in
 one of its crossreffing fields."
-  (interactive)
+  (interactive "P")
   (ebib--execute-when
     (entries
-     (if-let ((xref-list (ebib--get-xref-alist (ebib--get-key-at-point) ebib--cur-db))
+     (if-let ((all-xref-list (ebib--get-xref-alist (ebib--get-key-at-point) ebib--cur-db))
+	      (xref-list (if (and ebib-follow-current-field-crossref (not arg)
+				  (eq (current-buffer) (ebib--buffer 'entry))
+				  (member (ebib--current-field) (mapcar #'car all-xref-list)))
+			     (cl-remove-if-not
+			      (lambda (x) (string= (car x) (ebib--current-field)))
+			      all-xref-list)
+			   all-xref-list))
 	      ;; If there is only one crossref key, jump to it
 	      (xref (if (cdr xref-list)
 			;; Otherwise read a key from the user
