@@ -3951,8 +3951,9 @@ Ignored first two arguments for compatibility with the format of
 `ebib-field-edit-functions'. INIT-CONTENTS is used as the initial
 input to `completing-read-multiple'. Consequently, entries are
 separated in the completion by `ebib-filename-separator'."
-  (let* ((key (ebib--get-key-at-point))
-	 (crm-separator ebib-filename-separator)
+  (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+         (crm-separator ebib-filename-separator)
+         (key (ebib--get-key-at-point))
 	 (default-directory (file-name-as-directory (car ebib-file-search-dirs)))
 	 (list (completing-read-multiple
 		(format "File(s) for %s: " key)
@@ -4259,7 +4260,8 @@ This argument is useful for list fields which have a canonical
 list of candidates, like \"language\".
 
 See also `ebib-field-edit-functions'."
-  (let* ((crm-char ";")
+  (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+         (crm-char ";")
 	 (crm-separator (format "[[:space:]]+*%s[[:space:]]+*" crm-char))
 	 (and-regexp "[[:space:]]+and[[:space:]]+")
 	 (collection
@@ -4308,7 +4310,8 @@ list separated by commas with optional whitespace on either side.
 See also `ebib-field-edit-functions'."
   ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
   ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
-  (let* ((crm-separator "[[:space:]]*,[[:space:]]*")
+  (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+         (crm-separator "[[:space:]]*,[[:space:]]*")
 	 (collection
 	  ;; Account for fields containing more than one entry, e.g.
 	  ;; keywords = {Bar, Foo, Qux}
