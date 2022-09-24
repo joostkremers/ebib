@@ -2402,6 +2402,13 @@ buffer and switch to it."
     (default
       (beep))))
 
+(defun ebib-current-entry-to-register (register)
+  "Store current entry's key as a string in REGISTER.
+Interactively, prompt for REGISTER with
+`register-read-with-preview'."
+  (interactive `(,(register-read-with-preview "Entry to register: ")))
+  (set-register register (ebib--get-key-at-point)))
+
 (defun ebib-jump-to-entry (arg)
   "Jump to an entry.
 Select an entry from any open database using completion and jump
