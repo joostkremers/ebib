@@ -1133,6 +1133,7 @@ keywords before Emacs is killed."
     (define-key map "Z" #'ebib-lower)
     (define-key map [mouse-1] #'ebib-index-open-at-point)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
+    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
     map)
   "Keymap for the ebib index buffer.")
 
@@ -3850,6 +3851,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     (define-key map "\C-x\C-s" #'ebib-save-current-database)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
+    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
     map)
   "Keymap for the Ebib entry buffer.")
 
