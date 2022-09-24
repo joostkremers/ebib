@@ -2409,6 +2409,18 @@ Interactively, prompt for REGISTER with
   (interactive `(,(register-read-with-preview "Entry to register: ")))
   (set-register register (ebib--get-key-at-point)))
 
+(defun ebib-jump-to-register (register)
+  "Jump to entry with key stored in REGISTER.
+Interactively, prompt for REGISTER with
+`register-read-with-preview'."
+  (interactive `(,(register-read-with-preview "Jump to register: ")))
+  (let* ((key (get-register register))
+	 (db (ebib--find-db-for-key key ebib--cur-db)))
+    (if (not (ebib-db-has-key key db))
+	(error "[Ebib] Could not find entry key `%s'" key)
+      (ebib--goto-entry-in-index key)
+      (ebib--update-entry-buffer))))
+
 (defun ebib-jump-to-entry (arg)
   "Jump to an entry.
 Select an entry from any open database using completion and jump
