@@ -356,6 +356,15 @@ default sort field is visible in the index buffer."
                        (choice (const :tag "Ascending Sort" ascend)
                                (const :tag "Descending Sort" descend)))))
 
+
+(defun ebib--history-get (n)
+  "Get Nth elt of `:history' list in `ebib--entry-history'.
+N counts from 0. If N < 0, or there are not enough elements,
+return nil.."
+  (when (>= n 0)
+    (nth n (plist-get ebib--entry-history :history))))
+
+(defun ebib--history-set-head (n)
 (defun ebib-compare-numerical-strings (a b)
   "Return t if A represents a number less than B represents.
 A and B are strings (e.g. \"3\" and \"11\")."
