@@ -3756,6 +3756,8 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map [mouse-1] #'ebib-entry-open-at-point)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
     (define-key map [remap jump-to-register] #'ebib-jump-to-register)
+    (define-key map "\C-b" #'ebib-history-back)
+    (define-key map "\C-f" #'ebib-history-forward)
     map)
   "Keymap for the Ebib entry buffer.")
 
