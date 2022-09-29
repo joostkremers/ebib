@@ -1287,6 +1287,23 @@ Currently, the following problems are marked:
 (defvar ebib--citation-history nil "Minibuffer history for citation commands.")
 (defvar ebib--key-history nil "Minibuffer history for entry keys.")
 (defvar ebib--keywords-history nil "Minibuffer history for keywords.")
+(defvar ebib--entry-history '(:head 0 :history nil)
+  "History of entries visited.
+`:history' is a list of all entries visited, with more recent
+entries nearer the beginning. `:head' is a 0-based index
+indicating where in the `:history' list we are currently.
+
+Commands which navigate between entries (including those which
+navigate the history) should (in order):
+- Copy everything from the second to the `:head'th element of the
+  `:history' list, reverse the result, and prepend it to the history
+  list (unless the `:head' value is less than 2, in which case nothing
+  would be prepended).
+- prepend the key of the entry arrived at to the `:history' list.
+- set `:head' to 0
+
+Passing the relevant key to `ebib--history-mutate' will achieve
+all of this in a convenient way.")
 
 (defvar ebib--saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib--window-before nil "The window that was active when Ebib was called.")
