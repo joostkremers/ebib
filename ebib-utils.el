@@ -365,6 +365,13 @@ return nil.."
     (nth n (plist-get ebib--entry-history :history))))
 
 (defun ebib--history-set-head (n)
+  "Set `:head' in `ebib--entry-history' to N."
+  (plist-put ebib--entry-history :head n))
+
+(defun ebib--history-get-head ()
+  "Get value of `:head' in `ebib--entry-history'."
+  (plist-get ebib--entry-history :head))
+
 (defun ebib-compare-numerical-strings (a b)
   "Return t if A represents a number less than B represents.
 A and B are strings (e.g. \"3\" and \"11\")."
