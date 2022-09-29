@@ -1646,7 +1646,43 @@ interactively."
        (ebib--update-entry-buffer)
        (ebib--history-mutate (ebib--get-key-at-point))))
     (default
-      (beep))))
+     (beep))))
+
+(defun ebib-history-back ()
+  "Jump to the last visited entry.
+Repeated invocations of this function and `ebib-history-forward'
+move back and forward in history without changing it. After this,
+moving somewhere else copies the sequence of moves through
+history into the history record, so that they can still be
+accessed."
+  (interactive)
+  (if-let* ((new-head (1+ (ebib--history-get-head)))
+	    (goto (ebib--history-get new-head))
+	    (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
+      (progn
+	(ebib-switch-to-database goto-db)
+	(ebib--goto-entry-in-index goto)
+	(ebib--update-entry-buffer)
+	(ebib--history-set-head new-head))
+    (error "[Ebib] Nowhere to go back to!")))
+
+(defun ebib-history-forward ()
+  "Jump to the entry visited before the current one in the history.
+Repeated invocations of this function and `ebib-history-back'
+move forward and back in history without changing it. After this,
+moving somewhere else copies the sequence of moves through
+history into the history record, so that they can still be
+accessed."
+  (interactive)
+  (if-let ((new-head (1- (ebib--history-get-head)))
+	   (goto (ebib--history-get new-head))
+	   (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
+      (progn
+	(ebib-switch-to-database goto-db)
+	(ebib--goto-entry-in-index goto)
+	(ebib--history-mutate goto)
+	(ebib--update-entry-buffer))
+    (error "[Ebib] Nowhere to go forward to!")))
 
 (defun ebib-show-annotation ()
   "Show the contents of the `annote' or `annotation' field in a *Help* window."
