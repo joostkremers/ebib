@@ -847,7 +847,8 @@ loaded, switch to it.  If KEY is given, jump to it."
     (setq ebib--needs-update t))
   (when ebib--needs-update
     (setq ebib--needs-update nil)
-    (ebib--update-buffers 'no-refresh)))
+    (ebib--update-buffers 'no-refresh))
+  (ebib--history-mutate (ebib--get-key-at-point)))
 
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
@@ -1333,7 +1334,8 @@ in the background, use `ebib--load-bibtex-file-internal'."
   (unless file
     (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
   (setq ebib--cur-db (ebib--load-bibtex-file-internal file))
-  (ebib--update-buffers))
+  (ebib--update-buffers)
+  (ebib--history-mutate (ebib--get-key-at-point)))
 
 (defun ebib--load-bibtex-file-internal (file)
   "Load BibTeX file FILE.
@@ -1618,7 +1620,12 @@ buffer if Ebib is not occupying the entire frame."
     (entries
      (if (bobp)                         ; If we're on the first entry,
          (beep)                         ; just beep.
-       (forward-line -1)
+       ;; Only update the history if we actually move (so that trying
+       ;; to move to the previous entry at the top of the buffer
+       ;; doesn't fill the history with repeated references to that
+       ;; entry)
+       (when (zerop (forward-line -1))
+	 (ebib--history-mutate (ebib--get-key-at-point)))
        (ebib--update-entry-buffer)))
     (default
       (beep))))
@@ -1636,7 +1643,8 @@ interactively."
            (forward-line -1)
            (if pfx (beep)))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
       (beep))))
 
@@ -1929,7 +1937,8 @@ ORDER indicates the sort order and should be either `ascend' or
     (entries
      (with-current-ebib-buffer 'index
        (goto-char (point-min))
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
       (beep))))
 
@@ -1941,7 +1950,8 @@ ORDER indicates the sort order and should be either `ascend' or
      (with-current-ebib-buffer 'index
        (goto-char (point-max))
        (forward-line -1)
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
       (beep))))
 
@@ -2422,7 +2432,8 @@ Interactively, prompt for REGISTER with
     (if (not (ebib-db-has-key key db))
 	(error "[Ebib] Could not find entry key `%s'" key)
       (ebib--goto-entry-in-index key)
-      (ebib--update-entry-buffer))))
+      (ebib--update-entry-buffer)
+      (ebib--history-mutate key))))
 
 (defun ebib-jump-to-entry (arg)
   "Jump to an entry.
@@ -2447,13 +2458,15 @@ candidates from the current database."
        (cond
         ((eq db ebib--cur-db)
          (if (ebib--goto-entry-in-index key)
-             (ebib--update-entry-buffer)
+             (progn (ebib--update-entry-buffer)
+		    (ebib--history-mutate key))
            (error "[Ebib] Could not find entry key `%s'" key)))
         (entries
          (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db) ; Save the current entry for the database we're jumping away from.
          (ebib-db-set-current-entry-key key db) ; Set the current entry in the database we're jumping to.
          (setq ebib--cur-db db)
-         (ebib--update-buffers 'no-refresh))
+         (ebib--update-buffers 'no-refresh)
+	 (ebib--history-mutate key))
         (t (error "[Ebib] Could not jump to entry")))))
     (default
       (error "[Ebib] No database opened"))))
