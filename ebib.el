@@ -1134,6 +1134,8 @@ keywords before Emacs is killed."
     (define-key map "Z" #'ebib-lower)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
     (define-key map [remap jump-to-register] #'ebib-jump-to-register)
+    (define-key map "\C-b" #'ebib-history-back)
+    (define-key map "\C-f" #'ebib-history-forward)
     map)
   "Keymap for the ebib index buffer.")
 
