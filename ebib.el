@@ -338,6 +338,22 @@ message."
 		      'help-echo (format "No entry with key `%s'" key))))
       keys))))
 
+(defun ebib--display-related-field (related-field)
+  "Return a string for RELATED-FIELD to display in the entry buffer.
+Separate values by commas and put each on a separate line. For
+each value, test if there is an entry with that key. If not,
+propertize the value with `ebib-warning-face' and an information
+help-echo message."
+  (ebib--convert-multiline-to-string
+   (mapcar
+    (lambda (key)
+      (if (ebib-db-has-key key ebib--cur-db)
+	  key
+	(propertize key
+		    'face 'ebib-warning-face
+		    'help-echo (format "No entry with key `%s'" key))))
+    (split-string related-field ",[[:space:]]*"))))
+
 (defun ebib--display-doi-field (doi-field)
   "Return a string for DOI-FIELD to display in the entry buffer."
   (propertize doi-field
