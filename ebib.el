@@ -4041,9 +4041,6 @@ always uses completion)."
   (let* ((key (ebib--get-key-at-point))
 	 (pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
-         ;; We relegate the actual editing to a number of helper functions.
-         ;; These functions should not modify the database themselves, they
-         ;; should just return the new value.
          (result (cond
                   ((string= field "=type=") (completing-read "Type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
                   ((ebib--multiline-p init-contents)
@@ -4055,8 +4052,7 @@ always uses completion)."
                    ;; any further action.
                    nil)
                   ;; A prefix argument means the user wants to edit the field as
-                  ;; a string, without any form of completion.  Evaluate `pfx' as
-		  ;; a cond.
+                  ;; a string, without any form of completion.
                   (pfx
                    (ebib--edit-field-literally field init-contents))
 		  ((when-let ((data (assoc field ebib-field-edit-functions
@@ -4461,7 +4457,7 @@ argument ARG functions as with \\[yank] / \\[yank-pop]."
       (let ((contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
         (if (ebib--multiline-p contents) ; Multiline fields cannot be raw.
             (beep)
-          (unless contents  ; If there is no value, the user can enter one,
+          (unless contents            ; If there is no value, the user can enter one,
             (ebib-edit-field field)   ; which we must then store unbraced.
             (setq contents (ebib-get-field-value field key ebib--cur-db 'noerror)))
           (when contents ; We must check to make sure the user entered some value.
