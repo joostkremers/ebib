@@ -3899,44 +3899,6 @@ If DEFAULT is specified, it is the initial input for the prompt."
                                                            (ebib-db-has-key key dependent))
                                                          (ebib--list-dependents ebib--cur-db))))))
 
-(defun ebib--edit-crossref (field)
-  "Edit cross-referencing FIELD."
-  (let ((keys (apply #'append (mapcar #'ebib-db-list-keys ebib--databases))))
-    (ebib--ifstring (key (completing-read (format "Key to insert in `%s': " field) keys nil t nil 'ebib--key-history))
-        (progn
-          (ebib-set-field-value field key (ebib--get-key-at-point) ebib--cur-db 'overwrite)
-          (ebib--redisplay-current-field)
-          (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                             (ebib-db-has-key (ebib--get-key-at-point) dependent))
-                                                           (ebib--list-dependents ebib--cur-db)))))))
-
-(defun ebib--edit-keywords-field ()
-  "Edit the keywords field."
-  ;; We shadow the binding of `minibuffer-local-completion-map' so that we
-  ;; can unbind <SPC>, since keywords may contain spaces.
-  (let ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
-        (key (ebib--get-key-at-point))
-	(prompt (format "New keyword (%s to finish): " (ebib--completion-finish-key 'completing-read))))
-    (cl-loop for keyword = (completing-read prompt ebib--keywords-completion-list nil nil nil 'ebib--keywords-history)
-             until (string= keyword "")
-             do (let* ((conts (ebib-get-field-value "keywords" key ebib--cur-db 'noerror 'unbraced))
-                       (new-conts (if conts
-                                      (concat conts ebib-keywords-separator keyword)
-                                    keyword)))
-                  (ebib-set-field-value "keywords"
-                                        (if ebib-keywords-field-keep-sorted
-                                            (ebib--keywords-sort new-conts)
-                                          new-conts)
-                                        key
-                                        ebib--cur-db
-                                        'overwrite)
-                  (ebib--maybe-add-keywords-to-canonical-list (list keyword))
-                  (ebib--redisplay-current-field)
-                  (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                                     (ebib-db-has-key key dependent))
-                                                                   (ebib--list-dependents ebib--cur-db))))
-             finally return (ebib-db-modified-p ebib--cur-db)))) ; Return t if the field was modified.
-
 (defun ebib--edit-file-field (_ _ init-contents)
   "Edit the \"file\" field'.
 Completing-read-multiple over filenames. Filenames are added to
