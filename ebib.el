@@ -4023,21 +4023,21 @@ string in the minibuffer.  Return the resulting string."
                  (if init-contents
                      (cons init-contents 0)))))
 
-(defun ebib-edit-field (field)
+(defun ebib-edit-field (field &optional interactive)
   "Edit FIELD of a BibTeX entry.
-Most fields are edited directly using the minibuffer, but a few
-are handled specially: the `type' `crossref', `xref' and
-`related' fields offer completion, the `annote', `annotation' and
-`abstract' fields are edited as a multiline field, the `keywords'
-field adds keywords one by one, also allowing completion, and the
-\"file\" field uses filename completion and shortens filenames if
-they are in (a subdirectory of) one of the directories in
-`ebib-file-search-dirs'.
+To obtain the value from the user, this function calls out to one
+of a set of helper functions that provide completion relevant to
+the field being edited.  See `ebib-field-edit-functions' for
+details.
 
-With a prefix argument, edit the current field directly, without
-any special treatment.  Exceptions are the \"type\" field and any
-field with a multiline value, which are always edited in a
-special manner."
+INTERACTIVE indicates whether this function should be considered
+to be called interactively.  If non-nil, point is moved to the
+next field when the edit is done.
+
+This function also checks the value of `current-prefix-arg': if
+it is non-nil, FIELD is edited directly, without
+completion (with the exception of the `=type=' field, which
+always uses completion)."
   (let* ((key (ebib--get-key-at-point))
 	 (pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
@@ -4073,16 +4073,13 @@ special manner."
     ;; When the edit returns, see if we need to move to the next field and
     ;; check whether we need to update the index display.
     (when result
-      (when (stringp result)
-	(ebib--ifstring (val result)
-	    (ebib-set-field-value field val key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
-	  (ebib-db-remove-field-value field key ebib--cur-db)))
-      ;; A numeric prefix argument is always non-nil when a command is called
-      ;; interactively, so `pfx' can only be nil if `ebib-edit-field' is called
-      ;; from Lisp code.
-      (when pfx (ebib-next-field))
+      (if (and (stringp result)
+               (not (string-empty-p result)))
+	  (ebib-set-field-value field result key ebib--cur-db 'overwrite (ebib-unbraced-p init-contents))
+	(ebib-db-remove-field-value field key ebib--cur-db))
       (ebib--redisplay-field field)
       (ebib--redisplay-index-item field)
+      (when interactive (ebib-next-field))
       (ebib--set-modified t ebib--cur-db t
 			  (seq-filter (lambda (dependent)
                                         (ebib-db-has-key key dependent))
@@ -4304,7 +4301,7 @@ without any special treatment.  Exceptions are the \"type\" field
 and any field with a multiline value, which are always edited in
 a special manner."
   (interactive)
-  (ebib-edit-field (ebib--current-field)))
+  (ebib-edit-field (ebib--current-field) t))
 
 (defun ebib--redisplay-index-item (field)
   "Redisplay current index item if FIELD is being displayed."
