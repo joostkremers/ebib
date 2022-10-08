@@ -214,11 +214,12 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 (defun ebib--redisplay-field (field)
   "Redisplay the contents of FIELD in the current buffer."
   (with-current-ebib-buffer 'entry
-    ;; If the `crossref' field has changed, we need to redisplay the entire entry.
-    (if (cl-equalp field "crossref")
+    ;; If the `=type=' or `crossref' field has changed, we need to redisplay the
+    ;; entire entry.
+    (if (member-ignore-case field '("=type=" "crossref"))
         (progn
           (ebib--update-entry-buffer)
-          (re-search-forward "^crossref"))
+          (re-search-forward (rx-to-string `(seq bol ,(string-trim field "=" "=")) t))) ; Remove =-signs from `=type='.
       (let ((inhibit-read-only t))
 	(goto-char (point-min))
 	(re-search-forward (format "^%s" field))
@@ -3889,16 +3890,6 @@ If DEFAULT is specified, it is the initial input for the prompt."
               (ebib--update-entry-buffer))
         (error (signal (car err) (cdr err)))))))
 
-(defun ebib--edit-entry-type ()
-  "Edit the entry type."
-  (ebib--ifstring (new-type (completing-read "Type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
-      (let ((key (ebib--get-key-at-point)))
-        (ebib-set-field-value "=type=" new-type key ebib--cur-db 'overwrite 'unbraced)
-        (ebib--update-entry-buffer)
-        (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                           (ebib-db-has-key key dependent))
-                                                         (ebib--list-dependents ebib--cur-db))))))
-
 (defun ebib--edit-file-field (_ _ init-contents)
   "Edit the \"file\" field'.
 Completing-read-multiple over filenames. Filenames are added to
@@ -4051,11 +4042,10 @@ special manner."
 	 (pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
          ;; We relegate the actual editing to a number of helper functions.
-         ;; These functions should return non-nil if editing was successful.
-         ;; They should also ensure that the field being edited is redisplayed
-         ;; and that the database's modified flag is set.
+         ;; These functions should not modify the database themselves, they
+         ;; should just return the new value.
          (result (cond
-                  ((string= field "=type=") (ebib--edit-entry-type))
+                  ((string= field "=type=") (completing-read "Type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
                   ((ebib--multiline-p init-contents)
                    (ebib--edit-field-as-multiline field)
                    ;; A multiline edit differs from the other fields, because
