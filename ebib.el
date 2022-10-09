@@ -337,7 +337,6 @@ of strings."
 
 (defun ebib--extract-note-text (key &optional truncate)
   "Extract the text of the note for entry KEY.
-
 This function simply calls `ebib-notes-extract-text-function'.
 KEY and TRUNCATE are passed on unchanged.  For their meaning, see
 the doc string of `ebib-extract-note-text-default'."
@@ -3870,10 +3869,10 @@ If DEFAULT is specified, it is the initial input for the prompt."
   (interactive)
   (let* ((key (ebib--get-key-at-point))
 	 (db-fields (seq-mapcat (lambda (type) (ebib--list-fields type 'all (ebib--get-dialect ebib--cur-db)))
-					  (ebib--list-entry-types)))
+				(ebib--list-entry-types)))
 	 (current-entry-fields (mapcar 'car (ebib-db-get-entry key ebib--cur-db)))
 	 (candidate-fields (delete-dups
-			     (seq-difference db-fields current-entry-fields)))
+			    (seq-difference db-fields current-entry-fields)))
 	 (field (completing-read "Field: " candidate-fields nil nil default)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (error "[Ebib] Field `%s' already has a value in entry `%s'" field key)
@@ -4125,7 +4124,6 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 
 (defun ebib--edit-lang-id-field (field-name fields init-contents)
   "Edit \"lang-id\" field.
-
 Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 `ebib--edit-literal-field'."
   (ebib--edit-literal-field
@@ -4133,7 +4131,6 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 
 (defun ebib--edit-pagination-field (field-name fields init-contents)
   "Edit \"pagination\" field.
-
 Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 `ebib--edit-literal-field'."
   (ebib--edit-literal-field
@@ -4142,7 +4139,6 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 
 (defun ebib--edit-pubstate-field (field-name fields init-contents)
   "Edit \"pubstate\" field.
-
 Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 `ebib--edit-literal-field'."
   (ebib--edit-literal-field
@@ -4152,7 +4148,6 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 
 (defun ebib--read-ref-as-entry (prompt databases &optional multiple)
   "Read entry keys from user.
-
 Arguments PROMPT and DATABASES are as in `ebib-read-entry',
 except that `ebib-citation-insert-multiple' is ignored when
 reading multiple candidates.
@@ -4160,9 +4155,9 @@ reading multiple candidates.
 If MULTIPLE is nil, the key is returned as a string, If non-nil,
 all selected keys are returned as a list of strings."
   (let* ((ebib-citation-insert-multiple t)
-	(entry (ebib-read-entry
-		(format "%s: " prompt) databases
-		multiple)))
+	 (entry (ebib-read-entry
+		 (format "%s: " prompt) databases
+		 multiple)))
     (if multiple
 	(mapcar #'car entry)
       (caar entry))))
@@ -4173,17 +4168,16 @@ FIELD-NAME is the name of the field being edited.  Key is read
 with `ebib--read-ref-as-entry'.
 
 The other two argument places are for compatibility with
-`ebib-field-edit-functions', and are ignore."
+`ebib-field-edit-functions', and are ignored."
   (ebib--read-ref-as-entry (format "%s: " field-name) `(,ebib--cur-db)))
 
 (defun ebib--edit-ref-list-field (field-name _ _)
   "Read multiple entry keys, returning a comma-separated list.
-
 FIELD-NAME is the name of the field being edited.  Key is read
 with `ebib--read-ref-as-entry'.
 
 The other two argument places are for compatibility with
-`ebib-field-edit-functions', and are ignore."
+`ebib-field-edit-functions', and are ignored."
   (let ((list (ebib--read-ref-as-entry
 	       field-name `(,ebib--cur-db) 'multiple)))
     ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
@@ -4192,7 +4186,6 @@ The other two argument places are for compatibility with
 
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
   "Edit a 'name list' or 'literal list' type field.
-
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field.  In name- and
@@ -4238,7 +4231,6 @@ See also `ebib-field-edit-functions'."
 
 (defun ebib--edit-language-field (field-name fields init-contents)
   "Edit \"language\" field.
-
 Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 `ebib--edit-list-field'."
   (ebib--edit-list-field
@@ -4732,7 +4724,6 @@ When the user enters an empty string, the value is not changed."
 
 (defun ebib-add-string (&optional arg)
   "Create a new @String definition.
-
 With prefix ARG, the string is created unbraced."
   (interactive "P")
   (ebib--ifstring (new-abbr (read-string "New @String abbreviation: " nil 'ebib--key-history))
