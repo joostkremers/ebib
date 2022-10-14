@@ -747,7 +747,8 @@ loaded, switch to it.  If KEY is given, jump to it."
     (setq ebib--needs-update t))
   (when ebib--needs-update
     (setq ebib--needs-update nil)
-    (ebib--update-buffers 'no-refresh)))
+    (ebib--update-buffers 'no-refresh))
+  (ebib--history-mutate (ebib--get-key-at-point)))
 
 (defun ebib--find-and-set-key (key files)
   "Make KEY the current entry.
@@ -1032,6 +1033,10 @@ keywords before Emacs is killed."
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
     (define-key map [mouse-1] #'ebib-index-open-at-point)
+    (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
+    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
+    (define-key map "\C-b" #'ebib-history-back)
+    (define-key map "\C-f" #'ebib-history-forward)
     map)
   "Keymap for the ebib index buffer.")
 
@@ -1231,7 +1236,8 @@ in the background, use `ebib--load-bibtex-file-internal'."
   (unless file
     (setq file (ebib--ensure-extension (expand-file-name (read-file-name "File to open: ")) (car ebib-bibtex-extensions))))
   (setq ebib--cur-db (ebib--load-bibtex-file-internal file))
-  (ebib--update-buffers))
+  (ebib--update-buffers)
+  (ebib--history-mutate (ebib--get-key-at-point)))
 
 (defun ebib--load-bibtex-file-internal (file)
   "Load BibTeX file FILE.
@@ -1516,7 +1522,12 @@ buffer if Ebib is not occupying the entire frame."
     (entries
      (if (bobp)                         ; If we're on the first entry,
          (beep)                         ; just beep.
-       (forward-line -1)
+       ;; Only update the history if we actually move (so that trying
+       ;; to move to the previous entry at the top of the buffer
+       ;; doesn't fill the history with repeated references to that
+       ;; entry)
+       (when (zerop (forward-line -1))
+	 (ebib--history-mutate (ebib--get-key-at-point)))
        (ebib--update-entry-buffer)))
     (default
       (beep))))
@@ -1534,9 +1545,46 @@ interactively."
            (forward-line -1)
            (if pfx (beep)))
        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
-      (beep))))
+     (beep))))
+
+(defun ebib-history-back ()
+  "Jump to the last visited entry.
+Repeated invocations of this function and `ebib-history-forward'
+move back and forward in history without changing it. After this,
+moving somewhere else copies the sequence of moves through
+history into the history record, so that they can still be
+accessed."
+  (interactive)
+  (if-let* ((new-head (1+ (ebib--history-get-head)))
+	    (goto (ebib--history-get new-head))
+	    (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
+      (progn
+	(ebib-switch-to-database goto-db)
+	(ebib--goto-entry-in-index goto)
+	(ebib--update-entry-buffer)
+	(ebib--history-set-head new-head))
+    (error "[Ebib] Nowhere to go back to!")))
+
+(defun ebib-history-forward ()
+  "Jump to the entry visited before the current one in the history.
+Repeated invocations of this function and `ebib-history-back'
+move forward and back in history without changing it. After this,
+moving somewhere else copies the sequence of moves through
+history into the history record, so that they can still be
+accessed."
+  (interactive)
+  (if-let ((new-head (1- (ebib--history-get-head)))
+	   (goto (ebib--history-get new-head))
+	   (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
+      (progn
+	(ebib-switch-to-database goto-db)
+	(ebib--goto-entry-in-index goto)
+	(ebib--history-mutate goto)
+	(ebib--update-entry-buffer))
+    (error "[Ebib] Nowhere to go forward to!")))
 
 (defun ebib-show-annotation ()
   "Show the contents of the `annote' or `annotation' field in a *Help* window."
@@ -1826,7 +1874,8 @@ ORDER indicates the sort order and should be either `ascend' or
     (entries
      (with-current-ebib-buffer 'index
        (goto-char (point-min))
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
       (beep))))
 
@@ -1838,7 +1887,8 @@ ORDER indicates the sort order and should be either `ascend' or
      (with-current-ebib-buffer 'index
        (goto-char (point-max))
        (forward-line -1)
-       (ebib--update-entry-buffer)))
+       (ebib--update-entry-buffer)
+       (ebib--history-mutate (ebib--get-key-at-point))))
     (default
       (beep))))
 
@@ -2298,6 +2348,26 @@ buffer and switch to it."
     (default
       (beep))))
 
+(defun ebib-current-entry-to-register (register)
+  "Store current entry's key as a string in REGISTER.
+Interactively, prompt for REGISTER with
+`register-read-with-preview'."
+  (interactive `(,(register-read-with-preview "Entry to register: ")))
+  (set-register register (ebib--get-key-at-point)))
+
+(defun ebib-jump-to-register (register)
+  "Jump to entry with key stored in REGISTER.
+Interactively, prompt for REGISTER with
+`register-read-with-preview'."
+  (interactive `(,(register-read-with-preview "Jump to register: ")))
+  (let* ((key (get-register register))
+	 (db (ebib--find-db-for-key key ebib--cur-db)))
+    (if (not (ebib-db-has-key key db))
+	(error "[Ebib] Could not find entry key `%s'" key)
+      (ebib--goto-entry-in-index key)
+      (ebib--update-entry-buffer)
+      (ebib--history-mutate key))))
+
 (defun ebib-jump-to-entry (arg)
   "Jump to an entry.
 Select an entry from any open database using completion and jump
@@ -2321,13 +2391,15 @@ candidates from the current database."
        (cond
         ((eq db ebib--cur-db)
          (if (ebib--goto-entry-in-index key)
-             (ebib--update-entry-buffer)
+             (progn (ebib--update-entry-buffer)
+		    (ebib--history-mutate key))
            (error "[Ebib] Could not find entry key `%s'" key)))
         (entries
          (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db) ; Save the current entry for the database we're jumping away from.
          (ebib-db-set-current-entry-key key db) ; Set the current entry in the database we're jumping to.
          (setq ebib--cur-db db)
-         (ebib--update-buffers 'no-refresh))
+         (ebib--update-buffers 'no-refresh)
+	 (ebib--history-mutate key))
         (t (error "[Ebib] Could not jump to entry")))))
     (default
       (error "[Ebib] No database opened"))))
@@ -3682,6 +3754,10 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     (define-key map "\C-x\C-s" #'ebib-save-current-database)
     (define-key map [mouse-1] #'ebib-entry-open-at-point)
+    (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
+    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
+    (define-key map "\C-b" #'ebib-history-back)
+    (define-key map "\C-f" #'ebib-history-forward)
     map)
   "Keymap for the Ebib entry buffer.")
 

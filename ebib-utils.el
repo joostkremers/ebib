@@ -354,6 +354,39 @@ default sort field is visible in the index buffer."
                        (choice (const :tag "Ascending Sort" ascend)
                                (const :tag "Descending Sort" descend)))))
 
+(defun ebib--history-mutate (key)
+  "Alter `ebib--entry-history' list.
+Copy everything from the second element to the element at
+`ebib--history-get-head' in the `:history' list in
+`ebib--entry-history', reverse the result, and prepend it to the
+history list. Then prepend KEY to the history list as well.
+Finally, set `:head' in `ebib--entry-history' to 0."
+  (when-let ((head (ebib--history-get-head))
+	     ;; Only bother if head is sufficiently large, otherwise
+	     ;; there's nothing to prependQ
+	     (_ (< 1 head))
+	     (hist-list (plist-get ebib--entry-history :history))
+	     (interim (seq-subseq hist-list 0 head)))
+    (plist-put ebib--entry-history :history
+	       (append (reverse interim) hist-list)))
+  (push key (plist-get ebib--entry-history :history))
+  (ebib--history-set-head 0))
+
+(defun ebib--history-get (n)
+  "Get Nth elt of `:history' list in `ebib--entry-history'.
+N counts from 0. If N < 0, or there are not enough elements,
+return nil.."
+  (when (>= n 0)
+    (nth n (plist-get ebib--entry-history :history))))
+
+(defun ebib--history-set-head (n)
+  "Set `:head' in `ebib--entry-history' to N."
+  (plist-put ebib--entry-history :head n))
+
+(defun ebib--history-get-head ()
+  "Get value of `:head' in `ebib--entry-history'."
+  (plist-get ebib--entry-history :head))
+
 (defun ebib-compare-numerical-strings (a b)
   "Return t if A represents a number less than B represents.
 A and B are strings (e.g. \"3\" and \"11\")."
@@ -1259,6 +1292,23 @@ Currently, the following problems are marked:
 (defvar ebib--citation-history nil "Minibuffer history for citation commands.")
 (defvar ebib--key-history nil "Minibuffer history for entry keys.")
 (defvar ebib--keywords-history nil "Minibuffer history for keywords.")
+(defvar ebib--entry-history '(:head 0 :history nil)
+  "History of entries visited.
+`:history' is a list of all entries visited, with more recent
+entries nearer the beginning. `:head' is a 0-based index
+indicating where in the `:history' list we are currently.
+
+Commands which navigate between entries (including those which
+navigate the history) should (in order):
+- Copy everything from the second to the `:head'th element of the
+  `:history' list, reverse the result, and prepend it to the history
+  list (unless the `:head' value is less than 2, in which case nothing
+  would be prepended).
+- prepend the key of the entry arrived at to the `:history' list.
+- set `:head' to 0
+
+Passing the relevant key to `ebib--history-mutate' will achieve
+all of this in a convenient way.")
 
 (defvar ebib--saved-window-config nil "Stores the window configuration when Ebib is called.")
 (defvar ebib--window-before nil "The window that was active when Ebib was called.")
