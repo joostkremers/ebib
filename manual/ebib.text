@@ -814,6 +814,7 @@ If a BibTeX entry in the buffer lacks an entry key (which sometimes happens with
 
 ```lisp
 (require 'ebib-biblio)
+(define-key ebib-index-mode-map (kbd "B") #'ebib-biblio-import-doi)
 (define-key biblio-selection-mode-map (kbd "e") #'ebib-biblio-selection-import)
 ```
 
@@ -822,13 +823,15 @@ Or with `use-package`:
 ```lisp
 (use-package ebib-biblio
   :after (ebib biblio)
-  :bind (:map biblio-selection-mode-map
+  :bind (:map ebib-index-mode-map
+              ("B" . ebib-biblio-import-doi)
+              :map biblio-selection-mode-map
               ("e" . ebib-biblio-selection-import)))
 ```
 
 If you now call `biblio-lookup`, you can use the key [`e`]{.key} (or any other key you choose, of course) in Biblio's selection buffer to import the selected entry into the current Ebib database.
 
-Additionally, loading `ebib-biblio` adds the key [`B`]{.key} to the Ebib index. This key asks you for a DOI and then tries to import the entry that the DOI points to into the current database.
+Additionally, you can use the key [`B`]{.key} in Ebib's index buffer to import an entry into the current database if you have its DOI.
 
 When fetching entries via Biblio, Ebib checks for duplicates based on the key of the new entry. This will only work reliably if both Ebib and Biblio are configured to automatically generate BibTeX keys. Ebib does this by default (see the option `ebib-autogenerate-keys`), Biblio can be configured to do so by setting the option `biblio-bibtex-use-autokey`.
 

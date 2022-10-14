@@ -60,6 +60,7 @@
 (defvar biblio-bibtex-use-autokey)
 (declare-function biblio--selection-forward-bibtex "ext:biblio-core.el" (forward-to &optional quit))
 
+;;;###autoload
 (defun ebib-biblio-import-doi (doi)
   "Fetch a BibTeX entry from a remote server by its DOI using `biblio.el'.
 The entry is stored in the current database."
@@ -70,8 +71,6 @@ The entry is stored in the current database."
                                  (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
                                                      (current-buffer))
                                  (ebib-import-entries ebib--cur-db)))))
-
-(define-key ebib-index-mode-map "B" #'ebib-biblio-import-doi)
 
 (defun ebib-biblio-selection-import-callback (bibtex _entry)
   "Add a BibTeX entry to the current Ebib database.

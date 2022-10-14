@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 6.8 from ebib.texi.
+This is ebib.info, produced by makeinfo version 6.7 from ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -2078,22 +2078,24 @@ support for it to Ebib by loading the package ‘ebib-biblio’ in your init
 file and adding an entry to ‘biblio-selection-mode-map’:
 
 (require 'ebib-biblio)
+(define-key ebib-index-mode-map (kbd "B") #'ebib-biblio-import-doi)
 (define-key biblio-selection-mode-map (kbd "e") #'ebib-biblio-selection-import)
 
 Or with ‘use-package’:
 
 (use-package ebib-biblio
   :after (ebib biblio)
-  :bind (:map biblio-selection-mode-map
+  :bind (:map ebib-index-mode-map
+              ("B" . ebib-biblio-import-doi)
+              :map biblio-selection-mode-map
               ("e" . ebib-biblio-selection-import)))
 
 If you now call ‘biblio-lookup’, you can use the key ‘e’ (or any other
 key you choose, of course) in Biblio’s selection buffer to import the
 selected entry into the current Ebib database.
 
-Additionally, loading ‘ebib-biblio’ adds the key ‘B’ to the Ebib index.
-This key asks you for a DOI and then tries to import the entry that the
-DOI points to into the current database.
+Additionally, you can use the key ‘B’ in Ebib’s index buffer to import
+an entry into the current database if you have its DOI.
 
 When fetching entries via Biblio, Ebib checks for duplicates based on
 the key of the new entry.  This will only work reliably if both Ebib and
@@ -3221,46 +3223,46 @@ Node: Importing entries from a buffer98882
 Ref: #importing-entries-from-a-buffer99115
 Node: Integration with the Biblio package100148
 Ref: #integration-with-the-biblio-package100397
-Node: Multiple Identical Fields101991
-Ref: #multiple-identical-fields102180
-Node: Linking to external resources104108
-Ref: #linking-to-external-resources104293
-Node: Viewing and Importing Files104495
-Ref: #viewing-and-importing-files104695
-Node: Editing the file field109826
-Ref: #editing-the-file-field109977
-Node: Calling a Browser for URLs and DOIs111348
-Ref: #calling-a-browser-for-urls-and-dois111564
-Node: Notes files113872
-Ref: #notes-files114022
-Node: Configuring files for storing notes115509
-Ref: #configuring-files-for-storing-notes115687
-Node: Hooks118654
-Ref: #hooks118817
-Node: Upgrading from earlier Ebib versions120218
-Ref: #upgrading-from-earlier-ebib-versions120441
-Node: Customising the notes file format121351
-Ref: #customising-the-notes-file-format121579
-Node: Displaying notes125603
-Ref: #displaying-notes125794
-Node: Using org-capture to record notes127143
-Ref: #using-org-capture-to-record-notes127334
-Node: Managing a reading list133344
-Ref: #managing-a-reading-list133506
-Node: Managing Keywords136525
-Ref: #managing-keywords136681
-Node: Using a Canonical Keywords List138288
-Ref: #using-a-canonical-keywords-list138446
-Node: Window Management140604
-Ref: #window-management140769
-Node: Copying Entries to the Kill Ring143928
-Ref: #copying-entries-to-the-kill-ring144127
-Node: Printing the Database146852
-Ref: #printing-the-database147025
-Node: Customisation150494
-Ref: #customisation150610
-Node: Modifying Key Bindings151836
-Ref: #modifying-key-bindings151963
+Node: Multiple Identical Fields102083
+Ref: #multiple-identical-fields102272
+Node: Linking to external resources104200
+Ref: #linking-to-external-resources104385
+Node: Viewing and Importing Files104587
+Ref: #viewing-and-importing-files104787
+Node: Editing the file field109918
+Ref: #editing-the-file-field110069
+Node: Calling a Browser for URLs and DOIs111440
+Ref: #calling-a-browser-for-urls-and-dois111656
+Node: Notes files113964
+Ref: #notes-files114114
+Node: Configuring files for storing notes115601
+Ref: #configuring-files-for-storing-notes115779
+Node: Hooks118746
+Ref: #hooks118909
+Node: Upgrading from earlier Ebib versions120310
+Ref: #upgrading-from-earlier-ebib-versions120533
+Node: Customising the notes file format121443
+Ref: #customising-the-notes-file-format121671
+Node: Displaying notes125695
+Ref: #displaying-notes125886
+Node: Using org-capture to record notes127235
+Ref: #using-org-capture-to-record-notes127426
+Node: Managing a reading list133436
+Ref: #managing-a-reading-list133598
+Node: Managing Keywords136617
+Ref: #managing-keywords136773
+Node: Using a Canonical Keywords List138380
+Ref: #using-a-canonical-keywords-list138538
+Node: Window Management140696
+Ref: #window-management140861
+Node: Copying Entries to the Kill Ring144020
+Ref: #copying-entries-to-the-kill-ring144219
+Node: Printing the Database146944
+Ref: #printing-the-database147117
+Node: Customisation150586
+Ref: #customisation150702
+Node: Modifying Key Bindings151928
+Ref: #modifying-key-bindings152055
 
 End Tag Table
 
