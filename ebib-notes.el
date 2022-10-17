@@ -419,7 +419,15 @@ string of the same width as `ebib-notes-symbol'."
   (if (ebib--notes-has-note key)
       (propertize ebib-notes-symbol
                   'face '(:height 0.8 :inherit ebib-link-face)
-                  'mouse-face 'highlight)
+		  'font-lock-face '(:height 0.8 :inherit ebib-link-face)
+                  'mouse-face 'highlight
+		  'help-echo "mouse-1: popup note"
+		  'button t
+		  'follow-link t
+		  'category t
+		  'button-data key
+		  'keymap button-map
+		  'action 'ebib-popup-note)
     (propertize (make-string (string-width ebib-notes-symbol) ?\s)
                 'face '(:height 0.8))))
 
