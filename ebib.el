@@ -4198,7 +4198,7 @@ This argument is useful for list fields which have a canonical
 list of candidates, like \"language\".
 
 See also `ebib-field-edit-functions'."
-  (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+  (let* ((crm-local-completion-map (make-composed-keymap '(keymap (32)) crm-local-completion-map))
          (crm-char ";")
 	 (crm-separator (format "[[:space:]]+*%s[[:space:]]+*" crm-char))
 	 (and-regexp "[[:space:]]+and[[:space:]]+")
@@ -4247,7 +4247,7 @@ list separated by commas with optional whitespace on either side.
 See also `ebib-field-edit-functions'."
   ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
   ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
-  (let* ((crm-local-must-match-map (make-composed-keymap '(keymap (32)) crm-local-must-match-map))
+  (let* ((crm-local-completion-map (make-composed-keymap '(keymap (32)) crm-local-completion-map))
          (crm-separator "[[:space:]]*,[[:space:]]*")
 	 (collection
 	  ;; Account for fields containing more than one entry, e.g.
