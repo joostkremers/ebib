@@ -1,4 +1,4 @@
-This is ebib.info, produced by makeinfo version 6.7 from ebib.texi.
+This is ebib.info, produced by makeinfo version 6.8 from ebib.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -2364,7 +2364,7 @@ When you record a new note, Ebib pops up a buffer and adds the note to
 the end of the relevant notes file.  If you prefer, you can also use Org
 mode’s capture system to record new notes.  This has the advantage that
 you have more control over the location where a note is stored and that
-you can more than one capture template.
+you can have more than one capture template.
 
 Note that with Ebib version 2.30, the functionality for notes files has
 changed and it may be necessary to update your configuration.  See *note
@@ -3235,34 +3235,34 @@ Node: Calling a Browser for URLs and DOIs111440
 Ref: #calling-a-browser-for-urls-and-dois111656
 Node: Notes files113964
 Ref: #notes-files114114
-Node: Configuring files for storing notes115601
-Ref: #configuring-files-for-storing-notes115779
-Node: Hooks118746
-Ref: #hooks118909
-Node: Upgrading from earlier Ebib versions120310
-Ref: #upgrading-from-earlier-ebib-versions120533
-Node: Customising the notes file format121443
-Ref: #customising-the-notes-file-format121671
-Node: Displaying notes125695
-Ref: #displaying-notes125886
-Node: Using org-capture to record notes127235
-Ref: #using-org-capture-to-record-notes127426
-Node: Managing a reading list133436
-Ref: #managing-a-reading-list133598
-Node: Managing Keywords136617
-Ref: #managing-keywords136773
-Node: Using a Canonical Keywords List138380
-Ref: #using-a-canonical-keywords-list138538
-Node: Window Management140696
-Ref: #window-management140861
-Node: Copying Entries to the Kill Ring144020
-Ref: #copying-entries-to-the-kill-ring144219
-Node: Printing the Database146944
-Ref: #printing-the-database147117
-Node: Customisation150586
-Ref: #customisation150702
-Node: Modifying Key Bindings151928
-Ref: #modifying-key-bindings152055
+Node: Configuring files for storing notes115606
+Ref: #configuring-files-for-storing-notes115784
+Node: Hooks118751
+Ref: #hooks118914
+Node: Upgrading from earlier Ebib versions120315
+Ref: #upgrading-from-earlier-ebib-versions120538
+Node: Customising the notes file format121448
+Ref: #customising-the-notes-file-format121676
+Node: Displaying notes125700
+Ref: #displaying-notes125891
+Node: Using org-capture to record notes127240
+Ref: #using-org-capture-to-record-notes127431
+Node: Managing a reading list133441
+Ref: #managing-a-reading-list133603
+Node: Managing Keywords136622
+Ref: #managing-keywords136778
+Node: Using a Canonical Keywords List138385
+Ref: #using-a-canonical-keywords-list138543
+Node: Window Management140701
+Ref: #window-management140866
+Node: Copying Entries to the Kill Ring144025
+Ref: #copying-entries-to-the-kill-ring144224
+Node: Printing the Database146949
+Ref: #printing-the-database147122
+Node: Customisation150591
+Ref: #customisation150707
+Node: Modifying Key Bindings151933
+Ref: #modifying-key-bindings152060
 
 End Tag Table
 

@@ -921,7 +921,7 @@ Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you p
 
 In the entry buffer, the first few lines of the note are shown under a pseudo-field `external note`. This is not an actual field in the `.bib` file, even though it is displayed as such. (You can customise this behaviour.)
 
-When you record a new note, Ebib pops up a buffer and adds the note to the end of the relevant notes file. If you prefer, you can also use Org mode's capture system to record new notes. This has the advantage that you have more control over the location where a note is stored and that you can more than one capture template.
+When you record a new note, Ebib pops up a buffer and adds the note to the end of the relevant notes file. If you prefer, you can also use Org mode's capture system to record new notes. This has the advantage that you have more control over the location where a note is stored and that you can have more than one capture template.
 
 Note that with Ebib version 2.30, the functionality for notes files has changed and it may be necessary to update your configuration. See [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) below for details.
 
