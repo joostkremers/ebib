@@ -2422,24 +2422,24 @@ are returned as a string."
 (defun ebib-display-www-link (field key db)
   "Return the content of FIELD from KEY in DB as a link.
 This function is mainly intended for the DOI and URL fields."
-  (let* ((val (ebib-get-field-value field key db 'noerror 'unbraced 'xref))
-	 ;; Unless field is doi, assume the string is a full url
-	 (str (if (and (string= (downcase field) "doi")
-		       (string-match-p "^[0-9]" val))
-		  (concat "https://dx.doi.org/" val)
-		val)))
-    (if val (propertize "www"
-			'face 'button
-			'font-lock-face 'button
-			'mouse-face 'highlight
-			'help-echo str
-			'button t
-			'follow-link t
-			'category t
-			'button-data str
-			'keymap button-map
-			'action 'ebib--call-browser)
-      (propertize "   " 'face '(:height 0.8)))))
+  (if-let ((val (ebib-get-field-value field key db 'noerror 'unbraced 'xref))
+	   ;; Unless field is doi, assume the string is a full url
+	   (str (if (and (string= (downcase field) "doi")
+		         (string-match-p "^[0-9]" val))
+		    (concat "https://dx.doi.org/" val)
+		  val)))
+      (propertize "www"
+		  'face 'button
+		  'font-lock-face 'button
+		  'mouse-face 'highlight
+		  'help-echo str
+		  'button t
+		  'follow-link t
+		  'category t
+		  'button-data str
+		  'keymap button-map
+		  'action 'ebib--call-browser)
+    (propertize "   " 'face '(:height 0.8))))
 
 (defun ebib--sort-keys-list (keys db)
   "Sort KEYS according to the sort info of DB.
