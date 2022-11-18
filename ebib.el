@@ -1967,8 +1967,9 @@ This function updates both the database and the buffer."
       (when marked
         (ebib-db-toggle-mark cur-key ebib--cur-db)
         (ebib-db-toggle-mark actual-new-key ebib--cur-db))
-      (let ((inhibit-read-only t))
-        (delete-region (point-at-bol) (1+ (point-at-eol))))
+      (with-current-ebib-buffer 'index
+	(let ((inhibit-read-only t))
+          (delete-region (point-at-bol) (1+ (point-at-eol)))))
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
       ;; Also update dependent databases.
       (let ((dependents (seq-filter (lambda (db)
