@@ -4163,7 +4163,12 @@ always uses completion)."
 	 (pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
          (result (cond
-                  ((string= field "=type=") (ebib--edit-type-field))
+                  ((string= field "=type=")
+		   (let ((rtn (ebib--edit-type-field)))
+		     ;; `ebib--edit-type-field' can change the current
+		     ;; key, so update it
+		     (setq key (ebib--get-key-at-point))
+		     rtn))
                   ((ebib--multiline-p init-contents)
                    (ebib--edit-field-as-multiline field)
                    ;; A multiline edit differs from the other fields, because
