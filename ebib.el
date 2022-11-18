@@ -4271,6 +4271,25 @@ all selected keys are returned as a list of strings."
   :group 'ebib
   :type 'boolean)
 
+(defun ebib--edit-type-field ()
+  "Prompt for an entry type.
+If the selected type is \"xdata\" or \"set\" (or a
+case-insensitive variation) and
+`ebib-always-prompt-for-special-keys' is non-nil or the original
+key is temporary or then also invoke `ebib-edit-keyname', to
+force the user to select a key for the entry manually."
+  (let ((type (completing-read
+	       "Type: "
+	       (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t)
+	       nil t)))
+    (when (and (member-ignore-case type '("xdata" "set"))
+	       (or ebib-always-prompt-for-special-keys
+		   (save-match-data
+		     (string-match "<new-entry[[:digit:]]+>"
+				   (ebib--get-key-at-point)))))
+      (ebib-edit-keyname))
+    type))
+
 (defun ebib--edit-ref-field (field-name _ _)
   "Edit an 'entry key' type field.
 FIELD-NAME is the name of the field being edited.  Key is read
