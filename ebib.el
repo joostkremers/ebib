@@ -4266,6 +4266,11 @@ all selected keys are returned as a list of strings."
 	(mapcar #'car entry)
       (caar entry))))
 
+(defcustom ebib-always-prompt-for-special-keys t
+  "Prompt for new key in already-named Xdata, Set entries."
+  :group 'ebib
+  :type 'boolean)
+
 (defun ebib--edit-ref-field (field-name _ _)
   "Edit an 'entry key' type field.
 FIELD-NAME is the name of the field being edited.  Key is read
