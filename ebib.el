@@ -4145,7 +4145,7 @@ always uses completion)."
 	 (pfx current-prefix-arg)
          (init-contents (ebib-get-field-value field key ebib--cur-db 'noerror))
          (result (cond
-                  ((string= field "=type=") (completing-read "Type: " (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t) nil t))
+                  ((string= field "=type=") (ebib--edit-type-field))
                   ((ebib--multiline-p init-contents)
                    (ebib--edit-field-as-multiline field)
                    ;; A multiline edit differs from the other fields, because
