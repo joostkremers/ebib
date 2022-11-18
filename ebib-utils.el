@@ -1877,14 +1877,25 @@ cross-referenced entry to the alist.  Note that inherited fields
 are not marked in any way, so they cannot be distinguished in the
 return value."
   (if-let ((entry (ebib-db-get-entry key db noerror))
-           (xref)
-           (xref-key (ebib-unbrace (cdr (assoc-string "crossref" entry 'case-fold))))
-           (xref-db (ebib--find-db-for-key xref-key db))
-           (xref-entry (ebib-db-get-entry xref-key xref-db 'noerror))
+	   (xref)
            (inheritances (if (eq (ebib--get-dialect db) 'BibTeX)
                              'BibTeX
-                           ebib-biblatex-inheritances)))
-      (parsebib--get-xref-fields (copy-alist entry) xref-entry inheritances)
+                           ebib-biblatex-inheritances))
+	   (xref-key-alist (ebib--get-xref-alist key db)))
+      ;; Try inheriting from each key in `xref-key-alist' in turn,
+      ;; until `value' is non-nil
+      (cl-loop for (xref-type . xref-key) in xref-key-alist
+	       do
+	       (when-let ((_ (ebib-db-has-key xref-key db))
+			  (xref-entry (ebib-get-entry xref-key db noerror 'xref))
+			  (source-type (ebib-db-get-field-value "=type=" xref-key db noerror))
+			  ;; When the cross-reference is from an xdata field, check if entry
+			  ;; referred to is an @Xdata entry. Otherwise anything is fine.
+			  (_ (if (cl-equalp xref-type "xdata")
+				 (cl-equalp source-type "xdata")
+			       t)))
+		 (setq entry (parsebib--get-xref-fields entry xref-entry inheritances)))
+	       finally return entry)
     entry))
 
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)

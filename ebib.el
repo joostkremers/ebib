@@ -214,9 +214,9 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 (defun ebib--redisplay-field (field)
   "Redisplay the contents of FIELD in the current buffer."
   (with-current-ebib-buffer 'entry
-    ;; If the `=type=' or `crossref' field has changed, we need to redisplay the
+    ;; If the `=type=', `crossref' or `xdata' field has changed, we need to redisplay the
     ;; entire entry.
-    (if (member-ignore-case field '("=type=" "crossref"))
+    (if (member-ignore-case field '("=type=" "crossref" "xdata"))
         (progn
           (ebib--update-entry-buffer)
           (re-search-forward (rx-to-string `(seq bol ,(string-trim field "=" "=")) t))) ; Remove =-signs from `=type='.
@@ -1742,7 +1742,8 @@ generate the key, see that function's documentation for details."
               ;; `bibtex-generate-autokey' will simply use the first one it
               ;; finds.  By sorting we make sure it's always the author.
               (ebib--format-entry (ebib--get-key-at-point) ebib--cur-db nil 'sort)
-              (let ((x-ref (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)))
+              (let ((x-ref (or (ebib-get-field-value "xdata" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced)
+			       (ebib-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))))
                 (if x-ref
                     (ebib--format-entry x-ref ebib--cur-db nil 'sort)))
               (goto-char (point-min))
@@ -2008,7 +2009,8 @@ Honour `ebib-create-backups' and BACKUP-DIRECTORY-ALIST."
       ;; sorted before Y (or at least *can* be, if Y also has a crossref
       ;; field).
       ((compare-xrefs (x _)
-                      (ebib-get-field-value "crossref" x db 'noerror))
+         (or (ebib-get-field-value "xdata" x db 'noerror)
+	     (ebib-get-field-value "crossref" x db 'noerror)))
        ;; This one's a bit trickier.  We iterate over the lists of fields in
        ;; `ebib-sort-order'.  For each level, `ebib--get-sortstring' then returns the
        ;; string that can be used for sorting.  If all fails, sorting is done on
