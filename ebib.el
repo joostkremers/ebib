@@ -506,7 +506,7 @@ which can be passed to `ebib--display-multiline-field'."
       ;; property with `ebib-crossref-face'
       (let* ((xref-lst (seq-filter (lambda (plist) (eq (caaddr plist) 'ebib--xref)) (object-intervals value)))
 	     (int-lst (mapcar #'butlast xref-lst)))
-	(mapcar
+	(mapc
 	 (lambda (ints)
 	   (add-text-properties
 	    (car ints) (cadr ints)
