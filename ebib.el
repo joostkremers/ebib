@@ -511,8 +511,8 @@ which can be passed to `ebib--display-multiline-field'."
 	   (add-text-properties
 	    (car ints) (cadr ints)
 	    `(face ebib-crossref-face
-              help-echo ,(format "Inherited from entry `%s'" (get-text-property (car ints) 'ebib--xref value)))
-	   value))
+                   help-echo ,(format "Inherited from entry `%s'" (get-text-property (car ints) 'ebib--xref value)))
+	    value))
 	 int-lst))
       (if (and (member-ignore-case field '("crossref" "xref"))
                (not (ebib--find-db-for-key (ebib-unbrace value) ebib--cur-db)))
