@@ -1886,14 +1886,14 @@ return value."
       ;; until `value' is non-nil
       (cl-loop for (xref-type . xref-key) in xref-key-alist
 	       do
-	       (when-let ((_ (ebib-db-has-key xref-key db))
+	       (when-let (((ebib-db-has-key xref-key db))
 			  (xref-entry (ebib-get-entry xref-key db noerror 'xref))
 			  (source-type (ebib-db-get-field-value "=type=" xref-key db noerror))
 			  ;; When the cross-reference is from an xdata field, check if entry
 			  ;; referred to is an @Xdata entry. Otherwise anything is fine.
-			  (_ (if (cl-equalp xref-type "xdata")
-				 (cl-equalp source-type "xdata")
-			       t)))
+			  ((if (cl-equalp xref-type "xdata")
+			       (cl-equalp source-type "xdata")
+			     t)))
 		 (setq entry (parsebib--get-xref-fields entry xref-entry inheritances)))
 	       finally return entry)
     entry))
@@ -2067,9 +2067,9 @@ string has the text property `ebib--alias' with value t."
 			    (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db)))
 			    ;; When the cross-reference is from an xdata field, check if entry
 			    ;; referred to is an @Xdata entry. Otherwise anything is fine.
-			    (_ (if (cl-equalp xref-type "xdata")
-				   (cl-equalp source-type "xdata")
-				 t))
+			    ((if (cl-equalp xref-type "xdata")
+				 (cl-equalp source-type "xdata")
+			       t))
 			    (xref-value (ebib-get-field-value xref-field xref-key xref-db 'noerror nil 'xref)))
 		   (setq value (propertize xref-value 'ebib--xref xref-key))))))
     (when (and (not value)
