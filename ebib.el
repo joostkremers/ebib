@@ -325,9 +325,9 @@ of strings."
 
 (defun ebib--display-xdata-field (xdata-field)
   "Return a string for XDATA-FIELD to display in the entry buffer.
-Separate values by commas and put each on a separate line. For
+Separate values by commas and put each on a separate line.  For
 each value, test if there is an entry with that key, and that it
-is actually an `@XData' entry. If either test fails, propertize
+is actually an `@XData' entry.  If either test fails, propertize
 the value with `ebib-warning-face' and an information help-echo
 message."
   (let ((keys (split-string xdata-field ",[[:space:]]*")))
@@ -347,8 +347,8 @@ message."
 
 (defun ebib--display-related-field (related-field)
   "Return a string for RELATED-FIELD to display in the entry buffer.
-Separate values by commas and put each on a separate line. For
-each value, test if there is an entry with that key. If not,
+Separate values by commas and put each on a separate line.  For
+each value, test if there is an entry with that key.  If not,
 propertize the value with `ebib-warning-face' and an information
 help-echo message."
   (ebib--convert-multiline-to-string
@@ -2464,8 +2464,8 @@ This function calls one of the `ebib-read-entry-*' functions
 depending on the completion system in use.
 
 If non-nil FILTER is a function applied to the entries of all
-databases. It is called for each entry with three arguments: the
-key, the entry itself (as an alist) and the databse. It should
+databases.  It is called for each entry with three arguments: the
+key, the entry itself (as an alist) and the database.  It should
 return non-nil for all entries which should be included in the
 prompt."
   (let ((dbs
@@ -2752,10 +2752,10 @@ Crossreffed entries are those whose key appears in the
 
 If the entry buffer is current, and the current field is one of
 `crosref', `xdata' or `xref', and has a value, then only consider
-keys in that value. ARG forces considering all crossref keys.
+keys in that value.  ARG forces considering all crossref keys.
 
-If there is only one such entry, switch to it. If there is more
-than one, allow the user to choose one from a list. If there are
+If there is only one such entry, switch to it.  If there is more
+than one, allow the user to choose one from a list.  If there are
 none, search for the first entry with the current entry's key in
 one of its crossreffing fields."
   (interactive "P")
@@ -4280,7 +4280,9 @@ except that `ebib-citation-insert-multiple' is ignored when
 reading multiple candidates.
 
 If MULTIPLE is nil, the key is returned as a string, If non-nil,
-all selected keys are returned as a list of strings."
+all selected keys are returned as a list of strings.
+
+FILTER is passed unmodified to `ebib-read-entry'."
   (let* ((ebib-citation-insert-multiple t)
 	 (entry (ebib-read-entry
 		 (format "%s: " prompt) databases

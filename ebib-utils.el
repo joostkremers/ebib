@@ -1901,10 +1901,11 @@ return value."
 (defun ebib--propertize-xdata-warnings (parts xkey xfield &optional xindex help-echo)
   "Return a granular xdata ref string with warning properties.
 PARTS is a list containing any the symbols `key' `field' and
-'index', in any order. XKEY is the key of the XData entry being
-referred to. XFIELD is the field referred to in that entry,
+'index', in any order.  XKEY is the key of the XData entry being
+referred to.  XFIELD is the field referred to in that entry,
 .XINDEX is the index of the item in the value of the field, if
-provided. See the BibLaTeX manual, Sec. 3.13.6 for more details.
+provided.  See the BibLaTeX manual, section 3.13.6 for more
+details.
 
 Returns a string \"xdata-XKEY-XFIELD[-XINDEX]\". XINDEX and the
 preceding dash are only included if XINDEX is non-nil. Each of the
@@ -1929,8 +1930,8 @@ Intended as a convenience function for use in
 (defun ebib--replace-granular-xdata-references (string db)
   "Replace xdata references within STRING with their values.
 Replace all strings of the form \"xdata=-KEY-FIELD[-INDEX]\" with
-the value of FIELD in entry with key KEY. If INDEX is present,
-parse the value as a list (splitting on \"and\" and removing
+the value of FIELD in entry with KEY.  If INDEX is present, parse
+the value as a list (splitting on \"and\" and removing
 surrounding whitespace) and return the element at INDEX,
 beginning at 1.
 
