@@ -2775,7 +2775,7 @@ one of its crossreffing fields."
 			(ebib--read-ref-as-entry
 			 "Crossref key" `(,ebib--cur-db) nil
 			 ;; Filter presented keys for just those crossreffed in current entry
-			 (lambda (key ent db) (member key (mapcar #'cdr xref-list))))
+			 (lambda (key _ent _db) (member key (mapcar #'cdr xref-list))))
 		      (cdar xref-list))))
 	 ;; If the entry has a crossref, see if we can find the relevant entry.
          (let ((database (seq-find (lambda (db)
