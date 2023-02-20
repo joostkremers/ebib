@@ -504,7 +504,13 @@ which can be passed to `ebib--display-multiline-field'."
           (setq value (propertize value 'face 'ebib-abbrev-face 'fontified t)))
       ;; Propertize any stretch of the value which has an `ebib--xref'
       ;; property with `ebib-crossref-face'
-      (let* ((xref-lst (seq-filter (lambda (plist) (eq (caaddr plist) 'ebib--xref)) (object-intervals value)))
+      (let* ((xref-lst (seq-filter (lambda (plist) (eq (caaddr plist) 'ebib--xref))
+				   ;; This is a HACK, based on
+				   ;; https://emacs.stackexchange.com/a/54181/34394
+				   ;; FIXME Using `object-intervals' would be much quicker and more
+				   ;; elegant here, but only once it's supported in a current
+				   ;; version of Emacs!
+				   (seq-partition (cdr-safe (read (substring (format "%S" value) 1))) 3)))
 	     (int-lst (mapcar #'butlast xref-lst)))
 	(mapc
 	 (lambda (ints)
