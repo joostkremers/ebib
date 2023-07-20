@@ -1169,7 +1169,7 @@ field in the prompt string, and completing on values of the
 fields in the list where appropriate.  They should return a
 string, suitable as a field value."
   :group 'ebib
-  :type '(repeat (cons (repeat (string) :tag "Fields")
+  :type '(repeat (cons (repeat :tag "Fields" (string))
 		       (function :tag "Completion function"))))
 
 (defcustom ebib-multiline-fields '("annote" "annotation" "abstract")
