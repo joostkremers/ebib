@@ -409,7 +409,7 @@ is not stored and the function returns nil.  If it is nil (or any
 other value), an error is raised.
 
 In order to delete the preamble, PREAMBLE should be nil and
-IF-EXISTS should be 'overwrite.
+IF-EXISTS should be `overwrite'.
 
 Return non-nil on success or nil if PREAMBLE could not be stored."
   (let ((existing-preamble (ebib-db-get-preamble db)))

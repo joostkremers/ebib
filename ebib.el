@@ -166,10 +166,10 @@ is applied to the item."
       ;; The last item isn't truncated.
       (insert (nth n (cadr data)))
       ;; Add a text property to identify the entry.
-      (add-text-properties (point-at-bol) (point) `(ebib-key ,key))
+      (add-text-properties (pos-bol) (point) `(ebib-key ,key))
       (insert "\n")
       (when mark
-        (add-text-properties (point-at-bol 0) (point) '(face ebib-marked-face))))))
+        (add-text-properties (pos-bol 0) (point) '(face ebib-marked-face))))))
 
 (defun ebib--goto-entry-in-index (key)
   "Move point to the entry designated by KEY.
@@ -224,7 +224,7 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
       (let ((inhibit-read-only t))
 	(goto-char (point-min))
 	(re-search-forward (format "^%s" field))
-        (delete-region (point-at-bol) (next-single-property-change (point) 'ebib-field-end))
+        (delete-region (pos-bol) (next-single-property-change (point) 'ebib-field-end))
 	(save-excursion
           (insert (format "%-17s %s"
                           (propertize field 'face 'ebib-field-face)
@@ -451,7 +451,7 @@ which can be passed to `ebib--display-multiline-field'."
       (when truncate
 	(let ((max (progn
                      (goto-char (point-min))
-                     (point-at-bol (* 2 ebib-notes-display-max-lines)))))
+                     (pos-bol (* 2 ebib-notes-display-max-lines)))))
 	  (when (< max (point-max))
             (setq truncated t)
             (delete-region max (point-max)))))
@@ -1975,7 +1975,7 @@ This function updates both the database and the buffer."
         (ebib-db-toggle-mark actual-new-key ebib--cur-db))
       (with-current-ebib-buffer 'index
 	(let ((inhibit-read-only t))
-          (delete-region (point-at-bol) (1+ (point-at-eol)))))
+          (delete-region (pos-bol) (1+ (pos-eol)))))
       (ebib--insert-entry-in-index-sorted actual-new-key t marked)
       ;; Also update dependent databases.
       (let ((dependents (seq-filter (lambda (db)
@@ -2012,8 +2012,8 @@ unmark all marked entries."
 (defun ebib--display-mark (mark)
   "Highlight/unhighlight the entry at point.
 If MARK is t, `ebib-marked-face is added, if nil, it is removed."
-  (let ((beg (point-at-bol))
-        (end (1+ (point-at-eol))))
+  (let ((beg (pos-bol))
+        (end (1+ (pos-eol))))
     (if mark
         (add-text-properties beg end '(face ebib-marked-face))
       (remove-text-properties beg end '(face ebib-marked-face)))))
@@ -2258,13 +2258,13 @@ instead."
            (progn (dolist (key marked-entries)
                     (ebib--goto-entry-in-index key)
                     (let ((inhibit-read-only t))
-                      (delete-region (point-at-bol) (1+ (point-at-eol))))
+                      (delete-region (pos-bol) (1+ (pos-eol))))
                     (ebib-db-remove-entry key ebib--cur-db))
                   (ebib-db-unmark-entry to-be-deleted ebib--cur-db) ; This works even though we already removed the entries from the database.
                   (message "Marked entries deleted."))
          (when (y-or-n-p (format "Delete %s? " to-be-deleted))
            (let ((inhibit-read-only t))
-             (delete-region (point-at-bol) (1+ (point-at-eol))))
+             (delete-region (pos-bol) (1+ (pos-eol))))
            (ebib-db-remove-entry to-be-deleted ebib--cur-db)
            (message "Entry `%s' deleted." to-be-deleted)))
        (ebib--set-modified t ebib--cur-db)
@@ -2280,7 +2280,7 @@ instead."
                    (ebib-db-set-modified t dependent))))
              (ebib--list-dependents ebib--cur-db))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-kill-entry ()
   "Kill the current entry.
@@ -2295,7 +2295,7 @@ entry is not deleted from the main database."
          (ebib--format-entry key ebib--cur-db)
          (kill-new (buffer-substring-no-properties (point-min) (point-max))))
        (let ((inhibit-read-only t))
-         (delete-region (point-at-bol) (1+ (point-at-eol))))
+         (delete-region (pos-bol) (1+ (pos-eol))))
        (if (ebib-db-dependent-p ebib--cur-db)
            (ebib-db-remove-entries-from-dependent key ebib--cur-db)
          (ebib-db-remove-entry key ebib--cur-db)
@@ -2311,7 +2311,7 @@ entry is not deleted from the main database."
        (ebib--set-modified t ebib--cur-db)
        (ebib--update-entry-buffer)))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-yank-entry (arg)
   "Yank the BibTeX entry at the front of the kill ring.
@@ -3447,14 +3447,14 @@ entry or the marked entries to the dependent database."
            (progn (dolist (key marked-entries)
                     (ebib--goto-entry-in-index key)
                     (let ((inhibit-read-only t))
-                      (delete-region (point-at-bol) (1+ (point-at-eol))))
+                      (delete-region (pos-bol) (1+ (pos-eol))))
                     (ebib-db-remove-entries-from-dependent key ebib--cur-db))
                   (ebib-db-unmark-entry marked-entries ebib--cur-db) ; This works even though we already removed the entries from the database.
                   (message "Marked entries removed."))
          (let ((key (ebib--get-key-at-point)))
            (when (y-or-n-p (format "Remove %s from depedent database? " key))
              (let ((inhibit-read-only t))
-               (delete-region (point-at-bol) (1+ (point-at-eol))))
+               (delete-region (pos-bol) (1+ (pos-eol))))
              (ebib-db-remove-entries-from-dependent key ebib--cur-db)
              (message "Entry `%s' removed." key))))
        (ebib--set-modified t ebib--cur-db)
@@ -4214,7 +4214,7 @@ always uses completion)."
                                       (ebib--list-dependents ebib--cur-db))))))
 
 (defun ebib--edit-literal-field (field-name fields init-contents &optional &rest extra-tables)
-  "Edit a 'literal' type field.
+  "Edit a \"literal\" type field.
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field.  See also
@@ -4322,7 +4322,7 @@ force the user to select a key for the entry manually."
     type))
 
 (defun ebib--edit-ref-field (field-name _ _)
-  "Edit an 'entry key' type field.
+  "Edit an \"entry key\" type field.
 FIELD-NAME is the name of the field being edited.  Key is read
 with `ebib--read-ref-as-entry'.
 
@@ -4351,7 +4351,7 @@ The other two argument places are for compatibility with
     (string-join list ", ")))
 
 (defun ebib--edit-list-field (field-name fields init-contents &optional &rest extra-tables)
-  "Edit a 'name list' or 'literal list' type field.
+  "Edit a \"name list\" or \"literal list\" type field.
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field.  In name- and
@@ -4404,7 +4404,7 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
    ebib--biblatex-language-keys))
 
 (defun ebib--edit-separated-values-field (field-name fields init-contents)
-  "Edit a 'separated values' type field.
+  "Edit a \"separated values\" type field.
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field, assumed to be a
@@ -4467,7 +4467,7 @@ a special manner."
       (with-current-ebib-buffer 'index
         (let ((key (ebib--get-key-at-point))
               (inhibit-read-only t))
-          (delete-region (point-at-bol) (1+ (point-at-eol)))
+          (delete-region (pos-bol) (1+ (pos-eol)))
           (ebib--insert-entry-in-index-sorted key t)))))
 
 (defun ebib-view-file-in-field (arg)
@@ -4843,7 +4843,7 @@ When the user enters an empty string, the value is not changed."
     (when (y-or-n-p (format "Delete @String definition %s? " string))
       (ebib-db-remove-string string ebib--cur-db)
       (let ((inhibit-read-only t))
-        (delete-region (point-at-bol) (1+ (point-at-eol))))
+        (delete-region (pos-bol) (1+ (pos-eol))))
       (when (eobp)                      ; Deleted the last string.
         (forward-line -1))
       (ebib--redisplay-strings-buffer)

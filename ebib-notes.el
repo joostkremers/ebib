@@ -41,6 +41,7 @@
 (require 'org-element nil t) ; Load org-element.el if available.
 
 (declare-function org-capture-get "org-capture" (prop &optional local))
+(declare-function ebib-extract-note-text-default "ext:ebib" (key truncate))
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
 

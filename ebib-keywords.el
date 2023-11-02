@@ -40,7 +40,7 @@
 (require 'ebib-utils)
 (require 'ebib-db)
 
-(defgroup ebib-keywords nil "Keyword settings for Ebib" :group 'ebib)
+(defgroup ebib-keywords nil "Keyword settings for Ebib." :group 'ebib)
 
 (defcustom ebib-keywords-separator ", "
   "String for separating keywords in the `keyword' field.

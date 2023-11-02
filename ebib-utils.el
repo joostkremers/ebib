@@ -1822,7 +1822,7 @@ nil, braces are added if not already present.  NOBRACE may also be
 the symbol `as-is', in which case the value is stored as is.
 
 A field can be removed from the entry by passing nil as VALUE and
-setting IF-EXISTS to 'overwrite.
+setting IF-EXISTS to `overwrite'.
 
 Return t upon success, or nil if the value could not be stored."
   (if (eq if-exists 'append)
@@ -1901,7 +1901,7 @@ return value."
 (defun ebib--propertize-xdata-warnings (parts xkey xfield &optional xindex help-echo)
   "Return a granular xdata ref string with warning properties.
 PARTS is a list containing any the symbols `key' `field' and
-'index', in any order.  XKEY is the key of the XData entry being
+`index', in any order.  XKEY is the key of the XData entry being
 referred to.  XFIELD is the field referred to in that entry,
 .XINDEX is the index of the item in the value of the field, if
 provided.  See the BibLaTeX manual, section 3.13.6 for more
@@ -2006,7 +2006,7 @@ If unsuccessful, text is propertized appropriately:
 (defun ebib--get-xref-alist (key db)
   "Return alist of crossreferencing keys in entry KEY, in DB.
 Only keys entered as values in the crossref, xdata and xref
-fields are considered (keys used in 'granular' xdata entries like
+fields are considered (keys used in `granular' xdata entries like
 \"xdata=fookey-foofield\" are not considered).
 
 The car of each element is the string name of the field
