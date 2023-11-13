@@ -323,6 +323,8 @@ If you want to force-save a database that has not been modified, you can use a p
 
 You can also save a database to another name with [`w`]{.key}. This command is similar to [`C-x C-w`]{.key} in Emacs: the new `.bib` file becomes associated with the database. This command can also be prefixed with [`C-u`]{.key} in order to overwrite any existing file without asking for confirmation.
 
+Note that by default, Ebib uses a single TAB to indent fields inside BibTeX entries. If you prefer to use spaces, set the option `ebib-save-indent-as-bibtex`. When this option is set, Ebib uses the value of the variables `bibtex-entry-offset` and `bibtex-field-indentation` to compute how many spaces to use to indent fields.
+
 
 ### Exporting Entries ### {.unlisted .unnumbered }
 

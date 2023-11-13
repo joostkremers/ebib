@@ -1,5 +1,11 @@
 % Ebib News
 
+## Version 2.40, November 2023 ##
+
+- New user option `ebib-save-indent-as-bibtex`: use spaces for indenting fields,
+  and use the same indentation that `bibtex-mode` would use.
+- Various bug fixes.
+
 ## Version 2.39, September 2022 ##
 
 - New user option `ebib-field-edit-functions` allows one to customise the way fields are edited.

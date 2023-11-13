@@ -836,6 +836,16 @@ one."
   :group 'ebib
   :type 'boolean)
 
+(defcustom ebib-save-indent-as-bibtex nil
+  "If non-nil, use `bibtex-mode' variables for indentation when saving.
+By default, when saving a `.bib' file, Ebib uses a single TAB
+character to indent fields.  When this option is set, Ebib uses
+the values of the variables `bibtex-entry-offset' and
+`bibtex-field-indentation' to compute the indentation and indents
+using spaces."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-use-timestamp nil
   "Add a timestamp to new entries.
 If this option is set, Ebib will add a `timestamp` field to every
@@ -2125,10 +2135,13 @@ formatting the entry."
                     ;; back.  See github issues #42, #55, #62.
                     (reverse entry)))
       (insert (format "@%s{%s,\n" type key))
-      (insert (mapconcat (lambda (field)
-                           (format "\t%s = %s" (car field) (cdr field)))
-                         entry
-                         ",\n"))
+      (let ((indent (if ebib-save-indent-as-bibtex
+                        (make-string (+ bibtex-entry-offset bibtex-field-indentation) ?\s)
+                      "\t")))
+        (insert (mapconcat (lambda (field)
+                             (format "%s%s = %s" indent (car field) (cdr field)))
+                           entry
+                           ",\n")))
       (insert "\n}\n\n"))))
 
 (defun ebib--format-comments (db)

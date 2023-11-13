@@ -12,14 +12,19 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
     ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -81,7 +86,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="styles/manual.css" />
   <!-- Favicon -->
@@ -1039,6 +1043,12 @@ class="key"><code>C-x C-w</code></span> in Emacs: the new
 command can also be prefixed with <span
 class="key"><code>C-u</code></span> in order to overwrite any existing
 file without asking for confirmation.</p>
+<p>Note that by default, Ebib uses a single TAB to indent fields inside
+BibTeX entries. If you prefer to use spaces, set the option
+<code>ebib-save-indent-as-bibtex</code>. When this option is set, Ebib
+uses the value of the variables <code>bibtex-entry-offset</code> and
+<code>bibtex-field-indentation</code> to compute how many spaces to use
+to indent fields.</p>
 <h3 class="unlisted unnumbered" id="exporting-entries">Exporting
 Entries</h3>
 <p>Sometimes it can be useful to copy entries from one database to
@@ -1381,21 +1391,21 @@ major mode you use in the multiline edit buffer, you can change them, of
 course. To do this, put something like the following in your init
 file:</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(with-eval-after-load &#39;ebib</span>
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(with-eval-after-load <span class="dt">&#39;ebib</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c c&quot;</span> <span class="kw">nil</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | c&quot;</span> &#39;ebib-quit-multiline-buffer-and-save)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | c&quot;</span> <span class="dt">&#39;ebib-quit-multiline-buffer-and-save</span>)</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c s&quot;</span> <span class="kw">nil</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> &#39;ebib-save-from-multiline-buffer))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> <span class="dt">&#39;ebib-save-from-multiline-buffer</span>))</span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c k&quot;</span> <span class="kw">nil</span>)</span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> &#39;ebib-cancel-multiline-buffer)</span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> <span class="dt">&#39;ebib-cancel-multiline-buffer</span>)</span></code></pre></div>
 <p>This removes the key bindings for <span
 class="key"><code>C-c c</code></span>, <span
 class="key"><code>C-c s</code></span> and <span
@@ -2149,9 +2159,9 @@ Biblio, you can add support for it to Ebib by loading the package
 <code>ebib-biblio</code> in your init file and adding an entry to
 <code>biblio-selection-mode-map</code>:</p>
 <div class="sourceCode" id="cb26"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">require</span> &#39;ebib-biblio)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>(define-key ebib-index-mode-map (kbd <span class="st">&quot;B&quot;</span>) #&#39;ebib-biblio-import-doi)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>(define-key biblio-selection-mode-map (kbd <span class="st">&quot;e&quot;</span>) #&#39;ebib-biblio-selection-import)</span></code></pre></div>
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">require</span> <span class="dt">&#39;ebib-biblio</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>(define-key ebib-index-mode-map (kbd <span class="st">&quot;B&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-import-doi)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>(define-key biblio-selection-mode-map (kbd <span class="st">&quot;e&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-selection-import)</span></code></pre></div>
 <p>Or with <code>use-package</code>:</p>
 <div class="sourceCode" id="cb27"><pre
 class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">use-package</span> ebib-biblio</span>
