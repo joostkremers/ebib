@@ -1965,32 +1965,34 @@ ORDER indicates the sort order and should be either `ascend' or
 
 (defun ebib--update-keyname (new-key)
   "Change the key of the current BibTeX entry to NEW-KEY.
-This function updates both the database and the buffer."
-  (let* ((cur-key (ebib--get-key-at-point))
-         (marked (ebib-db-marked-p cur-key ebib--cur-db))
-         (actual-new-key (ebib-db-change-key cur-key new-key ebib--cur-db (if ebib-uniquify-keys 'uniquify 'noerror))))
-    (when actual-new-key
-      (ebib-db-set-current-entry-key actual-new-key ebib--cur-db)
-      (when marked
-        (ebib-db-toggle-mark cur-key ebib--cur-db)
-        (ebib-db-toggle-mark actual-new-key ebib--cur-db))
-      (with-current-ebib-buffer 'index
-	(let ((inhibit-read-only t))
-          (delete-region (pos-bol) (1+ (pos-eol)))))
-      (ebib--insert-entry-in-index-sorted actual-new-key t marked)
-      ;; Also update dependent databases.
-      (let ((dependents (seq-filter (lambda (db)
-                                      (ebib-db-has-key cur-key db))
-                                    (ebib--list-dependents ebib--cur-db))))
-        (mapc (lambda (dependent)
-                (ebib-db-remove-entries-from-dependent cur-key dependent)
-                (ebib-db-add-entries-to-dependent actual-new-key dependent)
-                (ebib--mark-index-dirty dependent)
-                (when (ebib-db-marked-p cur-key dependent)
-                  (ebib-db-unmark-entry cur-key dependent)
-                  (ebib-db-mark-entry actual-new-key dependent)))
-              dependents)
-        (ebib--set-modified t ebib--cur-db nil dependents)))))
+This function updates both the database and the buffer.  Note
+that nothing is changed if NEW-KEY is equal to the existing key."
+  (let ((cur-key (ebib--get-key-at-point)))
+    (unless (string= new-key cur-key)
+      (let ((marked (ebib-db-marked-p cur-key ebib--cur-db))
+            (actual-new-key (ebib-db-change-key cur-key new-key ebib--cur-db (if ebib-uniquify-keys 'uniquify 'noerror))))
+        (when actual-new-key
+          (ebib-db-set-current-entry-key actual-new-key ebib--cur-db)
+          (when marked
+            (ebib-db-toggle-mark cur-key ebib--cur-db)
+            (ebib-db-toggle-mark actual-new-key ebib--cur-db))
+          (with-current-ebib-buffer 'index
+	    (let ((inhibit-read-only t))
+              (delete-region (pos-bol) (1+ (pos-eol)))))
+          (ebib--insert-entry-in-index-sorted actual-new-key t marked)
+          ;; Also update dependent databases.
+          (let ((dependents (seq-filter (lambda (db)
+                                          (ebib-db-has-key cur-key db))
+                                        (ebib--list-dependents ebib--cur-db))))
+            (mapc (lambda (dependent)
+                    (ebib-db-remove-entries-from-dependent cur-key dependent)
+                    (ebib-db-add-entries-to-dependent actual-new-key dependent)
+                    (ebib--mark-index-dirty dependent)
+                    (when (ebib-db-marked-p cur-key dependent)
+                      (ebib-db-unmark-entry cur-key dependent)
+                      (ebib-db-mark-entry actual-new-key dependent)))
+                  dependents)
+            (ebib--set-modified t ebib--cur-db nil dependents)))))))
 
 (defun ebib-mark-entry (arg)
   "Mark or unmark the current entry.
