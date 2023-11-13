@@ -9,7 +9,7 @@
 ;; Version: 2.39
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
-;; Package-Requires: ((parsebib "4.0") (emacs "26.1"))
+;; Package-Requires: ((parsebib "4.0") (emacs "26.1") (compat "29.1.4.3")
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -57,6 +57,7 @@
 (require 'pp)
 (require 'hl-line)
 (require 'mule-util)
+(require 'compat)  ; for `pos-bol', `pos-eol'.
 (require 'parsebib)
 (require 'button)
 (require 'ebib-utils)
