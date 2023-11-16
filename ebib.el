@@ -4412,7 +4412,7 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
 INIT-CONTENTS is the original value of the field and should be a
-BibTeX list (i.e., a string consisting of comma-separated
+Biblatex list (i.e., a string consisting of comma-separated
 values).
 
 See also `ebib-field-edit-functions'."
