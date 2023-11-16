@@ -2034,10 +2034,14 @@ system."
 	 (xref-key (ebib-get-field-value "xref" key db 'noerror 'unbraced)))
     ;; Alist of name of refering field, and bibkey to which it refers. Order
     ;; matters here -- earlier xdata keys take precedence, then later ones, then
-    ;; the crossref key (this follows the BibLaTeX implementation).
-    `(,@(mapcar (lambda (key) `("xdata" . ,key)) xdata-key-list)
-      ,@(when crossref-key `(("crossref" . ,crossref-key)))
-      ,@(when xref-key `(("xref" . ,xref-key))))))
+    ;; the crossref key (this follows the BibLaTeX implementation).  As a
+    ;; precaution, cross-referencing fields that reference the entry itself are
+    ;; removed, because they would throw Ebib in an infinite loop.
+    (cl-remove-if (lambda (e)
+                    (string= key (cdr e)))
+                  `(,@(mapcar (lambda (key) `("xdata" . ,key)) xdata-key-list)
+                    ,@(when crossref-key `(("crossref" . ,crossref-key)))
+                    ,@(when xref-key `(("xref" . ,xref-key)))))))
 
 (defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
   "Return the value of FIELD in entry KEY in database DB.
