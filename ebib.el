@@ -4411,8 +4411,9 @@ Arguments FIELD-NAME, FIELDS AND INIT-CONTENTS are as in
   "Edit a \"separated values\" type field.
 FIELD-NAME is the name of the field being edited.  FIELDS is a
 list of fields from which to pull completion candidates.
-INIT-CONTENTS is the original value of the field, assumed to be a
-list separated by commas with optional whitespace on either side.
+INIT-CONTENTS is the original value of the field and should be a
+BibTeX list (i.e., a string consisting of comma-separated
+values).
 
 See also `ebib-field-edit-functions'."
   ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
