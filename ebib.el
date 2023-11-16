@@ -4420,15 +4420,19 @@ See also `ebib-field-edit-functions'."
   ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
   (let* ((crm-local-completion-map (make-composed-keymap '(keymap (32)) crm-local-completion-map))
          (crm-separator "[[:space:]]*,[[:space:]]*")
-	 (collection
-	  ;; Account for fields containing more than one entry, e.g.
-	  ;; keywords = {Bar, Foo, Qux}
-	  (delete-dups
-	   (apply
-	    #'append
-	    (mapcar (lambda (str)
-		      (split-string str crm-separator t "[[:space:]]"))
-		    (ebib--create-collection-from-fields fields)))))
+         ;; If we're editing the "keywords" field, the completion candidates are
+         ;; taken from `ebib--keywords-completion-list'. Otherwise, we collect
+         ;; all the values for the current field in the currently open
+         ;; databases. Since the field values are actually (Biblatex) list, we
+         ;; need to split them on commas.))
+	 (collection (if (string= field-name "keywords")
+                         ebib--keywords-completion-list
+	               (delete-dups
+	                (apply
+	                 #'append
+	                 (mapcar (lambda (str)
+		                   (split-string str crm-separator t "[[:space:]]"))
+		                 (ebib--create-collection-from-fields fields))))))
 	 (result (completing-read-multiple
 		  (format "%s: " field-name) collection nil nil
 		  ;; Append a crm-separator to the result, so that
