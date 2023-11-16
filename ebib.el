@@ -2755,18 +2755,19 @@ on a field which crossrefs other entries (`crossref', `xdata' or
   :type 'boolean)
 
 (defun ebib-follow-crossref (&optional arg)
-  "Jump to an entry crossreffed from the current entry.
-Crossreffed entries are those whose key appears in the
-`crossref', `xdata' or `xref' fields of the current entry.
+  "Jump to an entry cross-referenced from the current entry.
+Cross-referenced entries are those whose key appears in the
+\"crossref\", \"xdata\" or \"xref\" fields of the current entry.
 
 If the entry buffer is current, and the current field is one of
-`crosref', `xdata' or `xref', and has a value, then only consider
-keys in that value.  ARG forces considering all crossref keys.
+\"crossref\", \"xdata\" or \"xref\", and has a value, then only
+consider keys in that value.  ARG forces considering all
+cross-referencing keys.
 
 If there is only one such entry, switch to it.  If there is more
 than one, allow the user to choose one from a list.  If there are
 none, search for the first entry with the current entry's key in
-one of its crossreffing fields."
+one of its cross-referencing fields."
   (interactive "P")
   (ebib--execute-when
     (entries
