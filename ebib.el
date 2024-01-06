@@ -699,12 +699,9 @@ not have an associated index buffer, create one and fill it."
 MATCH-STR is a regexp that will be highlighted when it occurs in
 the field contents."
   (when ebib--note-window
-    (if (window-live-p ebib--note-window)
-        (let ((buf (window-buffer ebib--note-window)))
-          (delete-window ebib--note-window)
-          (if (eq ebib-notes-storage 'one-file-per-note)
-              (kill-buffer buf))
-          (setq ebib--needs-update nil))) ; See below.
+    (when (window-live-p ebib--note-window)
+      (delete-window ebib--note-window)
+      (setq ebib--needs-update nil)) ; See below.
     (setq ebib--note-window nil))
   (with-current-ebib-buffer 'entry
     (let ((inhibit-read-only t)
