@@ -351,7 +351,7 @@ Otherwise just open the note file for KEY.
 Return a cons of the buffer and the position of the note in the
 buffer: in a multi-note file, this is the position of the
 Custom_ID of the note; if each note has its own file, the
-position is simply 1.
+position is set to point.
 
 If KEY has no note, return nil."
   (cond
@@ -373,7 +373,7 @@ If KEY has no note, return nil."
                  ;; Otherwise try and open the file.
                  (and (file-readable-p filename)
                       (ebib--notes-open-single-note-file filename)))))
-      (when buf (cons buf 1))))))
+      (when buf (cons buf (with-current-buffer buf (point))))))))
 
 (defun ebib--notes-create-new-note (key db)
   "Create a note for KEY in DB.
