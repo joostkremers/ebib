@@ -453,7 +453,7 @@ name is fully qualified by prepending the directory in
 Return the buffer but do not select it."
   (let ((buf (find-file-noselect file)))
     (with-current-buffer buf
-      (add-hook 'after-save-hook 'ebib--maybe-update-entry-buffer nil t))
+      (add-hook 'after-save-hook 'ebib--update-entry-buffer-keep-note))
     buf))
 
 ;;; Common notes file.

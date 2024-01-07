@@ -694,38 +694,44 @@ not have an associated index buffer, create one and fill it."
 
 (defvar ebib--note-window nil "Window showing the current entry's note.")
 
-(defun ebib--update-entry-buffer (&optional match-str)
+(defun ebib--update-entry-buffer (&optional match-str keep-note)
   "Fill the entry buffer with the fields of the current entry.
 MATCH-STR is a regexp that will be highlighted when it occurs in
-the field contents."
-  (when ebib--note-window
-    (when (window-live-p ebib--note-window)
-      (delete-window ebib--note-window)
-      (setq ebib--needs-update nil)) ; See below.
-    (setq ebib--note-window nil))
-  (with-current-ebib-buffer 'entry
-    (let ((inhibit-read-only t)
-          (key (ebib--get-key-at-point)))
-      (erase-buffer)
-      (when key   ; Are there entries being displayed?
-        (ebib--display-fields key ebib--cur-db match-str)
-        (goto-char (point-min))
-        (if (and (get-buffer-window (ebib--buffer 'entry))
-                 (eq ebib-notes-show-note-method 'all)
-                 (eq ebib-layout 'full)
-                 (ebib--notes-has-note key))
-            (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point)))
-                  ;; If Ebib is lowered and then reopened, we need to redisplay
-                  ;; the entry buffer, because otherwise the notes buffer isn't
-                  ;; redisplayed. So we set the variable `ebib--needs-update' to
-                  ;; t, which then causes the command `ebib' to redisplay the
-                  ;; buffers. This is a hack, but the simplest way to do it.
-                  ebib--needs-update t))))))
+the field contents.
 
-(defun ebib--maybe-update-entry-buffer ()
-  "Update the entry buffer if it exists."
-  (if (ebib--buffer 'entry)
-      (ebib--update-entry-buffer)))
+If KEEP-NOTE is non-nil, the window showing the current entry's
+note is not recreated."
+  (when (ebib--buffer 'entry)
+    (when (and ebib--note-window (not keep-note))
+      (when (window-live-p ebib--note-window)
+        (delete-window ebib--note-window)
+        (setq ebib--needs-update nil))  ; See below.
+      (setq ebib--note-window nil))
+    (with-current-ebib-buffer 'entry
+      (let ((inhibit-read-only t)
+            (key (ebib--get-key-at-point)))
+        (erase-buffer)
+        (when key   ; Are there entries being displayed?
+          (ebib--display-fields key ebib--cur-db match-str)
+          (goto-char (point-min))
+          (if (and (not keep-note)
+                   (get-buffer-window (ebib--buffer 'entry))
+                   (eq ebib-notes-show-note-method 'all)
+                   (eq ebib-layout 'full)
+                   (ebib--notes-has-note key))
+              (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point)))
+                    ;; If Ebib is lowered and then reopened, we need to redisplay
+                    ;; the entry buffer, because otherwise the notes buffer isn't
+                    ;; redisplayed. So we set the variable `ebib--needs-update' to
+                    ;; t, which then causes the command `ebib' to redisplay the
+                    ;; buffers. This is a hack, but the simplest way to do it.
+                    ebib--needs-update t)))))))
+
+(defun ebib--update-entry-buffer-keep-note ()
+  "Update the entry buffer but keep the note window."
+  ;; This function is used in `after-save-hook' in note buffers. See
+  ;; `ebib--notes-open-single-note-file'.
+  (ebib--update-entry-buffer nil t))
 
 (defun ebib--set-modified (mod db &optional main dependents)
   "Set the modified flag MOD on database DB.
