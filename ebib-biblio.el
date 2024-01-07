@@ -48,6 +48,8 @@
 ;;; Code:
 
 (require 'biblio nil 'noerror)
+(require 'bibtex)
+(require 'ebib-db)
 
 (defvar ebib--databases)
 (defvar ebib--cur-db)
@@ -68,10 +70,7 @@ The entry is stored in the current database."
   (interactive "MDOI: ")
   (biblio-doi-forward-bibtex (biblio-cleanup-doi doi)
                              (lambda (result)
-                               (with-temp-buffer
-                                 (biblio-doi--insert (biblio-format-bibtex result biblio-bibtex-use-autokey)
-                                                     (current-buffer))
-                                 (ebib-import-entries ebib--cur-db)))))
+                               (ebib-biblio-selection-import-callback (biblio-format-bibtex result biblio-bibtex-use-autokey) nil))))
 
 (defun ebib-biblio-selection-import-callback (bibtex _entry)
   "Add a BibTeX entry to the current Ebib database.
@@ -79,7 +78,14 @@ BIBTEX is the textual representation of the entry, ENTRY is its
 metadata."
   (with-temp-buffer
     (insert bibtex)
-    (ebib-import-entries ebib--cur-db)))
+    (let ((key (save-excursion
+                 (goto-char (point-min))
+                 (looking-at bibtex-any-entry-maybe-empty-head)
+                 (bibtex-key-in-head))))
+      (ebib-import-entries ebib--cur-db)
+      (when key
+        (ebib-db-set-current-entry-key key ebib--cur-db))
+      (ebib--update-buffers))))
 
 (defun ebib-biblio-selection-import ()
   "Import the current entry in the `biblio.el' selection buffer into Ebib."
