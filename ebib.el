@@ -1680,7 +1680,7 @@ note or `ebib-notes-new-note-hook' for a new note."
              (run-hooks hook)))
          (pop-to-buffer (car buf)))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-org-capture (&optional goto keys)
   "Call `org-capture' from within Ebib.
