@@ -812,7 +812,7 @@ If a BibTeX entry in the buffer lacks an entry key (which sometimes happens with
 
 ## Integration with the Biblio package ##
 
-[Biblio](https://github.com/cpitclaudel/biblio.el) is a package with which you can browse a number of online bibliographic databases and import BibTeX entries based on their DOI. If you use Biblio, you can add support for it to Ebib by loading the package `ebib-biblio` in your init file and adding an entry to `biblio-selection-mode-map`:
+[Biblio](https://github.com/cpitclaudel/biblio.el) is a package with which you can browse a number of online bibliographic databases and import BibTeX entries based on their DOI. If you use Biblio, you can add support for it to Ebib by loading the package `ebib-biblio` in your init file and adding two keybindings: one to `ebib-index-mode-map` and one to `biblio-selection-mode-map`:
 
 ```lisp
 (require 'ebib-biblio)
@@ -833,7 +833,7 @@ Or with `use-package`:
 
 If you now call `biblio-lookup`, you can use the key [`e`]{.key} (or any other key you choose, of course) in Biblio's selection buffer to import the selected entry into the current Ebib database.
 
-Additionally, you can use the key [`B`]{.key} in Ebib's index buffer to import an entry into the current database if you have its DOI.
+Additionally, you can use the key [`B`]{.key} in Ebib's index buffer to import an entry into the current database if you have its DOI. Here, too, you can choose a different key, of course.
 
 When fetching entries via Biblio, Ebib checks for duplicates based on the key of the new entry. This will only work reliably if both Ebib and Biblio are configured to automatically generate BibTeX keys. Ebib does this by default (see the option `ebib-autogenerate-keys`), Biblio can be configured to do so by setting the option `biblio-bibtex-use-autokey`.
 

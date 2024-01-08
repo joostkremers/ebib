@@ -2156,7 +2156,8 @@ package</h2>
 package with which you can browse a number of online bibliographic
 databases and import BibTeX entries based on their DOI. If you use
 Biblio, you can add support for it to Ebib by loading the package
-<code>ebib-biblio</code> in your init file and adding an entry to
+<code>ebib-biblio</code> in your init file and adding two keybindings:
+one to <code>ebib-index-mode-map</code> and one to
 <code>biblio-selection-mode-map</code>:</p>
 <div class="sourceCode" id="cb26"><pre
 class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">require</span> <span class="dt">&#39;ebib-biblio</span>)</span>
@@ -2176,7 +2177,8 @@ course) in Biblio’s selection buffer to import the selected entry into
 the current Ebib database.</p>
 <p>Additionally, you can use the key <span
 class="key"><code>B</code></span> in Ebib’s index buffer to import an
-entry into the current database if you have its DOI.</p>
+entry into the current database if you have its DOI. Here, too, you can
+choose a different key, of course.</p>
 <p>When fetching entries via Biblio, Ebib checks for duplicates based on
 the key of the new entry. This will only work reliably if both Ebib and
 Biblio are configured to automatically generate BibTeX keys. Ebib does

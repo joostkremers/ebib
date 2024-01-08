@@ -38,9 +38,11 @@
 ;;
 ;; To use this code, `require' it in your init file.  This adds the key "B" to
 ;; the index mode map, which fetches a BibTeX entry by DOI
-;; (`ebib-biblio-import-doi').  You should also add a key to
-;; `biblio-selection-mode-map' and bind it to `ebib-biblio-selection-import':
+;; (`ebib-biblio-import-doi').  You should also add a binding to
+;; `ebib-index-mode-map' for `ebib-biblio-import-doi', and one to
+;; `biblio-selection-mode-map' for `ebib-biblio-selection-import':
 ;;
+;; (define-key ebib-index-mode-map (kbd "B") #'ebib-biblio-import-doi)
 ;; (define-key biblio-selection-mode-map (kbd "e") #'ebib-biblio-selection-import)
 
 ;;; Code:
@@ -49,7 +51,6 @@
 
 (defvar ebib--databases)
 (defvar ebib--cur-db)
-(defvar ebib-index-mode-map)
 (declare-function ebib-read-database "ext:ebib.el" (prompt &optional databases))
 (declare-function ebib-import-entries "ext:ebib.el" (&optional db))
 
