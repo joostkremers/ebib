@@ -1,6 +1,7 @@
 ;;; ebib-biblio.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2003-2022 Joost Kremers
+;; Copyright (c) 2024 Samuel W. Flint
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
