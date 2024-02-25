@@ -468,7 +468,7 @@ necessary.  If FILE cannot be opened, an error is raised."
         (error "[Ebib] Cannot read or create notes file"))
       (setq buf (find-file-noselect file))
       (with-current-buffer buf
-        (add-hook 'after-save-hook 'ebib--maybe-update-entry-buffer nil t)))
+        (add-hook 'after-save-hook 'ebib--update-entry-buffer-keep-note nil t)))
     buf))
 
 (provide 'ebib-notes)
