@@ -196,7 +196,7 @@ value is nil.  Note that this function searches in the current
 buffer."
   (save-excursion
     (goto-char (point-min))
-    (search-forward (funcall (cdr (assoc ?K ebib-reading-list-template-specifiers)) key nil) nil t)))
+    (re-search-forward (concat (funcall (cdr (assoc ?K ebib-reading-list-template-specifiers)) key nil) "$") nil t)))
 
 (defun ebib--reading-list-new-item (key db)
   "Add a reading list item for KEY in DB.
