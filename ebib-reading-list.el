@@ -210,6 +210,8 @@ return nil."
       (insert (ebib--reading-list-fill-template key db))
       (run-hooks 'ebib-reading-list-new-item-hook)
       (save-buffer)
+      (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+      (ebib--update-buffers)
       key)))
 
 (defun ebib--reading-list-remove-item (key)
@@ -223,6 +225,8 @@ do nothing and return nil."
         (funcall ebib-reading-list-remove-item-function)
         (run-hooks 'ebib-reading-list-remove-item-hook)
         (save-buffer)
+        (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)
+        (ebib--update-buffers)
         key))))
 
 (defun ebib--reading-list-fill-template (key db)
