@@ -2545,7 +2545,9 @@ your notes in a single file, the template <strong>must</strong> contain
 a <code>:PROPERTIES:</code> block with the <code>%K</code> format
 specifier, because it is required in order to identify the note and
 connect it to its BibTeX entry. Without it, Ebib won’t be able to tell
-whether an entry has a note or not and won’t be able to display it.</p>
+whether an entry has a note or not and won’t be able to display it. Also
+keep in mind that the <code>%K</code> specifier <strong>must</strong>
+occur on a line of its own in the template.</p>
 <p>If you use a separate file for each note, the notes are identified by
 the file name, so there’s no real need for the <code>:PROPERTIES:</code>
 block, but it can still be useful if you use other Org-based tools on

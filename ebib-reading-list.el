@@ -65,7 +65,9 @@ sign and a character.  These specifiers are defined by
 must be present in the template and should be replaced by an
 identifier that is unique for the entry.  This identifier is used
 to retrieve the item.  Without it, Ebib is not able to determine
-whether an entry is on the reading list or not."
+whether an entry is on the reading list or not.  Note also that
+`%K' must be on a line of its own in the template (i.e., must be
+surrounded by \\n characters."
   :group 'ebib-reading-list
   :type '(string "Reading list item template"))
 

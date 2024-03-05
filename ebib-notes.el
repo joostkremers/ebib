@@ -146,6 +146,8 @@ Note that the `%K' specifier must be present in the template and
 should be replaced by an identifier that is unique for the entry.
 This identifier is used to retrieve the note.  Without it, Ebib
 is not able to determine whether an entry has a note or not.
+Note also that `%K` must occur on a line of its own, i.e., must
+be surrounded by \\n characters in the template.''
 
 The template can also contain the string \"%%?\" to indicate the
 position where the cursor is to be placed when creating a new

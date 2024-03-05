@@ -2538,7 +2538,8 @@ notes in a single file, the template *must* contain a ‘:PROPERTIES:’
 block with the ‘%K’ format specifier, because it is required in order to
 identify the note and connect it to its BibTeX entry.  Without it, Ebib
 won't be able to tell whether an entry has a note or not and won't be
-able to display it.
+able to display it.  Also keep in mind that the ‘%K’ specifier *must*
+occur on a line of its own in the template.
 
 If you use a separate file for each note, the notes are identified by
 the file name, so there's no real need for the ‘:PROPERTIES:’ block, but
@@ -3252,26 +3253,26 @@ Node: Upgrading from earlier Ebib versions120463
 Ref: #upgrading-from-earlier-ebib-versions120686
 Node: Customising the notes file format121596
 Ref: #customising-the-notes-file-format121824
-Node: Displaying notes125832
-Ref: #displaying-notes126023
-Node: Using org-capture to record notes127368
-Ref: #using-org-capture-to-record-notes127559
-Node: Managing a reading list133555
-Ref: #managing-a-reading-list133717
-Node: Managing Keywords136732
-Ref: #managing-keywords136888
-Node: Using a Canonical Keywords List138495
-Ref: #using-a-canonical-keywords-list138653
-Node: Window Management140791
-Ref: #window-management140956
-Node: Copying Entries to the Kill Ring144091
-Ref: #copying-entries-to-the-kill-ring144290
-Node: Printing the Database147013
-Ref: #printing-the-database147186
-Node: Customisation150629
-Ref: #customisation150745
-Node: Modifying Key Bindings151959
-Ref: #modifying-key-bindings152086
+Node: Displaying notes125930
+Ref: #displaying-notes126121
+Node: Using org-capture to record notes127466
+Ref: #using-org-capture-to-record-notes127657
+Node: Managing a reading list133653
+Ref: #managing-a-reading-list133815
+Node: Managing Keywords136830
+Ref: #managing-keywords136986
+Node: Using a Canonical Keywords List138593
+Ref: #using-a-canonical-keywords-list138751
+Node: Window Management140889
+Ref: #window-management141054
+Node: Copying Entries to the Kill Ring144189
+Ref: #copying-entries-to-the-kill-ring144388
+Node: Printing the Database147111
+Ref: #printing-the-database147284
+Node: Customisation150727
+Ref: #customisation150843
+Node: Modifying Key Bindings152057
+Ref: #modifying-key-bindings152184
 
 End Tag Table
 
