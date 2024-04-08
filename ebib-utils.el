@@ -1647,7 +1647,7 @@ empty string."
 
 (defun ebib-create-org-file-link (key db)
   "Create an org link to the file in entry KEY in DB.
-The file is taken from the \"file\" filed in the entry designated
+The file is taken from the \"file\" field in the entry designated
 by KEY in the current database.  If that field contains more than
 one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
