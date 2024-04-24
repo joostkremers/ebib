@@ -131,7 +131,7 @@
   ("yaml_metadata_block"))
  (output . "NEWS.html")
  (data-dir)
- (output-dir . "~/src/Elisp/ebib/docs/")
+ (output-dir . "~/src/ebib/docs/")
  (template)
  (css "styles/manual.css")
  (reference-odt)
