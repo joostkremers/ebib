@@ -96,7 +96,7 @@ entry buffer."
                                         ('key+filename (format "%s@%s" key (ebib-db-get-filename ebib--cur-db :shortened)))
                                         ('key+filepath (format "%s@%s" key (ebib-db-get-filename ebib--cur-db))))))
            (description (ignore-errors (funcall ebib-citation-description-function key ebib--cur-db))))
-      (org-store-link-props :type "ebib"
+      (org-link-store-props :type "ebib"
                             :link link
                             :description description))))
 
@@ -137,14 +137,14 @@ position in the relevant buffer."
       (goto-char position)
       (goto-char (org-element-property :begin (org-element-context)))
       (cond
-       ((looking-at org-bracket-link-regexp)
+       ((looking-at org-link-bracket-re)
         (mapconcat 'org-ebib-make-help-echo-string
                    (split-string
                     (cadr (split-string (match-string-no-properties 1)
                                         ":" t "[[:punct:]]*"))
                     "," t)
                    "\n"))
-       ((looking-at org-plain-link-re)
+       ((looking-at org-link-plain-re)
         (mapconcat 'org-ebib-make-help-echo-string
                    (split-string
                     (cadr (split-string (match-string-no-properties 0)
