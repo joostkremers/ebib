@@ -5204,7 +5204,7 @@ pdf.  The file name is created by applying the function in
                  (ebib--update-entry-buffer))))
          (error "[Ebib] No URL found in url field"))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib--transform-url (url)
   "Transform URL by applying `ebib-url-download-transformations' to it.
