@@ -35,7 +35,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -2442,11 +2442,11 @@ file name, however, Ebib applies the function in
 <code>ebib-notes-name-transform-function</code> to it, or, if this is
 not set, the function in <code>ebib-name-transform-function</code>. This
 means that you can configure the name of the new note file to whatever
-you prefer. (See <a href="#viewing-and-importing-files">Viewing
-Files</a> for some examples of the changes that can be applied. Note
-that if you do not wish to apply any changes but also do not want the
-function in <code>ebib-name-transform-function</code> to be applied, you
-can set <code>ebib-notes-name-transform-function</code> to
+you prefer. (See <a href="#viewing-and-importing-files">Viewing and
+Importing Files</a> for some examples of the changes that can be
+applied. Note that if you do not wish to apply any changes but also do
+not want the function in <code>ebib-name-transform-function</code> to be
+applied, you can set <code>ebib-notes-name-transform-function</code> to
 <code>identity</code>.)</p>
 <p>If <code>ebib-notes-storage</code> is set to
 <code>multiple-notes-per-files</code>, Ebib won’t create a new file when

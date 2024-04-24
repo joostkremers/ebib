@@ -2419,11 +2419,12 @@ gives it a name that consists of the entry key plus the extension
 function in ‘ebib-notes-name-transform-function’ to it, or, if this is
 not set, the function in ‘ebib-name-transform-function’.  This means
 that you can configure the name of the new note file to whatever you
-prefer.  (See *note Viewing Files: #viewing-and-importing-files. for
-some examples of the changes that can be applied.  Note that if you do
-not wish to apply any changes but also do not want the function in
-‘ebib-name-transform-function’ to be applied, you can set
-‘ebib-notes-name-transform-function’ to ‘identity’.)
+prefer.  (See *note Viewing and Importing Files:
+#viewing-and-importing-files. for some examples of the changes that can
+be applied.  Note that if you do not wish to apply any changes but also
+do not want the function in ‘ebib-name-transform-function’ to be
+applied, you can set ‘ebib-notes-name-transform-function’ to
+‘identity’.)
 
 If ‘ebib-notes-storage’ is set to ‘multiple-notes-per-files’, Ebib won't
 create a new file when you create a new note.  Instead, it will ask you
@@ -3247,32 +3248,32 @@ Node: Notes files114132
 Ref: #notes-files114282
 Node: Configuring files for storing notes115770
 Ref: #configuring-files-for-storing-notes115948
-Node: Hooks118903
-Ref: #hooks119066
-Node: Upgrading from earlier Ebib versions120463
-Ref: #upgrading-from-earlier-ebib-versions120686
-Node: Customising the notes file format121596
-Ref: #customising-the-notes-file-format121824
-Node: Displaying notes125930
-Ref: #displaying-notes126121
-Node: Using org-capture to record notes127466
-Ref: #using-org-capture-to-record-notes127657
-Node: Managing a reading list133653
-Ref: #managing-a-reading-list133815
-Node: Managing Keywords136830
-Ref: #managing-keywords136986
-Node: Using a Canonical Keywords List138593
-Ref: #using-a-canonical-keywords-list138751
-Node: Window Management140889
-Ref: #window-management141054
-Node: Copying Entries to the Kill Ring144189
-Ref: #copying-entries-to-the-kill-ring144388
-Node: Printing the Database147111
-Ref: #printing-the-database147284
-Node: Customisation150727
-Ref: #customisation150843
-Node: Modifying Key Bindings152057
-Ref: #modifying-key-bindings152184
+Node: Hooks118917
+Ref: #hooks119080
+Node: Upgrading from earlier Ebib versions120477
+Ref: #upgrading-from-earlier-ebib-versions120700
+Node: Customising the notes file format121610
+Ref: #customising-the-notes-file-format121838
+Node: Displaying notes125944
+Ref: #displaying-notes126135
+Node: Using org-capture to record notes127480
+Ref: #using-org-capture-to-record-notes127671
+Node: Managing a reading list133667
+Ref: #managing-a-reading-list133829
+Node: Managing Keywords136844
+Ref: #managing-keywords137000
+Node: Using a Canonical Keywords List138607
+Ref: #using-a-canonical-keywords-list138765
+Node: Window Management140903
+Ref: #window-management141068
+Node: Copying Entries to the Kill Ring144203
+Ref: #copying-entries-to-the-kill-ring144402
+Node: Printing the Database147125
+Ref: #printing-the-database147298
+Node: Customisation150741
+Ref: #customisation150857
+Node: Modifying Key Bindings152071
+Ref: #modifying-key-bindings152198
 
 End Tag Table
 
