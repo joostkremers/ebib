@@ -69,9 +69,9 @@ file containing the key, or `key+filepath', which adds the full
 path to the `.bib' file.  If the file name or path is added, it
 is separated from the key with an @-sign."
   :group 'ebib
-  :type '(choice (const :tag "Key only" 'key)
-                 (const :tag "Key and file name" 'key+filename)
-                 (const :tag "Key and file path" 'key+filepath)))
+  :type '(choice (const :tag "Key only" key)
+                 (const :tag "Key and file name" key+filename)
+                 (const :tag "Key and file path" key+filepath)))
 
 (org-link-set-parameters "ebib" :follow #'org-ebib-open :store #'org-ebib-store-link)
 
