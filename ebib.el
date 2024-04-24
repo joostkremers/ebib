@@ -6,7 +6,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.40
+;; Version: 2.41
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "4.0") (emacs "27.1") (compat "29.1.4.3"))
@@ -5161,11 +5161,11 @@ If an entry is found in `ebib-url-download-transformations' that
 matches the URL, it is applied to the URL before attempting to
 download the file.
 
-The file is downloaded to the first entry for
-`ebib-file-search-dirs'.  It is assumed that the file linked is a
-pdf.  The file name is created by applying the function in
-`ebib-name-transform-function' to the entry key and by appending
-\".pdf\" to it."
+The file is downloaded to the directory specified by
+`ebib-import-target-directory'.  It is assumed that the file
+linked is a pdf.  The file name is created by applying the
+function in `ebib-name-transform-function' to the entry key and
+by appending \".pdf\" to it."
   (interactive "P")
   (ebib--execute-when
     (entries
@@ -5173,7 +5173,12 @@ pdf.  The file name is created by applying the function in
             (urls (ebib-get-field-value "url" key ebib--cur-db 'noerror 'unbraced)))
        (if urls
            (let* ((fname (ebib--create-file-name-from-key key "pdf"))
-                  (fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname))
+                  (dest-dir (pcase ebib-import-target-directory
+                              ('first-search-dir (car ebib-file-search-dirs))
+                              ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
+                              ((pred stringp) ebib-import-target-directory)
+                              ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t)))))
+                  (fullpath (concat (file-name-as-directory dest-dir) fname))
                   (urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
                   (pdfurl (ebib--transform-url urlvalue))
                   (overwrite nil))
@@ -5220,18 +5225,23 @@ is applied.  If no entry matches, URL is returned unchanged."
 
 (defun ebib-import-file (arg)
   "Import a file into the database.
-Ask the user for a file path, rename it and move it to the first
-directory in `ebib-file-search-dirs'.  The new name is created by
-applying the function in `ebib-name-transform-function' to the
-entry key.  The file extension of the original file is retained.
-If prefix ARG is non-nil, do not delete the original file."
+Ask the user for a file path, rename it and move it to the
+directory indicated by `ebib-import-target-directory'.  The new
+name is created by applying the function in
+`ebib-name-transform-function' to the entry key.  The file
+extension of the original file is retained.  If prefix ARG is
+non-nil, do not delete the original file."
   (interactive "P")
   (let* ((key (ebib--get-key-at-point))
-         (file-path (expand-file-name (read-file-name "File to import: " ebib-import-directory nil t)))
+         (file-path (expand-file-name (read-file-name "File to import: " ebib-import-source-directory nil t)))
          (ext (file-name-extension file-path))
          (new-name (ebib--create-file-name-from-key key ext))
-         (dest-dir (file-name-as-directory (car ebib-file-search-dirs)))
-         (dest-path (concat dest-dir new-name))
+         (dest-dir (pcase ebib-import-target-directory
+                     ('first-search-dir (car ebib-file-search-dirs))
+                     ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
+                     ((pred stringp) ebib-import-target-directory)
+                     ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t)))))
+         (dest-path (concat (file-name-as-directory dest-dir) new-name))
          (overwrite nil))
     (if (not (file-writable-p dest-path))
         (error "[Ebib] Cannot write file %s" dest-path))

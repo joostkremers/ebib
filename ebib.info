@@ -2247,10 +2247,10 @@ database: ‘ebib-download-url’ and ‘ebib-import-file’.  By default, these
 are not bound to any keys, but they can of course be called with ‘M-x’.
 The first of these, ‘ebib-download-url’ attempts to convert the URL in
 the ‘url’ field into a URL that points to a pdf file, downloads that
-file, renames it and saves it in the first directory in
-‘ebib-file-search-dirs’.  The name under which the file is saved is
-created by applying the function in ‘ebib-name-transform-function’ to
-the entry key and adding ‘.pdf’ to it.
+file, renames it and saves it to a target directory specified by the
+user.  The name under which the file is saved is created by applying the
+function in ‘ebib-name-transform-function’ to the entry key and adding
+‘.pdf’ to it.
 
 How a URL should be converted to a URL pointing to the pdf file depends
 on several factors, of course.  The option
@@ -2262,12 +2262,19 @@ course welcome.
 
 The function ‘ebib-import-file’ can be used to import a file into the
 database that is stored on your computer somewhere.  It asks for the
-file name, renames the file and moves it to the first directory in
-‘ebib-file-search-dirs’.  The file name is created in the same way as
-with ‘ebib-download-url’: by applying the function in
+file name, renames the file and moves it to a target directory specified
+by the user.  The file name is created in the same way as with
+‘ebib-download-url’: by applying the function in
 ‘ebib-name-transform-function’ to the entry key.  The extension of the
 original file is maintained, however, so it doesn't just work for pdf
 files.
+
+The target directory that ‘ebib-download-url’ and ‘ebib-import-file’ use
+is determined by the user option ‘ebib-import-target-directory’.  By
+default, this points to the first directory in ‘ebib-file-search-dirs’,
+but you can set it to use the same directory as the database into which
+the URL/file is imported, to a fixed directory, or you can have Ebib ask
+you each time for a target directory.
 
 Both ‘ebib-download-url’ and ‘ebib-import-file’ add the imported file to
 the ‘file’ field if it is not already there.
@@ -3240,40 +3247,40 @@ Node: Linking to external resources104406
 Ref: #linking-to-external-resources104591
 Node: Viewing and Importing Files104793
 Ref: #viewing-and-importing-files104993
-Node: Editing the file field110112
-Ref: #editing-the-file-field110263
-Node: Calling a Browser for URLs and DOIs111616
-Ref: #calling-a-browser-for-urls-and-dois111832
-Node: Notes files114132
-Ref: #notes-files114282
-Node: Configuring files for storing notes115770
-Ref: #configuring-files-for-storing-notes115948
-Node: Hooks118917
-Ref: #hooks119080
-Node: Upgrading from earlier Ebib versions120477
-Ref: #upgrading-from-earlier-ebib-versions120700
-Node: Customising the notes file format121610
-Ref: #customising-the-notes-file-format121838
-Node: Displaying notes125944
-Ref: #displaying-notes126135
-Node: Using org-capture to record notes127480
-Ref: #using-org-capture-to-record-notes127671
-Node: Managing a reading list133667
-Ref: #managing-a-reading-list133829
-Node: Managing Keywords136844
-Ref: #managing-keywords137000
-Node: Using a Canonical Keywords List138607
-Ref: #using-a-canonical-keywords-list138765
-Node: Window Management140903
-Ref: #window-management141068
-Node: Copying Entries to the Kill Ring144203
-Ref: #copying-entries-to-the-kill-ring144402
-Node: Printing the Database147125
-Ref: #printing-the-database147298
-Node: Customisation150741
-Ref: #customisation150857
-Node: Modifying Key Bindings152071
-Ref: #modifying-key-bindings152198
+Node: Editing the file field110506
+Ref: #editing-the-file-field110657
+Node: Calling a Browser for URLs and DOIs112010
+Ref: #calling-a-browser-for-urls-and-dois112226
+Node: Notes files114526
+Ref: #notes-files114676
+Node: Configuring files for storing notes116164
+Ref: #configuring-files-for-storing-notes116342
+Node: Hooks119311
+Ref: #hooks119474
+Node: Upgrading from earlier Ebib versions120871
+Ref: #upgrading-from-earlier-ebib-versions121094
+Node: Customising the notes file format122004
+Ref: #customising-the-notes-file-format122232
+Node: Displaying notes126338
+Ref: #displaying-notes126529
+Node: Using org-capture to record notes127874
+Ref: #using-org-capture-to-record-notes128065
+Node: Managing a reading list134061
+Ref: #managing-a-reading-list134223
+Node: Managing Keywords137238
+Ref: #managing-keywords137394
+Node: Using a Canonical Keywords List139001
+Ref: #using-a-canonical-keywords-list139159
+Node: Window Management141297
+Ref: #window-management141462
+Node: Copying Entries to the Kill Ring144597
+Ref: #copying-entries-to-the-kill-ring144796
+Node: Printing the Database147519
+Ref: #printing-the-database147692
+Node: Customisation151135
+Ref: #customisation151251
+Node: Modifying Key Bindings152465
+Ref: #modifying-key-bindings152592
 
 End Tag Table
 

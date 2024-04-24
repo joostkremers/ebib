@@ -2300,11 +2300,10 @@ keys, but they can of course be called with <span
 class="key"><code>M-x</code></span>. The first of these,
 <code>ebib-download-url</code> attempts to convert the URL in the
 <code>url</code> field into a URL that points to a pdf file, downloads
-that file, renames it and saves it in the first directory in
-<code>ebib-file-search-dirs</code>. The name under which the file is
-saved is created by applying the function in
-<code>ebib-name-transform-function</code> to the entry key and adding
-<code>.pdf</code> to it.</p>
+that file, renames it and saves it to a target directory specified by
+the user. The name under which the file is saved is created by applying
+the function in <code>ebib-name-transform-function</code> to the entry
+key and adding <code>.pdf</code> to it.</p>
 <p>How a URL should be converted to a URL pointing to the pdf file
 depends on several factors, of course. The option
 <code>ebib-url-download-transformations</code> is used to decide how to
@@ -2315,12 +2314,19 @@ href="https://www.jstor.org/">JSTOR</a>. Suggestions for other sites are
 of course welcome.</p>
 <p>The function <code>ebib-import-file</code> can be used to import a
 file into the database that is stored on your computer somewhere. It
-asks for the file name, renames the file and moves it to the first
-directory in <code>ebib-file-search-dirs</code>. The file name is
-created in the same way as with <code>ebib-download-url</code>: by
-applying the function in <code>ebib-name-transform-function</code> to
-the entry key. The extension of the original file is maintained,
-however, so it doesn’t just work for pdf files.</p>
+asks for the file name, renames the file and moves it to a target
+directory specified by the user. The file name is created in the same
+way as with <code>ebib-download-url</code>: by applying the function in
+<code>ebib-name-transform-function</code> to the entry key. The
+extension of the original file is maintained, however, so it doesn’t
+just work for pdf files.</p>
+<p>The target directory that <code>ebib-download-url</code> and
+<code>ebib-import-file</code> use is determined by the user option
+<code>ebib-import-target-directory</code>. By default, this points to
+the first directory in <code>ebib-file-search-dirs</code>, but you can
+set it to use the same directory as the database into which the URL/file
+is imported, to a fixed directory, or you can have Ebib ask you each
+time for a target directory.</p>
 <p>Both <code>ebib-download-url</code> and <code>ebib-import-file</code>
 add the imported file to the <code>file</code> field if it is not
 already there.</p>

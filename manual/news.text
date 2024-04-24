@@ -1,5 +1,10 @@
 % Ebib News
 
+## Version 2.41, April 2024 ##
+
+- New user option `ebib-import-target-directory`: specify the target directory for importing files / URLs.
+- Renamed user option `ebib-import-directory` to `ebib-import-source-directory`.
+
 ## Version 2.40, November 2023 ##
 
 - New user option `ebib-save-indent-as-bibtex`: use spaces for indenting fields,

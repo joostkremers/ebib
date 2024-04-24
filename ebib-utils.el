@@ -968,12 +968,27 @@ to handle a URL on the command line."
 
 (make-obsolete-variable 'ebib-file-field "The standard file field can no longer be customized" "Ebib 2.27")
 
-(defcustom ebib-import-directory "~/Downloads/"
+(defcustom ebib-import-source-directory "~/Downloads/"
   "Directory to import files from.
 When using the command `ebib-import-file', this directory is
-offered as the default directory."
+offered as the default directory to import a file from."
   :group 'ebib
   :type 'directory)
+
+(make-obsolete-variable 'ebib-import-directory 'ebib-import-source-directory "Ebib 2.41")
+
+(defcustom ebib-import-target-directory 'first-search-dir
+  "Directory to save imported files to.
+Valid values are the symbol `first-search-dir', which means to
+use the first directory in `ebib-file-search-dirs', the symbol
+`current-db', which means to use the directory of the current
+database, the symbol `ask', which means to ask the user each
+time, or a directory path (as a string)."
+  :group 'ebib
+  :type '(choice (const :tag "Use first directory in `ebib-file-search-dirs'" first-search-dir)
+                 (const :tag "Use directory of current database" current-db)
+                 (directory :tag "Set fixed directory")
+                 (const :tag "Ask the user each time" ask)))
 
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
@@ -989,7 +1004,7 @@ the executable.  In this case, the string should also contain
 \"%s\", which will be replaced with the path to the file being
 opened.
 
-HANDLER can also be a Emacs Lisp function, which should take one
+HANDLER can also be an Emacs Lisp function, which should take one
 argument, the path to the file being opened.
 
 When you open a file for which no HANDLER is defined, or for
