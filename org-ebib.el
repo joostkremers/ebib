@@ -92,9 +92,9 @@ entry buffer."
     ;; This is an Ebib entry
     (let* ((key (ebib--get-key-at-point))
            (link (concat "ebib:" (pcase org-ebib-link-type
-                                        ('key key)
-                                        ('key+filename (format "%s@%s" key (ebib-db-get-filename ebib--cur-db :shortened)))
-                                        ('key+filepath (format "%s@%s" key (ebib-db-get-filename ebib--cur-db))))))
+                                   ('key key)
+                                   ('key+filename (format "%s@%s" key (ebib-db-get-filename ebib--cur-db :shortened)))
+                                   ('key+filepath (format "%s@%s" key (ebib-db-get-filename ebib--cur-db))))))
            (description (ignore-errors (funcall ebib-citation-description-function key ebib--cur-db))))
       (org-link-store-props :type "ebib"
                             :link link
