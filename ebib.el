@@ -5173,11 +5173,11 @@ by appending \".pdf\" to it."
             (urls (ebib-get-field-value "url" key ebib--cur-db 'noerror 'unbraced)))
        (if urls
            (let* ((fname (ebib--create-file-name-from-key key "pdf"))
-                  (dest-dir (pcase ebib-import-target-directory
-                              ('first-search-dir (car ebib-file-search-dirs))
-                              ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
-                              ((pred stringp) ebib-import-target-directory)
-                              ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t)))))
+                  (dest-dir (file-name-as-directory (pcase ebib-import-target-directory
+                                                      ('first-search-dir (car ebib-file-search-dirs))
+                                                      ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
+                                                      ((pred stringp) ebib-import-target-directory)
+                                                      ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t))))))
                   (fullpath (concat (file-name-as-directory dest-dir) fname))
                   (urlvalue (ebib--select-url urls (if (numberp arg) arg nil)))
                   (pdfurl (ebib--transform-url urlvalue))
@@ -5195,7 +5195,7 @@ by appending \".pdf\" to it."
                  (cl-case choice
                    ((?c ?q) (error "[Ebib] Cancelled downloading URL"))
                    (?r (setq fname (read-string (format "Change `%s' to: " fname) fname))
-                       (setq fullpath (concat (file-name-as-directory (car ebib-file-search-dirs)) fname)))
+                       (setq fullpath (concat dest-dir fname)))
                    (?o (setq overwrite t)))))
              (url-copy-file pdfurl fullpath t)
              (message "[Ebib] Downloaded URL %s to %s" pdfurl fullpath)
@@ -5236,12 +5236,12 @@ non-nil, do not delete the original file."
          (file-path (expand-file-name (read-file-name "File to import: " ebib-import-source-directory nil t)))
          (ext (file-name-extension file-path))
          (new-name (ebib--create-file-name-from-key key ext))
-         (dest-dir (pcase ebib-import-target-directory
-                     ('first-search-dir (car ebib-file-search-dirs))
-                     ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
-                     ((pred stringp) ebib-import-target-directory)
-                     ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t)))))
-         (dest-path (concat (file-name-as-directory dest-dir) new-name))
+         (dest-dir (file-name-as-directory (pcase ebib-import-target-directory
+                                             ('first-search-dir (car ebib-file-search-dirs))
+                                             ('current-db (file-name-directory (ebib-db-get-filename ebib--cur-db)))
+                                             ((pred stringp) ebib-import-target-directory)
+                                             ('ask (expand-file-name (read-directory-name "Save imported file to: " (car ebib-file-search-dirs) nil t))))))
+         (dest-path (concat dest-dir new-name))
          (overwrite nil))
     (if (not (file-writable-p dest-path))
         (error "[Ebib] Cannot write file %s" dest-path))
@@ -5251,7 +5251,7 @@ non-nil, do not delete the original file."
         (cl-case choice
           ((?c ?q) (error "[Ebib] Cancelled importing file"))
           (?r (setq new-name (read-string (format "Change `%s' to: " new-name) new-name))
-              (setq dest-path (concat (file-name-as-directory (car ebib-file-search-dirs)) new-name)))
+              (setq dest-path (concat dest-dir new-name)))
           (?o (setq overwrite t)))))
     (copy-file file-path dest-path t)
     (unless arg
