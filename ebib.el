@@ -57,9 +57,9 @@
 (require 'pp)
 (require 'hl-line)
 (require 'mule-util)
+(require 'button)
 (require 'compat)  ; for `pos-bol', `pos-eol'.
 (require 'parsebib)
-(require 'button)
 (require 'ebib-utils)
 (require 'ebib-db)
 (require 'ebib-filters)
