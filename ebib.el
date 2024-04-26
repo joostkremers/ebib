@@ -83,7 +83,9 @@
 (declare-function helm-build-sync-source "ext:helm-source.el" (name &rest args))
 (declare-function helm "ext:helm.el" (&rest plist))
 
-;;; Helper functions
+;;;; Helper functions
+
+;;; Functions for `display-buffer'
 
 (defun ebib--display-buffer-reuse-window (buffer _)
   "Display BUFFER in an existing Ebib window.
@@ -138,7 +140,15 @@ window.  If all else fails, pop up a new frame."
                       display-buffer-pop-up-frame))
                    t)))
 
-(defun ebib--display-entry-key (key &optional mark)
+;;; Display functions for the index buffer
+
+(defun ebib--get-key-at-point ()
+  "Return the key of the current item in the index buffer.
+If point is not on a BibTeX entry, return nil."
+  (with-current-ebib-buffer 'index
+    (get-text-property (point) 'ebib-key)))
+
+(defun ebib--display-entry (key &optional mark)
   "Display BibTeX item designated by KEY in the index buffer at POINT.
 Included in the display are the data in the fields specified in
 `ebib-index-columns'.  The item is given the text property
@@ -205,13 +215,15 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
              (new-pos (save-excursion
                         (goto-char (point-min))
                         (forward-line pos)
-                        (ebib--display-entry-key key mark)
+                        (ebib--display-entry key mark)
                         (point))))
         (when move-point
           (goto-char new-pos)
           (forward-line -1)
           (set-window-point (get-buffer-window) (point))
           (hl-line-highlight))))))
+
+;;; Display functions for the entry buffer.
 
 (defun ebib--redisplay-field (field)
   "Redisplay the contents of FIELD in the current buffer."
@@ -235,34 +247,6 @@ If MARK is non-nil, `ebib-mark-face' is applied to the entry."
 (defun ebib--redisplay-current-field ()
   "Redisplay the contents of the current field in the entry buffer."
   (ebib--redisplay-field (ebib--current-field)))
-
-(defun ebib--generate-string-display (string)
-  "Get a formatted string for displaying abbrev STRING."
-  (let* ((def (ebib-get-string string ebib--cur-db 'noerror nil))
-	 (rawp (ebib-unbraced-p def))
-	 (unbraced-str (ebib-unbrace def))
-	 (multilinep (ebib--multiline-p unbraced-str))
-	 (str (if multilinep
-		  (ebib--first-line unbraced-str)
-		unbraced-str))
-	 (flags (concat (if rawp "*" "")
-			(if multilinep "+" "")))
-	 (expansion (if rawp (concat "[" (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "]") "")))
-    (format "%-18s %2s%s  %s"
-	    string	 ;; Abbreviation
-	    flags	 ;; Raw/multiline indicators
-	    str		 ;; Definition (presented without unbraced)
-	    expansion))) ;; Full expansion when unbraced
-
-(defun ebib--redisplay-strings-buffer ()
-  "Redisplay all strings in strings buffer."
-  (with-current-ebib-buffer 'strings
-    (let ((inhibit-read-only t)
-	  (string (ebib--current-string)))
-      (erase-buffer)
-      (ebib--fill-strings-buffer)
-      (re-search-forward
-       (rx-to-string `(: line-start ,string (syntax -)) t)))))
 
 (defun ebib--convert-multiline-to-string (multilines)
   "Convert MULTILINES to a single multiline string.
@@ -296,10 +280,10 @@ of strings."
       (setq multilines (seq-subseq multilines 0 ebib-multiline-display-max-lines))
       (setq truncated t))
     (setq multilines (thread-last multilines
-                       (seq-drop-while (lambda (elt) (string= elt "")))
-                       (reverse)
-                       (seq-drop-while (lambda (elt) (string= elt "")))
-                       (reverse)))
+                                  (seq-drop-while (lambda (elt) (string= elt "")))
+                                  (reverse)
+                                  (seq-drop-while (lambda (elt) (string= elt "")))
+                                  (reverse)))
     (cl-values (ebib--convert-multiline-to-string multilines)
                (if truncated
                    (concat "\n" (make-string 19 ?\s)
@@ -605,20 +589,38 @@ it is highlighted.  DB defaults to the current database."
                         (ebib--convert-multiline-to-string note))
                 (propertize "\n" 'ebib-field-end t))))))
 
-(defun ebib--key-in-index-p (key)
-  "Return t if the entry for KEY is listed in the index buffer."
-  (with-current-ebib-buffer 'index
-    (goto-char (point-min))
-    (while (not (or (string= key (ebib--get-key-at-point))
-                    (eobp)))
-      (forward-line 1))
-    (not (eobp))))
 
-(defun ebib--get-key-at-point ()
-  "Return the key of the item at point.
-If point is not on a BibTeX entry, return nil."
-  (with-current-ebib-buffer 'index
-    (get-text-property (point) 'ebib-key)))
+;;; Display functions for the strings buffer.
+
+(defun ebib--generate-string-display (string)
+  "Get a formatted string for displaying abbrev STRING."
+  (let* ((def (ebib-get-string string ebib--cur-db 'noerror nil))
+	 (rawp (ebib-unbraced-p def))
+	 (unbraced-str (ebib-unbrace def))
+	 (multilinep (ebib--multiline-p unbraced-str))
+	 (str (if multilinep
+		  (ebib--first-line unbraced-str)
+		unbraced-str))
+	 (flags (concat (if rawp "*" "")
+			(if multilinep "+" "")))
+	 (expansion (if rawp (concat "[" (ebib-get-string string ebib--cur-db 'noerror 'unbraced 'expand) "]") "")))
+    (format "%-18s %2s%s  %s"
+	    string	 ;; Abbreviation
+	    flags	 ;; Raw/multiline indicators
+	    str		 ;; Definition (presented without unbraced)
+	    expansion))) ;; Full expansion when unbraced
+
+(defun ebib--redisplay-strings-buffer ()
+  "Redisplay all strings in strings buffer."
+  (with-current-ebib-buffer 'strings
+    (let ((inhibit-read-only t)
+	  (string (ebib--current-string)))
+      (erase-buffer)
+      (ebib--fill-strings-buffer)
+      (re-search-forward
+       (rx-to-string `(: line-start ,string (syntax -)) t)))))
+
+;;; Updating the buffers
 
 (defun ebib--update-buffers (&optional no-index-refresh)
   "Redisplay the index and entry buffers.
@@ -670,7 +672,7 @@ not have an associated index buffer, create one and fill it."
                       (message "No entries matching the filter")
                     ;; Fill the buffer.
                     (dolist (entry cur-keys-list)
-                      (ebib--display-entry-key entry (member entry marked-entries)))
+                      (ebib--display-entry entry (member entry marked-entries)))
                     ;; Make sure the current entry is among the visible entries.
                     (unless (member cur-entry cur-keys-list)
                       (setq cur-entry (car cur-keys-list)))))))
@@ -2756,6 +2758,15 @@ on a field which crossrefs other entries (`crossref', `xdata' or
 `xref')."
   :group 'ebib
   :type 'boolean)
+
+(defun ebib--key-in-index-p (key)
+  "Return t if the entry for KEY is listed in the index buffer."
+  (with-current-ebib-buffer 'index
+    (goto-char (point-min))
+    (while (not (or (string= key (ebib--get-key-at-point))
+                    (eobp)))
+      (forward-line 1))
+    (not (eobp))))
 
 (defun ebib-follow-crossref (&optional arg)
   "Jump to an entry cross-referenced from the current entry.
@@ -5322,17 +5333,12 @@ active."
 Each element in the list is a string holding the name of the .bib
 file.
 
-If the file-local variable `ebib-local-bibfiles' is set to a
-list, return its value, otherwise try to find the .bib files for
-the current buffer.  The method by which the .bib files are
-searched depends on the buffer's major mode.  In LaTeX buffers,
-this function searches the current buffer or the buffer file's
-master file for a `\\bibliography' or `\\addbibresource' command
-and returns the file(s) given in its argument.
-
-In buffers in which `pandoc-mode' is active, check if the current
-settings include a `bibliography' setting and use the files
-listed there.
+Also set the buffer-local variable `ebib-local-bibfiles' to this
+list.  If this variable is already set, just return its value,
+otherwise try to find the .bib files for the current buffer,
+using a method that depends on the buffer's major mode.
+Currently, only methods for LaTeX buffers and buffers with
+`pandoc-mode' are implemented.
 
 If no .bib files are found, return nil."
   (if (listp ebib-local-bibfiles)
