@@ -47,6 +47,7 @@
                   (local-vars)                          ; The file's local variable block.
                   (dialect)                             ; The dialect of this database.
                   (buffer)                              ; The index buffer.
+                  (vtable)                              ; The vtable displaying the entries.
                   (cur-entry)                           ; The current entry.
                   (marked-entries)                      ; List of marked entries.
                   (filter)                              ; The active filter.
@@ -145,6 +146,14 @@ No check is performed to see if VARS is really a local variable block."
 (defun ebib-db-set-buffer (buffer db)
   "Set BUFFER as DB's index buffer."
   (setf (ebib-db-val 'buffer db) buffer))
+
+(defun ebib-db-get-vtable (db)
+  "Return the vtable for DB."
+  (ebib-db-val 'vtable db))
+
+(defun ebib-db-set-vtable (vtable db)
+  "Set VTABLE as DB's vtable."
+  (setf (ebib-db-val 'vtable db) vtable))
 
 (defun ebib--db-get-current-entry-key (db)
   "Return the key of the current entry in DB."
