@@ -75,6 +75,7 @@ This option allows you to specify which `.bib' file(s) Ebib
 should load automatically when it starts up.  Specify one file per
 line.  You can complete a partial filename with `M-TAB`."
   :group 'ebib
+  :safe (lambda (val) (seq-every-p #'stringp val))
   :type '(repeat (file :must-match t)))
 
 (defcustom ebib-local-bibfiles t
