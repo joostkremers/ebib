@@ -58,6 +58,7 @@
 (require 'hl-line)
 (require 'mule-util)
 (require 'button)
+(require 'vtable)
 (require 'compat)  ; for `pos-bol', `pos-eol'.
 (require 'parsebib)
 (require 'ebib-utils)
@@ -146,7 +147,7 @@ window.  If all else fails, pop up a new frame."
   "Return the key of the current item in the index buffer.
 If point is not on a BibTeX entry, return nil."
   (with-current-ebib-buffer 'index
-    (get-text-property (point) 'ebib-key)))
+    (vtable-current-object)))
 
 (defun ebib--display-entry (key &optional mark)
   "Display BibTeX item designated by KEY in the index buffer at POINT.
@@ -635,6 +636,34 @@ contents is recreated unconditionally."
   (ebib--update-index-buffer no-index-refresh)
   (ebib--update-entry-buffer))
 
+(defvar ebib--vtable-columns nil "The value of `ebib-index-columns' converted to vtable format.")
+
+(defun ebib--vtable-columns ()
+  "Convert the value of `ebib-index-columns' to vtable format."
+  (or ebib--vtable-columns
+      (setq ebib--vtable-columns
+            (let ((columns (mapcar (lambda (e)
+                                     `(:name ,(cl-first e) :width ,(cl-second e)))
+                                   ebib-index-columns)))
+              ;; The first element needs an additional `:primary' property, and
+              ;; the last element shouldn't have a `:width' property.
+              (setf (car columns) (append (car columns) '(:primary ascend)))
+              (setf (car (last columns)) (plist-put (car (last columns)) :width nil))
+              columns))))
+
+(defun ebib--make-vtable (entries db)
+  "Create or update the vindex buffer for DB.
+ENTRIES is a list of entries keys to be displayed.  This does not
+have to be the full list of entries in DB."
+  (make-vtable
+   :columns (ebib--vtable-columns)
+   :insert nil
+   :separator-width 2
+   :face 'default
+   :objects entries
+   :getter (lambda (object column vtable)
+             (ebib--get-field-value-for-display (vtable-column vtable column) object db))))
+
 (defun ebib--update-index-buffer (&optional no-refresh)
   "Recreate the contents of the index buffer using the keys of `ebib--cur-db'.
 If `ebib--cur-db' is nil, the buffer is just erased and its name
@@ -664,15 +693,19 @@ not have an associated index buffer, create one and fill it."
             (when ebib--cur-db
               (let ((cur-keys-list (ebib--list-keys))
                     (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
-                ;; We may call this function when there are no entries in the
-                ;; database. If so, we don't need to do this:
-                (unless (= 0 (ebib-db-count-entries ebib--cur-db))
-                  ;; It may be that no entry satisfies the filter.
-                  (if (not cur-keys-list)
-                      (message "No entries matching the filter")
-                    ;; Fill the buffer.
-                    (dolist (entry cur-keys-list)
-                      (ebib--display-entry entry (member entry marked-entries)))
+                (cond
+                 ;; If there are no entries in the database, we can't create a
+                 ;; vtable.
+                 ((= 0 (ebib-db-count-entries ebib--cur-db))
+                  (ebib-db-set-vtable nil ebib--cur-db))
+                 ;; Ditto if there are entries but none match the current
+                 ;; filter.
+                 ((not cur-keys-list)
+                  (ebib-db-set-vtable nil ebib--cur-db)
+                  (message "No entries matching the filter"))
+                 ;; Otherwise, fill the buffer.
+                 (t (let ((table (ebib--make-vtable cur-keys-list ebib--cur-db)))
+                      (vtable-insert table))
                     ;; Make sure the current entry is among the visible entries.
                     (unless (member cur-entry cur-keys-list)
                       (setq cur-entry (car cur-keys-list)))))))
