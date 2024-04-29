@@ -708,7 +708,8 @@ not have an associated index buffer, create one and fill it."
                   (message "No entries matching the filter"))
                  ;; Otherwise, fill the buffer.
                  (t (let ((table (ebib--make-vtable cur-keys-list ebib--cur-db)))
-                      (vtable-insert table))
+                      (vtable-insert table)
+                      (ebib-db-set-vtable table ebib--cur-db))
                     ;; Make sure the current entry is among the visible entries.
                     (unless (member cur-entry cur-keys-list)
                       (setq cur-entry (car cur-keys-list)))))))
