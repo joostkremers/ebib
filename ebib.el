@@ -1067,7 +1067,8 @@ ask for confirmation."
           ebib--notes-list nil
           ebib--keywords-completion-list nil
           ebib--filters-alist nil
-          ebib--filters-modified nil)
+          ebib--filters-modified nil
+          ebib--vtable-columns nil)
     (set-window-configuration ebib--saved-window-config)
     (remove-hook 'kill-emacs-query-functions 'ebib--kill-emacs-query-function)
     (remove-hook 'kill-buffer-query-functions 'ebib--kill-multiline-query-function)
