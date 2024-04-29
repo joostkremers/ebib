@@ -659,8 +659,8 @@ have to be the full list of entries in DB."
   (make-vtable
    :columns (ebib--vtable-columns)
    :insert nil
-   :separator-width 2
    :face 'default
+   :divider ebib-index-column-separator
    :objects entries
    :getter (lambda (object column vtable)
              (cond

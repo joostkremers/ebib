@@ -371,7 +371,7 @@ the second."
   :group 'ebib
   :type '(alist :key-type string :value-type symbol))
 
-(defcustom ebib-index-column-separator "  "
+(defcustom ebib-index-column-separator ""
   "Separator between columns in the index buffer."
   :group 'ebib
   :type 'string)
