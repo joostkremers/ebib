@@ -1220,6 +1220,10 @@ file.  If this option is set, the database is automatically saved."
   "Face used for highlighting lines."
   :group 'ebib-faces)
 
+(defface ebib-index-face '((t (:inherit default)))
+  "Face used in the index buffer."
+  :group 'ebib-faces)
+
 (defface ebib-highlight-face '((t (:inherit highlight)))
   "Face used for highlighting things."
   :group 'ebib-faces)
