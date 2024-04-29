@@ -695,8 +695,7 @@ not have an associated index buffer, create one and fill it."
           (let ((inhibit-read-only t))
             (erase-buffer)
             (when ebib--cur-db
-              (let ((cur-keys-list (ebib--list-keys))
-                    (marked-entries (ebib-db-list-marked-entries ebib--cur-db)))
+              (let ((cur-keys-list (ebib--list-keys)))
                 (cond
                  ;; If there are no entries in the database, we can't create a
                  ;; vtable.
