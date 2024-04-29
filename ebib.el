@@ -649,7 +649,8 @@ contents is recreated unconditionally."
               ;; the last element shouldn't have a `:width' property.
               (setf (car columns) (append (car columns) '(:primary ascend)))
               (setf (car (last columns)) (plist-put (car (last columns)) :width nil))
-              columns))))
+              ;; Add an initial column for marks.
+              (append '((:name "" :width 1)) columns)))))
 
 (defun ebib--make-vtable (entries db)
   "Create or update the vindex buffer for DB.
@@ -662,7 +663,10 @@ have to be the full list of entries in DB."
    :face 'default
    :objects entries
    :getter (lambda (object column vtable)
-             (ebib--get-field-value-for-display (vtable-column vtable column) object db))))
+             (cond
+              ((= column 0)  ; The mark column.
+               (if (ebib-db-marked-p object db) (propertize "*" 'face 'ebib-warning-face) " "))
+              (t (ebib--get-field-value-for-display (vtable-column vtable column) object db))))))
 
 (defun ebib--update-index-buffer (&optional no-refresh)
   "Recreate the contents of the index buffer using the keys of `ebib--cur-db'.
@@ -2045,7 +2049,7 @@ unmark all marked entries."
          (let ((inhibit-read-only t)
                (cur-entry (ebib--get-key-at-point)))
            (ebib-db-toggle-mark cur-entry ebib--cur-db)
-           (ebib--display-mark (ebib-db-marked-p cur-entry ebib--cur-db)))
+           (vtable-update-object (ebib-db-get-vtable ebib--cur-db) cur-entry))
          (ebib-next-entry)))
       (default
         (beep)))))
