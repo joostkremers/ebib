@@ -69,13 +69,13 @@ This is the entry type assigned to newly created entries."
   :group 'ebib
   :type 'string)
 
+;;;###autoload (put 'ebib-preload-bib-files 'safe-local-variable '(lambda (val) (seq-every-p #'stringp val)))
 (defcustom ebib-preload-bib-files nil
   "List of BibTeX files to load automatically when Ebib starts.
 This option allows you to specify which `.bib' file(s) Ebib
 should load automatically when it starts up.  Specify one file per
 line.  You can complete a partial filename with `M-TAB`."
   :group 'ebib
-  :safe (lambda (val) (seq-every-p #'stringp val))
   :type '(repeat (file :must-match t)))
 
 (defcustom ebib-local-bibfiles t
