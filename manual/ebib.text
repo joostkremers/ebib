@@ -1083,6 +1083,8 @@ External packages can provide functions which fulfill a simple interface to repl
  - `:create-note` takes a *key* and a *database* object, and returns a cons of `(BUFFER . POINT)` denoting the start of the note.
  - `:open-note` takes a *key* and returns a buffer containing the note, with point at its start.
 
+Example integration may be found in `ebib-citar.el`.
+
 # Managing a reading list #
 
 Ebib offers the ability to manage a reading list as an Org file. In order to make use of this functionality, you must set the option `ebib-reading-list-file` to a file in which the reading list is stored. Once you've specified a file, you can add the current entry to the reading list with [`R a`]{.key}. The mode line of the entry buffer will show `[R]` to indicate that the current entry is on the reading list.
