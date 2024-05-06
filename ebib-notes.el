@@ -84,7 +84,8 @@ vary based on ACTION.  The following keywords must be supported:
   :group 'ebib-notes
   :type '(choice (const :tag "Use one file per note" one-file-per-note)
                  (const :tag "Use multiple notes per file" multiple-notes-per-file)
-                 (function :tag "Use external library" ignore)))
+                 (const :tag "Use Citar" :value ebib-citar-backend)
+                 (function :tag "Use external library")))
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
