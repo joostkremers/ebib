@@ -32,7 +32,7 @@
 ;;; Commentary:
 
 ;; This file is part of Ebib, a BibTeX database manager for Emacs.  It
-;; contains functions that integrate [citar.el] with Ebib.
+;; contains functions that integrate [citar] with Ebib.
 ;;
 ;; [citar]: https://github.com/emacs-citar/citar
 ;;
