@@ -64,7 +64,7 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   "Open CITEKEY using `ebib'."
   (ebib nil citekey))
 
-(defvar ebib-citar--previous-values nil
+(defvar ebib--citar-previous-values nil
   "Ebib-Citar integration variable backup.
 
 Will contain, as a list, the values of the following before
@@ -82,12 +82,12 @@ manage notes, and Ebib will be used to open bibliographic
 entries."
   :global t
   (if ebib-citar-mode
-      (setf ebib-citar--previous-values (list ebib-notes-storage citar-open-entry-function)
+      (setf ebib--citar-previous-values (list ebib-notes-storage citar-open-entry-function)
             ebib-notes-storage #'ebib-citar-backend
             citar-open-entry-function #'ebib-citar-entry-function)
-    (setf ebib-notes-storage (nth 0 ebib-citar--previous-values)
-          citar-open-entry-function (nth 1 ebib-citar--previous-values)
-          ebib-citar--previous-values nil)))
+    (setf ebib-notes-storage (nth 0 ebib--citar-previous-values)
+          citar-open-entry-function (nth 1 ebib--citar-previous-values)
+          ebib--citar-previous-values nil)))
 
 (provide 'ebib-citar)
 
