@@ -66,20 +66,20 @@ If this option is set to `multiple-notes-per-file', notes are
 searched in the files and directories listed in
 `ebib-notes-locations'.
 
-If this option is set to a function, it must conform to the
-following specification.  It shall take two arguments, ACTION and
-PARAMETERS (a list as specified by ACTION).  Actions are as
-follows:
+If this option is set to a function, it must be a function of two
+arguments, ACTION and PARAMETERS.  ACTION is a keyword indicating
+what action to perform, PARAMETERS is a list of parameters, which
+vary based on ACTION.  The following keywords must be supported:
 
- - `:has-note' takes a KEY, and return a generalized boolean
-   determining if a note exists for the entry.
+ - `:has-note' takes a KEY, and returns non-nil if a note exists
+   for the entry.
 
- - `:create-note' takes a KEY and a DATABASE, returning a cons
+ - `:create-note' takes a KEY and a DATABASE and returns a cons
    of (BUFFER . POINT) where the note begins.  Depending on how
    note creation is performed, it may be helpful to set
    `ebib-notes-template' to the empty string.
 
- - `:open-note' takes a KEY and return a buffer, with point at
+ - `:open-note' takes a KEY and returns a buffer, with point at
    the start of the note."
   :group 'ebib-notes
   :type '(choice (const :tag "Use one file per note" one-file-per-note)
