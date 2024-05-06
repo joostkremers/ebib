@@ -47,7 +47,6 @@
 
 (defun ebib-citar-backend (operation args)
   "Citar backend for ebib notes.
-
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   (pcase operation
     (`:has-note
@@ -66,20 +65,15 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
 
 (defvar ebib--citar-previous-values nil
   "Ebib-Citar integration variable backup.
-
-Will contain, as a list, the values of the following before
-`ebib-citar-mode' is enabled.
+When `ebib-citar-mode' is enabled, this variable is used to
+backup the values of the following variables:
  - `ebib-notes-storage'
  - `citar-open-entry-function'")
 
 (define-minor-mode ebib-citar-mode
   "Integrate Ebib and Citar.
-
-When enabled, `ebib-notes-storage' will be set to
-`ebib-citar-backend', and `citar-open-entry-function' will be set
-to `ebib-citar-entry-function'.  Thus, Citar will be used to
-manage notes, and Ebib will be used to open bibliographic
-entries."
+When enabled, use Citar to manage notes and Ebib to open
+bibliographic entries."
   :global t
   (if ebib-citar-mode
       (setf ebib--citar-previous-values (list ebib-notes-storage citar-open-entry-function)
