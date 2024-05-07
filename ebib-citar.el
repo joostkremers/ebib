@@ -45,13 +45,17 @@
 (require 'ebib)
 (require 'citar)
 
+(defvar ebib-citar--notes-checker nil
+  "Notes checker for ebib-citar.")
+
 (defun ebib-citar-backend (operation &rest args)
   "Citar backend for ebib notes.
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   (pcase operation
     (`:has-note
-     (let ((has-notes-p (citar-has-notes)))
-       (if has-notes-p (funcall has-notes-p (car args)))))
+     (unless ebib-citar--notes-checker
+       (setf ebib-citar--notes-checker (citar-has-notes)))
+     (funcall ebib-citar--notes-checker (car args)))
     (`:create-note
      (citar-create-note (car args))
      (ebib-citar-backend :open-note (list (car args))))
