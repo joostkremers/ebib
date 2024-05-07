@@ -66,10 +66,11 @@ If this option is set to `multiple-notes-per-file', notes are
 searched in the files and directories listed in
 `ebib-notes-locations'.
 
-If this option is set to a function, it must be a function of two
-arguments, ACTION and PARAMETERS.  ACTION is a keyword indicating
-what action to perform, PARAMETERS is a list of parameters, which
-vary based on ACTION.  The following keywords must be supported:
+If this option is set to a function, it must be a function of the
+following form: (ACTION &rest PARAMETERS).  ACTION is a keyword
+indicating what action to perform, and PARAMETERS is a list of
+parameters, which vary based on ACTION.  The following keywords
+must be supported:
 
  - `:has-note' takes a KEY, and returns non-nil if a note exists
    for the entry.
@@ -363,7 +364,7 @@ note file if `ebib-notes-storage' is set to `one-note-per-file'."
         (if (file-readable-p (ebib--create-notes-file-name key))
             (cl-pushnew key ebib--notes-list)))
        ((functionp ebib-notes-storage)
-        (funcall ebib-notes-storage :has-note (list key))))))
+        (apply ebib-notes-storage :has-note (list key))))))
 
 (defun ebib--notes-goto-note (key)
   "Find or create a buffer containing the note for KEY.
@@ -398,7 +399,7 @@ If KEY has no note, return nil."
                       (ebib--notes-open-single-note-file filename)))))
       (when buf (cons buf (with-current-buffer buf (point))))))
    ((functionp ebib-notes-storage)
-    (let ((buffer (funcall ebib-notes-storage :open-note (list key))))
+    (let ((buffer (apply ebib-notes-storage :open-note (list key))))
       (when buffer
         (cons buffer (with-current-buffer buffer (point))))))))
 
@@ -432,7 +433,7 @@ the position where point should be placed."
                     pos 1)
             (error "[Ebib] Could not create note file `%s' " filename))))
        ((functionp ebib-notes-storage)
-        (let ((note-data (funcall ebib-notes-storage :create-note (list key db))))
+        (let ((note-data (apply ebib-notes-storage :create-note (list key db))))
           (setq buf (car note-data)
                 pos (or (cdr note-data) 1)))))
       (let ((note (ebib--notes-fill-template key db)))

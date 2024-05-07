@@ -45,7 +45,7 @@
 (require 'ebib)
 (require 'citar)
 
-(defun ebib-citar-backend (operation args)
+(defun ebib-citar-backend (operation &rest args)
   "Citar backend for ebib notes.
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   (pcase operation
