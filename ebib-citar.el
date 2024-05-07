@@ -75,6 +75,7 @@ backup the values of the following variables:
 When enabled, use Citar to manage notes and Ebib to open
 bibliographic entries."
   :global t
+  :group 'ebib-notes
   (if ebib-citar-mode
       (setf ebib--citar-previous-values (list ebib-notes-storage citar-open-entry-function)
             ebib-notes-storage #'ebib-citar-backend
