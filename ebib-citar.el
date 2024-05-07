@@ -55,7 +55,8 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
     (`:has-note
      (unless ebib-citar--notes-checker
        (setf ebib-citar--notes-checker (citar-has-notes)))
-     (funcall ebib-citar--notes-checker (car args)))
+     (when ebib-citar--notes-checker
+       (funcall ebib-citar--notes-checker (car args))))
     (`:create-note
      (citar-create-note (car args))
      (ebib-citar-backend :open-note (list (car args))))
