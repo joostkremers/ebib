@@ -60,7 +60,10 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
      (citar-create-note (car args))
      (ebib-citar-backend :open-note (list (car args))))
     (`:open-note
-     (when-let* ((notes-file (car (last (apply #'ebib-citar-backend :has-note args))))
+     (when-let* ((citekey (car args))
+                 (notes-hash-table (citar-get-notes citekey))
+                 (notes-files (gethash citekey notes-hash-table))
+                 (notes-file (nth (1- (length notes-files)) notes-files))
                  (buffer (find-file-noselect notes-file)))
        buffer))))
 
