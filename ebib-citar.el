@@ -50,7 +50,8 @@
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   (pcase operation
     (`:has-note
-     (citar-has-notes (car args)))
+     (let ((has-notes-p (citar-has-notes)))
+       (funcall has-notes-p (car args))))
     (`:create-note
      (citar-create-note (car args))
      (ebib-citar-backend :open-note (list (car args))))
