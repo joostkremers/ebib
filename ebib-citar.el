@@ -59,14 +59,14 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
        (funcall ebib-citar--notes-checker (car args))))
     (:create-note
      (citar-create-note (car args))
-     (ebib-citar-backend :open-note (list (car args))))
+     (ebib-citar-backend :open-note (car args)))
     (:open-note
      (when-let* ((citekey (car args))
                  (notes-hash-table (citar-get-notes citekey))
                  (notes-files (gethash citekey notes-hash-table))
                  (notes-file (nth (1- (length notes-files)) notes-files))
                  (buffer (find-file-noselect notes-file)))
-       buffer))))
+       (list buffer 1)))))
 
 (defun ebib-citar-entry-function (citekey)
   "Open CITEKEY using `ebib'."
@@ -76,7 +76,7 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   "Ebib-Citar integration variable backup.
 When `ebib-citar-mode' is enabled, this variable is used to
 backup the values of the following variables:
- - `ebib-notes-storage'
+ - `ebib-notes-backend'
  - `citar-open-entry-function'")
 
 (define-minor-mode ebib-citar-mode
@@ -86,10 +86,10 @@ bibliographic entries."
   :global t
   :group 'ebib-notes
   (if ebib-citar-mode
-      (setf ebib--citar-previous-values (list ebib-notes-storage citar-open-entry-function)
-            ebib-notes-storage #'ebib-citar-backend
+      (setf ebib--citar-previous-values (list ebib-notes-backend citar-open-entry-function)
+            ebib-notes-backend #'ebib-citar-backend
             citar-open-entry-function #'ebib-citar-entry-function)
-    (setf ebib-notes-storage (nth 0 ebib--citar-previous-values)
+    (setf ebib-notes-backend (nth 0 ebib--citar-previous-values)
           citar-open-entry-function (nth 1 ebib--citar-previous-values)
           ebib--citar-previous-values nil)))
 
