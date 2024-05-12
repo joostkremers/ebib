@@ -392,82 +392,6 @@ help-echo message."
 	      'keymap button-map
 	      'action (lambda (_) (ebib-follow-crossref))))
 
-(defun ebib--extract-note-text (key &optional truncate)
-  "Extract the text of the note for entry KEY.
-This function simply calls `ebib-notes-extract-text-function'.
-KEY and TRUNCATE are passed on unchanged.  For their meaning, see
-the doc string of `ebib-extract-note-text-default'."
-  (funcall ebib-notes-extract-text-function key truncate))
-
-(defun ebib-extract-note-text-default (key truncate)
-  "Extract the text of the note for KEY.
-The note must be an Org entry under its own headline.
-
-If TRUNCATE is non-nil, the note is truncated at
-`ebib-notes-display-max-lines' lines.  If the original text is
-longer than that, an ellipsis marker \"[...]\" is added.
-
-The return value is a list of strings, each a separate line,
-which can be passed to `ebib--display-multiline-field'."
-  (with-temp-buffer
-    (cond
-     ((eq ebib-notes-storage 'multiple-notes-per-file)
-      (let* ((location (ebib--notes-goto-note key))
-             (buffer (car location))
-             (position (cdr location))
-             beg end)
-        (when location
-          (with-current-buffer buffer
-            (save-mark-and-excursion
-              (goto-char position)
-              (org-mark-subtree)
-              (setq beg (region-beginning)
-                    end (region-end))))
-          (insert-buffer-substring buffer beg end))))
-     ((eq ebib-notes-storage 'one-file-per-note)
-      (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
-        (when (file-readable-p filename)
-          (insert-file-contents filename)))))
-    (let ((truncated nil)
-	  string)
-      ;; If appropriate, first reduce the size of the text we need to
-      ;; pass to `org-element-parse-buffer', since this function can
-      ;; be slow if the note is long.
-      (when truncate
-	(let ((max (progn
-                     (goto-char (point-min))
-                     (pos-bol (* 2 ebib-notes-display-max-lines)))))
-	  (when (< max (point-max))
-            (setq truncated t)
-            (delete-region max (point-max)))))
-
-      ;; Extract any property drawers.
-      (let ((contents (org-element-parse-buffer)))
-	(org-element-map contents 'property-drawer
-          (lambda (drawer)
-            (org-element-extract-element drawer)))
-	(erase-buffer)
-	(insert (org-element-interpret-data contents)))
-      ;; Extract relevant lines
-      (let* ((beg (progn
-                    (goto-char (point-min))
-                    (forward-line 1)	; Skip the headline.
-                    (point)))
-	     ;; If `truncate', then take the first
-	     ;; `ebib-notes-display-max-lines' lines.
-             (end (if truncate
-		      (progn
-			(goto-char (point-min))
-			(forward-line (1+ ebib-notes-display-max-lines))
-			(point))
-		    ;; Otherwise take all lines
-		    (point-max))))
-        (setq string (buffer-substring-no-properties beg end))
-	(if (or truncated
-		(< end (point-max)))
-            (setq string (concat string "[...]\n"))))
-      (split-string string "\n"))))
-
 (defun ebib--get-field-highlighted (field key &optional db match-str)
   "Return the contents of FIELD in entry KEY in DB with MATCH-STR highlighted."
   (or db (setq db ebib--cur-db))
@@ -581,8 +505,8 @@ it is highlighted.  DB defaults to the current database."
                     fields)))
           (list req-fields opt-fields extra-fields undef-fields))
     (when (and (eq ebib-notes-show-note-method 'top-lines)
-               (ebib--notes-has-note key))
-      (let ((note (ebib--extract-note-text key 'truncate)))
+               (funcall ebib-notes-backend :has-note key))
+      (let ((note (funcall ebib-notes-backend :extract-text key 'truncate)))
         (insert "\n"
                 (format "%-18s %s"
                         (propertize "external note" 'face 'ebib-field-face)
@@ -720,7 +644,7 @@ note is not recreated."
                    (get-buffer-window (ebib--buffer 'entry))
                    (eq ebib-notes-show-note-method 'all)
                    (eq ebib-layout 'full)
-                   (ebib--notes-has-note key))
+                   (funcall ebib-notes-backend :has-note key))
               (setq ebib--note-window (display-buffer (ebib-open-note (ebib--get-key-at-point)))
                     ;; If Ebib is lowered and then reopened, we need to redisplay
                     ;; the entry buffer, because otherwise the notes buffer isn't
@@ -732,7 +656,7 @@ note is not recreated."
 (defun ebib--update-entry-buffer-keep-note ()
   "Update the entry buffer but keep the note window."
   ;; This function is used in `after-save-hook' in note buffers. See
-  ;; `ebib--notes-open-single-note-file'.
+  ;; `ebib--notes-singleton-open-file'.
   (ebib--update-entry-buffer nil t))
 
 (defun ebib--set-modified (mod db &optional main dependents)
@@ -979,12 +903,9 @@ the new buffer."
     buffer))
 
 (defun ebib-check-notes-config ()
-  "Check the user's notes configuration and adjust if necessary.
-If `ebib-notes-file' is set, `ebib-notes-locations' is set to
-`multiple-notes-per-file' and a warning is issued."
-  (when (and (bound-and-true-p ebib-notes-file))
-    (setq ebib-notes-storage 'multiple-notes-per-file)
-    (ebib--log 'warning "Ebib's handling of external notes has changed.  Please visit the manual and update your configuration.")))
+  "Check the user's notes configuration and give a warning if necessary."
+  (when (and (boundp 'ebib-notes-storage))
+    (ebib--log 'warning "Ebib's system for external notes has changed.  Please visit the manual and update your configuration.")))
 
 (defun ebib-force-quit ()
   "Force quit Ebib by call `ebib-quit'."
@@ -1651,41 +1572,30 @@ interactively."
           (princ "[No annotation]"))))))
 
 (defun ebib-open-note (key)
-  "Open the note for KEY and return its buffer.
-If `ebib-notes-storage' is set to `multiple-notes-per-file', this
-function runs `ebib-notes-open-note-after-hook'."
-  (let ((buf (ebib--notes-goto-note key)))
+  "Open the note for KEY and return its buffer."
+  (let ((buf (funcall ebib-notes-backend :open-note key)))
     (when buf
       (with-current-buffer (car buf)
-        (goto-char (cdr buf))
-        (if (eq ebib-notes-storage 'multiple-notes-per-file)
-            (run-hooks 'ebib-notes-open-note-after-hook)))
+        (goto-char (cadr buf))
+        (run-hooks (caddr buf)))
       (car buf))))
 
 (defun ebib-popup-note (key)
   "Open the note for KEY or create a new one if none exists.
 KEY defaults to the current entry's key.  Display and select the
-buffer containing the entry using `pop-to-buffer'.
-
-If `ebib-notes-storage' is set to `multiple-notes-per-file', this
-function runs `ebib-notes-open-note-after-hook' for an existing
-note or `ebib-notes-new-note-hook' for a new note."
+buffer containing the entry using `pop-to-buffer'."
   (interactive (list (ebib--get-key-at-point)))
   (ebib--execute-when
     (entries
-     (let ((buf (ebib--notes-goto-note key))
-           (hook 'ebib-notes-open-note-after-hook))
+     (let ((buf (funcall ebib-notes-backend :open-note key)))
        (when (not buf) ; We need to create a new note.
-         (setq buf (ebib--notes-create-new-note key ebib--cur-db)
-               hook 'ebib-notes-new-note-hook))
-       ;; If `ebib-notes-use-org-capture' is non-nil, we don't need to pop up
-       ;; the buffer.  `ebib--notes-create-new-note' returns nil in this case,
-       ;; so we can simply check the value of `buf':
+         (setq buf (funcall ebib-notes-backend :create-note key ebib--cur-db)))
+       ;; When a new note is created, the back-end may take care of displaying
+       ;; and selecting the note's buffer.  In this case, `buf' should be nil.
        (when buf
          (with-current-buffer (car buf)
-           (goto-char (cdr buf))
-           (when (eq ebib-notes-storage 'multiple-notes-per-file)
-             (run-hooks hook)))
+           (goto-char (cadr buf))
+           (run-hooks (caddr buf)))
          (pop-to-buffer (car buf)))))
     (default
      (beep))))
@@ -3872,7 +3782,7 @@ if the current entry has a note and `ebib-reading-list-symbol' if
 the current entry is on the reading list.  The latter two symbols
 are enclosed in braces."
   (let* ((key (ebib--get-key-at-point))
-         (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
+         (info (concat (if (funcall ebib-notes-backend :has-note key) ebib-notes-symbol "")
                        (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
     (if (not (string= info ""))
         (setq info (concat " [" info "] ")))
@@ -4534,7 +4444,7 @@ entry, it is never killed."
     (let* ((external (string= field "external"))
 	   (key (ebib--get-key-at-point))
 	   (contents (if external
-			 (string-join (ebib--extract-note-text key nil) "\n")
+			 (string-join (funcall ebib-notes-backend :extract-text key nil) "\n")
 		       (ebib-get-field-value field key ebib--cur-db 'noerror 'unbraced 'xref)))
 	   (action-string (if kill "kill" "delete"))
 	   (thing-string (if external "note" "field contents")))
@@ -4545,12 +4455,7 @@ entry, it is never killed."
        ((and (stringp contents) (or kill (y-or-n-p (format "Delete %s? " thing-string))))
 	(when kill (kill-new contents))
 	(if external
-	    (if (eq ebib-notes-storage 'one-file-per-note)
-		(progn
-		  (delete-file (expand-file-name (ebib--create-notes-file-name key)))
-		  (delete key ebib--notes-list))
-	      (error "[Ebib] `ebib-notes-storage' set to `%s', deleting not supported.
-Try opening the note file and deleting it manually" ebib-notes-storage))
+	    (funcall ebib-notes-backend :delete-note key ebib--cur-db)
 	  (ebib-db-remove-field-value field key ebib--cur-db))
 	;; Applicable for external or otherwise
 	(ebib--redisplay-field field)

@@ -53,40 +53,50 @@ key."
   :group 'ebib-notes
   :type '(string :tag "Note file symbol"))
 
-(defcustom ebib-notes-storage 'one-file-per-note
-  "Storage location of external notes.
-Possible values are `one-file-per-note',
-`multiple-notes-per-file', and a function.  If
-`one-file-per-note', each note is stored in a separate file in
-the directory `ebib-notes-directory' or in the first directory
-listed in `ebib-bib-search-dirs' if `ebib-notes-directory' is
-nil.
-
-If this option is set to `multiple-notes-per-file', notes are
-searched in the files and directories listed in
-`ebib-notes-locations'.
-
-If this option is set to a function, it must be a function of the
-following form: (ACTION &rest PARAMETERS).  ACTION is a keyword
-indicating what action to perform, and PARAMETERS is a list of
-parameters, which vary based on ACTION.  The following keywords
-must be supported:
+(defcustom ebib-notes-backend #'ebib-notes-singleton-backend
+  "Notes back-end to use.
+The value of this option is a function that implements a notes
+backend.  Such a function must be of the following form: (ACTION
+&rest PARAMETERS).  ACTION is a keyword indicating what action to
+perform, and PARAMETERS is a list of parameters, which vary based
+on ACTION.  The following ACTION keywords must be supported:
 
  - `:has-note' takes a KEY, and returns non-nil if a note exists
    for the entry.
 
- - `:create-note' takes a KEY and a DATABASE and returns a cons
-   of (BUFFER . POINT) where the note begins.  Depending on how
-   note creation is performed, it may be helpful to set
-   `ebib-notes-template' to the empty string.
+ - `:create-note' takes a KEY and a DATABASE and returns a list
+   of (BUFFER POINT HOOKS), POINT being the position where the
+   note begins and HOOKS a list of hook functions (which can be
+   nil).  Ebib displays the buffer, selects it, positions point
+   at POINT and runs the functions in HOOKS.  The notes back-end
+   can also take care of displaying and selecting the buffer
+   itself, in which case this function should return nil.
 
- - `:open-note' takes a KEY and returns a buffer, with point at
-   the start of the note."
+ - `:open-note' takes a KEY and opens its note in a buffer,
+   returning a list of (BUFFER POINT HOOKS), POINT being some
+   position inside the note (not necessarily the start of the
+   note), HOOKS a list of hook functions (which can be nil).
+   Ebib displays the buffer, positions point at POINT and runs
+   the functions in HOOKS.  If KEY does not have a note, this
+   function should return nil.
+
+ - `:extract-text' takes a KEY and an optional boolean TRUNCATE
+   argument and returns the text of the note as a list of lines.
+   If TRUNCATE is non-nil, truncate the text at
+   `ebib-notes-display-max-lines' of text.
+
+ - `:delete-note' takes a key and an optional database, tries to
+   delete the note and returns non-nil if the deletion succeeded,
+   or nil if it failed.  This function may also raise a
+   `user-error' if deletion is not possible or not desired."
   :group 'ebib-notes
-  :type '(choice (const :tag "Use one file per note" one-file-per-note)
-                 (const :tag "Use multiple notes per file" multiple-notes-per-file)
+  :type '(choice (function-item :tag "Use one file per note" ebib-notes-singleton-backend)
+                 (function-item :tag "Use multiple notes per file" ebib-notes-multiple-backend)
+                 (function-item :tag "Use Org capture" ebib-notes-org-capture-backend)
                  (function-item :tag "Use Citar" ebib-citar-backend)
-                 (function :tag "Use external library")))
+                 (function :tag "Use custom back-end")))
+
+(make-obsolete-variable 'ebib-notes-storage "The variable `ebib-notes-storage' is no longer used. See the manual for details." "Ebib 2.5")
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
@@ -144,17 +154,6 @@ instead."
   :type '(choice (const :tag "Use `ebib-name-transform-function'" nil)
                  (function :tag "Apply function")))
 
-(defcustom ebib-notes-extract-text-function #'ebib-extract-note-text-default
-  "Function to extract the text of a note.
-The function should take two arguments: KEY, indicating the entry
-to which the relevant note belongs, and TRUNCATE, which, if
-non-nil, indicates that the resulting text should be truncated to
-`ebib-notes-display-max-lines'.  The function should return a list
-of strings, each a separate line, which can be passed to
-`ebib--display-multiline-field'."
-  :group 'ebib-notes
-  :type 'function)
-
 (defcustom ebib-notes-template "* %T\n:PROPERTIES:\n%K\n:END:\n%%?\n"
   "Template for a note entry in the notes file.
 New notes are created on the basis of this template.  The
@@ -176,7 +175,9 @@ note.
 If `org-capture' is used to create notes, the template can also
 contain format specifiers for `org-capture'; these need to be
 preceded by an extra `%', which is stripped before the template
-is passed to the `org-capture' mechanism."
+is passed to the `org-capture' mechanism.  In this case, this
+option can also be set to a list of templates, each identified by
+a key corresponding to a template in `org-capture-templates'."
   :group 'ebib-notes
   :type '(choice (string :tag "Note template")
                  (repeat :tag "List of templates"
@@ -205,17 +206,6 @@ used to create an identifier for the note."
   :type '(repeat (cons :tag "Specifier"
                        (character :tag "Character")
                        (symbol :tag "Function or variable"))))
-
-(defcustom ebib-notes-use-org-capture nil
-  "If set, use `org-capture' to create new notes.
-If this option is set to a string, it must correspond to a key in
-`org-capture-templates'.  Creating a new note will then
-automatically use the corresponding template and bypass the
-interactive selection."
-  :group 'ebib-notes
-  :type '(choice (const :tag "Use org-capture" t)
-                 (string :tag "Use org-capture template")
-                 (const :tag "Do not use org-capture" nil)))
 
 (defvar ebib--org-current-key nil
   "Key of the current entry when `org-capture' is called from Ebib.")
@@ -308,6 +298,8 @@ string where point should be located."
       (setq pos 0))
     (cons note pos)))
 
+(defvar ebib--notes-list nil "List of entry keys for which a note exists.")
+
 (defun ebib--notes-list-files ()
   "Return a list of notes files.
 List all the files in `ebib-notes-locations' and all files in the
@@ -318,11 +310,11 @@ directories in `ebib-notes-locations' that have the extension in
    ;; still need to check `ebib-notes-default-file' (see below).
    (ebib-notes-locations
     (cl-flet ((list-files (loc)
-                          (cond
-                           ((file-directory-p loc)
-                            (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
-                           ((string= (downcase (file-name-extension loc)) "org")
-                            (list loc)))))
+                (cond
+                 ((file-directory-p loc)
+                  (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
+                 ((string= (downcase (file-name-extension loc)) "org")
+                  (list loc)))))
       (seq-reduce (lambda (lst loc)
                     (append (list-files loc) lst))
                   ebib-notes-locations (if ebib-notes-default-file
@@ -342,53 +334,20 @@ buffer."
     (goto-char (point-min))
     (re-search-forward (concat (regexp-quote (funcall (cdr (assoc ?K ebib-notes-template-specifiers)) key nil)) "$") nil t)))
 
-(defvar ebib--notes-list nil "List of entry keys for which a note exists.")
-
-(defun ebib--notes-has-note (key)
-  "Return non-nil if entry KEY has an associated note.
-Unlike `ebib--notes-goto-note', this function does not visit the
-note file if `ebib-notes-storage' is set to `one-note-per-file'."
-  (or (member key ebib--notes-list)
-      (cond
-       ((eq ebib-notes-storage 'multiple-notes-per-file)
-        (unless ebib--notes-list
-          ;; We need to initialize `ebib--notes-list'.
-          (setq ebib--notes-list (seq-reduce (lambda (lst file)
-                                               (if (not (file-writable-p file))
-                                                   (ebib--log 'error "Could not open notes file `%s'" file)
-                                                 (with-current-buffer (ebib--notes-buffer file)
-                                                   (append (funcall ebib-notes-get-ids-function) lst))))
-                                             (ebib--notes-list-files) '())))
-        (member key ebib--notes-list))
-       ((eq ebib-notes-storage 'one-file-per-note)
-        (if (file-readable-p (ebib--create-notes-file-name key))
-            (cl-pushnew key ebib--notes-list)))
-       ((functionp ebib-notes-storage)
-        (apply ebib-notes-storage :has-note (list key))))))
-
-(defun ebib--notes-goto-note (key)
+(defun ebib--notes-goto-note (key backend)
   "Find or create a buffer containing the note for KEY.
-If `ebib-notes-storage' is set to `multiple-notes-per-file', run
-`ebib-notes-search-note-before-hook' before locating the note.
-Otherwise just open the note file for KEY.
+BACKEND is the notes back-end being used.  It should be one of
+the symbols `singleton' or `multiple'.
 
 Return a cons of the buffer and the position of the note in the
-buffer: in a multi-note file, this is the position of the
-Custom_ID of the note; if each note has its own file, the
+buffer: if BACKEND is `mulitple,', this is the position of the
+Custom_ID of the note; if BACKEND is `singleton', the
 position is set to point.
 
 If KEY has no note, return nil."
   (cond
-   ((eq ebib-notes-storage 'multiple-notes-per-file)
-    (catch 'found
-      (dolist (file (ebib--notes-list-files))
-        (with-current-buffer (ebib--notes-buffer file)
-          (run-hooks 'ebib-notes-search-note-before-hook)
-          (let ((location (ebib--notes-locate-note key)))
-            (when location
-              (throw 'found (cons (current-buffer) location))))))))
-   ((eq ebib-notes-storage 'one-file-per-note)
-    (let* ((filename (expand-file-name (ebib--create-notes-file-name key)))
+   ((eq backend 'singleton)
+    (let* ((filename (expand-file-name (ebib--notes-singleton-create-file-name key)))
            (buf (or
                  ;; In case the user created the note already but didn't save
                  ;; the file yet, check if there's a buffer visiting the note
@@ -396,60 +355,50 @@ If KEY has no note, return nil."
                  (get-file-buffer filename)
                  ;; Otherwise try and open the file.
                  (and (file-readable-p filename)
-                      (ebib--notes-open-single-note-file filename)))))
-      (when buf (cons buf (with-current-buffer buf (point))))))
-   ((functionp ebib-notes-storage)
-    (let ((buffer (apply ebib-notes-storage :open-note (list key))))
-      (when buffer
-        (cons buffer (with-current-buffer buffer (point))))))))
+                      (ebib--notes-singleton-open-note-file filename)))))
+      (when buf (list buf (with-current-buffer buf (point))))))
+   ((eq backend 'multiple)
+    (catch 'found
+      (dolist (file (ebib--notes-list-files))
+        (with-current-buffer (ebib--notes-multiple-get-buffer file)
+          (run-hooks 'ebib-notes-search-note-before-hook)
+          (let ((location (ebib--notes-locate-note key)))
+            (when location
+              (throw 'found (list (current-buffer) location ebib-notes-open-note-after-hook))))))))))
 
-(defun ebib--notes-create-new-note (key db)
+(defun ebib--notes-create-new-org-note (key db backend)
   "Create a note for KEY in DB.
-If `ebib-notes-use-org-capture' is set, call `org-capture' and
-return nil.
+BACKEND is the notes back-end being used.  It should be one of
+the symbols `singleton' or `multiple'.
 
-If `ebib-notes-use-org-capture' is not set, create a new note
-according to the settings of `ebib-notes-storage',
-`ebib-notes-default-file' and/or `ebib-notes-directory' and
-return a cons of the buffer in which the new note is created and
+Return a cons of the buffer in which the new note is created and
 the position where point should be placed."
-  (if ebib-notes-use-org-capture
-      (let ((ebib--org-current-key key))
-        (if (stringp ebib-notes-use-org-capture)
-            (org-capture nil ebib-notes-use-org-capture)
-          (org-capture))
-        (push key ebib--notes-list)
-        nil) ; We must return nil, cf. comment in `ebib-popup-note'.
-    (let (buf pos)
-      (cond
-       ((eq ebib-notes-storage 'multiple-notes-per-file)
-        (setq buf (ebib--notes-buffer (or ebib-notes-default-file
-                                          (completing-read "Save note to file: " (ebib--notes-list-files) nil t)))
-              pos (1+ (buffer-size buf))))
-       ((eq ebib-notes-storage 'one-file-per-note)
-        (let ((filename (expand-file-name (ebib--create-notes-file-name key))))
-          (if (file-writable-p filename)
-              (setq buf (ebib--notes-open-single-note-file filename)
-                    pos 1)
-            (error "[Ebib] Could not create note file `%s' " filename))))
-       ((functionp ebib-notes-storage)
-        (let ((note-data (apply ebib-notes-storage :create-note (list key db))))
-          (setq buf (car note-data)
-                pos (or (cdr note-data) 1)))))
-      (let ((note (ebib--notes-fill-template key db)))
-        (with-current-buffer buf
-          (goto-char pos)
-          (insert (car note))
-          (setq pos (+ pos (cdr note)))
-          (push key ebib--notes-list)))
-      (cons buf pos))))
+  (let (buf pos)
+    (cond
+     ((eq backend 'multiple)
+      (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-default-file
+                                                     (completing-read "Save note to file: " (ebib--notes-list-files) nil t)))
+            pos (1+ (buffer-size buf))))
+     ((eq backend 'singleton)
+      (let ((filename (expand-file-name (ebib--notes-singleton-create-file-name key))))
+        (if (file-writable-p filename)
+            (setq buf (ebib--notes-singleton-open-note-file filename)
+                  pos 1)
+          (error "[Ebib] Could not create note file `%s' " filename)))))
+    (let ((note (ebib--notes-fill-template key db)))
+      (with-current-buffer buf
+        (goto-char pos)
+        (insert (car note))
+        (setq pos (+ pos (cdr note)))
+        (push key ebib--notes-list)))
+    (list buf pos ebib-notes-new-note-hook)))
 
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return a string to indicate if a note exists for KEY.
 If the entry KEY has an external note, return `ebib-notes-symbol'
 propertized with `ebib-link-face'.  Otherwise, return an empty
 string of the same width as `ebib-notes-symbol'."
-  (if (ebib--notes-has-note key)
+  (if (funcall ebib-notes-backend :has-note key)
       (propertize ebib-notes-symbol
                   'face '(:height 0.8 :inherit ebib-link-face)
 		  'font-lock-face '(:height 0.8 :inherit ebib-link-face)
@@ -464,9 +413,81 @@ string of the same width as `ebib-notes-symbol'."
     (propertize (make-string (string-width ebib-notes-symbol) ?\s)
                 'face '(:height 0.8))))
 
-;;; One file per note.
+(defun ebib--notes-extract-org-text (key truncate backend)
+  "Extract the text of the note for KEY.
+The note must be an Org entry under its own headline.
 
-(defun ebib--create-notes-file-name (key)
+If TRUNCATE is non-nil, the note is truncated at
+`ebib-notes-display-max-lines' lines.  If the original text is
+longer than that, an ellipsis marker \"[...]\" is added.
+
+BACKEND is the notes back-end being used.  It should be one of
+the symbols `singleton' or `multiple'.
+
+The return value is a list of strings, each a separate line,
+which can be passed to `ebib--display-multiline-field'."
+  (with-temp-buffer
+    (cond
+     ((eq backend 'singleton)
+      (let ((filename (expand-file-name (ebib--notes-singleton-create-file-name key))))
+        (when (file-readable-p filename)
+          (insert-file-contents filename))))
+     ((eq backend 'multiple)
+      (let* ((location (ebib--notes-goto-note key backend))
+             (buffer (car location))
+             (position (cadr location))
+             beg end)
+        (when location
+          (with-current-buffer buffer
+            (save-mark-and-excursion
+              (goto-char position)
+              (org-mark-subtree)
+              (setq beg (region-beginning)
+                    end (region-end))))
+          (insert-buffer-substring buffer beg end)))))
+    (let ((truncated nil)
+	  string)
+      ;; If appropriate, first reduce the size of the text we need to
+      ;; pass to `org-element-parse-buffer', since this function can
+      ;; be slow if the note is long.
+      (when truncate
+	(let ((max (progn
+                     (goto-char (point-min))
+                     (pos-bol (* 2 ebib-notes-display-max-lines)))))
+	  (when (< max (point-max))
+            (setq truncated t)
+            (delete-region max (point-max)))))
+
+      ;; Extract any property drawers.
+      (let ((contents (org-element-parse-buffer)))
+	(org-element-map contents 'property-drawer
+          (lambda (drawer)
+            (org-element-extract-element drawer)))
+	(erase-buffer)
+	(insert (org-element-interpret-data contents)))
+      ;; Extract relevant lines
+      (let* ((beg (progn
+                    (goto-char (point-min))
+                    (forward-line 1)	; Skip the headline.
+                    (point)))
+	     ;; If `truncate', then take the first
+	     ;; `ebib-notes-display-max-lines' lines.
+             (end (if truncate
+		      (progn
+			(goto-char (point-min))
+			(forward-line (1+ ebib-notes-display-max-lines))
+			(point))
+		    ;; Otherwise take all lines
+		    (point-max))))
+        (setq string (buffer-substring-no-properties beg end))
+	(if (or truncated
+		(< end (point-max)))
+            (setq string (concat string "[...]\n"))))
+      (split-string string "\n"))))
+
+;;; `ebib-notes-singleton-backend'
+
+(defun ebib--notes-singleton-create-file-name (key)
   "Create a notes filename for KEY.
 First, `ebib-notes-name-transform-function' is applied to KEY,
 and `ebib-notes-file-extension' is added to it.  Then, the file
@@ -480,17 +501,31 @@ name is fully qualified by prepending the directory in
                    key)
           ebib-notes-file-extension))
 
-(defun ebib--notes-open-single-note-file (file)
-  "Open the note file for FILE.
+(defun ebib--notes-singleton-open-note-file (file)
+  "Open the note FILE.
 Return the buffer but do not select it."
   (let ((buf (find-file-noselect file)))
     (with-current-buffer buf
       (add-hook 'after-save-hook 'ebib--update-entry-buffer-keep-note))
     buf))
 
-;;; Common notes file.
+(defun ebib-notes-singleton-backend (action &rest args)
+  "Notes back-end using one file per note.
+Execute ACTION given ARGS per `ebib-notes-backend'.  See its doc
+string for details."
+  (pcase action
+    (:has-note (or (member (car args) ebib--notes-list)
+                   (if (file-readable-p (ebib--notes-singleton-create-file-name (car args)))
+                       (cl-pushnew (car args) ebib--notes-list))))
+    (:create-note (ebib--notes-create-new-org-note (car args) (cadr args) 'singleton))
+    (:open-note (ebib--notes-goto-note (car args) 'singleton))
+    (:extract-text (ebib--notes-extract-org-text (car args) (cadr args) 'singleton))
+    (:delete-note (delete-file (expand-file-name (ebib--notes-singleton-create-file-name (car args))))
+		  (delete (car args) ebib--notes-list))))
 
-(defun ebib--notes-buffer (file)
+;;; `ebib-notes-multiple-backend'
+
+(defun ebib--notes-multiple-get-buffer (file)
   "Return the buffer containing the notes file FILE.
 If the file has not been opened yet, open it, creating it if
 necessary.  If FILE cannot be opened, an error is raised."
@@ -502,6 +537,60 @@ necessary.  If FILE cannot be opened, an error is raised."
       (with-current-buffer buf
         (add-hook 'after-save-hook 'ebib--update-entry-buffer-keep-note nil t)))
     buf))
+
+(defun ebib--notes-multiple-has-note (key)
+  "Return non-nil if entry KEY has an associated note.
+This function is only useful if multiple notes are stored in a
+file, i.e., with the back-ends `ebib-notes-multiple-backend' and
+`ebib-notes-org-capture-backend'."
+  (unless ebib--notes-list
+    ;; We need to initialize `ebib--notes-list'.
+    (setq ebib--notes-list
+          (seq-reduce (lambda (lst file)
+                        (if (not (file-writable-p file))
+                            (ebib--log 'error "Could not open notes file `%s'" file)
+                          (with-current-buffer (ebib--notes-multiple-get-buffer file)
+                            (append (funcall ebib-notes-get-ids-function) lst))))
+                      (ebib--notes-list-files) '())))
+  (member key ebib--notes-list))
+
+(defun ebib-notes-multiple-backend (action &rest args)
+  "Notes back-end using multiple notes per notes file.
+Execute ACTION given ARGS per `ebib-notes-backend'.  See its doc
+string for details."
+  (pcase action
+    (:has-note (ebib--notes-multiple-has-note (car args)))
+    (:create-note (ebib--notes-create-new-org-note (car args) (cadr args) 'multiple))
+    (:open-note (ebib--notes-goto-note (car args) 'multiple))
+    (:extract-text (ebib--notes-extract-org-text (car args) (cadr args) 'multiple))
+    (:delete-note (user-error "[Ebib] Deleting a note is not supported with the current notes back-end"))))
+
+;;; `ebib-notes-org-capture-backend'
+
+(defcustom ebib-notes-org-capture-default-template nil
+  "Default `org-capture' template to use.
+This should be the key of the template as defined in
+`org-capture-templates'.  If this option is nil, the user is
+presented with the normal Org Capture menu."
+  :group 'ebib-notes
+  :type '(choice (const :tag "Show org Capture menu" nil)
+                 (string :tag "Org Capture template key")))
+
+(make-obsolete-variable 'ebib-notes-use-org-capture 'ebib-notes-org-capture-default-template "Ebib 2.5")
+
+(defun ebib-notes-org-capture-backend (action &rest args)
+  "Notes back-end using `org-capture'.
+Execute ACTION given ARGS per `ebib-notes-backend'.  See its doc
+string for details."
+  (pcase action
+    (:has-note (ebib--notes-multiple-has-note (car args)))
+    (:create-note (let ((ebib--org-current-key (car args)))
+                    (org-capture nil ebib-notes-org-capture-default-template)
+                    (push (car args) ebib--notes-list)
+                    nil))  ; We must return nil, cf. comment in `ebib-popup-note'.
+    (:open-note (ebib--notes-goto-note (car args) 'multiple))
+    (:extract-text (ebib--notes-extract-org-text (car args) (cadr args) 'multiple))
+    (:delete-note (user-error "[Ebib] Deleting a note is not supported with the current notes back-end"))))
 
 (provide 'ebib-notes)
 
