@@ -56,13 +56,16 @@ key."
 (defcustom ebib-notes-backend #'ebib-notes-singleton-backend
   "Notes back-end to use.
 The value of this option is a function that implements a notes
-backend.  Such a function must be of the following form: (ACTION
-&rest PARAMETERS).  ACTION is a keyword indicating what action to
-perform, and PARAMETERS is a list of parameters, which vary based
-on ACTION.  The following ACTION keywords must be supported:
+backend.  The function's signature must be of the following
+form: (ACTION &rest PARAMETERS).  ACTION is a keyword indicating
+what action to perform, and PARAMETERS is a list of parameters,
+which vary based on ACTION.  The following ACTION keywords must
+be supported:
 
  - `:has-note' takes a KEY, and returns non-nil if a note exists
-   for the entry.
+   for the entry.  This function should never raise an error.
+   Instead, if the notes system has not been configured, it
+   should simply return nil.
 
  - `:create-note' takes a KEY and a DATABASE and returns a list
    of (BUFFER POINT HOOKS), POINT being the position where the
@@ -70,20 +73,25 @@ on ACTION.  The following ACTION keywords must be supported:
    nil).  Ebib displays the buffer, selects it, positions point
    at POINT and runs the functions in HOOKS.  The notes back-end
    can also take care of displaying and selecting the buffer
-   itself, in which case this function should return nil.
+   itself, in which case this function should return nil.  This
+   function may also raise a `user-error' if the notes system has
+   not been configured.
 
  - `:open-note' takes a KEY and opens its note in a buffer,
    returning a list of (BUFFER POINT HOOKS), POINT being some
    position inside the note (not necessarily the start of the
    note), HOOKS a list of hook functions (which can be nil).
    Ebib displays the buffer, positions point at POINT and runs
-   the functions in HOOKS.  If KEY does not have a note, this
-   function should return nil.
+   the functions in HOOKS.  If KEY does not have a note, or if
+   the notes system has not been configured, this function should
+   return nil.  It should never raise an error.
 
  - `:extract-text' takes a KEY and an optional boolean TRUNCATE
    argument and returns the text of the note as a list of lines.
    If TRUNCATE is non-nil, truncate the text at
-   `ebib-notes-display-max-lines' of text.
+   `ebib-notes-display-max-lines' of text.  If no note exists for
+   KEY or if the notes system has not been configured, this
+   function should return nil.  It should never raise an error.
 
  - `:delete-note' takes a key and an optional database, tries to
    delete the note and returns non-nil if the deletion succeeded,
