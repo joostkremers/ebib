@@ -96,7 +96,7 @@ on ACTION.  The following ACTION keywords must be supported:
                  (function-item :tag "Use Citar" ebib-citar-backend)
                  (function :tag "Use custom back-end")))
 
-(make-obsolete-variable 'ebib-notes-storage "The variable `ebib-notes-storage' is no longer used. See the manual for details." "Ebib 2.5")
+(make-obsolete-variable 'ebib-notes-storage "The variable `ebib-notes-storage' is no longer used. See the manual for details." "Ebib 2.50")
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
