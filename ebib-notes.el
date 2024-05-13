@@ -352,12 +352,13 @@ the symbols `singleton' or `multiple'.
 
 Return a cons of the buffer in which the new note is created and
 the position where point should be placed."
-  (let (buf pos)
+  (let (buf pos hooks)
     (cond
      ((eq backend 'multiple)
-            pos (1+ (buffer-size buf))))
       (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-multiple-default-file
                                                      (completing-read "Save note to file: " (ebib--notes-multiple-list-files) nil t)))
+            pos (1+ (buffer-size buf))
+            hooks ebib-notes-new-note-hook))
      ((eq backend 'singleton)
       (let ((filename (expand-file-name (ebib--notes-singleton-create-file-name key))))
         (if (file-writable-p filename)
@@ -370,7 +371,7 @@ the position where point should be placed."
         (insert (car note))
         (setq pos (+ pos (cdr note)))
         (push key ebib--notes-list)))
-    (list buf pos ebib-notes-new-note-hook)))
+    (list buf pos hooks)))
 
 (defun ebib-notes-display-note-symbol (_field key _db)
   "Return a string to indicate if a note exists for KEY.
