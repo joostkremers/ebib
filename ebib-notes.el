@@ -98,44 +98,38 @@ on ACTION.  The following ACTION keywords must be supported:
 
 (make-obsolete-variable 'ebib-notes-storage "The variable `ebib-notes-storage' is no longer used. See the manual for details." "Ebib 2.50")
 
-(defcustom ebib-notes-directory nil
-  "Directory to save notes files to.
-Ebib creates notes files based on the entry key using the options
-`ebib-notes-directory', `ebib-notes-file-extension' and
-`ebib-notes-name-transform-function'.
-
-If this option is nil, the first directory in `ebib-file-search-dirs' is
-used.
-
-Note that this option is ignored if `ebib-notes-storage' is set
-to `multiple-notes-per-file'."
-  :group 'ebib-notes
-  :type '(choice (const :tag "Use first of `ebib-file-search-dirs'")
-                 (directory :tag "Specify directory")))
+(make-obsolete-variable 'ebib-notes-directory "The variable `ebib-notes-directory' is no longer used. See the manual for details." "Ebib 2.50")
 
 (defcustom ebib-notes-locations nil
   "Locations for notes files.
-Entries can be files or directories.  Files should be specified
-with their full path and should have `ebib-notes-file-extension'
-as their extension.  For directories, all files with
-`ebib-notes-file-extension' are searched for notes."
+Entries can be files or directories.  Entries should be specified
+with their full paths and files should have
+`ebib-notes-file-extension' as their extension.  For directories,
+all files with `ebib-notes-file-extension' are considered files
+that can contain notes.
+
+This option is used for all three built-in notes back-ends.  For
+`ebib-notes-singleton-backend', this option should list a single
+directory, which is the directory to which all notes are saved.
+For the back-ends `ebib-notes-multiple-backend' and
+`ebib-notes-org-capture-backend', this option can remain nil if
+`ebib-notes-multiple-default-file' is set."
   :group 'ebib-notes
   :type '(repeat (file :tag "Notes location (file or directory)")))
 
-(define-obsolete-variable-alias 'ebib-notes-use-single-file 'ebib-notes-default-file "Ebib 2.20")
-(define-obsolete-variable-alias 'ebib-notes-file 'ebib-notes-default-file "Ebib 2.30")
-
-(defcustom ebib-notes-default-file nil
+(defcustom ebib-notes-multiple-default-file nil
   "Path to the default notes file.
-If `ebib-notes-storage` is set to `multiple-notes-per-file', set
-this option to define the file to which notes should be stored.
-If you leave this option unset, you are prompted for the file to
-store a new note to.
+If `ebib-notes-backend' is set to `ebib-notes-multiple-backend',
+set this option to define the file to which notes should be
+stored.  If you leave this option unset, you are prompted for the
+file to store a new note to.
 
 Note that this file does not need to be listed in
 `ebib-notes-locations'."
   :group 'ebib-notes
   :type '(file :tag "Default notes file"))
+
+(make-obsolete-variable 'ebib-notes-default-file 'ebib-notes-multiple-default-file "Ebib 2.50")
 
 (defcustom ebib-notes-file-extension "org"
   "Extension used for notes files.
@@ -300,29 +294,6 @@ string where point should be located."
 
 (defvar ebib--notes-list nil "List of entry keys for which a note exists.")
 
-(defun ebib--notes-list-files ()
-  "Return a list of notes files.
-List all the files in `ebib-notes-locations' and all files in the
-directories in `ebib-notes-locations' that have the extension in
-`ebib-notes-file-extension'."
-  (cond
-   ;; If `ebib-notes-locations' is nil, we don't need to do all this, but we
-   ;; still need to check `ebib-notes-default-file' (see below).
-   (ebib-notes-locations
-    (cl-flet ((list-files (loc)
-                (cond
-                 ((file-directory-p loc)
-                  (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
-                 ((string= (downcase (file-name-extension loc)) "org")
-                  (list loc)))))
-      (seq-reduce (lambda (lst loc)
-                    (append (list-files loc) lst))
-                  ebib-notes-locations (if ebib-notes-default-file
-                                           (list ebib-notes-default-file)
-                                         '()))))
-   (ebib-notes-default-file
-    (list ebib-notes-default-file))))
-
 (defun ebib--notes-locate-note (key)
   "Locate the note identified by KEY in the current buffer.
 Convert KEY into an identifier using the function associated with
@@ -359,7 +330,7 @@ If KEY has no note, return nil."
       (when buf (list buf (with-current-buffer buf (point))))))
    ((eq backend 'multiple)
     (catch 'found
-      (dolist (file (ebib--notes-list-files))
+      (dolist (file (ebib--notes-multiple-list-files))
         (with-current-buffer (ebib--notes-multiple-get-buffer file)
           (run-hooks 'ebib-notes-search-note-before-hook)
           (let ((location (ebib--notes-locate-note key)))
@@ -376,9 +347,9 @@ the position where point should be placed."
   (let (buf pos)
     (cond
      ((eq backend 'multiple)
-      (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-default-file
-                                                     (completing-read "Save note to file: " (ebib--notes-list-files) nil t)))
             pos (1+ (buffer-size buf))))
+      (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-multiple-default-file
+                                                     (completing-read "Save note to file: " (ebib--notes-multiple-list-files) nil t)))
      ((eq backend 'singleton)
       (let ((filename (expand-file-name (ebib--notes-singleton-create-file-name key))))
         (if (file-writable-p filename)
@@ -492,9 +463,9 @@ which can be passed to `ebib--display-multiline-field'."
 First, `ebib-notes-name-transform-function' is applied to KEY,
 and `ebib-notes-file-extension' is added to it.  Then, the file
 name is fully qualified by prepending the directory in
-`ebib-notes-directory'."
+`ebib-notes-locations'."
   (format "%s/%s.%s"
-          (or ebib-notes-directory (car ebib-file-search-dirs))
+          (or (car ebib-notes-locations) (car ebib-file-search-dirs))
           (funcall (or ebib-notes-name-transform-function
                        ebib-name-transform-function
                        #'identity)
@@ -551,8 +522,31 @@ file, i.e., with the back-ends `ebib-notes-multiple-backend' and
                             (ebib--log 'error "Could not open notes file `%s'" file)
                           (with-current-buffer (ebib--notes-multiple-get-buffer file)
                             (append (funcall ebib-notes-get-ids-function) lst))))
-                      (ebib--notes-list-files) '())))
+                      (ebib--notes-multiple-list-files) '())))
   (member key ebib--notes-list))
+
+(defun ebib--notes-multiple-list-files ()
+  "Return a list of notes files.
+List all the files in `ebib-notes-locations' and all files in the
+directories in `ebib-notes-locations' that have the extension in
+`ebib-notes-file-extension'."
+  (cond
+   ;; If `ebib-notes-locations' is nil, we don't need to do all this, but we
+   ;; still need to check `ebib-notes-multiple-default-file' (see below).
+   (ebib-notes-locations
+    (cl-flet ((list-files (loc)
+                (cond
+                 ((file-directory-p loc)
+                  (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
+                 ((string= (downcase (file-name-extension loc)) "org")
+                  (list loc)))))
+      (seq-reduce (lambda (lst loc)
+                    (append (list-files loc) lst))
+                  ebib-notes-locations (if ebib-notes-multiple-default-file
+                                           (list ebib-notes-multiple-default-file)
+                                         '()))))
+   (ebib-notes-multiple-default-file
+    (list ebib-notes-multiple-default-file))))
 
 (defun ebib-notes-multiple-backend (action &rest args)
   "Notes back-end using multiple notes per notes file.
