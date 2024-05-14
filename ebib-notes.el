@@ -355,17 +355,17 @@ Return a cons of the buffer in which the new note is created and
 the position where point should be placed."
   (let (buf pos hooks)
     (cond
-     ((eq backend 'multiple)
-      (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-multiple-default-file
-                                                     (completing-read "Save note to file: " (ebib--notes-multiple-list-files) nil t)))
-            pos (1+ (buffer-size buf))
-            hooks ebib-notes-new-note-hook))
      ((eq backend 'singleton)
       (let ((filename (expand-file-name (ebib--notes-singleton-create-file-name key))))
         (if (file-writable-p filename)
             (setq buf (ebib--notes-singleton-open-note-file filename)
                   pos 1)
-          (error "[Ebib] Could not create note file `%s' " filename)))))
+          (error "[Ebib] Could not create note file `%s' " filename))))
+     ((eq backend 'multiple)
+      (setq buf (ebib--notes-multiple-get-buffer (or ebib-notes-multiple-default-file
+                                                     (completing-read "Save note to file: " (ebib--notes-multiple-list-files) nil t)))
+            pos (1+ (buffer-size buf))
+            hooks ebib-notes-new-note-hook)))
     (let ((note (ebib--notes-fill-template key db)))
       (with-current-buffer buf
         (goto-char pos)
