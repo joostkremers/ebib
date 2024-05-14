@@ -90,8 +90,9 @@ be supported:
    argument and returns the text of the note as a list of lines.
    If TRUNCATE is non-nil, truncate the text at
    `ebib-notes-display-max-lines' of text.  If no note exists for
-   KEY or if the notes system has not been configured, this
-   function should return nil.  It should never raise an error.
+   KEY, if the notes system has not been configured or if the
+   note text cannot be extracted, this function should return
+   nil.  It should never raise an error.
 
  - `:delete-note' takes a key and an optional database, tries to
    delete the note and returns non-nil if the deletion succeeded,
