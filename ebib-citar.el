@@ -61,12 +61,9 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
      (citar-create-note (car args))
      (ebib-citar-backend :open-note (car args)))
     (:open-note
-     (when-let* ((citekey (car args))
-                 (notes-hash-table (citar-get-notes citekey))
-                 (notes-files (gethash citekey notes-hash-table))
-                 (notes-file (nth (1- (length notes-files)) notes-files))
-                 (buffer (find-file-noselect notes-file)))
-       (list buffer 1)))))
+     (when-let ((resource (citar--select-resource args :notes t)))
+       (pcase-let ((`(,type . ,descriptor) resource))
+         (list (funcall (citar--get-notes-config :open) descriptor) 0 nil))))))
 
 (defun ebib-citar-entry-function (citekey)
   "Open CITEKEY using `ebib'."
