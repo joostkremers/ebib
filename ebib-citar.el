@@ -63,7 +63,11 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
     (:open-note
      (when-let ((resource (citar--select-resource args :notes t)))
        (pcase-let ((`(,type . ,descriptor) resource))
-         (list (funcall (citar--get-notes-config :open) descriptor) 0 nil))))))
+         (let* ((buffer (save-excursion
+                          (with-current-buffer (funcall (citar--get-notes-config :open) descriptor)
+                            (current-buffer))))
+                (point (with-current-buffer buffer (point))))
+           (list buffer point nil)))))))
 
 (defun ebib-citar-entry-function (citekey)
   "Open CITEKEY using `ebib'."
