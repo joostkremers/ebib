@@ -53,8 +53,6 @@
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
   (pcase operation
     (:has-note
-     (unless ebib-citar--notes-checker
-       (setf ebib-citar--notes-checker (citar-has-notes)))
      (when ebib-citar--notes-checker
        (funcall ebib-citar--notes-checker (car args))))
     (:create-note
@@ -87,10 +85,14 @@ bibliographic entries."
   :global t
   :group 'ebib-notes
   (if ebib-citar-mode
-      (setf ebib-citar--previous-values (list ebib-notes-backend citar-open-entry-function)
-            ebib-notes-backend #'ebib-citar-backend
-            citar-open-entry-function #'ebib-citar-entry-function)
-    (setf ebib-notes-backend (nth 0 ebib-citar--previous-values)
+      (progn
+        (or ebib-citar--notes-checker
+            (setq ebib-citar--notes-checker (citar-has-notes))
+            (user-error "[Ebib-Citar] Notes back-end has not been configured"))
+        (setq ebib-citar--previous-values (list ebib-notes-backend citar-open-entry-function)
+              ebib-notes-backend #'ebib-citar-backend
+              citar-open-entry-function #'ebib-citar-entry-function))
+    (setq ebib-notes-backend (nth 0 ebib-citar--previous-values)
           citar-open-entry-function (nth 1 ebib-citar--previous-values)
           ebib-citar--previous-values nil)))
 
