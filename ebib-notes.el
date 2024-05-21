@@ -102,7 +102,6 @@ be supported:
   :type '(choice (function-item :tag "Use one file per note" ebib-notes-singleton-backend)
                  (function-item :tag "Use multiple notes per file" ebib-notes-multiple-backend)
                  (function-item :tag "Use Org capture" ebib-notes-org-capture-backend)
-                 (function-item :tag "Use Citar" ebib-citar-backend)
                  (function :tag "Use custom back-end")))
 
 (make-obsolete-variable 'ebib-notes-storage "The variable `ebib-notes-storage' is no longer used. See the manual for details." "Ebib 2.50")
