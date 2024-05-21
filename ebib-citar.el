@@ -48,6 +48,16 @@
 (defvar ebib-citar--notes-checker nil
   "Notes checker for ebib-citar.")
 
+(defun ebib-citar--open-note (keys)
+  "Open the note for KEYS."
+  (when-let ((resource (citar--select-resource keys :notes t)))
+    (pcase-let ((`(,_type . ,descriptor) resource))
+      (let* ((buffer (save-excursion
+                       (with-current-buffer (funcall (citar--get-notes-config :open) descriptor)
+                         (current-buffer))))
+             (point (with-current-buffer buffer (point))))
+        (list buffer point nil)))))
+
 (defun ebib-citar-backend (operation &rest args)
   "Citar backend for ebib notes.
 Execute OPERATION given ARGS per `ebib-notes-storage', which see."
@@ -57,15 +67,11 @@ Execute OPERATION given ARGS per `ebib-notes-storage', which see."
        (funcall ebib-citar--notes-checker (car args))))
     (:create-note
      (citar-create-note (car args))
-     (ebib-citar-backend :open-note (car args)))
+     (ebib-citar--open-note args))
     (:open-note
-     (when-let ((resource (citar--select-resource args :notes t)))
-       (pcase-let ((`(,type . ,descriptor) resource))
-         (let* ((buffer (save-excursion
-                          (with-current-buffer (funcall (citar--get-notes-config :open) descriptor)
-                            (current-buffer))))
-                (point (with-current-buffer buffer (point))))
-           (list buffer point nil)))))))
+     (ebib-citar--open-note args))
+    (:extract-text (ebib--log 'message "[Ebib-Citar] Cannot extract note text"))
+    (:delete-note (user-error "[Ebib-Citar] Cannot delete note"))))
 
 (defun ebib-citar-entry-function (citekey)
   "Open CITEKEY using `ebib'."
