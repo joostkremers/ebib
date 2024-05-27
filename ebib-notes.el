@@ -44,6 +44,9 @@
 (declare-function ebib-extract-note-text-default "ext:ebib" (key truncate))
 
 (defgroup ebib-notes nil "Settings for notes files." :group 'ebib)
+(defgroup ebib-notes-singleton nil "Settings for the `singleton' back-end." :group 'ebib-notes)
+(defgroup ebib-notes-multiple nil "Settings for the `multiple' and `org-capture' back-ends." :group 'ebib-notes)
+(defgroup ebib-notes-org-capture nil "Settings for the `org-capture' back-end." :group 'ebib-notes)
 
 (defcustom ebib-notes-symbol "N"
   "Symbol used to indicate the presence of a note for the current entry.
@@ -134,7 +137,7 @@ file to store a new note to.
 
 Note that this file does not need to be listed in
 `ebib-notes-locations'."
-  :group 'ebib-notes
+  :group 'ebib-notes-multiple
   :type '(file :tag "Default notes file"))
 
 (make-obsolete-variable 'ebib-notes-default-file 'ebib-notes-multiple-default-file "Ebib 2.50")
@@ -144,7 +147,7 @@ Note that this file does not need to be listed in
 The extension should be specified without a dot.  Note that this
 option is only used if `ebib-notes-storage' is set to
 `one-file-per-note'."
-  :group 'ebib-notes
+  :group 'ebib-notes-singleton
   :type '(string :tag "Extension"))
 
 (defcustom ebib-notes-name-transform-function nil
@@ -233,7 +236,7 @@ file.  It can be used to prepare the buffer for searching the
 note.
 
 This hook is also run when a new note is being created."
-  :group 'ebib
+  :group 'ebib-notes-multiple
   :type 'hook)
 
 (defcustom ebib-notes-open-note-after-hook '(org-back-to-heading org-narrow-to-subtree org-show-subtree)
@@ -244,7 +247,7 @@ the cursor, etc.
 
 This hook is not run when a new note is created, see
 `ebib-notes-new-note-hook'."
-  :group 'ebib-notes
+  :group 'ebib-notes-multiple
   :type 'hook)
 
 (defcustom ebib-notes-new-note-hook '(org-narrow-to-subtree)
@@ -252,7 +255,7 @@ This hook is not run when a new note is created, see
 This hook is only used when notes are stored in a common notes
 file.  It can be used to prepare the note for display, position
 the cursor, etc."
-  :group 'ebib-notes
+  :group 'ebib-notes-multiple
   :type 'hook)
 
 (defcustom ebib-notes-get-ids-function #'ebib-notes-extract-org-ids
@@ -575,7 +578,7 @@ string for details."
 This should be the key of the template as defined in
 `org-capture-templates'.  If this option is nil, the user is
 presented with the normal Org Capture menu."
-  :group 'ebib-notes
+  :group 'ebib-notes-org-capture
   :type '(choice (const :tag "Show org Capture menu" nil)
                  (string :tag "Org Capture template key")))
 
