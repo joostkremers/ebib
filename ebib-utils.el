@@ -2700,7 +2700,7 @@ history list. Then prepend KEY to the history list as well.
 Finally, set `:head' in `ebib--entry-history' to 0."
   (when-let ((head (ebib--history-get-head))
 	     ;; Only bother if head is sufficiently large, otherwise
-	     ;; there's nothing to prependQ
+	     ;; there's nothing to prepend:
 	     ((< 1 head))
 	     (hist-list (plist-get ebib--entry-history :history))
 	     (interim (seq-subseq hist-list 0 head)))
