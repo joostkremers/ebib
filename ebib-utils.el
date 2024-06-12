@@ -356,39 +356,6 @@ default sort field is visible in the index buffer."
                        (choice (const :tag "Ascending Sort" ascend)
                                (const :tag "Descending Sort" descend)))))
 
-(defun ebib--history-mutate (key)
-  "Alter `ebib--entry-history' list.
-Copy everything from the second element to the element at
-`ebib--history-get-head' in the `:history' list in
-`ebib--entry-history', reverse the result, and prepend it to the
-history list. Then prepend KEY to the history list as well.
-Finally, set `:head' in `ebib--entry-history' to 0."
-  (when-let ((head (ebib--history-get-head))
-	     ;; Only bother if head is sufficiently large, otherwise
-	     ;; there's nothing to prependQ
-	     (_ (< 1 head))
-	     (hist-list (plist-get ebib--entry-history :history))
-	     (interim (seq-subseq hist-list 0 head)))
-    (plist-put ebib--entry-history :history
-	       (append (reverse interim) hist-list)))
-  (push key (plist-get ebib--entry-history :history))
-  (ebib--history-set-head 0))
-
-(defun ebib--history-get (n)
-  "Get Nth elt of `:history' list in `ebib--entry-history'.
-N counts from 0. If N < 0, or there are not enough elements,
-return nil.."
-  (when (>= n 0)
-    (nth n (plist-get ebib--entry-history :history))))
-
-(defun ebib--history-set-head (n)
-  "Set `:head' in `ebib--entry-history' to N."
-  (plist-put ebib--entry-history :head n))
-
-(defun ebib--history-get-head ()
-  "Get value of `:head' in `ebib--entry-history'."
-  (plist-get ebib--entry-history :head))
-
 (defun ebib-compare-numerical-strings (a b)
   "Return t if A represents a number less than B represents.
 A and B are strings (e.g. \"3\" and \"11\")."
@@ -2720,6 +2687,42 @@ specified in `ebib-field-sort-functions-alist', with
         (setq keys (nreverse keys))))
   ;; Now return the list of keys.
   keys)
+
+;; History commands
+
+
+(defun ebib--history-mutate (key)
+  "Alter `ebib--entry-history' list.
+Copy everything from the second element to the element at
+`ebib--history-get-head' in the `:history' list in
+`ebib--entry-history', reverse the result, and prepend it to the
+history list. Then prepend KEY to the history list as well.
+Finally, set `:head' in `ebib--entry-history' to 0."
+  (when-let ((head (ebib--history-get-head))
+	     ;; Only bother if head is sufficiently large, otherwise
+	     ;; there's nothing to prependQ
+	     (_ (< 1 head))
+	     (hist-list (plist-get ebib--entry-history :history))
+	     (interim (seq-subseq hist-list 0 head)))
+    (plist-put ebib--entry-history :history
+	       (append (reverse interim) hist-list)))
+  (push key (plist-get ebib--entry-history :history))
+  (ebib--history-set-head 0))
+
+(defun ebib--history-get (n)
+  "Get Nth elt of `:history' list in `ebib--entry-history'.
+N counts from 0. If N < 0, or there are not enough elements,
+return nil.."
+  (when (>= n 0)
+    (nth n (plist-get ebib--entry-history :history))))
+
+(defun ebib--history-set-head (n)
+  "Set `:head' in `ebib--entry-history' to N."
+  (plist-put ebib--entry-history :head n))
+
+(defun ebib--history-get-head ()
+  "Get value of `:head' in `ebib--entry-history'."
+  (plist-get ebib--entry-history :head))
 
 (provide 'ebib-utils)
 
