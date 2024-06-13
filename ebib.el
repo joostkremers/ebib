@@ -1132,7 +1132,6 @@ keywords before Emacs is killed."
     (define-key map "y" #'ebib-yank-entry)
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
-    (define-key map [mouse-1] #'ebib-index-open-at-point)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
     (define-key map [remap jump-to-register] #'ebib-jump-to-register)
     (define-key map "\C-b" #'ebib-history-back)
