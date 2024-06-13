@@ -1,5 +1,10 @@
 % Ebib News
 
+## Version 2.42, June 2024 ##
+
+- Keep navigation history and commands to navigate it.
+- Store entries in registers, in order to be able to navigate back to them.
+
 ## Version 2.41, April 2024 ##
 
 - New user option `ebib-import-target-directory`: specify the target directory for importing files / URLs.
