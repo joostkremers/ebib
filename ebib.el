@@ -1653,7 +1653,7 @@ interactively."
 (defun ebib-history-back ()
   "Jump to the last visited entry.
 Repeated invocations of this function and `ebib-history-forward'
-move back and forward in history without changing it. After this,
+move back and forward in history without changing it.  After this,
 moving somewhere else copies the sequence of moves through
 history into the history record, so that they can still be
 accessed."
@@ -1671,7 +1671,7 @@ accessed."
 (defun ebib-history-forward ()
   "Jump to the entry visited before the current one in the history.
 Repeated invocations of this function and `ebib-history-back'
-move forward and back in history without changing it. After this,
+move forward and back in history without changing it.  After this,
 moving somewhere else copies the sequence of moves through
 history into the history record, so that they can still be
 accessed."

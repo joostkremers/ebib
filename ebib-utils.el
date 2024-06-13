@@ -1291,7 +1291,7 @@ Currently, the following problems are marked:
 (defvar ebib--entry-history '(:head 0 :history nil)
   "History of entries visited.
 `:history' is a list of all entries visited, with more recent
-entries nearer the beginning. `:head' is a 0-based index
+entries nearer the beginning.  `:head' is a 0-based index
 indicating where in the `:history' list we are currently.
 
 Commands which navigate between entries (including those which
@@ -1300,8 +1300,8 @@ navigate the history) should (in order):
   `:history' list, reverse the result, and prepend it to the history
   list (unless the `:head' value is less than 2, in which case nothing
   would be prepended).
-- prepend the key of the entry arrived at to the `:history' list.
-- set `:head' to 0
+- Prepend the key of the entry arrived at to the `:history' list.
+- Set `:head' to 0
 
 Passing the relevant key to `ebib--history-mutate' will achieve
 all of this in a convenient way.")
@@ -2689,15 +2689,14 @@ specified in `ebib-field-sort-functions-alist', with
   ;; Now return the list of keys.
   keys)
 
-;; History commands
-
+;;; History commands
 
 (defun ebib--history-mutate (key)
   "Alter `ebib--entry-history' list.
 Copy everything from the second element to the element at
 `ebib--history-get-head' in the `:history' list in
 `ebib--entry-history', reverse the result, and prepend it to the
-history list. Then prepend KEY to the history list as well.
+history list.  Then prepend KEY to the history list as well.
 Finally, set `:head' in `ebib--entry-history' to 0."
   (when-let ((head (ebib--history-get-head))
 	     ;; Only bother if head is sufficiently large, otherwise
