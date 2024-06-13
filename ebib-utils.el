@@ -1,6 +1,7 @@
 ;;; ebib-utils.el --- Part of Ebib, a BibTeX database manager  -*- lexical-binding: t -*-
 
-;; Copyright (c) 2003-2023 Joost Kremers
+;; Copyright (c) 2003-2024 Joost Kremers
+;; Copyright (c) 2022-2024 Hugo Heagren
 ;; All rights reserved.
 
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
