@@ -1682,8 +1682,8 @@ accessed."
       (progn
 	(ebib-switch-to-database goto-db)
 	(ebib--goto-entry-in-index goto)
-	(ebib--history-mutate goto)
-	(ebib--update-entry-buffer))
+	(ebib--update-entry-buffer)
+	(ebib--history-set-head new-head))
     (error "[Ebib] Nowhere to go forward to!")))
 
 (defun ebib-show-annotation ()
