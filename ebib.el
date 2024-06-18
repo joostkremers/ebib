@@ -297,8 +297,8 @@ of strings."
   (let ((files (ebib--split-files file-field)))
     (ebib--convert-multiline-to-string (mapcar (lambda (file)
 						 (propertize file
-							     'face 'button
-							     'font-lock-face 'button
+							     'face 'ebib-link-face
+							     'font-lock-face 'ebib-link-face
 							     'mouse-face 'highlight
 							     'help-echo "mouse-1: open this file"
 							     'button t
@@ -350,8 +350,8 @@ help-echo message."
 (defun ebib--display-doi-field (doi-field)
   "Return a string for DOI-FIELD to display in the entry buffer."
   (propertize doi-field
-	      'face 'button
-	      'font-lock-face 'button
+	      'face 'ebib-link-face
+	      'font-lock-face 'ebib-link-face
 	      'mouse-face 'highlight
 	      'help-echo "mouse-1: follow this doi"
 	      'button t
@@ -367,8 +367,8 @@ help-echo message."
     (ebib--convert-multiline-to-string
      (mapcar (lambda (url)
 	       (propertize url
-			   'face 'button
-			   'font-lock-face 'button
+			   'face 'ebib-link-face
+			   'font-lock-face 'ebib-link-face
 			   'mouse-face 'highlight
 			   'help-echo "mouse-1: follow this url"
 			   'button t
@@ -382,8 +382,8 @@ help-echo message."
 (defun ebib--display-crossref-field (crossref)
   "Return a string for CROSSREF to display in the entry buffer."
   (propertize crossref
-	      'face 'button
-	      'font-lock-face 'button
+	      'face 'ebib-link-face
+	      'font-lock-face 'ebib-link-face
 	      'mouse-face 'highlight
 	      'help-echo "mouse-1: follow crossref"
 	      'button t

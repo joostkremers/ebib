@@ -2638,8 +2638,8 @@ This function is mainly intended for the DOI and URL fields."
 		    (concat "https://dx.doi.org/" val)
 		  val)))
       (propertize "www"
-		  'face 'button
-		  'font-lock-face 'button
+		  'face 'ebib-link-face
+		  'font-lock-face 'ebib-link-face
 		  'mouse-face 'highlight
 		  'help-echo str
 		  'button t
