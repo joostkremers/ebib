@@ -56,18 +56,38 @@ key."
 
 (defcustom ebib-notes-storage 'one-file-per-note
   "Storage location of external notes.
-Possible values are `one-file-per-note' and
-`multiple-notes-per-file'.  If `one-file-per-note', each note is
-stored in a separate file in the directory `ebib-notes-directory'
-or in the first directory listed in `ebib-bib-search-dirs' if
-`ebib-notes-directory' is nil.
+Possible values are `one-file-per-note',
+`multiple-notes-per-file', and a function.  If
+`one-file-per-note', each note is stored in a separate file in
+the directory `ebib-notes-directory' or in the first directory
+listed in `ebib-bib-search-dirs' if `ebib-notes-directory' is
+nil.
 
 If this option is set to `multiple-notes-per-file', notes are
 searched in the files and directories listed in
-`ebib-notes-locations'."
+`ebib-notes-locations'.
+
+If this option is set to a function, it must be a function of the
+following form: (ACTION &rest PARAMETERS).  ACTION is a keyword
+indicating what action to perform, and PARAMETERS is a list of
+parameters, which vary based on ACTION.  The following keywords
+must be supported:
+
+ - `:has-note' takes a KEY, and returns non-nil if a note exists
+   for the entry.
+
+ - `:create-note' takes a KEY and a DATABASE and returns a cons
+   of (BUFFER . POINT) where the note begins.  Depending on how
+   note creation is performed, it may be helpful to set
+   `ebib-notes-template' to the empty string.
+
+ - `:open-note' takes a KEY and returns a buffer, with point at
+   the start of the note."
   :group 'ebib-notes
   :type '(choice (const :tag "Use one file per note" one-file-per-note)
-                 (const :tag "Use multiple notes per file" multiple-notes-per-file)))
+                 (const :tag "Use multiple notes per file" multiple-notes-per-file)
+                 (function-item :tag "Use Citar" ebib-citar-backend)
+                 (function :tag "Use external library")))
 
 (defcustom ebib-notes-directory nil
   "Directory to save notes files to.
@@ -343,7 +363,9 @@ note file if `ebib-notes-storage' is set to `one-note-per-file'."
         (member key ebib--notes-list))
        ((eq ebib-notes-storage 'one-file-per-note)
         (if (file-readable-p (ebib--create-notes-file-name key))
-            (cl-pushnew key ebib--notes-list))))))
+            (cl-pushnew key ebib--notes-list)))
+       ((functionp ebib-notes-storage)
+        (apply ebib-notes-storage :has-note (list key))))))
 
 (defun ebib--notes-goto-note (key)
   "Find or create a buffer containing the note for KEY.
@@ -376,7 +398,11 @@ If KEY has no note, return nil."
                  ;; Otherwise try and open the file.
                  (and (file-readable-p filename)
                       (ebib--notes-open-single-note-file filename)))))
-      (when buf (cons buf (with-current-buffer buf (point))))))))
+      (when buf (cons buf (with-current-buffer buf (point))))))
+   ((functionp ebib-notes-storage)
+    (let ((buffer (apply ebib-notes-storage :open-note (list key))))
+      (when buffer
+        (cons buffer (with-current-buffer buffer (point))))))))
 
 (defun ebib--notes-create-new-note (key db)
   "Create a note for KEY in DB.
@@ -406,7 +432,11 @@ the position where point should be placed."
           (if (file-writable-p filename)
               (setq buf (ebib--notes-open-single-note-file filename)
                     pos 1)
-            (error "[Ebib] Could not create note file `%s' " filename)))))
+            (error "[Ebib] Could not create note file `%s' " filename))))
+       ((functionp ebib-notes-storage)
+        (let ((note-data (apply ebib-notes-storage :create-note (list key db))))
+          (setq buf (car note-data)
+                pos (or (cdr note-data) 1)))))
       (let ((note (ebib--notes-fill-template key db)))
         (with-current-buffer buf
           (goto-char pos)

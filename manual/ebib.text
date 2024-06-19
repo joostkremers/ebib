@@ -944,7 +944,9 @@ The procedure for creating a new note depends on the setting of `ebib-notes-stor
 
 If `ebib-notes-storage` is set to `multiple-notes-per-files`, Ebib won't create a new file when you create a new note. Instead, it will ask you for the file to save the note to and offer the files in `ebib-notes-locations` as candidates. If you don't want to be asked, you can set the option `ebib-notes-default-file`: new notes are then automatically stored to that file. You can subsequently use Org to move notes around or archive them.
 
-New notes are created based on a template (`ebib-note-nemplate`). By default, the note is a top-level item with an Org headline consisting of the author(s), year and title of the entry. The entry also has a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. If `ebib-notes-storage` is set to `multiple-notes-per-fil`, this custom ID is essential, because it is what Ebib uses to find the note. (If you use `one-file-per-note`, the file name is used to identify an entry, even though the custom ID is still included.)
+Finally, if `ebib-notes-storage` is set to a function, Ebib will use an external package to manage notes, but will display notes and note status using the package.  (See [External Notes Management](#external-notes-management) for more information.)
+
+New notes are created based on a template (`ebib-note-nemplate`). By default, the note is a top-level item with an Org headline consisting of the author(s), year and title of the entry. The entry also has a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. If `ebib-notes-storage` is set to `multiple-notes-per-file`, this custom ID is essential, because it is what Ebib uses to find the note. (If you use `one-file-per-note`, the file name is used to identify an entry, even though the custom ID is still included.)
 
 The template can of course be customised. Details are discussed below.
 
@@ -1074,6 +1076,15 @@ Note that Ebib only searches for a single note for each entry, so if you create 
 
 Note that Ebib also provides an Ebib-friendly command to call `org-capture` directly. This command, `ebib-org-capture` (not bound to any key by default), takes the same arguments as `org-capture` and can be used in the same way. It makes sure that `ebib-notes-create-org-template` can find the current entry and then calls `org-capture`. 
 
+## External Notes Management ## {.unlisted .unnumbered}
+
+External packages can provide functions which fulfill a simple interface to replace Ebib's note management, as `ebib-notes-storage`. These functions must arguments in the form `(ACTION &rest PARAMETERS)`. Known actions and their return values are as follows.
+
+ - `:has-note` takes a *key* and returns a generalized boolean determining if a note exists for the entry.
+ - `:create-note` takes a *key* and a *database* object, and returns a cons of `(BUFFER . POINT)` denoting the start of the note.
+ - `:open-note` takes a *key* and returns a buffer containing the note, with point at its start.
+
+Example integration may be found in `ebib-citar.el`.
 
 # Managing a reading list #
 
