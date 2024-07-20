@@ -60,6 +60,7 @@
 (require 'mule-util)
 (require 'button)
 (require 'compat)  ; for `pos-bol', `pos-eol'.
+(require 'register)
 (require 'parsebib)
 (require 'ebib-utils)
 (require 'ebib-db)
@@ -2456,9 +2457,12 @@ buffer and switch to it."
 (defun ebib-current-entry-to-register (register)
   "Store current entry's key as a string in REGISTER.
 Interactively, prompt for REGISTER with
-`register-read-with-preview'."
+`register-read-with-preview'.
+
+The entry is stored as a list (ebib-entry KEY), where KEY is a string.
+This is to enable `register-val-jump-to' to dispatch properly."
   (interactive `(,(register-read-with-preview "Entry to register: ")))
-  (set-register register (ebib--get-key-at-point)))
+  (set-register register `(ebib-entry ,(ebib--get-key-at-point))))
 
 (defun ebib-jump-to-register (register)
   "Jump to entry with key stored in REGISTER.
