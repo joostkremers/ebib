@@ -1135,7 +1135,6 @@ keywords before Emacs is killed."
     (define-key map "z" #'ebib-leave-ebib-windows)
     (define-key map "Z" #'ebib-lower)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
-    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
     (define-key map "\C-b" #'ebib-history-back)
     (define-key map "\C-f" #'ebib-history-forward)
     map)
@@ -2464,12 +2463,9 @@ This is to enable `register-val-jump-to' to dispatch properly."
   (interactive `(,(register-read-with-preview "Entry to register: ")))
   (set-register register `(ebib-entry ,(ebib--get-key-at-point))))
 
-(defun ebib-jump-to-register (register)
-  "Jump to entry with key stored in REGISTER.
-Interactively, prompt for REGISTER with
-`register-read-with-preview'."
-  (interactive `(,(register-read-with-preview "Jump to register: ")))
-  (let* ((key (get-register register))
+(cl-defmethod register-val-jump-to ((val (head ebib-entry)) _arg)
+  "Jump to Ebib entry with key which is the cadr of VAL."
+  (let* ((key (cadr val))
 	 (db (ebib--find-db-for-key key ebib--cur-db)))
     (if (not (ebib-db-has-key key db))
 	(error "[Ebib] Could not find entry key `%s'" key)
@@ -3906,7 +3902,6 @@ hook `ebib-reading-list-remove-item-hook' is run."
     (define-key map "\C-xk" 'ebib-quit-entry-buffer)
     (define-key map "\C-x\C-s" #'ebib-save-current-database)
     (define-key map [remap point-to-register] #'ebib-current-entry-to-register)
-    (define-key map [remap jump-to-register] #'ebib-jump-to-register)
     (define-key map "\C-b" #'ebib-history-back)
     (define-key map "\C-f" #'ebib-history-forward)
     map)
