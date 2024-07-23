@@ -1,5 +1,10 @@
 % Ebib News
 
+## Version 2.43, July 2024 ##
+
+- Use standard Emacs register functionality for storing entries in registers and jumping back to them.
+- Support for setting Ebib customisation options in directory-local variables.
+
 ## Version 2.42, June 2024 ##
 
 - Keep navigation history and commands to navigate it.

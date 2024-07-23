@@ -111,7 +111,7 @@ You can quickly jump to any entry in a database with the key [`j`]{.key}. This a
 
 If you use [selectrum](https://github.com/raxod502/selectrum), [ivy](https://github.com/abo-abo/swiper) or [helm](https://github.com/emacs-helm/helm) or the built-in package ido, using [`j`]{.key} becomes even more convenient: instead of completing the entry key, you can type any part of the author/editor names, of the title and the year of the entry you want to jump to. You can also see the bibliography file to which the entry belongs. This is a good way to search for a particular entry if you're not sure of the entry key. 
 
-Ebib keeps a history of the entries that you've visited. You can move through this history with [`C-b`]{.key} and [`C-f`]{.key}. Furthermore, using the default commands `point-to-register` and `jump-to-register` (which are rebound in the index buffer to `ebib-current-entry-to-register` and `ebib-jump-to-register`, respectively), you can store an entry in a register and jump back to it at a later point.
+Ebib keeps a history of the entries that you've visited. You can move through this history with [`C-b`]{.key} and [`C-f`]{.key}. Furthermore, using the Emacs command `point-to-register`, you can store an entry in a register and jump back to it at a later point with `jump-to-register`.
 
 ## Displaying and Sorting the Entries List ##
 
@@ -1192,6 +1192,8 @@ Ebib can be customised through Emacs' standard customisation interface. The rele
 In the index buffer, Ebib's menu has an Options submenu. This menu gives you quick access to Ebib's customisation buffer, and it also provides checkboxes for several settings that can be toggled on and off. All of these settings have defaults that can be defined in the customisation buffer. Setting or unsetting them in the Options menu only changes them for the duration of your Emacs session, it doesn't affect the default setting.
 
 The same is true for the printing options that are in the Print menu. When set or unset in the menu, the default values specified in the customisation buffer do not change.
+
+You can also set Ebib options in a `.dir-locals.el` file. Note, however, that these only take effect if you start Ebib from the relevant directory. If you put Ebib in the background and return to it with [`M-x ebib`]{.key}, a `.dir-locals.el` is not taken into account.
 
 
 ## Modifying Key Bindings ## {.unlisted .unnumbered}
