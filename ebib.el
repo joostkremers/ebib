@@ -1166,6 +1166,7 @@ there for details."
 (define-derived-mode ebib-index-mode
   fundamental-mode "Ebib-index"
   "Major mode for the Ebib index buffer."
+  (hack-dir-local-variables-non-file-buffer)
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
@@ -3910,6 +3911,7 @@ hook `ebib-reading-list-remove-item-hook' is run."
 (define-derived-mode ebib-entry-mode
   fundamental-mode "Ebib"
   "Major mode for the Ebib entry buffer."
+  (hack-dir-local-variables-non-file-buffer)
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
@@ -4810,6 +4812,7 @@ arguments for compatibility with `ebib-field-edit-functions'."
 (define-derived-mode ebib-strings-mode
   fundamental-mode "Ebib-strings"
   "Major mode for the Ebib strings buffer."
+  (hack-dir-local-variables-non-file-buffer)
   (setq buffer-read-only t)
   (if ebib-hide-cursor
       (setq cursor-type nil))
@@ -5221,6 +5224,7 @@ The text being edited is stored before saving the database."
 (define-derived-mode ebib-log-mode
   fundamental-mode "Ebib-log"
   "Major mode for the Ebib log buffer."
+  (hack-dir-local-variables-non-file-buffer)
   (local-set-key "\C-xb" 'ebib-quit-log-buffer)
   (local-set-key "\C-xk" 'ebib-quit-log-buffer)
   (ebib-set-default-dir))
