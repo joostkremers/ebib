@@ -123,7 +123,7 @@ You can use any `biblatex` or BibTeX field to define a column in the index buffe
 
 Three other column labels have special behaviour: `"Title"`, `"Doi"`, and `"Url"`. These do display information from the fields they correspond with, but in a special way: `"Title"` tries to make the title look nice by removing braces and LaTeX commands (leaving only their obligatory arguments) and by displaying the arguments of `\emph`, `\textit`, `\textbf` and `\textsc` in italic, bold or caps. Accented characters that are created using LaTeX commands such as `\"{a}` are displayed as the actual accented characters and a number of LaTeX commands for special characters are replaced with the corresponding Unicode character. 
 
-The column labels`"Doi"` and `"Url"` don't display the contents of these fields, but instead yield a clickable string `"www"`;  clicking on `"www"` takes you to the relevant web page.
+The column labels `"Doi"` and `"Url"` don't display the contents of these fields, but instead yield a clickable string `"www"`;  clicking on `"www"` takes you to the relevant web page.
 
 The final predefined column label is `"Note"`. This does not, as might be expected, display the contents of the note field. Rather, it checks whether the entry in question has an external annotation (see [Notes Files](#notes-files)). For those entries that have an annotation, the `"Note"` column displays a (clickable) `"N"`. (Keep in mind, though, that if you keep your notes in a single file, adding this column to the index display can slow down the creation of the index buffer (and thus Ebib's start-up). If you wish to use this column, it is probably best to keep notes in separate files.)
 
