@@ -2186,9 +2186,11 @@ The FORCE argument is used as in `ebib-save-current-database'."
         (error "[Ebib] File not saved"))))
 
   ;; Now save the database.
-  (with-temp-buffer
+  (with-current-buffer (or (find-buffer-visiting (ebib-db-get-filename db))
+                           (find-file-noselect (ebib-db-get-filename db)))
+    (erase-buffer)
     (ebib--format-database-as-bibtex db)
-    (write-region (point-min) (point-max) (ebib-db-get-filename db)))
+    (basic-save-buffer))
   (ebib--set-modified nil db))
 
 (defun ebib-write-database (force)
