@@ -3109,6 +3109,15 @@ prefix argument ARG."
     (default
       (beep))))
 
+(defcustom ebib-doi-resolver "https://doi.org/"
+  "URL to use as a DOI resolver for the \"doi\" field.
+This URL *must* end in a terminal slash (/) to be used.
+
+By default, use the DOI Foundation's preferred proxy,
+https://doi.org/"
+  :group 'ebib
+  :type 'string)
+
 (defun ebib-browse-doi ()
   "Open the DOI in the \"doi\" field in a browser.
 The \"doi\" field may contain only one DOI.  If necessary, the
@@ -3117,12 +3126,16 @@ being sent to the browser."
   (interactive)
   (ebib--execute-when
     (entries
-     (let ((doi (ebib-get-field-value "doi" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
-       (unless doi
+     (let ((doi-data (ebib-get-field-value "doi" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+       (unless doi-data
          (error "[Ebib] No DOI found in doi field"))
-       (ebib--call-browser (if (string-match-p "^[[:space:]]*https?://dx.doi.org/" doi)
-                               doi
-                             (concat "https://dx.doi.org/" doi)))))
+       (save-match-data
+         ;; RX based on https://www.crossref.org/blog/dois-and-matching-regular-expressions/
+         (if (string-match (rx (group-n 1 (or (and "10." (>= 4 digit) "/" (+ (or ?- ?. ?_ ";" ?\( ?\) ?/ ?: alnum)))
+                                              (and "10.1002/" (+ (not space)) word-boundary))))
+                           doi-data)
+             (ebib--call-browser (concat ebib-doi-resolver (url-encode-url (match-string-no-properties 1 doi-data))))
+           (error "[Ebib] Unable to parse doi field")))))
     (default
       (beep))))
 

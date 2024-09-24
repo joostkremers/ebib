@@ -918,7 +918,7 @@ It is not even necessary that the relevant field contains *only* URLs. It may co
 
 By default Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. You can, of course, customise the regular expression that controls this behaviour. See the option "Url Regexp" for details.
 
-Similarly, with the key [`I`]{.key} in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The whole contents of the field is assumed to be the DOI and is sent to the browser, prepended with the string `https://dx.doi.org/` if necessary.
+Similarly, with the key [`I`]{.key} in the index buffer you can send a DOI to a browser. The DOI must be stored in the `doi` field. Unlike URLs, there can only be one DOI in this field. The DOI is extracted from this field (a resolver URL is removed if present), and a resolver URL is prepended (`https://doi.org/` by default, customizable as `ebib-doi-resolver`) before being sent to the browser.
 
 Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option "Browser Command".
 
