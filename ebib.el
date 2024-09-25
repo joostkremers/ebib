@@ -4389,11 +4389,10 @@ FILTER is passed unmodified to `ebib-read-entry'."
 
 (defun ebib--edit-type-field ()
   "Prompt for an entry type.
-If the selected type is \"xdata\" or \"set\" (or a
-case-insensitive variation) and
+If the selected type is Xdata or Set and
 `ebib-always-prompt-for-special-keys' is non-nil or the original
-key is temporary or then also invoke `ebib-edit-keyname', to
-force the user to select a key for the entry manually."
+key is temporary, also invoke `ebib-edit-keyname', to force the
+user to select a key for the entry manually."
   (let ((type (completing-read
 	       "Type: "
 	       (ebib--list-entry-types (ebib--get-dialect ebib--cur-db) t)
