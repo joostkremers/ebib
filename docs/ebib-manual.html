@@ -2401,9 +2401,11 @@ details.</p>
 <p>Similarly, with the key <span class="key"><code>I</code></span> in
 the index buffer you can send a DOI to a browser. The DOI must be stored
 in the <code>doi</code> field. Unlike URLs, there can only be one DOI in
-this field. The whole contents of the field is assumed to be the DOI and
-is sent to the browser, prepended with the string
-<code>https://dx.doi.org/</code> if necessary.</p>
+this field. The DOI is extracted from this field, and a resolver URL is
+prepended (<code>https://doi.org/</code> by default, customisable as
+<code>ebib-doi-resolver</code>) before being sent to the browser. Note
+that if the <code>doi</code> field already contains a DOI resolver URL,
+it is removed.</p>
 <p>Ebib uses the Emacs function <code>browse-url</code> to call the
 default browser on the system. If you prefer to use another browser,
 however, you can specify this with the option “Browser Command”.</p>
