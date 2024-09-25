@@ -966,6 +966,17 @@ to handle a URL on the command line."
   :type '(choice (const :tag "Use standard browser" nil)
                  (string :tag "Specify browser command")))
 
+(defcustom ebib-doi-resolver "https://doi.org/"
+  "URL to use as a DOI resolver for the \"doi\" field.
+By default, use the DOI Foundation's preferred proxy,
+https://doi.org/.  Note that this URL must end in a slash."
+  :group 'ebib
+  :type '(string :tag "DOI resolver"
+                 :validate (lambda (widget)
+                             (unless (string-suffix-p "/" (widget-value widget))
+                               (widget-put widget :error "[Ebib] DOI resolver must end in a slash.")
+                               widget))))
+
 (make-obsolete-variable 'ebib-doi-field "The default DOI field can no longer be customized" "Ebib 2.27")
 
 (make-obsolete-variable 'ebib-file-field "The standard file field can no longer be customized" "Ebib 2.27")

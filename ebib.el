@@ -3109,15 +3109,6 @@ prefix argument ARG."
     (default
       (beep))))
 
-(defcustom ebib-doi-resolver "https://doi.org/"
-  "URL to use as a DOI resolver for the \"doi\" field.
-This URL *must* end in a terminal slash (/) to be used.
-
-By default, use the DOI Foundation's preferred proxy,
-https://doi.org/"
-  :group 'ebib
-  :type 'string)
-
 (defun ebib-browse-doi ()
   "Open the DOI in the \"doi\" field in a browser.
 The \"doi\" field may contain only one DOI.  If necessary, the
