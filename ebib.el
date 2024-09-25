@@ -2823,16 +2823,6 @@ result."
             entry))
     result))
 
-
-(defcustom ebib-follow-current-field-crossref t
-  "Consider only current crossref fields when following crossrefs.
-If non-nil, `ebib-follow-crossref' will only consider keys
-present in the value of the current field, when called with point
-on a field which crossrefs other entries (`crossref', `xdata' or
-`xref')."
-  :group 'ebib
-  :type 'boolean)
-
 (defun ebib--key-in-index-p (key)
   "Return t if the entry for KEY is listed in the index buffer."
   (with-current-ebib-buffer 'index
@@ -4396,11 +4386,6 @@ FILTER is passed unmodified to `ebib-read-entry'."
     (if multiple
 	(mapcar #'car entry)
       (caar entry))))
-
-(defcustom ebib-always-prompt-for-special-keys t
-  "Prompt for new key in already-named Xdata, Set entries."
-  :group 'ebib
-  :type 'boolean)
 
 (defun ebib--edit-type-field ()
   "Prompt for an entry type.

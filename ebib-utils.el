@@ -212,6 +212,11 @@ menu."
   :group 'ebib
   :type '(repeat (string :tag "Field")))
 
+(defcustom ebib-always-prompt-for-special-keys t
+  "Prompt for new key in already-named Xdata, Set entries."
+  :group 'ebib
+  :type 'boolean)
+
 (defcustom ebib-layout 'full
   "Ebib window layout.
 This option defines how Ebib displays the buffers it uses.  Possible values are:
@@ -823,6 +828,15 @@ BibTeX dialect is set to `BibTeX', this option is ignored."
                                      (string :tag "Source field")
                                      (choice (string :tag "Target field)")
                                              (const :tag "No inheritance" none)))))))
+
+(defcustom ebib-follow-current-field-crossref t
+  "Consider only current crossref fields when following crossrefs.
+If non-nil, `ebib-follow-crossref' will only consider keys
+present in the value of the current field, when called with point
+on a field which crossrefs other entries (`crossref', `xdata' or
+`xref')."
+  :group 'ebib
+  :type 'boolean)
 
 (defcustom ebib-save-xrefs-first t
   "Save entries with a crossref field first in the BibTeX-file.
