@@ -1,5 +1,11 @@
 % Ebib News
 
+## Version 2,44, September 2024 ##
+
+- New user option `ebib-doi-resolver`.
+- Breaking change: Remove any DOI resolver in the `doi` field, if present,
+  before sending a DOI to the browser.
+
 ## Version 2.43, July 2024 ##
 
 - Use standard Emacs register functionality for storing entries in registers and jumping back to them.
