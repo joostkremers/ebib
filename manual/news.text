@@ -1,6 +1,6 @@
 % Ebib News
 
-## Version 2,44, September 2024 ##
+## Version 2.44, September 2024 ##
 
 - New user option `ebib-doi-resolver`.
 - Breaking change: Remove any DOI resolver in the `doi` field, if present,
