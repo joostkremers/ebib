@@ -2394,9 +2394,9 @@ mode's capture system to record new notes.  This has the advantage that
 you have more control over the location where a note is stored and that
 you can have more than one capture template.
 
-Note that with Ebib version 2.30, the functionality for notes files has
-changed and it may be necessary to update your configuration.  See *note
-Upgrading from earlier Ebib versions:
+Note that with Ebib version 2.30 (released Feb. 2021), the functionality
+for notes files has changed and it may be necessary to update your
+configuration.  See *note Upgrading from earlier Ebib versions:
 #upgrading-from-earlier-ebib-versions. below for details.
 
 * Menu:
@@ -2453,12 +2453,12 @@ you can set the option ‘ebib-notes-default-file’: new notes are then
 automatically stored to that file.  You can subsequently use Org to move
 notes around or archive them.
 
-New notes are created based on a template (‘ebib-note-nemplate’).  By
+New notes are created based on a template (‘ebib-note-template’).  By
 default, the note is a top-level item with an Org headline consisting of
 the author(s), year and title of the entry.  The entry also has a
 ‘:PROPERTIES:’ block containing a custom ID for the entry, which
 consists of the entry key.  If ‘ebib-notes-storage’ is set to
-‘multiple-notes-per-fil’, this custom ID is essential, because it is
+‘multiple-notes-per-file’, this custom ID is essential, because it is
 what Ebib uses to find the note.  (If you use ‘one-file-per-note’, the
 file name is used to identify an entry, even though the custom ID is
 still included.)
@@ -3270,34 +3270,34 @@ Node: Calling a Browser for URLs and DOIs112524
 Ref: #calling-a-browser-for-urls-and-dois112740
 Node: Notes files115155
 Ref: #notes-files115305
-Node: Configuring files for storing notes116793
-Ref: #configuring-files-for-storing-notes116971
-Node: Hooks119940
-Ref: #hooks120103
-Node: Upgrading from earlier Ebib versions121500
-Ref: #upgrading-from-earlier-ebib-versions121723
-Node: Customising the notes file format122633
-Ref: #customising-the-notes-file-format122861
-Node: Displaying notes126967
-Ref: #displaying-notes127158
-Node: Using org-capture to record notes128503
-Ref: #using-org-capture-to-record-notes128694
-Node: Managing a reading list134690
-Ref: #managing-a-reading-list134852
-Node: Managing Keywords137867
-Ref: #managing-keywords138023
-Node: Using a Canonical Keywords List139630
-Ref: #using-a-canonical-keywords-list139788
-Node: Window Management141926
-Ref: #window-management142091
-Node: Copying Entries to the Kill Ring145226
-Ref: #copying-entries-to-the-kill-ring145425
-Node: Printing the Database148148
-Ref: #printing-the-database148321
-Node: Customisation151764
-Ref: #customisation151880
-Node: Modifying Key Bindings153371
-Ref: #modifying-key-bindings153498
+Node: Configuring files for storing notes116814
+Ref: #configuring-files-for-storing-notes116992
+Node: Hooks119962
+Ref: #hooks120125
+Node: Upgrading from earlier Ebib versions121522
+Ref: #upgrading-from-earlier-ebib-versions121745
+Node: Customising the notes file format122655
+Ref: #customising-the-notes-file-format122883
+Node: Displaying notes126989
+Ref: #displaying-notes127180
+Node: Using org-capture to record notes128525
+Ref: #using-org-capture-to-record-notes128716
+Node: Managing a reading list134712
+Ref: #managing-a-reading-list134874
+Node: Managing Keywords137889
+Ref: #managing-keywords138045
+Node: Using a Canonical Keywords List139652
+Ref: #using-a-canonical-keywords-list139810
+Node: Window Management141948
+Ref: #window-management142113
+Node: Copying Entries to the Kill Ring145248
+Ref: #copying-entries-to-the-kill-ring145447
+Node: Printing the Database148170
+Ref: #printing-the-database148343
+Node: Customisation151786
+Ref: #customisation151902
+Node: Modifying Key Bindings153393
+Ref: #modifying-key-bindings153520
 
 End Tag Table
 

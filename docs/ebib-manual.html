@@ -94,9 +94,6 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans&family=Roboto+Slab&display=swap" rel="stylesheet">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -2428,8 +2425,9 @@ to the end of the relevant notes file. If you prefer, you can also use
 Org mode’s capture system to record new notes. This has the advantage
 that you have more control over the location where a note is stored and
 that you can have more than one capture template.</p>
-<p>Note that with Ebib version 2.30, the functionality for notes files
-has changed and it may be necessary to update your configuration. See <a
+<p>Note that with Ebib version 2.30 (released Feb. 2021), the
+functionality for notes files has changed and it may be necessary to
+update your configuration. See <a
 href="#upgrading-from-earlier-ebib-versions">Upgrading from earlier Ebib
 versions</a> below for details.</p>
 <h2 class="unlisted unnumbered"
@@ -2475,12 +2473,12 @@ candidates. If you don’t want to be asked, you can set the option
 stored to that file. You can subsequently use Org to move notes around
 or archive them.</p>
 <p>New notes are created based on a template
-(<code>ebib-note-nemplate</code>). By default, the note is a top-level
+(<code>ebib-note-template</code>). By default, the note is a top-level
 item with an Org headline consisting of the author(s), year and title of
 the entry. The entry also has a <code>:PROPERTIES:</code> block
 containing a custom ID for the entry, which consists of the entry key.
 If <code>ebib-notes-storage</code> is set to
-<code>multiple-notes-per-fil</code>, this custom ID is essential,
+<code>multiple-notes-per-file</code>, this custom ID is essential,
 because it is what Ebib uses to find the note. (If you use
 <code>one-file-per-note</code>, the file name is used to identify an
 entry, even though the custom ID is still included.)</p>

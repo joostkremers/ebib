@@ -931,7 +931,7 @@ In the entry buffer, the first few lines of the note are shown under a pseudo-fi
 
 When you record a new note, Ebib pops up a buffer and adds the note to the end of the relevant notes file. If you prefer, you can also use Org mode's capture system to record new notes. This has the advantage that you have more control over the location where a note is stored and that you can have more than one capture template.
 
-Note that with Ebib version 2.30, the functionality for notes files has changed and it may be necessary to update your configuration. See [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) below for details.
+Note that with Ebib version 2.30 (released Feb. 2021), the functionality for notes files has changed and it may be necessary to update your configuration. See [Upgrading from earlier Ebib versions](#upgrading-from-earlier-ebib-versions) below for details.
 
 
 ## Configuring files for storing notes ## {.unlisted .unnumbered}
@@ -944,7 +944,7 @@ The procedure for creating a new note depends on the setting of `ebib-notes-stor
 
 If `ebib-notes-storage` is set to `multiple-notes-per-files`, Ebib won't create a new file when you create a new note. Instead, it will ask you for the file to save the note to and offer the files in `ebib-notes-locations` as candidates. If you don't want to be asked, you can set the option `ebib-notes-default-file`: new notes are then automatically stored to that file. You can subsequently use Org to move notes around or archive them.
 
-New notes are created based on a template (`ebib-note-nemplate`). By default, the note is a top-level item with an Org headline consisting of the author(s), year and title of the entry. The entry also has a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. If `ebib-notes-storage` is set to `multiple-notes-per-fil`, this custom ID is essential, because it is what Ebib uses to find the note. (If you use `one-file-per-note`, the file name is used to identify an entry, even though the custom ID is still included.)
+New notes are created based on a template (`ebib-note-template`). By default, the note is a top-level item with an Org headline consisting of the author(s), year and title of the entry. The entry also has a `:PROPERTIES:` block containing a custom ID for the entry, which consists of the entry key. If `ebib-notes-storage` is set to `multiple-notes-per-file`, this custom ID is essential, because it is what Ebib uses to find the note. (If you use `one-file-per-note`, the file name is used to identify an entry, even though the custom ID is still included.)
 
 The template can of course be customised. Details are discussed below.
 
