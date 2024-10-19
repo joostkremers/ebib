@@ -3620,7 +3620,7 @@ the current entry."
                                                                  (length (seq-difference (ebib-db-list-keys dependent) to-be-modified))))
                                                             (ebib--list-dependents ebib--cur-db)))))
           (default
-            (beep)))
+           (beep)))
         (ebib--update-entry-buffer)))))
 
 (defun ebib-add-canonical-keyword (pfx)
