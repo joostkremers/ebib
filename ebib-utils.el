@@ -2440,27 +2440,27 @@ will be expanded recursively."
 (defun ebib-unbraced-p (string)
   "Non-nil if STRING is not enclosed in braces or quotes."
   (save-match-data
-   (cl-flet ((remove-from-string (string remove)
-                                (apply #'concat (split-string string remove))))
-    (when (stringp string)
-      (cond
-       ((eq (string-to-char string) ?\{)
-        ;; First, remove all escaped { and } from the string:
-        (setq string (remove-from-string (remove-from-string string "[\\][{]")
-                                         "[\\][}]"))
-        ;; Then remove the innermost braces with their contents and continue until
-        ;; no more braces are left.
-        (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
-          (setq string (remove-from-string string "{[^{]*?}")))
-        ;; If STRING is not empty, the original string contains material not in braces.
-        (> (length string) 0))
-       ((eq (string-to-char string) ?\")
-        ;; Remove escaped ", then remove any occurrences of balanced quotes with
-        ;; their contents and check for the length of the remaining string.
-        (> (length (remove-from-string (remove-from-string string "[\\][\"]")
-                                       "\"[^\"]*?\""))
-           0))
-       (t t))))))
+    (cl-flet ((remove-from-string (string remove)
+                (apply #'concat (split-string string remove))))
+      (when (stringp string)
+        (cond
+         ((eq (string-to-char string) ?\{)
+          ;; First, remove all escaped { and } from the string:
+          (setq string (remove-from-string (remove-from-string string "[\\][{]")
+                                           "[\\][}]"))
+          ;; Then remove the innermost braces with their contents and continue until
+          ;; no more braces are left.
+          (while (and (member ?\{ (string-to-list string)) (member ?\} (string-to-list string)))
+            (setq string (remove-from-string string "{[^{]*?}")))
+          ;; If STRING is not empty, the original string contains material not in braces.
+          (> (length string) 0))
+         ((eq (string-to-char string) ?\")
+          ;; Remove escaped ", then remove any occurrences of balanced quotes with
+          ;; their contents and check for the length of the remaining string.
+          (> (length (remove-from-string (remove-from-string string "[\\][\"]")
+                                         "\"[^\"]*?\""))
+             0))
+         (t t))))))
 
 (defun ebib-unbrace (string)
   "Convert STRING to its unbraced counterpart.
