@@ -484,19 +484,19 @@ database DB."
   (let ((transformations '(("Title" . parsebib-clean-TeX-markup)
                            ("Date" . ebib-biblatex-date-to-year))))
     (cl-flet ((create-replacements (match)
-                                   (save-match-data
-                                     (string-match "{\\([^A-Za-z]*\\)\\([A-Za-z|]+\\)\\([^A-Za-z]*\\)}" match)
-                                     (let* ((pre (match-string 1 match))
-                                            (fields (match-string 2 match))
-                                            (post (match-string 3 match))
-                                            (field (seq-find (lambda (field)
-                                                               (ebib-get-field-value field key db 'noerror nil 'xref))
-                                                             (split-string fields "|" t)))
-                                            (value (if field (ebib-get-field-value field key db 'noerror 'unbraced 'xref))))
-                                       (if value (concat pre
-                                                         (funcall (alist-get field transformations #'identity nil #'cl-equalp) value)
-                                                         post)
-                                         "")))))
+                (save-match-data
+                  (string-match "{\\([^A-Za-z]*\\)\\([A-Za-z|]+\\)\\([^A-Za-z]*\\)}" match)
+                  (let* ((pre (match-string 1 match))
+                         (fields (match-string 2 match))
+                         (post (match-string 3 match))
+                         (field (seq-find (lambda (field)
+                                            (ebib-get-field-value field key db 'noerror nil 'xref))
+                                          (split-string fields "|" t)))
+                         (value (if field (ebib-get-field-value field key db 'noerror 'unbraced 'xref))))
+                    (if value (concat pre
+                                      (funcall (alist-get field transformations #'identity nil #'cl-equalp) value)
+                                      post)
+                      "")))))
       (replace-regexp-in-string "{.*?}" #'create-replacements template nil t))))
 
 (defcustom ebib-citation-commands '((latex-mode

@@ -299,11 +299,11 @@ directories in `ebib-notes-locations' that have the extension in
    ;; still need to check `ebib-notes-default-file' (see below).
    (ebib-notes-locations
     (cl-flet ((list-files (loc)
-                          (cond
-                           ((file-directory-p loc)
-                            (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
-                           ((string= (downcase (file-name-extension loc)) "org")
-                            (list loc)))))
+                (cond
+                 ((file-directory-p loc)
+                  (directory-files loc 'full (concat (regexp-quote ebib-notes-file-extension) "\\'") 'nosort))
+                 ((string= (downcase (file-name-extension loc)) "org")
+                  (list loc)))))
       (seq-reduce (lambda (lst loc)
                     (append (list-files loc) lst))
                   ebib-notes-locations (if ebib-notes-default-file

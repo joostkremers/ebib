@@ -3589,18 +3589,18 @@ add keywords to all of them.  If not, the keywords are added to
 the current entry."
   (interactive)
   (cl-flet ((add-keywords (entry-key keywords)
-                          ;; KEYWORDS is a list of keywords to be added to entry ENTRY-KEY.
-                          (let* ((conts (ebib-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
-                                 (keywords-string (mapconcat #'identity keywords ebib-keywords-separator))
-                                 (new-conts (if conts
-                                                (concat conts ebib-keywords-separator keywords-string)
-                                              keywords-string)))
-                            (ebib-set-field-value "keywords"
-                                                  (if ebib-keywords-field-keep-sorted
-                                                      (ebib--keywords-sort new-conts)
-                                                    new-conts)
-                                                  entry-key ebib--cur-db 'overwrite)
-                            (ebib--maybe-add-keywords-to-canonical-list keywords))))
+              ;; KEYWORDS is a list of keywords to be added to entry ENTRY-KEY.
+              (let* ((conts (ebib-get-field-value "keywords" entry-key ebib--cur-db 'noerror 'unbraced))
+                     (keywords-string (mapconcat #'identity keywords ebib-keywords-separator))
+                     (new-conts (if conts
+                                    (concat conts ebib-keywords-separator keywords-string)
+                                  keywords-string)))
+                (ebib-set-field-value "keywords"
+                                      (if ebib-keywords-field-keep-sorted
+                                          (ebib--keywords-sort new-conts)
+                                        new-conts)
+                                      entry-key ebib--cur-db 'overwrite)
+                (ebib--maybe-add-keywords-to-canonical-list keywords))))
     (let* ((minibuffer-local-completion-map (make-composed-keymap '(keymap (32)) minibuffer-local-completion-map))
            (keywords (ebib--completing-read-keywords ebib--keywords-completion-list)))
       (when keywords
