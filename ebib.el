@@ -3943,9 +3943,9 @@ Return a string that contains the entry key, `ebib-notes-symbol'
 if the current entry has a note and `ebib-reading-list-symbol' if
 the current entry is on the reading list.  The latter two symbols
 are enclosed in braces."
-  (let* ((key (ebib--get-key-at-point))
-         (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
-                       (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
+  (when-let ((key (ebib--get-key-at-point))
+             (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
+                           (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
     (if (not (string= info ""))
         (setq info (concat " [" info "] ")))
     (format " «%s»%s" key info)))
