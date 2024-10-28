@@ -1,0 +1,11 @@
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
+
+(eldev-use-local-dependency "~/src/parsebib")
+
+(eldev-add-extra-dependencies 'test 'with-simulated-input)
+
+;; Autodetermined by `eldev init'.
+(eldev-use-package-archive 'gnu-elpa)
+(eldev-use-package-archive 'melpa)
+
+(eldev-use-plugin 'autoloads)

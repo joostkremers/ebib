@@ -7,4 +7,7 @@
 /manual/ebib.texi
 /.vagrant/
 /ChangeLog
-/.cask/
+
+# Added automatically by ‘eldev init’.
+/.eldev
+/Eldev-local
