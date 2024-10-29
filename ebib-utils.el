@@ -588,41 +588,22 @@ description for citations in Org buffers."
   :group 'ebib
   :type 'boolean)
 
-(defcustom ebib-citation-description-function 'ebib-author-year-description
+(defcustom ebib-citation-description-function 'ebib-create-org-author/year
   "Function for creating a description to be used in citations.
 This function is called to provide a description to substitute
 for the %D directive in `ebib-citation-commands', and also when
 creating Org links with `org-store-link', provided the library
 `org-ebib' is loaded.
 
-The default value of this option provides an author/year
-description composed of the author or editor field of the entry
-and the year field, combined as \"Author (Year)\".  A second
-option is to use the Title field on an entry for the link
-description.
-
-It is also possible to specify a user-defined function.  This
-function should take two arguments: the key of the entry for
-which a description is to be created, and the database that
-contains the entry."
+Three predefined functions are provided.  In addition, it is
+possible to specify a user-defined function, which should take
+two arguments: the key of the entry for which a description is to
+be created, and the database that contains the entry."
   :group 'ebib
-  :type '(choice (function-item :tag "Author/Year" ebib-author-year-description)
-                 (function-item :tag "Title" ebib-title-description)
+  :type '(choice (function-item :tag "Author/Year" ebib-create-org-author/year)
+                 (function-item :tag "Title" ebib-create-org-title)
+                 (function-item :tag "Author/Year/Title" ebib-create-org-description)
                  (function :tag "Custom Function")))
-
-(defun ebib-author-year-description (key db)
-  "Provide an author/year description for an Org Ebib link.
-KEY is the key of the entry to provide the link for, DB the
-database that contains the entry."
-  (format "%s (%s)"
-          (ebib--get-field-value-for-display "Author/Editor" key db)
-          (ebib--get-field-value-for-display "Year" key db)))
-
-(defun ebib-title-description (key db)
-  "Provide a title description for an Org Ebib link.
-KEY is the key of the entry to provide the link for, DB the
-database that contains the entry."
-  (ebib-get-field-value "Title" key db "(Untitled)" 'unbraced 'xref))
 
 (defcustom ebib-multiline-major-mode 'text-mode
   "The major mode of the multiline edit buffer."
@@ -1665,6 +1646,14 @@ error."
 The key is prepended with the string \"Custom_id:\", so that it
 can be used in a :PROPERTIES: block."
   (format ":Custom_id: %s" key))
+
+(defun ebib-create-org-author/year (key db)
+  "Return a title for an Org mode note for KEY in DB.
+The title is formed from the author(s) / editor(s) of the entry and its year."
+  (let ((author (or (ebib-get-field-value "author" key db 'noerror 'unbraced 'xref 'expand-strings 'org)
+                    (ebib-get-field-value "editor" key db "(No Author)" 'unbraced 'xref 'expand-strings 'org)))
+        (year (ebib-get-year-for-display key db)))
+    (format "%s (%s)" author year)))
 
 (defun ebib-create-org-title (key db)
   "Return a title for an Org mode note for KEY in DB.
