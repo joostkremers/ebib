@@ -2414,8 +2414,8 @@ well. When you hit <span class="key"><code>N</code></span> on an entry
 in the index buffer, Ebib creates a note for the entry, which is saved
 in a separate file. If an entry already has a note associated with it,
 <span class="key"><code>N</code></span> opens it. By default, notes are
-created as Org entries. (Changing that is possible, though it’s somewhat
-involved.)</p>
+created as Org entries. (Changing that is possible, though you may lose
+some convenience. See below for some pointers.)</p>
 <p>In the entry buffer, the first few lines of the note are shown under
 a pseudo-field <code>external note</code>. This is not an actual field
 in the <code>.bib</code> file, even though it is displayed as such. (You
@@ -2590,20 +2590,15 @@ use it.</p>
 argument is set to the key of the current entry and the <code>db</code>
 argument to the current database. With these arguments, it is possible
 to, e.g., retrieve the value of a specific field in the entry:</p>
-<pre><code>(ebib-get-field-value &lt;field&gt; key db &#39;noerror &#39;unbraced &#39;xref)</code></pre>
+<pre><code>(ebib-get-field-value &lt;field&gt; key db &#39;noerror &#39;unbraced &#39;xref &#39;expand-strings &#39;org)</code></pre>
 <p>where <code>&lt;field&gt;</code> is the field as a (case-insensitive)
-string whose value is to be retrieved.</p>
+string whose value is to be retrieved. The argument
+<code>'noerror</code> is necessary to avoid triggering an error if
+<code>field</code> does not exist in the entry. The other arguments
+determine how the field value is returned. See the doc string of
+<code>ebib-get-field-value</code> for details.</p>
 <p>Instead of a function, you may also provide a variable. The
 variable’s value is then used to replace the specifier.</p>
-<p>Because the template can be customised and the major mode is
-determined from the file extension, it is in principle possible to use
-another format than Org for notes. In this case, it is easier to use
-separate note files, but as long as you have a <code>%K</code> directive
-in your template (and an appropriately defined function for it, see the
-option <code>ebib-notes-template-specifiers</code>), it should still be
-possible to use a single notes file. (Emphasis on <em>should</em>,
-however, because this has not been tested.) You will also need to
-customise the three hooks discussed above in this case.</p>
 <h2 class="unlisted unnumbered" id="displaying-notes">Displaying
 notes</h2>
 <p>If an entry has an external note, the first few lines are shown in
@@ -2627,6 +2622,70 @@ format, but only works if you use Ebib’s default window layout (see the
 section <a href="#window-management">Window Management</a> for details),
 because that is the only window layout that ensures that the note can be
 displayed without getting in the way.</p>
+<h2 class="unlisted unnumbered" id="using-markdown-for-notes">Using
+Markdown for notes</h2>
+<p>Because the template can be customised and the major mode is
+determined from the file extension, it is in principle possible to use
+another format than Org for notes. In this case, it is easier to use
+separate note files, because in a single notes file, Ebib needs to be
+able to identify the location of a note. In Org files, this is fairly
+straightforward using a <code>:PROPERTIES:</code> block, but there is no
+similar ready-made option for other formats.</p>
+<p>Provided you use a single file for each note, however, it is possible
+to use another format. To do so, the following options will need to be
+customised:</p>
+<ul>
+<li><p><code>ebib-note-file-extension</code>: set this to the extension
+you use for your notes files, without the dot. The extension also
+determines the major mode Emacs uses to open note files.</p></li>
+<li><p><code>ebib-notes-directory</code>: this needs to be set to the
+directory containing your notes. Ebib does not support single note files
+in multiple directories, so you need to put all note files in a single
+directory.</p></li>
+<li><p><code>ebib-notes-name-transform-function</code>: this can be set
+to a function that creates a name for a note file. It should return just
+the base name, without the path and without the extension. If you don’t
+customise it, the option <code>ebib-name-transform-function</code> will
+be used instead. If you don’t customise that option either, the entry
+key will be used as the file name.</p></li>
+<li><p><code>ebib-notes-template</code>: this needs to be customised to
+match the format you are using. By default, this template creates an Org
+header with a properties block. Note that if you have one note per file,
+the requirement that the template contain the <code>%K</code> specifier
+does not apply, because the note is identified based on the file
+name.</p></li>
+<li><p><code>ebib-notes-template-specifiers</code>: create functions for
+the specifiers that you use in <code>ebib-notes-template</code> and
+customise this option to use them. Note that if you use Markdown, the
+relevant functions are already defined. They are named with
+<code>markdown</code> instead of <code>org</code>, so for the
+<code>%T</code> specifier, the Markdown function is
+<code>ebib-create-markdown-title</code>, etc.</p></li>
+<li><p><code>ebib-notes-show-note-method</code>: the default value of
+this option is only compatible with Org files. If you use a different
+format, you must either unset it, or set it to the value
+<code>all</code>. If you want to keep the default value
+(<code>top-lines</code>), you need to customise
+<code>ebib-notes-extract-text-function</code>, which would involve
+writing a function that extracts the top N lines of a note.</p></li>
+</ul>
+<p>It should be possible to make Ebib work with multiple notes per file
+in a format other than Org, but this has not been tested. If you wish to
+try and make this work, two things are important: First, make sure to
+include a unique identifier for each note. Unique in this case means not
+only unique for the entry, but also unique in the notes file, because
+Ebib searches for this identifier to locate the note. For example, using
+just the entry key in a Markdown file does not guarantee uniqueness,
+because the entry key can be used to insert a citation. (Ebib includes
+the function <code>ebib-create-markdown-identifier</code>, which creates
+a unique identifier by prepending <code>ID:</code> to the entry
+key.)</p>
+<p>Second, you will probably need to customise the hooks
+<code>ebib-notes-search-note-before-hook</code>,
+<code>ebib-notes-open-note-after-hook</code> and
+<code>ebib-notes-new-note-hook</code> discussed above. They are needed
+to ensure that Ebib positions point correctly when creating or editing a
+note.</p>
 <h2 class="unlisted unnumbered"
 id="using-org-capture-to-record-notes">Using <code>org-capture</code> to
 record notes</h2>

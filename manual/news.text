@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.45, October 2024 ##
+
+- Handle TeX markup better when creating a note.
+
 ## Version 2.44, September 2024 ##
 
 - New user option `ebib-doi-resolver`.

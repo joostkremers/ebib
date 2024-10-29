@@ -1658,6 +1658,8 @@ error."
         (setq url (match-string 1 url)))
     url))
 
+;; Template specifiers for Org
+
 (defun ebib-create-org-identifier (key _)
   "Create a unique identifier for KEY for use in an org file.
 The key is prepended with the string \"Custom_id:\", so that it
@@ -1666,24 +1668,18 @@ can be used in a :PROPERTIES: block."
 
 (defun ebib-create-org-title (key db)
   "Return a title for an Org mode note for KEY in DB.
-The title is formed from the title of the entry.  Newlines are
-removed from the resulting string."
-  (ebib--ifstring (title (ebib-clean-TeX-markup-from-entry "title" key db))
-      (remove ?\n (format "%s" title))
-    "(No Title)"))
+The title is formed from the title of the entry."
+  (ebib-get-field-value "title" key db "(No Title)" 'unbraced 'xref 'expand-strings 'org))
 
 (defun ebib-create-org-description (key db)
   "Return a description for an Org mode note for KEY in DB.
 The title is formed from the author(s) or editor(s) of the entry,
-its year and its title.  Newlines are removed from the resulting
-string."
-  (let ((author (or (ebib-get-field-value "author" key db 'noerror 'unbraced 'xref)
-                    (ebib-get-field-value "editor" key db 'noerror 'unbraced 'xref)
-                    "(No Author)"))
+its year and its title."
+  (let ((author (or (ebib-get-field-value "author" key db 'noerror 'unbraced 'xref 'expand-strings 'org)
+                    (ebib-get-field-value "editor" key db "(No Author)" 'unbraced 'xref 'expand-strings 'org)))
         (year (ebib-get-year-for-display key db))
-        (title (or (ebib-get-field-value "title" key db 'noerror 'unbraced 'xref)
-                   "(No Title)")))
-    (remove ?\n (format "%s (%s): %s" author year title))))
+        (title (ebib-get-field-value "title" key db "(No Title)" 'unbraced 'xref 'expand-strings 'org)))
+    (format "%s (%s): %s" author year title)))
 
 (defun ebib-create-org-cite (key _db)
   "Return a citation for an Org mode note for KEY in DB."
@@ -1735,6 +1731,79 @@ the empty string."
     (if doi (format "[[doi:%s]]" doi) "")))
 
 (defun ebib-create-org-url-link (key db)
+  "Create an org link to the URL in entry KEY in DB.
+The URL is taken from \"url\" in the entry designated by KEY in
+the current database.  If that field contains more than one url,
+the user is asked to select one.  If \"url\" is empty, return the
+empty string."
+  (let* ((urls (ebib-get-field-value "url" key db 'noerror 'unbraced 'xref))
+         (url (ebib--select-url urls nil)))
+    (if url (format "[[%s]]" url) "")))
+
+;; Template specifiers for Markdown
+
+(defun ebib-create-markdown-identifier (key _)
+  "Create a unique identifier for KEY for use in a Markdown file.
+The identifier consists of the entry key, prepended with the
+string \"ID:\", to avoid confusion with citations."
+  (format "ID:%s" key))
+
+(defun ebib-create-markdown-title (key db)
+  "Return a title for a Markdown note for KEY in DB.
+The title is formed from the title of the entry.  Newlines are
+removed from the resulting string."
+  (ebib-get-field-value "title" key db "(No Title)" 'unbraced 'xref 'expand-strings 'markdown))
+
+(defun ebib-create-markdown-description (key db)
+  "Return a description for a Markdown note for KEY in DB.
+The title is formed from the author(s) or editor(s) of the entry,
+its year and its title.  Newlines are removed from the resulting
+string."
+  (let ((author (or (ebib-get-field-value "author" key db 'noerror 'unbraced 'xref 'expand-strings 'markdown)
+                    (ebib-get-field-value "editor" key db "(No Author)" 'unbraced 'xref 'expand-strings 'markdown)))
+        (year (ebib-get-year-for-display key db))
+        (title (ebib-get-field-value "title" key db "(No Title)" 'unbraced 'xref 'expand-strings 'markdown)))
+    (format "%s (%s): %s" author year title)))
+
+(defun ebib-create-markdown-cite (key _db)
+  "Return a citation for a Markdown note for KEY in DB."
+  (format "@%s" key))
+
+(defun ebib-create-markdown-link (key db)
+  "Create a Markdown link for KEY in DB.
+Check the entry designated by KEY whether it has a file, a DOI or
+a URL (in that order) and use the first element found to create a
+link.  If none of these elements is found, return the empty
+string."
+  (cond
+   ((ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)
+    (ebib-create-markdown-file-link key db))
+   ((ebib-get-field-value "doi" key db 'noerror 'unbraced 'xref)
+    (ebib-create-markdown-doi-link key db))
+   ((ebib-get-field-value "url" key db 'noerror 'unbraced 'xref)
+    (ebib-create-markdown-url-link key db))
+   (t "")))
+
+(defun ebib-create-markdown-file-link (key db)
+  "Create an org link to the file in entry KEY in DB.
+The file is taken from the \"file\" field in the entry designated
+by KEY in the current database.  If that field contains more than
+one file name, the user is asked to select one.  If
+the \"file\" field is empty, return the empty string."
+  (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
+    (if files
+        (format "<file://%s>" (ebib--expand-file-name (ebib--select-file files nil key)))
+      "")))
+
+(defun ebib-create-markdown-doi-link (key db)
+  "Create an org link to the DOI in entry KEY in DB.
+The file is taken from the \"doi\" in the entry designated by KEY
+in the current database.  If the \"doi\" field is empty, return
+the empty string."
+  (let ((doi (ebib-get-field-value "doi" key db 'noerror 'unbraced 'xref)))
+    (if doi (format "<doi:%s>" doi) "")))
+
+(defun ebib-create-markdown-url-link (key db)
   "Create an org link to the URL in entry KEY in DB.
 The URL is taken from \"url\" in the entry designated by KEY in
 the current database.  If that field contains more than one url,
@@ -2102,7 +2171,7 @@ system."
                     ,@(when crossref-key `(("crossref" . ,crossref-key)))
                     ,@(when xref-key `(("xref" . ,xref-key)))))))
 
-(defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings)
+(defun ebib-get-field-value (field key db &optional noerror unbraced xref expand-strings replace-TeX)
   "Return the value of FIELD in entry KEY in database DB.
 If FIELD or KEY does not exist, trigger an error, unless NOERROR
 is non-nil.  In this case, if NOERROR is a string, return NOERROR,
@@ -2114,13 +2183,19 @@ cross-referenced entry.  If the result is non-nil, the returned
 text has the text property `ebib--xref', which has as value the
 key of the entry from which the field value was retrieved.
 
+Similarly, the value can be retrieved from an alias field.  (See
+the variable `ebib--field-aliases').  In this case, the returned
+string has the text property `ebib--alias' with value t.
+
 If EXPAND-STRINGS is non-nil and the field is unbraced then
 abbreviation strings and concatenation are expanded.  The result
 has the text property `ebib--expanded' with value t.
 
-Similarly, the value can be retrieved from an alias field.  (See
-the variable `ebib--field-aliases').  In this case, the returned
-string has the text property `ebib--alias' with value t."
+If REPLACE-TEX is non-nil, TeX markup is cleaned up using the
+function `parsebib-clean-TeX-markup'.  The value of REPLACE-TEX
+should be one of the symbols `display', `org' or `markdown',
+indicating the type of clean-up to be done.  See the variable
+`parsebib-TeX-cleanup-target' for details."
   (let* ((value (ebib-db-get-field-value field key db 'noerror))
          (type (ebib-db-get-field-value "=type=" key db 'noerror))
          (xref-key-alist)
@@ -2169,6 +2244,9 @@ string has the text property `ebib--alias' with value t."
 	(setq value (ebib--replace-granular-xdata-references value db)))
       (when unbraced
         (setq value (ebib-unbrace value)))
+      (when (memq replace-TeX '(display org markdown))
+        (let ((parsebib-TeX-cleanup-target replace-TeX))
+          (setq value (parsebib-clean-TeX-markup value))))
       (when alias
         (add-text-properties 0 (length value) '(ebib--alias t) value)))
     (when (and (not value)

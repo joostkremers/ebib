@@ -2381,7 +2381,8 @@ way to do that as well.  When you hit ‘N’ on an entry in the index
 buffer, Ebib creates a note for the entry, which is saved in a separate
 file.  If an entry already has a note associated with it, ‘N’ opens it.
 By default, notes are created as Org entries.  (Changing that is
-possible, though it's somewhat involved.)
+possible, though you may lose some convenience.  See below for some
+pointers.)
 
 In the entry buffer, the first few lines of the note are shown under a
 pseudo-field ‘external note’.  This is not an actual field in the ‘.bib’
@@ -2406,6 +2407,7 @@ configuration.  See *note Upgrading from earlier Ebib versions:
 * Upgrading from earlier Ebib versions::
 * Customising the notes file format::
 * Displaying notes::
+* Using Markdown for notes::
 * Using org-capture to record notes::
 
 
@@ -2589,26 +2591,19 @@ the key of the current entry and the ‘db’ argument to the current
 database.  With these arguments, it is possible to, e.g., retrieve the
 value of a specific field in the entry:
 
-(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
+(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref 'expand-strings 'org)
 
 where ‘<field>’ is the field as a (case-insensitive) string whose value
-is to be retrieved.
+is to be retrieved.  The argument ‘'noerror’ is necessary to avoid
+triggering an error if ‘field’ does not exist in the entry.  The other
+arguments determine how the field value is returned.  See the doc string
+of ‘ebib-get-field-value’ for details.
 
 Instead of a function, you may also provide a variable.  The variable's
 value is then used to replace the specifier.
 
-Because the template can be customised and the major mode is determined
-from the file extension, it is in principle possible to use another
-format than Org for notes.  In this case, it is easier to use separate
-note files, but as long as you have a ‘%K’ directive in your template
-(and an appropriately defined function for it, see the option
-‘ebib-notes-template-specifiers’), it should still be possible to use a
-single notes file.  (Emphasis on _should_, however, because this has not
-been tested.)  You will also need to customise the three hooks discussed
-above in this case.
-
 
-File: ebib.info,  Node: Displaying notes,  Next: Using org-capture to record notes,  Prev: Customising the notes file format,  Up: Notes files
+File: ebib.info,  Node: Displaying notes,  Next: Using Markdown for notes,  Prev: Customising the notes file format,  Up: Notes files
 
 10.5 Displaying notes
 =====================
@@ -2636,9 +2631,81 @@ because that is the only window layout that ensures that the note can be
 displayed without getting in the way.
 
 
-File: ebib.info,  Node: Using org-capture to record notes,  Prev: Displaying notes,  Up: Notes files
+File: ebib.info,  Node: Using Markdown for notes,  Next: Using org-capture to record notes,  Prev: Displaying notes,  Up: Notes files
 
-10.6 Using ‘org-capture’ to record notes
+10.6 Using Markdown for notes
+=============================
+
+Because the template can be customised and the major mode is determined
+from the file extension, it is in principle possible to use another
+format than Org for notes.  In this case, it is easier to use separate
+note files, because in a single notes file, Ebib needs to be able to
+identify the location of a note.  In Org files, this is fairly
+straightforward using a ‘:PROPERTIES:’ block, but there is no similar
+ready-made option for other formats.
+
+Provided you use a single file for each note, however, it is possible to
+use another format.  To do so, the following options will need to be
+customised:
+
+   • ‘ebib-note-file-extension’: set this to the extension you use for
+     your notes files, without the dot.  The extension also determines
+     the major mode Emacs uses to open note files.
+
+   • ‘ebib-notes-directory’: this needs to be set to the directory
+     containing your notes.  Ebib does not support single note files in
+     multiple directories, so you need to put all note files in a single
+     directory.
+
+   • ‘ebib-notes-name-transform-function’: this can be set to a function
+     that creates a name for a note file.  It should return just the
+     base name, without the path and without the extension.  If you
+     don't customise it, the option ‘ebib-name-transform-function’ will
+     be used instead.  If you don't customise that option either, the
+     entry key will be used as the file name.
+
+   • ‘ebib-notes-template’: this needs to be customised to match the
+     format you are using.  By default, this template creates an Org
+     header with a properties block.  Note that if you have one note per
+     file, the requirement that the template contain the ‘%K’ specifier
+     does not apply, because the note is identified based on the file
+     name.
+
+   • ‘ebib-notes-template-specifiers’: create functions for the
+     specifiers that you use in ‘ebib-notes-template’ and customise this
+     option to use them.  Note that if you use Markdown, the relevant
+     functions are already defined.  They are named with ‘markdown’
+     instead of ‘org’, so for the ‘%T’ specifier, the Markdown function
+     is ‘ebib-create-markdown-title’, etc.
+
+   • ‘ebib-notes-show-note-method’: the default value of this option is
+     only compatible with Org files.  If you use a different format, you
+     must either unset it, or set it to the value ‘all’.  If you want to
+     keep the default value (‘top-lines’), you need to customise
+     ‘ebib-notes-extract-text-function’, which would involve writing a
+     function that extracts the top N lines of a note.
+
+It should be possible to make Ebib work with multiple notes per file in
+a format other than Org, but this has not been tested.  If you wish to
+try and make this work, two things are important: First, make sure to
+include a unique identifier for each note.  Unique in this case means
+not only unique for the entry, but also unique in the notes file,
+because Ebib searches for this identifier to locate the note.  For
+example, using just the entry key in a Markdown file does not guarantee
+uniqueness, because the entry key can be used to insert a citation.
+(Ebib includes the function ‘ebib-create-markdown-identifier’, which
+creates a unique identifier by prepending ‘ID:’ to the entry key.)
+
+Second, you will probably need to customise the hooks
+‘ebib-notes-search-note-before-hook’, ‘ebib-notes-open-note-after-hook’
+and ‘ebib-notes-new-note-hook’ discussed above.  They are needed to
+ensure that Ebib positions point correctly when creating or editing a
+note.
+
+
+File: ebib.info,  Node: Using org-capture to record notes,  Prev: Using Markdown for notes,  Up: Notes files
+
+10.7 Using ‘org-capture’ to record notes
 ========================================
 
 Instead of using Ebib's own system to record notes, you can also use
@@ -3270,34 +3337,36 @@ Node: Calling a Browser for URLs and DOIs112524
 Ref: #calling-a-browser-for-urls-and-dois112740
 Node: Notes files115155
 Ref: #notes-files115305
-Node: Configuring files for storing notes116814
-Ref: #configuring-files-for-storing-notes116992
-Node: Hooks119962
-Ref: #hooks120125
-Node: Upgrading from earlier Ebib versions121522
-Ref: #upgrading-from-earlier-ebib-versions121745
-Node: Customising the notes file format122655
-Ref: #customising-the-notes-file-format122883
-Node: Displaying notes126989
-Ref: #displaying-notes127180
-Node: Using org-capture to record notes128525
-Ref: #using-org-capture-to-record-notes128716
-Node: Managing a reading list134712
-Ref: #managing-a-reading-list134874
-Node: Managing Keywords137889
-Ref: #managing-keywords138045
-Node: Using a Canonical Keywords List139652
-Ref: #using-a-canonical-keywords-list139810
-Node: Window Management141948
-Ref: #window-management142113
-Node: Copying Entries to the Kill Ring145248
-Ref: #copying-entries-to-the-kill-ring145447
-Node: Printing the Database148170
-Ref: #printing-the-database148343
-Node: Customisation151786
-Ref: #customisation151902
-Node: Modifying Key Bindings153393
-Ref: #modifying-key-bindings153520
+Node: Configuring files for storing notes116880
+Ref: #configuring-files-for-storing-notes117058
+Node: Hooks120028
+Ref: #hooks120191
+Node: Upgrading from earlier Ebib versions121588
+Ref: #upgrading-from-earlier-ebib-versions121811
+Node: Customising the notes file format122721
+Ref: #customising-the-notes-file-format122949
+Node: Displaying notes126728
+Ref: #displaying-notes126910
+Node: Using Markdown for notes128255
+Ref: #using-markdown-for-notes128453
+Node: Using org-capture to record notes132111
+Ref: #using-org-capture-to-record-notes132310
+Node: Managing a reading list138306
+Ref: #managing-a-reading-list138468
+Node: Managing Keywords141483
+Ref: #managing-keywords141639
+Node: Using a Canonical Keywords List143246
+Ref: #using-a-canonical-keywords-list143404
+Node: Window Management145542
+Ref: #window-management145707
+Node: Copying Entries to the Kill Ring148842
+Ref: #copying-entries-to-the-kill-ring149041
+Node: Printing the Database151764
+Ref: #printing-the-database151937
+Node: Customisation155380
+Ref: #customisation155496
+Node: Modifying Key Bindings156987
+Ref: #modifying-key-bindings157114
 
 End Tag Table
 

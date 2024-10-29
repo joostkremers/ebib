@@ -925,7 +925,7 @@ Ebib uses the Emacs function `browse-url` to call the default browser on the sys
 
 # Notes files #
 
-Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit [`N`]{.key} on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, [`N`]{.key} opens it.  By default, notes are created as Org entries. (Changing that is possible, though it's somewhat involved.)
+Ebib supports the `annotation` field (or `annote` field in BibTeX), but if you prefer to keep notes outside the `.bib` file, there is an easy way to do that as well. When you hit [`N`]{.key} on an entry in the index buffer, Ebib creates a note for the entry, which is saved in a separate file. If an entry already has a note associated with it, [`N`]{.key} opens it.  By default, notes are created as Org entries. (Changing that is possible, though you may lose some convenience. See below for some pointers.)
 
 In the entry buffer, the first few lines of the note are shown under a pseudo-field `external note`. This is not an actual field in the `.bib` file, even though it is displayed as such. (You can customise this behaviour.)
 
@@ -997,14 +997,12 @@ It is possible to change the strings that the specifiers produce, or to add new 
 When the specifier functions are called, the `key` argument is set to the key of the current entry and the `db` argument to the current database. With these arguments, it is possible to, e.g., retrieve the value of a specific field in the entry:
 
 ```
-(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref)
+(ebib-get-field-value <field> key db 'noerror 'unbraced 'xref 'expand-strings 'org)
 ```
 
-where `<field>` is the field as a (case-insensitive) string whose value is to be retrieved.
+where `<field>` is the field as a (case-insensitive) string whose value is to be retrieved. The argument `'noerror` is necessary to avoid triggering an error if `field` does not exist in the entry. The other arguments determine how the field value is returned. See the doc string of `ebib-get-field-value` for details.
 
 Instead of a function, you may also provide a variable. The variable's value is then used to replace the specifier.
-
-Because the template can be customised and the major mode is determined from the file extension, it is in principle possible to use another format than Org for notes. In this case, it is easier to use separate note files, but as long as you have a `%K` directive in your template (and an appropriately defined function for it, see the option `ebib-notes-template-specifiers`), it should still be possible to use a single notes file. (Emphasis on *should*, however, because this has not been tested.) You will also need to customise the three hooks discussed above in this case.
 
 
 ## Displaying notes ## {.unlisted .unnumbered}
@@ -1012,6 +1010,29 @@ Because the template can be customised and the major mode is determined from the
 If an entry has an external note, the first few lines are shown in the entry buffer as a field called `external note`. The number of lines to show can be customised with the option `ebib-notes-display-max-lines`, which defaults to 10. If you prefer, you can also have the entire note shown, not just the first few lines, by customising the option `ebib-notes-show-note-method`. The note is then shown in a separate buffer that is displayed when an entry has a note. This setting is only really convenient if you use a multiple notes per file, because the buffer is not closed after displaying the note. If you use a separate file for each note, you'll end up with a lot of open buffers. (Showing only the first few lines in the entry buffer does not have this limitation, as it just reads the text of the note from the file, it does not visit the file in a buffer.)
 
 Note also that displaying the note inline in the entry buffer is only possible with Org files, so your notes must use Org mode for it to work. Showing the entire note in a separate buffer can be done with any format, but only works if you use Ebib's default window layout (see the section [Window Management](#window-management) for details), because that is the only window layout that ensures that the note can be displayed without getting in the way.
+
+
+## Using Markdown for notes ## {.unlisted .unnumbered}
+
+Because the template can be customised and the major mode is determined from the file extension, it is in principle possible to use another format than Org for notes. In this case, it is easier to use separate note files, because in a single notes file, Ebib needs to be able to identify the location of a note. In Org files, this is fairly straightforward using a `:PROPERTIES:` block, but there is no similar ready-made option for other formats.
+
+Provided you use a single file for each note, however, it is possible to use another format. To do so, the following options will need to be customised:
+
+- `ebib-note-file-extension`: set this to the extension you use for your notes files, without the dot. The extension also determines the major mode Emacs uses to open note files.
+
+- `ebib-notes-directory`: this needs to be set to the directory containing  your notes. Ebib does not support single note files in multiple directories, so you need to put all note files in a single directory.
+
+- `ebib-notes-name-transform-function`: this can be set to a function that creates a name for a note file. It should return just the base name, without the path and without the extension. If you don't customise it, the option `ebib-name-transform-function` will be used instead. If you don't customise that option either, the entry key will be used as the file name.
+
+- `ebib-notes-template`: this needs to be customised to match the format you are using. By default, this template creates an Org header with a properties block. Note that if you have one note per file, the requirement that the template contain the `%K` specifier does not apply, because the note is identified based on the file name.
+
+- `ebib-notes-template-specifiers`: create functions for the specifiers that you use in `ebib-notes-template` and customise this option to use them. Note that if you use Markdown, the relevant functions are already defined. They are named with `markdown` instead of `org`, so for the `%T` specifier, the Markdown function is `ebib-create-markdown-title`, etc.
+
+- `ebib-notes-show-note-method`: the default value of this option is only compatible with Org files. If you use a different format, you must either unset it, or set it to the value `all`. If you want to keep the default value (`top-lines`), you need to customise `ebib-notes-extract-text-function`, which would involve writing a function that extracts the top N lines of a note.
+
+It should be possible to make Ebib work with multiple notes per file in a format other than Org, but this has not been tested. If you wish to try and make this work, two things are important: First, make sure to include a unique identifier for each note. Unique in this case means not only unique for the entry, but also unique in the notes file, because Ebib searches for this identifier to locate the note. For example, using just the entry key in a Markdown file does not guarantee uniqueness, because the entry key can be used to insert a citation. (Ebib includes the function `ebib-create-markdown-identifier`, which creates a unique identifier by prepending `ID:` to the entry key.)
+
+Second, you will probably need to customise the hooks `ebib-notes-search-note-before-hook`, `ebib-notes-open-note-after-hook` and `ebib-notes-new-note-hook` discussed above. They are needed to ensure that Ebib positions point correctly when creating or editing a note.
 
 
 ## Using `org-capture` to record notes ## {.unlisted .unnumbered}
