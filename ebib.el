@@ -1519,7 +1519,7 @@ identifier, an error is logged and t is returned."
 If the @Comment is a local variable list, store it as such in DB.
 If the @Comment defines a main database, do not store the
 comment."
-  (let ((comment (parsebib--@Comment)))
+  (let ((comment (parsebib-read-comment)))
     (when comment
       (or
        ;; Local variables.
@@ -1550,7 +1550,7 @@ Return value is the string if one was read, nil otherwise."
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
   (unless (ebib-db-dependent-p db) ; @Preamble is not stored in dependent files.
-    (let ((preamble (substring (parsebib--@Preamble) 1 -1))) ; We need to remove the braces around the text.
+    (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
       (if preamble
           (ebib-db-set-preamble preamble db 'append)))))
 
