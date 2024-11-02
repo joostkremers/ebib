@@ -10,7 +10,7 @@
 ;; Version: 2.45
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
-;; Package-Requires: ((parsebib "5.0") (emacs "27.1") (compat "29.1.4.3"))
+;; Package-Requires: ((parsebib "6.0") (emacs "27.1") (compat "29.1.4.3"))
 
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -1494,7 +1494,7 @@ is set to t."
               ((cl-equalp entry-type "comment")
                (ebib--bib-read-comment db))
               ((stringp entry-type)
-               (when (ebib--bib-read-entry entry-type db timestamp)
+               (when (ebib--bib-read-entry db timestamp)
                  (setq n-entries (1+ n-entries))
                  (unless (assoc-string entry-type entry-list 'case-fold)
                    (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
@@ -1511,15 +1511,15 @@ start of a line), but does not consist of a valid BibTeX
 identifier, an error is logged and t is returned."
   (condition-case err
       (parsebib-find-next-item)
-    (parsebib-entry-type-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
-                               t))) ; Return t so that searching continues in ebib--bib-find-bibtex-entries.
+    (parsebib-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
+                    t))) ; Return t so that searching continues in ebib--bib-find-bibtex-entries.
 
 (defun ebib--bib-read-comment (db)
   "Read an @Comment entry and store it in DB.
 If the @Comment is a local variable list, store it as such in DB.
 If the @Comment defines a main database, do not store the
 comment."
-  (let ((comment (parsebib-read-comment)))
+  (let ((comment (parsebib--@Comment)))
     (when comment
       (or
        ;; Local variables.
@@ -1550,18 +1550,18 @@ Return value is the string if one was read, nil otherwise."
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
   (unless (ebib-db-dependent-p db) ; @Preamble is not stored in dependent files.
-    (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
+    (let ((preamble (substring (parsebib--@Preamble) 1 -1))) ; We need to remove the braces around the text.
       (if preamble
           (ebib-db-set-preamble preamble db 'append)))))
 
-(defun ebib--bib-read-entry (entry-type db &optional timestamp)
-  "Read a BibTeX entry with type ENTRY-TYPE and store it in DB.
+(defun ebib--bib-read-entry (db &optional timestamp)
+  "Read a BibTeX entry and store it in DB.
 Return the entry key if an entry was found and could be stored,
 nil otherwise.  Optional argument TIMESTAMP indicates whether a
 timestamp is to be added.  (Whether a timestamp is actually added
 also depends on `ebib-use-timestamp'.)"
   (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
-         (entry (parsebib-read-entry entry-type)))
+         (entry (parsebib-read-entry)))
     (if entry
         (let ((entry-key (cdr (assoc-string "=key=" entry))))
           (if (ebib-db-dependent-p db)
@@ -2420,7 +2420,7 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
                (setq is-modified t)
                (message "[Ebib] Yanked @Comment.")))
             ((stringp entry-type)
-             (setq entry-key (ebib--bib-read-entry entry-type ebib--cur-db t))
+             (setq entry-key (ebib--bib-read-entry ebib--cur-db t))
              (if entry-key
                  (progn (ebib-db-set-current-entry-key entry-key ebib--cur-db)
                         (setq is-modified t)
@@ -2436,7 +2436,7 @@ The prefix argument ARG functions as with \\[yank] / \\[yank-pop]."
          (ebib--insert-entry-in-index-sorted entry-key t)
          (ebib--update-entry-buffer))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-select-and-popup-entry ()
   "Make the entry at point current and display it.
