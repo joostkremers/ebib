@@ -57,7 +57,7 @@
 (require 'crm)
 (require 'pp)
 (require 'hl-line)
-(require 'mule-util)
+(require 'mule-util)  ; for `truncate-string-ellipsis' and `truncate-string-to-width'
 (require 'button)
 (require 'compat)  ; for `pos-bol', `pos-eol'.
 (require 'register)
