@@ -321,7 +321,7 @@ message."
     (ebib--convert-multiline-to-string
      (mapcar
       (lambda (key)
-	(if-let ((type (ebib-db-get-field-value "=type=" key ebib--cur-db 'noerror)))
+	(if-let* ((type (ebib-db-get-field-value "=type=" key ebib--cur-db 'noerror)))
 	    (if (cl-equalp "xdata" type)
 		key
 	      (propertize key
@@ -1573,7 +1573,7 @@ also depends on `ebib-use-timestamp'.)"
               (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
             (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
             (when (and entry-key (not ebib-keywords))
-              (if-let ((keywords (ebib-unbrace (cdr (assoc-string "keywords" entry 'case-fold)))))
+              (if-let* ((keywords (ebib-unbrace (cdr (assoc-string "keywords" entry 'case-fold)))))
                   (mapc #'ebib--keywords-add-to-completion-list (ebib--keywords-to-list keywords))))
             (unless entry-key
               (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
@@ -1677,9 +1677,9 @@ moving somewhere else copies the sequence of moves through
 history into the history record, so that they can still be
 accessed."
   (interactive)
-  (if-let ((new-head (1- (ebib--history-get-head)))
-	   (goto (ebib--history-get new-head))
-	   (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
+  (if-let* ((new-head (1- (ebib--history-get-head)))
+	    (goto (ebib--history-get new-head))
+	    (goto-db (ebib--find-db-for-key goto ebib--cur-db)))
       (progn
 	(ebib-switch-to-database goto-db)
 	(ebib--goto-entry-in-index goto)
@@ -2849,22 +2849,22 @@ one of its cross-referencing fields."
   (interactive "P")
   (ebib--execute-when
     (entries
-     (if-let ((all-xref-list (ebib--get-xref-alist (ebib--get-key-at-point) ebib--cur-db))
-	      (xref-list (if (and ebib-follow-current-field-crossref (not arg)
-				  (eq (current-buffer) (ebib--buffer 'entry))
-				  (member (ebib--current-field) (mapcar #'car all-xref-list)))
-			     (cl-remove-if-not
-			      (lambda (x) (string= (car x) (ebib--current-field)))
-			      all-xref-list)
-			   all-xref-list))
-	      ;; If there is only one crossref key, jump to it
-	      (xref (if (cdr xref-list)
-			;; Otherwise read a key from the user
-			(ebib--read-ref-as-entry
-			 "Crossref key" `(,ebib--cur-db) nil
-			 ;; Filter presented keys for just those crossreffed in current entry
-			 (lambda (key _ent _db) (member key (mapcar #'cdr xref-list))))
-		      (cdar xref-list))))
+     (if-let* ((all-xref-list (ebib--get-xref-alist (ebib--get-key-at-point) ebib--cur-db))
+	       (xref-list (if (and ebib-follow-current-field-crossref (not arg)
+				   (eq (current-buffer) (ebib--buffer 'entry))
+				   (member (ebib--current-field) (mapcar #'car all-xref-list)))
+			      (cl-remove-if-not
+			       (lambda (x) (string= (car x) (ebib--current-field)))
+			       all-xref-list)
+			    all-xref-list))
+	       ;; If there is only one crossref key, jump to it
+	       (xref (if (cdr xref-list)
+			 ;; Otherwise read a key from the user
+			 (ebib--read-ref-as-entry
+			  "Crossref key" `(,ebib--cur-db) nil
+			  ;; Filter presented keys for just those crossreffed in current entry
+			  (lambda (key _ent _db) (member key (mapcar #'cdr xref-list))))
+		       (cdar xref-list))))
 	 ;; If the entry has a crossref, see if we can find the relevant entry.
          (let ((database (seq-find (lambda (db)
 				     (ebib-db-get-entry xref db 'noerror))
@@ -3943,9 +3943,9 @@ Return a string that contains the entry key, `ebib-notes-symbol'
 if the current entry has a note and `ebib-reading-list-symbol' if
 the current entry is on the reading list.  The latter two symbols
 are enclosed in braces."
-  (when-let ((key (ebib--get-key-at-point))
-             (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
-                           (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
+  (when-let* ((key (ebib--get-key-at-point))
+              (info (concat (if (ebib--notes-has-note key) ebib-notes-symbol "")
+                            (if (ebib--reading-list-item-p key) ebib-reading-list-symbol ""))))
     (if (not (string= info ""))
         (setq info (concat " [" info "] ")))
     (format " «%s»%s" key info)))
@@ -4068,12 +4068,12 @@ was called interactively."
 (defun ebib-jump-to-field ()
   "Read a field from the user and jump to it."
   (interactive)
-  (when-let ((entry-type (ebib-get-field-value "=type=" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
-             (fields (ebib--list-fields entry-type 'all))
-             (field (completing-read "Jump to field: " fields nil t))
-             (location (save-excursion
-                         (goto-char (point-min))
-                         (re-search-forward (concat "^" field) nil t))))
+  (when-let* ((entry-type (ebib-get-field-value "=type=" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced))
+              (fields (ebib--list-fields entry-type 'all))
+              (field (completing-read "Jump to field: " fields nil t))
+              (location (save-excursion
+                          (goto-char (point-min))
+                          (re-search-forward (concat "^" field) nil t))))
     (if location
 	(goto-char location)
       (beginning-of-line))))
@@ -4277,8 +4277,8 @@ always uses completion)."
                   ;; a string, without any form of completion.
                   (pfx
                    (ebib--edit-field-literally field init-contents))
-		  ((when-let ((data (assoc field ebib-field-edit-functions
-					   (lambda (a b) (member-ignore-case b a)))))
+		  ((when-let* ((data (assoc field ebib-field-edit-functions
+					    (lambda (a b) (member-ignore-case b a)))))
 		     (funcall (cdr data) field (car data) (ebib-unbrace init-contents))))
                   ;; An external note is shown in the field "external note", but
                   ;; `ebib--current-field' only reads up to the first space, so
@@ -5366,8 +5366,8 @@ active."
              (insert-buffer-substring buffer)
              (let ((result (ebib--bib-find-bibtex-entries db t)))
                (ebib-db-set-modified t db)
-               (if-let ((index (ebib-db-get-buffer db))
-                        (window (get-buffer-window index t)))
+               (if-let* ((index (ebib-db-get-buffer db))
+                         (window (get-buffer-window index t)))
                    (ebib--update-index-buffer)
                  (ebib--mark-index-dirty db))
                (message (format "Imported %d entries, %d @Strings and %s @Preamble."
