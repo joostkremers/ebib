@@ -268,21 +268,18 @@ return value is also nil."
   (when filter
     (if ebib-filters-display-as-lisp
         (format "%S" filter)
-      (cl-labels
-          ((pp-filter (f)
-                      (cond
-                       ((listp f) ; `f' is either a list or a string.
-                        (let ((op (cl-first f)))
-                          (cond
-                           ((eq op 'not)
-                            (format "not %s" (pp-filter (cl-second f))))
-                           ((eq op 'contains)
-                            (format "(%s contains \"%s\")" (pp-filter (cl-second f)) (pp-filter (cl-third f))))
-                           ((member op '(and or))
-                            (format "(%s %s %s)" (pp-filter (cl-second f)) op (pp-filter (cl-third f)))))))
-                       (t (if (string= f "any")
-                              "any field"
-                            f)))))
+      (cl-labels ((pp-filter (f)
+                    (cond
+                     ((listp f)                ; `f' is either a list or a string.
+                      (pcase (cl-first f)
+                        ('not
+                         (format "not %s" (pp-filter (cl-second f))))
+                        ('contains
+                         (format "(%s contains \"%s\")" (pp-filter (cl-second f)) (pp-filter (cl-third f))))
+                        (`,(or 'and 'or)
+                         (format "(%s %s %s)" (pp-filter (cl-second f)) (cl-first f) (pp-filter (cl-third f))))))
+                     ((string= f "any") "any field")
+                     (t f))))
         (let ((pretty-filter (pp-filter filter)))
           (if (not pretty-filter)
               "Filtered"
