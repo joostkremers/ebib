@@ -5470,24 +5470,24 @@ bibitems are extracted from this file and a new .bib file is
 created containing only these entries."
   (interactive)
   (ebib--execute-when
-   (database
-    (or ebib-local-bibfiles
-	(setq ebib-local-bibfiles (ebib--get-local-bibfiles)))
-    (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
-	   (bbl-file (concat filename-sans-extension ".bbl"))
-	   (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
-      (unless (file-exists-p bbl-file)
-	(error "[Ebib] No .bbl file exists.  Run BibTeX first"))
-      (when (or (not (file-exists-p bib-file))
-		(y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
-	(when (file-exists-p bib-file)
-	  (delete-file bib-file t))
-	(let ((databases (seq-filter #'ebib--get-db-from-filename
-				     ebib-local-bibfiles)))
-	  (with-temp-buffer
-	    (insert-file-contents bbl-file)
-	    (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))
-   (default
+    (database
+     (or ebib-local-bibfiles
+	 (setq ebib-local-bibfiles (ebib--get-local-bibfiles)))
+     (let* ((filename-sans-extension (file-name-sans-extension (buffer-file-name)))
+	    (bbl-file (concat filename-sans-extension ".bbl"))
+	    (bib-file (concat filename-sans-extension (car ebib-bibtex-extensions))))
+       (unless (file-exists-p bbl-file)
+	 (error "[Ebib] No .bbl file exists.  Run BibTeX first"))
+       (when (or (not (file-exists-p bib-file))
+		 (y-or-n-p (format "%s already exists.  Overwrite? " (file-name-nondirectory bib-file))))
+	 (when (file-exists-p bib-file)
+	   (delete-file bib-file t))
+	 (let ((databases (seq-filter #'ebib--get-db-from-filename
+				      ebib-local-bibfiles)))
+	   (with-temp-buffer
+	     (insert-file-contents bbl-file)
+	     (ebib--export-entries-to-file (ebib-read-entries-from-bbl) bib-file databases))))))
+    (default
      (beep))))
 
 (defun ebib-read-entries-from-bbl ()
