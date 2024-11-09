@@ -261,7 +261,7 @@ See `ebib--filters-run-filter'.")
 
 (defun ebib--filters-pp-filter (filter)
   "Convert FILTER into a string suitable for displaying.
-If `ebib--filters-display-as-lisp' is set, this simply converts
+If `ebib-filters-display-as-lisp' is set, this simply converts
 FILTER into a string representation of the Lisp expression.
 Otherwise, it is converted into infix notation.  If FILTER is nil,
 return value is also nil."
