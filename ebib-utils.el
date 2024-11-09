@@ -2003,24 +2003,24 @@ XREF is non-nil, add any fields that are inherited from a
 cross-referenced entry to the alist.  Note that inherited fields
 are not marked in any way, so they cannot be distinguished in the
 return value."
-  (if-let ((entry (ebib-db-get-entry key db noerror))
-	   (xref)
-           (inheritances (if (eq (ebib--get-dialect db) 'BibTeX)
-                             'BibTeX
-                           ebib-biblatex-inheritances))
-	   (xref-key-alist (ebib--get-xref-alist key db)))
+  (if-let* ((entry (ebib-db-get-entry key db noerror))
+	    (xref)
+            (inheritances (if (eq (ebib--get-dialect db) 'BibTeX)
+                              'BibTeX
+                            ebib-biblatex-inheritances))
+	    (xref-key-alist (ebib--get-xref-alist key db)))
       ;; Try inheriting from each key in `xref-key-alist' in turn,
       ;; until `value' is non-nil
       (cl-loop for (xref-type . xref-key) in xref-key-alist
 	       do
-	       (when-let (((ebib-db-has-key xref-key db))
-			  (xref-entry (ebib-get-entry xref-key db noerror 'xref))
-			  (source-type (ebib-db-get-field-value "=type=" xref-key db noerror))
-			  ;; When the cross-reference is from an xdata field, check if entry
-			  ;; referred to is an @Xdata entry. Otherwise anything is fine.
-			  ((if (cl-equalp xref-type "xdata")
-			       (cl-equalp source-type "xdata")
-			     t)))
+	       (when-let* (((ebib-db-has-key xref-key db))
+			   (xref-entry (ebib-get-entry xref-key db noerror 'xref))
+			   (source-type (ebib-db-get-field-value "=type=" xref-key db noerror))
+			   ;; When the cross-reference is from an xdata field, check if entry
+			   ;; referred to is an @Xdata entry. Otherwise anything is fine.
+			   ((if (cl-equalp xref-type "xdata")
+			        (cl-equalp source-type "xdata")
+			      t)))
 		 (setq entry (parsebib--get-xref-fields entry xref-entry inheritances)))
 	       finally return entry)
     entry))
@@ -2120,9 +2120,9 @@ If unsuccessful, text is propertized appropriately:
 			   ;; ...or is it field which only the user uses (valid because
 			   ;; BibLaTeX ignores fields it doesn't know about)...
 			   (not (member xdata-field (mapcar #'car bibtex-biblatex-field-alist))))
-		       (if-let (val (nth (- (string-to-number xdata-index) 1)
-					 (save-match-data
-					   (split-string xdata-value "and" t "[[:space:]]*"))))
+		       (if-let* ((val (nth (- (string-to-number xdata-index) 1)
+					   (save-match-data
+					     (split-string xdata-value "and" t "[[:space:]]*")))))
 			   (propertize val 'ebib--xref xdata-key)
 			 (ebib--propertize-xdata-warnings '(index) xdata-key xdata-field xdata-index "Not enough items in field"))
 		     (ebib--propertize-xdata-warnings '(field index) xdata-key xdata-field xdata-index (format "`%s' is not an indexable field" xdata-field))))
@@ -2200,15 +2200,15 @@ indicating the type of clean-up to be done.  See the variable
 	;; until `value' is non-nil
 	(cl-loop for (xref-type . xref-key) in xref-key-alist until value
 		 do
-		 (when-let ((xref-db (ebib--find-db-for-key xref-key db))
-			    (source-type (ebib-db-get-field-value "=type=" xref-key xref-db 'noerror))
-			    (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db)))
-			    ;; When the cross-reference is from an xdata field, check if entry
-			    ;; referred to is an @Xdata entry. Otherwise anything is fine.
-			    ((if (cl-equalp xref-type "xdata")
-				 (cl-equalp source-type "xdata")
-			       t))
-			    (xref-value (ebib-get-field-value xref-field xref-key xref-db 'noerror nil 'xref)))
+		 (when-let* ((xref-db (ebib--find-db-for-key xref-key db))
+			     (source-type (ebib-db-get-field-value "=type=" xref-key xref-db 'noerror))
+			     (xref-field (ebib--get-xref-field field type source-type (ebib-db-get-dialect db)))
+			     ;; When the cross-reference is from an xdata field, check if entry
+			     ;; referred to is an @Xdata entry. Otherwise anything is fine.
+			     ((if (cl-equalp xref-type "xdata")
+				  (cl-equalp source-type "xdata")
+			        t))
+			     (xref-value (ebib-get-field-value xref-field xref-key xref-db 'noerror nil 'xref)))
 		   (setq value (propertize xref-value 'ebib--xref xref-key))))))
     (when (and (not value)
                (eq (ebib--get-dialect db) 'biblatex))                   ; Check if there is a field alias
@@ -2723,12 +2723,12 @@ are returned as a string."
 (defun ebib-display-www-link (field key db)
   "Return the content of FIELD from KEY in DB as a link.
 This function is mainly intended for the DOI and URL fields."
-  (if-let ((val (ebib-get-field-value field key db 'noerror 'unbraced 'xref))
-	   ;; Unless field is doi, assume the string is a full url
-	   (str (if (and (string= (downcase field) "doi")
-		         (string-match-p "^[0-9]" val))
-		    (concat "https://dx.doi.org/" val)
-		  val)))
+  (if-let* ((val (ebib-get-field-value field key db 'noerror 'unbraced 'xref))
+	    ;; Unless field is doi, assume the string is a full url
+	    (str (if (and (string= (downcase field) "doi")
+		          (string-match-p "^[0-9]" val))
+		     (concat "https://dx.doi.org/" val)
+		   val)))
       (propertize "www"
 		  'face 'ebib-link-face
 		  'font-lock-face 'ebib-link-face
@@ -2790,12 +2790,12 @@ Copy everything from the second element to the element at
 `ebib--entry-history', reverse the result, and prepend it to the
 history list.  Then prepend KEY to the history list as well.
 Finally, set `:head' in `ebib--entry-history' to 0."
-  (when-let ((head (ebib--history-get-head))
-	     ;; Only bother if head is sufficiently large, otherwise
-	     ;; there's nothing to prepend:
-	     ((< 1 head))
-	     (hist-list (plist-get ebib--entry-history :history))
-	     (interim (seq-subseq hist-list 0 head)))
+  (when-let* ((head (ebib--history-get-head))
+	      ;; Only bother if head is sufficiently large, otherwise
+	      ;; there's nothing to prepend:
+	      ((< 1 head))
+	      (hist-list (plist-get ebib--entry-history :history))
+	      (interim (seq-subseq hist-list 0 head)))
     (plist-put ebib--entry-history :history
 	       (append (reverse interim) hist-list)))
   (push key (plist-get ebib--entry-history :history))

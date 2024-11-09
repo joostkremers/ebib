@@ -318,7 +318,7 @@ there is a name conflict."
         (let ((print-length nil)
               (print-level nil)
               (print-circle nil))
-          (insert ";; -*- mode: emacs-lisp -*-\n\n")
+          (insert ";; -*- mode: lisp-data -*-\n\n")
           (insert (format ";; Ebib filters file\n;; Saved on %s\n\n" (format-time-string "%Y.%m.%d %H:%M")))
           (pp ebib--filters-alist (current-buffer))
           (write-region (point-min) (point-max) file)))
