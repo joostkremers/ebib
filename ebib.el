@@ -1503,12 +1503,13 @@ is set to t."
 (defun ebib--bib-find-next-bibtex-item ()
   "Search for the next BibTeX item in the current buffer.
 A BibTeX item is an entry, or a @Preamble, @String or @Comment
-definition.  If an item is found, point is placed right after it
-and the entry type is returned.  If no item is found, point is
-left at the end of the buffer and nil is returned.  If something
-is found that appears to be an entry (essentially, an `@' at the
-start of a line), but does not consist of a valid BibTeX
-identifier, an error is logged and t is returned."
+definition.  If an item is found, place point at the start of the
+line on which the item is found and return the entry type.  If no
+item is found, leave point at the end of the buffer and return
+nil.  If something is found that appears to be an
+entry (essentially, an `@' at the start of a line), but does not
+consist of a valid BibTeX identifier, an error is logged and t is
+returned."
   (condition-case err
       (parsebib-find-next-item)
     (parsebib-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
