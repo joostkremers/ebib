@@ -249,7 +249,8 @@ See `ebib--filters-run-filter'.")
   ;; before eval'ing the filter.
   (let ((filter (ebib-db-get-filter db)))
     (eval
-     `(cl-macrolet (`(ebib--search-in-entry ,regexp ebib-entry ,(unless (cl-equalp field "any") field)))
+     `(cl-macrolet ((contains (field regexp)
+                              `(ebib--search-in-entry ,regexp ebib-entry ,(unless (cl-equalp field "any") field))))
         (seq-filter (lambda (key)
                       (let ((ebib-entry (if ebib-filters-include-crossref
                                             (ebib-get-entry key db 'noerror 'xref)
