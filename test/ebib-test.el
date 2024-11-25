@@ -112,6 +112,11 @@
                    (ebib--filters-pp-filter '(and (contains "any" "chomsky") (not (contains "editor" "noam")))))
                  "(any field contains \"chomsky\") and not (editor contains \"noam\")")))
 
+;;; Random tests
+(ert-deftest ebib--split-urls-test ()
+  (should (equal (ebib--split-urls "\\url{https://somewhere.org} https://somewhere.else.org")
+                 '("https://somewhere.org" "https://somewhere.else.org"))))
+
 ;; TODO: Add tests for
 ;; `ebib-citation-prompt-with-format-string`
 ;; which is what this branch is about anyway.

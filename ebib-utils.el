@@ -869,17 +869,23 @@ string."
 
 (make-obsolete-variable 'ebib-url-field "The default URL field can no longer be customized" "Ebib 2.27")
 
-(defcustom ebib-url-regexp "\\\\url{\\(.*\\)}\\|https?://[^ ';<>\"\n\t\f]+"
+(defcustom ebib-url-regexp "\\\\url{\\(?1:.*\\)}\\|\\(?1:https?://[^ ';<>\"\n\t\f]+\\)"
   "Regular expression to extract URLs from a field.
 This is the regular expression that Ebib uses to search for URLs
 in a field.  With the default value, Ebib considers everything
-that is in a LaTeX `\\url{...}' command as a URL, and furthermore
-every string of text that starts with `http://' or `https://' and
-does not contain whitespace or one of the characters ' \" ; < or >.
+that is in a LaTeX \"\\url{...}\" command as a URL, and
+furthermore every string of text that starts with \"http://\" or
+\"https://\" and does not contain whitespace or one of the
+characters ' \" ; < or >.
 
-Note that the semicolon is added for consistency: it makes it
-possible to use the same separator in the `url' field as in the
-`file' field."
+The semicolon is included in this set for consistency: it makes
+it possible to use the same separator in the `url' field as in
+the `file' field.  Note that this is not a necessity: URLs can be
+separated on whitespace.
+
+If you customize this option, make sure to use an explicitly
+numbered group to enclose the actual URL, since this is what the
+function `ebib--split-urls' expects."
   :group 'ebib
   :type 'string)
 
@@ -1606,12 +1612,13 @@ the function `ebib--create-file-name-from-key' for details."
 
 (defun ebib--split-urls (urls)
   "Split URLS (a string) into separate URLs.
-Return value is a list of strings.  The URLs in URLS are
-  separated using `ebib-url-regexp'."
+Return a list of strings, each a URL.  If the LaTeX command
+\\url{...} encloses a URL, it is removed.  See the user option
+`ebib-url-regexp' for details."
   (let ((start 0)
         (result nil))
     (while (string-match ebib-url-regexp urls start)
-      (push (match-string 0 urls) result)
+      (push (match-string 1 urls) result)
       (setq start (match-end 0)))
     (nreverse result)))
 
