@@ -1,5 +1,13 @@
 % Ebib News
 
+## Version 2.47, November 2024 ##
+
+- Use completion when selecting a file or URL to view instead of asking for a number.
+
+## Version 2.46, November 2024 ##
+
+- Update for `parsebib.el` version 6.0.
+
 ## Version 2.45, October 2024 ##
 
 - Handle TeX markup better when creating a note.
