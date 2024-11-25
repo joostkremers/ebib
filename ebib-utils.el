@@ -1592,23 +1592,26 @@ separated by `ebib-filename-separator'."
 (defun ebib--select-file (files n key)
   "Split FILES into separate files and return the Nth.
 FILES should be a string of file names separated by
-`ebib-filename-separator'.  If there is only one file name in
-FILES, it is returned regardless of the value of N.  If N is nil,
-the user is asked to enter a number, unless there is only one
-file in FILES, in which case that one is chosen automatically.
-If FILES is nil, a file name is created on the basis of KEY.  See
-the function `ebib--create-file-name-from-key' for details."
+`ebib-filename-separator'.  N counts from 1.
+
+If there is only one file name in FILES, it is returned
+regardless of the value of N.  If N is nil, the user is asked to
+select a file.
+
+If FILES is nil, a file name is created on the basis of KEY,
+using the function `ebib--create-file-name-from-key'."
   (if (not files)
       (ebib--create-file-name-from-key key "pdf")
     (let ((file-list (ebib--split-files files)))
       (cond
        ((= (length file-list) 1)
-        (setq n 1))
+        (car file-list))
        ((null n)
-        (setq n (string-to-number (read-string (format "Select file [1-%d]: " (length file-list)))))))
-      (unless (<= 1 n (length file-list))  ; Unless n is within range.
-        (error "[Ebib] No such file (%d)" n))
-      (nth (1- n) file-list))))
+        (completing-read "Select file: " file-list nil t))
+       ((numberp n)
+        (if (<= 1 n (length file-list))  ; See if n is within range.
+            (nth (1- n) file-list)
+          (error "[Ebib] Number %d does not correspond to a file" n)))))))
 
 (defun ebib--split-urls (urls)
   "Split URLS (a string) into separate URLs.
@@ -1624,27 +1627,25 @@ Return a list of strings, each a URL.  If the LaTeX command
 
 (defun ebib--select-url (urls n)
   "Select a URL from URLS.
-URLS is a string containing one or more URLs.  URLS is split
-using `ebib-url-regexp' and the Nth URL is returned.  If N is
-nil, the user is asked which URL to select, unless there is only
-one.  If URLS is nil or does not contain any valid URLs, raise an
-error."
+URLS is a string containing one or more URLs.  N counts from 1.
+
+URLS is split using `ebib-url-regexp' and the Nth URL is
+returned.  If N is nil, the user is asked which URL to select,
+unless there is only one.  If URLS is nil or does not contain any
+valid URLs, raise an error."
   (unless urls
-    (error "[Ebib] No URLs found"))
-  (setq urls (ebib--split-urls urls))
-  (unless urls
-    (error "[Ebib] No valid URLs found"))
+    (error "[Ebib] URL field is empty"))
+  (unless (setq urls (ebib--split-urls urls))
+    (error "[Ebib] No valid URLs found in URL field"))
   (cond
    ((= (length urls) 1)
-    (setq n 1))
+    (car urls))
    ((null n) ; The user didn't provide a numeric prefix argument.
-    (setq n (string-to-number (read-string (format "Select URL to open [1-%d]: " (length urls)))))))
-  (unless (<= 1 n (length urls))  ; Unless n is within range.
-    (error "[Ebib] No such URL (%d)" n))
-  (let ((url (nth (1- n) urls)))
-    (if (string-match "\\\\url{\\(.*?\\)}" url) ; See if the url is contained in \url{...}.
-        (setq url (match-string 1 url)))
-    url))
+    (completing-read "Select URL to open: " urls nil t))
+   ((numberp n)
+    (if (<= 1 n (length urls))  ; See if n is within range.
+        (nth (1- n) urls)
+      (error "[Ebib] Number %d does not correspond to a URL" n)))))
 
 ;; Template specifiers for Org
 

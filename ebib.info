@@ -2204,11 +2204,11 @@ notes, if you store those in separate files) you can use Ebib to call
 external viewers for these files or have them opened in Emacs.  The
 interface for this is similar to that for calling a browser: if you
 press ‘f’ in the index buffer, Ebib searches the ‘file’ field for a
-filename and when it finds one, calls an appropriate viewer.  In the
-entry buffer, you can use ‘f’ on any field and it will check that
-particular field for a file name.  It is also possible to have more than
-one filename in a field.  In that case, Ebib asks you which one you want
-to open.
+filename and when it finds one, calls an appropriate viewer.  If you
+have more than one file in the ‘file’ field (separated by
+‘ebib-filename-separator’), you are asked which one you want to open.
+Alternatively, you can use a prefix argument: ‘M-2 f’ will open the
+second file in the file field.
 
 The file names in the ‘file’ field do not have to have full paths.  You
 can set the option "File Search Dirs" to a list of directories that Ebib
@@ -3332,42 +3332,42 @@ Node: Linking to external resources104924
 Ref: #linking-to-external-resources105109
 Node: Viewing and Importing Files105311
 Ref: #viewing-and-importing-files105511
-Node: Editing the file field111024
-Ref: #editing-the-file-field111175
-Node: Calling a Browser for URLs and DOIs112528
-Ref: #calling-a-browser-for-urls-and-dois112744
-Node: Notes files115159
-Ref: #notes-files115309
-Node: Configuring files for storing notes116884
-Ref: #configuring-files-for-storing-notes117062
-Node: Hooks120032
-Ref: #hooks120195
-Node: Upgrading from earlier Ebib versions121592
-Ref: #upgrading-from-earlier-ebib-versions121815
-Node: Customising the notes file format122725
-Ref: #customising-the-notes-file-format122953
-Node: Displaying notes126732
-Ref: #displaying-notes126914
-Node: Using Markdown for notes128259
-Ref: #using-markdown-for-notes128457
-Node: Using org-capture to record notes132115
-Ref: #using-org-capture-to-record-notes132314
-Node: Managing a reading list138310
-Ref: #managing-a-reading-list138472
-Node: Managing Keywords141487
-Ref: #managing-keywords141643
-Node: Using a Canonical Keywords List143250
-Ref: #using-a-canonical-keywords-list143408
-Node: Window Management145546
-Ref: #window-management145711
-Node: Copying Entries to the Kill Ring148846
-Ref: #copying-entries-to-the-kill-ring149045
-Node: Printing the Database151768
-Ref: #printing-the-database151941
-Node: Customisation155384
-Ref: #customisation155500
-Node: Modifying Key Bindings156991
-Ref: #modifying-key-bindings157118
+Node: Editing the file field111038
+Ref: #editing-the-file-field111189
+Node: Calling a Browser for URLs and DOIs112542
+Ref: #calling-a-browser-for-urls-and-dois112758
+Node: Notes files115173
+Ref: #notes-files115323
+Node: Configuring files for storing notes116898
+Ref: #configuring-files-for-storing-notes117076
+Node: Hooks120046
+Ref: #hooks120209
+Node: Upgrading from earlier Ebib versions121606
+Ref: #upgrading-from-earlier-ebib-versions121829
+Node: Customising the notes file format122739
+Ref: #customising-the-notes-file-format122967
+Node: Displaying notes126746
+Ref: #displaying-notes126928
+Node: Using Markdown for notes128273
+Ref: #using-markdown-for-notes128471
+Node: Using org-capture to record notes132129
+Ref: #using-org-capture-to-record-notes132328
+Node: Managing a reading list138324
+Ref: #managing-a-reading-list138486
+Node: Managing Keywords141501
+Ref: #managing-keywords141657
+Node: Using a Canonical Keywords List143264
+Ref: #using-a-canonical-keywords-list143422
+Node: Window Management145560
+Ref: #window-management145725
+Node: Copying Entries to the Kill Ring148860
+Ref: #copying-entries-to-the-kill-ring149059
+Node: Printing the Database151782
+Ref: #printing-the-database151955
+Node: Customisation155398
+Ref: #customisation155514
+Node: Modifying Key Bindings157005
+Ref: #modifying-key-bindings157132
 
 End Tag Table
 

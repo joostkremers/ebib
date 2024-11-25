@@ -2249,11 +2249,12 @@ external viewers for these files or have them opened in Emacs. The
 interface for this is similar to that for calling a browser: if you
 press <span class="key"><code>f</code></span> in the index buffer, Ebib
 searches the <code>file</code> field for a filename and when it finds
-one, calls an appropriate viewer. In the entry buffer, you can use <span
-class="key"><code>f</code></span> on any field and it will check that
-particular field for a file name. It is also possible to have more than
-one filename in a field. In that case, Ebib asks you which one you want
-to open.</p>
+one, calls an appropriate viewer. If you have more than one file in the
+<code>file</code> field (separated by
+<code>ebib-filename-separator</code>), you are asked which one you want
+to open. Alternatively, you can use a prefix argument: <span
+class="key"><code>M-2 f</code></span> will open the second file in the
+file field.</p>
 <p>The file names in the <code>file</code> field do not have to have
 full paths. You can set the option “File Search Dirs” to a list of
 directories that Ebib should search when opening a file from the
