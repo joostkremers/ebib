@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.48, December 2024 ##
+
+- Add option to hide all fields that have no value.
+
 ## Version 2.47, November 2024 ##
 
 - Use completion when selecting a file or URL to view instead of asking for a number.

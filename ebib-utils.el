@@ -202,15 +202,13 @@ the option \"Hidden Fields\" (`ebib--hidden-fields') for details."
                                 "venue"
                                 "version"
                                 "volumes")
-  "List of fields that are not displayed.
-The fields in this list are not displayed by default.  Since
-biblatex defines a large number of fields, it is not practical to
-display them all in the entry buffer.  You can make these fields
-temporarily visible with the command
-`\\<ebib-index-mode-map>\\[ebib-toggle-hidden]' or through the
-menu."
+  "List of fields that are not displayed when empty.
+The value is a list of field names (as case-insensitive strings).
+The value can also be t, in which case all fields are treated as
+hidden, i.e., they are only displayed when they have a value.q"
   :group 'ebib
-  :type '(repeat (string :tag "Field")))
+  :type '(choice (const :tag "All fields" t)
+                 (repeat :tag "Specify fields" (string :tag "Field"))))
 
 (defcustom ebib-always-prompt-for-special-keys t
   "Prompt for new key in already-named Xdata, Set entries."

@@ -7,7 +7,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.47
+;; Version: 2.48
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "6.0") (emacs "27.1") (compat "29.1.4.3"))
@@ -571,7 +571,9 @@ it is highlighted.  DB defaults to the current database."
               (insert "\n")
               (mapc (lambda (field)
                       (unless (and (not (ebib-get-field-value field key db 'noerror nil 'xref 'expand-strings)) ; If a field does not have a value,
-                                   (member-ignore-case field ebib-hidden-fields)				; and is hidden, don't display it,
+                                   (or (eq ebib-hidden-fields t)				                ; and is hidden, don't display it,
+                                       (and (listp ebib-hidden-fields)
+                                            (member-ignore-case field ebib-hidden-fields)))
                                    ebib--hide-hidden-fields)							; unless the user wants to see all hidden fields.
                         (insert (format "%-17s %s"
                                         (propertize field 'face 'ebib-field-face)
