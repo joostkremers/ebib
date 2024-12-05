@@ -146,8 +146,8 @@ id="toc-copy-cut-kill-paste-yank-and-delete">Copy, Cut (Kill), Paste
 (Yank), and Delete</a></li>
 <li><a href="#undefined-fields" id="toc-undefined-fields">Undefined
 Fields</a></li>
-<li><a href="#hidden-fields" id="toc-hidden-fields">Hidden
-Fields</a></li>
+<li><a href="#hiding-fields-from-display"
+id="toc-hiding-fields-from-display">Hiding Fields from Display</a></li>
 <li><a href="#timestamps" id="toc-timestamps">Timestamps</a></li>
 <li><a href="#saving-a-database" id="toc-saving-a-database">Saving a
 Database</a></li>
@@ -973,25 +973,33 @@ option <code>ebib-extra-fields</code>.</p>
 itself is also deleted. (In fact, the field remains in the database
 until you close the database, but it will not be saved, so the next time
 you load the <code>.bib</code> file, the field is gone.)</p>
-<h2 id="hidden-fields">Hidden Fields</h2>
+<h2 id="hiding-fields-from-display">Hiding Fields from Display</h2>
 <p><code>Biblatex</code> defines a large number of fields, many of which
 are optional for most entry types. Displaying all these fields in the
 entry buffer would not be very practical, because you are most likely
 interested in only a few of them. For this reason, Ebib defines a
 (fairly large) number of fields as ‘hidden’, meaning that they are not
-shown in the entry buffer. You can make these fields visible with the
-key <span class="key"><code>H</code></span> in the index buffer. Which
-fields are treated as hidden is controlled by the option “Hidden Fields”
-(<code>ebib-hidden-fields</code>), which can be customised.</p>
-<p>Most of the fields defined as hidden are
-<code>biblatex</code>-specific, because BibTeX recognises a much smaller
-number of fields and there isn’t much of a need to hide the lesser used
-ones. However, the functionality is available: if you wish to use it,
-just add the relevant fields to the option
-<code>ebib-hidden-fields</code>.</p>
-<p>Note that a hidden field that has a value is always shown in the
-index buffer. Hidden fields are only hidden in entries that don’t define
-a value for them.</p>
+shown in the entry buffer unless they have a value (i.e., if they are
+present in the BibTeX entry).</p>
+<p>If you want to insert a value into a field that is hidden by default,
+you need to make the hidden fields visible first, which can be done with
+the key <span class="key"><code>H</code></span> (in the index buffer).
+Alternatively, you can use <span class="key"><code>a</code></span> in
+the entry buffer to add a field, provided you know its exact name. (Keep
+in mind that you can use <span class="key"><code>a</code></span> to add
+fields that are not predefined, so Ebib won’t complain if you mistype
+the field name. Completion is available, though.)</p>
+<p>Which fields are treated as hidden is controlled by the option
+“Hidden Fields” (<code>ebib-hidden-fields</code>), which can be
+customised. The default value of this option contains a fairly long list
+of fields, most of which are <code>biblatex</code>-specific, though the
+option can of course be used for BibTeX files as well.</p>
+<p>If you prefer Ebib to show <em>only</em> the fields that have a
+value, (e.g., when you use Ebib mainly for viewing, not for editing,
+BibTeX entries), you can set <code>ebib-hidden-fields</code> to the
+value <code>t</code>: This essentially makes all fields hidden, which
+means that all fields without a value are suppressed and only fields
+with a value are shown.</p>
 <h2 id="timestamps">Timestamps</h2>
 <p>Ebib provides the possibility to add a timestamp to every new entry,
 recording the time it was added to the database. The timestamp is

@@ -533,7 +533,7 @@ important editing facilities.
 * Editing Multiline Values::
 * Copy Cut Kill Paste Yank and Delete::
 * Undefined Fields::
-* Hidden Fields::
+* Hiding Fields from Display::
 * Timestamps::
 * Saving a Database::
 * Cross-referencing::
@@ -787,7 +787,7 @@ value.  If you do want to yank text into a field that already has a
 value, simply hit ‘d’ first to delete the text.
 
 
-File: ebib.info,  Node: Undefined Fields,  Next: Hidden Fields,  Prev: Copy Cut Kill Paste Yank and Delete,  Up: Editing the Database
+File: ebib.info,  Node: Undefined Fields,  Next: Hiding Fields from Display,  Prev: Copy Cut Kill Paste Yank and Delete,  Up: Editing the Database
 
 3.7 Undefined Fields
 ====================
@@ -809,32 +809,41 @@ until you close the database, but it will not be saved, so the next time
 you load the ‘.bib’ file, the field is gone.)
 
 
-File: ebib.info,  Node: Hidden Fields,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
+File: ebib.info,  Node: Hiding Fields from Display,  Next: Timestamps,  Prev: Undefined Fields,  Up: Editing the Database
 
-3.8 Hidden Fields
-=================
+3.8 Hiding Fields from Display
+==============================
 
 ‘Biblatex’ defines a large number of fields, many of which are optional
 for most entry types.  Displaying all these fields in the entry buffer
 would not be very practical, because you are most likely interested in
 only a few of them.  For this reason, Ebib defines a (fairly large)
 number of fields as 'hidden', meaning that they are not shown in the
-entry buffer.  You can make these fields visible with the key ‘H’ in the
-index buffer.  Which fields are treated as hidden is controlled by the
-option "Hidden Fields" (‘ebib-hidden-fields’), which can be customised.
+entry buffer unless they have a value (i.e., if they are present in the
+BibTeX entry).
 
-Most of the fields defined as hidden are ‘biblatex’-specific, because
-BibTeX recognises a much smaller number of fields and there isn't much
-of a need to hide the lesser used ones.  However, the functionality is
-available: if you wish to use it, just add the relevant fields to the
-option ‘ebib-hidden-fields’.
+If you want to insert a value into a field that is hidden by default,
+you need to make the hidden fields visible first, which can be done with
+the key ‘H’ (in the index buffer).  Alternatively, you can use ‘a’ in
+the entry buffer to add a field, provided you know its exact name.
+(Keep in mind that you can use ‘a’ to add fields that are not
+predefined, so Ebib won't complain if you mistype the field name.
+Completion is available, though.)
 
-Note that a hidden field that has a value is always shown in the index
-buffer.  Hidden fields are only hidden in entries that don't define a
-value for them.
+Which fields are treated as hidden is controlled by the option "Hidden
+Fields" (‘ebib-hidden-fields’), which can be customised.  The default
+value of this option contains a fairly long list of fields, most of
+which are ‘biblatex’-specific, though the option can of course be used
+for BibTeX files as well.
+
+If you prefer Ebib to show _only_ the fields that have a value, (e.g.,
+when you use Ebib mainly for viewing, not for editing, BibTeX entries),
+you can set ‘ebib-hidden-fields’ to the value ‘t’: This essentially
+makes all fields hidden, which means that all fields without a value are
+suppressed and only fields with a value are shown.
 
 
-File: ebib.info,  Node: Timestamps,  Next: Saving a Database,  Prev: Hidden Fields,  Up: Editing the Database
+File: ebib.info,  Node: Timestamps,  Next: Saving a Database,  Prev: Hiding Fields from Display,  Up: Editing the Database
 
 3.9 Timestamps
 ==============
@@ -3250,124 +3259,124 @@ Node: Alias Types and Fields21052
 Ref: #alias-types-and-fields21221
 Node: Editing the Database23278
 Ref: #editing-the-database23444
-Node: Adding and Deleting Entries24056
-Ref: #adding-and-deleting-entries24227
-Node: Marking Entries25924
-Ref: #marking-entries26100
-Node: Editing Field Values26600
-Ref: #editing-field-values26796
-Node: @String abbreviations in field values30007
-Ref: #string-abbreviations-in-field-values30254
-Node: Editing Multiline Values32856
-Ref: #editing-multiline-values33084
-Node: Copy Cut Kill Paste Yank and Delete34987
-Ref: #copy-cut-kill-paste-yank-and-delete35230
-Node: Undefined Fields36201
-Ref: #undefined-fields36381
-Node: Hidden Fields37270
-Ref: #hidden-fields37419
-Node: Timestamps38477
-Ref: #timestamps38621
-Node: Saving a Database40528
-Ref: #saving-a-database40692
-Node: Exporting Entries42254
-Ref: #exporting-entries42374
-Node: Cross-referencing43746
-Ref: #cross-referencing43920
-Node: Sorting the bib File46348
-Ref: #sorting-the-bib-file46541
-Node: @Preamble Definition48789
-Ref: #preamble-definition48974
-Node: @String Definitions50937
-Ref: #string-definitions51109
-Node: @Comments53459
-Ref: #comments53611
-Node: Creating Entry Stubs54102
-Ref: #creating-entry-stubs54279
-Node: Multiline Edit Buffers55007
-Ref: #multiline-edit-buffers55170
-Node: Main and Dependent Databases59481
-Ref: #main-and-dependent-databases59686
-Node: Inserting Citations into a Text Buffer62572
-Ref: #inserting-citations-into-a-text-buffer62786
-Node: Single Citations62983
-Ref: #single-citations63152
-Node: Citations with multiple keys65517
-Ref: #citations-with-multiple-keys65731
-Node: Key Bindings67490
-Ref: #key-bindings67682
-Node: Defining Citation Commands68438
-Ref: #defining-citation-commands68671
-Node: Associating a Database with a Text Buffer74557
-Ref: #associating-a-database-with-a-text-buffer74842
-Node: Links and Citations in Org buffers76217
-Ref: #links-and-citations-in-org-buffers76453
-Node: Searching77882
-Ref: #searching78017
-Node: Filters81465
-Ref: #filters81582
-Node: Simple Selection82637
-Ref: #simple-selection82762
-Node: Complex Filters84465
-Ref: #complex-filters84623
-Node: Storing and Saving Filters89261
-Ref: #storing-and-saving-filters89440
-Node: Special Filters92291
-Ref: #special-filters92468
-Node: An Example Listing Recent Additions93851
-Ref: #an-example-listing-recent-additions94076
-Node: Properties of Filtered Databases96440
-Ref: #properties-of-filtered-databases96633
-Node: Importing BibTeX entries98280
-Ref: #importing-bibtex-entries98451
-Node: Merging bib files98765
-Ref: #merging-bib-files98936
-Node: Importing entries from a buffer99525
-Ref: #importing-entries-from-a-buffer99758
-Node: Integration with the Biblio package100787
-Ref: #integration-with-the-biblio-package101036
-Node: Multiple Identical Fields102821
-Ref: #multiple-identical-fields103010
-Node: Linking to external resources104924
-Ref: #linking-to-external-resources105109
-Node: Viewing and Importing Files105311
-Ref: #viewing-and-importing-files105511
-Node: Editing the file field111038
-Ref: #editing-the-file-field111189
-Node: Calling a Browser for URLs and DOIs112542
-Ref: #calling-a-browser-for-urls-and-dois112758
-Node: Notes files115173
-Ref: #notes-files115323
-Node: Configuring files for storing notes116898
-Ref: #configuring-files-for-storing-notes117076
-Node: Hooks120046
-Ref: #hooks120209
-Node: Upgrading from earlier Ebib versions121606
-Ref: #upgrading-from-earlier-ebib-versions121829
-Node: Customising the notes file format122739
-Ref: #customising-the-notes-file-format122967
-Node: Displaying notes126746
-Ref: #displaying-notes126928
-Node: Using Markdown for notes128273
-Ref: #using-markdown-for-notes128471
-Node: Using org-capture to record notes132129
-Ref: #using-org-capture-to-record-notes132328
-Node: Managing a reading list138324
-Ref: #managing-a-reading-list138486
-Node: Managing Keywords141501
-Ref: #managing-keywords141657
-Node: Using a Canonical Keywords List143264
-Ref: #using-a-canonical-keywords-list143422
-Node: Window Management145560
-Ref: #window-management145725
-Node: Copying Entries to the Kill Ring148860
-Ref: #copying-entries-to-the-kill-ring149059
-Node: Printing the Database151782
-Ref: #printing-the-database151955
-Node: Customisation155398
-Ref: #customisation155514
-Node: Modifying Key Bindings157005
-Ref: #modifying-key-bindings157132
+Node: Adding and Deleting Entries24069
+Ref: #adding-and-deleting-entries24240
+Node: Marking Entries25937
+Ref: #marking-entries26113
+Node: Editing Field Values26613
+Ref: #editing-field-values26809
+Node: @String abbreviations in field values30020
+Ref: #string-abbreviations-in-field-values30267
+Node: Editing Multiline Values32869
+Ref: #editing-multiline-values33097
+Node: Copy Cut Kill Paste Yank and Delete35000
+Ref: #copy-cut-kill-paste-yank-and-delete35243
+Node: Undefined Fields36214
+Ref: #undefined-fields36407
+Node: Hiding Fields from Display37296
+Ref: #hiding-fields-from-display37484
+Node: Timestamps39041
+Ref: #timestamps39198
+Node: Saving a Database41105
+Ref: #saving-a-database41269
+Node: Exporting Entries42831
+Ref: #exporting-entries42951
+Node: Cross-referencing44323
+Ref: #cross-referencing44497
+Node: Sorting the bib File46925
+Ref: #sorting-the-bib-file47118
+Node: @Preamble Definition49366
+Ref: #preamble-definition49551
+Node: @String Definitions51514
+Ref: #string-definitions51686
+Node: @Comments54036
+Ref: #comments54188
+Node: Creating Entry Stubs54679
+Ref: #creating-entry-stubs54856
+Node: Multiline Edit Buffers55584
+Ref: #multiline-edit-buffers55747
+Node: Main and Dependent Databases60058
+Ref: #main-and-dependent-databases60263
+Node: Inserting Citations into a Text Buffer63149
+Ref: #inserting-citations-into-a-text-buffer63363
+Node: Single Citations63560
+Ref: #single-citations63729
+Node: Citations with multiple keys66094
+Ref: #citations-with-multiple-keys66308
+Node: Key Bindings68067
+Ref: #key-bindings68259
+Node: Defining Citation Commands69015
+Ref: #defining-citation-commands69248
+Node: Associating a Database with a Text Buffer75134
+Ref: #associating-a-database-with-a-text-buffer75419
+Node: Links and Citations in Org buffers76794
+Ref: #links-and-citations-in-org-buffers77030
+Node: Searching78459
+Ref: #searching78594
+Node: Filters82042
+Ref: #filters82159
+Node: Simple Selection83214
+Ref: #simple-selection83339
+Node: Complex Filters85042
+Ref: #complex-filters85200
+Node: Storing and Saving Filters89838
+Ref: #storing-and-saving-filters90017
+Node: Special Filters92868
+Ref: #special-filters93045
+Node: An Example Listing Recent Additions94428
+Ref: #an-example-listing-recent-additions94653
+Node: Properties of Filtered Databases97017
+Ref: #properties-of-filtered-databases97210
+Node: Importing BibTeX entries98857
+Ref: #importing-bibtex-entries99028
+Node: Merging bib files99342
+Ref: #merging-bib-files99513
+Node: Importing entries from a buffer100102
+Ref: #importing-entries-from-a-buffer100335
+Node: Integration with the Biblio package101364
+Ref: #integration-with-the-biblio-package101613
+Node: Multiple Identical Fields103398
+Ref: #multiple-identical-fields103587
+Node: Linking to external resources105501
+Ref: #linking-to-external-resources105686
+Node: Viewing and Importing Files105888
+Ref: #viewing-and-importing-files106088
+Node: Editing the file field111615
+Ref: #editing-the-file-field111766
+Node: Calling a Browser for URLs and DOIs113119
+Ref: #calling-a-browser-for-urls-and-dois113335
+Node: Notes files115750
+Ref: #notes-files115900
+Node: Configuring files for storing notes117475
+Ref: #configuring-files-for-storing-notes117653
+Node: Hooks120623
+Ref: #hooks120786
+Node: Upgrading from earlier Ebib versions122183
+Ref: #upgrading-from-earlier-ebib-versions122406
+Node: Customising the notes file format123316
+Ref: #customising-the-notes-file-format123544
+Node: Displaying notes127323
+Ref: #displaying-notes127505
+Node: Using Markdown for notes128850
+Ref: #using-markdown-for-notes129048
+Node: Using org-capture to record notes132706
+Ref: #using-org-capture-to-record-notes132905
+Node: Managing a reading list138901
+Ref: #managing-a-reading-list139063
+Node: Managing Keywords142078
+Ref: #managing-keywords142234
+Node: Using a Canonical Keywords List143841
+Ref: #using-a-canonical-keywords-list143999
+Node: Window Management146137
+Ref: #window-management146302
+Node: Copying Entries to the Kill Ring149437
+Ref: #copying-entries-to-the-kill-ring149636
+Node: Printing the Database152359
+Ref: #printing-the-database152532
+Node: Customisation155975
+Ref: #customisation156091
+Node: Modifying Key Bindings157582
+Ref: #modifying-key-bindings157709
 
 End Tag Table
 
