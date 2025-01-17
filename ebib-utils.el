@@ -867,6 +867,13 @@ string."
 
 (make-obsolete-variable 'ebib-url-field "The default URL field can no longer be customized" "Ebib 2.27")
 
+(defcustom ebib-url-fields '("url")
+  "List of fields that may contain URLs.
+URLs contained in this field (i.e., anything that matches
+`ebib-url-regexp'), is made clickable."
+  :group 'ebib
+  :type '(repeat (string :tag "Field")))
+
 (defcustom ebib-url-regexp "\\\\url{\\(?1:.*\\)}\\|\\(?1:https?://[^ ';<>\"\n\t\f]+\\)"
   "Regular expression to extract URLs from a field.
 This is the regular expression that Ebib uses to search for URLs
