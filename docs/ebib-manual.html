@@ -314,11 +314,11 @@ you use non-standard entry types, you may need to customise
 you use. If Ebib finds entry types in a <code>.bib</code> file that are
 not defined, those entries will still be loaded, but their entry type is
 displayed using Emacs’ <code>error</code> face. The most likely case in
-which this may happen is when you load a BibTeX file without letting
-Ebib know the file is <code>biblatex</code>-specific. By default, Ebib
-assumes that a <code>.bib</code> file it loads is a BibTeX file. If you
-intend to use <code>biblatex</code> files, make sure to read the section
-<a href="#biblatex-vs-bibtex"><code>Biblatex</code> vs. Bibtex</a>.</p>
+which this may happen is when you load a file that is
+<code>biblatex</code>-specific, since by default, Ebib assumes that a
+<code>.bib</code> file it loads is a BibTeX file. If you intend to use
+<code>biblatex</code> files, make sure to read the section <a
+href="#biblatex-vs-bibtex"><code>Biblatex</code> vs. Bibtex</a>.</p>
 <p>When you open a <code>.bib</code> file, the directory in which you
 started Ebib is the start directory for file name completion. If you
 always want Ebib to assume a specific default directory, regardless of
@@ -731,14 +731,21 @@ work, the item at the top of the kill ring must be a string that
 constitutes a properly formatted BibTeX entry. If this is not the case,
 Ebib gives you a warning and rotates the kill ring, so that you can
 press <span class="key"><code>y</code></span> again to (try and) add the
-next element in the kill ring to the database.</p>
+next element in the kill ring to the database. Yanking also works with
+<code>@Preamble</code>, <code>@String</code> and <code>@Comment</code>
+definitions.</p>
 <p>Killing an entry from a database obviously yields a properly
 formatted BibTeX entry (so you can easily move entries from one database
 to another by killing and then yanking them), but killing a BibTeX entry
 from another buffer or copying one from an outside source (e.g., a
 website) is also possible.</p>
-<p>Note that yanking also works with <code>@Preamble</code>,
-<code>@String</code> and <code>@Comment</code> definitions.</p>
+<p>Note that it is possible to copy an entry to the kill ring (without
+deleting it) with the key sequence <span
+class="key"><code>C e</code></span>, i.e., capital <span
+class="key"><code>C</code></span> followed by <span
+class="key"><code>e</code></span>. (See <a
+href="#copying-entries-to-the-kill-ring">Copying Entries to the Kill
+Ring</a> for more copying commands.)</p>
 <h2 id="marking-entries">Marking Entries</h2>
 <p>Commands in the index buffer generally operate on one single entry.
 Some commands can be performed on multiple entries simultaneously. To do
@@ -2398,7 +2405,7 @@ valid character in URLs. This is done for consistency with the
 semicolon+space) is the standard separator for files in the
 <code>file</code> field. This way, you can use the same separator to
 distinguish multiple URLs in the <code>url</code> field.</p>
-<p>By default Ebib also regards everything that is enclosed in a LaTeX
+<p>Ebib also regards everything that is enclosed in a LaTeX
 <code>\url{...}</code> command as a URL. So if you use <code>;</code> to
 separate URLs and then happen to run into a URL that contains a
 semicolon, you can enclose it in <code>\url{...}</code> and it will be
