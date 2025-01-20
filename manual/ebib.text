@@ -55,7 +55,7 @@ When you open a `.bib` file, the directory in which you started Ebib is the star
 
 ## Preloading `.bib` Files ##
 
-Chances are that you will be doing most of your work with one or a few `.bib` files. In order to open these files automatically when Ebib is started, set the option "Preload Bib Files" (`ebib-preload-bib-files`). You may specify the files to preload with their full path or with a relative path. In the latter case, the files are searched for in the directories listed in the option `ebib-bib-search-dirs`.
+Chances are that you will be doing most of your work with one or a few `.bib` files. In order to open these files automatically when Ebib is started, set the option `ebib-preload-bib-files`. You may specify the files to preload with their full path or with a relative path. In the latter case, the files are searched for in the directories listed in the option `ebib-bib-search-dirs`.
 
 It is also possible to set this variable as a file-local or directory-local variable (i.e., in a ~.dir-locals.el` file). You can use this method to only load the `.bib` file or files associated with a specific project.
 
@@ -303,7 +303,7 @@ Note that if you delete the contents of an undefined field, the field itself is 
 
 If you want to insert a value into a field that is hidden by default, you need to make the hidden fields visible first, which can be done with the key [`H`]{.key} (in the index buffer). Alternatively, you can use [`a`]{.key} in the entry buffer to add a field, provided you know its exact name. (Keep in mind that you can use [`a`]{.key} to add fields that are not predefined, so Ebib won't complain if you mistype the field name. Completion is available, though.)
 
-Which fields are treated as hidden is controlled by the option "Hidden Fields" (`ebib-hidden-fields`), which can be customised. The default value of this option contains a fairly long list of fields, most of which are  `biblatex`-specific, though the option can of course be used for BibTeX files as well.
+Which fields are treated as hidden is controlled by the option `ebib-hidden-fields`, which can be customised. The default value of this option contains a fairly long list of fields, most of which are  `biblatex`-specific, though the option can of course be used for BibTeX files as well.
 
 If you prefer Ebib to show *only* the fields that have a value, (e.g., when you use Ebib mainly for viewing, not for editing, BibTeX entries), you can set `ebib-hidden-fields` to the value `t`: This essentially makes all fields hidden, which means that all fields without a value are suppressed and only fields with a value are shown.
 
@@ -533,7 +533,7 @@ Note that commands of the form [`C-c <letter>`]{.key} are reserved for the user,
 
 ## Defining Citation Commands ##
 
-Citation commands are defined for specific major modes. Ebib defines commands for `latex-mode` (a.k.a. `LaTeX-mode`), for `org-mode` and for `markdown-mode`. As mentioned, the commands defined for LaTeX are those used by `biblatex`. If you use something else, you may need to set up some commands yourself. This can be done by customising the option "Citation Commands" (`ebib-citation-commands`).
+Citation commands are defined for specific major modes. Ebib defines commands for `latex-mode` (a.k.a. `LaTeX-mode`), for `org-mode` and for `markdown-mode`. As mentioned, the commands defined for LaTeX are those used by `biblatex`. If you use something else, you may need to set up some commands yourself. This can be done by customising the option `ebib-citation-commands`.
 
 Each command consists of an identifier, which you type when Ebib prompts you for a citation command, plus a format string, which is used to create the actual citation command.
 
@@ -814,7 +814,7 @@ In the index buffer, the Ebib menu has an option to merge a second `.bib` file i
 
 Another way to add entries to a database is to import them from an Emacs buffer. If, for example, you find ready-formatted BibTeX entries in a text file or on the internet, you can copy & paste them to any Emacs buffer (e.g. the `*scratch*` buffer), and then execute the command [`M-x ebib-import-entries`]{.key}. Ebib then goes through the buffer (or the active region) and loads all BibTeX entries it finds into the current database (i.e. the database that was active when you lowered Ebib). Text in the buffer that is not part of a BibTeX entry is ignored.
 
-If a BibTeX entry in the buffer lacks an entry key (which sometimes happens with BibTeX entries found on the internet), Ebib will generate a temporary key for it of the form `<new-entryXX>`, where `XX` is a number. You can change such keys by hitting [`E`]{.key} in the index buffer. Such a key will also automatically be replaced with a more sensible key if you edit the entry. See the option "Autogenerate Keys" (`ebib-autogenerate-keys`) for details.
+If a BibTeX entry in the buffer lacks an entry key (which sometimes happens with BibTeX entries found on the internet), Ebib will generate a temporary key for it of the form `<new-entryXX>`, where `XX` is a number. You can change such keys by hitting [`E`]{.key} in the index buffer. Such a key will also automatically be replaced with a more sensible key if you edit the entry. See the option `ebib-autogenerate-keys` for details.
 
 
 ## Integration with the Biblio package ##
@@ -851,7 +851,7 @@ Ebib and Biblio both use the functionality of `bibtex.el` to generate keys. Refe
 
 Under normal circumstances, a BibTeX entry only contains one occurrence of each field. If `biblatex` or BibTeX notices that an entry contains more than one occurrence of a required or optional field, it issues a warning. Ebib is somewhat less gracious, it simply takes the value of the last occurrence without giving any warning. (Note, by the way, that `biblatex` will use the value of the *first* occurrence, not the last.) When extra fields appear more than once in an entry, `biblatex` does not warn you, since it ignores those fields anyway. Here, too, Ebib's standard behaviour is to ignore all but the last value.
 
-However, some online reference management services "use" this feature of BibTeX in that they put multiple `keywords` fields in the BibTeX entries that they produce. If you were to import such an entry into Ebib, you would lose all your keywords except the last one. To remedy this, you can tell Ebib that it should allow multiple occurrences of a single field in a BibTeX entry. You can do this by setting the customisation option "Allow Identical Fields".
+However, some online reference management services "use" this feature of BibTeX in that they put multiple `keywords` fields in the BibTeX entries that they produce. If you were to import such an entry into Ebib, you would lose all your keywords except the last one. To remedy this, you can tell Ebib that it should allow multiple occurrences of a single field in a BibTeX entry. You can do this by setting the customisation option `ebib-allow-identical-fields`.
 
 With this option set, Ebib collapses the multiple occurrences into a single occurrence. All the values of the different occurrences are collected and stored in the single occurrence, separated by the default keywords separator (`ebib-keywords-separator`). That is, Ebib does not retain the multiple occurrences, but it does retain the values. So suppose you have an entry that contains the following `keywords` fields:
 
@@ -864,7 +864,7 @@ With this option set, Ebib collapses the multiple occurrences into a single occu
         keywords = {hibernation}
     }
 
-If you load this entry into Ebib with the option "Allow Identical Fields" set, you will get the following:
+If you load this entry into Ebib with the option `ebib-allow-identical-fields` set, you will get the following:
 
     @book{Jones1998,
         author = {Jones, Joan},
@@ -883,7 +883,7 @@ BibTeX entries can contain links to external files, URLs and DOIs. Ebib offers s
 
 If you have electronic versions of the papers in your database stored on your computer, or any other file associated with your entries (e.g., notes, if you store those in separate files) you can use Ebib to call external viewers for these files or have them opened in Emacs. The interface for this is similar to that for calling a browser: if you press [`f`]{.key} in the index buffer, Ebib searches the `file` field for a filename and when it finds one, calls an appropriate viewer. If you have more than one file in the `file` field (separated by `ebib-filename-separator`), you are asked which one you want to open. Alternatively, you can use a prefix argument: [`M-2 f`]{.key} will open the second file in the file field.
 
-The file names in the `file` field do not have to have full paths. You can set the option "File Search Dirs" to a list of directories that Ebib should search when opening a file from the `file` field. Note that Ebib searches only the directories in this list, not their subdirectories. However, you can specify a relative path in the `file` field: if you put something like `a/Abney1987.pdf` in the `file` field, Ebib searches for the relevant file in a subdirectory `a/` of the directories listed in the option "File Search Dirs". As an extra service, Ebib also searches for the base filename, i.e., `Abney1987` in this particular case.
+The file names in the `file` field do not have to have full paths. You can set the option `ebib-file-search-dirs` to a list of directories that Ebib should search when opening a file from the `file` field. Note that Ebib searches only the directories in this list, not their subdirectories. However, you can specify a relative path in the `file` field: if you put something like `a/Abney1987.pdf` in the `file` field, Ebib searches for the relevant file in a subdirectory `a/` of the directories listed in the option `ebib-file-search-dirs`. As an extra service, Ebib also searches for the base filename, i.e., `Abney1987` in this particular case.
 
 Ebib can call different external programs depending on the file extension of the relevant file. The option `ebib-file-associations` allows you to specify which programs to call for which types of files. By default, `.pdf` and `.ps` files are handled, by `xpdf` and `gv`, respectively. You can specify further file types by their extensions (do not include the dot). The program is searched for in `exec-path`, but you can of course specify the full path to the program.
 
@@ -906,9 +906,9 @@ Both `ebib-download-url` and `ebib-import-file` add the imported file to the `fi
 
 ### Editing the `file` field ### {.unlisted .unnumbered}
 
-As mentioned above, editing the `file` field is a bit different from editing other fields. Instead of typing the full contents of the file field, you are asked to specify a single file name. When you hit [`RET`]{.key}, Ebib adds the filename to the `file` field, appending it to any existing contents (adding a separator if necessary), and then asks you for the next file. If you don't want to add another, just hit [`RET`]{.key}. The default separator is `"; "` (semicolon-space), but this can be customised (see the option "Filename Separator" for details). The advantage of this method is that you can use [`TAB`]{.key} completion to complete file names.
+As mentioned above, editing the `file` field is a bit different from editing other fields. Instead of typing the full contents of the file field, you are asked to specify a single file name. When you hit [`RET`]{.key}, Ebib adds the filename to the `file` field, appending it to any existing contents (adding a separator if necessary), and then asks you for the next file. If you don't want to add another, just hit [`RET`]{.key}. The default separator is `"; "` (semicolon-space), but this can be customised (see the option `ebib-filename-separator` for details). The advantage of this method is that you can use [`TAB`]{.key} completion to complete file names.
 
-The first directory in the option "File Search Dirs" is used as the starting directory for filename completion when editing the `file` field. Note that when completing file names, Ebib does not take the directories in "File Search Dirs" into account: completion is done using the standard Emacs file name completion mechanism. However, when you enter a file name, Ebib checks if it is in a (subdirectory of) one of the directories in "File Search Dirs", and if so, cuts off the relevant part of the file name to turn it into a relative path. (You can disable this behaviour with the option `ebib-truncate-file-names`: if unset, file names are always stored as absolute paths.)
+The first directory in the option `ebib-file-search-dirs` is used as the starting directory for filename completion when editing the `file` field. Note that when completing file names, Ebib does not take the directories in `ebib-file-search-dirs` into account: completion is done using the standard Emacs file name completion mechanism. However, when you enter a file name, Ebib checks if it is in a (subdirectory of) one of the directories in `ebib-file-search-dirs`, and if so, cuts off the relevant part of the file name to turn it into a relative path. (You can disable this behaviour with the option `ebib-truncate-file-names`: if unset, file names are always stored as absolute paths.)
 
 
 ## Calling a Browser for URLs and DOIs ##
@@ -921,13 +921,14 @@ It is not even necessary that the relevant field contains *only* URLs. It may co
 
 Note that the semicolon is included here even though it is actually a valid character in URLs. This is done for consistency with the `file` field, because the semicolon (actually, semicolon+space) is the standard separator for files in the `file` field. This way, you can use the same separator to distinguish multiple URLs in the `url` field.
 
-Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. Alternatively, you can customise the regular expression that controls this behaviour. See the option "ebib-url-regexp" for details.
+
+Ebib also regards everything that is enclosed in a LaTeX `\url{...}` command as a URL. So if you use `; ` to separate URLs and then happen to run into a URL that contains a semicolon, you can enclose it in `\url{...}` and it will be recognised properly. Alternatively, you can customise the regular expression that controls this behaviour. See the option `ebib-url-regexp` for details.
 
 By default, Ebib assumes URLs are stored in the `url` field. If you have other fields that may contain URLs, you can add them to the user option `ebib-url-fields`: URLs in those fields will then be made clickable and they will be presented as options when you type [`u`]{.key}.
 
 If the `doi` field contains a valid DOI, you can send it to a DOI resolver with the key [`I`]{.key}. Unlike URLs, there can only be one DOI in the `doi` field. The DOI is extracted from it and a resolver URL is prepended (`https://doi.org/` by default, customisable as `ebib-doi-resolver`) before being sent to the browser. Note that if the `doi` field already contains a DOI resolver URL, it is removed.
 
-Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option "Browser Command".
+Ebib uses the Emacs function `browse-url` to call the default browser on the system. If you prefer to use another browser, however, you can specify this with the option `ebib-browser-Command`.
 
 
 # Notes files #
@@ -1107,7 +1108,7 @@ Note that Ebib also provides an Ebib-friendly command to call `org-capture` dire
 
 Ebib offers the ability to manage a reading list as an Org file. In order to make use of this functionality, you must set the option `ebib-reading-list-file` to a file in which the reading list is stored. Once you've specified a file, you can add the current entry to the reading list with [`R a`]{.key}. The mode line of the entry buffer will show `[R]` to indicate that the current entry is on the reading list.
 
-A reading list is simply an Org file with one entry (i.e., heading) per item. Each entry is marked with `TODO`, so that the items can be included in the Org agenda. If you prefer to use another todo state, you can customise the option `ebib-reading-list-todo-marker`. You can mark an entry as done from within Ebib with the key [`R d`]{.key}. This will change the todo state of the item to `DONE` (customisable through the option `ebib-reading-list-done-marker`). With [`R v`]{.key} you can view the reading list.
+A reading list is simply an Org file with one entry (i.e., heading) per item. Each entry is marked with `TODO`, so that the items can be included in the Org agenda. (If you prefer to use another todo state, you can customise the option `ebib-reading-list-todo-marker`.) You can mark an entry as done from within Ebib with the key [`R d`]{.key}. This will change the todo state of the item to `DONE` (customisable through the option `ebib-reading-list-done-marker`). With [`R v`]{.key} you can view the reading list.
 
 The format of a reading list item can be customised in much the same way that notes are. The default template for reading list items is provided by the option `ebib-reading-list-template`, and the specifiers that can be used in this template are in `ebib-reading-list-template-specifiers`. Most of the specifiers are the same as for the notes template, with the exception of `%K`. For the reading list, this specifier uses a different function, which adds a prefix `reading_` to the key. In this way, the custom ID of a reading list item and a note will not interfere. Furthermore, the reading list template accepts a specifier `%M`, which is replaced with the todo marker specified in the option `ebib-reading-list-todo-marker` (by default `TODO`).
 
@@ -1131,22 +1132,22 @@ The keywords completion list is composed of the keywords in all the `.bib` files
 
 ## Using a Canonical Keywords List ## {.unlisted .unnumbered}
 
-By default, the completion list does not contain keywords that are not used in any of your `.bib` files. If you wish to use a set of canonical keywords that are always offered for completion, regardless of whether they are used in a currently opened `.bib` file or not, you can set the option "Keywords" (`ebib-keywords`). This can be a list of keywords or the name of a file containing the keywords. If it is a file name, the file should be a simple text file with one keyword per line.
+By default, the completion list does not contain keywords that are not used in any of your `.bib` files. If you wish to use a set of canonical keywords that are always offered for completion, regardless of whether they are used in a currently opened `.bib` file or not, you can set the option `ebib-keywords`. This can be a list of keywords or the name of a file containing the keywords. If it is a file name, the file should be a simple text file with one keyword per line.
 
 If you set this option, keywords in a database that are not in the canonical list are displayed in Ebib's warning face (`ebib-warning-face`). You can add them to the canonical list with the key sequence [`K s`]{.key}, which will ask you for the keyword to add, or with [`K c`]{.key}, which adds all keywords of the current entry to the canonical list. You can also remove all keywords from the `keywords` field that are not in the list of canonical keywords with the key sequence [`K p`]{.key}.
 
-Even if you use a list of canonical keywords, you can still enter keywords that are not in the list when you edit the `keywords` field. If you do so, the new keywords are added to the list automatically. If you do not wish this to happen, unset the option "Keywords Add New To Canonical".
+Even if you use a list of canonical keywords, you can still enter keywords that are not in the list when you edit the `keywords` field. If you do so, the new keywords are added to the list automatically. If you do not wish this to happen, unset the option `ebib-keywords-add-new-to-canonical`.
 
-If new keywords were added to the list of canonical keywords, you will be asked if you wish to save the list when you quit Ebib. If you always want this to happen without asking for confirmation, set the option "Keywords Save On Exit" to `always`. Note that you can also save the list manually with the key sequence [`K S`]{.key} (capital [`K`]{.key}, capital [`S`]{.key}).
+If new keywords were added to the list of canonical keywords, you will be asked if you wish to save the list when you quit Ebib. If you always want this to happen without asking for confirmation, set the option `ebib-keywords-save-on-exit` to `always`. Note that you can also save the list manually with the key sequence [`K S`]{.key} (capital [`K`]{.key}, capital [`S`]{.key}).
 
-If you haven't configured a list of canonical keywords, the key sequence [`K S`]{.key} creates one from the keywords used in your open `.bib` files. The list is then saved to your customisation file (usually `~/.emacs.d/init.el`). If you prefer to keep your keywords in a separate file, you need to create the file yourself (as mentioned, one keyword per line; keywords may of course contain spaces), and configure the option "Keywords" (`ebib-keywords`) yourself.
+If you haven't configured a list of canonical keywords, the key sequence [`K S`]{.key} creates one from the keywords used in your open `.bib` files. The list is then saved to your customisation file (usually `~/.emacs.d/init.el`). If you prefer to keep your keywords in a separate file, you need to create the file yourself (as mentioned, one keyword per line; keywords may of course contain spaces), and configure the option `ebib-keywords` yourself.
 
 
 # Window Management #
 
-By default, Ebib takes over the entire Emacs frame it is started in, displaying the index window at the top and the entry window below it. There are a few options to change this behaviour, however. They are all part of the customisation group `ebib-windows`, and allow you to specify two alternative ways to deal with Ebib windows. The main layout option is simply called "Layout" and has four options: use the full frame (the default), use the current window, use the right part of the frame, or display only the index window.
+By default, Ebib takes over the entire Emacs frame it is started in, displaying the index window at the top and the entry window below it. There are a few options to change this behaviour, however. They are all part of the customisation group `ebib-windows`, and allow you to specify two alternative ways to deal with Ebib windows. The main layout option is simply called `ebib-layout` and has four options: use the full frame (the default), use the current window, use the right part of the frame, or display only the index window.
 
-If you set the layout to use only the right part of the frame, the Ebib buffers are displayed on the right of the frame, with the (usually larger) left part of the frame displaying some other buffer, normally the buffer from which you called Ebib. The width of the Ebib windows can be set with the option "Width", which defaults to 80, and which can be specified as an absolute value (the number of columns), but also as a value relative to the current window. In that case, you must specify a value between 0 and 1. Note that when this option is used, the key [`z`]{.key} does not hide the Ebib buffers, it simply switches to a non-Ebib window in the same frame. You can use (uppercase) [`Z`]{.key} to hide the Ebib buffers. Furthermore, with this option, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it.
+If you set the layout to use only the right part of the frame, the Ebib buffers are displayed on the right of the frame, with the (usually larger) left part of the frame displaying some other buffer, normally the buffer from which you called Ebib. The width of the Ebib windows can be set with the option `ebib-width`, which defaults to 80, and which can be specified as an absolute value (the number of columns), but also as a value relative to the current window. In that case, you must specify a value between 0 and 1. Note that when this option is used, the key [`z`]{.key} does not hide the Ebib buffers, it simply switches to a non-Ebib window in the same frame. You can use (uppercase) [`Z`]{.key} to hide the Ebib buffers. Furthermore, with this option, the multiline edit buffer is not displayed in the same window as the entry buffer. Rather, Ebib uses another, non-Ebib window to display it.
 
 The fourth option that Ebib provides is to only show the index buffer on start-up. In this case, Ebib does not display the entry buffer when it is started. Instead, only the index buffer is displayed, which can be navigated in the usual manner. The entry buffer is only displayed when you add or edit an entry. When you've finished editing and move back to the index buffer, the entry buffer is hidden again.
 
@@ -1154,9 +1155,9 @@ The entry buffer is also displayed if you press [`RET`]{.key}. When you do this,
 
 In this case, too, the key [`z`]{.key} does not hide the index window. Rather, it just selects another, non-Ebib window. In order to hide the index window, you can use (uppercase) [`Z`]{.key}.
 
-If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option "Popup Entry Window". Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
+If you set Ebib's layout to display only the index buffer on startup, you can additionally set the option `ebib-popup-entry-window`. Normally, Ebib will reuse an existing window to display the entry buffer (and restore its original buffer when you leave the entry buffer). With this option set, however, Ebib uses the Emacs function `display-buffer-popup-window` to create a new window (which is destroyed again when you leave the entry buffer).
 
-Further relevant options are "Window Vertical Split", which displays the index buffer to the left of the frame rather than at the top, and "Index Window Size", which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
+Further relevant options are `ebib-window-vertical-split`, which displays the index buffer to the left of the frame rather than at the top, and `ebib-index-window-size`, which determines the size of the index window (either its height or its width, depending on whether the index window is displayed at the top or on the left of the frame.)
 
 
 # Copying Entries to the Kill Ring #
@@ -1198,19 +1199,19 @@ If you print your entries as a bibliography, Ebib creates a simple LaTeX documen
 
 If you choose to print as index cards, Ebib also creates a LaTeX file. However, instead of simply providing a `\nocite{*}` command, this file contains a `tabular` environment for each entry in the database listing all the fields of that entry and their values.
 
-The entries are separated by a `\bigskip`, but if you set the option `Print Newpage` in the customisation buffer (or in the Print menu), the entries are separated by a `\newpage`, so that every entry is on a separate page. The latter option is useful when printing actual index cards (though you'd probably have to change the page size with the `geometry` package as well).
+The entries are separated by a `\bigskip`, but if you set the option `ebib-print-newpage` in the customisation buffer (or in the Print menu), the entries are separated by a `\newpage`, so that every entry is on a separate page. The latter option is useful when printing actual index cards (though you'd probably have to change the page size with the `geometry` package as well).
 
-By default, the index cards only show single-line field values. That is, multiline values are normally excluded. If you want to include multiline values in the print-out, you have to set the option `Print Multiline` in the Options menu or in Ebib's customisation buffer. With this option set, Ebib includes all multiline values in the LaTeX file that it creates. Note however that Ebib does not change anything about the formatting of the text in a multiline value. So if you plan to make (heavy) use of this option, make sure that the way you type your text conforms to LaTeX's conventions (e.g. empty lines to mark paragraphs, etc.) and doesn't contain any characters such as [`&`]{.key} that are illegal in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
+By default, the index cards only show single-line field values. That is, multiline values are normally excluded. If you want to include multiline values in the print-out, you have to set the option `ebib-print-multiline` in the Options menu or in Ebib's customisation buffer. With this option set, Ebib includes all multiline values in the LaTeX file that it creates. Note however that Ebib does not change anything about the formatting of the text in a multiline value. So if you plan to make (heavy) use of this option, make sure that the way you type your text conforms to LaTeX's conventions (e.g. empty lines to mark paragraphs, etc.) and doesn't contain any characters such as [`&`]{.key} that are illegal in LaTeX. (Or, alternatively, use LaTeX code in your multiline fields.)
 
 As mentioned, when you "print" the database, Ebib really just creates a LaTeX file. More precisely, it creates a temporary buffer and writes the LaTeX code into it, and then saves the contents of that buffer to a file. After it has done that, Ebib lowers itself and instruct Emacs to open the file in a buffer, which will then be properly set up as a LaTeX buffer. From there you can run LaTeX and view the result.
 
 Before doing all this, Ebib asks you which file to write to. Be careful with this: since this is supposed to be a temporary file, Ebib simply assumes that if you provide a filename of an existing file, it can overwrite that file without warning!
 
-A better way to tell Ebib which file to use is to set the option "Print Tempfile" in Ebib's customisation buffer to some temporary file. When this option is set, Ebib will always use this file to write to, and will not ask you for a filename anymore.
+A better way to tell Ebib which file to use is to set the option `ebib-print-tempfile` in Ebib's customisation buffer to some temporary file. When this option is set, Ebib will always use this file to write to, and will not ask you for a filename anymore.
 
 Note that both print options operate on all entries of the database or on the selected entries.
 
-The option "Print Preamble" and "LaTeX Preamble" allow you to customise the preamble of the LaTeX file that is created.
+The option `ebib-print-preamble` and `ebib-latex-preamble` allow you to customise the preamble of the LaTeX file that is created.
 
 
 # Customisation #
