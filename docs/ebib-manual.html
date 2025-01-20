@@ -2391,24 +2391,30 @@ simply searches the URLs in the field and ignores the rest of the text.
 Ebib considers every string of characters that starts with
 <code>http://</code> or <code>https://</code> and that does not contain
 whitespace or any of the characters <code>" ' ; &lt;</code> or
-<code>&gt;</code> as a URL. The semicolon is included here even though
-it is actually a valid character in URLs. This is done for consistency,
-because the semicolon (actually, semicolon+space) is the standard
-separator for files in the <code>file</code> field and in this way, you
-can use the same separator to distinguish multiple URLs in the
-<code>url</code> field.</p>
+<code>&gt;</code> as a URL.</p>
+<p>Note that the semicolon is included here even though it is actually a
+valid character in URLs. This is done for consistency with the
+<code>file</code> field, because the semicolon (actually,
+semicolon+space) is the standard separator for files in the
+<code>file</code> field. This way, you can use the same separator to
+distinguish multiple URLs in the <code>url</code> field.</p>
 <p>By default Ebib also regards everything that is enclosed in a LaTeX
 <code>\url{...}</code> command as a URL. So if you use <code>;</code> to
 separate URLs and then happen to run into a URL that contains a
 semicolon, you can enclose it in <code>\url{...}</code> and it will be
-recognised properly. You can, of course, customise the regular
-expression that controls this behaviour. See the option “Url Regexp” for
-details.</p>
-<p>Similarly, with the key <span class="key"><code>I</code></span> in
-the index buffer you can send a DOI to a browser. The DOI must be stored
-in the <code>doi</code> field. Unlike URLs, there can only be one DOI in
-this field. The DOI is extracted from this field, and a resolver URL is
-prepended (<code>https://doi.org/</code> by default, customisable as
+recognised properly. Alternatively, you can customise the regular
+expression that controls this behaviour. See the option
+“ebib-url-regexp” for details.</p>
+<p>By default, Ebib assumes URLs are stored in the <code>url</code>
+field. If you have other fields that may contain URLs, you can add them
+to the user option <code>ebib-url-fields</code>: URLs in those fields
+will then be made clickable and they will be presented as options when
+you type <span class="key"><code>u</code></span>.</p>
+<p>If the <code>doi</code> field contains a valid DOI, you can send it
+to a DOI resolver with the key <span class="key"><code>I</code></span>.
+Unlike URLs, there can only be one DOI in the <code>doi</code> field.
+The DOI is extracted from it and a resolver URL is prepended
+(<code>https://doi.org/</code> by default, customisable as
 <code>ebib-doi-resolver</code>) before being sent to the browser. Note
 that if the <code>doi</code> field already contains a DOI resolver URL,
 it is removed.</p>

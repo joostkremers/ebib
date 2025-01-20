@@ -2354,26 +2354,32 @@ It may contain other text mixed with the URLs: Ebib simply searches the
 URLs in the field and ignores the rest of the text.  Ebib considers
 every string of characters that starts with ‘http://’ or ‘https://’ and
 that does not contain whitespace or any of the characters ‘" ' ; <’ or
-‘>’ as a URL. The semicolon is included here even though it is actually
-a valid character in URLs.  This is done for consistency, because the
-semicolon (actually, semicolon+space) is the standard separator for
-files in the ‘file’ field and in this way, you can use the same
+‘>’ as a URL.
+
+Note that the semicolon is included here even though it is actually a
+valid character in URLs.  This is done for consistency with the ‘file’
+field, because the semicolon (actually, semicolon+space) is the standard
+separator for files in the ‘file’ field.  This way, you can use the same
 separator to distinguish multiple URLs in the ‘url’ field.
 
 By default Ebib also regards everything that is enclosed in a LaTeX
 ‘\url{...}’ command as a URL. So if you use ‘;’ to separate URLs and
 then happen to run into a URL that contains a semicolon, you can enclose
-it in ‘\url{...}’ and it will be recognised properly.  You can, of
-course, customise the regular expression that controls this behaviour.
-See the option "Url Regexp" for details.
+it in ‘\url{...}’ and it will be recognised properly.  Alternatively,
+you can customise the regular expression that controls this behaviour.
+See the option "ebib-url-regexp" for details.
 
-Similarly, with the key ‘I’ in the index buffer you can send a DOI to a
-browser.  The DOI must be stored in the ‘doi’ field.  Unlike URLs, there
-can only be one DOI in this field.  The DOI is extracted from this
-field, and a resolver URL is prepended (‘https://doi.org/’ by default,
-customisable as ‘ebib-doi-resolver’) before being sent to the browser.
-Note that if the ‘doi’ field already contains a DOI resolver URL, it is
-removed.
+By default, Ebib assumes URLs are stored in the ‘url’ field.  If you
+have other fields that may contain URLs, you can add them to the user
+option ‘ebib-url-fields’: URLs in those fields will then be made
+clickable and they will be presented as options when you type ‘u’.
+
+If the ‘doi’ field contains a valid DOI, you can send it to a DOI
+resolver with the key ‘I’.  Unlike URLs, there can only be one DOI in
+the ‘doi’ field.  The DOI is extracted from it and a resolver URL is
+prepended (‘https://doi.org/’ by default, customisable as
+‘ebib-doi-resolver’) before being sent to the browser.  Note that if the
+‘doi’ field already contains a DOI resolver URL, it is removed.
 
 Ebib uses the Emacs function ‘browse-url’ to call the default browser on
 the system.  If you prefer to use another browser, however, you can
@@ -3345,38 +3351,38 @@ Node: Editing the file field111615
 Ref: #editing-the-file-field111766
 Node: Calling a Browser for URLs and DOIs113119
 Ref: #calling-a-browser-for-urls-and-dois113335
-Node: Notes files115750
-Ref: #notes-files115900
-Node: Configuring files for storing notes117475
-Ref: #configuring-files-for-storing-notes117653
-Node: Hooks120623
-Ref: #hooks120786
-Node: Upgrading from earlier Ebib versions122183
-Ref: #upgrading-from-earlier-ebib-versions122406
-Node: Customising the notes file format123316
-Ref: #customising-the-notes-file-format123544
-Node: Displaying notes127323
-Ref: #displaying-notes127505
-Node: Using Markdown for notes128850
-Ref: #using-markdown-for-notes129048
-Node: Using org-capture to record notes132706
-Ref: #using-org-capture-to-record-notes132905
-Node: Managing a reading list138901
-Ref: #managing-a-reading-list139063
-Node: Managing Keywords142078
-Ref: #managing-keywords142234
-Node: Using a Canonical Keywords List143841
-Ref: #using-a-canonical-keywords-list143999
-Node: Window Management146137
-Ref: #window-management146302
-Node: Copying Entries to the Kill Ring149437
-Ref: #copying-entries-to-the-kill-ring149636
-Node: Printing the Database152359
-Ref: #printing-the-database152532
-Node: Customisation155975
-Ref: #customisation156091
-Node: Modifying Key Bindings157582
-Ref: #modifying-key-bindings157709
+Node: Notes files116043
+Ref: #notes-files116193
+Node: Configuring files for storing notes117768
+Ref: #configuring-files-for-storing-notes117946
+Node: Hooks120916
+Ref: #hooks121079
+Node: Upgrading from earlier Ebib versions122476
+Ref: #upgrading-from-earlier-ebib-versions122699
+Node: Customising the notes file format123609
+Ref: #customising-the-notes-file-format123837
+Node: Displaying notes127616
+Ref: #displaying-notes127798
+Node: Using Markdown for notes129143
+Ref: #using-markdown-for-notes129341
+Node: Using org-capture to record notes132999
+Ref: #using-org-capture-to-record-notes133198
+Node: Managing a reading list139194
+Ref: #managing-a-reading-list139356
+Node: Managing Keywords142371
+Ref: #managing-keywords142527
+Node: Using a Canonical Keywords List144134
+Ref: #using-a-canonical-keywords-list144292
+Node: Window Management146430
+Ref: #window-management146595
+Node: Copying Entries to the Kill Ring149730
+Ref: #copying-entries-to-the-kill-ring149929
+Node: Printing the Database152652
+Ref: #printing-the-database152825
+Node: Customisation156268
+Ref: #customisation156384
+Node: Modifying Key Bindings157875
+Ref: #modifying-key-bindings158002
 
 End Tag Table
 

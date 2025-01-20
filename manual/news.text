@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.49, January 2025 ##
+
+- Add new user option `ebib-url-fields` to customise the fields that (may) contain URLs, so that they can be made clickable and can be selected with `ebib-browse-url`.
+
 ## Version 2.48, December 2024 ##
 
 - Add option to hide all fields that have no value.

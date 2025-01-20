@@ -7,7 +7,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.48
+;; Version: 2.49
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "6.0") (emacs "27.1") (compat "29.1.4.3"))
@@ -3088,19 +3088,25 @@ new database."
        (ebib--update-buffers 'no-refresh)))))
 
 (defun ebib-browse-url (&optional arg)
-  "Browse the URL in the \"url\" field.
-If the \"url\" field contains more than one URL, ask the user
-which one to open.  Alternatively, the user can provide a numeric
-prefix argument ARG."
+  "Open a URL.
+Check all fields in `ebib-url-fields' for URLs and ask the user
+which one to open.  If only one URL is found, it is opened
+without asking.
+
+The user can also provide a numeric prefix argument ARG to select
+the URL to open."
   (interactive "P")
   (ebib--execute-when
     (entries
-     (let ((urls (ebib-get-field-value "url" (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref)))
+     (let ((urls (mapconcat (lambda (url)
+                              (ebib-get-field-value url (ebib--get-key-at-point) ebib--cur-db 'noerror 'unbraced 'xref))
+                            ebib-url-fields
+                            " ")))
        (if urls
            (ebib--call-browser (ebib--select-url urls (if (numberp arg) arg nil)))
          (error "[Ebib] No URL found in url field"))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-browse-doi ()
   "Open the DOI in the \"doi\" field in a browser.
