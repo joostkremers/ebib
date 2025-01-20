@@ -1514,48 +1514,62 @@ consist of a valid BibTeX identifier, an error is logged and t is
 returned."
   (condition-case err
       (parsebib-find-next-item)
-    (parsebib-error (ebib--log 'error "Error: illegal entry type at line %d. Skipping" (line-number-at-pos (cadr err)))
-                    t))) ; Return t so that searching continues in ebib--bib-find-bibtex-entries.
+    (parsebib-error
+     (ebib--log 'error (concat (apply #'format (cddr err))
+                               (format " at line %d" (line-number-at-pos (cadr err)))))
+     t))) ; Return t so that searching continues in ebib--bib-find-bibtex-entries.
 
 (defun ebib--bib-read-comment (db)
   "Read an @Comment entry and store it in DB.
 If the @Comment is a local variable list, store it as such in DB.
 If the @Comment defines a main database, do not store the
 comment."
-  (let ((comment (parsebib-read-comment)))
-    (when comment
-      (or
-       ;; Local variables.
-       (let ((lvars (ebib--local-vars-to-list comment)))
-         (if lvars
-             (ebib-db-set-local-vars lvars db)))
-       ;; Main file: do nothing (the main file was dealt with in `ebib--bib-read-entries'.
-       (string-match-p "^[[:space:]]*ebib-\\(?:main\\|master\\)-file: \\(.*\\)$" comment)
-       ;; Otherwise, store the comment.
-       (ebib-db-set-comment comment db)))))
+  (condition-case err
+      (let ((comment (parsebib-read-comment)))
+        (when comment
+          (or
+           ;; Local variables.
+           (let ((lvars (ebib--local-vars-to-list comment)))
+             (if lvars
+                 (ebib-db-set-local-vars lvars db)))
+           ;; Main file: do nothing (the main file was dealt with in `ebib--bib-read-entries'.
+           (string-match-p "^[[:space:]]*ebib-\\(?:main\\|master\\)-file: \\(.*\\)$" comment)
+           ;; Otherwise, store the comment.
+           (ebib-db-set-comment comment db))))
+    (parsebib-error
+     (ebib--log 'error (concat (apply #'format (cddr err))
+                               (format " at line %d" (line-number-at-pos (cadr err))))))))
 
 (defun ebib--bib-read-string (db)
   "Read an @String definition and store it in DB.
 Return value is the string if one was read, nil otherwise."
   (unless (ebib-db-dependent-p db) ; @Strings are not stored in dependent files.
-    (let* ((def (parsebib-read-string))
-           (abbr (car def))
-           (string (cdr def)))
-      (if def
-          (if (ebib-set-string abbr string db nil 'as-is)
-              string
-            (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
-                                        (line-number-at-pos) abbr)))
-        (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))))
+    (condition-case err
+        (let* ((def (parsebib-read-string))
+               (abbr (car def))
+               (string (cdr def)))
+          (if def
+              (if (ebib-set-string abbr string db nil 'as-is)
+                  string
+                (ebib--log 'warning (format "Line %d: @String definition `%s' duplicated. Skipping."
+                                            (line-number-at-pos) abbr)))
+            (ebib--log 'error "Error: illegal string identifier at line %d. Skipping" (line-number-at-pos))))
+      (parsebib-error
+       (ebib--log 'error (concat (apply #'format (cddr err))
+                                 (format " at line %d" (line-number-at-pos (cadr err)))))))))
 
 (defun ebib--bib-read-preamble (db)
   "Read a @Preamble definition and store it in DB.
 If there was already another @Preamble definition, the new one is
 added to the existing one with a hash sign `#' between them."
   (unless (ebib-db-dependent-p db) ; @Preamble is not stored in dependent files.
-    (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
-      (if preamble
-          (ebib-db-set-preamble preamble db 'append)))))
+    (condition-case err
+        (let ((preamble (substring (parsebib-read-preamble) 1 -1))) ; We need to remove the braces around the text.
+          (if preamble
+              (ebib-db-set-preamble preamble db 'append)))
+      (parsebib-error
+       (ebib--log 'error (concat (apply #'format (cddr err))
+                                 (format " at line %d" (line-number-at-pos (cadr err)))))))))
 
 (defun ebib--bib-read-entry (db &optional timestamp)
   "Read a BibTeX entry and store it in DB.
@@ -1563,26 +1577,28 @@ Return the entry key if an entry was found and could be stored,
 nil otherwise.  Optional argument TIMESTAMP indicates whether a
 timestamp is to be added.  (Whether a timestamp is actually added
 also depends on `ebib-use-timestamp'.)"
-  (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
-         (entry (parsebib-read-entry)))
-    (if entry
-        (let ((entry-key (cdr (assoc-string "=key=" entry))))
-          (if (ebib-db-dependent-p db)
-              (if (ebib-db-has-key entry-key (ebib-db-get-main db))
-                  (ebib-db-add-entries-to-dependent entry-key db)
-                (ebib--log 'error "Entry key `%s' not found in main database" entry-key))
-            (when (string= entry-key "")
-              (setq entry-key (ebib--generate-tempkey db))
-              (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
-            (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
-            (when (and entry-key (not ebib-keywords))
-              (if-let* ((keywords (ebib-unbrace (cdr (assoc-string "keywords" entry 'case-fold)))))
-                  (mapc #'ebib--keywords-add-to-completion-list (ebib--keywords-to-list keywords))))
-            (unless entry-key
-              (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
-            entry-key)) ; Return the entry key, or nil if no entry could be stored.
-      (ebib--log 'warning "Line %d: Could not read a valid entry." (line-number-at-pos beg))
-      nil))) ; Make sure to return nil upon failure.
+  (condition-case err
+      (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
+             (entry (parsebib-read-entry))
+             (entry-key (cdr (assoc-string "=key=" entry))))
+        (if (ebib-db-dependent-p db)
+            (if (ebib-db-has-key entry-key (ebib-db-get-main db))
+                (ebib-db-add-entries-to-dependent entry-key db)
+              (ebib--log 'error "Entry key `%s' not found in main database" entry-key))
+          (when (string= entry-key "")
+            (setq entry-key (ebib--generate-tempkey db))
+            (ebib--log 'warning "Line %d: Temporary key generated for entry." (line-number-at-pos beg)))
+          (setq entry-key (ebib--store-entry entry-key entry db timestamp (if ebib-uniquify-keys 'uniquify 'noerror)))
+          (when (and entry-key (not ebib-keywords))
+            (if-let* ((keywords (ebib-unbrace (cdr (assoc-string "keywords" entry 'case-fold)))))
+                (mapc #'ebib--keywords-add-to-completion-list (ebib--keywords-to-list keywords))))
+          (unless entry-key
+            (ebib--log 'warning "Line %d: Entry `%s' duplicated. Skipping." (line-number-at-pos beg) entry-key))
+          entry-key))  ; Return the entry key, or nil if no entry could be stored.
+    (parsebib-error
+     (ebib--log 'error (concat (apply #'format (cddr err))
+                               (format " at line %d" (line-number-at-pos (cadr err)))))
+     nil))) ; Make sure to return nil upon failure.
 
 (defun ebib-leave-ebib-windows ()
   "Leave the Ebib windows, lowering them if necessary."
