@@ -2256,6 +2256,15 @@ indicating the type of clean-up to be done.  See the variable
       (setq value noerror))
     value))
 
+(defun ebib-has-field-value (fields key db)
+  "Return non-nil if any of the fields in FIELDS in entry KEY has a value.
+DB is the database containing KEY.  FIELDS should be a list of
+field names."
+  (and db
+       (seq-find (lambda (field)
+                   (ebib-get-field-value field key db 'noerror))
+                 fields)))
+
 ;; Functions for writing out Bib(La)TeX entries.
 (defun ebib--format-entry (key db &optional timestamp sort)
   "Write entry KEY in DB into the current buffer in BibTeX format.
