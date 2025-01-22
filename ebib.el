@@ -1222,7 +1222,7 @@ there for details."
      "--"
      ["Open Note" ebib-popup-note (ebib--get-key-at-point)]
      ["Show Annotation" ebib-show-annotation (ebib--get-key-at-point)]
-     ["Follow Crossref" ebib-follow-crossref (ebib-db-get-field-value "crossref" (ebib--get-key-at-point) ebib--cur-db 'noerror)])
+     ["Follow Crossref" ebib-follow-crossref (ebib-has-field-value (list "crossref") (ebib--get-key-at-point) ebib--cur-db)])
 
     ["Edit Strings" ebib-edit-strings (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
     ["Edit Preamble" ebib-edit-preamble (and ebib--cur-db (not (ebib-db-get-filter ebib--cur-db)))]
@@ -1247,14 +1247,14 @@ there for details."
     "--"
 
     ("Attachments"
-     ["View File" ebib-view-file (and ebib--cur-db (ebib-get-field-value "file" (ebib--get-key-at-point) ebib--cur-db 'noerror))]
+     ["View File" ebib-view-file (ebib-has-field-value (list "file") (ebib--get-key-at-point) ebib--cur-db)]
      ["Import Local File" ebib-import-file (ebib--get-key-at-point)]
      ["Import File From URL" ebib-download-url (ebib--get-key-at-point)]
      ["Create Entries For Local Files" ebib-add-file-entry ebib--cur-db])
     ("Links"
-     ["Open URL" ebib-browse-url (and ebib--cur-db (ebib-get-field-value "url" (ebib--get-key-at-point) ebib--cur-db 'noerror))]
-     ["Open DOI" ebib-browse-doi (and ebib--cur-db (ebib-get-field-value "doi" (ebib--get-key-at-point) ebib--cur-db 'noerror))])
-    "--"
+     ["Open URL" ebib-browse-url (ebib-has-field-value ebib-url-fields (ebib--get-key-at-point) ebib--cur-db)]
+     ["Open DOI" ebib-browse-doi (ebib-has-field-value (list "doi") (ebib--get-key-at-point) ebib--cur-db)]
+     "--")
 
     ("Filters"
      ["Create Filter" ebib-filters-logical-and (ebib--get-key-at-point)]
