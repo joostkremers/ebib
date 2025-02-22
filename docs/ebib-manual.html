@@ -23,8 +23,9 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +36,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -288,14 +289,14 @@ publication, and the title.</p>
 accessed. Most functions are also bound to keys, but especially some of
 the lesser used ones can (by default) only be accessed through the
 menu.</p>
-<p>To quit Ebib and unload all <code>.bib</code> files, type <span
-class="key"><code>q</code></span>. Alternatively, type <span
+<p>To quit Ebib and unload all <code>.bib</code> files, press <span
+class="key"><code>q</code></span>. Alternatively, press <span
 class="key"><code>z</code></span> to put Ebib in the background but keep
 it active. This way, the <code>.bib</code> files that you have opened
 remain loaded, and you can return to them by typing <span
 class="key"><code>M-x ebib</code></span> again.</p>
 <h2 id="opening-a-.bib-file">Opening a <code>.bib</code> File</h2>
-<p>To open a <code>.bib</code> file, type <span
+<p>To open a <code>.bib</code> file, press <span
 class="key"><code>o</code></span>. Ebib reads the file that you specify
 and reports how many entries it found, how many <code>@String</code>
 definitions it found, and whether a <code>@Preamble</code> was found. If
@@ -339,12 +340,12 @@ file or files associated with a specific project.</p>
 <h2 id="starting-a-new-.bib-file">Starting a New <code>.bib</code>
 File</h2>
 <p>To start a new <code>.bib</code> file from scratch, you first need to
-give the database a name. So, to start a new database, type <span
+give the database a name. So, to start a new database, press <span
 class="key"><code>o</code></span> first, and give the new file a name.
 Once you have done this, you can start adding entries to the
 database.</p>
 <h2 id="closing-a-database">Closing a database</h2>
-<p>If you are done with a database, type <span
+<p>If you are done with a database, press <span
 class="key"><code>c</code></span> to close it. This unloads the current
 database (you are asked for confirmation if you have unsaved changes),
 but it does not leave Ebib, and the other databases you have open will
@@ -530,13 +531,13 @@ separate files.)</p>
 <p>You can define new column labels and redefine the existing ones by
 customising the option <code>ebib-field-transformation-functions</code>.
 Note that <code>"Title"</code>, <code>"Doi"</code>, <code>"Url"</code>,
-and <code>"Note"</code> are actually defined through this option.
-<code>"Entry Key"</code>, <code>"Author/Editor"</code>, and
-<code>"Year"</code> are not (they are hard-coded), but they can be
-overridden by adding an entry for them in
-<code>ebib-field-transformation-functions</code>. For example, if you do
-not wish for TeX markup to be hidden in titles, remove the
-<code>"Title"</code> entry in this option.</p>
+and <code>"Note"</code> are actually defined through this option. For
+example, if you do not wish for TeX markup to be hidden in titles,
+remove the <code>"Title"</code> entry in this option. The
+columns<code>"Entry Key"</code>, <code>"Author/Editor"</code>, and
+<code>"Year"</code> are not defined in
+<code>ebib-field-transformation-functions</code> (they are hard-coded),
+but they <em>can</em> be overridden by adding an entry for them.</p>
 <p>The first column defined in <code>ebib-index-colums</code> is the
 column on which the entries are sorted by default, i.e., when the
 database is first opened and when you press <span
@@ -708,7 +709,7 @@ into line with <code>biblatex</code>’s conventions.</p>
 <code>.bib</code> files, you can also edit them. This section describes
 the most important editing facilities.</p>
 <h2 id="adding-and-deleting-entries">Adding and Deleting Entries</h2>
-<p>To add an entry to a database, type <span
+<p>To add an entry to a database, press <span
 class="key"><code>a</code></span>. This creates a new entry with a
 temporary key and puts you in the entry buffer, where you can edit the
 fields of the entry. When you finish editing the entry fields, the
@@ -893,14 +894,14 @@ explains that if you have defined:</p>
 <pre><code>title = 1966 # WGA</code></pre>
 <p>which will produce “1966 World Gnus Almanac”. Or you can do:</p>
 <pre><code>month = &quot;1~&quot; # jan</code></pre>
-<p>which will produce someting like “1 January” (assuming your
-bibliography style has defined the abbreviation <code>jan</code>). All
-this is possible with Ebib, simply by entering the exact text including
-quotes or braces around the strings, and marking the relevant field as
-special.</p>
+<p>which will produce something like “1 January” (assuming your
+bibliography style has defined the abbreviation <code>jan</code>; note
+that <code>~</code> yields a non-breaking space). All this is possible
+with Ebib, simply by entering the exact text including quotes or braces
+around the strings, and marking the relevant field as special.</p>
 <p>An easy way to enter a <code>@String</code> abbreviation as a field
 value is to use the key <span class="key"><code>s</code></span> instead
-of <span class="key"><code>e</code></span>. If you type <span
+of <span class="key"><code>e</code></span>. If you press <span
 class="key"><code>s</code></span>, Ebib asks you for a
 <code>@String</code> abbreviation to put in the current field, and
 automatically marks the field as special. This method uses
@@ -916,9 +917,9 @@ if you could only write one line of text in them. Therefore, when you
 edit one of these fields, Ebib puts you in a so-called <em>multiline
 edit buffer</em>. This is essentially a text mode buffer that allows you
 to enter text freely.</p>
-<p>To store the text and leave the multiline edit buffer, type <span
+<p>To store the text and leave the multiline edit buffer, press <span
 class="key"><code>C-c C-c</code></span>. If you want to leave the
-multiline edit buffer and discard your changes, type <span
+multiline edit buffer and discard your changes, press <span
 class="key"><code>C-c C-k</code></span>. This command cancels the edit
 and leaves the multiline edit buffer. The text that is stored in the
 field you were editing is not altered.</p>
@@ -952,9 +953,9 @@ class="key"><code>c</code></span> copies the contents of the current
 field to the kill ring, <span class="key"><code>k</code></span> kills
 the contents of the current field to the kill ring, and <span
 class="key"><code>y</code></span> yanks (pastes) the most recently
-killed text in the kill ring. You can type <span
+killed text in the kill ring. You can press <span
 class="key"><code>y</code></span> repeatedly to get the same effect you
-get in Emacs when you type <span class="key"><code>M-y</code></span>
+get in Emacs when you press <span class="key"><code>M-y</code></span>
 after an initial <span class="key"><code>C-y</code></span>.</p>
 <p>The contents of a field can also be deleted with the command <span
 class="key"><code>d</code></span>. This command does not store the text
@@ -1101,7 +1102,7 @@ file.</p>
 <h2 id="cross-referencing">Cross-referencing</h2>
 <p>Both <code>Biblatex</code> and BibTeX allow entries to refer to other
 entries through the <code>crossref</code> field. If an entry has a
-<code>crossref</code> field, Ebib displays the field values that nte
+<code>crossref</code> field, Ebib displays the field values that the
 entry inherits from its parent entry. To indicate that they are just
 inherited values, they are marked with <code>ebib-crossref-face</code>,
 which by default inherits from <code>font-lock-comment-face</code>.
@@ -1120,22 +1121,22 @@ child entry that does not have a value simply inherits the value of the
 same-name field in the parent entry. Customisation is not possible here,
 neither in BibTeX nor in Ebib.</p>
 <p>If you are viewing an entry that has a <code>crossref</code> field
-and you want to go to the parent entry you can type <span
+and you want to go to the parent entry you can press <span
 class="key"><code>C</code></span>. This command reads the value of the
 <code>crossref</code> field and then jumps to the entry it contains. If
 you want to do the reverse, i.e., see if the current entry is the parent
 of any other entries, you can use the same key <span
-class="key"><code>C</code></span>: if you type <span
+class="key"><code>C</code></span>: if you press <span
 class="key"><code>C</code></span> on an entry that does not have a
 <code>crossref</code> field, Ebib starts searching the database for the
 current entry key.</p>
 <p>Note that after Ebib has jumped to the first child entry, you cannot
-type <span class="key"><code>C</code></span> again to find the next one.
-Since you are now on a child entry, this key would take you back to the
-parent entry. In order to find the next child entry, you have to type
-<span class="key"><code>RET</code></span>, as with a normal search.
-(Also, if the cross-referenced entry appears alphabetically before the
-cross-referencing entry, you need to type <span
+press <span class="key"><code>C</code></span> again to find the next
+one. Since you are now on a child entry, this key would take you back to
+the parent entry. In order to find the next child entry, you have to
+press <span class="key"><code>RET</code></span>, as with a normal
+search. (Also, if the cross-referenced entry appears alphabetically
+before the cross-referencing entry, you need to press <span
 class="key"><code>g</code></span> and then <span
 class="key"><code>/</code></span>.)</p>
 <p>Note that if you want to use <code>biblatex</code>’s or BibTeX’s
@@ -1148,7 +1149,7 @@ this, cross-referencing will not work reliably.</p>
 <p>By default, the entries in the database are saved to the
 <code>.bib</code> file in alphabetical order according to entry key.
 (Entries with a <code>crossref</code> field are saved first, but also
-sorted alphabetically) For most purposes, this is sufficient, but in
+sorted alphabetically). For most purposes, this is sufficient, but in
 some cases (e.g., in ConTeXt), it is necessary to have more control over
 the order of entries in the <code>.bib</code> file.</p>
 <p>Ebib allows you to specify the sort order in the <code>.bib</code>
@@ -1165,7 +1166,7 @@ yields a value. So if the first sort level is
 editor field yields a value for a particular entry, that entry is sorted
 on the BibTeX key.</p>
 <p>If two or more entries yield the same value for the first sort level,
-meaning that they cannot be sorted on that level, are sorted on the
+meaning that they cannot be sorted on that level, they are sorted on the
 second sort level. If, for example, the second sort level is
 <code>(year)</code>, entries from the same author are sorted on the year
 of publication.</p>
@@ -1353,11 +1354,12 @@ permanent keys automatically when you edit the entries.</p>
 (so-called <em>multiline fields</em>) and the <code>@Preamble</code> are
 edited in a so-called <em>multiline edit buffer</em>. This section
 discusses the details of this buffer.</p>
-<p>Ebib enters a multiline edit buffer in one of three cases: when you
-edit the <code>@Preamble</code> definition, when you hit <span
-class="key"><code>m</code></span> in the entry buffer to edit a field as
-multiline, or when you hit <span class="key"><code>e</code></span> on
-the <code>annote</code>/<code>annotation</code> or <code>abstract</code>
+<p>Ebib enters a multiline edit buffer in one of the following cases:
+when you edit the <code>@Preamble</code> definition, when you press
+<span class="key"><code>m</code></span> in the entry buffer to edit a
+field as multiline, or when you press <span
+class="key"><code>e</code></span> on the
+<code>annote</code>/<code>annotation</code> or <code>abstract</code>
 fields, or on a field whose value already is multiline.</p>
 <p>The major mode that is used in multiline edit buffers is
 user-configurable. The default value is <code>text-mode</code>, but if
@@ -1422,12 +1424,12 @@ class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb9-1"><a 
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c s&quot;</span> <span class="kw">nil</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> <span class="dt">&#39;ebib-save-from-multiline-buffer</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> <span class="dt">&#39;ebib-save-from-multiline-buffer</span>)</span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c k&quot;</span> <span class="kw">nil</span>)</span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> <span class="dt">&#39;ebib-cancel-multiline-buffer</span>)</span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> <span class="dt">&#39;ebib-cancel-multiline-buffer</span>))</span></code></pre></div>
 <p>This removes the key bindings for <span
 class="key"><code>C-c c</code></span>, <span
 class="key"><code>C-c s</code></span> and <span
@@ -1447,7 +1449,7 @@ database contains a subset of the entries of its main database and all
 the data of the entries is shared by both databases. If you edit an
 entry in the dependent database, the edit shows up in the main one as
 well, and vice versa.</p>
-<p>To create a dependent database, type <span
+<p>To create a dependent database, press <span
 class="key"><code>M c</code></span> in the database that is going to be
 the main database. Ebib asks you for a file name and then creates a new
 empty database. You can associate this database with a text buffer in
@@ -1474,7 +1476,7 @@ from the main database that is also present in a dependent database, it
 is removed from both, given that a dependent database can only have
 entries that also exist in the main database.</p>
 <p>A database can serve as the main database for more than one dependent
-databases, but the reverse is not possible: each dependent database can
+database, but the reverse is not possible: each dependent database can
 only have one main database.</p>
 <p>If you save a dependent database, it is saved as a normal, standalone
 <code>.bib</code> file that can be used with <code>biblatex</code> or
@@ -1571,7 +1573,7 @@ class="key"><code>C-c b</code></span> to
 <pre><code>(define-key &#39;LaTeX-mode-map &quot;\C-cb&quot; &#39;ebib-insert-citation)</code></pre>
 <p>Note that commands of the form <span
 class="key"><code>C-c &lt;letter&gt;</code></span> are reserved for the
-user, and should therefore not be set by any package. For this reasons,
+user, and should therefore not be set by any package. For this reason,
 Ebib does not set this command itself.</p>
 <p><code>ebib-insert-citation</code> recognises the major mode of the
 buffer it is called from and uses this information to determine which
@@ -1795,13 +1797,13 @@ a field with a multiline value, Ebib will highlight the ellipsis symbol
 <code>[...]</code> that is displayed after the last line of the field
 value.</p>
 <p>A search term may of course appear more than once in the database. To
-search for the next occurrence, type <span
+search for the next occurrence, press <span
 class="key"><code>RET</code></span>. This continues searching for the
 search term in the rest of the database. Again, the first entry found to
 contain the search string is displayed. Note that the search does not
 wrap: if the end of the database is reached, Ebib stops searching and
 informs you that no further occurrence of the search string was found.
-If you want to continue searching from the top, type <span
+If you want to continue searching from the top, press <span
 class="key"><code>g</code></span> and then continue the search with
 <span class="key"><code>RET</code></span>.</p>
 <p>Note that once you’ve started a search with <span
@@ -1943,9 +1945,9 @@ operations, they are <em>not</em> equivalent: <span
 class="key"><code>~</code></span> negates the entire filter built up so
 far, while the negative prefix argument only negates the single
 selection criterion you enter with it.</p>
-<p>When a filter is active, the filter itself is displayed at the top of
-the index buffer. If the index window is too small to display the entire
-filter (which can easily happen if Ebib is set to split the frame
+<p>When a filter is active, the filter itself is displayed in the index
+buffer’s mode line. If the index window is too small to display the
+entire filter (which can easily happen if Ebib is set to split the frame
 vertically rather than horizontally), you can press <span
 class="key"><code>F v</code></span> (uppercase <span
 class="key"><code>F</code></span>, small <span
@@ -1973,7 +1975,7 @@ entries by default, customise the user option
 <h2 class="unlisted unnumbered" id="storing-and-saving-filters">Storing
 and Saving Filters</h2>
 <p>When you cancel a filter, it is automatically stored so that it can
-be reapplied later. To reapply a filter, type <span
+be reapplied later. To reapply a filter, press <span
 class="key"><code>F L</code></span>. This will reapply the last used
 filter regardless of which database you’re in. That is, you can use this
 to search more than one database without having to type the filter over
@@ -1993,7 +1995,7 @@ available to all databases.</p>
 class="key"><code>F a</code></span>. This will ask for the name of a
 filter and apply it to the current database. You can extend the filter
 in the normal way, though the changes will not be stored automatically.
-To store it, type <span class="key"><code>F s</code></span> again. You
+To store it, press <span class="key"><code>F s</code></span> again. You
 can store the extended filter under the old name, in which case Ebib
 will ask you for confirmation, or under a new name, which will store it
 as a new filter, keeping the old one.</p>
@@ -2387,7 +2389,7 @@ and DOIs</h2>
 is common to store URLs and DOIs in a BibTeX database.
 <code>Biblatex</code> has standardised fields for this information, for
 BibTeX, Ebib adds these fields to each entry.</p>
-<p>To open a URL in your default browser, you can type <span
+<p>To open a URL in your default browser, you can press <span
 class="key"><code>u</code></span> in the index or entry buffer. Ebib
 takes the URL stored in the <code>url</code> field of the current entry
 and passes it to your browser. If you happen to have more than one URL
@@ -2419,7 +2421,7 @@ expression that controls this behaviour. See the option
 field. If you have other fields that may contain URLs, you can add them
 to the user option <code>ebib-url-fields</code>: URLs in those fields
 will then be made clickable and they will be presented as options when
-you type <span class="key"><code>u</code></span>.</p>
+you press <span class="key"><code>u</code></span>.</p>
 <p>If the <code>doi</code> field contains a valid DOI, you can send it
 to a DOI resolver with the key <span class="key"><code>I</code></span>.
 Unlike URLs, there can only be one DOI in the <code>doi</code> field.
@@ -2752,9 +2754,9 @@ class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb32-1"><a
 note is created and where it is stored.</p>
 <p>As mentioned, the only part of this entry that should not be changed
 is the last line. This line specifies that the actual template is
-created by the function<code>ebib-notes-create-org-template</code>. This
-function takes <code>ebib-notes-template</code> and converts it into a
-template that <code>org-capture</code> can use.</p>
+created by the function <code>ebib-notes-create-org-template</code>.
+This function takes <code>ebib-notes-template</code> and converts it
+into a template that <code>org-capture</code> can use.</p>
 <p>The <code>%</code>-directives in <code>ebib-notes-template</code> are
 interpreted by Ebib, not by the Org capture mechanism. It is therefore
 still essential that it contains a <code>%K</code> directive to create
@@ -3047,7 +3049,7 @@ the directive is simply ignored.</p>
 The <code>{Doi|Url.}</code> directive in the previous example contains a
 full stop, which is only included in the reference if the
 <code>Doi</code> or <code>Url</code> field is present.</p>
-<p>The contents of the fields is used literally, with two exceptions:
+<p>The contents of the fields are used literally, with two exceptions:
 the <code>Date</code> field may contain a full date+time specification
 or even a date range, but only the year (or the year of the first date
 in a date range) is used. Similarly, the <code>Title</code> field is
