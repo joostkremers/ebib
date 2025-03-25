@@ -5327,15 +5327,6 @@ is applied.  If no entry matches, URL is returned unchanged."
         (funcall fn url)
       url)))
 
-(defcustom ebib-import-file-functions nil
-  "Abnormal hook run when importing files.
-The functions in this hook are each called with two arguments:the key of
-the entry and the filepath of the imported file (i.e. the path to which
-it is has been written, not the path it was originally retrieved from).
-The return values of these functions are discarded."
-  :group 'ebib-reading-list
-  :type 'hook)
-
 (defun ebib-import-file (arg)
   "Import a file into the database.
 Ask the user for a file path, rename it and move it to the

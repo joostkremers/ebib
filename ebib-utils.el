@@ -1009,6 +1009,15 @@ time, or a directory path (as a string)."
                  (directory :tag "Set fixed directory")
                  (const :tag "Ask the user each time" ask)))
 
+(defcustom ebib-import-file-functions nil
+  "Abnormal hook run when importing files.
+The functions in this hook are each called with two arguments:the key of
+the entry and the filepath of the imported file (i.e. the path to which
+it is has been written, not the path it was originally retrieved from).
+The return values of these functions are discarded."
+  :group 'ebib-reading-list
+  :type 'hook)
+
 (defcustom ebib-file-associations '(("pdf" . "xpdf")
                                     ("ps" . "gv"))
   "List of file associations.
