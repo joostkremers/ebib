@@ -57,7 +57,7 @@ When you open a `.bib` file, the directory in which you started Ebib is the star
 
 Chances are that you will be doing most of your work with one or a few `.bib` files. In order to open these files automatically when Ebib is started, set the option `ebib-preload-bib-files`. You may specify the files to preload with their full path or with a relative path. In the latter case, the files are searched for in the directories listed in the option `ebib-bib-search-dirs`.
 
-It is also possible to set this variable as a file-local or directory-local variable (i.e., in a ~.dir-locals.el` file). You can use this method to only load the `.bib` file or files associated with a specific project.
+It is also possible to set this variable as a file-local or directory-local variable (i.e., in a `~.dir-locals.el` file). You can use this method to only load the `.bib` file or files associated with a specific project.
 
 
 ## Starting a New `.bib` File ##
