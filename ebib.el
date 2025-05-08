@@ -5303,6 +5303,8 @@ by appending \".pdf\" to it."
                    (?o (setq overwrite t)))))
              (url-copy-file pdfurl fullpath t)
              (message "[Ebib] Downloaded URL %s to %s" pdfurl fullpath)
+             (unless (run-hook-with-args-until-failure 'ebib-url-download-functions key fullpath)
+               (ebib--log 'message "[Ebib] Running hook `ebib-url-download-functions' failed" ))
              (let ((files (ebib-get-field-value "file" key ebib--cur-db 'noerror 'unbraced)))
                (when (or (null files)
                          (not (string-match-p (regexp-quote fname) files)))

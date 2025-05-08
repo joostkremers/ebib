@@ -908,6 +908,16 @@ transformation function is applied to the URL."
   :type '(repeat (cons :tag "Transformation"
                        (regexp :tag "Matcher") (function :tag "Function"))))
 
+(defcustom ebib-url-download-functions nil
+  "Abnormal hook run when downloading files from the internet.
+The functions in this hook are each called with two arguments: the key
+of the entry and the file path of the downloaded file (i.e., the path to
+which it was saved, not the URL it was originally retrieved from).
+These functions are run for side-effects, their return values are
+discarded."
+  :group 'ebib
+  :type 'hook)
+
 (defun ebib-transform-arXiv-url (url)
   "Transform an arXiv URL to the URL of its correspnoding pdf file."
   (concat (replace-regexp-in-string (regexp-quote "/abs/") "/pdf/" url t t) ".pdf"))
