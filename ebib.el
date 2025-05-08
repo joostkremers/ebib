@@ -5267,7 +5267,7 @@ download the file.
 
 The file is downloaded to the directory specified by
 `ebib-import-target-directory'.  It is assumed that the file
-linked is a pdf.  The file name is created by applying the
+linked to is a pdf.  The file name is created by applying the
 function in `ebib-name-transform-function' to the entry key and
 by appending \".pdf\" to it."
   (interactive "P")
