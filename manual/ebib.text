@@ -26,6 +26,13 @@ Once installed, Ebib can be started with [`M-x ebib`]{.key}. This command is als
 
     (global-set-key (kbd "C-c e") 'ebib)
 
+Or, with `use-package`:
+
+```
+(use-package ebib
+  :bind ("C-c e" . ebib))
+```
+
 Ebib can also be called from an Eshell command line. When used in this way, you can provide a filename to load. So, provided a file `references.bib` exists in `~/Work/Papers/`, the following command:
 
     ~/Work/Papers $ ebib references.bib
