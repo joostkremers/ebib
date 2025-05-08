@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.50, March 2025 ##
+
+- New user options `ebib-import-file-functions` and `ebib-url-download-functions`.
+
 ## Version 2.49, January 2025 ##
 
 - Add new user option `ebib-url-fields` to customise the fields that (may) contain URLs, so that they can be made clickable and can be selected with `ebib-browse-url`.

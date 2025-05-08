@@ -908,7 +908,7 @@ The function `ebib-import-file` can be used to import a file into the database t
 
 The target directory that `ebib-download-url` and `ebib-import-file` use is determined by the user option `ebib-import-target-directory`. By default, this points to the first directory in `ebib-file-search-dirs`, but you can set it to use the same directory as the database into which the URL/file is imported, to a fixed directory, or you can have Ebib ask you each time for a target directory.
 
-Both `ebib-download-url` and `ebib-import-file` add the imported file to the `file` field if it is not already there.
+Both `ebib-download-url` and `ebib-import-file` add the imported file to the `file` field. In addition, both functions come with an abnormal hook, `ebib-import-file-functions` and `ebib-url-download-functions`, which can be used to run additional actions when you import a file. The functions in these hooks are called with two arguments: the key of the current entry, and the file path of the imported file. (In the functions, you can use the variable `ebib--cur-db` to access the current database.) The functions are called for side-effects, their return values are ignored.
 
 
 ### Editing the `file` field ### {.unlisted .unnumbered}

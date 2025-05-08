@@ -2358,8 +2358,16 @@ set it to use the same directory as the database into which the URL/file
 is imported, to a fixed directory, or you can have Ebib ask you each
 time for a target directory.</p>
 <p>Both <code>ebib-download-url</code> and <code>ebib-import-file</code>
-add the imported file to the <code>file</code> field if it is not
-already there.</p>
+add the imported file to the <code>file</code> field. In addition, both
+functions come with an abnormal hook,
+<code>ebib-import-file-functions</code> and
+<code>ebib-url-download-functions</code>, which can be used to run
+additional actions when you import a file. The functions in these hooks
+are called with two arguments: the key of the current entry, and the
+file path of the imported file. (In the functions, you can use the
+variable <code>ebib--cur-db</code> to access the current database.) The
+functions are called for side-effects, their return values are
+ignored.</p>
 <h3 class="unlisted unnumbered" id="editing-the-file-field">Editing the
 <code>file</code> field</h3>
 <p>As mentioned above, editing the <code>file</code> field is a bit

@@ -2307,7 +2307,14 @@ the URL/file is imported, to a fixed directory, or you can have Ebib ask
 you each time for a target directory.
 
 Both ‘ebib-download-url’ and ‘ebib-import-file’ add the imported file to
-the ‘file’ field if it is not already there.
+the ‘file’ field.  In addition, both functions come with an abnormal
+hook, ‘ebib-import-file-functions’ and ‘ebib-url-download-functions’,
+which can be used to run additional actions when you import a file.  The
+functions in these hooks are called with two arguments: the key of the
+current entry, and the file path of the imported file.  (In the
+functions, you can use the variable ‘ebib--cur-db’ to access the current
+database.)  The functions are called for side-effects, their return
+values are ignored.
 
 * Menu:
 
@@ -3358,42 +3365,42 @@ Node: Linking to external resources105849
 Ref: #linking-to-external-resources106034
 Node: Viewing and Importing Files106236
 Ref: #viewing-and-importing-files106436
-Node: Editing the file field111982
-Ref: #editing-the-file-field112133
-Node: Calling a Browser for URLs and DOIs113522
-Ref: #calling-a-browser-for-urls-and-dois113738
-Node: Notes files116451
-Ref: #notes-files116601
-Node: Configuring files for storing notes118176
-Ref: #configuring-files-for-storing-notes118354
-Node: Hooks121324
-Ref: #hooks121487
-Node: Upgrading from earlier Ebib versions122884
-Ref: #upgrading-from-earlier-ebib-versions123107
-Node: Customising the notes file format124017
-Ref: #customising-the-notes-file-format124245
-Node: Displaying notes128024
-Ref: #displaying-notes128206
-Node: Using Markdown for notes129551
-Ref: #using-markdown-for-notes129749
-Node: Using org-capture to record notes133407
-Ref: #using-org-capture-to-record-notes133606
-Node: Managing a reading list139603
-Ref: #managing-a-reading-list139765
-Node: Managing Keywords142782
-Ref: #managing-keywords142938
-Node: Using a Canonical Keywords List144545
-Ref: #using-a-canonical-keywords-list144703
-Node: Window Management146833
-Ref: #window-management146998
-Node: Copying Entries to the Kill Ring150177
-Ref: #copying-entries-to-the-kill-ring150376
-Node: Printing the Database153100
-Ref: #printing-the-database153273
-Node: Customisation156753
-Ref: #customisation156869
-Node: Modifying Key Bindings158360
-Ref: #modifying-key-bindings158487
+Node: Editing the file field112457
+Ref: #editing-the-file-field112608
+Node: Calling a Browser for URLs and DOIs113997
+Ref: #calling-a-browser-for-urls-and-dois114213
+Node: Notes files116926
+Ref: #notes-files117076
+Node: Configuring files for storing notes118651
+Ref: #configuring-files-for-storing-notes118829
+Node: Hooks121799
+Ref: #hooks121962
+Node: Upgrading from earlier Ebib versions123359
+Ref: #upgrading-from-earlier-ebib-versions123582
+Node: Customising the notes file format124492
+Ref: #customising-the-notes-file-format124720
+Node: Displaying notes128499
+Ref: #displaying-notes128681
+Node: Using Markdown for notes130026
+Ref: #using-markdown-for-notes130224
+Node: Using org-capture to record notes133882
+Ref: #using-org-capture-to-record-notes134081
+Node: Managing a reading list140078
+Ref: #managing-a-reading-list140240
+Node: Managing Keywords143257
+Ref: #managing-keywords143413
+Node: Using a Canonical Keywords List145020
+Ref: #using-a-canonical-keywords-list145178
+Node: Window Management147308
+Ref: #window-management147473
+Node: Copying Entries to the Kill Ring150652
+Ref: #copying-entries-to-the-kill-ring150851
+Node: Printing the Database153575
+Ref: #printing-the-database153748
+Node: Customisation157228
+Ref: #customisation157344
+Node: Modifying Key Bindings158835
+Ref: #modifying-key-bindings158962
 
 End Tag Table
 
