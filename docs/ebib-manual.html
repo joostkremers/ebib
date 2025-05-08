@@ -264,6 +264,9 @@ this command globally to e.g., <span
 class="key"><code>C-c e</code></span>, put something like the following
 in Emacs’ init file:</p>
 <pre><code>(global-set-key (kbd &quot;C-c e&quot;) &#39;ebib)</code></pre>
+<p>Or, with <code>use-package</code>:</p>
+<pre><code>(use-package ebib
+  :bind (&quot;C-c e&quot; . ebib))</code></pre>
 <p>Ebib can also be called from an Eshell command line. When used in
 this way, you can provide a filename to load. So, provided a file
 <code>references.bib</code> exists in <code>~/Work/Papers/</code>, the
@@ -414,13 +417,13 @@ class="key"><code>C-n</code></span></td>
 <td>move one entry down</td>
 </tr>
 <tr class="odd">
-<td><span class="key"><code>Space</code></span> <span
-class="key"><code>PgDn</code></span></td>
+<td><span class="key"><code>b</code></span> <span
+class="key"><code>PgUp</code></span></td>
 <td>move one page up</td>
 </tr>
 <tr class="even">
-<td><span class="key"><code>b</code></span> <span
-class="key"><code>PgUp</code></span></td>
+<td><span class="key"><code>Space</code></span> <span
+class="key"><code>PgDn</code></span></td>
 <td>move one page down</td>
 </tr>
 <tr class="odd">
@@ -787,13 +790,13 @@ class="key"><code>C-n</code></span></td>
 <td>move one field down</td>
 </tr>
 <tr class="odd">
-<td><span class="key"><code>Space</code></span> <span
-class="key"><code>PgDn</code></span></td>
+<td><span class="key"><code>b</code></span> <span
+class="key"><code>PgUp</code></span></td>
 <td>move to previous set</td>
 </tr>
 <tr class="even">
-<td><span class="key"><code>b</code></span> <span
-class="key"><code>PgUp</code></span></td>
+<td><span class="key"><code>Space</code></span> <span
+class="key"><code>PgDn</code></span></td>
 <td>move to next set</td>
 </tr>
 <tr class="odd">
@@ -1258,13 +1261,13 @@ class="key"><code>C-n</code></span></td>
 <td>move one string down</td>
 </tr>
 <tr class="odd">
-<td><span class="key"><code>Space</code></span> <span
-class="key"><code>PgDn</code></span></td>
+<td><span class="key"><code>b</code></span> <span
+class="key"><code>PgUp</code></span></td>
 <td>move ten strings up</td>
 </tr>
 <tr class="even">
-<td><span class="key"><code>b</code></span> <span
-class="key"><code>PgUp</code></span></td>
+<td><span class="key"><code>Space</code></span> <span
+class="key"><code>PgDn</code></span></td>
 <td>move ten strings down</td>
 </tr>
 <tr class="odd">
@@ -1414,22 +1417,22 @@ them as well.</p>
 major mode you use in the multiline edit buffer, you can change them, of
 course. To do this, put something like the following in your init
 file:</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(with-eval-after-load <span class="dt">&#39;ebib</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c c&quot;</span> <span class="kw">nil</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | c&quot;</span> <span class="dt">&#39;ebib-quit-multiline-buffer-and-save</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c s&quot;</span> <span class="kw">nil</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> <span class="dt">&#39;ebib-save-from-multiline-buffer</span>)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c k&quot;</span> <span class="kw">nil</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> <span class="dt">&#39;ebib-cancel-multiline-buffer</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(with-eval-after-load <span class="dt">&#39;ebib</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c c&quot;</span> <span class="kw">nil</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | c&quot;</span> <span class="dt">&#39;ebib-quit-multiline-buffer-and-save</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c s&quot;</span> <span class="kw">nil</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | s&quot;</span> <span class="dt">&#39;ebib-save-from-multiline-buffer</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c k&quot;</span> <span class="kw">nil</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  (define-key ebib-multiline-mode-map</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;\C-c | k&quot;</span> <span class="dt">&#39;ebib-cancel-multiline-buffer</span>))</span></code></pre></div>
 <p>This removes the key bindings for <span
 class="key"><code>C-c c</code></span>, <span
 class="key"><code>C-c s</code></span> and <span
@@ -2062,24 +2065,24 @@ Additions</h2>
 <p>One special filter is included with Ebib. It filters recent additions
 to the database. The command that creates the filter is
 <code>ebib-list-recent</code>:</p>
-<div class="sourceCode" id="cb24"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">defun</span><span class="fu"> ebib-list-recent </span>(days)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;List entries created in the last DAYS days.&quot;</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  (interactive <span class="st">&quot;nNumber of days: &quot;</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">;; Save the database&#39;s current filter, if there is one.</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let</span> ((filter (ebib-db-get-filter ebib--cur-db)))</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">when</span> filter (<span class="kw">setq</span> ebib--filters-last-filter filter)))</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let*</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">;; Calculate the from-date in Emacs&#39; time format.</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>      ((date (time-subtract (current-time) (days-to-time days)))</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>       <span class="co">;; Create a Lisp expression that will function as the filter.</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>       (filter `(ebib--newer-than (<span class="kw">quote</span> ,date))))</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Install it as the current database&#39;s filter.</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    (ebib-db-set-filter filter ebib--cur-db)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Update the current entry key.</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Update the display, so that only filtered entries are visible.</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    (ebib--update-buffers)))</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">defun</span><span class="fu"> ebib-list-recent </span>(days)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;List entries created in the last DAYS days.&quot;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  (interactive <span class="st">&quot;nNumber of days: &quot;</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">;; Save the database&#39;s current filter, if there is one.</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let</span> ((filter (ebib-db-get-filter ebib--cur-db)))</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">when</span> filter (<span class="kw">setq</span> ebib--filters-last-filter filter)))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let*</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">;; Calculate the from-date in Emacs&#39; time format.</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>      ((date (time-subtract (current-time) (days-to-time days)))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>       <span class="co">;; Create a Lisp expression that will function as the filter.</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>       (filter `(ebib--newer-than (<span class="kw">quote</span> ,date))))</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Install it as the current database&#39;s filter.</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    (ebib-db-set-filter filter ebib--cur-db)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Update the current entry key.</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    (ebib-db-set-current-entry-key (ebib--get-key-at-point) ebib--cur-db)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">;; Update the display, so that only filtered entries are visible.</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    (ebib--update-buffers)))</span></code></pre></div>
 <p>First, this function saves the current filter if there is one. It
 then calculates a date in Emacs’ internal time format by subtracting the
 number of days provided by the user from the current date and creates a
@@ -2088,18 +2091,18 @@ later than this date. This expression is then installed as the filter
 for the current database. A call to <code>ebib--update-buffers</code>
 then updates the display, taking the filter into account.</p>
 <p>The function <code>ebib--newer-than</code> is defined as follows:</p>
-<div class="sourceCode" id="cb25"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">defun</span><span class="fu"> ebib--newer-than </span>(date)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Function for use in filters.</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="st">Return t if the entry being tested is newer than DATE.  DATE must</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">be a list of the format returned by `current-time&#39; and is</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">compared to the timestamp of the entry being tested.  If the</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="st">entry has no timestamp, or a timestamp that cannot be converted</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="st">into a date representation, return nil.&quot;</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let</span> ((timestamp (<span class="kw">cdr</span> (assoc-string <span class="st">&quot;timestamp&quot;</span> ebib-entry))))</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">when</span> (<span class="kw">and</span> timestamp</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>               (<span class="kw">setq</span> timestamp (<span class="kw">ignore-errors</span> (date-to-time timestamp))))</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>      (time-less-p date timestamp))))</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">defun</span><span class="fu"> ebib--newer-than </span>(date)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Function for use in filters.</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="st">Return t if the entry being tested is newer than DATE.  DATE must</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="st">be a list of the format returned by `current-time&#39; and is</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="st">compared to the timestamp of the entry being tested.  If the</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="st">entry has no timestamp, or a timestamp that cannot be converted</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="st">into a date representation, return nil.&quot;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  (<span class="kw">let</span> ((timestamp (<span class="kw">cdr</span> (assoc-string <span class="st">&quot;timestamp&quot;</span> ebib-entry))))</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">when</span> (<span class="kw">and</span> timestamp</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>               (<span class="kw">setq</span> timestamp (<span class="kw">ignore-errors</span> (date-to-time timestamp))))</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      (time-less-p date timestamp))))</span></code></pre></div>
 <p>This function obtains the time stamp of the entry being tested from
 the variable <code>ebib-entry</code> and then tries to convert it to
 Emacs’ time format. If successful, it compares this time to the date
@@ -2183,18 +2186,18 @@ Biblio, you can add support for it to Ebib by loading the package
 <code>ebib-biblio</code> in your init file and adding two keybindings:
 one to <code>ebib-index-mode-map</code> and one to
 <code>biblio-selection-mode-map</code>:</p>
-<div class="sourceCode" id="cb26"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">require</span> <span class="dt">&#39;ebib-biblio</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>(define-key ebib-index-mode-map (kbd <span class="st">&quot;B&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-import-doi)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>(define-key biblio-selection-mode-map (kbd <span class="st">&quot;e&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-selection-import)</span></code></pre></div>
-<p>Or with <code>use-package</code>:</p>
 <div class="sourceCode" id="cb27"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">use-package</span> ebib-biblio</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  :after (ebib biblio)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  :bind (:map ebib-index-mode-map</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>              (<span class="st">&quot;B&quot;</span> . ebib-biblio-import-doi)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>              :map biblio-selection-mode-map</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>              (<span class="st">&quot;e&quot;</span> . ebib-biblio-selection-import)))</span></code></pre></div>
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">require</span> <span class="dt">&#39;ebib-biblio</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>(define-key ebib-index-mode-map (kbd <span class="st">&quot;B&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-import-doi)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>(define-key biblio-selection-mode-map (kbd <span class="st">&quot;e&quot;</span>) <span class="op">#&#39;</span>ebib-biblio-selection-import)</span></code></pre></div>
+<p>Or with <code>use-package</code>:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">use-package</span> ebib-biblio</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  :after (ebib biblio)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  :bind (:map ebib-index-mode-map</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>              (<span class="st">&quot;B&quot;</span> . ebib-biblio-import-doi)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>              :map biblio-selection-mode-map</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>              (<span class="st">&quot;e&quot;</span> . ebib-biblio-selection-import)))</span></code></pre></div>
 <p>If you now call <code>biblio-lookup</code>, you can use the key <span
 class="key"><code>e</code></span> (or any other key you choose, of
 course) in Biblio’s selection buffer to import the selected entry into
@@ -2743,12 +2746,12 @@ note. This entry can have any key, description, type and target you
 like, but the template should be a function.</p>
 <p>The following is an example entry for
 <code>org-capture-templates</code>:</p>
-<div class="sourceCode" id="cb32"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(<span class="st">&quot;e&quot;</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;BibTeX note&quot;</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a> entry</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a> (file+headline <span class="st">&quot;~/Work/Bibtex/Bib_Notes.org&quot;</span> <span class="st">&quot;Bibliography Notes&quot;</span>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a> (<span class="kw">function</span> ebib-notes-create-org-template))</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>(<span class="st">&quot;e&quot;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;BibTeX note&quot;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a> entry</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a> (file+headline <span class="st">&quot;~/Work/Bibtex/Bib_Notes.org&quot;</span> <span class="st">&quot;Bibliography Notes&quot;</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a> (<span class="kw">function</span> ebib-notes-create-org-template))</span></code></pre></div>
 <p>Because you are free to set the type and target to anything that
 <code>org-capture</code> accepts, you have more control over the way a
 note is created and where it is stored.</p>
@@ -2766,9 +2769,9 @@ template, though. To do this, put an additional <code>%</code> before
 the directive. For example, <code>org-capture</code> can add a time
 stamp with <code>%t</code>. In order to add a time stamp to a
 bibliography note, write <code>%%t</code>:</p>
-<div class="sourceCode" id="cb33"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> ebib-notes-template</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;* %T</span><span class="sc">\n</span><span class="st">:PROPERTIES:</span><span class="sc">\n</span><span class="st">%K</span><span class="sc">\n</span><span class="st">:END:</span><span class="sc">\n</span><span class="st">%%t</span><span class="sc">\n</span><span class="st">%%?</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> ebib-notes-template</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;* %T</span><span class="sc">\n</span><span class="st">:PROPERTIES:</span><span class="sc">\n</span><span class="st">%K</span><span class="sc">\n</span><span class="st">:END:</span><span class="sc">\n</span><span class="st">%%t</span><span class="sc">\n</span><span class="st">%%?</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <p><code>ebib-notes-create-org-template</code> strips off one
 <code>%</code> and passes the result on to <code>org-capture</code>,
 which then sees <code>%t</code> and replaces it with a time stamp. (Note
@@ -2784,9 +2787,9 @@ when it is called from Ebib. Therefore, you may want to disable the
 entry altogether when you call <code>org-capture</code> from somewhere
 else. You can do this by configuring the option
 <code>org-capture-template-contexts</code>:</p>
-<div class="sourceCode" id="cb34"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> org-capture-template-contexts</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>      &#39;((<span class="st">&quot;e&quot;</span> ((in-mode ebib-index-mode)))))</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> org-capture-template-contexts</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>      &#39;((<span class="st">&quot;e&quot;</span> ((in-mode ebib-index-mode)))))</span></code></pre></div>
 <div class="line-block"></div>
 <p>The <code>"e"</code> is the key that you’ve chosen for your template.
 This setting ensures that the <code>org-capture</code> template
@@ -2798,8 +2801,8 @@ altogether and open an <code>org-capture</code> buffer immediately with
 the appropriate template. To do this, set
 <code>ebib-notes-use-org-capture</code> to the key of the template that
 you use for Ebib notes (<code>"e"</code> in the current example):</p>
-<div class="sourceCode" id="cb35"><pre
-class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> ebib-notes-use-org-capture <span class="st">&quot;e&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> ebib-notes-use-org-capture <span class="st">&quot;e&quot;</span>)</span></code></pre></div>
 <p>This will cause <code>org-capture</code> to bypass the selection
 buffer and immediately put you in the edit buffer with the relevant
 template.</p>

@@ -107,8 +107,8 @@ The basic motion keys in the index buffer are the following:
 |--------------------------------------------+-------------------------|
 | [`up`]{.key} [`p`]{.key} [`C-p`]{.key}     | move one entry up       |
 | [`down`]{.key} [`n`]{.key} [`C-n`]{.key}   | move one entry down     |
-| [`Space`]{.key} [`PgDn`]{.key}             | move one page up        |
-| [`b`]{.key} [`PgUp`]{.key}                 | move one page down      |
+| [`b`]{.key} [`PgUp`]{.key}                 | move one page up        |
+| [`Space`]{.key} [`PgDn`]{.key}             | move one page down      |
 | [`g`]{.key} [`Home`]{.key}                 | move to the first entry |
 | [`G`]{.key} [`End`]{.key}                  | move to the last entry  |
 
@@ -226,8 +226,8 @@ You can move between fields with the same keys that you use to move between entr
 |------------------------------------------+-------------------------|
 | [`up`]{.key} [`p`]{.key} [`C-p`]{.key}   | move one field up       |
 | [`down`]{.key} [`n`]{.key} [`C-n`]{.key} | move one field down     |
-| [`Space`]{.key} [`PgDn`]{.key}           | move to previous set    |
-| [`b`]{.key} [`PgUp`]{.key}               | move to next set        |
+| [`b`]{.key} [`PgUp`]{.key}               | move to previous set    |
+| [`Space`]{.key} [`PgDn`]{.key}           | move to next set        |
 | [`g`]{.key} [`Home`]{.key}               | move to the first field |
 | [`G`]{.key} [`End`]{.key}                | move to the last field  |
 
@@ -413,8 +413,8 @@ The following keys are available in the strings buffer:
 |------------------------------------------|----------------------------------|
 | [`up`]{.key} [`p`]{.key} [`C-p`]{.key}   | move one string up               |
 | [`down`]{.key} [`n`]{.key} [`C-n`]{.key} | move one string down             |
-| [`Space`]{.key} [`PgDn`]{.key}           | move ten strings up              |
-| [`b`]{.key} [`PgUp`]{.key}               | move ten strings down            |
+| [`b`]{.key} [`PgUp`]{.key}               | move ten strings up              |
+| [`Space`]{.key} [`PgDn`]{.key}           | move ten strings down            |
 | [`g`]{.key} [`Home`]{.key}               | move to the first string         |
 | [`G`]{.key} [`End`]{.key}                | move to the last string          |
 |                                          |                                  |
