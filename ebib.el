@@ -4522,7 +4522,7 @@ values).
 
 See also `ebib-field-edit-functions'."
   ;; NOTE When used with BibLaTeX, this assumes that xsvsep is set to
-  ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]" in Emacs.
+  ;; "\s*,\s*", equivalent to "[[:space:]]*,[[:space:]]*" in Emacs.
   (let* ((crm-local-completion-map (make-composed-keymap '(keymap (32)) crm-local-completion-map))
          (crm-separator "[[:space:]]*,[[:space:]]*")
          ;; If we're editing the "keywords" field, the completion candidates are
