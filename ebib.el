@@ -4475,7 +4475,7 @@ list of candidates, like \"language\".
 See also `ebib-field-edit-functions'."
   (let* ((crm-local-completion-map (make-composed-keymap '(keymap (32)) crm-local-completion-map))
          (crm-char ";")
-	 (crm-separator (format "[[:space:]]+*%s[[:space:]]+*" crm-char))
+	 (crm-separator (format "[[:space:]]*%s[[:space:]]*" crm-char))
 	 (and-regexp "[[:space:]]+and[[:space:]]+")
 	 (collection
 	  ;; Account for fields containing more than one entry, e.g.
