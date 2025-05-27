@@ -15,6 +15,7 @@ header {
 
 a {
   text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
   color: #495464;
 }
 
