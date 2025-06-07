@@ -2208,9 +2208,11 @@ unconditionally, even if the new file already exists."
          (when (or force
                    (not (file-exists-p new-filename))
                    (y-or-n-p (format (format "File %s already exists; overwrite? " new-filename))))
-           (with-temp-buffer
+           (with-current-buffer (or (find-buffer-visiting new-file-name)
+                                    (find-file-noselect new-file-name))
+             (erase-buffer)
              (ebib--format-database-as-bibtex ebib--cur-db)
-             (write-region (point-min) (point-max) new-filename nil nil nil))
+             (basic-save-buffer))
            (if (ebib-db-get-filter ebib--cur-db)
                (message "Wrote filtered entries as new database to %s" new-filename)
              ;; If this wasn't a filtered db, we rename it.
@@ -2220,7 +2222,7 @@ unconditionally, even if the new file already exists."
                                     (file-name-nondirectory new-filename)))
              (ebib--set-modified nil ebib--cur-db)))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-save-current-database (force)
   "Save the current database.
