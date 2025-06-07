@@ -2205,9 +2205,11 @@ The FORCE argument is used as in `ebib-save-current-database'."
         (error "[Ebib] File not saved"))))
 
   ;; Now save the database.
-  (with-temp-buffer
+  (with-current-buffer (or (find-buffer-visiting (ebib-db-get-filename db))
+                           (find-file-noselect (ebib-db-get-filename db)))
+    (erase-buffer)
     (ebib--format-database-as-bibtex db)
-    (write-region (point-min) (point-max) (ebib-db-get-filename db)))
+    (basic-save-buffer))
   (ebib--set-modified nil db))
 
 (defun ebib-write-database (force)
@@ -2225,9 +2227,11 @@ unconditionally, even if the new file already exists."
          (when (or force
                    (not (file-exists-p new-filename))
                    (y-or-n-p (format (format "File %s already exists; overwrite? " new-filename))))
-           (with-temp-buffer
+           (with-current-buffer (or (find-buffer-visiting new-file-name)
+                                    (find-file-noselect new-file-name))
+             (erase-buffer)
              (ebib--format-database-as-bibtex ebib--cur-db)
-             (write-region (point-min) (point-max) new-filename nil nil nil))
+             (basic-save-buffer))
            (if (ebib-db-get-filter ebib--cur-db)
                (message "Wrote filtered entries as new database to %s" new-filename)
              ;; If this wasn't a filtered db, we rename it.
@@ -2237,7 +2241,7 @@ unconditionally, even if the new file already exists."
                                     (file-name-nondirectory new-filename)))
              (ebib--set-modified nil ebib--cur-db)))))
     (default
-      (beep))))
+     (beep))))
 
 (defun ebib-save-current-database (force)
   "Save the current database.
