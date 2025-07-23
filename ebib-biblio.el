@@ -93,7 +93,7 @@ metadata."
                  (goto-char (point-min))
                  (looking-at bibtex-any-entry-maybe-empty-head)
                  (bibtex-key-in-head))))
-      (ebib-import-entries ebib--cur-db)
+      (ebib-import-entries ebib--cur-db ebib-biblio-import-filters)
       (when key
         (ebib-db-set-current-entry-key key ebib--cur-db))
       (ebib--update-buffers))))
