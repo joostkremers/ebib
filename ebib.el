@@ -1573,15 +1573,22 @@ added to the existing one with a hash sign `#' between them."
        (ebib--log 'error (concat (apply #'format (cddr err))
                                  (format " at line %d" (line-number-at-pos (cadr err)))))))))
 
-(defun ebib--bib-read-entry (db &optional timestamp)
+(defun ebib--bib-read-entry (db &optional timestamp filters)
   "Read a BibTeX entry and store it in DB.
 Return the entry key if an entry was found and could be stored,
 nil otherwise.  Optional argument TIMESTAMP indicates whether a
 timestamp is to be added.  (Whether a timestamp is actually added
-also depends on `ebib-use-timestamp'.)"
+also depends on `ebib-use-timestamp'.)
+
+After reading, but before storing, the entry is passed through FILTERS,
+a list of filter functions. Each filter is a function, which takes one
+entry and returns an entry, with any desired changes."
   (condition-case err
       (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
-             (entry (parsebib-read-entry))
+             (raw-entry (parsebib-read-entry))
+	     ;; Each filter is a function which takes a whole entry,
+	     ;; and returns a whole entry.
+	     (entry (seq-reduce (lambda (arg fun) (funcall fun arg)) filters raw-entry))
              (entry-key (cdr (assoc-string "=key=" entry))))
         (if (ebib-db-dependent-p db)
             (if (ebib-db-has-key entry-key (ebib-db-get-main db))
