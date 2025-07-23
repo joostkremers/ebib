@@ -1582,13 +1582,17 @@ also depends on `ebib-use-timestamp'.)
 
 After reading, but before storing, the entry is passed through FILTERS,
 a list of filter functions. Each filter is a function, which takes one
-entry and returns an entry, with any desired changes."
+entry and returns an entry, with any desired changes. As a special case,
+a filter returning nil is equivalent to it returning the entry
+unchanged (this makes it easier to write filters which only apply in
+some cases -- where they don't apply, just return nil, instead of
+juggling the original and altered versions in a conditional)."
   (condition-case err
       (let* ((beg (point)) ; Save the start of the entry in case something goes wrong.
              (raw-entry (parsebib-read-entry))
 	     ;; Each filter is a function which takes a whole entry,
 	     ;; and returns a whole entry.
-	     (entry (seq-reduce (lambda (arg fun) (funcall fun arg)) filters raw-entry))
+	     (entry (seq-reduce (lambda (arg fun) (or (funcall fun arg) arg)) filters raw-entry))
              (entry-key (cdr (assoc-string "=key=" entry))))
         (if (ebib-db-dependent-p db)
             (if (ebib-db-has-key entry-key (ebib-db-get-main db))
