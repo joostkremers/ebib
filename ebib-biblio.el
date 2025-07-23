@@ -64,6 +64,8 @@
 (defvar biblio-bibtex-use-autokey)
 (declare-function biblio--selection-forward-bibtex "ext:biblio-core.el" (forward-to &optional quit))
 
+(defgroup ebib-biblio nil "Ebib biblio." :group 'ebib)
+
 ;;;###autoload
 (defun ebib-biblio-import-doi (doi)
   "Fetch a BibTeX entry from a remote server by its DOI using `biblio.el'.
