@@ -67,10 +67,8 @@
 (defgroup ebib-biblio nil "Ebib biblio." :group 'ebib)
 
 (defcustom ebib-biblio-import-filters nil
-  "List of filters for entries imported from DOIs. Each filter is a
-function, which takes one entry (an alist with field names as keys, and
-field contents as values) and returns an entry of the same format, with
-any desired changes."
+  "List of filters for entries imported from DOIs. The filters are
+ultimately handled by `ebib--bib-read-entry', which see."
   :group 'ebib-biblio
   :type '(list function))
 
