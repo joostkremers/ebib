@@ -1468,7 +1468,7 @@ error and return nil."
                 (ebib-db-set-main main db)
               (ebib--log 'error "Could not find main database `%s'" main-file))))))) ; This returns nil.
 
-(defun ebib--bib-find-bibtex-entries (db timestamp)
+(defun ebib--bib-find-bibtex-entries (db timestamp &optional filters)
   "Find the BibTeX entries in the current buffer.
 The search is started at the beginnig of the buffer.  All entries
 found are stored in DB.  Return value is a three-element list: the
@@ -1478,7 +1478,9 @@ indicating whether a @Preamble was found.
 
 TIMESTAMP indicates whether a timestamp is to be added to each
 entry.  Note that a timestamp is only added if `ebib-use-timestamp'
-is set to t."
+is set to t.
+
+FILTERS is passed straight to `ebib--bib-read-entry'."
   (let ((n-entries 0)
         (n-strings 0)
         (preamble nil)
@@ -1496,7 +1498,7 @@ is set to t."
               ((cl-equalp entry-type "comment")
                (ebib--bib-read-comment db))
               ((stringp entry-type)
-               (when (ebib--bib-read-entry db timestamp)
+               (when (ebib--bib-read-entry db timestamp filters)
                  (setq n-entries (1+ n-entries))
                  (unless (assoc-string entry-type entry-list 'case-fold)
                    (ebib--log 'warning "Line %d: Unknown entry type `%s'." (line-number-at-pos) entry-type))))))
