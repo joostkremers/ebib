@@ -66,6 +66,14 @@
 
 (defgroup ebib-biblio nil "Ebib biblio." :group 'ebib)
 
+(defcustom ebib-biblio-import-filters nil
+  "List of filters for entries imported from DOIs. Each filter is a
+function, which takes one entry (an alist with field names as keys, and
+field contents as values) and returns an entry of the same format, with
+any desired changes."
+  :group 'ebib-biblio
+  :type '(list function))
+
 ;;;###autoload
 (defun ebib-biblio-import-doi (doi)
   "Fetch a BibTeX entry from a remote server by its DOI using `biblio.el'.
