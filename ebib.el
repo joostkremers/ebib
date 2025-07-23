@@ -5381,12 +5381,14 @@ non-nil, do not delete the original file."
 
 ;;; Functions for non-Ebib buffers
 
-(defun ebib-import-entries (&optional db)
+(defun ebib-import-entries (&optional db filters)
   "Search for BibTeX entries in the current buffer.
 The entries are added to DB, which defaults to the current
 database (i.e., the database that was active when Ebib was
 lowered.  Works on the whole buffer, or on the region if it is
-active."
+active.
+
+FILTERS is passed straight to `ebib--bib-find-bibtex-entries'."
   (interactive)
   (ebib--execute-when
     (real-db
@@ -5399,7 +5401,7 @@ active."
                (buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--bib-find-bibtex-entries db t)))
+             (let ((result (ebib--bib-find-bibtex-entries db t filters)))
                (ebib-db-set-modified t db)
                (if-let* ((index (ebib-db-get-buffer db))
                          (window (get-buffer-window index t)))
