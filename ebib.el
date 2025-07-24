@@ -1804,7 +1804,7 @@ is replaced with a number in ascending sequence."
        ((string= (car props) "=type=")   ; The =type= field should not be braced.
         (push props fields))
        ((cl-equalp (car props) "file")
-        (let ((short-file (ebib--file-relative-name (expand-file-name (cdr props)))))
+        (let ((short-file (ebib--file-relative-name (expand-file-name (cdr props)) ebib-file-search-dirs)))
           (push (cons "file" (ebib-brace short-file)) fields)))
        (t
         (push (cons (car props) (ebib-brace (cdr props))) fields))))
@@ -4182,7 +4182,7 @@ If `ebib-truncate-file-names' is non-nil, the name is truncated
 relative to `ebib-file-search-dirs'.  Subsequently,
 `ebib-file-name-mod-function' is applied to the name."
   (setq file (if ebib-truncate-file-names
-                 (ebib--file-relative-name file)
+                 (ebib--file-relative-name file ebib-file-search-dirs)
                file))
   (funcall ebib-file-name-mod-function file t))
 
