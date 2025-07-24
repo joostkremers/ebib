@@ -1591,6 +1591,24 @@ raised."
             "."
             ext)))
 
+(defun ebib--file-relative-name (file)
+  "Return a name for FILE relative to `ebib-file-search-dirs'.
+If FILE is not in (a subdirectory of) one of the directories in
+`ebib-file-search-dirs', return FILE."
+  ;; We first create a list of names relative to each dir in
+  ;; `ebib-file-search-dirs', discarding those that start with `..'
+  (let* ((names (delq nil (mapcar (lambda (dir)
+                                    (let ((rel-name (file-relative-name file dir)))
+                                      (unless (string-prefix-p ".." rel-name)
+                                        rel-name)))
+                                  ebib-file-search-dirs)))
+         ;; Then we take the shortest one...
+         (name (car (sort names (lambda (x y)
+                                  (< (length x) (length y)))))))
+    ;; ...and return it, or the filename itself if it couldn't be
+    ;; relativized.
+    (or name file)))
+
 (defun ebib--expand-file-name (file)
   "Search and expand FILE.
 FILE is a file name, possibly with a partial file path.  It is
