@@ -1617,12 +1617,13 @@ return FILE."
     ;; relativized.
     (or name file)))
 
-(defun ebib--expand-file-name (file dirs)
+(defun ebib--expand-file-name (file dirs &optional no-default-dir)
   "Search and expand FILE in DIRS.
 FILE is a file name, possibly with a partial file path.  It is expanded
 relative to DIRS.  If the file cannot be found, the non-directory part
 is searched for as well.  As a last resort, FILE is expanded relative to
-`default-directory'.  If FILE is an absolute file name, expand it with
+`default-directory', unless NO-DEFAULT-DIR is non-nil, in which case the
+return value is nil.  If FILE is an absolute file name, expand it with
 `expand-file-name' and return the result."
   (if (file-name-absolute-p file)
       (expand-file-name file)
@@ -1630,7 +1631,7 @@ is searched for as well.  As a last resort, FILE is expanded relative to
                         (list (file-name-directory (ebib-db-get-filename ebib--cur-db))))))
       (or (locate-file file dirs)
           (locate-file (file-name-nondirectory file) dirs)
-          (expand-file-name file)))))
+          (and (not no-default-dir) (expand-file-name file))))))
 
 (defun ebib--split-files (files)
   "Split FILES (a string) into separate files.
