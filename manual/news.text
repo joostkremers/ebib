@@ -1,8 +1,12 @@
 % Ebib News
 
-## Version 2.51, August 2025 ##
+## Version 2.52, August 2025 ##
 
 - Add import filters and user options `ebib-import-entries-filters` and `ebib-biblio-import-filters`.
+
+## Version 2.51, August 2025 ##
+
+- Use a relative path for the main database when saving a dependent database, if the main database is located inside a directory in `ebib-bib-search-dirs`.
 
 ## Version 2.50, March 2025 ##
 
