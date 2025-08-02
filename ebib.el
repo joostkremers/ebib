@@ -1462,11 +1462,11 @@ error and return nil."
     (goto-char (point-min))
     (save-match-data
       (if (re-search-forward "@Comment{\n[[:space:]]*ebib-\\(?:main\\|master\\)-file: \\(.*\\)\n}" nil t)
-          (let* ((main-file (match-string 1))
-                 (main (ebib--get-or-open-db main-file)))
-            (if main
-                (ebib-db-set-main main db)
-              (ebib--log 'error "Could not find main database `%s'" main-file))))))) ; This returns nil.
+          (if-let* ((main-file (match-string 1))
+                    (path (ebib--expand-file-name main-file ebib-bib-search-dirs 'no-default-dir))
+                    (main (ebib--get-or-open-db path)))
+              (ebib-db-set-main main db)
+            (ebib--log 'error "Could not find main database `%s'" main-file)))))) ; This returns nil.
 
 (defun ebib--bib-find-bibtex-entries (db timestamp)
   "Find the BibTeX entries in the current buffer.

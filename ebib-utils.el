@@ -2347,10 +2347,10 @@ formatting the entry."
 
 (defun ebib--format-main (db)
   "Write DB's main database to the current buffer."
-  (let ((main (ebib-db-get-main db)))
-    (when main
-      (insert (format "@Comment{\nebib-main-file: %s\n}\n\n"
-                      (ebib-db-get-filename main))))))
+  (when-let* ((main (ebib-db-get-main db))
+              (path (ebib--file-relative-name (ebib-db-get-filename main) ebib-bib-search-dirs)))
+    (insert (format "@Comment{\nebib-main-file: %s\n}\n\n"
+                    path))))
 
 (defun ebib--format-strings (db)
   "Write the @Strings of DB into the current buffer in BibTeX format."
