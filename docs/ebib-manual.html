@@ -337,7 +337,7 @@ preload with their full path or with a relative path. In the latter
 case, the files are searched for in the directories listed in the option
 <code>ebib-bib-search-dirs</code>.</p>
 <p>It is also possible to set this variable as a file-local or
-directory-local variable (i.e., in a <code>~.dir-locals.el</code> file).
+directory-local variable (i.e., in a <code>.dir-locals.el</code> file).
 You can use this method to only load the <code>.bib</code> file or files
 associated with a specific project.</p>
 <h2 id="starting-a-new-.bib-file">Starting a New <code>.bib</code>
@@ -1491,6 +1491,13 @@ opens a dependent database, it only reads the entry keys from the
 database. This means that if you edit a dependent database’s
 <code>.bib</code> file outside of Ebib, the changes you make are ignored
 when you open the file in Ebib.</p>
+<p>Note that if the main database is located in one of the directories
+listed in the user option <code>ebib-bib-search-dirs</code>, the main
+database’s name is saved to the dependent’s <code>.bib</code> file as a
+relative file path. This makes it easier to use the same set of
+<code>.bib</code> files on different computers with different locations
+for the <code>.bib</code> files (e.g., because of different
+<code>HOME</code> directories).</p>
 <h1 id="inserting-citations-into-a-text-buffer">Inserting Citations into
 a Text Buffer</h1>
 <h2 id="single-citations">Single Citations</h2>
