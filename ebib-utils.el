@@ -1610,21 +1610,20 @@ return FILE."
     ;; relativized.
     (or name file)))
 
-(defun ebib--expand-file-name (file)
-  "Search and expand FILE.
-FILE is a file name, possibly with a partial file path.  It is
-expanded relative to `ebib-file-search-dirs'.  If the file cannot
-be found, the non-directory part is searched for as well.  As a
-last resort, FILE is expanded relative to `default-directory'.
-If FILE is an absolute file name, expand it with
+(defun ebib--expand-file-name (file dirs)
+  "Search and expand FILE in DIRS.
+FILE is a file name, possibly with a partial file path.  It is expanded
+relative to DIRS.  If the file cannot be found, the non-directory part
+is searched for as well.  As a last resort, FILE is expanded relative to
+`default-directory'.  If FILE is an absolute file name, expand it with
 `expand-file-name' and return the result."
   (if (file-name-absolute-p file)
       (expand-file-name file)
     (let* ((unmod-file (funcall ebib-file-name-mod-function file nil))
-           (ebib-file-search-dirs (append ebib-file-search-dirs
-                                          (list (file-name-directory (ebib-db-get-filename ebib--cur-db))))))
-      (or (locate-file unmod-file ebib-file-search-dirs)
-          (locate-file (file-name-nondirectory unmod-file) ebib-file-search-dirs)
+           (dirs (append dirs
+                         (list (file-name-directory (ebib-db-get-filename ebib--cur-db))))))
+      (or (locate-file unmod-file dirs)
+          (locate-file (file-name-nondirectory unmod-file) dirs)
           (expand-file-name unmod-file)))))
 
 (defun ebib--split-files (files)
@@ -1749,7 +1748,7 @@ one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
   (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
-        (let* ((absolute-path (ebib--expand-file-name (ebib--select-file files nil key)))
+        (let* ((absolute-path (ebib--expand-file-name (ebib--select-file files nil key) ebib-file-search-dirs))
                (relative-path (file-relative-name absolute-path default-directory))
                (abbreviate-path (abbreviate-file-name absolute-path))
                (final-path
@@ -1833,7 +1832,7 @@ one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
   (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
-        (format "<file://%s>" (ebib--expand-file-name (ebib--select-file files nil key)))
+        (format "<file://%s>" (ebib--expand-file-name (ebib--select-file files nil key) ebib-file-search-dirs))
       "")))
 
 (defun ebib-create-markdown-doi-link (key db)

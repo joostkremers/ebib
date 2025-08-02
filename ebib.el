@@ -3170,7 +3170,7 @@ file to choose."
 
 (defun ebib--call-file-viewer (file)
   "Open FILE with an external viewer."
-  (let ((file-full-path (ebib--expand-file-name file)))
+  (let ((file-full-path (ebib--expand-file-name file ebib-file-search-dirs)))
     (if (file-exists-p file-full-path)
         (let* ((ext (file-name-extension file-full-path))
                (viewer (cdr (assoc ext ebib-file-associations))))
