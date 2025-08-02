@@ -1626,12 +1626,11 @@ is searched for as well.  As a last resort, FILE is expanded relative to
 `expand-file-name' and return the result."
   (if (file-name-absolute-p file)
       (expand-file-name file)
-    (let* ((unmod-file (funcall ebib-file-name-mod-function file nil))
-           (dirs (append dirs
-                         (list (file-name-directory (ebib-db-get-filename ebib--cur-db))))))
-      (or (locate-file unmod-file dirs)
-          (locate-file (file-name-nondirectory unmod-file) dirs)
-          (expand-file-name unmod-file)))))
+    (let ((dirs (append dirs
+                        (list (file-name-directory (ebib-db-get-filename ebib--cur-db))))))
+      (or (locate-file file dirs)
+          (locate-file (file-name-nondirectory file) dirs)
+          (expand-file-name file)))))
 
 (defun ebib--split-files (files)
   "Split FILES (a string) into separate files.
@@ -1755,7 +1754,9 @@ one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
   (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
-        (let* ((absolute-path (ebib--expand-file-name (ebib--select-file files nil key) ebib-file-search-dirs))
+        (let* ((absolute-path (ebib--expand-file-name
+                               (funcall ebib-file-name-mod-function (ebib--select-file files nil key) nil)
+                               ebib-file-search-dirs))
                (relative-path (file-relative-name absolute-path default-directory))
                (abbreviated-path (abbreviate-file-name absolute-path))
                (final-path
@@ -1839,7 +1840,9 @@ one file name, the user is asked to select one.  If
 the \"file\" field is empty, return the empty string."
   (let ((files (ebib-get-field-value "file" key db 'noerror 'unbraced 'xref)))
     (if files
-        (format "<file://%s>" (ebib--expand-file-name (ebib--select-file files nil key) ebib-file-search-dirs))
+        (format "<file://%s>" (ebib--expand-file-name
+                               (funcall ebib-file-name-mod-function (ebib--select-file files nil key) nil)
+                               ebib-file-search-dirs))
       "")))
 
 (defun ebib-create-markdown-doi-link (key db)
