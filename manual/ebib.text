@@ -498,6 +498,8 @@ A database can serve as the main database for more than one dependent database, 
 
 If you save a dependent database, it is saved as a normal, standalone `.bib` file that can be used with `biblatex` or BibTeX. When you reopen the file in Ebib, a special comment at the top of the file makes sure that Ebib recognises it as a dependent database and loads the main database as well, if necessary. Note that when Ebib opens a dependent database, it only reads the entry keys from the `.bib` file. The data of each entry is taken from the main database. This means that if you edit a dependent database's `.bib` file outside of Ebib, the changes you make are ignored when you open the file in Ebib.
 
+Note that if the main database is located in one of the directories listed in the user option `ebib-bib-search-dirs`, the main database's name is saved to the dependent's `.bib` file as a relative file path. This makes it easier to use the same set of `.bib` files on different computers with different locations for the `.bib` files (e.g., because of different `HOME` directories).
+
 
 # Inserting Citations into a Text Buffer #
 
