@@ -1727,14 +1727,14 @@ the \"file\" field is empty, return the empty string."
     (if files
         (let* ((absolute-path (ebib--expand-file-name (ebib--select-file files nil key)))
                (relative-path (file-relative-name absolute-path default-directory))
-               (abbreviate-path (abbreviate-file-name absolute-path))
+               (abbreviated-path (abbreviate-file-name absolute-path))
                (final-path
                 (cl-case ebib-link-file-path-type
                   (relative relative-path)
                   (adaptive (if (string-match (concat "^" (regexp-quote default-directory))
                                               absolute-path)
                                 relative-path
-                              abbreviate-path))
+                              abbreviated-path))
                   (otherwise absolute-path))))
           (format "[[file:%s]]" final-path))
       "")))
