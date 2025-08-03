@@ -823,6 +823,8 @@ Another way to add entries to a database is to import them from an Emacs buffer.
 
 If a BibTeX entry in the buffer lacks an entry key (which sometimes happens with BibTeX entries found on the internet), Ebib will generate a temporary key for it of the form `<new-entryXX>`, where `XX` is a number. You can change such keys by hitting [`E`]{.key} in the index buffer. Such a key will also automatically be replaced with a more sensible key if you edit the entry. See the option `ebib-autogenerate-keys` for details.
 
+The user option `ebib-import-entries-filters` can be set to a list of functions that are applied to each entry that is imported. You can use this to make specific modifications to entries before they are added to the database. Each function should take a single entry as its sole argument and should return the modified entry. As a special case, if a filter function returns `nil`, the entry is not changed. (This is to make sure that a filter function cannot accidentally drop an entry entirely.)
+
 
 ## Integration with the Biblio package ##
 
@@ -852,6 +854,8 @@ Additionally, you can use the key [`B`]{.key} in Ebib's index buffer to import a
 When fetching entries via Biblio, Ebib checks for duplicates based on the key of the new entry. This will only work reliably if both Ebib and Biblio are configured to automatically generate BibTeX keys. Ebib does this by default (see the option `ebib-autogenerate-keys`), Biblio can be configured to do so by setting the option `biblio-bibtex-use-autokey`.
 
 Ebib and Biblio both use the functionality of `bibtex.el` to generate keys. Refer to the documentation string of the function `bibtex-generate-autokey` to find out how to customise this functionality.
+
+Entries imported through Biblio can also be modified using filter functions. The relevant user option is `ebib-biblio-import-filters`.
 
 
 ## Multiple Identical Fields ##

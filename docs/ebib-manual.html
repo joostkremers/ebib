@@ -2177,6 +2177,14 @@ class="key"><code>E</code></span> in the index buffer. Such a key will
 also automatically be replaced with a more sensible key if you edit the
 entry. See the option <code>ebib-autogenerate-keys</code> for
 details.</p>
+<p>The user option <code>ebib-import-entries-filters</code> can be set
+to a list of functions that are applied to each entry that is imported.
+You can use this to make specific modifications to entries before they
+are added to the database. Each function should take a single entry as
+its sole argument and should return the modified entry. As a special
+case, if a filter function returns <code>nil</code>, the entry is not
+changed. (This is to make sure that a filter function cannot
+accidentally drop an entry entirely.)</p>
 <h2 id="integration-with-the-biblio-package">Integration with the Biblio
 package</h2>
 <p><a href="https://github.com/cpitclaudel/biblio.el">Biblio</a> is a
@@ -2216,6 +2224,9 @@ Biblio can be configured to do so by setting the option
 to generate keys. Refer to the documentation string of the function
 <code>bibtex-generate-autokey</code> to find out how to customise this
 functionality.</p>
+<p>Entries imported through Biblio can also be modified using filter
+functions. The relevant user option is
+<code>ebib-biblio-import-filters</code>.</p>
 <h2 id="multiple-identical-fields">Multiple Identical Fields</h2>
 <p>Under normal circumstances, a BibTeX entry only contains one
 occurrence of each field. If <code>biblatex</code> or BibTeX notices

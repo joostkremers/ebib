@@ -1,5 +1,9 @@
 % Ebib News
 
+## Version 2.51, August 2025 ##
+
+- Add import filters and user options `ebib-import-entries-filters` and `ebib-biblio-import-filters`.
+
 ## Version 2.50, March 2025 ##
 
 - New user options `ebib-import-file-functions` and `ebib-url-download-functions`.

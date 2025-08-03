@@ -2101,6 +2101,15 @@ Such a key will also automatically be replaced with a more sensible key
 if you edit the entry.  See the option ‘ebib-autogenerate-keys’ for
 details.
 
+The user option ‘ebib-import-entries-filters’ can be set to a list of
+functions that are applied to each entry that is imported.  You can use
+this to make specific modifications to entries before they are added to
+the database.  Each function should take a single entry as its sole
+argument and should return the modified entry.  As a special case, if a
+filter function returns ‘nil’, the entry is not changed.  (This is to
+make sure that a filter function cannot accidentally drop an entry
+entirely.)
+
 
 File: ebib.info,  Node: Integration with the Biblio package,  Next: Multiple Identical Fields,  Prev: Importing entries from a buffer,  Up: Importing BibTeX entries
 
@@ -2145,6 +2154,9 @@ Ebib and Biblio both use the functionality of ‘bibtex.el’ to generate
 keys.  Refer to the documentation string of the function
 ‘bibtex-generate-autokey’ to find out how to customise this
 functionality.
+
+Entries imported through Biblio can also be modified using filter
+functions.  The relevant user option is ‘ebib-biblio-import-filters’.
 
 
 File: ebib.info,  Node: Multiple Identical Fields,  Prev: Integration with the Biblio package,  Up: Importing BibTeX entries
@@ -3357,50 +3369,50 @@ Node: Merging bib files99694
 Ref: #merging-bib-files99865
 Node: Importing entries from a buffer100454
 Ref: #importing-entries-from-a-buffer100687
-Node: Integration with the Biblio package101694
-Ref: #integration-with-the-biblio-package101943
-Node: Multiple Identical Fields103728
-Ref: #multiple-identical-fields103917
-Node: Linking to external resources105849
-Ref: #linking-to-external-resources106034
-Node: Viewing and Importing Files106236
-Ref: #viewing-and-importing-files106436
-Node: Editing the file field112457
-Ref: #editing-the-file-field112608
-Node: Calling a Browser for URLs and DOIs113997
-Ref: #calling-a-browser-for-urls-and-dois114213
-Node: Notes files116926
-Ref: #notes-files117076
-Node: Configuring files for storing notes118651
-Ref: #configuring-files-for-storing-notes118829
-Node: Hooks121799
-Ref: #hooks121962
-Node: Upgrading from earlier Ebib versions123359
-Ref: #upgrading-from-earlier-ebib-versions123582
-Node: Customising the notes file format124492
-Ref: #customising-the-notes-file-format124720
-Node: Displaying notes128499
-Ref: #displaying-notes128681
-Node: Using Markdown for notes130026
-Ref: #using-markdown-for-notes130224
-Node: Using org-capture to record notes133882
-Ref: #using-org-capture-to-record-notes134081
-Node: Managing a reading list140078
-Ref: #managing-a-reading-list140240
-Node: Managing Keywords143257
-Ref: #managing-keywords143413
-Node: Using a Canonical Keywords List145020
-Ref: #using-a-canonical-keywords-list145178
-Node: Window Management147308
-Ref: #window-management147473
-Node: Copying Entries to the Kill Ring150652
-Ref: #copying-entries-to-the-kill-ring150851
-Node: Printing the Database153575
-Ref: #printing-the-database153748
-Node: Customisation157228
-Ref: #customisation157344
-Node: Modifying Key Bindings158835
-Ref: #modifying-key-bindings158962
+Node: Integration with the Biblio package102205
+Ref: #integration-with-the-biblio-package102454
+Node: Multiple Identical Fields104380
+Ref: #multiple-identical-fields104569
+Node: Linking to external resources106501
+Ref: #linking-to-external-resources106686
+Node: Viewing and Importing Files106888
+Ref: #viewing-and-importing-files107088
+Node: Editing the file field113109
+Ref: #editing-the-file-field113260
+Node: Calling a Browser for URLs and DOIs114649
+Ref: #calling-a-browser-for-urls-and-dois114865
+Node: Notes files117578
+Ref: #notes-files117728
+Node: Configuring files for storing notes119303
+Ref: #configuring-files-for-storing-notes119481
+Node: Hooks122451
+Ref: #hooks122614
+Node: Upgrading from earlier Ebib versions124011
+Ref: #upgrading-from-earlier-ebib-versions124234
+Node: Customising the notes file format125144
+Ref: #customising-the-notes-file-format125372
+Node: Displaying notes129151
+Ref: #displaying-notes129333
+Node: Using Markdown for notes130678
+Ref: #using-markdown-for-notes130876
+Node: Using org-capture to record notes134534
+Ref: #using-org-capture-to-record-notes134733
+Node: Managing a reading list140730
+Ref: #managing-a-reading-list140892
+Node: Managing Keywords143909
+Ref: #managing-keywords144065
+Node: Using a Canonical Keywords List145672
+Ref: #using-a-canonical-keywords-list145830
+Node: Window Management147960
+Ref: #window-management148125
+Node: Copying Entries to the Kill Ring151304
+Ref: #copying-entries-to-the-kill-ring151503
+Node: Printing the Database154227
+Ref: #printing-the-database154400
+Node: Customisation157880
+Ref: #customisation157996
+Node: Modifying Key Bindings159487
+Ref: #modifying-key-bindings159614
 
 End Tag Table
 
