@@ -5391,7 +5391,9 @@ database (i.e., the database that was active when Ebib was
 lowered.  Works on the whole buffer, or on the region if it is
 active.
 
-FILTERS is passed straight to `ebib--bib-find-bibtex-entries'."
+FILTERS is passed to `ebib--bib-find-bibtex-entries' unchanged, which
+see.  If FILTERS is nil, the value of `ebib-import-entries-filters' is
+used (which may also be nil, obviously)."
   (interactive)
   (ebib--execute-when
     (real-db
@@ -5404,7 +5406,7 @@ FILTERS is passed straight to `ebib--bib-find-bibtex-entries'."
                (buffer (current-buffer)))
            (with-temp-buffer
              (insert-buffer-substring buffer)
-             (let ((result (ebib--bib-find-bibtex-entries db t filters)))
+             (let ((result (ebib--bib-find-bibtex-entries db t (or filters ebib-import-entries-filters))))
                (ebib-db-set-modified t db)
                (if-let* ((index (ebib-db-get-buffer db))
                          (window (get-buffer-window index t)))

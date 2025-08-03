@@ -997,6 +997,13 @@ https://doi.org/.  Note that this URL must end in a slash."
 
 (make-obsolete-variable 'ebib-file-field "The standard file field can no longer be customized" "Ebib 2.27")
 
+(defcustom ebib-import-entries-filters nil
+  "List of filters for entries imported from a buffer.
+These filters are applied when importing entries with the command
+`ebib-import-entries', which see."
+  :group 'ebib
+  :type '(list function))
+
 (defcustom ebib-import-source-directory "~/Downloads/"
   "Directory to import files from.
 When using the command `ebib-import-file', this directory is
