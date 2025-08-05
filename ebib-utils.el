@@ -1098,7 +1098,7 @@ function."
   :type '(choice (const :tag "Do not apply any function" identity)
                  (function :tag "Apply function")))
 
-(defcustom ebib-file-name-mod-function 'identity
+(defcustom ebib-file-name-mod-function 'ebib-dont-change-file-name
   "Function to modify a file name in the file field.
 This function should take two arguments, the first being the file
 name (absolute or relative), the second either t or nil.  If t,
@@ -1106,8 +1106,13 @@ the file name should be modified for storing, if nil the
 modifications should be undone so that the file name can be
 passed to an external viewer."
   :group 'ebib
-  :type '(choice (const :tag "Do not modify file names" identity)
+  :type '(choice (const :tag "Do not modify file names" ebib-dont-change-file-name)
                  (function :tag "Modification function")))
+
+(defun ebib-dont-change-file-name (file _)
+  "Return FILE unchanged.
+This function is the default value for `ebib-file-name-mod-function'."
+  file)
 
 (defcustom ebib-local-variable-indentation ""
   "Indentation of the local variable block."
