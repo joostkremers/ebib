@@ -4057,12 +4057,19 @@ The prefix argument PFX is used to determine whether the command
 was called interactively."
   (interactive "p")
   (let ((field-end (next-single-property-change (point) 'ebib-field-end)))
-    (if (= (1+ field-end) (point-max))  ; If we would end up at the empty line
-        (if pfx                         ; below the last field, beep.
-            (beep))
-      (goto-char (1+ field-end))        ; Otherwise move point.
-      (while (ebib--line-at-point)      ; And see if we need to adjust.
-        (forward-line 1)))))
+    (cond
+     ;; If we're past the last 'ebib-field-end' change (e.g., after end-of-buffer),
+     ;; do nothing and optionally beep when called interactively.
+     ((null field-end)
+      (when pfx (beep)))
+     ;; If we would end up at the empty line below the last field, just beep.
+     ((= (1+ field-end) (point-max))
+      (when pfx (beep)))
+     ;; Otherwise move point to the next field and adjust if needed.
+     (t
+      (goto-char (1+ field-end))
+      (while (ebib--line-at-point)
+        (forward-line 1))))))
 
 (defun ebib-goto-first-field ()
   "Move to the first field."
