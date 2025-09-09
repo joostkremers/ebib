@@ -3,6 +3,7 @@
 ## Version 2.52, August 2025 ##
 
 - Add import filters and user options `ebib-import-entries-filters` and `ebib-biblio-import-filters`.
+- Use a relative path in a dependent .bib file to point to the main database, if the main database is in `ebib-bib-search-dirs`.
 
 ## Version 2.51, August 2025 ##
 
