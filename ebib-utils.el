@@ -342,7 +342,10 @@ If the sorting flag is t, a sorting function is looked up in
 impossible.
 
 Note that the default sort field is the first field in this
-option.  See also `ebib-index-default-sort'."
+option.  See also `ebib-index-default-sort'.
+
+Note also that the width of the last column is ignored: instead, the
+entire remaining width of the window is used."
   :group 'ebib
   :type '(repeat (list  (string :tag "Field")
                         (integer :tag "Width")
