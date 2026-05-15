@@ -649,7 +649,9 @@ its contents, unless the buffer-local value of
 not have an associated index buffer, create one and fill it."
   (let ((window (get-buffer-window (ebib--buffer 'index)))
         (index-buffer (when ebib--cur-db
-                        (ebib-db-get-buffer ebib--cur-db))))
+                        (let ((buffer (ebib-db-get-buffer ebib--cur-db)))
+                          (and (buffer-live-p buffer)
+                               buffer)))))
     (when (not index-buffer)
       (setq index-buffer (ebib--get-or-create-index-buffer ebib--cur-db))
       (setq no-refresh nil)) ; We just created the index buffer, so we need to fill it.
@@ -840,6 +842,7 @@ loaded, switch to it.  If KEY is given, jump to it."
     (ebib-init)
     (setq ebib--needs-update t)
     (ebib-check-notes-config))
+  (ebib--ensure-buffers)
   ;; Set up the windows.
   (ebib--setup-windows)
   ;; See if we have a file.
@@ -949,24 +952,32 @@ window and make the frame active,"
 (defun ebib--create-buffers ()
   "Create the buffers for Ebib."
   ;; First we create a buffer to hold the fields of the current entry.
-  (push (cons 'entry (get-buffer-create "*Ebib-entry*")) ebib--buffer-alist)
+  (setf (alist-get 'entry ebib--buffer-alist) (get-buffer-create "*Ebib-entry*"))
   (with-current-ebib-buffer 'entry
     (ebib-entry-mode)
     (buffer-disable-undo))
   ;; Then we create a buffer to hold the @String definitions.
-  (push (cons 'strings (get-buffer-create "*Ebib-strings*")) ebib--buffer-alist)
+  (setf (alist-get 'strings ebib--buffer-alist) (get-buffer-create "*Ebib-strings*"))
   (with-current-ebib-buffer 'strings
     (ebib-strings-mode)
     (buffer-disable-undo))
   ;; The log buffer.
-  (push (cons 'log (get-buffer-create "*Ebib-log*")) ebib--buffer-alist)
+  (setf (alist-get 'log ebib--buffer-alist) (get-buffer-create "*Ebib-log*"))
   (with-current-ebib-buffer 'log
     (erase-buffer)
     (insert "Ebib log messages\n\n(Press C-v or SPACE to scroll down, M-v or `b' to scroll up, `q' to quit.)\n\n")
     (ebib-log-mode)
     (buffer-disable-undo))
   ;; And lastly we create a buffer for the entry keys.
-  (push (cons 'index (ebib--get-or-create-index-buffer)) ebib--buffer-alist))
+  (setf (alist-get 'index ebib--buffer-alist) (ebib--get-or-create-index-buffer)))
+
+(defun ebib--ensure-buffers ()
+  "Recreate Ebib buffers that have been killed."
+  (unless (seq-every-p (lambda (buffer)
+                         (buffer-live-p (ebib--buffer buffer)))
+                       '(entry strings log index))
+    (ebib--create-buffers)
+    (setq ebib--needs-update t)))
 
 (defun ebib--get-or-create-index-buffer (&optional db)
   "Create an index buffer for DB.
@@ -974,7 +985,9 @@ If DB already has an index buffer, return it instead.  If DB is
 nil, get or create a buffer named \" Ebib (no file)\".  Return
 the new buffer."
   (let ((buffer (if db
-                    (or (ebib-db-get-buffer db)
+                    (or (let ((index-buffer (ebib-db-get-buffer db)))
+                          (and (buffer-live-p index-buffer)
+                               index-buffer))
                         (generate-new-buffer (ebib-db-get-filename db 'short)))
                   (get-buffer-create ebib--empty-index-buffer-name))))
     (with-current-buffer buffer
