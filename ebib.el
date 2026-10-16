@@ -7,7 +7,7 @@
 ;; Author: Joost Kremers <joostkremers@fastmail.fm>
 ;; Maintainer: Joost Kremers <joostkremers@fastmail.fm>
 ;; Created: 2003
-;; Version: 2.51
+;; Version: 2.53.1
 ;; Keywords: text bibtex
 ;; URL: http://joostkremers.github.io/ebib/
 ;; Package-Requires: ((parsebib "6.0") (emacs "27.1") (compat "29.1.4.3"))
