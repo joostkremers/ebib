@@ -4778,25 +4778,24 @@ arguments for compatibility with `ebib-field-edit-functions'."
   (let ((key (ebib--get-key-at-point)))
     (if (ebib-get-field-value field key ebib--cur-db 'noerror)
         (beep)
-      (let* ((strings (ebib-db-list-strings ebib--cur-db)))
-        (when strings
-          (with-selected-window (get-buffer-window (ebib--buffer 'index))
-            (let* ((target-len (+ 2 (apply #'max (mapcar #'length strings))))
-                   (annotation-function
-                    (lambda (item)
-                      (when-let* ((expansion (ebib--expand-string item ebib--cur-db t)))
-                        (format "%s%s"
-                                (make-string (- target-len (length item)) ? )
-                                expansion))))
-                   (completion-extra-properties (list :annotation-function annotation-function))
-                   (string (completing-read "Abbreviation to insert: " strings nil t)))
-              (when string
-                (ebib-set-field-value field string key ebib--cur-db 'overwrite 'unbraced)
-                (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
-                                                                   (ebib-db-has-key key dependent))
-                                                                 (ebib--list-dependents ebib--cur-db))))))
-          (ebib--redisplay-field field)
-          (ebib-next-field))))))
+      (when-let* ((strings (ebib-db-list-strings ebib--cur-db)))
+        (with-selected-window (get-buffer-window (ebib--buffer 'index))
+          (let* ((target-len (+ 2 (apply #'max (mapcar #'length strings))))
+                 (annotation-function
+                  (lambda (item)
+                    (when-let* ((expansion (ebib--expand-string item ebib--cur-db t)))
+                      (format "%s%s"
+                              (make-string (- target-len (length item)) ? )
+                              expansion))))
+                 (completion-extra-properties (list :annotation-function annotation-function))
+                 (string (completing-read "Abbreviation to insert: " strings nil t)))
+            (when string
+              (ebib-set-field-value field string key ebib--cur-db 'overwrite 'unbraced)
+              (ebib--set-modified t ebib--cur-db t (seq-filter (lambda (dependent)
+                                                                 (ebib-db-has-key key dependent))
+                                                               (ebib--list-dependents ebib--cur-db))))))
+        (ebib--redisplay-field field)
+        (ebib-next-field)))))
 
 (defun ebib-insert-abbreviation-current-field ()
   "Insert an abbreviation into current field from the ones defined the database ."
